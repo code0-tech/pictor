@@ -1,4 +1,5 @@
 import React from 'react';
+import "./_my-component.scss"
 
 export type MyComponentProps = {}
 

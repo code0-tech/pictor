@@ -1,5 +1,5 @@
 {
-  "name": "@code0-tech/base-ui-test",
+  "name": "@code0-tech/base-ui",
   "version": "0.0.0",
   "description": "A simple template for a custom React component library",
   "scripts": {

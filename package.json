@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "A simple template for a custom React component library",
   "scripts": {
-    "dev": "npm run dev-storybook",
+    "dev": "npm run storybook:dev",
     "build": "npm run clear && npm run rollup",
     "clear": "concurrently --kill-others \"rimraf ./dist\" \"rimraf ./storybook-static\"",
     "rollup": "rollup -c",

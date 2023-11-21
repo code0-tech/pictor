@@ -7,7 +7,7 @@
     "build": "npm run clear && npm run rollup",
     "clear": "concurrently --kill-others \"rimraf ./dist\" \"rimraf ./storybook-static\"",
     "rollup": "rollup -c",
-    "dev-storybook": "storybook dev -p 6006",
+    "storybook:dev": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "author": "Code0",

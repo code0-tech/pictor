@@ -8,7 +8,7 @@
     "clear": "concurrently --kill-others \"rimraf ./dist\" \"rimraf ./storybook-static\"",
     "rollup": "rollup -c",
     "storybook:dev": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "storybook:build": "storybook build"
   },
   "author": "Code0",
   "license": "MIT",

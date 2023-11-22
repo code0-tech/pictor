@@ -1,0 +1,20 @@
+name: Storybook
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  storybook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Taucher2003/GitLab-Pipeline-Action@1.1.0
+        name: Run pipeline
+        with:
+          GL_SERVER_URL: https://gitlab.com
+          GL_PROJECT_ID: '52344025'
+          GL_RUNNER_TOKEN: ${{ secrets.GL_RUNNER_TOKEN }}
+          GL_API_TOKEN: ${{ secrets.GL_API_TOKEN }}
+          SHOW_JOB_LOGS: all

@@ -1,0 +1,15 @@
+storybook:build:
+  image: node:20.9.0
+  stage: build
+  script:
+    - npm ci
+    - npm run storybook:build
+    - echo "Storybook available at https://code0-tech.gitlab.io/-/base-ui/-/jobs/$CI_JOB_ID/artifacts/storybook-static/index.html"
+  environment:
+    name: storybook/$CI_COMMIT_REF_SLUG
+    url: https://code0-tech.gitlab.io/-/base-ui/-/jobs/$CI_JOB_ID/artifacts/storybook-static/index.html
+    auto_stop_in: 7 days
+  artifacts:
+    paths:
+      - storybook-static
+    expire_in: 7 days

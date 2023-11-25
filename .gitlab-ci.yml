@@ -4,7 +4,10 @@ storybook:build:
   script:
     - npm ci
     - npm run storybook:build
-    - echo "Storybook available at https://code0-tech.gitlab.io/-/base-ui/-/jobs/$CI_JOB_ID/artifacts/storybook-static/index.html"
+    - |
+      echo -e "\e[0Ksection_start:`date +%s`:glpa_summary\r\e[0KHeader of the summary"
+      echo "Storybook available at https://code0-tech.gitlab.io/-/base-ui/-/jobs/$CI_JOB_ID/artifacts/storybook-static/index.html"
+      echo -e "\e[0Ksection_end:`date +%s`:glpa_summary\r\e[0K"
   environment:
     name: storybook/$CI_COMMIT_REF_SLUG
     url: https://code0-tech.gitlab.io/-/base-ui/-/jobs/$CI_JOB_ID/artifacts/storybook-static/index.html

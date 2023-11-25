@@ -6,15 +6,39 @@ on:
       - main
   pull_request:
 
+permissions:
+  pull-requests: write
+
 jobs:
   storybook:
     runs-on: ubuntu-latest
     steps:
-      - uses: Taucher2003/GitLab-Pipeline-Action@1.1.0
+      - uses: Taucher2003/GitLab-Pipeline-Action@1.2.0
         name: Run pipeline
+        id: pipeline
         with:
           GL_SERVER_URL: https://gitlab.com
           GL_PROJECT_ID: '52344025'
           GL_RUNNER_TOKEN: ${{ secrets.GL_RUNNER_TOKEN }}
           GL_API_TOKEN: ${{ secrets.GL_API_TOKEN }}
           SHOW_JOB_LOGS: all
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v2
+        id: find-comment
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: <!-- glpa_comment:storybook -->
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v3
+        if: ${{ !cancelled() && github.event_name == 'pull_request' }}
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            <!-- glpa_comment:storybook -->
+            ${{ steps.pipeline.outputs.SUMMARY_TEXT }}
+          edit-mode: replace

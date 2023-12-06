@@ -1,0 +1,173 @@
+.input {
+  margin-bottom: 1rem;
+  max-width: 300px;
+
+  &:last-child, &:last-of-type {
+    margin-bottom: 0;
+  }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: 50%;
+  }
+
+  &__control {
+    background: rgba(white, .1);
+    border: 1px solid rgba(white, .25);
+    border-radius: .5rem;
+    display: flex;
+    position: relative;
+    align-items: center;
+
+    &:hover, &:active, &--focus {
+      border: 1px solid rgba(white, .5);
+    }
+  }
+
+  &__label {
+    color: rgba(white, .5);
+    font-size: .75rem;
+    font-family: Ubuntu, sans-serif;
+    margin-bottom: .5rem;
+    display: block;
+    text-transform: uppercase;
+  }
+
+  &__field {
+    position: relative;
+    display: inline-block;
+    background: none;
+    padding: .5rem 0;
+    width: 100%;
+    color: rgba(white, .5);
+    font-family: Ubuntu, sans-serif;
+    border: none;
+    outline: none;
+    margin: .25rem .25rem .25rem .5rem;
+    box-shadow: none;
+    font-size: 1rem;
+
+    &::placeholder {
+      color: rgba(white, .25);
+    }
+  }
+
+  &__icon {
+    color: rgba(white, .5);
+    background: rgba(white, .1);
+    border: 1px solid rgba(white, .25);
+
+    width: 1rem;
+    height: 1rem;
+    padding: .25rem;
+    margin-left: .5rem;
+    border-radius: 100rem;
+
+    > svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+  }
+
+  &__desc {
+    padding-left: 1rem;
+    color: rgba(white, .5);
+    font-size: .75rem;
+    font-family: Ubuntu, sans-serif;
+    margin: .5rem 0;
+
+    &:before {
+      content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin slice" width="12" height="12" viewBox="0 -2 24 24" stroke-width="2" stroke="rgba(255, 255, 255, 0.5)" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>');
+      height: .75rem;
+      width: .75rem;
+      padding: .25rem 0;
+      margin-right: .25rem;
+    }
+  }
+
+  &__message {
+    display: none;
+    position: relative;
+    color: rgba(white, .5);
+    border-radius: 0 0 .5rem .5rem;
+    font-size: .75rem;
+    font-family: Ubuntu, sans-serif;
+    width: 100%;
+    max-width: 100%;
+
+    &:before {
+      position: absolute;
+      content: "";
+      width: .5rem;
+      height: 1rem;
+      top: -1rem;
+      border-bottom-left-radius: 50rem;
+      left: 0;
+      z-index: -1;
+
+    }
+
+    &:after {
+      position: absolute;
+      content: "";
+      width: .5rem;
+      height: 1rem;
+      top: -1rem;
+      border-bottom-right-radius: 50rem;
+      right: 0;
+      z-index: -1;
+
+    }
+
+    > p {
+      margin: 0;
+      padding: .5rem .5rem .5rem 1rem;
+
+      &:before {
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMin slice" width="12" height="12" viewBox="0 -2 24 24" stroke-width="2" stroke="rgba(255, 255, 255, 0.5)" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>');
+        height: .75rem;
+        width: .75rem;
+        padding: .25rem 0;
+        margin-right: .25rem;
+      }
+    }
+  }
+
+  &--not-valid {
+    .input__message {
+      display: block;
+      background: #3e0019;
+
+      &:before {
+        background: rgba(#3e0019, 0);
+        box-shadow: 0 .5rem 0 0 #3e0019;
+
+      }
+
+      &:after {
+        background: rgba(#3e0019, 0);
+        box-shadow: 0 .5rem 0 0 #3e0019;
+      }
+
+    }
+  }
+
+  &--valid {
+    .input__message {
+      display: block;
+      background: #003110;
+
+      &:before {
+        background: rgba(#003110, 0);
+        box-shadow: 0 .5rem 0 0 #003110;
+
+      }
+
+      &:after {
+        background: rgba(#003110, 0);
+        box-shadow: 0 .5rem 0 0 #003110;
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "@code0-tech/base-ui",
-  "version": "0.0.0",
+  "version": "0.1.0-pre-alpha",
   "description": "A simple template for a custom React component library",
   "scripts": {
     "dev": "npm run storybook:dev",
@@ -27,9 +27,12 @@
     "@storybook/addon-onboarding": "^1.0.8",
     "@storybook/blocks": "^7.5.3",
     "@storybook/cli": "^7.5.3",
+    "@storybook/manager-api": "^7.5.3",
     "@storybook/react": "^7.5.3",
     "@storybook/react-vite": "^7.5.3",
     "@storybook/testing-library": "^0.2.2",
+    "@storybook/theming": "^7.5.3",
+    "@tabler/icons-react": "^2.42.0",
     "@types/react": "^18.0.15",
     "babel-loader": "^8.2.3",
     "concurrently": "^8.2.2",
@@ -55,6 +58,7 @@
   ],
   "types": "dist/index.d.ts",
   "peerDependencies": {
+    "@tabler/icons-react": "2.42.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },

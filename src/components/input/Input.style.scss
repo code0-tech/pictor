@@ -56,9 +56,15 @@
     color: rgba(white, .5);
     background: rgba(white, .1);
     border: 1px solid rgba(white, .25);
+    overflow: hidden;
 
+    display: flex;
     width: 1rem;
-    height: 1rem;
+    height: auto;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 50/50;
     padding: .25rem;
     margin-left: .5rem;
     border-radius: 100rem;

@@ -1,7 +1,6 @@
 import React, {DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode} from "react";
 import "./Input.style.scss"
-import {b} from "@storybook/theming/dist/create-3ae9aa71";
-import {Icon, TablerIconsProps} from "@tabler/icons-react";
+import {TablerIconsProps} from "@tabler/icons-react";
 
 export interface InputType {
     children: React.ReactNode | React.ReactNode[]
@@ -27,11 +26,11 @@ export type InputControlTypesType = "email"
 // params / props declaration for InputComponent
 export interface InputControlType extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
     placeholder: string
-    children: React.ReactNode
+    //TODO: allow both as non required and make sure this does not result in errors inside the component
+    children: ReactElement<InputControlMessageType | InputControlIconType>[]
 
     //default is text type
     type?: InputControlTypesType
-    icon?: ReactElement<Partial<Omit<TablerIconsProps, "size">>>
 }
 
 const Input: React.FC<InputType> = (props: InputType) => {
@@ -59,13 +58,12 @@ const Input: React.FC<InputType> = (props: InputType) => {
  */
 const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
 
-    const {type, placeholder, children, icon} = props
-
+    const {type, placeholder, children} = props
+    const icon = children.find(child => child.type == InputControlIcon)
+    const message = children.find(child => child.type == InputControlMessage)
     return <>
         <div className={"input__control"}>
-            {icon ? <span className={"input__icon"}>
-                {icon}
-            </span> : null}
+            {icon ?? null}
             <input onFocus={event => {
                 if (event.target.parentElement)
                     event.target.parentElement.classList.add("input__control--focus")
@@ -74,12 +72,26 @@ const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
                     event.target.parentElement.classList.remove("input__control--focus")
             }} type={type} placeholder={placeholder} className={"input__field"}/>
         </div>
-        {children}
+        {message ?? null}
     </>
 }
 
-const InputControlMessage: React.FC<{ children: string }> = ({children}) => {
+export type InputControlMessageType = {
+    children: string
+}
+
+const InputControlMessage: React.FC<InputControlMessageType> = ({children}) => {
     return <div className={"input__message"}><p>{children}</p></div>
+}
+
+export type InputControlIconType = {
+    children: ReactElement<TablerIconsProps>
+}
+
+const InputControlIcon: React.FC<InputControlIconType> = ({children}) => {
+    return <span className={"input__icon"}>
+        {children}
+    </span>
 }
 
 const InputLabel: React.FC<{ children: string }> = ({children}) => {
@@ -94,6 +106,7 @@ export default Object.assign(Input, {
     Desc: InputDesc,
     Label: InputLabel,
     Control: Object.assign(InputControl, {
-        Message: InputControlMessage
+        Message: InputControlMessage,
+        Icon: InputControlIcon
     })
 });

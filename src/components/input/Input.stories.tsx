@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import Input from "./Input";
 import {IconMail} from "@tabler/icons-react";
 
@@ -9,11 +9,10 @@ export default {
 
 export const Mail = () => <Input>
     <Input.Label>e-mail</Input.Label>
-    <Input.Control placeholder={"name@mail.com"} onFocus={event => {
-        console.log("sdsd")
-    }}/>
+    <Input.Control placeholder={"name@mail.com"}/>
     <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
 </Input>
+
 
 export const Disabled = () => <Input disabled>
     <Input.Control placeholder={"Your Mail"}>

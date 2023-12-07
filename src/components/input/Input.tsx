@@ -1,4 +1,4 @@
-import React, {DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode} from "react";
+import React, {DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode, RefAttributes} from "react";
 import "./Input.style.scss"
 import {TablerIconsProps} from "@tabler/icons-react";
 
@@ -8,6 +8,17 @@ export interface InputType {
     disabled?: boolean
     //defaults to undefined
     valid?: boolean | undefined
+}
+
+
+const Input: React.FC<InputType> = (props: InputType) => {
+
+    const {disabled, children, valid} = props
+
+    return <div
+        className={`input ${disabled ? "input--disabled" : ""} ${valid ? "input--valid" : valid !== undefined ? "input--not-valid" : ""}`}>
+        {children}
+    </div>
 }
 
 export type InputControlTypesType = "email"
@@ -33,16 +44,6 @@ export interface InputControlType extends DetailedHTMLProps<InputHTMLAttributes<
     type?: InputControlTypesType
 }
 
-const Input: React.FC<InputType> = (props: InputType) => {
-
-    const {disabled, children, valid} = props
-
-    return <div
-        className={`input ${disabled ? "input--disabled" : ""} ${valid ? "input--valid" : valid !== undefined ? "input--not-valid" : ""}`}>
-        {children}
-    </div>
-}
-
 /**
  * Component to create the input. Manages the icon and the success / failure message.
  * Extends the normal HTMLInputElement to allow further adjustments.
@@ -53,7 +54,7 @@ const Input: React.FC<InputType> = (props: InputType) => {
  * @since 0.1.0-pre-alpha
  * @author Nico Sammito
  */
-const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
+const InputControl: React.ForwardRefExoticComponent<Omit<InputControlType, "ref"> & RefAttributes<HTMLInputElement>> = React.forwardRef<HTMLInputElement, InputControlType>((props, ref) => {
 
     const {type, placeholder, children, ...args} = props
     const childNodes = children && !Array.isArray(children) ? Array.of(children) : children;
@@ -80,11 +81,11 @@ const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
     return <>
         <div className={"input__control"}>
             {icon ?? null}
-            <input type={type} placeholder={placeholder} className={"input__field"} {...args}/>
+            <input ref={ref} type={type} placeholder={placeholder} className={"input__field"} {...args}/>
         </div>
         {message ?? null}
     </>
-}
+})
 
 export type InputControlMessageType = {
     children: string
@@ -104,11 +105,20 @@ const InputControlIcon: React.FC<InputControlIconType> = ({children}) => {
     </span>
 }
 
-const InputLabel: React.FC<{ children: string }> = ({children}) => {
+export type InputLabelType = {
+    children: string
+}
+
+const InputLabel: React.FC<InputLabelType> = ({children}) => {
     return <label className={"input__label"}>{children}</label>
 }
 
-const InputDesc: React.FC<{ children: string }> = ({children}) => {
+
+export type InputDescType = {
+    children: string
+}
+
+const InputDesc: React.FC<InputDescType> = ({children}) => {
     return <p className={"input__desc"}>{children}</p>
 }
 

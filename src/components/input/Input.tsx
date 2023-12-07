@@ -44,36 +44,43 @@ const Input: React.FC<InputType> = (props: InputType) => {
 }
 
 /**
- * basic input component with code0 design and standard features like error or
- * success design or labeling and description
+ * Component to create the input. Manages the icon and the success / failure message.
+ * Extends the normal HTMLInputElement to allow further adjustments.
  *
  * @example
- * <Input label={} desc={} args...>Some description text</Input>
- *
- * @param props
- * @return the Input component as a {@link React.FC} with given parameters in JSX
+ * <Input.Control placeholder={} type={} args...>{@link InputControlIcon} {@link InputControlMessage}</Input.Control>
  *
  * @since 0.1.0-pre-alpha
  * @author Nico Sammito
  */
 const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
 
-    const {type, placeholder, children} = props
-    const icon = children.find(child => child.type == InputControlIcon)
-    const message = children.find(child => child.type == InputControlMessage)
+    const {type, placeholder, children, ...args} = props
     const childNodes = children && !Array.isArray(children) ? Array.of(children) : children;
     const icon = childNodes ?  childNodes.find(child => child.type == InputControlIcon) : null
     const message = childNodes ? childNodes.find(child => child.type == InputControlMessage) : null
+
+    const onFocusParam = args.onFocus
+    const onBlurParam = args.onBlur
+
+    const onFocus = ((event: React.FocusEvent<HTMLInputElement>) => {
+        if (event.target.parentElement)
+            event.target.parentElement.classList.add("input__control--focus")
+        if (onFocusParam) onFocusParam(event)
+    })
+    const onBlur = ((event: React.FocusEvent<HTMLInputElement>) => {
+        if (event.target.parentElement)
+            event.target.parentElement.classList.remove("input__control--focus")
+        if (onBlurParam) onBlurParam(event)
+    })
+
+    args.onFocus = onFocus
+    args.onBlur = onBlur
+
     return <>
         <div className={"input__control"}>
             {icon ?? null}
-            <input onFocus={event => {
-                if (event.target.parentElement)
-                    event.target.parentElement.classList.add("input__control--focus")
-            }} onBlur={event => {
-                if (event.target.parentElement)
-                    event.target.parentElement.classList.remove("input__control--focus")
-            }} type={type} placeholder={placeholder} className={"input__field"}/>
+            <input type={type} placeholder={placeholder} className={"input__field"} {...args}/>
         </div>
         {message ?? null}
     </>

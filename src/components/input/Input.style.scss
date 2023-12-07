@@ -25,7 +25,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      border-radius: .5rem;
+      border-radius: inherit;
       padding: 1px; /* control the border thickness */
       background: linear-gradient(0deg, rgba(white, 0), rgba(white, .1));
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);

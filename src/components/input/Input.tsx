@@ -27,7 +27,7 @@ export type InputControlTypesType = "email"
 export interface InputControlType extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
     placeholder: string
     //TODO: allow both as non required and make sure this does not result in errors inside the component
-    children: ReactElement<InputControlMessageType | InputControlIconType>[]
+    children?: ReactElement<InputControlMessageType | InputControlIconType>[] | ReactElement<InputControlMessageType | InputControlIconType>
 
     //default is text type
     type?: InputControlTypesType
@@ -61,6 +61,9 @@ const InputControl: React.FC<InputControlType> = (props: InputControlType) => {
     const {type, placeholder, children} = props
     const icon = children.find(child => child.type == InputControlIcon)
     const message = children.find(child => child.type == InputControlMessage)
+    const childNodes = children && !Array.isArray(children) ? Array.of(children) : children;
+    const icon = childNodes ?  childNodes.find(child => child.type == InputControlIcon) : null
+    const message = childNodes ? childNodes.find(child => child.type == InputControlMessage) : null
     return <>
         <div className={"input__control"}>
             {icon ?? null}

@@ -13,14 +13,31 @@
 
   &__control {
     background: rgba(white, .1);
-    border: 1px solid rgba(white, .25);
+    border: none;
     border-radius: .5rem;
     display: flex;
     position: relative;
     align-items: center;
+    box-shadow: 0 .1rem .1rem rgba(black, .1);
+    overflow: visible;
+
+    &:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: .5rem;
+      padding: 1px; /* control the border thickness */
+      background: linear-gradient(0deg, rgba(white, 0), rgba(white, .1));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
 
     &:hover, &:active, &--focus {
-      border: 1px solid rgba(white, .5);
+      &:before {
+        background: linear-gradient(0deg, rgba(white, 0), rgba(white, .25));
+      }
     }
   }
 
@@ -68,6 +85,7 @@
     padding: .25rem;
     margin-left: .5rem;
     border-radius: 100rem;
+    box-shadow: 0 0 1rem rgba(white, .1);
 
     > svg {
       width: 1rem;
@@ -98,6 +116,7 @@
     color: rgba(white, .5);
     border-radius: 0 0 .5rem .5rem;
     font-size: .75rem;
+    z-index: -1;
     font-family: Ubuntu, sans-serif;
     width: 100%;
     max-width: 100%;

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React from "react";
 import Input from "./Input";
 import {IconMail} from "@tabler/icons-react";
 

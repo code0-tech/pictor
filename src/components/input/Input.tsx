@@ -66,12 +66,12 @@ const InputControl: React.ForwardRefExoticComponent<Omit<InputControlType, "ref"
 
     const onFocus = ((event: React.FocusEvent<HTMLInputElement>) => {
         if (event.target.parentElement)
-            event.target.parentElement.classList.add("input__control--focus")
+            event.target.parentElement.classList.add("input__control--active")
         if (onFocusParam) onFocusParam(event)
     })
     const onBlur = ((event: React.FocusEvent<HTMLInputElement>) => {
         if (event.target.parentElement)
-            event.target.parentElement.classList.remove("input__control--focus")
+            event.target.parentElement.classList.remove("input__control--active")
         if (onBlurParam) onBlurParam(event)
     })
 

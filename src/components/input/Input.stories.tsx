@@ -9,7 +9,9 @@ export default {
 
 export const Mail = () => <Input>
     <Input.Label>e-mail</Input.Label>
-    <Input.Control placeholder={"name@mail.com"}/>
+    <Input.Control placeholder={"name@mail.com"}>
+        <Input.Control.Icon><IconMail/></Input.Control.Icon>
+    </Input.Control>
     <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
 </Input>
 

@@ -1,0 +1,65 @@
+@import "variables";
+
+
+@mixin gradientBorder($isPrimary: true) {
+
+  $color: if($isPrimary, $primary, $secondary);
+
+  &:after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px; /* control the border thickness */
+    background: linear-gradient(0deg, rgba($color, 0), rgba($color, .1));
+    -webkit-mask: linear-gradient($color 0 0) content-box, linear-gradient($color 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  &:hover, &:active, &--active {
+    &:after {
+      background: linear-gradient(0deg, rgba($color, 0), rgba($color, .25));
+    }
+  }
+}
+
+@mixin box($level: 1) {
+
+  background: mixinColor($primary, $level);
+  border-radius: $borderRadius;
+  color: rgba($primary, .5);
+  font-family: Ubuntu, sans-serif;
+  font-size: 1rem;
+  box-shadow: 0 .1rem .1rem rgba($black, .1);
+  border: none;
+  position: relative;
+
+  @include gradientBorder(true)
+}
+
+@mixin boxSecondary($level: 1) {
+
+  background: mixinColor($secondary, $level);
+  border-radius: $borderRadius;
+  color: rgba($secondary, .5);
+  box-shadow: 0 .1rem .1rem rgba($black, .1);
+  border: none;
+  position: relative;
+
+  @include gradientBorder(false)
+}
+
+
+@function mixinColor($color, $level) {
+  @return mix($color, $bodyBg, 10% * $level);
+}
+
+@function lighten($level) {
+  @return mixinColor(white, $level);
+}
+
+@function darken($level) {
+  @return mixinColor(black, $level);
+}

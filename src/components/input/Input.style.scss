@@ -1,3 +1,5 @@
+@import "../../styles/helpers";
+
 .input {
   margin-bottom: 1rem;
   max-width: 300px;
@@ -12,33 +14,10 @@
   }
 
   &__control {
-    background: rgba(white, .1);
-    border: none;
-    border-radius: .5rem;
     display: flex;
-    position: relative;
     align-items: center;
-    box-shadow: 0 .1rem .1rem rgba(black, .1);
-    overflow: hidden;
 
-    &:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px; /* control the border thickness */
-      background: linear-gradient(0deg, rgba(white, 0), rgba(white, .1));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
-    }
-
-    &:hover, &:active, &--focus {
-      &:before {
-        background: linear-gradient(0deg, rgba(white, 0), rgba(white, .25));
-      }
-    }
+    @include box();
   }
 
   &__label {
@@ -69,22 +48,19 @@
   }
 
   &__icon {
-    color: rgba(white, .5);
-    background: rgba(white, .1);
-    border: 1px solid rgba(white, .25);
-    overflow: hidden;
-
     display: flex;
     width: 1rem;
     height: auto;
-    position: relative;
     justify-content: center;
     align-items: center;
     aspect-ratio: 50/50;
     padding: .25rem;
     margin-left: .5rem;
-    border-radius: 100rem;
-    box-shadow: 0 0 1rem rgba(white, .1);
+    pointer-events: none;
+
+    //first parameter describes weither the box is in primary or secondary style
+    //second parameter describes weither the this box is inside another box
+    @include box(2);
 
     > svg {
       width: 1rem;
@@ -125,11 +101,9 @@
       position: absolute;
       content: "";
       width: .5rem;
-      height: 1rem;
-      top: -1rem;
-      border-bottom-left-radius: 50rem;
+      height: .5rem;
+      top: -.5rem;
       left: 0;
-      z-index: -1;
 
     }
 
@@ -137,11 +111,9 @@
       position: absolute;
       content: "";
       width: .5rem;
-      height: 1rem;
-      top: -1rem;
-      border-bottom-right-radius: 50rem;
+      height: .5rem;
+      top: -.5rem;
       right: 0;
-      z-index: -1;
 
     }
 
@@ -162,18 +134,19 @@
 
   &--not-valid {
     .input__message {
+
+      $color: mixinColor(#D90429, 2.5);
+
       display: block;
-      background: #3e0019;
+      background: $color;
 
       &:before {
-        background: rgba(#3e0019, 0);
-        box-shadow: 0 .5rem 0 0 #3e0019;
+        background: $color;
 
       }
 
       &:after {
-        background: rgba(#3e0019, 0);
-        box-shadow: 0 .5rem 0 0 #3e0019;
+        background: $color;
       }
 
     }
@@ -181,19 +154,21 @@
 
   &--valid {
     .input__message {
+
+      $color: mixinColor(#29BF12, 2.5);
+
       display: block;
-      background: #003110;
+      background: $color;
 
       &:before {
-        background: rgba(#003110, 0);
-        box-shadow: 0 .5rem 0 0 #003110;
+        background: $color;
 
       }
 
       &:after {
-        background: rgba(#003110, 0);
-        box-shadow: 0 .5rem 0 0 #003110;
+        background: $color;
       }
+
     }
   }
 }

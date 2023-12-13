@@ -1,42 +1,32 @@
 @import "variables";
 
+@mixin box($level: 0, $color: $primary) {
 
-@mixin gradientBorder($isPrimary: true) {
-
-  $color: if($isPrimary, $primary, $secondary);
-
-  &:after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px; /* control the border thickness */
-    background: linear-gradient(0deg, rgba($color, 0), rgba($color, .1));
-    -webkit-mask: linear-gradient($color 0 0) content-box, linear-gradient($color 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+  @if ($level <= 0) {
+    background: mixinColor($primary, .5);
+  } @else {
+    background: linear-gradient(135deg, mixinColor($color, $level) 0%, mixinColor($color, $level / 2) 100%);
   }
-
-  &:hover, &:active, &--active {
-    &:after {
-      background: linear-gradient(0deg, rgba($color, 0), rgba($color, .25));
-    }
-  }
-}
-
-@mixin box($level: 1) {
-
-  background: mixinColor($primary, $level);
   border-radius: $borderRadius;
   color: rgba($primary, .5);
   font-family: Ubuntu, sans-serif;
-  font-size: 1rem;
-  box-shadow: 0 .1rem .1rem rgba($black, .1);
-  border: none;
+  font-size: $secondaryFontSize;
+  @if ($level >= 2) {
+    box-shadow: 0 .25rem .25rem rgba($black, .2), inset 0 0 0 1px rgba($color, .1);
+  } @else {
+    box-shadow: inset 0 0 0 1px rgba($color, .1);
+  }
   position: relative;
 
-  @include gradientBorder(true)
+
+  &:hover, &:active, &--active {
+
+    @if ($level >= 2) {
+      box-shadow: 0 .25rem .25rem rgba($black, .2), inset 0 0 0 1px rgba($color, .2);
+    } @else {
+      box-shadow: inset 0 0 0 1px rgba($color, .2);
+    }
+  }
 }
 
 @mixin boxSecondary($level: 1) {
@@ -45,15 +35,13 @@
   border-radius: $borderRadius;
   color: rgba($secondary, .5);
   box-shadow: 0 .1rem .1rem rgba($black, .1);
-  border: none;
+  border: 1px solid rgba($primary, .1);
   position: relative;
-
-  @include gradientBorder(false)
 }
 
 
 @function mixinColor($color, $level) {
-  @return mix($color, $bodyBg, 10% * $level);
+  @return mix($color, $bodyBg, 15% * $level);
 }
 
 @function lighten($level) {

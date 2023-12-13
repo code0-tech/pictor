@@ -34,7 +34,7 @@ const Alert: React.FC<AlertType> = (props) => {
                 {icon ? <AlertIcon variant={variant}/> : null}
                 <span className={"alert__heading"}>{title}</span>
             </div>
-            {dismissible ? <span className={"alert__dismissible"} onClick={event => onClose(event)}><IconX/></span> : null}
+            {dismissible ? <span className={"alert__dismissible"} onClick={onClose}><IconX/></span> : null}
         </div>
 
         {children ? <div className={"alert__content"}>

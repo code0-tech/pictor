@@ -21,7 +21,7 @@ const meta: Meta<typeof Alert> = {
 export default meta
 type Story = StoryObj<typeof Alert>;
 
-export const AllStyles: Story = {
+export const WithBody: Story = {
     render: (args) => {
 
         const {dismissible, icon} = args
@@ -33,6 +33,27 @@ export const AllStyles: Story = {
                     return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
                     </Alert>
+                })
+            }
+        </>
+
+    },
+    args: {
+        dismissible: false,
+        icon: true
+    }
+}
+
+export const WithoutBody: Story = {
+    render: (args) => {
+
+        const {dismissible, icon} = args
+
+        return <>
+            {
+                ["primary", "secondary", "success", "warning", "error"].map(value => {
+                    // @ts-ignore
+                    return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}/>
                 })
             }
         </>

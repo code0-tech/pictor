@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "variables";
 
 @mixin box($level: 0, $color: $primary) {
@@ -5,7 +6,7 @@
   @if ($level <= 0) {
     background: mixinColor($primary, .5);
   } @else {
-    background: linear-gradient(135deg, mixinColor($color, $level) 0%, mixinColor($color, $level / 2) 100%);
+    background: linear-gradient(135deg, mixinColor($color, $level) 0%, mixinColor($color, math.div($level, 2)) 100%);
   }
   border-radius: $borderRadius;
   color: rgba($primary, .5);

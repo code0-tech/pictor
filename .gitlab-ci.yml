@@ -16,3 +16,13 @@ storybook:build:
     paths:
       - storybook-static
     expire_in: 7 days
+
+storybook:test:
+  image: ghcr.io/code0-tech/build-images/node-20.9-playwright:6.1
+  stage: test
+  script:
+    - source ~/.asdf/asdf.sh
+    - npm ci
+    - npm run storybook:dev &
+    - curl --fail -sv --retry 30 --retry-delay 3 --head --retry-all-errors http://127.0.0.1:6006
+    - npm run storybook:test -- --ci --browsers chromium firefox webkit

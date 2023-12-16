@@ -1,54 +1,29 @@
 @use "sass:math";
 @import "variables";
 
-@mixin box($level: 0, $color: $primary) {
+@mixin box($active: true, $color: $secondary) {
 
-  @if ($level <= 0) {
-    background: mixinColor($primary, .5);
-  } @else {
-    background: linear-gradient(135deg, mixinColor($color, $level) 0%, mixinColor($color, math.div($level, 2)) 100%);
-  }
+  background: rgba($color, 10%);
   border-radius: $borderRadius;
-  color: rgba($primary, .5);
+  color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   font-size: $secondaryFontSize;
-  @if ($level >= 2) {
-    box-shadow: 0 .25rem .25rem rgba($black, .2), inset 0 0 0 1px rgba($color, .1);
-  } @else {
-    box-shadow: inset 0 0 0 1px rgba($color, .1);
-  }
+  border: 1px solid borderColor($color);
   position: relative;
 
-
-  &:hover, &:active, &--active {
-
-    @if ($level >= 2) {
-      box-shadow: 0 .25rem .25rem rgba($black, .2), inset 0 0 0 1px rgba($color, .2);
-    } @else {
-      box-shadow: inset 0 0 0 1px rgba($color, .2);
+  @if ($active == true) {
+    &:hover, &:active, &--active {
+      border: 1px solid borderColor($color, true);
     }
+
+    &--active {
+      outline: 1px solid $info;
+      outline-offset: 2px;
+    }
+
   }
 }
 
-@mixin boxSecondary($level: 1) {
-
-  background: mixinColor($secondary, $level);
-  border-radius: $borderRadius;
-  color: rgba($secondary, .5);
-  box-shadow: 0 .1rem .1rem rgba($black, .1);
-  border: 1px solid rgba($primary, .1);
-  position: relative;
-}
-
-
-@function mixinColor($color, $level) {
-  @return mix($color, $bodyBg, 15% * $level);
-}
-
-@function lighten($level) {
-  @return mixinColor(white, $level);
-}
-
-@function darken($level) {
-  @return mixinColor(black, $level);
+@function borderColor($color: $white, $hover: false) {
+  @return rgba($white, if($hover, 0.2, 0.1))
 }

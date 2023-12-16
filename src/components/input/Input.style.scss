@@ -111,8 +111,15 @@
   &--not-valid {
 
     .input__control {
-      outline: 1px solid $error !important;
-      outline-offset: 2px;
+      border-color: borderColor($error, false);
+
+      @include hoverAndActiveContent {
+        border-color: borderColor($error, true);
+      }
+
+      @include activeContent {
+        outline-color: $error;
+      }
     }
 
     .input__message {
@@ -125,13 +132,21 @@
   &--valid {
 
     .input__control {
-      outline: 1px solid $success !important;
-      outline-offset: 2px;
+      border-color: borderColor($success, false);
+
+      @include hoverAndActiveContent {
+        border-color: borderColor($success, true);
+      }
+
+      @include activeContent {
+        outline-color: $success;
+      }
     }
 
     .input__message {
       display: block;
       background: rgba($success, .1);
+
     }
   }
 }

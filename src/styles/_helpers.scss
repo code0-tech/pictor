@@ -12,18 +12,29 @@
   position: relative;
 
   @if ($active == true) {
-    &:hover, &:active, &--active {
+    @include hoverAndActiveContent {
       border: 1px solid borderColor($color, true);
     }
 
-    &--active {
+    @include activeContent {
       outline: 1px solid $info;
       outline-offset: 2px;
     }
+  }
+}
 
+@mixin hoverAndActiveContent() {
+  &:hover, &:active, &--active {
+    @content
+  }
+}
+
+@mixin activeContent() {
+  &--active {
+    @content
   }
 }
 
 @function borderColor($color: $white, $hover: false) {
-  @return rgba($white, if($hover, 0.2, 0.1))
+  @return rgba($color, if($hover, 0.2, 0.1))
 }

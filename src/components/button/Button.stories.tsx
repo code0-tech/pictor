@@ -12,11 +12,15 @@ const meta = {
             type: "boolean",
             default: true
         },
+        disabled: {
+            type: "boolean",
+            default: false
+        },
         variant: {table: {disable: true}}
     }
 }
 
-type ButtonStory = StoryObj<{ icon: boolean }>;
+type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean}>;
 type ButtonGroupStory = StoryObj<typeof ButtonGroup>;
 
 export default meta
@@ -24,13 +28,13 @@ export default meta
 export const Buttons: ButtonStory = {
     render: (args) => {
 
-        const {icon} = args
+        const {icon, disabled} = args
 
         return <>
             {
                 ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
                     // @ts-ignore
-                    return <Button variant={value}>
+                    return <Button disabled={disabled} variant={value}>
                         {icon ? <Button.Icon><IconAbc/></Button.Icon> : null}
                         {value}
                     </Button>
@@ -39,7 +43,8 @@ export const Buttons: ButtonStory = {
         </>
     },
     args: {
-        icon: true
+        icon: true,
+        disabled: false
     }
 }
 
@@ -62,6 +67,18 @@ export const ButtonGroups: ButtonGroupStory = {
                     ["primary", "primary", "primary", "primary"].map((value, index) => {
                         // @ts-ignore
                         return <Button variant={value}>
+                            {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
+                            {value}
+                        </Button>
+                    })
+                }
+            </ButtonGroup>
+
+            <ButtonGroup>
+                {
+                    ["primary", "primary", "primary", "primary"].map((value, index) => {
+                        // @ts-ignore
+                        return <Button disabled={(index % 2) == 0} variant={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>

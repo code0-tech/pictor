@@ -10,6 +10,10 @@
   margin-bottom: 1rem;
   width: fit-content;
 
+  &--disabled {
+    opacity: 50%;
+    pointer-events: none;
+  }
 
   &__icon + &__content {
     margin-left: .5rem;

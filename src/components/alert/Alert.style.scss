@@ -71,7 +71,7 @@
     }
 
     .alert__content {
-      border-top: 1px solid borderColor($color);
+      border-top: 1px solid borderColor();
     }
 
     .alert__dismissible {

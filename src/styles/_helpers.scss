@@ -8,12 +8,12 @@
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   font-size: $secondaryFontSize;
-  border: 1px solid borderColor($color);
+  border: 1px solid borderColor();
   position: relative;
 
   @if ($active == true) {
     @include hoverAndActiveContent {
-      border: 1px solid borderColor($color, true);
+      border: 1px solid borderColor($white, true);
     }
 
     @include activeContent {

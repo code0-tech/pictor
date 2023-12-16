@@ -6,8 +6,8 @@ export interface AlertType {
 
     children?: ReactNode | ReactNode[]
     title: ReactNode
-    //defaults to info
-    variant?: "primary" | "secondary" | "success" | "warning" | "error"
+    //defaults to primary
+    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
     //defaults to true
     icon?: boolean
     //defaults to false
@@ -16,6 +16,7 @@ export interface AlertType {
 }
 
 const IconVariants = {
+    "info": <IconInfoCircle/>,
     "primary": <IconInfoCircle/>,
     "secondary": <IconInfoCircle/>,
     "success": <IconCircleCheck/>,
@@ -49,7 +50,7 @@ export interface AlertHeadingType {
 }
 
 export interface AlertIconType {
-    variant: "primary" | "secondary" | "success" | "warning" | "error"
+    variant: "primary" | "secondary" | "info" | "success" | "warning" | "error"
 }
 
 const AlertIcon: React.FC<AlertIconType> = ({variant}) => {

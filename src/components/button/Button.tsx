@@ -4,6 +4,7 @@ import React, {
     DetailedHTMLProps,
     ReactNode
 } from "react";
+import {getChild, getContent} from "../utils";
 
 export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
     children: ReactNode | ReactNode[]
@@ -36,24 +37,6 @@ const ButtonIcon: React.FC<ButtonIconType> = ({children}) => {
     return <span className={"button__icon"}>
         {children}
     </span>
-}
-
-
-const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>): ReactNode | null => {
-    return React.Children.toArray(children).find((childT) => {
-        if (!React.isValidElement(childT)) return false;
-        return childT.type == child;
-    })
-}
-
-const getContent = (children: ReactNode | ReactNode[], ...child: React.FC<any>[]): ReactNode[] | null => {
-
-    const array = React.Children.toArray(children).filter((childT) => {
-        if (!React.isValidElement(childT)) return true;
-        return !child.find(value => value == childT.type);
-    })
-
-    return array.length == 0 ? null : array
 }
 
 export default Object.assign(Button, {

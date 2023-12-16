@@ -1,7 +1,7 @@
 @import "../../styles/helpers";
 
 .alert {
-  @include box(1);
+  @include box(false);
 
   padding: .5rem;
   margin-bottom: 1rem;
@@ -30,8 +30,7 @@
   }
 
   &__icon {
-    @include box(2);
-    pointer-events: none;
+    @include box(false);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,7 +45,7 @@
   }
 
   &__dismissible {
-    @include box(2);
+    @include box();
 
     display: flex;
     width: 1rem;
@@ -65,18 +64,19 @@
 
 @each $name, $color in $variants {
   .alert--#{$name} {
-    @include box(1, $color);
+    @include box(false, $color);
 
     .alert__icon {
-      @include box(2, $color);
+      @include box(false, $color);
     }
 
     .alert__content {
-      border-top: 1px solid rgba($color, .1);
+      border-top: 1px solid borderColor($color);
     }
 
     .alert__dismissible {
-      @include box(2, $color);
+      @include box(true, $color);
     }
+
   }
 }

@@ -1,10 +1,12 @@
 $bodyBg: #030014;
-$primary: #ffffff;
-$secondary: #70ffb2;
+$primary: #030014;
+$secondary: #ffffff;
+$info: #70ffb2;
 $success: #29BF12;
 $warning: #FFBE0B;
 $error: #D90429;
 $black: #000000;
+$white: #ffffff;
 
 //component styling
 $borderRadius: .5rem;
@@ -17,5 +19,6 @@ $variants: (
         "secondary": $secondary,
         "success": $success,
         "warning": $warning,
-        "error": $error
+        "error": $error,
+        "info": $info
 )

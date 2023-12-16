@@ -15,12 +15,13 @@
   &__control {
     display: flex;
     align-items: center;
+    margin-bottom: .5rem;
 
-    @include box(1);
+    @include box();
   }
 
   &__label {
-    color: rgba(white, .5);
+    color: rgba($white, .5);
     font-size: .75rem;
     font-family: Ubuntu, sans-serif;
     margin-bottom: .5rem;
@@ -33,7 +34,7 @@
     display: inline-block;
     background: none;
     width: 100%;
-    color: rgba(white, .5);
+    color: rgba($white, .5);
     font-family: Ubuntu, sans-serif;
     border: none;
     outline: none;
@@ -42,11 +43,13 @@
     font-size: 1rem;
 
     &::placeholder {
-      color: rgba(white, .25);
+      color: rgba($white, .25);
     }
   }
 
   &__icon {
+    @include box(false);
+
     display: flex;
     width: 1rem;
     height: auto;
@@ -57,10 +60,6 @@
     margin-left: .5rem;
     pointer-events: none;
 
-    //first parameter describes weither the box is in primary or secondary style
-    //second parameter describes weither the this box is inside another box
-    @include box(2);
-
     > * {
       width: 1rem;
       height: 1rem;
@@ -70,7 +69,7 @@
 
   &__desc {
     padding-left: 1rem;
-    color: rgba(white, .5);
+    color: rgba($white, .5);
     font-size: .75rem;
     font-family: Ubuntu, sans-serif;
     margin: .5rem 0;
@@ -88,33 +87,11 @@
   &__message {
     display: none;
     position: relative;
-    color: rgba(white, .5);
-    border-radius: 0 0 .5rem .5rem;
+    color: rgba($white, .5);
+    border-radius: $borderRadius;
     font-size: .75rem;
     z-index: -1;
     font-family: Ubuntu, sans-serif;
-    width: 100%;
-    max-width: 100%;
-
-    &:before {
-      position: absolute;
-      content: "";
-      width: .5rem;
-      height: .5rem;
-      top: -.5rem;
-      left: 0;
-
-    }
-
-    &:after {
-      position: absolute;
-      content: "";
-      width: .5rem;
-      height: .5rem;
-      top: -.5rem;
-      right: 0;
-
-    }
 
     > p {
       margin: 0;
@@ -132,41 +109,43 @@
   }
 
   &--not-valid {
+
+    .input__control {
+      border-color: borderColor($error, false);
+
+      @include hoverAndActiveContent {
+        border-color: borderColor($error, true);
+      }
+
+      @include activeContent {
+        outline-color: $error;
+      }
+    }
+
     .input__message {
-
-      $color: mixinColor(#D90429, 1);
-
       display: block;
-      background: $color;
-
-      &:before {
-        background: $color;
-
-      }
-
-      &:after {
-        background: $color;
-      }
+      background: rgba($error, .1);
 
     }
   }
 
   &--valid {
+
+    .input__control {
+      border-color: borderColor($success, false);
+
+      @include hoverAndActiveContent {
+        border-color: borderColor($success, true);
+      }
+
+      @include activeContent {
+        outline-color: $success;
+      }
+    }
+
     .input__message {
-
-      $color: mixinColor(#29BF12, 1);
-
       display: block;
-      background: $color;
-
-      &:before {
-        background: $color;
-
-      }
-
-      &:after {
-        background: $color;
-      }
+      background: rgba($success, .1);
 
     }
   }

@@ -1,0 +1,25 @@
+@import "../../styles/helpers";
+
+.button-group {
+  @include box(false, $primary);
+
+  border: none;
+  width: fit-content;
+  margin-bottom: 1rem;
+  display: flex;
+
+  > * {
+    margin-bottom: 0 !important;
+    border-radius: 0 !important;
+
+    &:first-child {
+      border-bottom-left-radius: .5rem !important;
+      border-top-left-radius: .5rem !important;
+    }
+
+    &:last-child {
+      border-bottom-right-radius: .5rem !important;
+      border-top-right-radius: .5rem !important;
+    }
+  }
+}

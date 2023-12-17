@@ -25,4 +25,8 @@ storybook:test:
     - npm ci
     - npm run storybook:dev &
     - curl --fail -sv --retry 30 --retry-delay 3 --head --retry-all-errors http://127.0.0.1:6006
-    - npm run storybook:test -- --ci --browsers chromium firefox webkit
+    - npm run storybook:test:all -- --ci
+  artifacts:
+    paths:
+      - __snapshots__/__diff_output__
+    expire_in: 7 days

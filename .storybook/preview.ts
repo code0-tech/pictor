@@ -24,7 +24,6 @@ const preview: Preview = {
           { id: 'landmark-one-main', enabled: false }, // not relevant to single components
           { id: 'page-has-heading-one', enabled: false }, // not relevant to single components
           { id: 'region', enabled: false }, // not relevant to single components
-          { id: 'color-contrast', enabled: false }, // doesn't work with gradients
         ],
       },
     },

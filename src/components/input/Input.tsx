@@ -16,7 +16,8 @@ const Input: React.FC<InputType> = (props: InputType) => {
     const {disabled, children, valid} = props
 
     return <div
-        className={`input ${disabled ? "input--disabled" : ""} ${valid ? "input--valid" : valid !== undefined ? "input--not-valid" : ""}`}>
+        className={`input ${disabled ? "input--disabled" : ""} ${valid ? "input--valid" : valid !== undefined ? "input--not-valid" : ""}`}
+        aria-disabled={disabled ? "true" : "false"}>
         {children}
     </div>
 }

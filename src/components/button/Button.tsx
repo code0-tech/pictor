@@ -27,7 +27,8 @@ const Button: React.FC<ButtonType> = (props) => {
     const content = getContent(children, ButtonIcon)
 
 
-    return <a {...args} className={`button button--${variant} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""}`}>
+    return <a {...args} className={`button button--${variant} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""}`}
+        aria-disabled={disabled ? "true" : "false"}>
         {icon}
         {content ? <span className={"button__content"}>{content}</span> : null}
     </a>

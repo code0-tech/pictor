@@ -1,5 +1,5 @@
 import type { TestRunnerConfig } from '@storybook/test-runner';
-import { getStoryContext } from '@storybook/test-runner'
+import { getStoryContext, waitForPageReady } from '@storybook/test-runner'
 import { injectAxe, checkA11y, configureAxe } from 'axe-playwright';
 
 const prepareA11y = async (page) => await injectAxe(page);
@@ -28,10 +28,9 @@ const executeA11y = async (page, context) => {
 }
 
 const config: TestRunnerConfig = {
-  async preVisit(page) {
-    await prepareA11y(page);
-  },
   async postVisit(page, context) {
+    await waitForPageReady(page);
+    await prepareA11y(page);
     await executeA11y(page, context);
   },
 };

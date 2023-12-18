@@ -3,6 +3,8 @@ import {getChild, getPositionAroundTarget} from "../../utils/utils";
 import "./Dropdown.style.scss"
 import {DropdownHeader} from "./DropdownHeader";
 import {DropdownFooter} from "./DropdownFooter";
+import {DropdownItem} from "./DropdownItem";
+import {DropdownItemGroup} from "./DropdownItemGroup";
 
 export interface DropdownType {
     children: ReactElement<DropdownTriggerType & DropdownMenuType>[],
@@ -150,5 +152,8 @@ export default Object.assign(Dropdown, {
     Trigger: DropdownTrigger,
     Menu: DropdownMenu,
     Header: DropdownHeader,
-    Footer: DropdownFooter
+    Footer: DropdownFooter,
+    Group: Object.assign(DropdownItemGroup, {
+        Item: DropdownItem
+    })
 })

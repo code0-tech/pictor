@@ -13,14 +13,14 @@ const meta: Meta = {
 
 export default meta;
 
-export const Test = () => {
+export const Dropdowns = () => {
     return <>
         <Dropdown position={"bottom"} align={"start"}>
             <Dropdown.Trigger>
                 <Button>Open Dropdown</Button>
             </Dropdown.Trigger>
             <Dropdown.Menu>
-                Loremss d sd sd s ds ds ds dsdsdsdsd sd Loremss d sd sd s ds ds ds dsdsdsdsd sd
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
             </Dropdown.Menu>
         </Dropdown>
 
@@ -35,7 +35,17 @@ export const Test = () => {
                         <Input.Control.Icon><IconSearch/></Input.Control.Icon>
                     </Input.Control>
                 </Dropdown.Header>
-                sds
+                <Dropdown.Group>
+                    <Dropdown.Group.Item>
+                        Item 1
+                    </Dropdown.Group.Item>
+                    <Dropdown.Group.Item>
+                        Item 2
+                    </Dropdown.Group.Item>
+                </Dropdown.Group>
+                <Dropdown.Footer>
+                    That's the footer
+                </Dropdown.Footer>
             </Dropdown.Menu>
         </Dropdown>
 
@@ -54,7 +64,7 @@ export const Test = () => {
                             </Button>
                         </Dropdown.Trigger>
                         <Dropdown.Menu>
-                            Loremss d sd sd s ds ds ds dsdsdsdsd sd Loremss d sd sd s ds ds ds dsdsdsdsd sd
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
                         </Dropdown.Menu>
                     </Dropdown>
                 })

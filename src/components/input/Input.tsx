@@ -82,7 +82,9 @@ const InputControl: React.ForwardRefExoticComponent<Omit<InputControlType, "ref"
     return <>
         <div className={"input__control"}>
             {icon ?? null}
-            <input ref={ref} type={type} placeholder={placeholder} className={"input__field"} {...args}/>
+            <input ref={ref} type={type} placeholder={placeholder} className={"input__field"} {...args} onMouseDown={event => {
+                (event.target as HTMLInputElement).focus()
+            }}/>
         </div>
         {message ?? null}
     </>

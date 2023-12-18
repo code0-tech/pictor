@@ -5,21 +5,38 @@
 
   border: none;
   width: fit-content;
-  margin-bottom: 1rem;
+  position: relative;
+  margin-bottom: 1rem !important;
   display: flex;
+  flex-flow: row wrap;
 
-  > * {
+  * {
+    margin-bottom: 0;
+  }
+
+  .button {
+    margin-bottom: 0;
+    border-radius: 0;
+    display: flex;
+  }
+
+  > div, .dropdown__trigger, .dropdown {
+    display: flex;
     margin-bottom: 0 !important;
-    border-radius: 0 !important;
+  }
 
-    &:first-child {
-      border-bottom-left-radius: .5rem !important;
-      border-top-left-radius: .5rem !important;
-    }
-
-    &:last-child {
-      border-bottom-right-radius: .5rem !important;
-      border-top-right-radius: .5rem !important;
+  &__first {
+    .button {
+      border-top-left-radius: $borderRadius !important;
+      border-bottom-left-radius: $borderRadius !important;
     }
   }
+
+  &__last {
+    .button {
+      border-top-right-radius: $borderRadius !important;
+      border-bottom-right-radius: $borderRadius !important;
+    }
+  }
+
 }

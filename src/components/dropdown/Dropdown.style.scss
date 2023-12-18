@@ -1,0 +1,125 @@
+@import "../../styles/helpers";
+
+.dropdown {
+
+  $color: $secondary;
+
+  position: relative;
+  margin-bottom: 1rem !important;
+  width: fit-content;
+
+  &__trigger {
+    width: fit-content;
+    position: relative;
+
+    > * {
+      margin: 0 !important;
+    }
+  }
+
+  &__header {
+    margin: -.5rem -.5rem .5rem -.5rem;
+    padding: .5rem;
+    border-bottom: 1px solid borderColor();
+
+    > * {
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__footer {
+    margin: .5rem -.5rem -.5rem -.5rem;
+    padding: .5rem;
+    border-top: 1px solid borderColor();
+
+    > * {
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__item {
+    position: relative;
+    margin: -.5rem;
+    padding: .5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    cursor: pointer;
+    border-top: 1px solid borderColor();
+    border-bottom: 1px solid borderColor();
+
+    @include hoverAndActiveContent {
+      background: rgba($color, .1);
+    }
+
+    &:first-of-type {
+      border-top: none;
+      margin-top: -.5rem;
+    }
+
+    &:last-of-type {
+      border-top: none;
+      border-bottom: none;
+      margin-bottom: -.5rem;
+    }
+  }
+
+  &__menu {
+    @include box(false, $color);
+
+    position: absolute;
+    display: none;
+    z-index: 99999;
+    padding: .5rem;
+    width: 200px;
+
+    &--active {
+      display: block;
+    }
+
+    &[data-position="left"] {
+      inset: 0 auto auto 0;
+      top: 50%;
+      transform: translateX(calc(-100% - .5rem)) translateY(-50%);
+    }
+
+    &[data-position="right"] {
+      top: 50%;
+      right: 0;
+      transform: translateX(calc(100% + .5rem)) translateY(-50%);
+    }
+
+    &[data-position="bottom"] {
+      top: calc(100% + .5rem);
+    }
+
+    &[data-position="top"] {
+      bottom: calc(100% + .5rem);
+    }
+
+    &[data-align="start"] {
+      right: auto;
+      left: 0;
+    }
+
+    &[data-align="end"] {
+      left: auto;
+      right: 0;
+    }
+
+  }
+
+}

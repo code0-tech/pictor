@@ -37,6 +37,6 @@
   }
 }
 
-@function borderColor($color: $white, $hover: false) {
-  @return rgba($color, if($hover, 0.2, 0.1))
+@function borderColor($hover: false) {
+  @return rgba($white, if($hover, 0.2, 0.1))
 }

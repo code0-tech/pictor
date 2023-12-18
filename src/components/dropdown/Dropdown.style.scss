@@ -1,6 +1,9 @@
 @import "../../styles/helpers";
 
 .dropdown {
+
+  $color: $secondary;
+
   position: relative;
   margin-bottom: 1rem;
   width: fit-content;
@@ -48,8 +51,34 @@
     }
   }
 
+  &__item {
+    position: relative;
+    margin: -.5rem;
+    padding: .5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    cursor: pointer;
+    border-top: 1px solid borderColor();
+    border-bottom: 1px solid borderColor();
+
+    @include hoverAndActiveContent {
+      background: rgba($color, .1);
+    }
+
+    &:first-of-type {
+      border-top: none;
+      margin-top: -.5rem;
+    }
+
+    &:last-of-type {
+      border-top: none;
+      border-bottom: none;
+      margin-bottom: -.5rem;
+    }
+  }
+
   &__menu {
-    @include box(false);
+    @include box(false, $color);
 
     position: absolute;
     display: none;

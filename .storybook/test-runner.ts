@@ -1,6 +1,9 @@
 import type { TestRunnerConfig } from '@storybook/test-runner';
 import { getStoryContext, waitForPageReady } from '@storybook/test-runner'
 import { injectAxe, checkA11y, configureAxe } from 'axe-playwright';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+
+const customSnapshotsDir = `${process.cwd()}/__snapshots__`;
 
 const prepareA11y = async (page) => await injectAxe(page);
 
@@ -27,11 +30,23 @@ const executeA11y = async (page, context) => {
   });
 }
 
+const executeVisualTest = async (page, context) => {
+  const image = await page.locator('#storybook-root').screenshot();
+  expect(image).toMatchImageSnapshot({
+    customSnapshotsDir,
+    customSnapshotIdentifier: `${context.id}-${page.context().browser().browserType().name()}`,
+  });
+}
+
 const config: TestRunnerConfig = {
+  setup() {
+    expect.extend({ toMatchImageSnapshot });
+  },
   async postVisit(page, context) {
     await waitForPageReady(page);
     await prepareA11y(page);
     await executeA11y(page, context);
+    await executeVisualTest(page, context);
   },
 };
 

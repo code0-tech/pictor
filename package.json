@@ -9,7 +9,9 @@
     "rollup": "rollup -c",
     "storybook:dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
-    "storybook:test": "test-storybook"
+    "storybook:test": "test-storybook",
+    "storybook:test:all": "test-storybook --browsers chromium firefox webkit",
+    "storybook:test:update": "npm run storybook:test:all -- -u"
   },
   "author": "Code0",
   "license": "MIT",
@@ -39,6 +41,7 @@
     "css-loader": "^6.5.1",
     "html-webpack-plugin": "^5.5.0",
     "identity-obj-proxy": "^3.0.0",
+    "jest-image-snapshot": "^6.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",

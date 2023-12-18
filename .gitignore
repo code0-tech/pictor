@@ -262,3 +262,5 @@ sketch
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/jetbrains+all,visualstudiocode,node,react
+
+__snapshots__/__diff_output__/

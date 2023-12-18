@@ -8,6 +8,8 @@
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   font-size: $secondaryFontSize;
+  -webkit-backdrop-filter: blur($borderRadius * 2);
+  backdrop-filter: blur($borderRadius * 2);
   border: 1px solid borderColor();
   position: relative;
 

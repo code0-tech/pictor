@@ -5,21 +5,37 @@
 
   border: none;
   width: fit-content;
+  position: relative;
   margin-bottom: 1rem;
   display: flex;
+  flex-flow: row wrap;
 
-  > * {
-    margin-bottom: 0 !important;
-    border-radius: 0 !important;
+  * {
+    margin-bottom: 0;
+  }
 
-    &:first-child {
-      border-bottom-left-radius: .5rem !important;
-      border-top-left-radius: .5rem !important;
-    }
+  .button {
+    margin-bottom: 0;
+    border-radius: 0;
+    display: flex;
+  }
 
-    &:last-child {
-      border-bottom-right-radius: .5rem !important;
-      border-top-right-radius: .5rem !important;
+  > div, .dropdown__trigger, .dropdown {
+    display: flex;
+  }
+
+  &__first {
+    .button {
+      border-top-left-radius: $borderRadius !important;
+      border-bottom-left-radius: $borderRadius !important;
     }
   }
+
+  &__last {
+    .button {
+      border-top-right-radius: $borderRadius !important;
+      border-bottom-right-radius: $borderRadius !important;
+    }
+  }
+
 }

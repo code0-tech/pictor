@@ -15,7 +15,7 @@
 
   @if ($active == true) {
     @include hoverAndActiveContent {
-      border: 1px solid borderColor($white, true);
+      border: 1px solid borderColor(true);
     }
 
     @include activeContent {

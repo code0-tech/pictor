@@ -111,10 +111,10 @@
   &--not-valid {
 
     .input__control {
-      border-color: borderColor($error, false);
+      border-color: borderColor(false);
 
       @include hoverAndActiveContent {
-        border-color: borderColor($error, true);
+        border-color: borderColor(true);
       }
 
       @include activeContent {
@@ -132,10 +132,10 @@
   &--valid {
 
     .input__control {
-      border-color: borderColor($success, false);
+      border-color: borderColor(false);
 
       @include hoverAndActiveContent {
-        border-color: borderColor($success, true);
+        border-color: borderColor(true);
       }
 
       @include activeContent {

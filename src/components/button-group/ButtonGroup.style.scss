@@ -6,7 +6,7 @@
   border: none;
   width: fit-content;
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem !important;
   display: flex;
   flex-flow: row wrap;
 
@@ -22,6 +22,7 @@
 
   > div, .dropdown__trigger, .dropdown {
     display: flex;
+    margin-bottom: 0 !important;
   }
 
   &__first {

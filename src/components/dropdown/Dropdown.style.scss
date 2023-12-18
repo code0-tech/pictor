@@ -5,7 +5,7 @@
   $color: $secondary;
 
   position: relative;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem !important;
   width: fit-content;
 
   &__trigger {

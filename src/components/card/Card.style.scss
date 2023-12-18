@@ -1,0 +1,44 @@
+@import "../../styles/helpers";
+
+.card {
+  @include box(false);
+
+  --padding: .5rem;
+
+  padding: 0 var(--padding);
+  overflow: hidden;
+  width: 200px;
+
+  &__img {
+    margin: 0 calc(-1 * var(--padding));
+    width: calc(100% + (var(--padding) * 2));
+    object-fit: cover;
+    padding: 0;
+
+    &:last-child {
+      margin-bottom: -4px !important;
+    }
+  }
+
+  &__img + * {
+    position: relative;
+    margin-top: -4px !important;
+  }
+
+  &__header {
+
+  }
+
+  &__footer {
+
+  }
+
+  &__title {
+
+  }
+
+  &__sub-title {
+
+  }
+
+}

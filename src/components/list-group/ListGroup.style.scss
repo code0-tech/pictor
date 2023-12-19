@@ -10,6 +10,11 @@
     border-bottom: 0;
   }
 
+  .dropdown, .dropdown__trigger {
+    display: block;
+    width: 100% !important;
+  }
+
   &__item {
 
     margin: 0 calc(-1 * var(--padding));
@@ -25,7 +30,6 @@
     &:last-of-type {
       border-bottom: 0;
     }
-
   }
 
 }

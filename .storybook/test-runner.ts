@@ -38,6 +38,8 @@ const executeVisualTest = async (page, context) => {
   });
 }
 
+const sleep = (time) => new Promise(resolve => setTimeout(resolve, time));
+
 const config: TestRunnerConfig = {
   setup() {
     expect.extend({ toMatchImageSnapshot });
@@ -45,6 +47,7 @@ const config: TestRunnerConfig = {
   async postVisit(page, context) {
     await waitForPageReady(page);
     await prepareA11y(page);
+    await sleep(2000);
     await executeA11y(page, context);
     await executeVisualTest(page, context);
   },

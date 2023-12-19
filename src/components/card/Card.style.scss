@@ -8,6 +8,18 @@
   padding: 0 var(--padding);
   width: 200px;
 
+  > * {
+    &:first-child {
+      border-top-left-radius: $borderRadius;
+      border-top-right-radius: $borderRadius;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: $borderRadius;
+      border-bottom-right-radius: $borderRadius;
+    }
+  }
+
   &__img {
     margin: 0 calc(-1 * var(--padding));
     width: calc(100% + (var(--padding) * 2));

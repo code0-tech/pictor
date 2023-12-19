@@ -22,19 +22,20 @@ export const Test = () => {
             <Card.Subtitle>Co-Founder</Card.Subtitle>
         </Card.Header>
         <ListGroup>
-            <ListGroup.Item>
-                <Dropdown position={"right"}>
-                    <Dropdown.Trigger>
+            <Dropdown position={"right"}>
+                <Dropdown.Trigger>
+                    <ListGroup.Item>
                         Test
-                    </Dropdown.Trigger>
-                    <Dropdown.Menu>
-                        <Dropdown.Header>
-                            test
-                        </Dropdown.Header>
-                        Test
-                    </Dropdown.Menu>
-                </Dropdown>
-            </ListGroup.Item>
+                    </ListGroup.Item>
+                </Dropdown.Trigger>
+                <Dropdown.Menu>
+                    <Dropdown.Header>
+                        test
+                    </Dropdown.Header>
+                    Test
+                </Dropdown.Menu>
+            </Dropdown>
+
         </ListGroup>
         <CardFooter>
             <ButtonGroup>

@@ -92,21 +92,21 @@
     &[data-position="left"] {
       inset: 0 auto auto 0;
       top: 50%;
-      transform: translateX(calc(-100% - .5rem)) translateY(-50%);
+      transform: translateX(calc(-100% - 1rem)) translateY(-50%);
     }
 
     &[data-position="right"] {
       top: 50%;
       right: 0;
-      transform: translateX(calc(100% + .5rem)) translateY(-50%);
+      transform: translateX(calc(100% + 1rem)) translateY(-50%);
     }
 
     &[data-position="bottom"] {
-      top: calc(100% + .5rem);
+      top: calc(100% + 1rem);
     }
 
     &[data-position="top"] {
-      bottom: calc(100% + .5rem);
+      bottom: calc(100% + 1rem);
     }
 
     &[data-align="start"] {

@@ -20,15 +20,26 @@
     }
   }
 
-  &__img {
+  &__img, &__header, &__footer {
+    border-bottom: 1px solid borderColor();
+    padding: var(--padding);
     margin: 0 calc(-1 * var(--padding));
     width: calc(100% + (var(--padding) * 2));
-    object-fit: cover;
-    padding: 0;
 
     &:last-child {
-      margin-bottom: -4px !important;
+      border-bottom: 0;
     }
+
+    > * {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__img {
+    object-fit: cover;
+    padding: 0;
   }
 
   &__img + * {
@@ -36,42 +47,10 @@
     margin-top: -4px !important;
   }
 
-  &__header {
-    margin: 0 calc(-1 * var(--padding));
-    padding: var(--padding);
-    border-bottom: 1px solid borderColor();
-
-    &:last-child {
-      border-bottom: 0;
-    }
-
-    > * {
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  &__footer {
-    margin: 0 calc(-1 * var(--padding));
-    padding: var(--padding);
-    border-bottom: 1px solid borderColor();
-
-    &:last-child {
-      border-bottom: 0;
-    }
-
-    > * {
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
   &__title {
     padding: 0;
     font-size: $primaryFontSize;
-    color: rgba($secondary, 1);
+    color: rgba($white, 1);
     font-weight: 500;
     margin: 0 0 .5rem;
   }
@@ -79,7 +58,7 @@
   &__sub-title {
     padding: 0;
     font-size: $secondaryFontSize;
-    color: rgba($secondary, .75);
+    color: rgba($white, .75);
     font-weight: 500;
     margin: 0 0 .5rem;
   }
@@ -87,5 +66,16 @@
   &__title + &__sub-title {
     margin-top: -.25rem;
   }
+}
 
+@each $name, $color in $variants {
+  .card--#{$name} {
+    @include box(false, $color);
+
+    .list-group__item {
+      @include hoverAndActiveContent {
+        background: rgba($color, .1) !important;
+      }
+    }
+  }
 }

@@ -10,13 +10,15 @@ export type CardChildType = CardHeaderType | CardImgStyle | CardTitleType | Card
 
 export interface CardType {
     children: ReactElement<CardChildType> | ReactElement<CardChildType>[]
+    //defaults to secondary
+    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error",
 }
 
 const Card: React.FC<CardType> = (props) => {
 
-    const {children, ...args} = props
+    const {children, variant = "secondary", ...args} = props
 
-    return <div {...args} className={"card"}>
+    return <div {...args} className={`card card--${variant}`}>
         {children}
     </div>
 }

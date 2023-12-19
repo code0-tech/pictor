@@ -26,7 +26,19 @@
   }
 
   &__header {
+    margin: 0 calc(-1 * var(--padding));
+    padding: var(--padding);
+    border-bottom: 1px solid borderColor();
 
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    > * {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   &__footer {
@@ -34,11 +46,23 @@
   }
 
   &__title {
-
+    padding: 0;
+    font-size: $primaryFontSize;
+    color: rgba($secondary, 1);
+    font-weight: 500;
+    margin: 0 0 .5rem;
   }
 
   &__sub-title {
+    padding: 0;
+    font-size: $secondaryFontSize;
+    color: rgba($secondary, .75);
+    font-weight: 500;
+    margin: 0 0 .5rem;
+  }
 
+  &__title + &__sub-title {
+    margin-top: -.25rem;
   }
 
 }

@@ -12,28 +12,10 @@ export default meta
 
 export const Test = () => {
     return <Card>
-        <ListGroup>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-        </ListGroup>
         <Card.Image src={"https://event.gls-west.de/Nico_Sammito.jpg"}/>
-        <ListGroup>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-            <ListGroup.Item>
-                test
-            </ListGroup.Item>
-        </ListGroup>
+        <Card.Header>
+            <Card.Title>Nico Sammito</Card.Title>
+            <Card.Subtitle>Co-Founder</Card.Subtitle>
+        </Card.Header>
     </Card>
 }

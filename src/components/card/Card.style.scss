@@ -74,7 +74,7 @@
 
     .list-group__item {
       @include hoverAndActiveContent {
-        background: rgba($color, .1) !important;
+        background: rgba(if($color == $primary, $white, $color), .1) !important;
       }
     }
   }

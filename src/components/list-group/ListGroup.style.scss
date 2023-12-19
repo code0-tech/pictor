@@ -19,7 +19,7 @@
     border-bottom: 1px solid borderColor();
 
     @include hoverAndActiveContent {
-      background: rgba($secondary, .1);
+      background: rgba($white, .1);
     }
 
     &:last-of-type {

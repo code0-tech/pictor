@@ -15,7 +15,7 @@ const meta: Meta = {
 export default meta
 
 export const Test = () => {
-    return <Card>
+    return <Card variant={"secondary"}>
         <Card.Image alt={"Nico Sammito"} src={"https://event.gls-west.de/Nico_Sammito.jpg"}/>
         <Card.Header>
             <Card.Title>Nico Sammito</Card.Title>

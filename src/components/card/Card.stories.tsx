@@ -23,12 +23,15 @@ export const Test = () => {
         </Card.Header>
         <ListGroup>
             <ListGroup.Item>
-                <Dropdown>
+                <Dropdown position={"right"}>
                     <Dropdown.Trigger>
                         Test
                     </Dropdown.Trigger>
                     <Dropdown.Menu>
-                        sd
+                        <Dropdown.Header>
+                            test
+                        </Dropdown.Header>
+                        Test
                     </Dropdown.Menu>
                 </Dropdown>
             </ListGroup.Item>

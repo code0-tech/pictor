@@ -39,10 +39,10 @@ export const Test = () => {
         </ListGroup>
         <CardFooter>
             <ButtonGroup>
-                <Button>
+                <Button variant={"secondary"}>
                     Button
                 </Button>
-                <Button>
+                <Button variant={"secondary"}>
                     Button
                 </Button>
             </ButtonGroup>

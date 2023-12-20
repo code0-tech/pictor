@@ -3,24 +3,17 @@
 
 @mixin box($active: true, $color: $secondary) {
 
-  background: rgba($color, 10%);
+  background: mix($bodyBg, $color, 90%);
+  @include border($active);
   border-radius: $borderRadius;
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   font-size: $secondaryFontSize;
-  -webkit-backdrop-filter: blur($borderRadius * 2);
-  backdrop-filter: blur($borderRadius * 2);
-  border: 1px solid borderColor();
   position: relative;
 
   @if ($active == true) {
     @include hoverAndActiveContent {
-      border: 1px solid borderColor(true);
-    }
-
-    @include activeContent {
-      outline: 1px solid $info;
-      outline-offset: 2px;
+      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 95%, 85%));
     }
   }
 }
@@ -32,11 +25,45 @@
 }
 
 @mixin activeContent() {
-  &--active {
+  &:active, &--active {
     @content
   }
 }
 
-@function borderColor($hover: false) {
-  @return rgba($white, if($hover, 0.2, 0.1))
+@function borderColor($interacted: false) {
+  @return rgba($white, if($interacted == true, .2, .1))
+}
+
+@mixin border($interact: true) {
+
+  border: 1px solid borderColor();
+
+  @if ($interact == true) {
+    &:active, &--active {
+      border: 1px solid borderColor(true);
+    }
+  }
+}
+
+@function color($color, $opacity: 0.5) {
+  @return rgba(if($color == $primary, $white, $color), $opacity)
+}
+
+@mixin background($color: $primary, $interact: true) {
+  background: mix($bodyBg, $color, 90%);
+
+  @if ($interact == true) {
+    &:hover, &:active, &--active {
+      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 95%, 85%));
+    }
+  }
+}
+
+@mixin disabled {
+
+  &--disabled {
+    opacity: 50%;
+    pointer-events: none;
+  }
+
 }

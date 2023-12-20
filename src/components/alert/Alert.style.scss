@@ -7,7 +7,6 @@
   margin-bottom: 1rem;
   min-height: 1.5rem;
 
-
   &__heading {
     font-weight: 500;
   }
@@ -30,17 +29,18 @@
   }
 
   &__icon {
-    @include box(false);
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: .25rem;
+    color: color($white);
+    width: 1.25rem;
+    height: 1.25rem;
     margin-right: .5rem;
 
     > * {
-      width: 1rem;
-      height: 1rem;
+      width: 1.25rem;
+      height: 1.25rem;
     }
   }
 
@@ -67,7 +67,7 @@
     @include box(false, $color);
 
     .alert__icon {
-      @include box(false, $color);
+      color: color($color);
     }
 
     .alert__content {

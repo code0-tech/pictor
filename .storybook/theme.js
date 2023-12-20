@@ -8,7 +8,7 @@ export default create({
     fontBase: '"Ubuntu", sans-serif',
     fontCode: 'monospace',
 
-    brandTitle: 'Code0 Base UI',
+    brandTitle: 'Code0 Pictor',
     brandUrl: 'https://code0.tech',
     brandImage: 'https://cdn.discordapp.com/attachments/1173726744130375791/1176472242469740604/Logo.png',
     brandTarget: '_self',

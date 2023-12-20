@@ -5,7 +5,6 @@
   $color: $secondary;
 
   position: relative;
-  margin-bottom: 1rem !important;
   width: fit-content;
 
   &__trigger {
@@ -103,7 +102,7 @@
     }
 
     &[data-position="bottom"] {
-      top: calc(100% + .5rem);
+      top: calc(100% + 1rem);
     }
 
     &[data-position="top"] {

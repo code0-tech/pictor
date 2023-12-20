@@ -1,0 +1,81 @@
+@import "../../styles/helpers";
+
+.card {
+  @include box(false);
+
+  --padding: .5rem;
+
+  padding: 0 var(--padding);
+  width: 200px;
+
+  > * {
+    &:first-child {
+      border-top-left-radius: $borderRadius;
+      border-top-right-radius: $borderRadius;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: $borderRadius;
+      border-bottom-right-radius: $borderRadius;
+    }
+  }
+
+  &__img, &__header, &__footer {
+    border-bottom: 1px solid borderColor();
+    padding: var(--padding);
+    margin: 0 calc(-1 * var(--padding));
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    > * {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__img {
+    object-fit: cover;
+    padding: 0;
+    width: calc(100% + (var(--padding) * 2));
+  }
+
+  &__img + * {
+    position: relative;
+    margin-top: -4px !important;
+  }
+
+  &__title {
+    padding: 0;
+    font-size: $primaryFontSize;
+    color: rgba($white, 1);
+    font-weight: 500;
+    margin: 0 0 .5rem;
+  }
+
+  &__sub-title {
+    padding: 0;
+    font-size: $secondaryFontSize;
+    color: rgba($white, .75);
+    font-weight: 500;
+    margin: 0 0 .5rem;
+  }
+
+  &__title + &__sub-title {
+    margin-top: -.25rem;
+  }
+}
+
+@each $name, $color in $variants {
+  .card--#{$name} {
+    @include box(false, $color);
+
+    .list-group__item {
+      @include hoverAndActiveContent {
+        background: rgba(if($color == $primary, $white, $color), .1) !important;
+      }
+    }
+  }
+}

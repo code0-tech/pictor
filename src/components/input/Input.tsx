@@ -2,8 +2,11 @@ import React, {DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode, 
 import "./Input.style.scss"
 import {TablerIconsProps} from "@tabler/icons-react";
 
+
+export type InputChildType = InputControlType | InputDescType | InputLabelType
+
 export interface InputType {
-    children: React.ReactNode | React.ReactNode[]
+    children: ReactElement<InputControlType> | ReactElement<InputChildType>[]
     //defaults to false
     disabled?: boolean
     //defaults to undefined
@@ -13,12 +16,20 @@ export interface InputType {
 
 const Input: React.FC<InputType> = (props: InputType) => {
 
-    const {disabled, children, valid} = props
+    const {disabled= false, children, valid} = props
+    const childNodes = React.Children.toArray(children).map(value => {
+        if (React.isValidElement(value) && value.type == InputControl)
+            return React.cloneElement(value as ReactElement, {
+                "aria-disabled": disabled,
+                "disabled": disabled
+            })
+        return value
+    })
 
     return <div
         className={`input ${disabled ? "input--disabled" : ""} ${valid ? "input--valid" : valid !== undefined ? "input--not-valid" : ""}`}
         aria-disabled={disabled ? "true" : "false"}>
-        {children}
+        {childNodes}
     </div>
 }
 
@@ -40,7 +51,8 @@ export interface InputControlType extends DetailedHTMLProps<InputHTMLAttributes<
     placeholder: string
     //TODO: allow both as non required and make sure this does not result in errors inside the component
     children?: ReactElement<InputControlMessageType | InputControlIconType>[] | ReactElement<InputControlMessageType | InputControlIconType>
-
+    //defaults to false
+    disabled?: boolean
     //default is text type
     type?: InputControlTypesType
 }
@@ -57,7 +69,7 @@ export interface InputControlType extends DetailedHTMLProps<InputHTMLAttributes<
  */
 const InputControl: React.ForwardRefExoticComponent<Omit<InputControlType, "ref"> & RefAttributes<HTMLInputElement>> = React.forwardRef<HTMLInputElement, InputControlType>((props, ref) => {
 
-    const {type, placeholder, children, ...args} = props
+    const {type, placeholder, children, disabled, ...args} = props
     const childNodes = children && !Array.isArray(children) ? Array.of(children) : children;
     const icon = childNodes ?  childNodes.find(child => child.type == InputControlIcon) : null
     const message = childNodes ? childNodes.find(child => child.type == InputControlMessage) : null
@@ -82,7 +94,7 @@ const InputControl: React.ForwardRefExoticComponent<Omit<InputControlType, "ref"
     return <>
         <div className={"input__control"}>
             {icon ?? null}
-            <input ref={ref} type={type} placeholder={placeholder} className={"input__field"} {...args} onMouseDown={event => {
+            <input ref={ref} disabled={disabled} type={type} placeholder={placeholder} className={"input__field"} {...args} onMouseDown={event => {
                 (event.target as HTMLInputElement).focus()
             }}/>
         </div>

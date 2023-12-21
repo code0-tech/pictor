@@ -1,3 +1,8 @@
+include:
+  - project: code0-tech/telescopium
+    ref: build-branch
+    file: ci-template.gitlab-ci.yml
+
 storybook:build:
   image: node:20.9.0
   stage: build

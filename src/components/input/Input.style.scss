@@ -7,10 +7,7 @@
     margin-bottom: 0;
   }
 
-  &--disabled {
-    pointer-events: none;
-    opacity: 50%;
-  }
+  @include disabled;
 
   &__control {
     display: flex;
@@ -48,21 +45,18 @@
   }
 
   &__icon {
-    @include box(false);
-
     display: flex;
-    width: 1rem;
-    height: auto;
+    width: 1.25rem;
+    height: 1.25rem;
     justify-content: center;
     align-items: center;
     aspect-ratio: 50/50;
-    padding: .25rem;
     margin-left: .5rem;
     pointer-events: none;
 
     > * {
-      width: 1rem;
-      height: 1rem;
+      width: 1.25rem;
+      height: 1.25rem;
     }
 
   }
@@ -110,18 +104,6 @@
 
   &--not-valid {
 
-    .input__control {
-      border-color: borderColor(false);
-
-      @include hoverAndActiveContent {
-        border-color: borderColor(true);
-      }
-
-      @include activeContent {
-        outline-color: $error;
-      }
-    }
-
     .input__message {
       display: block;
       background: rgba($error, .1);
@@ -130,18 +112,6 @@
   }
 
   &--valid {
-
-    .input__control {
-      border-color: borderColor(false);
-
-      @include hoverAndActiveContent {
-        border-color: borderColor(true);
-      }
-
-      @include activeContent {
-        outline-color: $success;
-      }
-    }
 
     .input__message {
       display: block;

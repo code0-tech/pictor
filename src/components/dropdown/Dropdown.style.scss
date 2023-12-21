@@ -60,9 +60,7 @@
     border-top: 1px solid borderColor();
     border-bottom: 1px solid borderColor();
 
-    @include hoverAndActiveContent {
-      background: rgba($color, .1);
-    }
+    @include background($color, true);
 
     &:first-of-type {
       border-top: none;

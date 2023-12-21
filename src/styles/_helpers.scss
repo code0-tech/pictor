@@ -31,7 +31,7 @@
 }
 
 @function borderColor($interacted: false) {
-  @return rgba($white, if($interacted == true, .2, .1))
+  @return rgba($white, if($interacted, .2, .1))
 }
 
 @mixin border($interact: true) {

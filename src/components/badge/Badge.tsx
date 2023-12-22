@@ -9,9 +9,9 @@ export interface BadgeType extends HTMLProps<HTMLSpanElement>{
 
 const Badge: React.FC<BadgeType> = (props) => {
     
-    const {variant, children, ...args} = props
+    const {variant = "primary", children, ...args} = props
     
-    return <span {...args} className={`badge`}>
+    return <span {...args} className={`badge badge--${variant}`}>
         {children}
     </span>
 }

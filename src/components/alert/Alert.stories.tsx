@@ -28,7 +28,7 @@ export const WithBody: Story = {
 
         return <>
             {
-                ["primary", "secondary", "info",  "success", "warning", "error"].map(value => {
+                ["primary", "secondary", "info",  "error", "success", "warning"].map(value => {
                     // @ts-ignore
                     return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam

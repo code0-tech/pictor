@@ -1,0 +1,35 @@
+name: CI / Update Snapshots
+
+on:
+  pull_request_target:
+    types:
+      - labeled
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  pipeline:
+    if: ${{ github.event.label.name == 'regenerate-snapshots' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Taucher2003/GitLab-Pipeline-Action@1.5.0
+        name: Run pipeline
+        id: pipeline
+        with:
+          GL_SERVER_URL: https://gitlab.com
+          GL_PROJECT_ID: '52344025'
+          GL_RUNNER_TOKEN: ${{ secrets.GL_RUNNER_TOKEN }}
+          GL_API_TOKEN: ${{ secrets.GL_API_TOKEN }}
+          SHOW_JOB_LOGS: all
+        env:
+          GLPA_C0_UPDATE_SNAPSHOTS: 'true'
+          GLPA_C0_GH_PR_HEAD_URL: ${{ github.event.pull_request.head.repo.clone_url }}
+          GLPA_C0_GH_PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          GLPA_C0_GH_BOT_PUSH_ACCESS_TOKEN: ${{ secrets.GH_BOT_PUSH_ACCESS_TOKEN }}
+          GLPA_C0_GH_BOT_PUSH_USERNAME: ${{ secrets.GH_BOT_PUSH_USERNAME }}
+      - run: gh pr edit "${{ github.event.number }}" --remove-label "regenerate-snapshots"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

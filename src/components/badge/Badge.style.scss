@@ -1,0 +1,19 @@
+@import "../../styles/helpers";
+
+.badge {
+  @include opacityBox(false);
+
+  padding: .25rem;
+  display: inline-flex;
+  font-size: $tertiaryFontSize;
+  border: none;
+  width: fit-content;
+}
+
+@each $name, $color in $variants {
+  .badge--#{$name} {
+    @include opacityBox(false, $color);
+    font-size: $tertiaryFontSize;
+    border: none;
+  }
+}

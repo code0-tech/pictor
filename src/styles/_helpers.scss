@@ -18,6 +18,22 @@
   }
 }
 
+@mixin opacityBox($active: true, $color: $secondary) {
+  background: rgba($color, 0.1);
+  @include border($active);
+  border-radius: $borderRadius;
+  color: rgba($white, .5);
+  font-family: Ubuntu, sans-serif;
+  font-size: $secondaryFontSize;
+  position: relative;
+
+  @if ($active == true) {
+    @include hoverAndActiveContent {
+      background: rgba($color, .2);
+    }
+  }
+}
+
 @mixin hoverAndActiveContent() {
   &:hover, &:active, &--active {
     @content

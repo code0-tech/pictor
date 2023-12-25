@@ -11,7 +11,8 @@
     "storybook:build": "storybook build",
     "storybook:test": "test-storybook",
     "storybook:test:all": "test-storybook --browsers chromium firefox webkit",
-    "storybook:test:update": "npm run storybook:test:all -- -u"
+    "storybook:test:update": "npm run storybook:test:all -- -u",
+    "docs:preview": "npm run --prefix ../telescopium project:preview pictor"
   },
   "author": "Code0",
   "license": "MIT",

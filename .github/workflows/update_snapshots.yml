@@ -14,7 +14,7 @@ jobs:
     if: ${{ github.event.label.name == 'regenerate-snapshots' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: Taucher2003/GitLab-Pipeline-Action@1.5.0
+      - uses: Taucher2003/GitLab-Pipeline-Action@1.5.1
         name: Run pipeline
         id: pipeline
         with:

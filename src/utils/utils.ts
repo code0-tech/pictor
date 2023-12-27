@@ -51,38 +51,62 @@ export const getPositionAroundTarget = (target: HTMLElement, element: HTMLElemen
         {
             name: "bottom",
             hierarchy: ["top", "left", "right"],
+            calculationY: (targetPos.y + targetPos.height + margin),
+            calculationX: (targetPos.x),
             conditionFit: ((targetPos.y + targetPos.height + margin + elementPos.height) <= windowSize.height)
         },
         {
             name: "top",
             hierarchy: ["bottom", "left", "right"],
+            calculationY: (targetPos.y - margin - elementPos.height),
+            calculationX: (targetPos.x),
             conditionFit: ((targetPos.y - margin - elementPos.height) >= 0)
         },
         {
             name: "left",
             hierarchy: ["right", "bottom", "top"],
+            calculationY: (targetPos.y - ((elementPos.height - targetPos.height) / 2)),
+            calculationX: (targetPos.x - margin - elementPos.width),
             conditionFit: ((targetPos.x - margin - elementPos.width) >= 0)
         },
         {
             name: "right",
             hierarchy: ["left", "bottom", "top"],
+            calculationY: (targetPos.y - ((elementPos.height - targetPos.height) / 2)),
+            calculationX: (targetPos.x + margin + targetPos.width),
             conditionFit: ((targetPos.x + targetPos.width + margin + elementPos.width) <= windowSize.width)
         }
     ]
 
     const currentPositionObject = positionObject.find(value => value.name == position)
 
-    if (!currentPositionObject) return "bottom"
-    if (currentPositionObject.conditionFit) return position
+    if (!currentPositionObject) return {
+        position: "bottom",
+        y: positionObject[0].calculationY,
+        x: positionObject[0].calculationX
+    }
+
+    if (currentPositionObject.conditionFit) return {
+        position,
+        y: currentPositionObject.calculationY,
+        x: currentPositionObject.calculationX
+    }
 
 
     for (let i = 0; i < currentPositionObject.hierarchy.length; i++) {
         const tempPositionObject = positionObject.find(value => value.name == currentPositionObject.hierarchy[i])
-        if (tempPositionObject?.conditionFit) {
-            return tempPositionObject.name
+        if (tempPositionObject?.conditionFit) return {
+            position: tempPositionObject.name,
+            y: tempPositionObject.calculationY,
+            x: tempPositionObject.calculationX
         }
+
     }
 
-    return "bottom"
+    return {
+        position: "bottom",
+        y: positionObject[0].calculationY,
+        x: positionObject[0].calculationX
+    }
 
 }

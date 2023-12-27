@@ -57,7 +57,17 @@ const Tooltip: React.FC<DropdownType> = (props) => {
 
         const calculatePosition = () => {
             const calculatedPosition = getPositionAroundTarget(trigger, menu, position)
-            menu.setAttribute("data-position", calculatedPosition)
+            menu.setAttribute("data-position", calculatedPosition.position)
+
+            if (calculatedPosition.position == "top") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else if (calculatedPosition.position == "left") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else if (calculatedPosition.position == "bottom") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            }
         }
 
         //calculate right position for the menu and set this as new attribute
@@ -81,11 +91,19 @@ const Tooltip: React.FC<DropdownType> = (props) => {
         tooltip.classList.remove("tooltip--active")
     }
 
+
     return <div className={"tooltip"} onMouseOver={triggerOnMouseOver} onMouseOut={triggerOnMouseOut} {...args}>
         {trigger}
 
         {/*calculate position based on props*/}
         {!!menu ? React.cloneElement(menu as ReactElement, {
+            "style": {
+                //left-right top-bottom
+              "transform": position == "top" ? `translate(0px, 0px)` :
+                         position == "right" ? `` :
+                         position == "left" ? `` :
+                         ``
+            },
             "data-position": position,
             "data-align": align,
         }) : null}

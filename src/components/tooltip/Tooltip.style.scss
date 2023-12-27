@@ -3,8 +3,6 @@
 .tooltip {
 
   $color: $secondary;
-
-  position: relative;
   width: fit-content;
 
   &__trigger {
@@ -23,7 +21,10 @@
   &__menu {
     @include box(false, $color);
 
-    position: absolute;
+    position: fixed;
+    top: 0;
+    word-break: break-word;
+    left: 0;
     display: none;
     z-index: 99999;
     padding: .5rem;
@@ -33,10 +34,6 @@
     }
 
     &[data-position="left"] {
-      inset: 0 auto auto 0;
-      top: 50%;
-      transform: translateX(calc(-100% - .5rem)) translateY(-50%);
-
       &:before {
         position: absolute;
         content: "";
@@ -49,10 +46,6 @@
     }
 
     &[data-position="right"] {
-      top: 50%;
-      right: 0;
-      transform: translateX(calc(100% + .5rem)) translateY(-50%);
-
       &:before {
         position: absolute;
         content: "";
@@ -65,8 +58,6 @@
     }
 
     &[data-position="bottom"] {
-      top: calc(100% + .5em);
-
       &:before {
         position: absolute;
         content: "";
@@ -79,27 +70,15 @@
     }
 
     &[data-position="top"] {
-      bottom: calc(100% + .5rem);
-
       &:before {
         position: absolute;
         content: "";
-        bottom: -.5rem;
+        bottom: calc(-.5rem - 1px);
         left: 0;
         background: transparent;
-        width: 100%;
+        width: calc(100% + 2px);
         height: .5rem;
       }
-    }
-
-    &[data-align="start"] {
-      right: auto;
-      left: 0;
-    }
-
-    &[data-align="end"] {
-      left: auto;
-      right: 0;
     }
 
   }

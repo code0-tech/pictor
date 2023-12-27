@@ -8,16 +8,48 @@ const meta: Meta = {
 }
 
 export const TooltipExample = () => {
-    return <Tooltip position={"top"}>
-        <Tooltip.Trigger>
-            <Button>
-                Test
-            </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Menu>
-            Test 2
-        </Tooltip.Menu>
-    </Tooltip>
+    return <>
+        <Tooltip position={"top"}>
+            <Tooltip.Trigger>
+                <Button>
+                    Test
+                </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Menu>
+                Test 2
+            </Tooltip.Menu>
+        </Tooltip>
+        <Tooltip position={"left"}>
+            <Tooltip.Trigger>
+                <Button>
+                    Test
+                </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Menu>
+                Test 2
+            </Tooltip.Menu>
+        </Tooltip>
+        <Tooltip position={"bottom"}>
+            <Tooltip.Trigger>
+                <Button>
+                    Test
+                </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Menu>
+                Test 2
+            </Tooltip.Menu>
+        </Tooltip>
+        <Tooltip position={"right"}>
+            <Tooltip.Trigger>
+                <Button>
+                    Test
+                </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Menu>
+                Test 2
+            </Tooltip.Menu>
+        </Tooltip>
+    </>
 }
 
 export default meta

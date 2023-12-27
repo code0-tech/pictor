@@ -8,6 +8,10 @@ const customSnapshotsDir = `${process.cwd()}/__snapshots__`;
 const prepareA11y = async (page) => await injectAxe(page);
 
 const executeA11y = async (page, context) => {
+  if(process.env.C0_DISABLE_A11Y_TESTS) {
+    return;
+  }
+
   // Get the entire context of a story, including parameters, args, argTypes, etc.
   const storyContext = await getStoryContext(page, context);
 

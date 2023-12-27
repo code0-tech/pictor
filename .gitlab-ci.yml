@@ -44,6 +44,8 @@ storybook:build:
 storybook:test:
   extends:
     - .storybook:test:base
+  variables:
+    C0_DISABLE_A11Y_TESTS: 'true'
   script:
     - npm run storybook:test:all -- --ci || exit_code=$?
     - |

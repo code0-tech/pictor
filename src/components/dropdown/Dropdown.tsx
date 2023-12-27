@@ -70,7 +70,17 @@ const Dropdown: React.FC<DropdownType> = (props) => {
 
         const calculatePosition = () => {
             const calculatedPosition = getPositionAroundTarget(trigger, menu, position)
-            menu.setAttribute("data-position", calculatedPosition)
+            menu.setAttribute("data-position", calculatedPosition.position)
+
+            if (calculatedPosition.position == "top") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else if (calculatedPosition.position == "left") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else if (calculatedPosition.position == "bottom") {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            } else {
+                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            }
         }
 
         //calculate right position for the menu and set this as new attribute

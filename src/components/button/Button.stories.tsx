@@ -90,26 +90,3 @@ export const ButtonGroups: ButtonGroupStory = {
         </>
     }
 }
-
-export const ButtonImage = () => {
-    return <ButtonGroup>
-        {
-            ["Pictor", "Sculptor", "Reticulum"].map(value => {
-                return <Tooltip>
-                    <Tooltip.Trigger>
-                        <Button variant={"primary"}>
-                            <Button.Icon>
-                                <img width={32}
-                                     src={"https://cdn.discordapp.com/attachments/1187919509298888746/1187921987868299388/Logo.png"}/>
-                            </Button.Icon>
-                            {value}
-                        </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Menu style={{width: "185px"}}>
-                        React Component Library
-                    </Tooltip.Menu>
-                </Tooltip>
-            })
-        }
-    </ButtonGroup>
-}

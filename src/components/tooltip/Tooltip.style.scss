@@ -20,6 +20,7 @@
 
   &__menu {
     @include box(false, $color);
+    box-shadow: 0 0 2rem .5rem rgba($bodyBg, 1);
 
     position: fixed;
     top: 0;

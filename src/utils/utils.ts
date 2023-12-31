@@ -65,14 +65,14 @@ export const getPositionAroundTarget = (target: HTMLElement, element: HTMLElemen
         {
             name: "left",
             hierarchy: ["right", "bottom", "top"],
-            calculationY: (targetPos.y - ((elementPos.height - targetPos.height) / 2)),
+            calculationY: (targetPos.y),
             calculationX: (targetPos.x - margin - elementPos.width),
             conditionFit: ((targetPos.x - margin - elementPos.width) >= 0)
         },
         {
             name: "right",
             hierarchy: ["left", "bottom", "top"],
-            calculationY: (targetPos.y - ((elementPos.height - targetPos.height) / 2)),
+            calculationY: (targetPos.y),
             calculationX: (targetPos.x + margin + targetPos.width),
             conditionFit: ((targetPos.x + targetPos.width + margin + elementPos.width) <= windowSize.width)
         }

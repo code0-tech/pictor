@@ -11,7 +11,7 @@ export interface DropdownType {
     //defaults to 'bottom'
     position?: 'top' | 'bottom' | 'left' | 'right'
     //defaults to 'start'
-    align?: 'start' | 'end'
+    align?: 'start' | 'center' | 'end'
     //defaults to 3 times the size of trigger
     maxWidthFactor?: number
 }
@@ -74,14 +74,19 @@ const Dropdown: React.FC<DropdownType> = (props) => {
             const calculatedPosition = getPositionAroundTarget(trigger, menu, position)
             menu.setAttribute("data-position", calculatedPosition.position)
             menu.style.maxWidth = `${trigger.offsetWidth * maxWidthFactor}px`
-            if (calculatedPosition.position == "top") {
-                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
-            } else if (calculatedPosition.position == "left") {
-                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
-            } else if (calculatedPosition.position == "bottom") {
-                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+            if (calculatedPosition.position == "top" || calculatedPosition.position == "bottom") {
+                const alignmentX = align == "start" ? calculatedPosition.x :
+                                   align == "center" ? calculatedPosition.x - ((menu.offsetWidth - trigger.offsetWidth) / 2) :
+                                   calculatedPosition.x - (menu.offsetWidth - trigger.offsetWidth)
+
+                menu.style.transform = `translate(${alignmentX}px,${calculatedPosition.y}px)`
             } else {
-                menu.style.transform = `translate(${calculatedPosition.x}px,${calculatedPosition.y}px)`
+
+                const alignmentY = align == "start" ? calculatedPosition.y :
+                                   align == "center" ? calculatedPosition.y - ((menu.offsetHeight - trigger.offsetHeight) / 2) :
+                                   calculatedPosition.y - (menu.offsetHeight - trigger.offsetHeight)
+
+                menu.style.transform = `translate(${calculatedPosition.x}px,${alignmentY}px)`
             }
         }
 

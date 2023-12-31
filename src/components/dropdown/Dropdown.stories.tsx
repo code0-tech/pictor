@@ -25,7 +25,7 @@ export const Dropdowns = () => {
         </Dropdown>
 
 
-        <Dropdown position={"bottom"} align={"start"}>
+        <Dropdown position={"top"} align={"center"}>
             <Dropdown.Trigger>
                 <Button>Open Dropdown</Button>
             </Dropdown.Trigger>

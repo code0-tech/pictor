@@ -89,17 +89,6 @@
       display: block;
     }
 
-
-    &[data-align="start"] {
-      right: auto;
-      left: 0;
-    }
-
-    &[data-align="end"] {
-      left: auto;
-      right: 0;
-    }
-
   }
 
 }

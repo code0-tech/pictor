@@ -7,11 +7,13 @@ import {DropdownItem} from "./DropdownItem";
 import {DropdownItemGroup} from "./DropdownItemGroup";
 
 export interface DropdownType {
-    children: ReactElement<DropdownTriggerType & DropdownMenuType>[],
+    children: ReactElement<DropdownTriggerType & DropdownMenuType>[]
     //defaults to 'bottom'
     position?: 'top' | 'bottom' | 'left' | 'right'
     //defaults to 'start'
-    align?: 'start' | 'end'
+    align?: 'start' | 'center' | 'end'
+    //defaults to 3 times the size of trigger
+    maxWidthFactor?: number
 }
 
 export interface DropdownTriggerType {
@@ -24,7 +26,7 @@ export interface DropdownMenuType {
 
 const Dropdown: React.FC<DropdownType> = (props) => {
 
-    const {position, align, children, ...args} = props
+    const {position = "bottom", align = "start", maxWidthFactor = 3, children, ...args} = props
     const trigger = getChild(children, DropdownTrigger)
     const menu = getChild(children, DropdownMenu)
 
@@ -70,7 +72,22 @@ const Dropdown: React.FC<DropdownType> = (props) => {
 
         const calculatePosition = () => {
             const calculatedPosition = getPositionAroundTarget(trigger, menu, position)
-            menu.setAttribute("data-position", calculatedPosition)
+            menu.setAttribute("data-position", calculatedPosition.position)
+            menu.style.maxWidth = `${trigger.offsetWidth * maxWidthFactor}px`
+            if (calculatedPosition.position == "top" || calculatedPosition.position == "bottom") {
+                const alignmentX = align == "start" ? calculatedPosition.x :
+                                   align == "center" ? calculatedPosition.x - ((menu.offsetWidth - trigger.offsetWidth) / 2) :
+                                   calculatedPosition.x - (menu.offsetWidth - trigger.offsetWidth)
+
+                menu.style.transform = `translate(${alignmentX}px,${calculatedPosition.y}px)`
+            } else {
+
+                const alignmentY = align == "start" ? calculatedPosition.y :
+                                   align == "center" ? calculatedPosition.y - ((menu.offsetHeight - trigger.offsetHeight) / 2) :
+                                   calculatedPosition.y - (menu.offsetHeight - trigger.offsetHeight)
+
+                menu.style.transform = `translate(${calculatedPosition.x}px,${alignmentY}px)`
+            }
         }
 
         //calculate right position for the menu and set this as new attribute
@@ -102,7 +119,6 @@ const Dropdown: React.FC<DropdownType> = (props) => {
             "onClick": triggerOnClick
         })}
 
-        {/*calculate position based on props*/}
         {!!menu ? React.cloneElement(menu as ReactElement, {
             "data-position": position,
             "data-align": align,

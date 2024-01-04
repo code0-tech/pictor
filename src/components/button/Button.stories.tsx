@@ -20,7 +20,7 @@ const meta = {
     }
 }
 
-type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean}>;
+type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean }>;
 type ButtonGroupStory = StoryObj<typeof ButtonGroup>;
 
 export default meta

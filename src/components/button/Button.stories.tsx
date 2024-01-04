@@ -3,7 +3,6 @@ import {StoryObj} from "@storybook/react";
 import React from "react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import {IconAbc} from "@tabler/icons-react";
-import Tooltip from "../tooltip/Tooltip";
 
 const meta = {
     title: "Button",

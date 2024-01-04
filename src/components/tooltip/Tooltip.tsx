@@ -78,9 +78,6 @@ const Tooltip: React.FC<DropdownType> = (props) => {
         //calculate right position for the menu and set this as new attribute
         calculatePosition()
 
-        //outside clicks that disables the dropdown
-
-
         //change position of menu when screen is resized
         window.addEventListener("resize", function temp() {
             calculatePosition()

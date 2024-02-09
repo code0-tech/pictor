@@ -71,6 +71,8 @@
     "access": "public"
   },
   "dependencies": {
+    "react-aria": "^3.31.1",
+    "react-stately": "^3.29.1",
     "rollup-plugin-visualizer": "^5.11.0"
   }
 }

@@ -4,6 +4,7 @@ import {useOverlayTriggerState} from "react-stately";
 import {getChild} from "../../utils/utils";
 import {OverlayTriggerProps, PositionProps} from "@react-types/overlays";
 import "./Popover.style.scss"
+import {AriaButtonOptions} from "@react-aria/button";
 
 export interface PopoverProps extends PositionProps, OverlayTriggerProps {
     children: React.ReactElement<PopoverTriggerType & PopoverContentType>[]
@@ -48,13 +49,13 @@ const Popover: React.FC<PopoverProps> = (props) => {
     }, state);
 
 
-    const {buttonProps} = useButton(triggerProps, triggerRef);
+    const {buttonProps} = useButton(triggerProps as AriaButtonOptions<'div'>, triggerRef);
 
 
     return (
         <>
-            <div ref={triggerRef}>
-                {popoverTrigger ? React.cloneElement(popoverTrigger?.props.children, buttonProps) : null}
+            <div ref={triggerRef} {...buttonProps}>
+                {popoverTrigger?.props.children}
             </div>
 
             {state.isOpen &&

@@ -1,0 +1,9 @@
+@import "src/styles/helpers";
+
+.popover {
+
+  &__content {
+    @include box(false);
+    padding: .5rem;
+  }
+}

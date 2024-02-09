@@ -1,51 +1,71 @@
-import React, {useRef} from "react";
-import {AriaPopoverProps, Overlay, useButton, useOverlayTrigger, usePopover} from "react-aria";
+import React from "react";
+import {Overlay, useButton, useOverlayTrigger, usePopover} from "react-aria";
 import {useOverlayTriggerState} from "react-stately";
+import {getChild} from "../../utils/utils";
+import {OverlayTriggerProps, PositionProps} from "@react-types/overlays";
+import "./Popover.style.scss"
 
-interface PopoverProps extends Omit<AriaPopoverProps, 'popoverRef'> {
+export interface PopoverProps extends PositionProps, OverlayTriggerProps {
+    children: React.ReactElement<PopoverTriggerType & PopoverContentType>[]
+}
+
+export interface PopoverTriggerType {
     children: React.ReactElement
+}
+
+export interface PopoverContentType {
+    children: React.ReactNode
 }
 
 const Popover: React.FC<PopoverProps> = (props) => {
 
     const {children, offset = 8, placement = "bottom start", ...args} = props
-    const triggerRef = React.useRef(null)
-    const popoverRef = useRef(null)
-    const state = useOverlayTriggerState({})
 
-    const {triggerProps, overlayProps} = useOverlayTrigger(
+    //get trigger and content from popover
+    const popoverTrigger = getChild(children, PopoverTrigger, true)
+    const popoverContent = getChild(children, PopoverContent, true)
+
+    //initial state for popover
+    const state = useOverlayTriggerState({
+        isOpen: props.isOpen,
+        defaultOpen: props.defaultOpen,
+        onOpenChange: props.onOpenChange
+    })
+
+    const triggerRef = React.useRef(null)
+    const popoverRef = React.useRef(null)
+
+    const {triggerProps} = useOverlayTrigger(
         {type: 'dialog'},
         state,
         triggerRef
     )
-    const {popoverProps, underlayProps} = usePopover({
+    const {popoverProps} = usePopover({
         placement,
         offset,
         triggerRef,
         popoverRef
     }, state);
 
-    let { buttonProps } = useButton(triggerProps, triggerRef);
 
-
-    const popoverContent = <span style={{color: "white"}}>dsd</span>
+    const {buttonProps} = useButton(triggerProps, triggerRef);
 
 
     return (
         <>
             <div ref={triggerRef}>
-                {React.cloneElement(children, buttonProps)}
+                {popoverTrigger ? React.cloneElement(popoverTrigger?.props.children, buttonProps) : null}
             </div>
+
             {state.isOpen &&
                 (
                     <Overlay>
-                        <div {...underlayProps} className="underlay"/>
                         <div
                             {...popoverProps}
                             ref={popoverRef}
-                            className="popover"
+                            className="popover__content"
                         >
-                            {React.cloneElement(popoverContent, overlayProps)}
+                            {popoverContent}
                         </div>
                     </Overlay>
                 )}
@@ -54,5 +74,26 @@ const Popover: React.FC<PopoverProps> = (props) => {
 
 }
 
+const PopoverTrigger: React.FC<PopoverTriggerType> = (props) => {
 
-export default Object.assign(Popover)
+    const {children, ...args} = props
+
+    return <div {...args}>
+        {children}
+    </div>
+}
+
+const PopoverContent: React.FC<PopoverContentType> = (props) => {
+
+    const {children, ...args} = props
+
+    return <>
+        {children}
+    </>
+}
+
+
+export default Object.assign(Popover, {
+    Trigger: PopoverTrigger,
+    Content: PopoverContent
+})

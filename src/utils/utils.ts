@@ -1,10 +1,20 @@
-import React, {ReactNode, RefObject, useCallback, useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useMemo, useState} from "react";
 
-export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>): ReactNode | null => {
-    return React.Children.toArray(children).find((childT) => {
-        if (!React.isValidElement(childT)) return false;
-        return childT.type == child;
-    })
+export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
+
+    const [childComponent, setChildComponent] = useState<React.ReactElement | undefined>()
+    useMemo(() => {
+        let found = false
+        React.Children.forEach(children, (childT, index) => {
+            if (React.isValidElement(childT) && childT.type == child) {
+                setChildComponent(childT)
+                found = true
+            }
+            else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)
+        })
+    }, [])
+
+    return childComponent
 }
 
 export const getContent = (children: ReactNode | ReactNode[], ...child: React.FC<any>[]): ReactNode[] | null => {

@@ -44,8 +44,6 @@ storybook:build:
 storybook:test:
   extends:
     - .storybook:test:base
-  variables:
-    C0_DISABLE_A11Y_TESTS: 'true'
   script:
     - npm run storybook:test:all -- --ci || exit_code=$?
     - |
@@ -68,6 +66,8 @@ storybook:test:
 storybook:test:update:
   extends:
     - .storybook:test:base
+  variables:
+    C0_DISABLE_A11Y_TESTS: 'true'
   before_script:
     - git remote add github $C0_GH_PR_HEAD_URL
     - git fetch github

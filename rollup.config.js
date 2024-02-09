@@ -5,7 +5,6 @@ import typescript from "@rollup/plugin-typescript";
 import postcss from "rollup-plugin-postcss";
 import visualizer from 'rollup-plugin-visualizer';
 import dts from "rollup-plugin-dts";
-import {getFiles} from "./scripts/buildUtils";
 
 const packageJson = require("./package.json");
 const extensions = ['.js', '.ts', '.jsx', '.tsx'];

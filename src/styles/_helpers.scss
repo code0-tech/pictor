@@ -13,7 +13,7 @@
 
   @if ($active == true) {
     @include hoverAndActiveContent {
-      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 95%, 85%));
+      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
     }
   }
 }
@@ -35,8 +35,9 @@
 }
 
 @mixin hoverAndActiveContent() {
-  &:hover, &:active, &--active {
-    @content
+  &:hover, &:active, &--active, &:focus, &:focus-visible {
+    @content;
+    outline: none;
   }
 }
 

@@ -1,10 +1,10 @@
 import React from "react";
-import {Overlay, useButton, useOverlayTrigger, usePopover} from "react-aria";
+import {useButton, useOverlayTrigger} from "react-aria";
 import {useOverlayTriggerState} from "react-stately";
 import {getChild} from "../../utils/utils";
 import {OverlayTriggerProps, PositionProps} from "@react-types/overlays";
-import "./Popover.style.scss"
 import {AriaButtonOptions} from "@react-aria/button";
+import {InternalPopover} from "./InternalPopover";
 
 export interface PopoverProps extends PositionProps, OverlayTriggerProps {
     children: React.ReactElement<PopoverTriggerType & PopoverContentType>[]
@@ -20,7 +20,7 @@ export interface PopoverContentType {
 
 const Popover: React.FC<PopoverProps> = (props) => {
 
-    const {children, offset = 8, placement = "bottom start", ...args} = props
+    const {children, ...args} = props
 
     //get trigger and content from popover
     const popoverTrigger = getChild(children, PopoverTrigger, true)
@@ -34,19 +34,12 @@ const Popover: React.FC<PopoverProps> = (props) => {
     })
 
     const triggerRef = React.useRef(null)
-    const popoverRef = React.useRef(null)
 
-    const {triggerProps} = useOverlayTrigger(
-        {type: 'dialog'},
+    const {triggerProps, overlayProps} = useOverlayTrigger(
+        {type: "dialog"},
         state,
         triggerRef
     )
-    const {popoverProps} = usePopover({
-        placement,
-        offset,
-        triggerRef,
-        popoverRef
-    }, state);
 
 
     const {buttonProps} = useButton(triggerProps as AriaButtonOptions<'div'>, triggerRef);
@@ -58,18 +51,11 @@ const Popover: React.FC<PopoverProps> = (props) => {
                 {popoverTrigger?.props.children}
             </div>
 
-            {state.isOpen &&
-                (
-                    <Overlay>
-                        <div
-                            {...popoverProps}
-                            ref={popoverRef}
-                            className="popover__content"
-                        >
-                            {popoverContent}
-                        </div>
-                    </Overlay>
-                )}
+            {state.isOpen && (
+                <InternalPopover {...args} state={state} triggerRef={triggerRef}>
+                    {popoverContent ? React.cloneElement(popoverContent, overlayProps) : null}
+                </InternalPopover>
+            )}
         </>
     );
 

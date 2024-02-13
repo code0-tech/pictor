@@ -12,7 +12,7 @@ export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>
             }
             else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)
         })
-    }, [])
+    }, [children, child])
 
     return childComponent
 }

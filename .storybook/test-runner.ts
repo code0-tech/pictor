@@ -35,7 +35,10 @@ const executeA11y = async (page, context) => {
 }
 
 const executeVisualTest = async (page, context) => {
-  const image = await page.locator('#storybook-root').screenshot();
+  const storyContext = await getStoryContext(page, context);
+  const screenshotSelector = storyContext.parameters?.visualTest?.selector ?? '#storybook-root';
+
+  const image = await page.locator(screenshotSelector).screenshot();
   expect(image).toMatchImageSnapshot({
     customSnapshotsDir,
     customSnapshotIdentifier: `${context.id}-${page.context().browser().browserType().name()}`,

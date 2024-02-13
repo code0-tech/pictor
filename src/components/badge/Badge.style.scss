@@ -14,6 +14,5 @@
   .badge--#{$name} {
     @include opacityBox(false, $color);
     font-size: $tertiaryFontSize;
-    border: none;
   }
 }

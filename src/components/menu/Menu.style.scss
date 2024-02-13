@@ -1,0 +1,89 @@
+@import "src/styles/helpers";
+
+.menu {
+
+  list-style: none;
+  margin: -.25rem 0;
+  padding: 0;
+  outline: none;
+
+  > *:first-child.menu__section {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  > *:last-child.menu__section {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+  }
+
+  &__item {
+    @include disabled();
+    border: none !important;
+    margin: 0 -.25rem;
+    border-radius: .5rem;
+    padding: .5rem;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    > div {
+      position: relative;
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+
+  }
+
+  &__section {
+    border-top: 1px solid borderColor();
+    border-bottom: 1px solid borderColor();
+    list-style: none;
+    margin: .25rem -.5rem;
+    padding: .25rem .5rem;
+    outline: none;
+
+    + .menu__section {
+      border-top: none;
+      margin-top: -.25rem;
+    }
+  }
+
+  &__section-title {
+    font-size: $tertiaryFontSize;
+    color: rgba($white, .25);
+    display: block;
+    margin: .25rem 0 .25rem .25rem;
+  }
+
+  &__icon {
+    margin-right: .5rem;
+  }
+
+  &__shortcut {
+    margin-left: auto;
+    padding-left: .5rem;
+  }
+
+}
+
+@each $name, $color in $variants {
+  .menu__item--#{$name} {
+    @include hoverAndActiveContent {
+      background: rgba($color, .2);
+    }
+
+    .menu__icon {
+      color: rgba($color, .5);
+    }
+  }
+  .menu__item--unselectable {
+    background: transparent !important;
+    pointer-events: none;
+  }
+}

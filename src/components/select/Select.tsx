@@ -2,7 +2,7 @@ import {getChild} from "../../utils/utils";
 import {Selection} from "react-stately";
 import React, {useState} from "react";
 import {Key} from "react-aria";
-import Menu, {MenuIconType, MenuItemType} from "../menu/Menu";
+import Menu, {MenuItemType} from "../menu/Menu";
 import Input from "../input/Input";
 import {IconSelector, TablerIconsProps} from "@tabler/icons-react";
 

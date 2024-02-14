@@ -14,6 +14,11 @@ const meta: Meta = {
             options: ['left start', 'left end', 'bottom start', 'bottom end', 'top start', 'top end', 'right start', 'right end'],
             control: {type: 'radio'},
         }
+    },
+    parameters: {
+        visualTest: {
+            selector: 'body'
+        }
     }
 }
 

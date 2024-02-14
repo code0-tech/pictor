@@ -28,7 +28,19 @@ export const BasicSelect: MenuStory = {
         const {defaultValue} = args
 
         return <>
-            <Select description={"Lorem ipsum"} defaultValue={defaultValue} disabled={false}>
+            <Select description={"Lorem ipsum"} defaultValue={defaultValue}>
+                <Select.Option>Lorem ipsum 1</Select.Option>
+                <Select.Option>Lorem ipsum 2</Select.Option>
+            </Select>
+        </>
+    }
+}
+
+export const BasicSelectWithOutDeselect: MenuStory = {
+    render: (args) => {
+
+        return <>
+            <Select forbidDeselect description={"Lorem ipsum"} defaultValue={"Lorem ipsum 1"}>
                 <Select.Option>Lorem ipsum 1</Select.Option>
                 <Select.Option>Lorem ipsum 2</Select.Option>
             </Select>
@@ -43,7 +55,7 @@ export const DisabledSelect: MenuStory = {
         const {defaultValue} = args
 
         return <>
-            <Select description={"Lorem ipsum"} defaultValue={defaultValue} disabled={true}>
+            <Select description={"Lorem ipsum"} defaultValue={defaultValue} disabled>
                 <Select.Icon><IconBulbOff></IconBulbOff></Select.Icon>
             </Select>
         </>

@@ -15,7 +15,8 @@ export interface SelectType {
     children: React.ReactElement<SelectIconType & SelectOptionType>[] | React.ReactElement<SelectIconType & SelectOptionType>,
     defaultValue?: string,
     disabled?: boolean,
-    description?: string
+    description?: string,
+    forbidDeselect?: boolean,
 }
 
 export interface SelectIconType {
@@ -46,6 +47,7 @@ const Select: React.FC<SelectType> = (props) => {
         <Menu defaultSelectedKeys={[props.defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
               onSelectionChange={selection => {
                   const keys: Set<Key> = selection as Set<Key>;
+                  if (keys.size === 0 && props.forbidDeselect) return
                   setSelection(keys.size === 0 ? new Set([""]) : selection)
               }}>
             <Menu.Trigger>

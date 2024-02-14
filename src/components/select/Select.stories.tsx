@@ -14,21 +14,26 @@ const meta: Meta = {
         defaultValue: {
             type: "string",
             defaultValue: "1"
+        },
+        label: {
+            type: "string",
+            defaultValue: "This is a label"
         }
     }
 }
 
 export default meta;
 
-type MenuStory = StoryObj<{ defaultValue: string }>
+type MenuStory = StoryObj<{ defaultValue: string, label: string }>
 
 export const BasicSelect: MenuStory = {
     render: (args) => {
 
-        const {defaultValue} = args
+        const {defaultValue, label} = args
 
         return <>
             <Select description={"Lorem ipsum"} defaultValue={defaultValue}>
+                <Select.Label>{label}</Select.Label>
                 <Select.Option>Lorem ipsum 1</Select.Option>
                 <Select.Option>Lorem ipsum 2</Select.Option>
             </Select>

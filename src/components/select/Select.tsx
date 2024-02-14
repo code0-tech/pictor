@@ -27,14 +27,20 @@ export interface SelectOptionType extends Omit<MenuItemType, "key"> {
     children: string
 }
 
+export interface SelectLabelType {
+    children: string,
+}
+
 
 const Select: React.FC<SelectType> = (props) => {
 
     const [selection, setSelection] = useState<Selection>(new Set([props.defaultValue ?? ""]));
     const selectedArray = [...selection] as string[]
+    const selectLabel: any = getChild(props.children, SelectLabel, false)
 
     const InputComponent: React.FC<any> = (otherProps) => {
         return <Input {...otherProps}>
+            {selectLabel && <Input.Label>{selectLabel}</Input.Label>}
             <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly={true}>
                 <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ??
                     <IconSelector/>}</Input.Control.Icon>
@@ -74,6 +80,13 @@ const SelectionOption: React.FC<SelectOptionType> = (props) => {
     return <>{children}</>
 }
 
+const SelectLabel: React.FC<SelectLabelType> = (props) => {
+
+    const {children} = props
+
+    return <>{children}</>
+}
+
 const SelectIcon: React.FC<TablerIconsProps> = (props) => {
 
     const {children} = props
@@ -85,4 +98,5 @@ const SelectIcon: React.FC<TablerIconsProps> = (props) => {
 export default Object.assign(Select, {
     Option: SelectionOption,
     Icon: SelectIcon,
+    Label: SelectLabel
 })

@@ -1,11 +1,7 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
-import Button from "../button/Button";
-import {Placement} from "react-aria";
-import {IconBulbOff, IconDisabled, IconLogout, IconUserCancel, IconUserEdit} from "@tabler/icons-react";
-import Badge from "../badge/Badge";
+import {IconBulbOff} from "@tabler/icons-react";
 import Select from "./Select";
-import Menu from "../menu/Menu";
 
 const meta: Meta = {
     title: "Select",

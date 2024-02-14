@@ -1,15 +1,10 @@
 import {getChild} from "../../utils/utils";
-import {Item, Section, Selection, useMenuTriggerState} from "react-stately";
-import React, {useEffect, useState} from "react";
-import {AriaMenuProps, Key, useButton, useMenuTrigger} from "react-aria";
-import {AriaButtonOptions} from "@react-aria/button";
-import {InternalPopover} from "../popover/InternalPopover";
-import {InternalMenu} from "../menu/InternalMenu";
-import {PopoverProps} from "../popover/Popover";
+import {Selection} from "react-stately";
+import React, {useState} from "react";
+import {Key} from "react-aria";
 import Menu, {MenuIconType, MenuItemType} from "../menu/Menu";
-import Badge from "../badge/Badge";
 import Input from "../input/Input";
-import {Icon, IconMail, IconSelect, IconSelector, TablerIconsProps} from "@tabler/icons-react";
+import {IconSelector, TablerIconsProps} from "@tabler/icons-react";
 
 export interface SelectType {
     children: React.ReactElement<SelectIconType & SelectOptionType>[] | React.ReactElement<SelectIconType & SelectOptionType>,
@@ -42,8 +37,7 @@ const Select: React.FC<SelectType> = (props) => {
         return <Input {...otherProps}>
             {selectLabel && <Input.Label>{selectLabel}</Input.Label>}
             <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly={true}>
-                <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ??
-                    <IconSelector/>}</Input.Control.Icon>
+                <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ?? <IconSelector/>}</Input.Control.Icon>
             </Input.Control>
             {props.description ? <Input.Desc>{props.description}</Input.Desc> : <></>}
         </Input>

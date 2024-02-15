@@ -98,7 +98,7 @@ export const Clearable: MenuStory = {
         const {defaultValue} = args
 
         return <>
-            <Select clearable label={"Test"} description={"Lorem ipsum"} defaultValue={defaultValue} disabled>
+            <Select clearable label={"Test"} description={"Lorem ipsum"} defaultValue={defaultValue} >
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>

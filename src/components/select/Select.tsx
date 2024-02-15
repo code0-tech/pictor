@@ -10,19 +10,19 @@ import "./Select.style.scss"
 
 export interface SelectType {
     children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
-    defaultValue?: string,
-    disabled?: boolean,
-    clearable?: boolean,
-    label?: string,
-    error?: React.ReactNode,
-    success?: React.ReactNode,
-    description?: string,
-    disallowDeselection?: boolean,
-    onDeselection?: (event: Event) => void,
-    onSelectionChange?: (event: Event, selection: Selection) => void,
+    defaultValue?: string, //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
+    disabled?: boolean, //If true the select is disabled and cant be used
+    clearable?: boolean, //Adds an icon to clear the current selection
+    label?: string, //A text which is displayed above the input to give a short description
+    error?: React.ReactNode, //A Node which is displayed as an error
+    success?: React.ReactNode, //A Node which is displayed as a success
+    description?: string, //A description for the input
+    disallowDeselection?: boolean, //If true the user cant deselect an element
+    onDeselection?: (event: SelectEvent) => void, //this event is trigger if an element is deselected
+    onSelectionChange?: (event: SelectEvent, selection: Selection) => void, //this event is trigger if an element is changed
 }
 
-export interface Event {
+export interface SelectEvent {
     isPrevented: () => boolean,
     preventDefault: () => void,
     setNewSelection: (selection: Selection) => void,
@@ -97,7 +97,7 @@ const Select: React.FC<SelectType> = (props) => {
 
 }
 
-const createCustomEvent = (newSelection: Selection): Event => {
+const createCustomEvent = (newSelection: Selection): SelectEvent => {
     let prevented = false
     let selection = newSelection
     return {
@@ -121,13 +121,13 @@ const createCustomEvent = (newSelection: Selection): Event => {
     }
 }
 
-const handleDeselectionEvent = (triggerMethod: (event: Event, newSelection: Selection) => void): Event => {
+const handleDeselectionEvent = (triggerMethod: (event: SelectEvent, newSelection: Selection) => void): SelectEvent => {
     const event = createCustomEvent(new Set([""]))
     triggerMethod(event, event.getNewSelection())
     return event
 }
 
-const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: Event, selection: Selection) => void): Event => {
+const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: SelectEvent, selection: Selection) => void): SelectEvent => {
     const event = createCustomEvent(newSelection)
     triggerMethod(event, event.getNewSelection())
     return event

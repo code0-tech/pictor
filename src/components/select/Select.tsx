@@ -52,24 +52,16 @@ const Select: React.FC<SelectType> = (props) => {
     const [selection, setSelection] = useState<Selection>(new Set([defaultValue ?? ""]))
     const selectedArray = [...selection] as string[]
 
-    const InputComponent: React.FC<any> = (otherProps) => {
-        return <div onClick={event => {
-            if (children && selectedArray[0] !== "") {
-                if ((event.target as HTMLDivElement).className.includes("input__control")) setSelection(new Set([""]))
-            }
-        }}>
-            <Input {...otherProps}>
-                <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
-                               value={selectedArray[0]} readOnly>
-                    <Input.Control.Icon>{clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> :
-                        <IconSelector/>}</Input.Control.Icon>
-                </Input.Control>
-            </Input>
-        </div>
-    }
 
     return <>
-        {disabled ? <InputComponent disabled/> :
+        {disabled ? <Input disabled>
+                <Input.Control{...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
+                              value={selectedArray[0]} readOnly>
+                    <Input.Control.Icon>
+                        {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
+                    </Input.Control.Icon>
+                </Input.Control>
+            </Input> :
             <Menu defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
@@ -88,12 +80,19 @@ const Select: React.FC<SelectType> = (props) => {
                       setSelection(newSelection)
                   }}>
                 <Menu.Trigger>
-                    <InputComponent/>
+                    <Input>
+                        <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
+                                      value={selectedArray[0]} readOnly>
+                            <Input.Control.Icon>
+                                {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
+                            </Input.Control.Icon>
+                        </Input.Control>
+                    </Input>
                 </Menu.Trigger>
 
                 <Menu.Content>
                     {
-                        Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
+                        Array.of(children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
                             return <Menu.Item {...child.props}
                                               key={child.key ?? index}>{child.props.children}</Menu.Item>
                         })

@@ -35,8 +35,8 @@ export interface SelectIconType {
     children: TablerIconsProps
 }
 
-//TODO implement label-, description-, error- and SuccessMessages, also need to implement clearable
-//These components doesnt exists, waiting for Nico
+//TODO implement label-, description-, error- and SuccessMessages
+//These components dont exists, waiting for Nico
 
 const Select: React.FC<SelectType> = (props) => {
 

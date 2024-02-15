@@ -39,43 +39,51 @@ export interface SelectIconType {
 //These components dont exists, waiting for Nico
 
 const Select: React.FC<SelectType> = (props) => {
+    const {
+        disabled = false, clearable = false, defaultValue,
+        onSelectionChange = () => {
+        }, onDeselection = () => {
+        },
+        children, label, disallowDeselection = false,
+        success, description,
+        error
+    } = props
 
-    const [selection, setSelection] = useState<Selection>(new Set([props.defaultValue ?? ""]))
+    const [selection, setSelection] = useState<Selection>(new Set([defaultValue ?? ""]))
     const selectedArray = [...selection] as string[]
 
     const InputComponent: React.FC<any> = (otherProps) => {
         return <div onClick={event => {
-            if (props.clearable && selectedArray[0] !== "") {
+            if (children && selectedArray[0] !== "") {
                 if ((event.target as HTMLDivElement).className.includes("input__control")) setSelection(new Set([""]))
             }
         }}>
             <Input {...otherProps}>
-                <Input.Control {...(props.label ? {label: props.label} : {label: ""})} placeholder={selectedArray[0]} value={selectedArray[0]} readOnly>
-                    <Input.Control.Icon>{props.clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}</Input.Control.Icon>
+                <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
+                               value={selectedArray[0]} readOnly>
+                    <Input.Control.Icon>{clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> :
+                        <IconSelector/>}</Input.Control.Icon>
                 </Input.Control>
             </Input>
         </div>
     }
 
     return <>
-        {props.disabled ? <InputComponent disabled/> :
-            <Menu defaultSelectedKeys={[props.defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
+        {disabled ? <InputComponent disabled/> :
+            <Menu defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
-                      if (keys.size === 0 && props.disallowDeselection) return
+                      if (keys.size === 0 && disallowDeselection) return
                       let newSelection = keys.size === 0 ? new Set([""]) : selection
                       if (keys.size === 0) {
-                          if (props.onDeselection) {
-                              const event = handleDeselectionEvent(props.onDeselection)
-                              if (event.isPrevented()) return
-                              newSelection = event.getNewSelection()
-                          }
+                          const event = handleDeselectionEvent(onDeselection)
+                          if (event.isPrevented()) return
+                          newSelection = event.getNewSelection()
+
                       } else {
-                          if (props.onSelectionChange) {
-                              const event = handleSelectionChangeEvent(selection, props.onSelectionChange)
-                              if (event.isPrevented()) return
-                              newSelection = event.getNewSelection()
-                          }
+                          const event = handleSelectionChangeEvent(selection, onSelectionChange)
+                          if (event.isPrevented()) return
+                          newSelection = event.getNewSelection()
                       }
                       setSelection(newSelection)
                   }}>
@@ -86,7 +94,8 @@ const Select: React.FC<SelectType> = (props) => {
                 <Menu.Content>
                     {
                         Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
-                            return <Menu.Item {...child.props} key={child.key ?? index}>{child.props.children}</Menu.Item>
+                            return <Menu.Item {...child.props}
+                                              key={child.key ?? index}>{child.props.children}</Menu.Item>
                         })
                     }
                 </Menu.Content>

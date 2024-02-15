@@ -28,7 +28,9 @@ export const BasicSelect: MenuStory = {
         const {defaultValue, label} = args
 
         return <>
-            <Select description={"Lorem ipsum"} defaultValue={defaultValue}>
+            <Select onSelectionChange={(event, selection) => {
+                console.log(event.getNewSelectionAsString())
+            }} description={"Lorem ipsum"} defaultValue={defaultValue}>
                 <Select.Label>{label}</Select.Label>
                 <Select.Option>Lorem ipsum 1</Select.Option>
                 <Select.Option>Lorem ipsum 2</Select.Option>
@@ -41,7 +43,7 @@ export const BasicSelectWithOutDeselect: MenuStory = {
     render: (args) => {
 
         return <>
-            <Select forbidDeselect description={"Lorem ipsum"} defaultValue={"Lorem ipsum 1"}>
+            <Select disallowDeselection description={"Lorem ipsum"} defaultValue={"Lorem ipsum 1"}>
                 <Select.Option>Lorem ipsum 1</Select.Option>
                 <Select.Option>Lorem ipsum 2</Select.Option>
             </Select>

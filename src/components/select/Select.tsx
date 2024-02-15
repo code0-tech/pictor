@@ -11,7 +11,18 @@ export interface SelectType {
     defaultValue?: string,
     disabled?: boolean,
     description?: string,
-    forbidDeselect?: boolean,
+    disallowDeselection?: boolean,
+    onDeselection?: (event: Event) => void,
+    onSelectionChange?: (event: Event, selection: Selection) => void,
+}
+
+export interface Event {
+    isPrevented: () => boolean,
+    preventDefault: () => void,
+    setNewSelection: (selection: Selection) => void,
+    setNewSelectionAsString: (selection: string) => void,
+    getNewSelection: () => Selection,
+    getNewSelectionAsString: () => string,
 }
 
 export interface SelectIconType {
@@ -19,7 +30,8 @@ export interface SelectIconType {
 }
 
 export interface SelectOptionType extends Omit<MenuItemType, "key"> {
-    children: string
+    key?: Key,
+    //Maybe needed in the future
 }
 
 export interface SelectLabelType {
@@ -37,7 +49,8 @@ const Select: React.FC<SelectType> = (props) => {
         return <Input {...otherProps}>
             {selectLabel && <Input.Label>{selectLabel}</Input.Label>}
             <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly={true}>
-                <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ?? <IconSelector/>}</Input.Control.Icon>
+                <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ??
+                    <IconSelector/>}</Input.Control.Icon>
             </Input.Control>
             {props.description ? <Input.Desc>{props.description}</Input.Desc> : <></>}
         </Input>
@@ -46,9 +59,24 @@ const Select: React.FC<SelectType> = (props) => {
     return props.disabled ? <InputComponent disabled/> :
         <Menu defaultSelectedKeys={[props.defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
               onSelectionChange={selection => {
-                  const keys: Set<Key> = selection as Set<Key>;
-                  if (keys.size === 0 && props.forbidDeselect) return
-                  setSelection(keys.size === 0 ? new Set([""]) : selection)
+                  const keys: Set<Key> = selection as Set<Key>
+                  if (keys.size === 0 && props.disallowDeselection) return
+                  let newSelection = keys.size === 0 ? new Set([""]) : selection
+                  if (keys.size === 0) {
+                      if (props.onDeselection) {
+                          const event = handleDeselectionEvent(props.onDeselection);
+                          if (event.isPrevented()) return
+                          newSelection = event.getNewSelection();
+                      }
+                  } else {
+                      if (props.onSelectionChange) {
+                          const event = handleSelectionChangeEvent(selection, props.onSelectionChange);
+                          if (event.isPrevented()) return
+                          newSelection = event.getNewSelection();
+                      }
+                  }
+
+                  setSelection(newSelection)
               }}>
             <Menu.Trigger>
                 <InputComponent/>
@@ -56,8 +84,9 @@ const Select: React.FC<SelectType> = (props) => {
 
             <Menu.Content>
                 {
-                    Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map(child => {
-                        return <Menu.Item  {...child.props} key={child.props.children}/>
+                    Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
+                        return <Menu.Item
+                            key={child.props.children.toString()} {...child.props}>{child.props.children}</Menu.Item>
                     })
                 }
             </Menu.Content>
@@ -66,6 +95,41 @@ const Select: React.FC<SelectType> = (props) => {
 
 }
 
+const createCustomEvent = (newSelection: Selection): Event => {
+    let prevented = false
+    let selection = newSelection
+    return {
+        isPrevented: () => prevented,
+        preventDefault: () => {
+            prevented = true
+        },
+        setNewSelection: (newSelection: Selection) => {
+            selection = newSelection
+        },
+        setNewSelectionAsString: (newSelection: string) => {
+            selection = new Set([newSelection])
+        },
+        getNewSelection: (): Selection => {
+            return selection
+        },
+        getNewSelectionAsString: (): string => {
+            const selectionArray = [...selection] as string[]
+            return selectionArray[0];
+        }
+    };
+};
+
+const handleDeselectionEvent = (triggerMethod: (event: Event, newSelection: Selection) => void): Event => {
+    const event = createCustomEvent(new Set([""]))
+    triggerMethod(event, event.getNewSelection())
+    return event
+};
+
+const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: Event, selection: Selection) => void): Event => {
+    const event = createCustomEvent(newSelection)
+    triggerMethod(event, event.getNewSelection())
+    return event
+};
 
 const SelectionOption: React.FC<SelectOptionType> = (props) => {
 

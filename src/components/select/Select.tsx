@@ -1,10 +1,10 @@
-import {getChild} from "../../utils/utils";
-import {Selection} from "react-stately";
-import React, {useState} from "react";
-import {Key} from "react-aria";
-import Menu, {MenuItemType} from "../menu/Menu";
-import Input from "../input/Input";
-import {IconSelector, TablerIconsProps} from "@tabler/icons-react";
+import {getChild} from "../../utils/utils"
+import {Selection} from "react-stately"
+import React, {useState} from "react"
+import {Key} from "react-aria"
+import Menu, {MenuItemType} from "../menu/Menu"
+import Input from "../input/Input"
+import {IconSelector, TablerIconsProps} from "@tabler/icons-react"
 
 export interface SelectType {
     children: React.ReactElement<SelectIconType & SelectOptionType>[] | React.ReactElement<SelectIconType & SelectOptionType>,
@@ -41,7 +41,7 @@ export interface SelectLabelType {
 
 const Select: React.FC<SelectType> = (props) => {
 
-    const [selection, setSelection] = useState<Selection>(new Set([props.defaultValue ?? ""]));
+    const [selection, setSelection] = useState<Selection>(new Set([props.defaultValue ?? ""]))
     const selectedArray = [...selection] as string[]
     const selectLabel: any = getChild(props.children, SelectLabel, false)
 
@@ -64,15 +64,15 @@ const Select: React.FC<SelectType> = (props) => {
                   let newSelection = keys.size === 0 ? new Set([""]) : selection
                   if (keys.size === 0) {
                       if (props.onDeselection) {
-                          const event = handleDeselectionEvent(props.onDeselection);
+                          const event = handleDeselectionEvent(props.onDeselection)
                           if (event.isPrevented()) return
-                          newSelection = event.getNewSelection();
+                          newSelection = event.getNewSelection()
                       }
                   } else {
                       if (props.onSelectionChange) {
-                          const event = handleSelectionChangeEvent(selection, props.onSelectionChange);
+                          const event = handleSelectionChangeEvent(selection, props.onSelectionChange)
                           if (event.isPrevented()) return
-                          newSelection = event.getNewSelection();
+                          newSelection = event.getNewSelection()
                       }
                   }
 
@@ -114,22 +114,22 @@ const createCustomEvent = (newSelection: Selection): Event => {
         },
         getNewSelectionAsString: (): string => {
             const selectionArray = [...selection] as string[]
-            return selectionArray[0];
+            return selectionArray[0]
         }
-    };
-};
+    }
+}
 
 const handleDeselectionEvent = (triggerMethod: (event: Event, newSelection: Selection) => void): Event => {
     const event = createCustomEvent(new Set([""]))
     triggerMethod(event, event.getNewSelection())
     return event
-};
+}
 
 const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: Event, selection: Selection) => void): Event => {
     const event = createCustomEvent(newSelection)
     triggerMethod(event, event.getNewSelection())
     return event
-};
+}
 
 const SelectionOption: React.FC<SelectOptionType> = (props) => {
 

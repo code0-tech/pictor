@@ -50,7 +50,7 @@ const Select: React.FC<SelectType> = (props) => {
             }
         }}>
             <Input {...otherProps}>
-                <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly>
+                <Input.Control {...(props.label ? {label: props.label} : {label: ""})} placeholder={selectedArray[0]} value={selectedArray[0]} readOnly>
                     <Input.Control.Icon>{props.clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}</Input.Control.Icon>
                 </Input.Control>
             </Input>

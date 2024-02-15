@@ -57,8 +57,8 @@ const Menu: React.FC<MenuType<any>> = (props) => {
 
     return (
         <>
-            <div ref={triggerRef} {...buttonProps} {...(!state.isOpen && {tabIndex: 1})}>
-                {menuTrigger ? React.cloneElement(menuTrigger.props.children, {...buttonProps, ...(!state.isOpen && {tabIndex: 1})}) : null}
+            <div ref={triggerRef} {...buttonProps} {...(!state.isOpen && {tabIndex: -1})}>
+                {menuTrigger ? React.cloneElement(menuTrigger.props.children, {...buttonProps, ...(!state.isOpen && {tabIndex: 0})}) : null}
             </div>
 
             {state.isOpen && (

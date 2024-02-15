@@ -4,7 +4,9 @@ import React, {useState} from "react"
 import {Key} from "react-aria"
 import Menu, {MenuItemType} from "../menu/Menu"
 import Input from "../input/Input"
-import {IconSelector, TablerIconsProps} from "@tabler/icons-react"
+import {IconSelector, IconX, TablerIconsProps} from "@tabler/icons-react"
+import {windows} from "rimraf";
+import "./Select.style.scss"
 
 export interface SelectType {
     children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
@@ -42,11 +44,17 @@ const Select: React.FC<SelectType> = (props) => {
     const selectedArray = [...selection] as string[]
 
     const InputComponent: React.FC<any> = (otherProps) => {
-        return <>
+        return <div onClick={event => {
+            if (props.clearable && selectedArray[0] !== "") {
+                if ((event.target as HTMLDivElement).className.includes("input__control")) setSelection(new Set([""]))
+            }
+        }}>
             <Input {...otherProps}>
-                <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly></Input.Control>
+                <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly>
+                    <Input.Control.Icon>{props.clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}</Input.Control.Icon>
+                </Input.Control>
             </Input>
-        </>
+        </div>
     }
 
     return <>
@@ -69,7 +77,6 @@ const Select: React.FC<SelectType> = (props) => {
                               newSelection = event.getNewSelection()
                           }
                       }
-                      console.log(newSelection)
                       setSelection(newSelection)
                   }}>
                 <Menu.Trigger>

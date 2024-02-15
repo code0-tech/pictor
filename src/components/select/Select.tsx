@@ -7,9 +7,13 @@ import Input from "../input/Input"
 import {IconSelector, TablerIconsProps} from "@tabler/icons-react"
 
 export interface SelectType {
-    children: React.ReactElement<SelectIconType & SelectOptionType>[] | React.ReactElement<SelectIconType & SelectOptionType>,
+    children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
     defaultValue?: string,
     disabled?: boolean,
+    clearable?: boolean,
+    label?: string,
+    error?: React.ReactNode,
+    success?: React.ReactNode,
     description?: string,
     disallowDeselection?: boolean,
     onDeselection?: (event: Event) => void,
@@ -29,68 +33,59 @@ export interface SelectIconType {
     children: TablerIconsProps
 }
 
-export interface SelectOptionType extends Omit<MenuItemType, "key"> {
-    key?: Key,
-    //Maybe needed in the future
-}
-
-export interface SelectLabelType {
-    children: string,
-}
-
+//TODO implement label-, description-, error- and SuccessMessages, also need to implement clearable
+//These components doesnt exists, waiting for Nico
 
 const Select: React.FC<SelectType> = (props) => {
 
     const [selection, setSelection] = useState<Selection>(new Set([props.defaultValue ?? ""]))
     const selectedArray = [...selection] as string[]
-    const selectLabel: any = getChild(props.children, SelectLabel, false)
 
     const InputComponent: React.FC<any> = (otherProps) => {
-        return <Input {...otherProps}>
-            {selectLabel && <Input.Label>{selectLabel}</Input.Label>}
-            <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly={true}>
-                <Input.Control.Icon>{getChild(props.children, SelectIcon, false) ??
-                    <IconSelector/>}</Input.Control.Icon>
-            </Input.Control>
-            {props.description ? <Input.Desc>{props.description}</Input.Desc> : <></>}
-        </Input>
+        return <>
+            <Input {...otherProps}>
+                <Input.Control placeholder={selectedArray[0]} value={selectedArray[0]} readOnly></Input.Control>
+            </Input>
+        </>
     }
 
-    return props.disabled ? <InputComponent disabled/> :
-        <Menu defaultSelectedKeys={[props.defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
-              onSelectionChange={selection => {
-                  const keys: Set<Key> = selection as Set<Key>
-                  if (keys.size === 0 && props.disallowDeselection) return
-                  let newSelection = keys.size === 0 ? new Set([""]) : selection
-                  if (keys.size === 0) {
-                      if (props.onDeselection) {
-                          const event = handleDeselectionEvent(props.onDeselection)
-                          if (event.isPrevented()) return
-                          newSelection = event.getNewSelection()
+    return <>
+        {props.disabled ? <InputComponent disabled/> :
+            <Menu defaultSelectedKeys={[props.defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
+                  onSelectionChange={selection => {
+                      const keys: Set<Key> = selection as Set<Key>
+                      if (keys.size === 0 && props.disallowDeselection) return
+                      let newSelection = keys.size === 0 ? new Set([""]) : selection
+                      if (keys.size === 0) {
+                          if (props.onDeselection) {
+                              const event = handleDeselectionEvent(props.onDeselection)
+                              if (event.isPrevented()) return
+                              newSelection = event.getNewSelection()
+                          }
+                      } else {
+                          if (props.onSelectionChange) {
+                              const event = handleSelectionChangeEvent(selection, props.onSelectionChange)
+                              if (event.isPrevented()) return
+                              newSelection = event.getNewSelection()
+                          }
                       }
-                  } else {
-                      if (props.onSelectionChange) {
-                          const event = handleSelectionChangeEvent(selection, props.onSelectionChange)
-                          if (event.isPrevented()) return
-                          newSelection = event.getNewSelection()
-                      }
-                  }
+                      console.log(newSelection)
+                      setSelection(newSelection)
+                  }}>
+                <Menu.Trigger>
+                    <InputComponent/>
+                </Menu.Trigger>
 
-                  setSelection(newSelection)
-              }}>
-            <Menu.Trigger>
-                <InputComponent/>
-            </Menu.Trigger>
-
-            <Menu.Content>
-                {
-                    Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
-                        return <Menu.Item
-                            key={child.props.children.toString()} {...child.props}>{child.props.children}</Menu.Item>
-                    })
-                }
-            </Menu.Content>
-        </Menu>
+                <Menu.Content>
+                    {
+                        Array.of(props.children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
+                            return <Menu.Item {...child.props} key={child.key ?? index}>{child.props.children}</Menu.Item>
+                        })
+                    }
+                </Menu.Content>
+            </Menu>
+        }
+    </>
 
 
 }
@@ -131,30 +126,13 @@ const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (eve
     return event
 }
 
-const SelectionOption: React.FC<SelectOptionType> = (props) => {
+const SelectionOption: React.FC<MenuItemType> = (props) => {
 
     const {children} = props
 
     return <>{children}</>
 }
-
-const SelectLabel: React.FC<SelectLabelType> = (props) => {
-
-    const {children} = props
-
-    return <>{children}</>
-}
-
-const SelectIcon: React.FC<TablerIconsProps> = (props) => {
-
-    const {children} = props
-
-    return <>{children}</>
-}
-
 
 export default Object.assign(Select, {
     Option: SelectionOption,
-    Icon: SelectIcon,
-    Label: SelectLabel
 })

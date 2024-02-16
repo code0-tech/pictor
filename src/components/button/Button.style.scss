@@ -1,8 +1,6 @@
 @import "../../styles/helpers";
 
 .button {
-  @include box(true);
-
   padding: .5rem;
   cursor: pointer;
   display: flex;
@@ -37,6 +35,36 @@
 @each $name, $color in $variants {
   .button--#{$name} {
     @include box(true, $color);
+
+    &.button__withoutBorder {
+      border-color: transparent;
+
+      &:active {
+        @include border();
+      }
+    }
+
+    &.button__withoutBackground {
+      background: transparent;
+      border-color: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+      &:hover, &.button__withoutAll:hover {
+        background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+      }
+      &:active, &.button__withoutAll:active {
+        @include border();
+      }
+    }
+
+    &.button__withoutAll {
+      background: transparent;
+      border-color: transparent;
+      &:hover {
+        background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+      }
+      &:active {
+        @include border();
+      }
+    }
 
     .button__icon {
       color: color($color);

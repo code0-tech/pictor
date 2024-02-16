@@ -58,7 +58,7 @@ export const Dropdowns = () => {
                         {value}
                     </Button> : <Dropdown position={"bottom"} align={"start"}>
                         <Dropdown.Trigger>
-                            <Button disabled={(index % 2) == 0} color={"secondary"}> variant={"normal"}
+                            <Button disabled={(index % 2) == 0} color={"secondary"}>
                                 {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                                 {value}
                             </Button>

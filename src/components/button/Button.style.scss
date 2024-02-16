@@ -36,7 +36,7 @@
   .button--#{$name} {
     @include box(true, $color);
 
-    &.button__withoutBorder {
+    &.button--filled {
       border-color: transparent;
 
       &:active {
@@ -44,18 +44,18 @@
       }
     }
 
-    &.button__withoutBackground {
+    &.button--outlined {
       background: transparent;
       border-color: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
-      &:hover, &.button__withoutAll:hover {
+      &:hover, &.button--none:hover {
         background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
       }
-      &:active, &.button__withoutAll:active {
+      &:active, &.button--none:active {
         @include border();
       }
     }
 
-    &.button__withoutAll {
+    &.button--none {
       background: transparent;
       border-color: transparent;
       &:hover {

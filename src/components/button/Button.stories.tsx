@@ -60,7 +60,7 @@ export const ButtonGroups: ButtonGroupStory = {
                 {
                     ["primary", "secondary", "info", "success", "warning", "error"].map((value, index) => {
                         // @ts-ignore
-                        return <Button variant={value}>
+                        return <Button color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>
@@ -71,7 +71,7 @@ export const ButtonGroups: ButtonGroupStory = {
                 {
                     ["primary", "primary", "primary", "primary"].map((value, index) => {
                         // @ts-ignore
-                        return <Button variant={value}>
+                        return <Button color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>
@@ -83,7 +83,7 @@ export const ButtonGroups: ButtonGroupStory = {
                 {
                     ["secondary", "secondary", "secondary", "secondary"].map((value, index) => {
                         // @ts-ignore
-                        return <Button disabled={(index % 2) == 0} variant={value}>
+                        return <Button disabled={(index % 2) == 0} color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>

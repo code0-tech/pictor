@@ -28,15 +28,8 @@ const Button: React.FC<ButtonType> = (props) => {
     const icon = getChild(children, ButtonIcon)
     const content = getContent(children, ButtonIcon)
 
-    const getVariant = (): string => {
-        if (variant == "none") return "button__withoutAll";
-        if (variant == "outlined") return "button__withoutBorder";
-        if (variant == "filled") return "button__withoutBackground";
-        return "";
-    }
-
     return <a {...args}
-              className={`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} ${getVariant()}`}
+              className={`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`}
               aria-disabled={disabled ? "true" : "false"}>
         {icon}
         {content ? <span className={"button__content"}>{content}</span> : null}

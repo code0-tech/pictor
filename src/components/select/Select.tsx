@@ -1,11 +1,9 @@
-import {getChild} from "../../utils/utils"
 import {Selection} from "react-stately"
 import React, {useState} from "react"
 import {Key} from "react-aria"
 import Menu, {MenuItemType} from "../menu/Menu"
 import Input from "../input/Input"
 import {IconSelector, IconX, TablerIconsProps} from "@tabler/icons-react"
-import {windows} from "rimraf";
 import "./Select.style.scss"
 
 export interface SelectType {

@@ -72,7 +72,7 @@ export const Error: MenuStory = {
         const {defaultValue, description, label, error} = args
 
         return <>
-            <Select error={<Badge>{error ? error : ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
+            <Select error={<Badge>{error ?? ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -86,7 +86,7 @@ export const Success: MenuStory = {
         const {defaultValue, description, label, success} = args
 
         return <>
-            <Select success={<Badge>{success ? success : ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
+            <Select success={<Badge>{success ?? ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>

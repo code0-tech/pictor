@@ -1,0 +1,56 @@
+@import "../../styles/helpers";
+
+$xs: (font: 0.6rem);
+$sm: (font: 0.75rem);
+$md: (font: 0.85rem);
+$lg: (font: 1rem);
+$xl: (font: 1.3rem);
+
+
+$sizes: (
+        "xs": $xs,
+        "sm": $sm,
+        "md": $md,
+        "lg": $lg,
+        "xl": $xl,
+);
+
+.pill-root {
+  padding: 0.2em 0.2em 0.2em 0.5em;
+  margin: 0.2em;
+  display: flex;
+}
+
+.pill-label {
+}
+
+.pill-remove-button {
+  background: transparent;
+  border: 0;
+}
+
+.pill-remove-icon {
+  margin-bottom: -0.1em
+}
+
+.pill-remove-button:active {
+  transform: translateY(1px);
+}
+
+@each $name, $color in $variants {
+  .pill-variant-#{$name} {
+    &.pill-root {
+      @include box(true, $color);
+    }
+  }
+}
+
+
+@each $name, $properties in $sizes {
+  .pill-size-#{$name} {
+    .pill-label {
+      font-size: map-get($properties, "font");
+    }
+  }
+}
+

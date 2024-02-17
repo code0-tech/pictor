@@ -20,7 +20,7 @@ export default meta;
 
 type MenuStory = StoryObj<{dismissible: boolean, size: string}>
 
-export const BasicPill: MenuStory = {
+export const BasicMultiSelect: MenuStory = {
     render: (args) => {
 
         const {dismissible, size} = args

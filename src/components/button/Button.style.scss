@@ -32,6 +32,10 @@
   }
 }
 
+@function getMixedColor($color) {
+  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+}
+
 @each $name, $color in $variants {
   .button--#{$name} {
     @include box(true, $color);
@@ -46,9 +50,9 @@
 
     &.button--outlined {
       background: transparent;
-      border-color: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+      border-color: getMixedColor($color);
       &:hover, &.button--none:hover {
-        background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+        background: getMixedColor($color);
       }
       &:active, &.button--none:active {
         @include border();
@@ -59,7 +63,7 @@
       background: transparent;
       border-color: transparent;
       &:hover {
-        background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+        background: getMixedColor($color);
       }
       &:active {
         @include border();

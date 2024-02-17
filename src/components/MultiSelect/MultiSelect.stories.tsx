@@ -13,7 +13,7 @@ export default meta;
 
 type MenuStory = StoryObj<typeof MultiSelect>
 
-export const BasicPill: MenuStory = {
+export const BasicMultiSelect: MenuStory = {
     render: (args) => {
 
         return <MultiSelect placeholder={"Select your items"}>

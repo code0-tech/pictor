@@ -1,5 +1,9 @@
 import React, {ReactNode, useEffect, useMemo, useState} from "react";
 
+export type Variant = "primary" | "secondary" | "info" | "success" | "warning" | "error";
+
+export const Variants: Variant[] = ["primary", "secondary", "info", "success", "warning", "error"]
+
 export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
 
     const [childComponent, setChildComponent] = useState<React.ReactElement | undefined>()

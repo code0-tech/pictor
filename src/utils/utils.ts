@@ -4,6 +4,11 @@ export type Variant = "primary" | "secondary" | "info" | "success" | "warning" |
 
 export const Variants: Variant[] = ["primary", "secondary", "info", "success", "warning", "error"]
 
+export type Size = "xs" | "sm" | "md" | "lg" | "xl";
+
+export const Sizes: Size[] = ["xs", "sm", "md", "lg", "xl"]
+
+
 export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
 
     const [childComponent, setChildComponent] = useState<React.ReactElement | undefined>()

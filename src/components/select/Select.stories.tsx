@@ -10,36 +10,40 @@ const meta: Meta = {
     argTypes: {
         defaultValue: {
             type: "string",
-            defaultValue: "Lorem ipsum 2"
         },
         label: {
             type: "string",
-            defaultValue: "This is a label"
         },
         error: {
             type: "string",
-            defaultValue: "There is an error"
         },
         success: {
             type: "string",
-            defaultValue: "This is working (Success)"
         },
     }
 }
 
 export default meta;
 
-type MenuStory = StoryObj<{ defaultValue: string, label: string, error: string, success: string }>
+export interface SelectType {
+    error: string,
+    success: string,
+    defaultValue: string,
+    clearable: boolean,
+    label: string,
+    description: string,
+    disallowDeselection: boolean,
+}
+
+type MenuStory = StoryObj<SelectType>
 
 export const Selection: MenuStory = {
     render: (args) => {
 
-        const {defaultValue, label} = args
+        const {defaultValue, description, label} = args
 
         return <>
-            <Select onSelectionChange={(event, selection) => {
-                console.log(event.getNewSelectionAsString())
-            }} label={label} description={"Lorem ipsum"} defaultValue={defaultValue}>
+            <Select label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -50,9 +54,11 @@ export const Selection: MenuStory = {
 export const NoDeselect: MenuStory = {
     render: (args) => {
 
+        const {defaultValue, label, description} = args
+
         return <>
-            <Select disallowDeselection description={"This component uses `disallowDeselection`"} defaultValue={"2"}
-                    label={"You cant deselect this"}>
+            <Select disallowDeselection description={description} defaultValue={defaultValue}
+                    label={label}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -63,12 +69,10 @@ export const NoDeselect: MenuStory = {
 export const Error: MenuStory = {
     render: (args) => {
 
-        const {defaultValue, label, error} = args
+        const {defaultValue, description, label, error} = args
 
         return <>
-            <Select onSelectionChange={(event, selection) => {
-                console.log(event.getNewSelectionAsString())
-            }} error={<Badge>{error}</Badge>} label={label} description={"Lorem ipsum"} defaultValue={defaultValue}>
+            <Select error={<Badge>{error ? error : ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -79,12 +83,10 @@ export const Error: MenuStory = {
 export const Success: MenuStory = {
     render: (args) => {
 
-        const {defaultValue, label, success} = args
+        const {defaultValue, description, label, success} = args
 
         return <>
-            <Select onSelectionChange={(event, selection) => {
-                console.log(event.getNewSelectionAsString())
-            }} success={<Badge>{success}</Badge>} label={label} description={"Lorem ipsum"} defaultValue={defaultValue}>
+            <Select success={<Badge>{success ? success : ""}</Badge>} label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -95,10 +97,10 @@ export const Success: MenuStory = {
 export const Clearable: MenuStory = {
     render: (args) => {
 
-        const {defaultValue} = args
+        const {defaultValue, description, label} = args
 
         return <>
-            <Select clearable label={"Test"} description={"Lorem ipsum"} defaultValue={defaultValue} >
+            <Select clearable label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>
@@ -109,10 +111,10 @@ export const Clearable: MenuStory = {
 export const Disabled: MenuStory = {
     render: (args) => {
 
-        const {defaultValue} = args
+        const {defaultValue, description, label} = args
 
         return <>
-            <Select label={"Test"} description={"Lorem ipsum"} defaultValue={defaultValue} disabled>
+            <Select disabled label={label} description={description} defaultValue={defaultValue}>
                 <Select.Option key={"Lorem ipsum 1"}>Lorem ipsum 1</Select.Option>
                 <Select.Option key={"Lorem ipsum 2"}>Lorem ipsum 2</Select.Option>
             </Select>

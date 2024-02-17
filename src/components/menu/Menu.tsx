@@ -1,5 +1,5 @@
 import React from "react";
-import {getChild} from "../../utils/utils";
+import {getChild, Variant} from "../../utils/utils";
 import {PopoverProps} from "../popover/Popover";
 import {AriaMenuProps, Key, useButton, useMenuTrigger} from "react-aria";
 import {Item, Section, useMenuTriggerState} from "react-stately";
@@ -24,7 +24,7 @@ export interface MenuContentType {
 export interface MenuItemType {
     children: React.ReactNode
     key: Key
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    variant?: Variant
     disabled?: boolean
     unselectable?: boolean
     textValue?: string

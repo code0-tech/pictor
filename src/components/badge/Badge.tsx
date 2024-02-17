@@ -1,10 +1,11 @@
 import React, {HTMLProps} from "react";
 import "./Badge.style.scss"
+import {Variant} from "../../utils/utils";
 
 export interface BadgeType extends HTMLProps<HTMLSpanElement>{
     children: string
     //defaults to primary
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    variant?: Variant
 }
 
 const Badge: React.FC<BadgeType> = (props) => {

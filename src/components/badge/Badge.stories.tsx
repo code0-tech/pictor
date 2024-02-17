@@ -3,6 +3,7 @@ import React from "react";
 import Badge from "./Badge";
 import Button from "../button/Button";
 import {IconGitBranch} from "@tabler/icons-react";
+import {Variants as BadgeVariants}  from "../../utils/utils";
 
 const meta: Meta = {
     title: "Badge",
@@ -13,8 +14,7 @@ export const Variants = () => {
     return <>
 
         {
-            ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
-                // @ts-ignore
+            BadgeVariants.map(value => {
                 return <Badge style={{marginRight: ".5rem"}} variant={value}>
                     {value}
                 </Badge>

@@ -1,13 +1,14 @@
 import React, {ReactElement, ReactNode} from "react";
 import {IconAlertCircle, IconCircleCheck, IconCircleX, IconInfoCircle, IconX} from "@tabler/icons-react";
 import "./Alert.style.scss"
+import {Variant} from "../../utils/utils";
 
 export interface AlertType {
 
     children?: ReactNode | ReactNode[]
     title: ReactNode
     //defaults to primary
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    variant?: Variant
     //defaults to true
     icon?: boolean
     //defaults to false
@@ -50,7 +51,7 @@ export interface AlertHeadingType {
 }
 
 export interface AlertIconType {
-    variant: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    variant: Variant
 }
 
 const AlertIcon: React.FC<AlertIconType> = ({variant}) => {

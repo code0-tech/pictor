@@ -3,6 +3,7 @@ import {StoryObj} from "@storybook/react";
 import React from "react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import {IconAbc} from "@tabler/icons-react";
+import {Variants} from "../../utils/utils";
 
 const meta = {
     title: "Button",
@@ -32,8 +33,7 @@ export const Buttons: ButtonStory = {
 
         return <>
             {
-                ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
-                    // @ts-ignore
+                Variants.map(value => {
                     return <Button disabled={disabled} variant={value}>
                         {icon ? <Button.Icon><IconAbc/></Button.Icon> : null}
                         {value}
@@ -53,8 +53,7 @@ export const ButtonGroups: ButtonGroupStory = {
         return <>
             <ButtonGroup>
                 {
-                    ["primary", "secondary", "info", "success", "warning", "error"].map((value, index) => {
-                        // @ts-ignore
+                    Variants.map((value, index) => {
                         return <Button variant={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
@@ -64,8 +63,7 @@ export const ButtonGroups: ButtonGroupStory = {
             </ButtonGroup>
             <ButtonGroup>
                 {
-                    ["primary", "primary", "primary", "primary"].map((value, index) => {
-                        // @ts-ignore
+                    Variants.map((value, index) => {
                         return <Button variant={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
@@ -76,8 +74,7 @@ export const ButtonGroups: ButtonGroupStory = {
 
             <ButtonGroup>
                 {
-                    ["secondary", "secondary", "secondary", "secondary"].map((value, index) => {
-                        // @ts-ignore
+                    Variants.map((value, index) => {
                         return <Button disabled={(index % 2) == 0} variant={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}

@@ -4,12 +4,12 @@ import React, {
     DetailedHTMLProps,
     ReactNode
 } from "react";
-import {getChild, getContent} from "../../utils/utils";
+import {getChild, getContent, Variant} from "../../utils/utils";
 
 export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error",
+    variant?: Variant,
     //defaults to false
     active?: boolean
     //defaults to false

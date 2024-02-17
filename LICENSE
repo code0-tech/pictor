@@ -1,16 +1,24 @@
-MIT License
+Copyright (c) 2023-present Code0
 
-Copyright (c) 2023 Code0
+Portions of this software are licensed as follows:
+
+* All content residing under the "docs/" directory of this repository is licensed under "Creative Commons: CC BY-SA 4.0 license".
+* All third party components incorporated into the Code0 Software are licensed under the original license provided by the owner of the applicable component.
+* Content outside of the above mentioned directories or restrictions above is available as defined below.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+of this software. This Software comes with restrictions, including the rights
+to use, copy, modify, merge, publish, distribute and not sublicense, and/or sell copies of this Software,
+and to permit persons to whom this Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+copies or substantial portions of this Software.
+
+This Software can be used, copied, merged, published and distributed commercially and non commercially, but it is not allowed
+to sell this Software and/or any copies.
+
+You agree that Code0 and/or its licensors (as applicable) retain all right, title and interest in and
+to all such modifications and/or patches and/or copies of this Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

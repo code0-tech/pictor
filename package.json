@@ -15,7 +15,6 @@
     "docs:preview": "npm run --prefix ../telescopium project:preview pictor"
   },
   "author": "Code0",
-  "license": "MIT",
   "devDependencies": {
     "@mdx-js/react": "^2.1.2",
     "@rollup/plugin-commonjs": "^21.1.0",

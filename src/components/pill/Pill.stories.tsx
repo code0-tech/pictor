@@ -50,7 +50,7 @@ export const WithHref: MenuStory = {
         const {dismissible, size} = args
 
         // @ts-ignore
-        return <Pill size={size} variant={"success"} removeButton={dismissible} href={"#"}>
+        return <Pill size={size} variant={"success"} removeButton={dismissible} href={"https://google.com"}>
                         <Pill.Content>enhancement</Pill.Content>
                     </Pill>
 

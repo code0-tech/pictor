@@ -25,7 +25,7 @@ const Pill: React.FC<PillType> = (props) => {
 
     return <span className={`pill-root pill-variant-${variant} pill-size-${size}`}>
             <span className={"pill-label"}>{content}</span>
-        {removeButton && <button onClick={onRemoveButtonClick} className={"pill-remove-button"}><IconX color={"#999999"} className={"pill-remove-icon"} size={"1.2em"}/></button>}
+        {removeButton && <button title={"Pill Title"} onClick={onRemoveButtonClick} className={"pill-remove-button"}><IconX color={"#999999"} className={"pill-remove-icon"}/></button>}
         </span>
 
 }

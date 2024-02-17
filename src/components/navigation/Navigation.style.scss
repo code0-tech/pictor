@@ -1,0 +1,12 @@
+@import "../../styles/helpers";
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  &--item {
+    text-decoration: none;
+    padding: 0 0.3rem;
+  }
+}

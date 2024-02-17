@@ -44,3 +44,23 @@ export const BasicPill: MenuStory = {
     }
 }
 
+export const WithHref: MenuStory = {
+    render: (args) => {
+
+        const {dismissible, size} = args
+
+        // @ts-ignore
+        return <Pill size={size} variant={"success"} removeButton={dismissible} href={"#"}>
+                        <Pill.Content>enhancement</Pill.Content>
+                    </Pill>
+
+
+
+
+    },
+    args: {
+        dismissible: false,
+        size: "md"
+    }
+}
+

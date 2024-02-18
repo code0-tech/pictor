@@ -15,51 +15,54 @@ $sizes: (
         "xl": $xl,
 );
 
-.pill-root {
-  padding: 0.2em 0.5em;
-  display: inline-block;
+.pill {
+
+  &-root {
+    padding: 0.2em 0.5em;
+    display: inline-block;
+  }
+
+  &-href {
+    cursor: pointer;
+  }
+
+  &-remove-icon {
+    height: 60%;
+    width: 60%;
+    margin-bottom: -0.2em
+  }
+
+  &-remove-button {
+    background: transparent;
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+    margin-right: 0;
+  }
+
+  &-remove-button:active {
+    transform: translateY(1px);
+  }
+
+  @each $name, $color in $variants {
+    &-color-#{$name} {
+      &.pill-root {
+        @include box(true, $color);
+      }
+    }
+  }
+
+  @each $name, $properties in $sizes {
+    &-size-#{$name} {
+      .pill-label {
+        font-size: map-get($properties, "font");
+      }
+    }
+  }
+
 }
 
 .rm-button-active {
   padding-right: 0;
-}
-
-.pill-href {
-  cursor: pointer;
-}
-
-.pill-remove-button {
-  background: transparent;
-  border: 0;
-  padding-left: 0;
-  padding-right: 0;
-  margin-right: 0;
-}
-
-.pill-remove-icon {
-  height: 60%;
-  width: 60%;
-  margin-bottom: -0.2em
-}
-
-.pill-remove-button:active {
-  transform: translateY(1px);
-}
-
-@each $name, $color in $variants {
-  .pill-color-#{$name} {
-    &.pill-root {
-      @include box(true, $color);
-    }
-  }
-}
-
-
-@each $name, $properties in $sizes {
-  .pill-size-#{$name} {
-    .pill-label {
-      font-size: map-get($properties, "font");
-    }
-  }
 }
 

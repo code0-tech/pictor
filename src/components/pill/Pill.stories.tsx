@@ -29,7 +29,7 @@ export const BasicPill: MenuStory = {
             {
                 ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
                     // @ts-ignore
-                    return <Pill size={size} variant={value} onClose={() => window.alert("closed")} removeButton={dismissible}
+                    return <Pill size={size} color={value} onClose={() => window.alert("closed")} removeButton={dismissible}
                                  title={value}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Pill>
                 })
             }

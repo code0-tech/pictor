@@ -9,7 +9,7 @@ import "./MultiSelect.style.scss"
 
 export interface SelectType extends Omit<MenuType<any>, "children">{
     children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
-    defaultValue?: string, //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
+    defaultValue?: string[], //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
     clearable?: boolean, //Adds an icon to clear the current selection
     label?: string, //A text which is displayed above the input to give a short description
@@ -35,72 +35,77 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         },
         children, label, disallowDeselection = false,
         success, description,
-        error, placeholder, placement = "bottom"
+        error, placeholder, placement = "bottom start"
     } = props
 
-    const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? [defaultValue] : []))
+    const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
     const selectedArray = [...selection] as string[]
 
     useEffect(() => {
-        const wrapperWidth = document.getElementsByClassName("multi-select-input")[0].clientWidth - 1
-        const elementById = document.getElementById("multi-select-pill-wrapper");
+        const wrapperWidth = document.getElementsByClassName("multi-select__input")[0].clientWidth - 1
+        const elementById = document.getElementById("multi-select__pill-wrapper");
         if (!elementById) return
         elementById.style.width = wrapperWidth + "px"
     }, [document.getElementsByClassName("multi-select-input")[0]?.clientWidth])
 
-    return <div onClick={event => {
-        console.log((event.target as HTMLDivElement).className)
-        if ((event.target as HTMLDivElement).className === "multi-select-wrapper") {
-            if (clearable) setSelection(new Set())
-        }
-
-    }} className={"multi-select-wrapper"}>
-        <div className={"multi-select-icon"}>
-            {clearable && selectedArray.length !== 0 ? <IconX className={"xIcon"}/> : <IconSelector/>}
-        </div>
-        <div>
-            <div id={"multi-select-pill-wrapper"} className={"multi-select-pill-wrapper"}>
-                {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                    return <Pill key={index} removeButton onRemoveButtonClick={() => {
-                        const newArray = selectedArray.filter(entry => entry !== value);
-                        const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
-
-                        setSelection(newSelection)
-                    }}>
-                        {value}
-                    </Pill>
-                })}
-            </div>
-            {disabled ? <Input disabled>
-                    <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={placeholder ?? ""}
-                                   readOnly>
-                        <Input.Control.Icon>
-                            {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
-                        </Input.Control.Icon>
-                    </Input.Control>
-                </Input> :
-                <Menu placement={placement} defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"multiple"} selectedKeys={selection}
-                      onSelectionChange={selection => {
-                          onSelectionChange(selection)
-                      }}>
-                    <Menu.Trigger>
-                        <input defaultValue={placeholder ?? ""} className={"multi-select-input"}
-                               placeholder={placeholder ?? ""} readOnly></input>
-                    </Menu.Trigger>
-
-                    <Menu.Content>
-                        {
-                            Array.of(children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
-                                return <Menu.Item {...child.props}
-                                                  key={child.key ?? index}>{child.props.children}</Menu.Item>
-                            })
+    return <>
+        {disabled ? <Input disabled>
+                <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={placeholder ?? ""}
+                               readOnly>
+                    <Input.Control.Icon>
+                        {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
+                    </Input.Control.Icon>
+                </Input.Control>
+            </Input> :
+            <Menu placement={placement} defaultSelectedKeys={defaultValue ?? ""} selectionMode={"multiple"}
+                  selectedKeys={selection}
+                  onSelectionChange={selection => {
+                      const keys: Set<Key> = selection as Set<Key>
+                      if (keys.size === 0 && disallowDeselection) return
+                      let newSelection = keys.size === 0 ? new Set([""]) : selection
+                      setSelection(newSelection)
+                      onSelectionChange(selection)
+                  }}>
+                <Menu.Trigger>
+                    <div onClick={event => {
+                        if ((event.target as HTMLDivElement).className === "multi-select-wrapper") {
+                            if (clearable) setSelection(new Set())
                         }
-                    </Menu.Content>
-                </Menu>
-            }
-        </div>
 
-    </div>
+                    }} className={"multi-select"}>
+                        {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
+                            <IconSelector className={"multi-select__icon"}/>}
+                        <div>
+                            <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
+                                {selectedArray.filter(entry => entry !== "").map((value, index) => {
+                                    return <Pill size={"sm"} key={index} removeButton onRemoveButtonClick={() => {
+                                        const newArray = selectedArray.filter(entry => entry !== value);
+                                        const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
+
+                                        setSelection(newSelection)
+                                    }}>
+                                        {value}
+                                    </Pill>
+                                })}
+                            </div>
+                            <input defaultValue={placeholder ?? ""} className={"multi-select__input"}
+                                   placeholder={placeholder ?? ""} readOnly></input>
+                        </div>
+                    </div>
+                </Menu.Trigger>
+
+                <Menu.Content>
+                    {
+                        Array.of(children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
+                            return <Menu.Item {...child.props}
+                                              key={child.key ?? index}>{child.props.children}</Menu.Item>
+                        })
+                    }
+                </Menu.Content>
+            </Menu>
+        }
+        </>
+
 
 
 }

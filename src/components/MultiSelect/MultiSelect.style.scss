@@ -1,53 +1,55 @@
 @import "../../styles/helpers";
 
-.multi-select-input {
-  color: white;
-  background: mix($bodyBg, $secondary, 90%);
-
-  position: relative;
-  display: inline-block;
-  background: none;
-  width: fit-content;
-  color: rgba($white, .5);
-  font-family: Ubuntu, sans-serif;
-  border: none;
-  outline: none;
-  padding: .25rem .5rem .25rem 0;
-  box-shadow: none;
-  font-size: 1rem;
 
 
-}
 
-.multi-select-pill-wrapper {
 
-}
-
-.multi-select-wrapper {
+.multi-select {
 
   display: flex;
   align-items: center;
   margin-bottom: .5rem;
 
   @include box(true);
-  @include border(true)
-}
+  @include border(true);
 
-.multi-select-icon {
-  display: flex;
-  width: 1.25rem;
-  height: 1.25rem;
-  justify-content: center;
-  align-items: center;
-  aspect-ratio: 50/50;
-  margin-left: 0.05rem;
-  margin-right: 0.1rem;
-  pointer-events: none;
+  &__input {
+    color: white;
+    background: mix($bodyBg, $secondary, 90%);
 
-  > * {
+    position: relative;
+    display: inline-block;
+    background: none;
+    width: fit-content;
+    color: rgba($white, .5);
+    font-family: Ubuntu, sans-serif;
+    border: none;
+    outline: none;
+    padding: .25rem .5rem .25rem 0;
+    box-shadow: none;
+    font-size: 1rem;
+
+
+  }
+
+  &__icon {
+    display: flex;
     width: 1.25rem;
     height: 1.25rem;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 50/50;
+    margin-left: 0.05rem;
+    margin-right: 0.1rem;
+    pointer-events: none;
+
+    > * {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   }
 }
+
+
 
 

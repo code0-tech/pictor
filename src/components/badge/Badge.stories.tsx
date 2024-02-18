@@ -25,7 +25,7 @@ export const Variants = () => {
 }
 
 export const ButtonExample = () => {
-    return <Button variant={"primary"}>
+    return <Button color={"primary"}>
         <Button.Icon>
             <IconGitBranch/>
         </Button.Icon>

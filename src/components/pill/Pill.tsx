@@ -24,8 +24,7 @@ const Pill: React.FC<PillType> = (props) => {
     } = props;
 
     return <span
-        className={`pill pill--${color} pill--${size}`} {...props}
-        id={"pill-root"}>
+        className={`pill pill--${color} pill--${size}`} {...props}>
             <span id={`pill__label`}
                   className={`pill__label ${removeButton ? "pill__label--active" : ""}`}>{children}</span>
         {removeButton &&

@@ -1,51 +1,31 @@
 @import "../../styles/helpers";
 
-
-
-
-
 .multi-select {
-
-  display: flex;
-  align-items: center;
-  margin-bottom: .5rem;
 
   @include box(true);
   @include border(true);
 
+  display: flex;
+  align-items: center;
+  padding: .5rem;
+  width: 100%;
+  //margin-bottom: .5rem;
+
   &__input {
-    color: white;
-    background: mix($bodyBg, $secondary, 90%);
 
-    position: relative;
-    display: inline-block;
-    background: none;
-    width: fit-content;
-    color: rgba($white, .5);
-    font-family: Ubuntu, sans-serif;
-    border: none;
-    outline: none;
-    padding: .25rem .5rem .25rem 0;
-    box-shadow: none;
-    font-size: 1rem;
-
+    opacity: 0;
 
   }
 
   &__icon {
-    display: flex;
-    width: 1.25rem;
-    height: 1.25rem;
-    justify-content: center;
-    align-items: center;
+    width: 1rem;
+    height: 1rem;
+    margin-right: .5rem;
     aspect-ratio: 50/50;
-    margin-left: 0.05rem;
-    margin-right: 0.1rem;
-    pointer-events: none;
 
     > * {
-      width: 1.25rem;
-      height: 1.25rem;
+      width: 1rem;
+      height: 1rem;
     }
   }
 }

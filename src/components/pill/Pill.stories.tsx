@@ -30,9 +30,7 @@ export const BasicPill: MenuStory = {
                 ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
                     // @ts-ignore
                     return <Pill size={size} variant={value} onClose={() => window.alert("closed")} removeButton={dismissible}
-                                 title={value}>
-                        <Pill.Content>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Pill.Content>
-                    </Pill>
+                                 title={value}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Pill>
                 })
             }
         </>
@@ -50,9 +48,7 @@ export const WithHref: MenuStory = {
         const {dismissible, size} = args
 
         // @ts-ignore
-        return <Pill size={size} variant={"success"} removeButton={dismissible} href={"https://google.com"}>
-                        <Pill.Content>enhancement</Pill.Content>
-                    </Pill>
+        return <Pill size={size} variant={"success"} removeButton={dismissible} href={"https://google.com"}>enhancement</Pill>
 
 
 

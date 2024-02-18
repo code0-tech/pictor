@@ -47,7 +47,7 @@ $sizes: (
 }
 
 @each $name, $color in $variants {
-  .pill-variant-#{$name} {
+  .pill-color-#{$name} {
     &.pill-root {
       @include box(true, $color);
     }

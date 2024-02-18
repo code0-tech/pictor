@@ -6,6 +6,11 @@ import React from "react";
 const meta: Meta = {
     title: "MultiSelect",
     component: MultiSelect,
+    argTypes: {
+        clearable: {
+            type: "boolean"
+        }
+    }
 }
 
 
@@ -15,7 +20,7 @@ type MenuStory = StoryObj<typeof MultiSelect>
 
 export const BasicMultiSelect: MenuStory = {
     render: (args) => {
-
+        const {clearable = false} = args
 
         const arr: React.ReactElement[] = [];
 
@@ -23,9 +28,12 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect placeholder={"Select your items:"}>
+        return <MultiSelect clearable={clearable} placeholder={"Select your items:"}>
             {arr}
         </MultiSelect>
 
+    },
+    args: {
+        clearable: false
     }
 }

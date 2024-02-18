@@ -83,7 +83,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         </Input.Control.Icon>
                     </Input.Control>
                 </Input> :
-                <Menu defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"multiple"} selectedKeys={selection}
+                <Menu placement={"bottom start"} defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"multiple"} selectedKeys={selection}
                       onSelectionChange={selection => {
                           const keys: Set<Key> = selection as Set<Key>
                           if (keys.size === 0 && disallowDeselection) return

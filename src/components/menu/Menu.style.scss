@@ -55,7 +55,7 @@
   }
 
   &__section-title {
-    font-size: $tertiaryFontSize;
+    font-size: map-get($xs, "font");
     color: rgba($white, .25);
     display: block;
     margin: .25rem 0 .25rem .25rem;

@@ -57,7 +57,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
                       if (keys.size === 0 && disallowDeselection) return
-                      let newSelection = keys.size === 0 ? new Set([""]) : selection
+                      let newSelection = keys.size === 0 ? new Set([]) : selection
                       setSelection(newSelection)
                       onSelectionChange(selection)
                   }}>
@@ -72,7 +72,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                             <IconSelector className={"multi-select__icon"}/>}
                         <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
                             {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                                return <Pill size={"sm"} color={"secondary"} key={index} removeButton={true}
+                                return <Pill size={"sm"} color={"primary"} key={index} removeButton={true}
                                              onClose={(event: MouseEvent) => {
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);

@@ -42,7 +42,7 @@ export const BasicMultiSelect: MenuStory = {
     },
     args: {
         clearable: false,
-        placement: "bottom",
-        placeholder: "Placeholder: "
+        placement: "bottom start",
+        placeholder: "Placeholder"
     }
 }

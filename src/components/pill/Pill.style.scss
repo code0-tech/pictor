@@ -12,6 +12,7 @@
   @each $name, $color in $variants {
     &--#{$name} {
       @include box(false, $color);
+      border: none;
     }
   }
 

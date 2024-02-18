@@ -9,6 +9,13 @@ const meta: Meta = {
     argTypes: {
         clearable: {
             type: "boolean"
+        },
+        placement: {
+            options: ['left start', 'left end', 'bottom start', 'bottom end', 'top start', 'top end', 'right start', 'right end'],
+            control: {type: 'radio'},
+        },
+        placeholder: {
+            type: "string"
         }
     }
 }
@@ -20,7 +27,7 @@ type MenuStory = StoryObj<typeof MultiSelect>
 
 export const BasicMultiSelect: MenuStory = {
     render: (args) => {
-        const {clearable = false} = args
+        const {clearable = false, placement, placeholder} = args
 
         const arr: React.ReactElement[] = [];
 
@@ -28,12 +35,14 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect  clearable={clearable} placeholder={"Select your items:"}>
+        return <MultiSelect placement={placement}  clearable={clearable} placeholder={placeholder}>
             {arr}
         </MultiSelect>
 
     },
     args: {
-        clearable: false
+        clearable: false,
+        placement: "bottom",
+        placeholder: "Placeholder: "
     }
 }

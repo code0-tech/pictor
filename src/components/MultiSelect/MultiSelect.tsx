@@ -41,7 +41,6 @@ const MultiSelect: React.FC<SelectType> = (props) => {
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
     const selectedArray = [...selection] as string[]
 
-    console.log(selectedArray.length)
 
     return <>
         {disabled ? <Input disabled>

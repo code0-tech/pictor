@@ -21,4 +21,19 @@ $variants: (
         "warning": $warning,
         "error": $error,
         "info": $info
-)
+);
+
+$xs: 0.6rem;
+$sm: 0.75rem;
+$md: 0.85rem;
+$lg: 1rem;
+$xl: 1.3rem;
+
+
+$sizes: (
+        "xs": $xs,
+        "sm": $sm,
+        "md": $md,
+        "lg": $lg,
+        "xl": $xl,
+);

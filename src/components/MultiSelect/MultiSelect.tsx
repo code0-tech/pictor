@@ -1,13 +1,13 @@
 import {Selection} from "react-stately"
 import React, {useEffect, useState} from "react"
-import {Key, Placement} from "react-aria"
+import {Key} from "react-aria"
 import Menu, {MenuItemType, MenuType} from "../menu/Menu"
 import Input from "../input/Input"
 import {IconSelector, IconX, TablerIconsProps} from "@tabler/icons-react"
 import Pill from "../pill/Pill";
 import "./MultiSelect.style.scss"
 
-export interface SelectType extends Omit<MenuType<any>, "children">{
+export interface SelectType extends Omit<MenuType<any>, "children"> {
     children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
     defaultValue?: string[], //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
@@ -31,8 +31,7 @@ export interface SelectIconType {
 const MultiSelect: React.FC<SelectType> = (props) => {
     const {
         disabled = false, clearable = false, defaultValue,
-        onSelectionChange = () => {
-        },
+        onSelectionChange = () => {},
         children, label, disallowDeselection = false,
         success, description,
         error, placeholder, placement = "bottom start"
@@ -40,13 +39,6 @@ const MultiSelect: React.FC<SelectType> = (props) => {
 
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
     const selectedArray = [...selection] as string[]
-
-    useEffect(() => {
-        const wrapperWidth = document.getElementsByClassName("multi-select__input")[0].clientWidth - 1
-        const elementById = document.getElementById("multi-select__pill-wrapper");
-        if (!elementById) return
-        elementById.style.width = wrapperWidth + "px"
-    }, [document.getElementsByClassName("multi-select-input")[0]?.clientWidth])
 
     return <>
         {disabled ? <Input disabled>
@@ -78,18 +70,20 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         <div>
                             <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
                                 {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                                    return <Pill size={"sm"} key={index} removeButton={true} onClose={(event: MouseEvent) => {
-                                        const newArray = selectedArray.filter(entry => entry !== value);
-                                        const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
+                                    return <Pill size={"sm"} color={"secondary"} key={index} removeButton={true}
+                                                 onClose={(event: MouseEvent) => {
+                                                     const newArray = selectedArray.filter(entry => entry !== value);
+                                                     const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
 
-                                        setSelection(newSelection)
-                                    }}>
+                                                     setSelection(newSelection)
+
+                                                 }}>
                                         {value}
                                     </Pill>
                                 })}
                             </div>
-                            <input defaultValue={placeholder ?? ""} className={"multi-select__input"}
-                                   placeholder={placeholder ?? ""} readOnly></input>
+                            {[...selection].length < 1 ? <input defaultValue={placeholder ?? ""} className={"multi-select__input"}
+                                   placeholder={placeholder ?? ""} readOnly></input> : null}
                         </div>
                     </div>
                 </Menu.Trigger>
@@ -104,8 +98,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                 </Menu.Content>
             </Menu>
         }
-        </>
-
+    </>
 
 
 }

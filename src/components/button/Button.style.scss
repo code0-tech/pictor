@@ -29,7 +29,7 @@
 @each $name, $font-size in $sizes {
   .button--#{$name} {
     font-size: $font-size;
-    padding: $font-size / 2;
+    padding: calc($font-size / 2);
 
     .button__icon {
       width: $font-size;

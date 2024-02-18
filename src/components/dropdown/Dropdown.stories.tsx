@@ -53,12 +53,12 @@ export const Dropdowns = () => {
             {
                 ["secondary", "secondary", "secondary", "secondary"].map((value, index) => {
                     // @ts-ignore
-                    return (index % 2 == 0) ? <Button disabled={(index % 2) == 0} variant={value}>
+                    return (index % 2 == 0) ? <Button disabled={(index % 2) == 0} color={value}>
                         {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                         {value}
                     </Button> : <Dropdown position={"bottom"} align={"start"}>
                         <Dropdown.Trigger>
-                            <Button disabled={(index % 2) == 0} variant={"secondary"}>
+                            <Button disabled={(index % 2) == 0} color={"secondary"}>
                                 {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                                 {value}
                             </Button>

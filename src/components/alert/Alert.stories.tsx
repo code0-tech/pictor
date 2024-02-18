@@ -1,7 +1,7 @@
 import React from "react";
 import Alert from "./Alert";
 import {Meta, StoryObj} from "@storybook/react";
-import {Variants} from "../../utils/utils";
+import {Colors} from "../../utils/utils";
 
 const meta: Meta<typeof Alert> = {
     title: "Alert",
@@ -15,7 +15,7 @@ const meta: Meta<typeof Alert> = {
         },
         onClose: {table:{disable: true}},
         title: {table:{disable: true}},
-        variant: {table:{disable: true}}
+        color: {table:{disable: true}}
     },
 }
 
@@ -29,8 +29,8 @@ export const WithBody: Story = {
 
         return <>
             {
-                Variants.map(value => {
-                    return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
+                Colors.map(value => {
+                    return <Alert color={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
                     </Alert>
                 })
@@ -51,8 +51,8 @@ export const WithoutBody: Story = {
 
         return <>
             {
-                Variants.map(value => {
-                    return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}/>
+                Colors.map(value => {
+                    return <Alert color={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}/>
                 })
             }
         </>

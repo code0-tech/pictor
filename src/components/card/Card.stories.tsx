@@ -15,7 +15,7 @@ const meta: Meta = {
 export default meta
 
 export const Test = () => {
-    return <Card variant={"secondary"}>
+    return <Card color={"secondary"}>
         <Card.Image alt={"Nico Sammito"} src={"https://event.gls-west.de/Nico_Sammito.jpg"}/>
         <Card.Header>
             <Card.Title>Nico Sammito</Card.Title>
@@ -39,10 +39,10 @@ export const Test = () => {
         </ListGroup>
         <CardFooter>
             <ButtonGroup>
-                <Button variant={"secondary"}>
+                <Button color={"secondary"}>
                     Button
                 </Button>
-                <Button variant={"secondary"}>
+                <Button color={"secondary"}>
                     Button
                 </Button>
             </ButtonGroup>

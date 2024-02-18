@@ -37,7 +37,7 @@ export function InternalMenu<T extends object>(props: AriaMenuProps<T>) {
 
 function InternalMenuItem<T>({item, state}: {item: Node<T>, state: TreeState<T>}) {
 
-    const {variant = "secondary", disabled = false, unselectable = false} = item.props as MenuItemType
+    const {color = "secondary", disabled = false, unselectable = false} = item.props as MenuItemType
 
     // Get props for the menu item element
     const ref = React.useRef(null);
@@ -48,7 +48,7 @@ function InternalMenuItem<T>({item, state}: {item: Node<T>, state: TreeState<T>}
     )
 
     return (
-        <li {...(!disabled ? {...menuItemProps} : {})} ref={ref} className={`menu__item menu__item--${variant} ${disabled && "menu__item--disabled"} ${unselectable && "menu__item--unselectable"}`}>
+        <li {...(!disabled ? {...menuItemProps} : {})} ref={ref} className={`menu__item menu__item--${color} ${disabled && "menu__item--disabled"} ${unselectable && "menu__item--unselectable"}`}>
 
             <div>{item.rendered}</div>
             {isSelected && !unselectable ? <IconCheck size={16} style={{marginLeft: ".5rem"}}/> : menuItemProps.role != "menuitem" ? <IconCheck size={16} style={{marginLeft: ".5rem", opacity: 0}}/> : null}

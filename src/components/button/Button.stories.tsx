@@ -3,7 +3,7 @@ import {StoryObj} from "@storybook/react";
 import React from "react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import {IconAbc} from "@tabler/icons-react";
-import {Variants} from "../../utils/utils";
+import {Colors} from "../../utils/utils";
 
 const meta = {
     title: "Button",
@@ -33,8 +33,8 @@ export const Buttons: ButtonStory = {
 
         return <>
             {
-                Variants.map(value => {
-                    return <Button disabled={disabled} variant={value}>
+                Colors.map(value => {
+                    return <Button disabled={disabled} color={value}>
                         {icon ? <Button.Icon><IconAbc/></Button.Icon> : null}
                         {value}
                     </Button>
@@ -53,8 +53,8 @@ export const ButtonGroups: ButtonGroupStory = {
         return <>
             <ButtonGroup>
                 {
-                    Variants.map((value, index) => {
-                        return <Button variant={value}>
+                    Colors.map((value, index) => {
+                        return <Button color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>
@@ -65,7 +65,7 @@ export const ButtonGroups: ButtonGroupStory = {
                 {
                     ["primary", "primary", "primary", "primary"].map((value, index) => {
                         // @ts-ignore
-                        return <Button variant={value}>
+                        return <Button color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>
@@ -77,7 +77,7 @@ export const ButtonGroups: ButtonGroupStory = {
                 {
                     ["secondary", "secondary", "secondary", "secondary"].map((value, index) => {
                         // @ts-ignore
-                        return <Button disabled={(index % 2) == 0} variant={value}>
+                        return <Button disabled={(index % 2) == 0} color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}
                         </Button>

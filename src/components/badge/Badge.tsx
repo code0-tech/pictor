@@ -1,18 +1,18 @@
 import React, {HTMLProps} from "react";
 import "./Badge.style.scss"
-import {Variant} from "../../utils/utils";
+import {Color} from "../../utils/utils";
 
 export interface BadgeType extends HTMLProps<HTMLSpanElement>{
     children: string
     //defaults to primary
-    variant?: Variant
+    color?: Color
 }
 
 const Badge: React.FC<BadgeType> = (props) => {
     
-    const {variant = "primary", children, ...args} = props
+    const {color = "primary", children, ...args} = props
     
-    return <span {...args} className={`badge badge--${variant}`}>
+    return <span {...args} className={`badge badge--${color}`}>
         {children}
     </span>
 }

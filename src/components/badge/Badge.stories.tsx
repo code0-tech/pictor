@@ -3,7 +3,7 @@ import React from "react";
 import Badge from "./Badge";
 import Button from "../button/Button";
 import {IconGitBranch} from "@tabler/icons-react";
-import {Variants as BadgeVariants}  from "../../utils/utils";
+import {Colors as BadgeVariants}  from "../../utils/utils";
 
 const meta: Meta = {
     title: "Badge",
@@ -15,7 +15,7 @@ export const Variants = () => {
 
         {
             BadgeVariants.map(value => {
-                return <Badge style={{marginRight: ".5rem"}} variant={value}>
+                return <Badge style={{marginRight: ".5rem"}} color={value}>
                     {value}
                 </Badge>
             })
@@ -25,12 +25,12 @@ export const Variants = () => {
 }
 
 export const ButtonExample = () => {
-    return <Button variant={"primary"}>
+    return <Button color={"primary"}>
         <Button.Icon>
             <IconGitBranch/>
         </Button.Icon>
         Merge Branch
-        <Badge style={{marginLeft: ".5rem"}} variant={"secondary"}>
+        <Badge style={{marginLeft: ".5rem"}} color={"secondary"}>
             Badge
         </Badge>
     </Button>

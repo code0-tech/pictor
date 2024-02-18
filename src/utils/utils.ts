@@ -1,8 +1,8 @@
 import React, {ReactNode, useEffect, useMemo, useState} from "react";
 
-export type Variant = "primary" | "secondary" | "info" | "success" | "warning" | "error";
+export type Color = "primary" | "secondary" | "info" | "success" | "warning" | "error";
 
-export const Variants: Variant[] = ["primary", "secondary", "info", "success", "warning", "error"]
+export const Colors: Color[] = ["primary", "secondary", "info", "success", "warning", "error"]
 
 export type Size = "xs" | "sm" | "md" | "lg" | "xl";
 

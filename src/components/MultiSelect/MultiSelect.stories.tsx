@@ -16,9 +16,15 @@ type MenuStory = StoryObj<typeof MultiSelect>
 export const BasicMultiSelect: MenuStory = {
     render: (args) => {
 
-        return <MultiSelect placeholder={"Select your items"}>
-            <MultiSelect.Option key={"1"}>Test (Key=1)</MultiSelect.Option>
-            <MultiSelect.Option key={"2"}>Test 2 (Key=2)</MultiSelect.Option>
+
+        const arr: React.ReactElement[] = [];
+
+        for (let i = 0; i < 100; i++) {
+            arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
+        }
+
+        return <MultiSelect placeholder={"Select your items 123123123123123asd"}>
+            {arr}
         </MultiSelect>
 
     }

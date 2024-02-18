@@ -1,5 +1,5 @@
 import {Selection} from "react-stately"
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {Key} from "react-aria"
 import Menu, {MenuItemType} from "../menu/Menu"
 import Input from "../input/Input"
@@ -51,22 +51,30 @@ const MultiSelect: React.FC<SelectType> = (props) => {
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? [defaultValue] : []))
     const selectedArray = [...selection] as string[]
 
+    useEffect(() => {
+        const wrapperWidth = document.getElementsByClassName("multi-select-input")[0].clientWidth - 1
+        const elementById = document.getElementById("multi-select-pill-wrapper");
+        if (!elementById) return
+        elementById.style.width = wrapperWidth + "px"
+    }, [document.getElementsByClassName("multi-select-input")[0]?.clientWidth])
 
     return <div className={"multi-select-wrapper"}>
         <div className={"multi-select-icon"}>
             {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
         </div>
         <div>
-            {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                return <Pill key={index} removeButton onRemoveButtonClick={() => {
-                    const newArray = selectedArray.filter(entry => entry !== value);
-                    const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
+            <div id={"multi-select-pill-wrapper"} className={"multi-select-pill-wrapper"}>
+                {selectedArray.filter(entry => entry !== "").map((value, index) => {
+                    return <Pill key={index} removeButton onRemoveButtonClick={() => {
+                        const newArray = selectedArray.filter(entry => entry !== value);
+                        const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
 
-                    setSelection(newSelection)
-                }}>
-                    <Pill.Content>{value}</Pill.Content>
-                </Pill>
-            })}
+                        setSelection(newSelection)
+                    }}>
+                        <Pill.Content>{value}</Pill.Content>
+                    </Pill>
+                })}
+            </div>
             {disabled ? <Input disabled>
                     <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={placeholder ?? ""}
                                    readOnly>
@@ -86,7 +94,8 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                           setSelection(newSelection)
                       }}>
                     <Menu.Trigger>
-                        <input defaultValue={placeholder ?? ""} className={"multi-select-input"} placeholder={placeholder ?? ""} readOnly></input>
+                        <input defaultValue={placeholder ?? ""} className={"multi-select-input"}
+                               placeholder={placeholder ?? ""} readOnly></input>
                     </Menu.Trigger>
 
                     <Menu.Content>

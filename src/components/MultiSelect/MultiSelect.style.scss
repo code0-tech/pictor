@@ -7,7 +7,7 @@
   position: relative;
   display: inline-block;
   background: none;
-  width: 10em;
+  width: fit-content;
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   border: none;
@@ -16,6 +16,10 @@
   box-shadow: none;
   font-size: 1rem;
 
+
+}
+
+.multi-select-pill-wrapper {
 
 }
 

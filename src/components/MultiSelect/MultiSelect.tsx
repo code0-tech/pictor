@@ -1,13 +1,13 @@
 import {Selection} from "react-stately"
 import React, {useEffect, useState} from "react"
-import {Key} from "react-aria"
-import Menu, {MenuItemType} from "../menu/Menu"
+import {Key, Placement} from "react-aria"
+import Menu, {MenuItemType, MenuType} from "../menu/Menu"
 import Input from "../input/Input"
 import {IconSelector, IconX, TablerIconsProps} from "@tabler/icons-react"
 import Pill from "../pill/Pill";
 import "./MultiSelect.style.scss"
 
-export interface SelectType {
+export interface SelectType extends Omit<MenuType<any>, "children">{
     children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
     defaultValue?: string, //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
@@ -18,16 +18,6 @@ export interface SelectType {
     success?: React.ReactNode, //A Node which is displayed as a success
     description?: string, //A description for the input
     disallowDeselection?: boolean, //If true the user cant deselect an element
-    onSelectionChange?: (event: SelectEvent, selection: Selection) => void, //this event is trigger if an element is changed
-}
-
-export interface SelectEvent {
-    isPrevented: () => boolean,
-    preventDefault: () => void,
-    setNewSelection: (selection: Selection) => void,
-    setNewSelectionAsStringArray: (selection: string[]) => void,
-    getNewSelection: () => Selection,
-    getNewSelectionAsStringArray: () => string[],
 }
 
 export interface SelectIconType {
@@ -45,7 +35,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         },
         children, label, disallowDeselection = false,
         success, description,
-        error, placeholder
+        error, placeholder, placement = "bottom"
     } = props
 
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? [defaultValue] : []))
@@ -89,15 +79,9 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         </Input.Control.Icon>
                     </Input.Control>
                 </Input> :
-                <Menu placement={"bottom start"} defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"multiple"} selectedKeys={selection}
+                <Menu placement={placement} defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"multiple"} selectedKeys={selection}
                       onSelectionChange={selection => {
-                          const keys: Set<Key> = selection as Set<Key>
-                          if (keys.size === 0 && disallowDeselection) return
-                          let newSelection = keys.size === 0 ? new Set([""]) : selection
-                          const event = handleSelectionChangeEvent(selection, onSelectionChange)
-                          if (event.isPrevented()) return
-                          newSelection = event.getNewSelection()
-                          setSelection(newSelection)
+                          onSelectionChange(selection)
                       }}>
                     <Menu.Trigger>
                         <input defaultValue={placeholder ?? ""} className={"multi-select-input"}
@@ -119,41 +103,6 @@ const MultiSelect: React.FC<SelectType> = (props) => {
     </div>
 
 
-}
-
-const createCustomEvent = (newSelection: Selection): SelectEvent => {
-    let prevented = false
-    let selection = newSelection
-    return {
-        isPrevented: () => prevented,
-        preventDefault: () => {
-            prevented = true
-        },
-        setNewSelection: (newSelection: Selection) => {
-            selection = newSelection
-        },
-        setNewSelectionAsStringArray: (newSelection: string[]) => {
-            selection = new Set(newSelection)
-        },
-        getNewSelection: (): Selection => {
-            return selection
-        },
-        getNewSelectionAsStringArray: (): string[] => {
-            return [...selection] as string[]
-        }
-    }
-}
-
-const handleDeselectionEvent = (triggerMethod: (event: SelectEvent, newSelection: Selection) => void): SelectEvent => {
-    const event = createCustomEvent(new Set([""]))
-    triggerMethod(event, event.getNewSelection())
-    return event
-}
-
-const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: SelectEvent, selection: Selection) => void): SelectEvent => {
-    const event = createCustomEvent(newSelection)
-    triggerMethod(event, event.getNewSelection())
-    return event
 }
 
 const SelectionOption: React.FC<MenuItemType> = (props) => {

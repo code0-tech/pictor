@@ -58,9 +58,15 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         elementById.style.width = wrapperWidth + "px"
     }, [document.getElementsByClassName("multi-select-input")[0]?.clientWidth])
 
-    return <div className={"multi-select-wrapper"}>
+    return <div onClick={event => {
+        console.log((event.target as HTMLDivElement).className)
+        if ((event.target as HTMLDivElement).className === "multi-select-wrapper") {
+            if (clearable) setSelection(new Set())
+        }
+
+    }} className={"multi-select-wrapper"}>
         <div className={"multi-select-icon"}>
-            {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
+            {clearable && selectedArray.length !== 0 ? <IconX className={"xIcon"}/> : <IconSelector/>}
         </div>
         <div>
             <div id={"multi-select-pill-wrapper"} className={"multi-select-pill-wrapper"}>

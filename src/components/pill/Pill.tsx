@@ -13,9 +13,7 @@ export interface PillType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnc
     size?: "xs" | "sm" | "md" | "lg" | "xl",
 }
 
-export interface PillContentType {
-    children: string,
-}
+
 
 const Pill: React.FC<PillType> = (props) => {
     const {children, removeButton = false, onClick, color = "primary", size = "md"} = props;

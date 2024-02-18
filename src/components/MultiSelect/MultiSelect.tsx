@@ -78,7 +78,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         <div>
                             <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
                                 {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                                    return <Pill size={"sm"} key={index} removeButton onRemoveButtonClick={() => {
+                                    return <Pill size={"sm"} key={index} removeButton={true} onClose={(event: MouseEvent) => {
                                         const newArray = selectedArray.filter(entry => entry !== value);
                                         const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
 

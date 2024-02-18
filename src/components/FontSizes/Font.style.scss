@@ -1,0 +1,8 @@
+@import "../../styles/variables";
+
+
+@each $name, $entry in $sizes {
+  .size__#{$name} {
+    font-size: map-get($entry, "font");
+  }
+}

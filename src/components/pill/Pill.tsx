@@ -27,7 +27,7 @@ const Pill: React.FC<PillType> = (props) => {
         className={`pill pill--${color} pill--${size}`} {...props}>
             <span className={`pill__label ${removeButton ? "pill__label--active" : ""}`}>{children}</span>
         {removeButton &&
-            <Button variant={color} size={size} onClick={onClose}>
+            <Button color={color} size={size} onClick={onClose}>
                 <Button.Icon><IconX color={"#999999"}/></Button.Icon>
             </Button>
         }

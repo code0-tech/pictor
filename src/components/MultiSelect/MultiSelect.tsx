@@ -71,7 +71,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
 
                         setSelection(newSelection)
                     }}>
-                        <Pill.Content>{value}</Pill.Content>
+                        {value}
                     </Pill>
                 })}
             </div>

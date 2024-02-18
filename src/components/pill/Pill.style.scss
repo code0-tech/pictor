@@ -1,68 +1,36 @@
 @import "../../styles/helpers";
 
-$xs: (font: 0.6rem);
-$sm: (font: 0.75rem);
-$md: (font: 0.85rem);
-$lg: (font: 1rem);
-$xl: (font: 1.3rem);
-
-
-$sizes: (
-        "xs": $xs,
-        "sm": $sm,
-        "md": $md,
-        "lg": $lg,
-        "xl": $xl,
-);
 
 .pill {
+  display: inline-flex;
 
-  &-root {
-    padding: 0.2em 0.5em;
-    display: inline-block;
-  }
-
-  &-href {
-    cursor: pointer;
-  }
-
-  &-remove-icon {
-    height: 60%;
-    width: 60%;
-    margin-bottom: -0.2em
-  }
-
-  &-remove-button {
-    background: transparent;
-    border: 0;
-    padding-left: 0;
-    padding-right: 0;
-    margin-right: 0;
-  }
-
-  &-remove-button:active {
-    transform: translateY(1px);
+  &__label {
+    display: flex;
+    align-items: center;
   }
 
   @each $name, $color in $variants {
-    &-color-#{$name} {
-      &.pill-root {
-        @include box(true, $color);
+    &--#{$name} {
+      &.pill {
+        @include box(false, $color);
       }
     }
   }
 
-  @each $name, $properties in $sizes {
-    &-size-#{$name} {
-      .pill-label {
-        font-size: map-get($properties, "font");
+  @each $name, $font-size in $sizes {
+    &--#{$name} {
+      .pill__label {
+        font-size: $font-size;
+
       }
+
+      .pill__label--active {
+        margin-right: $font-size / 2;
+      }
+
+      padding: $font-size / 2;
     }
   }
 
-}
-
-.rm-button-active {
-  padding-right: 0;
 }
 

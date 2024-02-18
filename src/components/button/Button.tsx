@@ -10,6 +10,7 @@ export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLA
     children: ReactNode | ReactNode[]
     //defaults to primary
     variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error",
+    size?: "xs" | "sm" | "md" | "lg" | "xl",
     //defaults to false
     active?: boolean
     //defaults to false
@@ -22,12 +23,12 @@ export interface ButtonIconType {
 
 const Button: React.FC<ButtonType> = (props) => {
 
-    const {children, variant = "primary", active = false, disabled = false, ...args} = props
+    const {children, size= "md", variant = "primary", active = false, disabled = false, ...args} = props
     const icon = getChild(children, ButtonIcon)
     const content = getContent(children, ButtonIcon)
 
 
-    return <a {...args} className={`button button--${variant} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""}`}
+    return <a {...args} className={`button button--${size} button--${variant} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""}`}
         aria-disabled={disabled ? "true" : "false"}>
         {icon}
         {content ? <span className={"button__content"}>{content}</span> : null}

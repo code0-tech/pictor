@@ -1,8 +1,6 @@
 @import "../../styles/helpers";
 
 .button {
-  @include box(true);
-
   padding: .5rem;
   cursor: pointer;
   display: flex;
@@ -34,9 +32,43 @@
   }
 }
 
+@function getMixedColor($color) {
+  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+}
+
 @each $name, $color in $variants {
   .button--#{$name} {
     @include box(true, $color);
+
+    &.button--filled {
+      border-color: transparent;
+
+      &:active {
+        @include border();
+      }
+    }
+
+    &.button--outlined {
+      background: transparent;
+      border-color: getMixedColor($color);
+      &:hover, &.button--none:hover {
+        background: getMixedColor($color);
+      }
+      &:active, &.button--none:active {
+        @include border();
+      }
+    }
+
+    &.button--none {
+      background: transparent;
+      border-color: transparent;
+      &:hover {
+        background: getMixedColor($color);
+      }
+      &:active {
+        @include border();
+      }
+    }
 
     .button__icon {
       color: color($color);

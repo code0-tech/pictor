@@ -23,7 +23,7 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect placeholder={"Select your items 123123123123123asd"}>
+        return <MultiSelect placeholder={"Select your items:"}>
             {arr}
         </MultiSelect>
 

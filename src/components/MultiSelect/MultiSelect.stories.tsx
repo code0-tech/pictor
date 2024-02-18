@@ -28,7 +28,7 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect clearable={clearable} placeholder={"Select your items:"}>
+        return <MultiSelect  clearable={clearable} placeholder={"Select your items:"}>
             {arr}
         </MultiSelect>
 

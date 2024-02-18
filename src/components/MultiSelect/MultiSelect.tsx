@@ -30,8 +30,9 @@ export interface SelectIconType {
 
 const MultiSelect: React.FC<SelectType> = (props) => {
     const {
-        disabled = false, clearable = false, defaultValue,
-        onSelectionChange = () => {},
+        disabled = false, clearable = false, defaultValue = [],
+        onSelectionChange = () => {
+        },
         children, label, disallowDeselection = false,
         success, description,
         error, placeholder, placement = "bottom start"
@@ -40,9 +41,12 @@ const MultiSelect: React.FC<SelectType> = (props) => {
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
     const selectedArray = [...selection] as string[]
 
+    console.log(selectedArray.length)
+
     return <>
         {disabled ? <Input disabled>
-                <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={placeholder ?? ""}
+                <Input.Control {...(label ? {label: label} : {label: ""})}
+                               placeholder={placeholder && selectedArray.length !== 0 ? placeholder : ""}
                                readOnly>
                     <Input.Control.Icon>
                         {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
@@ -67,24 +71,24 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                     }} className={"multi-select"}>
                         {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
                             <IconSelector className={"multi-select__icon"}/>}
-                        <div>
-                            <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
-                                {selectedArray.filter(entry => entry !== "").map((value, index) => {
-                                    return <Pill size={"sm"} color={"secondary"} key={index} removeButton={true}
-                                                 onClose={(event: MouseEvent) => {
-                                                     const newArray = selectedArray.filter(entry => entry !== value);
-                                                     const newSelection = new Set(newArray.length === 0 ? [""] : newArray);
+                        <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
+                            {selectedArray.filter(entry => entry !== "").map((value, index) => {
+                                return <Pill size={"sm"} color={"secondary"} key={index} removeButton={true}
+                                             onClose={(event: MouseEvent) => {
+                                                 const newArray = selectedArray.filter(entry => entry !== value);
+                                                 const newSelection = new Set(newArray.length === 0 ? [] : newArray);
 
-                                                     setSelection(newSelection)
+                                                 setSelection(newSelection)
 
-                                                 }}>
-                                        {value}
-                                    </Pill>
-                                })}
-                            </div>
-                            {[...selection].length < 1 ? <input defaultValue={placeholder ?? ""} className={"multi-select__input"}
-                                   placeholder={placeholder ?? ""} readOnly></input> : null}
+                                             }}>
+                                    {value}
+                                </Pill>
+                            })}
                         </div>
+                        {selectedArray.length === 0 ?
+                            <input value={(selectedArray.length === 0 && placeholder) ? placeholder : ""}
+                                   className={"multi-select__input"}
+                                   readOnly></input>: null}
                     </div>
                 </Menu.Trigger>
 

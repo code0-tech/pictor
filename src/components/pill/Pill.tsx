@@ -9,7 +9,7 @@ export interface PillType extends Omit<HTMLProps<HTMLAnchorElement>, "size"> {
     removeButton?: boolean
     //defaults to primary
     color?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
-    //Defaults to md
+    //Defaults to sm
     size?: "xs" | "sm" | "md" | "lg" | "xl"
     onClose?: MouseEventHandler
 }
@@ -19,7 +19,7 @@ const Pill: React.FC<PillType> = (props) => {
     const {
         children, removeButton = false,
         color = "primary",
-        size = "md",
+        size = "sm",
         onClose
     } = props;
 

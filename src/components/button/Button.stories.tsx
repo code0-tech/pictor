@@ -17,11 +17,15 @@ const meta = {
             type: "boolean",
             default: false
         },
-        variant: {table: {disable: true}}
+        variant: {
+            options: ['none', 'normal', 'filled', 'outlined'],
+            control: {type: 'radio'},
+        },
+        color: {table: {disable: true}}
     }
 }
 
-type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean }>;
+type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean, variant: string }>;
 type ButtonGroupStory = StoryObj<typeof ButtonGroup>;
 
 export default meta
@@ -29,7 +33,7 @@ export default meta
 export const Buttons: ButtonStory = {
     render: (args) => {
 
-        const {icon, disabled} = args
+        const {icon, disabled, variant} = args
 
         return <>
             {
@@ -44,7 +48,8 @@ export const Buttons: ButtonStory = {
     },
     args: {
         icon: true,
-        disabled: false
+        disabled: false,
+        variant: "normal"
     }
 }
 
@@ -84,7 +89,6 @@ export const ButtonGroups: ButtonGroupStory = {
                     })
                 }
             </ButtonGroup>
-
         </>
     }
 }

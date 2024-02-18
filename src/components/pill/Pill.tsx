@@ -30,7 +30,6 @@ const Pill: React.FC<PillType> = (props) => {
             </Button>
         }
         </span>
-
 }
 
 

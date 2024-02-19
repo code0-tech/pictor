@@ -1,6 +1,6 @@
 import React from "react";
 import {Size} from "../../utils/types";
-import "./Font.style.scss"
+import "./Text.style.scss"
 
 export interface FontType extends Omit<Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>, "children">, "className"> {
     children: string,

@@ -1,0 +1,8 @@
+@import "../../styles/variables";
+
+
+@each $name, $font in $sizes {
+  .size--#{$name} {
+    font-size: $font;
+  }
+}

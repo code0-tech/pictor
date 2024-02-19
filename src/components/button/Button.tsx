@@ -4,7 +4,8 @@ import React, {
     DetailedHTMLProps,
     ReactNode
 } from "react";
-import {getChild, getContent, Color} from "../../utils/utils";
+import {getChild, getContent} from "../../utils/utils";
+import {Color} from "../../utils/types"
 
 export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
     children: ReactNode | ReactNode[]

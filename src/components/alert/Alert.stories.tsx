@@ -1,7 +1,7 @@
 import React from "react";
 import Alert from "./Alert";
 import {Meta, StoryObj} from "@storybook/react";
-import {Colors} from "../../utils/utils";
+import {Colors} from "../../utils/types";
 
 const meta: Meta<typeof Alert> = {
     title: "Alert",

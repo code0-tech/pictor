@@ -33,7 +33,7 @@ const Alert: React.FC<AlertType> = (props) => {
     return <div className={`alert alert--${color}`}>
         <div className={"alert__header"}>
             <div className={"alert__header-wrapper"}>
-                {icon ? <AlertIcon variant={color}/> : null}
+                {icon ? <AlertIcon color={color}/> : null}
                 <span className={"alert__heading"}>{title}</span>
             </div>
             {dismissible ? <span className={"alert__dismissible"} onClick={onClose}><IconX/></span> : null}
@@ -51,12 +51,12 @@ export interface AlertHeadingType {
 }
 
 export interface AlertIconType {
-    variant: Color
+    color: Color
 }
 
-const AlertIcon: React.FC<AlertIconType> = ({variant}) => {
+const AlertIcon: React.FC<AlertIconType> = ({color}) => {
     return <span className={"alert__icon"}>
-        {IconColors[variant]}
+        {IconColors[color]}
     </span>
 }
 

@@ -1,12 +1,12 @@
-import Font from "./Font";
+import Text from "./Text";
 import React from "react";
-import {Sizes} from "../../utils/utils";
+import {Sizes} from "../../utils/types";
 import {Button, ButtonGroup} from "../../index";
 
 
 export default {
     title: "Font",
-    component: Font
+    component: Text
 };
 
 export const Fonts = () => <>
@@ -15,7 +15,7 @@ export const Fonts = () => <>
             {
                 Sizes.map(value =>
                     <Button>
-                        <Font size={value}>{value}</Font>
+                        <Text size={value}>{value}</Text>
                     </Button>
                 )
             }

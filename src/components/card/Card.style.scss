@@ -49,7 +49,7 @@
 
   &__title {
     padding: 0;
-    font-size: map-get($lg, "font");
+    font-size: $lg;
     color: rgba($white, 1);
     font-weight: 500;
     margin: 0 0 .5rem;
@@ -57,7 +57,7 @@
 
   &__sub-title {
     padding: 0;
-    font-size: map-get($md, "font");
+    font-size: $md;
     color: rgba($white, .75);
     font-weight: 500;
     margin: 0 0 .5rem;

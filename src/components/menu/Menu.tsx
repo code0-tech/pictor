@@ -1,5 +1,5 @@
 import React from "react";
-import {getChild, Color} from "../../utils/utils";
+import {getChild} from "../../utils/utils";
 import {PopoverProps} from "../popover/Popover";
 import {AriaMenuProps, Key, useButton, useMenuTrigger} from "react-aria";
 import {Item, Section, useMenuTriggerState} from "react-stately";
@@ -8,6 +8,7 @@ import {InternalPopover} from "../popover/InternalPopover";
 import {InternalMenu} from "./InternalMenu";
 import Badge from "../badge/Badge";
 import "./Menu.style.scss"
+import {Color} from "../../utils/types";
 
 export interface MenuType<T> extends AriaMenuProps<T>, PopoverProps {
     children: React.ReactElement<MenuTriggerType & MenuContentType>[]

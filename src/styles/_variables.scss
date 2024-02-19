@@ -11,11 +11,11 @@ $white: #ffffff;
 
 //(font-)sizes
 
-$xs: ("font": .75rem);
-$sm: ("font": .8rem);
-$md: ("font": 1rem);
-$lg: ("font": 1.25rem);
-$xl: ("font": 2rem);
+$xs: .75rem;
+$sm: .8rem;
+$md: 1rem;
+$lg: 1.25rem;
+$xl: 2rem;
 
 $sizes: (
         "xs": $xs,

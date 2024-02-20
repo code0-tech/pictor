@@ -11,7 +11,6 @@ export interface SelectType extends Omit<MenuType<any>, "children"> {
     children: React.ReactElement<MenuItemType>[] | React.ReactElement<MenuItemType>,
     defaultValue?: string[], //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
-    clearable?: boolean, //Adds an icon to clear the current selection
     label?: string, //A text which is displayed above the input to give a short description
     minValues?: number, //defaults to -1
     maxValues?: number, //defaults to -1
@@ -27,7 +26,7 @@ export interface SelectType extends Omit<MenuType<any>, "children"> {
 
 const MultiSelect: React.FC<SelectType> = (props) => {
     const {
-        disabled = false, clearable = false, defaultValue = [],
+        disabled = false, defaultValue = [],
         onSelectionChange = () => {
         },
         children, label, minValues = -1, maxValues = -1,
@@ -46,7 +45,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                                placeholder={placeholder && selectedArray.length !== 0 ? placeholder : ""}
                                readOnly>
                     <Input.Control.Icon>
-                        {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
+                        {<IconSelector/>}
                     </Input.Control.Icon>
                 </Input.Control>
             </Input> :
@@ -89,8 +88,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                                    className={"multi-select__input"}
                                    readOnly></input> : null}
                         <div>
-                            {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
-                                <IconSelector className={"multi-select__icon"}/>}
+                            <IconSelector className={"multi-select__icon"}/>
                         </div>
                     </div>
                 </Menu.Trigger>

@@ -34,6 +34,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         error, placeholder, placement = "bottom start"
     } = props
 
+    const [open, setOpen] = useState<boolean>(false)
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
     const selectedArray = [...selection] as string[]
 
@@ -50,6 +51,14 @@ const MultiSelect: React.FC<SelectType> = (props) => {
             </Input> :
             <Menu placement={placement} defaultSelectedKeys={defaultValue ?? ""} selectionMode={"multiple"}
                   selectedKeys={selection}
+                  isOpen={open}
+                  onOpenChange={isOpen => {
+                      //prevent change over mouse location and check
+                      const hoveredElements = document.querySelectorAll(':hover');
+                      const hoveredElement = hoveredElements[hoveredElements.length - 1]
+
+                      !hoveredElement.classList.contains("button") && setOpen(isOpen)
+                  }}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
                       if (keys.size === 0 && disallowDeselection) return
@@ -58,23 +67,18 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                       onSelectionChange(selection)
                   }}>
                 <Menu.Trigger>
-                    <div onClick={event => {
-                        if ((event.target as HTMLDivElement).className === "multi-select-wrapper") {
-                            if (clearable) setSelection(new Set())
-                        }
-
-                    }} className={"multi-select"}>
+                    <div className={"multi-select"}>
                         {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
-                            <IconSelector className={"multi-select__icon"}/>}
-                        <div id={"multi-select__pill-wrapper"} className={"multi-select__pill-wrapper"}>
+                            <IconSelector size={16} className={"multi-select__icon"}/>}
+                        <div className={"multi-select__pill-wrapper"} onMouseDown={event => console.log(event)}>
                             {selectedArray.filter(entry => entry !== "").map((value, index) => {
                                 return <Pill size={"sm"} color={"primary"} key={index} removeButton={true}
                                              onClose={(event: MouseEvent) => {
+                                                 console.log("lklklk")
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
                                                  if (newSelection.size === 0 && disallowDeselection) return
                                                  setSelection(newSelection)
-
                                              }}>
                                     {value}
                                 </Pill>
@@ -83,7 +87,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         {selectedArray.length === 0 ?
                             <input value={(selectedArray.length === 0 && placeholder) ? placeholder : ""}
                                    className={"multi-select__input"}
-                                   readOnly></input>: null}
+                                   readOnly></input> : null}
                     </div>
                 </Menu.Trigger>
 
@@ -91,7 +95,8 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                     {
                         Array.of(children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
                             return <Menu.Item {...child.props}
-                                              key={child.key ?? index}>{child.props.children}</Menu.Item>
+                                              key={child.key ?? index}
+                                              textValue={String(child.key)}>{child.props.children}</Menu.Item>
                         })
                     }
                 </Menu.Content>

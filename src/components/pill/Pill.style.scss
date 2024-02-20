@@ -2,17 +2,22 @@
 
 .pill {
   display: inline-flex;
-  margin: 0.2em;
+  z-index: 999;
 
   &__label {
     display: flex;
     align-items: center;
   }
 
+  > .button > * {
+    pointer-events: none;
+
+  }
+
   @each $name, $color in $variants {
     &--#{$name} {
       @include box(false, $color);
-      border: none;
+      background: none;
     }
   }
 
@@ -26,6 +31,8 @@
         margin-right: calc($font-size / 2);
       }
 
+      margin-right: calc($font-size / 2);
+      margin-bottom: calc($font-size / 2);
       padding: calc($font-size / 2);
     }
   }

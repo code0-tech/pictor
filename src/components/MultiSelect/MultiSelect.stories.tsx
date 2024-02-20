@@ -17,9 +17,6 @@ const meta: Meta = {
         placeholder: {
             type: "string"
         },
-        defaultValue: {
-            type: "string"
-        },
         disabled: {
             type: "boolean"
         },
@@ -36,7 +33,7 @@ type MenuStory = StoryObj<typeof MultiSelect>
 
 export const BasicMultiSelect: MenuStory = {
     render: (args) => {
-        const {clearable = false, placement, placeholder, defaultValue, disabled, disallowDeselection} = args
+        const {clearable = false, placement, placeholder, disabled, disallowDeselection} = args
 
         const arr: React.ReactElement[] = [];
 
@@ -44,7 +41,7 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect disabled={disabled} defaultValue={defaultValue} disallowDeselection={disallowDeselection} placement={placement}  clearable={clearable} placeholder={placeholder}>
+        return <MultiSelect disabled={disabled} disallowDeselection={disallowDeselection} placement={placement}  clearable={clearable} placeholder={placeholder}>
             {arr}
         </MultiSelect>
 
@@ -53,7 +50,6 @@ export const BasicMultiSelect: MenuStory = {
         clearable: false,
         placement: "bottom start",
         placeholder: "Placeholder",
-        defaultValue: ["1"],
         disabled: false,
         disallowDeselection: false
     }

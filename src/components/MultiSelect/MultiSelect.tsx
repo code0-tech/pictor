@@ -8,7 +8,7 @@ import Pill from "../pill/Pill";
 import "./MultiSelect.style.scss"
 
 export interface SelectType extends Omit<MenuType<any>, "children"> {
-    children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
+    children: React.ReactElement<MenuItemType>[] | React.ReactElement<MenuItemType>,
     defaultValue?: string[], //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
     clearable?: boolean, //Adds an icon to clear the current selection
@@ -18,10 +18,6 @@ export interface SelectType extends Omit<MenuType<any>, "children"> {
     success?: React.ReactNode, //A Node which is displayed as a success
     description?: string, //A description for the input
     disallowDeselection?: boolean, //If true the user cant deselect an element
-}
-
-export interface SelectIconType {
-    children: TablerIconsProps
 }
 
 //TODO implement label-, description-, error- and SuccessMessages

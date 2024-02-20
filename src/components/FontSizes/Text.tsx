@@ -1,8 +1,8 @@
-import React from "react";
+import React, {HTMLProps} from "react";
 import {Size} from "../../utils/types";
 import "./Text.style.scss"
 
-export interface FontType extends Omit<Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>, "children">, "className"> {
+export interface FontType extends Omit<Omit<Omit<HTMLProps<HTMLSpanElement>, "children">, "className">, "size"> {
     children: string,
     size: Size,
 }

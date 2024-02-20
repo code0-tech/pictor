@@ -3,13 +3,16 @@
 .multi-select {
 
   @include box(true);
-  @include border(true);
 
   display: flex;
   align-items: center;
   padding: .5rem;
 
   //margin-bottom: .5rem;
+
+  &__pill-wrapper {
+    margin-bottom: -0.375rem;
+  }
 
   &__input {
     color: white;
@@ -30,13 +33,10 @@
 
   &__icon {
     width: 1rem;
-    height: 1rem;
     margin-right: .5rem;
-    aspect-ratio: 50/50;
 
     > * {
       width: 1rem;
-      height: 1rem;
     }
   }
 }

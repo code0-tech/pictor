@@ -2,14 +2,14 @@ import React, {HTMLProps} from "react";
 import {Size} from "../../utils/types";
 import "./Text.style.scss"
 
-export interface FontType extends Omit<Omit<Omit<HTMLProps<HTMLSpanElement>, "children">, "className">, "size"> {
+export interface FontType extends Omit<Omit<HTMLProps<HTMLSpanElement>, "children">, "size"> {
     children: string,
     size: Size,
 }
 
 const Text: React.FC<FontType> = ({ size, children, ...rest }) => {
 
-    return <span className={`size--${size}`} {...rest}>
+    return <span {...rest} className={`size--${size}`}>
         {children}
     </span>
 }

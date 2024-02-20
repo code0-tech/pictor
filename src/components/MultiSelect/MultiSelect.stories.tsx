@@ -2,6 +2,7 @@ import MultiSelect from "./MultiSelect";
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
 import Badge from "../badge/Badge";
+import {IconBrandMercedes, IconBrandToyota, IconFileUnknown} from "@tabler/icons-react";
 
 
 const meta: Meta = {
@@ -21,8 +22,11 @@ const meta: Meta = {
         disabled: {
             type: "boolean"
         },
-        disallowDeselection: {
-            type: "boolean"
+        maxValues: {
+            type: "number"
+        },
+        minValues: {
+            type: "number"
         }
     }
 }
@@ -34,7 +38,7 @@ type MenuStory = StoryObj<typeof MultiSelect>
 
 export const BasicMultiSelect: MenuStory = {
     render: (args) => {
-        const {clearable = false, placement, placeholder, disabled, disallowDeselection} = args
+        const {clearable = false, placement, placeholder, disabled, maxValues, minValues} = args
 
         const arr: React.ReactElement[] = [];
 
@@ -43,7 +47,7 @@ export const BasicMultiSelect: MenuStory = {
         }
 
         return <div style={{width: "300px"}}>
-            <MultiSelect disabled={disabled} disallowDeselection={disallowDeselection} placement={placement}
+            <MultiSelect maxValues={maxValues} minValues={minValues} disabled={disabled}  placement={placement}
                          clearable={clearable} placeholder={placeholder}>
                 {arr}
             </MultiSelect>
@@ -55,17 +59,38 @@ export const BasicMultiSelect: MenuStory = {
         placement: "bottom start",
         placeholder: "Placeholder",
         disabled: false,
-        disallowDeselection: false
+        maxValues: -1,
+        minValues: -1
     }
 }
 
-export const TestStory = () => {
-    return <div style={{width: "300px"}}>
-        <MultiSelect placement={"bottom start"} placeholder={"sddssdsd"}>
-           <MultiSelect.Option key={"test"}>
-               <Badge>Test</Badge>
-               sdss
-           </MultiSelect.Option>
-        </MultiSelect>
-    </div>
+
+export const CarSelection: MenuStory = {
+    render: (args) => {
+        const {clearable = false, placement, placeholder, disabled, maxValues, minValues} = args
+
+        return <div style={{width: "300px"}}>
+            <MultiSelect disabled={disabled} minValues={minValues} maxValues={maxValues} placement={placement}
+                         clearable={clearable} placeholder={placeholder}>
+                <MultiSelect.Option key={"Mercedes"}><Badge>Mercedes</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"BMW"}><Badge>BMW</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Toyota"}><Badge>Toyota</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Tesla"}><Badge>Tesla</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Jeep"}><Badge>Jeep</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Chevrolet"}><Badge>Chevrolet</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Honda"}><Badge>Honda</Badge></MultiSelect.Option>
+                <MultiSelect.Option key={"Ford"}><Badge>Ford</Badge></MultiSelect.Option>
+            </MultiSelect>
+        </div>
+
+    },
+    args: {
+        clearable: false,
+        placement: "bottom start",
+        placeholder: "Select your 2 favorite Car Brand",
+        disabled: false,
+        minValues: 1,
+        maxValues: 2
+    }
 }
+

@@ -68,8 +68,10 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   }}>
                 <Menu.Trigger>
                     <div className={"multi-select"}>
-                        {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
-                            <IconSelector size={16} className={"multi-select__icon"}/>}
+                        <div>
+                            {clearable && selectedArray.length !== 0 ? <IconX className={"multi-select__icon"}/> :
+                                <IconSelector className={"multi-select__icon"}/>}
+                        </div>
                         <div className={"multi-select__pill-wrapper"} onMouseDown={event => console.log(event)}>
                             {selectedArray.filter(entry => entry !== "").map((value, index) => {
                                 return <Pill size={"sm"} color={"primary"} key={index} removeButton={true}

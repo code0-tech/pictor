@@ -23,9 +23,7 @@ export const TextSizes: StoryObj<typeof Text> = {
         const {size} = args
 
         return <>
-            <Button>
                 <Text size={size}>{size}</Text>
-            </Button>
         </>
     },
     args: {

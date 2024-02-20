@@ -41,9 +41,12 @@ export const BasicMultiSelect: MenuStory = {
             arr.push(<MultiSelect.Option key={i}>{i}</MultiSelect.Option>)
         }
 
-        return <MultiSelect disabled={disabled} disallowDeselection={disallowDeselection} placement={placement}  clearable={clearable} placeholder={placeholder}>
-            {arr}
-        </MultiSelect>
+        return <div style={{width: "300px"}}>
+            <MultiSelect disabled={disabled} disallowDeselection={disallowDeselection} placement={placement}
+                         clearable={clearable} placeholder={placeholder}>
+                {arr}
+            </MultiSelect>
+        </div>
 
     },
     args: {

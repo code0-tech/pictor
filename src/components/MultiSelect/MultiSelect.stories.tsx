@@ -1,6 +1,7 @@
 import MultiSelect from "./MultiSelect";
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
+import Badge from "../badge/Badge";
 
 
 const meta: Meta = {
@@ -56,4 +57,15 @@ export const BasicMultiSelect: MenuStory = {
         disabled: false,
         disallowDeselection: false
     }
+}
+
+export const TestStory = () => {
+    return <div style={{width: "300px"}}>
+        <MultiSelect placement={"bottom start"} placeholder={"sddssdsd"}>
+           <MultiSelect.Option key={"test"}>
+               <Badge>Test</Badge>
+               sdss
+           </MultiSelect.Option>
+        </MultiSelect>
+    </div>
 }

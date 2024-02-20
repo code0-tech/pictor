@@ -1,24 +1,34 @@
 import Text from "./Text";
 import React from "react";
-import {Sizes} from "../../utils/types";
+import {Colors, Size, Sizes} from "../../utils/types";
 import {Button, ButtonGroup} from "../../index";
+import Alert from "../alert/Alert";
+import {StoryObj} from "@storybook/react";
 
 
 export default {
     title: "Font",
-    component: Text
+    component: Text,
+    argTypes: {
+        size: {
+            options: ["xs", "sm", "md", "lg", "xl"],
+            control: {type: 'radio'}
+        }
+    }
 };
 
-export const Fonts = () => <>
-    {
-        <ButtonGroup>
-            {
-                Sizes.map(value =>
-                    <Button>
-                        <Text size={value}>{value}</Text>
-                    </Button>
-                )
-            }
-        </ButtonGroup>
+
+export const TextSizes: StoryObj<typeof Text> = {
+    render: (args) => {
+        const {size} = args
+
+        return <>
+            <Button>
+                <Text size={size}>{size}</Text>
+            </Button>
+        </>
+    },
+    args: {
+        size: "sm"
     }
-</>
+}

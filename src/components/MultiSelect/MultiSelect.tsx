@@ -13,11 +13,12 @@ export interface SelectType extends Omit<MenuType<any>, "children"> {
     disabled?: boolean, //If true the select is disabled and cant be used
     clearable?: boolean, //Adds an icon to clear the current selection
     label?: string, //A text which is displayed above the input to give a short description
+    minValues?: number, //defaults to -1
+    maxValues?: number, //defaults to -1
     placeholder?: string,
     error?: React.ReactNode, //A Node which is displayed as an error
     success?: React.ReactNode, //A Node which is displayed as a success
     description?: string, //A description for the input
-    disallowDeselection?: boolean, //If true the user cant deselect an element
 }
 
 //TODO implement label-, description-, error- and SuccessMessages
@@ -29,7 +30,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         disabled = false, clearable = false, defaultValue = [],
         onSelectionChange = () => {
         },
-        children, label, disallowDeselection = false,
+        children, label, minValues = -1, maxValues = -1,
         success, description,
         error, placeholder, placement = "bottom start"
     } = props
@@ -61,7 +62,8 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   }}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
-                      if (keys.size === 0 && disallowDeselection) return
+                      if (maxValues !== -1 && (keys.size > maxValues && selectedArray.length < keys.size)) return
+                      if (minValues !== -1 && (keys.size < minValues && selectedArray.length > keys.size)) return
                       let newSelection = keys.size === 0 ? new Set([]) : selection
                       setSelection(newSelection)
                       onSelectionChange(selection)
@@ -71,10 +73,11 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                         <div className={"multi-select__pill-wrapper"}>
                             {selectedArray.filter(entry => entry !== "").map((value, index) => {
                                 return <Pill size={"sm"} color={"primary"} key={index} removeButton={true}
-                                             onClose={(event: MouseEvent) => {
+                                             onClose={() => {
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
-                                                 if (newSelection.size === 0 && disallowDeselection) return
+                                                 if (maxValues !== -1 && (newSelection.size > maxValues && selectedArray.length < newSelection.size)) return
+                                                 if (minValues !== -1 && (newSelection.size < minValues && selectedArray.length > newSelection.size)) return
                                                  setSelection(newSelection)
                                              }}>
                                     {value}

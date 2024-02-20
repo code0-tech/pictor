@@ -72,7 +72,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                                              onClose={(event: MouseEvent) => {
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
-
+                                                 if (newSelection.size === 0 && disallowDeselection) return
                                                  setSelection(newSelection)
 
                                              }}>

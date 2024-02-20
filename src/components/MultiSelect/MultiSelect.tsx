@@ -68,11 +68,10 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   }}>
                 <Menu.Trigger>
                     <div className={"multi-select"}>
-                        <div className={"multi-select__pill-wrapper"} onMouseDown={event => console.log(event)}>
+                        <div className={"multi-select__pill-wrapper"}>
                             {selectedArray.filter(entry => entry !== "").map((value, index) => {
                                 return <Pill size={"sm"} color={"primary"} key={index} removeButton={true}
                                              onClose={(event: MouseEvent) => {
-                                                 console.log("lklklk")
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
                                                  if (newSelection.size === 0 && disallowDeselection) return

@@ -143,8 +143,8 @@ export const UserSelection: MenuStory = {
         placement: "bottom start",
         placeholder: "Select your favorite Code0 Users",
         disabled: false,
-        minValues: 1,
-        maxValues: 2
+        minValues: -1,
+        maxValues: -1
     }
 }
 

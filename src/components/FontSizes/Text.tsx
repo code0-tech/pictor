@@ -9,7 +9,7 @@ export interface FontType extends Omit<Omit<HTMLProps<HTMLSpanElement>, "childre
 
 const Text: React.FC<FontType> = ({ size, children, ...rest }) => {
 
-    return <span {...rest} className={`size--${size}`}>
+    return <span {...rest} className={`text size--${size}`}>
         {children}
     </span>
 }

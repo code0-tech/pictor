@@ -1,13 +1,14 @@
 import React, {ReactElement, ReactNode} from "react";
 import {IconAlertCircle, IconCircleCheck, IconCircleX, IconInfoCircle, IconX} from "@tabler/icons-react";
 import "./Alert.style.scss"
+import {Color} from "../../utils/utils";
 
 export interface AlertType {
 
     children?: ReactNode | ReactNode[]
     title: ReactNode
     //defaults to primary
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    color?: Color
     //defaults to true
     icon?: boolean
     //defaults to false
@@ -15,7 +16,7 @@ export interface AlertType {
     onClose?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
 }
 
-const IconVariants = {
+const IconColors = {
     "info": <IconInfoCircle/>,
     "primary": <IconInfoCircle/>,
     "secondary": <IconInfoCircle/>,
@@ -27,12 +28,12 @@ const IconVariants = {
 
 const Alert: React.FC<AlertType> = (props) => {
 
-    const {variant = "primary", dismissible = false, icon = true, title, onClose = (event) => {}, children} = props
+    const {color = "primary", dismissible = false, icon = true, title, onClose = (event) => {}, children} = props
 
-    return <div className={`alert alert--${variant}`}>
+    return <div className={`alert alert--${color}`}>
         <div className={"alert__header"}>
             <div className={"alert__header-wrapper"}>
-                {icon ? <AlertIcon variant={variant}/> : null}
+                {icon ? <AlertIcon color={color}/> : null}
                 <span className={"alert__heading"}>{title}</span>
             </div>
             {dismissible ? <span className={"alert__dismissible"} onClick={onClose}><IconX/></span> : null}
@@ -50,12 +51,12 @@ export interface AlertHeadingType {
 }
 
 export interface AlertIconType {
-    variant: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    color: Color
 }
 
-const AlertIcon: React.FC<AlertIconType> = ({variant}) => {
+const AlertIcon: React.FC<AlertIconType> = ({color}) => {
     return <span className={"alert__icon"}>
-        {IconVariants[variant]}
+        {IconColors[color]}
     </span>
 }
 

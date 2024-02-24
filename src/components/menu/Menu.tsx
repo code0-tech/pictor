@@ -8,6 +8,7 @@ import {InternalPopover} from "../popover/InternalPopover";
 import {InternalMenu} from "./InternalMenu";
 import Badge from "../badge/Badge";
 import "./Menu.style.scss"
+import {Color} from "../../utils/types";
 
 export interface MenuType<T> extends AriaMenuProps<T>, PopoverProps {
     children: React.ReactElement<MenuTriggerType & MenuContentType>[]
@@ -24,7 +25,7 @@ export interface MenuContentType {
 export interface MenuItemType {
     children: React.ReactNode
     key: Key
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
+    color?: Color
     disabled?: boolean
     unselectable?: boolean
     textValue?: string

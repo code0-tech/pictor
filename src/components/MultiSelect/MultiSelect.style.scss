@@ -8,6 +8,7 @@
   justify-content: space-between;
   align-items: center;
   padding: .5rem;
+  width: fit-content;
 
   //margin-bottom: .5rem;
 
@@ -22,7 +23,8 @@
     position: relative;
     display: inline-block;
     background: none;
-    width: 100%;
+    width: fit-content;
+    white-space: nowrap;
     color: rgba($white, .5);
     font-family: Ubuntu, sans-serif;
     border: none;

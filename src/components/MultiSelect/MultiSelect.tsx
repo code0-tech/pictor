@@ -75,7 +75,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                                              onClose={() => {
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
-                                                 if (maxValues !== -1 && maxValues!! > 0 && (newSelection.size > maxValues!! && selectedArray.length < newSelection.size)) return
+                                                 if (maxValues && maxValues > 1 && (newSelection.size > maxValues && selectedArray.length < newSelection.size)) return
                                                  setSelection(newSelection)
                                              }}>
                                     {value}

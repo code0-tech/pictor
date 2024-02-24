@@ -12,7 +12,7 @@ export interface SelectType extends Omit<MenuType<any>, "children"> {
     defaultValue?: string[], //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
     disabled?: boolean, //If true the select is disabled and cant be used
     label?: string, //A text which is displayed above the input to give a short description
-    maxValues?: number, //defaults to -1
+    maxValues?: number, //defaults to undefined
     placeholder?: string,
     error?: React.ReactNode, //A Node which is displayed as an error
     success?: React.ReactNode, //A Node which is displayed as a success
@@ -28,10 +28,12 @@ const MultiSelect: React.FC<SelectType> = (props) => {
         disabled = false, defaultValue = [],
         onSelectionChange = () => {
         },
-        children, label, maxValues = -1,
+        children, label, maxValues,
         success, description,
         error, placeholder, placement = "bottom start"
     } = props
+
+
 
     const [open, setOpen] = useState<boolean>(false)
     const [selection, setSelection] = useState<Selection>(new Set(defaultValue ? defaultValue : []))
@@ -60,7 +62,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   }}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
-                      if (maxValues !== -1 && (keys.size > maxValues && selectedArray.length < keys.size)) return
+                      if (maxValues !== undefined && (keys.size > maxValues && selectedArray.length < keys.size)) return
                       let newSelection = keys.size === 0 ? new Set([]) : selection
                       setSelection(newSelection)
                       onSelectionChange(selection)
@@ -73,7 +75,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                                              onClose={() => {
                                                  const newArray = selectedArray.filter(entry => entry !== value);
                                                  const newSelection = new Set(newArray.length === 0 ? [] : newArray);
-                                                 if (maxValues !== -1 && (newSelection.size > maxValues && selectedArray.length < newSelection.size)) return
+                                                 if (maxValues !== -1 && maxValues!! > 0 && (newSelection.size > maxValues!! && selectedArray.length < newSelection.size)) return
                                                  setSelection(newSelection)
                                              }}>
                                     {value}

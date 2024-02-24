@@ -62,7 +62,7 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                   }}
                   onSelectionChange={selection => {
                       const keys: Set<Key> = selection as Set<Key>
-                      if (maxValues && (keys.size > maxValues && selectedArray.length < keys.size)) return
+                      if (maxValues && maxValues > 1 && (keys.size > maxValues && selectedArray.length < keys.size)) return
                       let newSelection = keys.size === 0 ? new Set([]) : selection
                       setSelection(newSelection)
                       onSelectionChange(selection)

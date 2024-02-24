@@ -83,9 +83,8 @@ const MultiSelect: React.FC<SelectType> = (props) => {
                             })}
                         </div>
                         {selectedArray.length === 0 ?
-                            <input value={(selectedArray.length === 0 && placeholder) ? placeholder : ""}
-                                   className={"multi-select__input"}
-                                   readOnly></input> : null}
+                            <span className={"multi-select__input"}
+                                   >{(selectedArray.length === 0 && placeholder) ? placeholder : ""}</span> : null}
                         <div>
                             <IconSelector className={"multi-select__icon"}/>
                         </div>

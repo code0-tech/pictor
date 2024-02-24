@@ -1,0 +1,12 @@
+@import "../../styles/variables";
+
+.text {
+  color: rgba($white, .5);
+  font-family: Ubuntu, sans-serif;
+}
+
+@each $name, $font in $sizes {
+  .size--#{$name} {
+    font-size: $font;
+  }
+}

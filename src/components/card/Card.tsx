@@ -5,20 +5,21 @@ import {CardHeader, CardHeaderType} from "./CardHeader";
 import {CardTitle, CardTitleType} from "./CardTitle";
 import {CardSubTitle, CardSubTitleType} from "./CardSubTitle";
 import {CardFooter, CardFooterType} from "./CardFooter";
+import {Color} from "../../utils/types";
 
 export type CardChildType = CardHeaderType | CardImgStyle | CardTitleType | CardSubTitleType | CardFooterType | any
 
 export interface CardType {
     children: ReactElement<CardChildType> | ReactElement<CardChildType>[]
     //defaults to secondary
-    variant?: "primary" | "secondary" | "info" | "success" | "warning" | "error",
+    color?: Color
 }
 
 const Card: React.FC<CardType> = (props) => {
 
-    const {children, variant = "secondary", ...args} = props
+    const {children, color = "secondary", ...args} = props
 
-    return <div {...args} className={`card card--${variant}`}>
+    return <div {...args} className={`card card--${color}`}>
         {children}
     </div>
 }

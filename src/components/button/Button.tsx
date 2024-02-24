@@ -5,13 +5,13 @@ import React, {
     ReactNode
 } from "react";
 import {getChild, getContent} from "../../utils/utils";
+import {Color} from "../../utils/types"
 
 export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
     children: ReactNode | ReactNode[]
+    size?: "xs" | "sm" | "md" | "lg" | "xl",
     //defaults to primary
-    color?: "primary" | "secondary" | "info" | "success" | "warning" | "error"
-    //defaults to md
-    size?: "xs" | "sm" | "md" | "lg" | "xl"
+    color?: Color,
     //default to normal
     variant?: "none" | "normal" | "outlined" | "filled"
     //defaults to false

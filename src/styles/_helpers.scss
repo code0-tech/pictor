@@ -8,7 +8,7 @@
   border-radius: $borderRadius;
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
-  font-size: $secondaryFontSize;
+  font-size: $md;
   position: relative;
 
   @if ($active == true) {
@@ -24,7 +24,7 @@
   border-radius: $borderRadius;
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
-  font-size: $secondaryFontSize;
+  font-size: $md;
   position: relative;
 
   @if ($active == true) {

@@ -1,6 +1,7 @@
 import React from "react";
 import Alert from "./Alert";
 import {Meta, StoryObj} from "@storybook/react";
+import {Colors} from "../../utils/types";
 
 const meta: Meta<typeof Alert> = {
     title: "Alert",
@@ -14,7 +15,7 @@ const meta: Meta<typeof Alert> = {
         },
         onClose: {table:{disable: true}},
         title: {table:{disable: true}},
-        variant: {table:{disable: true}}
+        color: {table:{disable: true}}
     },
 }
 
@@ -28,9 +29,8 @@ export const WithBody: Story = {
 
         return <>
             {
-                ["primary", "secondary", "info",  "success", "warning", "error"].map(value => {
-                    // @ts-ignore
-                    return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
+                Colors.map(value => {
+                    return <Alert color={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}>
                         Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
                     </Alert>
                 })
@@ -51,9 +51,8 @@ export const WithoutBody: Story = {
 
         return <>
             {
-                ["primary", "secondary", "info",  "success", "warning", "error"].map(value => {
-                    // @ts-ignore
-                    return <Alert variant={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}/>
+                Colors.map(value => {
+                    return <Alert color={value} onClose={event => window.alert("closed")} dismissible={dismissible} icon={icon} title={value}/>
                 })
             }
         </>

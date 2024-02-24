@@ -38,7 +38,7 @@ export const MenuAccount: MenuStory = {
                 </Menu.Trigger>
                 <Menu.Content>
                     <Menu.Section>
-                        <Menu.Item variant={"info"} unselectable key={"ssd"}>
+                        <Menu.Item color={"info"} unselectable key={"ssd"}>
                             Storage almost full. You can <br/>
                             manage your storage in Settings →
                         </Menu.Item>
@@ -46,11 +46,11 @@ export const MenuAccount: MenuStory = {
                     <Menu.Section title={"Account Settings"}>
                         <Menu.Item key={"update-account"}><Menu.Icon><IconUserEdit/></Menu.Icon> Update
                             Account</Menu.Item>
-                        <Menu.Item variant={"error"}
+                        <Menu.Item color={"error"}
                                    key={"delete-account"}><Menu.Icon><IconUserCancel/></Menu.Icon> Delete
                             Account</Menu.Item>
                     </Menu.Section>
-                    <Menu.Item variant={"warning"}
+                    <Menu.Item color={"warning"}
                                key="logout"><Menu.Icon><IconLogout/></Menu.Icon> Logout <Menu.Shortcut>⌘Q</Menu.Shortcut></Menu.Item>
                 </Menu.Content>
             </Menu>

@@ -3,6 +3,7 @@ import {StoryObj} from "@storybook/react";
 import React from "react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import {IconAbc} from "@tabler/icons-react";
+import {Colors} from "../../utils/types";
 
 const meta = {
     title: "Button",
@@ -40,7 +41,7 @@ export const Buttons: ButtonStory = {
 
         return <>
             {
-                ["primary", "secondary", "info", "success", "warning", "error"].map(value => {
+                Colors.map(value => {
                     // @ts-ignore
                     return <Button size={size} disabled={disabled} variant={variant} color={value}>
                         {icon ? <Button.Icon><IconAbc/></Button.Icon> : null}
@@ -63,8 +64,7 @@ export const ButtonGroups: ButtonGroupStory = {
         return <>
             <ButtonGroup>
                 {
-                    ["primary", "secondary", "info", "success", "warning", "error"].map((value, index) => {
-                        // @ts-ignore
+                    Colors.map((value, index) => {
                         return <Button color={value}>
                             {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
                             {value}

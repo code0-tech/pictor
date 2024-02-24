@@ -1,17 +1,16 @@
 @import "../../styles/helpers";
 
 .button {
-  padding: .5rem;
+
+  
   cursor: pointer;
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
   width: fit-content;
 
   @include disabled;
 
   &__icon + &__content {
-    margin-left: .5rem;
     display: inline-block;
     position: relative;
   }
@@ -20,14 +19,26 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 1.25rem;
-    height: 1.25rem;
     color: color($white);
     cursor: pointer;
 
-    > * {
-      width: 1.25rem;
-      height: 1.25rem;
+
+  }
+}
+
+@each $name, $font-size in $sizes {
+  .button--#{$name} {
+    font-size: $font-size;
+    padding: calc($font-size / 2);
+
+    .button__icon {
+      width: $font-size;
+      height: $font-size;
+
+      > * {
+        width: $font-size;
+        height: $font-size;
+      }
     }
   }
 }
@@ -68,6 +79,10 @@
       &:active {
         @include border();
       }
+    }
+
+    .button__icon + .button__content {
+      margin-left: .5rem;
     }
 
     .button__icon {

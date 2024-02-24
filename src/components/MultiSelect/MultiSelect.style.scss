@@ -1,0 +1,52 @@
+@import "../../styles/helpers";
+
+.multi-select {
+
+  @include box(true);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .5rem;
+  width: fit-content;
+
+  //margin-bottom: .5rem;
+
+  &__pill-wrapper {
+    margin-bottom: -0.375rem;
+  }
+
+  &__input {
+    color: white;
+    background: mix($bodyBg, $secondary, 90%);
+
+    position: relative;
+    display: inline-block;
+    background: none;
+    width: fit-content;
+    white-space: nowrap;
+    color: rgba($white, .5);
+    font-family: Ubuntu, sans-serif;
+    border: none;
+    outline: none;
+    padding: .25rem .5rem .25rem 0;
+    box-shadow: none;
+    font-size: 1rem;
+  }
+
+  &__icon {
+    aspect-ratio: 1/1;
+    margin-left: .5rem;
+    width: 1rem;
+    height: 1rem;
+
+    > * {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+
+
+

@@ -21,11 +21,15 @@ const meta = {
             options: ['none', 'normal', 'filled', 'outlined'],
             control: {type: 'radio'},
         },
+        size: {
+            options: ["xs", "sm", "md", "lg", "xl"],
+            control: {type: "radio"},
+        },
         color: {table: {disable: true}}
     }
 }
 
-type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean, variant: string }>;
+type ButtonStory = StoryObj<{ icon: boolean, disabled: boolean, variant: string, size: string }>;
 type ButtonGroupStory = StoryObj<typeof ButtonGroup>;
 
 export default meta
@@ -33,13 +37,13 @@ export default meta
 export const Buttons: ButtonStory = {
     render: (args) => {
 
-        const {icon, disabled, variant} = args
+        const {icon, disabled, variant, size} = args
 
         return <>
             {
                 Colors.map(value => {
                     // @ts-ignore
-                    return <Button variant={variant} disabled={disabled} color={value}>
+                    return <Button size={size} disabled={disabled} variant={variant} color={value}>
                         {icon ? <Button.Icon><IconAbc/></Button.Icon> : null}
                         {value}
                     </Button>
@@ -50,7 +54,8 @@ export const Buttons: ButtonStory = {
     args: {
         icon: true,
         disabled: false,
-        variant: "normal"
+        variant: "normal",
+        size: "md",
     }
 }
 

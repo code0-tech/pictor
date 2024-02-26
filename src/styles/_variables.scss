@@ -25,6 +25,12 @@ $sizes: (
         "xl": $xl,
 );
 
+$hierarchy: (
+        "primary": 0.75,
+        "seconday": 0.5,
+        "tertiary": 0.25,
+);
+
 
 //component styling
 $borderRadius: .5rem;

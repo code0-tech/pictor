@@ -10,7 +10,7 @@
   width: fit-content;
 }
 
-@each $name, $color in $variants {
+@each $name, $color in $colors {
   .badge--#{$name} {
     @include opacityBox(false, $color);
     font-size: $xs;

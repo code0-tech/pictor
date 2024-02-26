@@ -36,7 +36,7 @@
   @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
 }
 
-@each $name, $color in $variants {
+@each $name, $color in $colors {
   .button--#{$name} {
     @include box(true, $color);
 

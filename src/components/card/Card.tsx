@@ -1,33 +1,48 @@
-import React, {ReactElement} from "react";
+import React, {HTMLProps, ReactElement, ReactNode} from "react";
 import "./Card.style.scss"
-import {CardImg, CardImgStyle} from "./CardImg";
-import {CardHeader, CardHeaderType} from "./CardHeader";
-import {CardTitle, CardTitleType} from "./CardTitle";
-import {CardSubTitle, CardSubTitleType} from "./CardSubTitle";
-import {CardFooter, CardFooterType} from "./CardFooter";
-import {Color} from "../../utils/types";
+import {Color, Size} from "../../utils/types";
 
-export type CardChildType = CardHeaderType | CardImgStyle | CardTitleType | CardSubTitleType | CardFooterType | any
 
-export interface CardType {
-    children: ReactElement<CardChildType> | ReactElement<CardChildType>[]
+export interface CardType extends HTMLProps<HTMLDivElement>{
+    children: ReactElement[]
     //defaults to secondary
-    color?: Color
+    color?: Color,
+    //defaults to normal
+    variant?: "none" | "normal" | "outlined" | "filled" | "gradient",
 }
+
+
+
+export interface SectionType {
+    children: ReactNode | ReactNode[]
+    //defaults to true
+    withoutPadding?: boolean,
+    //defaults to false
+    image?: boolean,
+}
+
 
 const Card: React.FC<CardType> = (props) => {
 
-    const {children, color = "secondary", ...args} = props
+    const {children, color = "secondary", variant = "normal", ...args} = props
 
-    return <div {...args} className={`card card--${color}`}>
-        {children}
-    </div>
+    return <>
+        <div {...args} className={`card card--${color} card--${variant} `}>
+            {props.children}
+        </div>
+    </>
 }
 
+const CardSection: React.FC<SectionType> = (props) => {
+    const {withoutPadding = true, image = false} = props;
+
+    return <>
+        <div
+            className={`card__section ${props.image ? "card__section--image" : ""} ${withoutPadding ? "card__section--no-padding" : ""}`}>{props.children}</div>
+    </>
+}
+
+
 export default Object.assign(Card, {
-    Image: CardImg,
-    Header: CardHeader,
-    Footer: CardFooter,
-    Title: CardTitle,
-    Subtitle: CardSubTitle
+    Section: CardSection,
 })

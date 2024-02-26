@@ -1,11 +1,8 @@
 import {Meta} from "@storybook/react";
 import React from "react";
 import Card from "./Card";
-import ListGroup from "../list-group/ListGroup";
-import {CardFooter} from "./CardFooter";
-import ButtonGroup from "../button-group/ButtonGroup";
-import Button from "../button/Button";
-import Dropdown from "../dropdown/Dropdown";
+import Badge from "../badge/Badge";
+import Text from "../FontSizes/Text";
 
 const meta: Meta = {
     title: "Card",
@@ -15,37 +12,26 @@ const meta: Meta = {
 export default meta
 
 export const Test = () => {
-    return <Card color={"secondary"}>
-        <Card.Image alt={"Nico Sammito"} src={"https://event.gls-west.de/Nico_Sammito.jpg"}/>
-        <Card.Header>
-            <Card.Title>Nico Sammito</Card.Title>
-            <Card.Subtitle>Co-Founder</Card.Subtitle>
-        </Card.Header>
-        <ListGroup>
-            <Dropdown position={"right"}>
-                <Dropdown.Trigger>
-                    <ListGroup.Item>
-                        Test
-                    </ListGroup.Item>
-                </Dropdown.Trigger>
-                <Dropdown.Menu>
-                    <Dropdown.Header>
-                        test
-                    </Dropdown.Header>
-                    Test
-                </Dropdown.Menu>
-            </Dropdown>
+    return <Card style={{
+        width: "400px"
+    }} >
 
-        </ListGroup>
-        <CardFooter>
-            <ButtonGroup>
-                <Button color={"secondary"}>
-                    Button
-                </Button>
-                <Button color={"secondary"}>
-                    Button
-                </Button>
-            </ButtonGroup>
-        </CardFooter>
+
+        <Card.Section image>
+            <img alt={""} width={"100%"} src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
+        </Card.Section>
+        <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+        }}>
+            <Text size={"lg"} hierarchy={"primary"}>Titel</Text>
+            <Badge>26.02.24 22:06</Badge>
+        </div>
+        <br/>
+        <Text hierarchy={"tertiary"} size={"md"}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut</Text>
+
+
+
     </Card>
 }

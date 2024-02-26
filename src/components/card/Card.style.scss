@@ -48,25 +48,41 @@
       border-color: getMixedColor($color);
     }
 
+
     &.card--gradient {
-      border: none;
-      outline: 1px solid borderColor(false);
 
-      &.card--gradient-top-left {
-        background: linear-gradient(135deg, getMixedColor($color) 10%, transparent 90%);
+      &:after {
+        position: absolute;
+        width: 150%;
+        height: 150%;
+        opacity: 75%;
+        content: "";
+        border-radius: 50rem;
+        filter: blur(4rem);
+        background: getMixedColor($color);
       }
 
-      &.card--gradient-bottom-left {
-        background: linear-gradient(45deg, getMixedColor($color) 10%, transparent 90%);
+
+      &.card--gradient-top-left:after {
+        top: -75%;
+        left: -75%;
       }
 
-      &.card--gradient-top-right {
-        background: linear-gradient(225deg, getMixedColor($color) 10%, transparent 90%);
+      &.card--gradient-bottom-left:after {
+        bottom: -75%;
+        left: -75%;
       }
 
-      &.card--gradient-bottom-right {
-        background: linear-gradient(315deg, getMixedColor($color) 10%, transparent 90%);
+      &.card--gradient-top-right:after {
+        top: -75%;
+        right: -75%;
       }
+
+      &.card--gradient-bottom-right:after {
+        bottom: -75%;
+        right: -75%;
+      }
+
 
     }
 

@@ -8,9 +8,11 @@ export interface CardType extends HTMLProps<HTMLDivElement>{
     //defaults to secondary
     color?: Color,
     //defaults to normal
-    variant?: "none" | "normal" | "outlined" | "filled" | "gradient",
+    variant?: "none" | "normal" | "outlined" | "filled",
+    //defaults to false
+    gradient?: boolean,
     //defaults to top-right
-    gradient?: "top-left" | "top-right" | "bottom-right" | "bottom-left"
+    gradientPosition?: "top-left" | "top-right" | "bottom-right" | "bottom-left"
 }
 
 
@@ -26,10 +28,10 @@ export interface SectionType {
 
 const Card: React.FC<CardType> = (props) => {
 
-    const {children, color = "secondary", variant = "normal", gradient= "top-right", ...args} = props
+    const {children, color = "secondary", variant = "normal", gradient = false, gradientPosition= "top-right", ...args} = props
 
     return <>
-        <div {...args} className={`card ${variant == "gradient" ? `card--gradient-${gradient}` : ""} card--${color} card--${variant} `}>
+        <div {...args} className={`card ${gradient && "card--gradient"} ${gradient && `card--gradient-${gradientPosition}`} card--${color} card--${variant}`}>
             {props.children}
         </div>
     </>

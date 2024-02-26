@@ -15,10 +15,13 @@ const meta: Meta = {
             control: {type: "radio"}
         },
         variant: {
-            options: ['none', 'normal', 'filled', 'outlined', 'gradient'],
+            options: ['none', 'normal', 'filled', 'outlined'],
             control: {type: 'radio'},
         },
         gradient: {
+            type: "boolean"
+        },
+        gradientPosition: {
             options: ["top-left", "top-right", "bottom-right", "bottom-left"],
             control: {type: 'radio'},
         }
@@ -31,7 +34,7 @@ type CardStory = StoryObj<typeof Card>;
 
 export const Test: CardStory = {
     render: (props) => {
-        return <Card variant={props.variant} gradient={props.gradient} color={props.color} style={{
+        return <Card variant={props.variant} gradientPosition={props.gradientPosition} gradient={props.gradient} color={props.color} style={{
             width: "400px"
         }}>
 
@@ -59,6 +62,7 @@ export const Test: CardStory = {
     args: {
         variant: "normal",
         color: "primary",
-        gradient: "top-right"
+        gradient: false,
+        gradientPosition: "top-right"
     }
 }

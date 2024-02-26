@@ -15,21 +15,60 @@
   }
 
 
-
   > * {
     &:first-child.card__section--image {
       margin-top: -1rem;
     }
+
     &:last-child.card__section--image {
       margin-bottom: -1rem;
     }
   }
 }
 
+@function getMixedColor($color) {
+  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
+}
 
 @each $name, $color in $colors {
   .card--#{$name} {
     @include box(false, $color);
+
+    &.card--none {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    &.card--filled {
+      border-color: transparent;
+    }
+
+    &.card--outlined {
+      background: transparent;
+      border-color: getMixedColor($color);
+    }
+
+    &.card--gradient {
+      border: none;
+      outline: 1px solid borderColor(false);
+
+      &.card--gradient-top-left {
+        background: linear-gradient(135deg, getMixedColor($color) 10%, transparent 90%);
+      }
+
+      &.card--gradient-bottom-left {
+        background: linear-gradient(45deg, getMixedColor($color) 10%, transparent 90%);
+      }
+
+      &.card--gradient-top-right {
+        background: linear-gradient(225deg, getMixedColor($color) 10%, transparent 90%);
+      }
+
+      &.card--gradient-bottom-right {
+        background: linear-gradient(315deg, getMixedColor($color) 10%, transparent 90%);
+      }
+
+    }
 
   }
 }

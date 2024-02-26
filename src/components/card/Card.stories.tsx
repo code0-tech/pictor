@@ -1,9 +1,10 @@
-import {Meta} from "@storybook/react";
+import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
-import Card from "./Card";
+import Card, {CardType} from "./Card";
 import Badge from "../badge/Badge";
 import Text from "../FontSizes/Text";
 import {Colors} from "../../utils/types";
+import ButtonGroup from "../button-group/ButtonGroup";
 
 const meta: Meta = {
     title: "Card",
@@ -26,8 +27,10 @@ const meta: Meta = {
 
 export default meta
 
-export const Test: any = {
-    render: (props: any) => {
+type CardStory = StoryObj<typeof Card>;
+
+export const Test: CardStory = {
+    render: (props) => {
         return <Card variant={props.variant} gradient={props.gradient} color={props.color} style={{
             width: "400px"
         }}>

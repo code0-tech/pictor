@@ -1,17 +1,18 @@
 @import "../../styles/helpers";
 
 .card {
-  padding: 1rem;
+  padding: .5rem;
   overflow: hidden;
 
   > * {
+
+
+    &.card__section > img {
+      border-radius: .5rem;
+    }
+
     &:first-child.card__section {
       margin-top: 0;
-
-      > img {
-        border-top-left-radius: .5rem;
-        border-top-right-radius: .5rem;
-      }
 
       &--border {
         padding-top: 0;
@@ -21,11 +22,6 @@
     }
     &:last-child.card__section {
       margin-bottom: 0;
-
-      > img {
-        border-bottom-left-radius: .5rem;
-        border-bottom-right-radius: .5rem;
-      }
 
       &--border {
         padding-bottom: 0;
@@ -40,21 +36,21 @@
   }
 
   &__section {
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    margin-bottom: .5rem;
+    margin-top: .5rem;
     position: relative;
 
     &--border {
-      margin-right: -1rem;
-      margin-left: -1rem;
-      padding: 1rem;
+      margin-right: -.5rem;
+      margin-left: -.5rem;
+      padding: .5rem;
 
       border-top: 1px solid borderColor();
       border-bottom: 1px solid borderColor();
 
       + .card__section--border {
         border-top: none;
-        margin-top: -1rem;
+        margin-top: -.5em;
       }
     }
   }

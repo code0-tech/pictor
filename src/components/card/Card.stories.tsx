@@ -26,6 +26,9 @@ const meta: Meta = {
         gradientPosition: {
             options: ["top-left", "top-right", "bottom-right", "bottom-left"],
             control: {type: 'radio'},
+        },
+        outline: {
+            type: "boolean"
         }
     }
 }
@@ -39,9 +42,10 @@ export const CardNews: CardStory = {
 
         const [heart, setHeart] = useState(false)
 
-        return <Card outline variant={props.variant} gradientPosition={props.gradientPosition} gradient={props.gradient}
+        return <Card outline={props.outline} variant={props.variant} gradientPosition={props.gradientPosition} gradient={props.gradient}
                      color={props.color} style={{
-            width: "400px"
+            width: "50vw",
+            maxWidth: "350px"
         }}>
 
 
@@ -49,7 +53,7 @@ export const CardNews: CardStory = {
                 <img alt={""} width={"100%"}
                      src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
             </Card.Section>
-            <Card.Section border>
+            <Card.Section>
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -87,7 +91,8 @@ export const CardNews: CardStory = {
     ,
     args: {
         variant: "outlined",
-        color: "info",
+        color: "secondary",
+        outline: true,
         gradient: true,
         gradientPosition: "top-right"
     }

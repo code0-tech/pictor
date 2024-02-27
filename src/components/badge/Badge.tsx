@@ -1,6 +1,6 @@
 import React, {HTMLProps} from "react";
 import "./Badge.style.scss"
-import {Color} from "../../utils/utils";
+import {Color} from "../../utils/types";
 
 export interface BadgeType extends HTMLProps<HTMLSpanElement>{
     children: string

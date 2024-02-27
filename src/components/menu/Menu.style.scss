@@ -72,7 +72,7 @@
 
 }
 
-@each $name, $color in $variants {
+@each $name, $color in $colors {
   .menu__item--#{$name} {
     @include hoverAndActiveContent {
       background: rgba($color, .2);

@@ -1,51 +1,99 @@
-import {Meta} from "@storybook/react";
-import React from "react";
-import Card from "./Card";
-import ListGroup from "../list-group/ListGroup";
-import {CardFooter} from "./CardFooter";
+import {Meta, StoryObj} from "@storybook/react";
+import React, {useState} from "react";
+import Card, {CardType} from "./Card";
+import Badge from "../badge/Badge";
+import Text from "../FontSizes/Text";
+import {Colors} from "../../utils/types";
 import ButtonGroup from "../button-group/ButtonGroup";
 import Button from "../button/Button";
-import Dropdown from "../dropdown/Dropdown";
+import {IconHeart, IconHeartFilled, IconShare, IconStar, IconStarFilled} from "@tabler/icons-react";
 
 const meta: Meta = {
     title: "Card",
-    component: Card
+    component: Card,
+    argTypes: {
+        color: {
+            options: Colors,
+            control: {type: "radio"}
+        },
+        variant: {
+            options: ['none', 'normal', 'filled', 'outlined'],
+            control: {type: 'radio'},
+        },
+        gradient: {
+            type: "boolean"
+        },
+        gradientPosition: {
+            options: ["top-left", "top-right", "bottom-right", "bottom-left"],
+            control: {type: 'radio'},
+        },
+        outline: {
+            type: "boolean"
+        }
+    }
 }
 
 export default meta
 
-export const Test = () => {
-    return <Card color={"secondary"}>
-        <Card.Image alt={"Nico Sammito"} src={"https://event.gls-west.de/Nico_Sammito.jpg"}/>
-        <Card.Header>
-            <Card.Title>Nico Sammito</Card.Title>
-            <Card.Subtitle>Co-Founder</Card.Subtitle>
-        </Card.Header>
-        <ListGroup>
-            <Dropdown position={"right"}>
-                <Dropdown.Trigger>
-                    <ListGroup.Item>
-                        Test
-                    </ListGroup.Item>
-                </Dropdown.Trigger>
-                <Dropdown.Menu>
-                    <Dropdown.Header>
-                        test
-                    </Dropdown.Header>
-                    Test
-                </Dropdown.Menu>
-            </Dropdown>
+type CardStory = StoryObj<typeof Card>;
 
-        </ListGroup>
-        <CardFooter>
-            <ButtonGroup>
-                <Button color={"secondary"}>
-                    Button
-                </Button>
-                <Button color={"secondary"}>
-                    Button
-                </Button>
-            </ButtonGroup>
-        </CardFooter>
-    </Card>
+export const CardNews: CardStory = {
+    render: (props) => {
+
+        const [heart, setHeart] = useState(false)
+
+        return <Card outline={props.outline} variant={props.variant} gradientPosition={props.gradientPosition} gradient={props.gradient}
+                     color={props.color} style={{
+            width: "50vw",
+            maxWidth: "350px"
+        }}>
+
+
+            <Card.Section image border>
+                <img alt={""} width={"100%"}
+                     src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
+            </Card.Section>
+            <Card.Section>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                }}>
+                    <div>
+                        <Text size={"lg"} hierarchy={"primary"} style={{display: "block", marginBottom: ".25rem"}}>A
+                            great backend story</Text>
+                        <Badge>by Niklas van Schrick</Badge>
+                    </div>
+                    <ButtonGroup>
+                        <Button color={"error"} onClick={() => setHeart(prevState => !prevState)}>
+                            {heart ? <div style={{display: "flex", alignItems: "center"}}>
+                                <IconHeartFilled style={{display: "flex", marginRight: ".5rem"}} size={16}/>
+                                <Badge color={"info"}>500</Badge>
+                            </div> : <div style={{display: "flex", alignItems: "center"}}>
+                                <IconHeart style={{display: "flex", marginRight: ".5rem"}} size={16}/>
+                                <Badge color={"info"}>499</Badge>
+                            </div>}
+                        </Button>
+                        <Button color={"primary"}>
+                            <IconShare style={{display: "flex"}} size={16}/>
+                        </Button>
+                    </ButtonGroup>
+                </div>
+            </Card.Section>
+            <Card.Section border>
+                <Text hierarchy={"tertiary"} size={"md"}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+                    diam
+                    nonumy eirmod tempor invidunt ut</Text>
+            </Card.Section>
+
+        </Card>
+    }
+    ,
+    args: {
+        variant: "outlined",
+        color: "secondary",
+        outline: true,
+        gradient: true,
+        gradientPosition: "top-right"
+    }
 }

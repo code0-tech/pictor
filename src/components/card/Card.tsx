@@ -3,7 +3,7 @@ import "./Card.style.scss"
 import {Color, Size} from "../../utils/types";
 
 
-export interface CardType extends HTMLProps<HTMLDivElement>{
+export interface CardType extends HTMLProps<HTMLDivElement> {
     children: ReactElement[]
     //defaults to secondary
     color?: Color,
@@ -13,36 +13,51 @@ export interface CardType extends HTMLProps<HTMLDivElement>{
     gradient?: boolean,
     //defaults to top-right
     gradientPosition?: "top-left" | "top-right" | "bottom-right" | "bottom-left"
+    //defaults to false
+    outline?: boolean
 }
-
 
 
 export interface SectionType {
     children: ReactNode | ReactNode[]
-    //defaults to true
-    withoutPadding?: boolean,
     //defaults to false
     image?: boolean,
+    //defaults to false
+    border?: boolean
 }
 
 
 const Card: React.FC<CardType> = (props) => {
 
-    const {children, color = "secondary", variant = "normal", gradient = false, gradientPosition= "top-right", ...args} = props
+    const {
+        children,
+        color = "secondary",
+        variant = "normal",
+        gradient = false,
+        gradientPosition = "top-right",
+        outline = false,
+        ...args
+    } = props
 
     return <>
-        <div {...args} className={`card ${gradient && "card--gradient"} ${gradient && `card--gradient-${gradientPosition}`} card--${color} card--${variant}`}>
-            {props.children}
+        <div {...args}
+             className={`card ${outline && "card--outline"} ${gradient && "card--gradient"} ${gradient && `card--gradient-${gradientPosition}`} card--${color} card--${variant}`}>
+            {children}
         </div>
     </>
 }
 
 const CardSection: React.FC<SectionType> = (props) => {
-    const {withoutPadding = true, image = false} = props;
+
+    const {
+        image = false,
+        border = false,
+        children
+    } = props;
 
     return <>
         <div
-            className={`card__section ${props.image ? "card__section--image" : ""} ${withoutPadding ? "card__section--no-padding" : ""}`}>{props.children}</div>
+            className={`card__section ${border ? "card__section--border" : ""} ${image ? "card__section--image" : ""}`}>{children}</div>
     </>
 }
 

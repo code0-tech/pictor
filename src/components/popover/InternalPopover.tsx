@@ -10,11 +10,12 @@ interface InternalPopoverType extends Omit<AriaPopoverProps, 'popoverRef'> {
 
 export const InternalPopover: React.FC<InternalPopoverType> = (props) => {
 
-    const {children, state, offset = 0, ...args} = props
+    const {children, state, offset = 8, containerPadding = 24, ...args} = props
     const popoverRef = React.useRef(null);
     const {popoverProps} = usePopover({
         ...args,
         offset,
+        containerPadding,
         popoverRef
     }, state);
 

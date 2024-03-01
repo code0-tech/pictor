@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  pipeline:
+  update-snapshots:
     if: ${{ github.event.label.name == 'regenerate-snapshots' }}
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,14 @@
+
+
+.cardstack {
+  display: flex;
+  flex-direction: column;
+  &__1 {
+    z-index: -1;
+    transform: translateY(-120%) scale(85%);
+  }
+  &__2 {
+    z-index: -2;
+    transform: translateY(-240%) scale(65%);
+  }
+}

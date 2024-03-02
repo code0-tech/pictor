@@ -22,15 +22,15 @@ export const Stack: CardStackStoryType = {
                     1
                 </>
                 <Card.Section>
-                    Test
+                    Test  123123123123123123123
                 </Card.Section>
             </Card>
-            <Card>
+            <Card color={"error"}>
                 <>
                     2
                 </>
                 <Card.Section>
-                    Test
+                    Test  123123123123123123123123123123123
                 </Card.Section>
             </Card>
 

@@ -27,7 +27,7 @@ export interface SectionType {
 }
 
 
-const Card: React.FC<CardType> = (props) => {
+const Card = React.forwardRef<HTMLDivElement, CardType>((props, ref) => {
 
     const {
         children,
@@ -40,12 +40,12 @@ const Card: React.FC<CardType> = (props) => {
     } = props
 
     return <>
-        <div {...args}
-             className={`card ${outline && "card--outline"} ${gradient && "card--gradient"} ${gradient && `card--gradient-${gradientPosition}`} card--${color} card--${variant}`}>
+        <div ref={ref} {...args}
+             className={`card ${outline ? "card--outline" : ""} ${gradient ? "card--gradient" : ""} ${gradient ? `card--gradient-${gradientPosition}` : ""} card--${color} card--${variant}`}>
             {children}
         </div>
     </>
-}
+})
 
 const CardSection: React.FC<SectionType> = (props) => {
 

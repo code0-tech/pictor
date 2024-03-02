@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {RefObject, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Card, {CardType} from "../card/Card";
 import "./Cardstack.style.scss"
 
@@ -8,44 +8,39 @@ export interface CardStackType {
 }
 
 export const CardStack: React.FC<CardStackType> = (props) => {
-    const ref = useRef<HTMLDivElement>(null)
-    const [currentCard, setCurrentCard] = useState<{index: number, width: string, height: string}>()
-    const {children}  = props
+    const {children} = props
+
+    const [firstCard, setFirstCard] = useState<number>(0)
 
     useEffect(() => {
-        setInterval(() => {
-            setCurrentCard((prev) => {
-                const newIndex = !prev ? 0 : prev.index + 1 > children.length - 1 ? 0 :  prev.index + 1;
-                return {
-                    index: newIndex,
-                    width: ref.current?.style.width ?? "",
-                    height: ref.current?.style.height ?? "",
-                };
+        setTimeout(() => {
+            setFirstCard((prev) => {
+                return prev + 1 > children.length - 1 ? 0 : prev + 1;
             })
         }, 5000)
-    }, [])
+    }, [firstCard])
 
-    return <>
-        <div className={"cardstack"}>
-            {Array.from({length: Math.min(children.length, 3)}).map((value, index, array) => {
-                if (index == 0) {
-                    const topCard = children.at(currentCard ? currentCard.index : -1);
-                    return topCard && React.cloneElement(topCard, {ref: ref})
-                }
-                return <div className={`cardstack__${index}`}>
-                    <Card {...children.at(index)?.props} style={{
-                            width: currentCard?.width,
-                            height: currentCard?.height}}>
 
-                    </Card>
-                </div>
-            })
+    return <div className={"card-stack"}>
+        {Array.from({length: Math.min(children.length, 3)}).map((_, index) => {
+
+            if (index == 0) {
+                return children.at(firstCard);
             }
-        </div>
-    </>
+
+            const currentCard = children.at(index)?.props as CardType;
+            return <div key={index} className={`card-stack__card card-stack__card--${index}`}>
+                <Card color={currentCard.color} gradient={currentCard.gradient}
+                      gradientPosition={currentCard.gradientPosition} variant={currentCard.variant}
+                      style={{
+                          padding: 0,
+                      }}>
+                </Card>
+            </div>
+        })
+        }
+    </div>
 }
 
 
-
-export default Object.assign(CardStack, {
-});
+export default CardStack

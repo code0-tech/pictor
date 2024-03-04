@@ -2,10 +2,10 @@
 
 .card {
   padding: .5rem;
+  position: relative;
   overflow: hidden;
 
-  > * {
-
+  * {
 
     &.card__section > img {
       border-radius: .5rem;

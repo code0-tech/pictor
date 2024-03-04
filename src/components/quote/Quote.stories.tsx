@@ -38,9 +38,9 @@ type QuoteStory = StoryObj<typeof Quote>;
 
 export const QuoteSample: QuoteStory = {
     render: (args) => {
-        return <Quote  {...args} name={"Gero Liebig"}
-                      logo={"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/GLS_Logo_2021.svg/2560px-GLS_Logo_2021.svg.png"}
-                      position={"Managing Board GLS Germany"}
+        return <Quote  {...args} name={"Nico Sammito"}
+                      logo={"https://avatars.githubusercontent.com/u/150623800?s=200&v=4"}
+                      position={"Co-founder"}
                       style={{width: "200px"}}>
             My favorite UX feedback from customers is:
             "How is the app so fast?"

@@ -1,11 +1,7 @@
 .quote {
 
   &__text {
-    &:after {
-      position: relative;
-      content: "\”";
-    }
-    &:before {
+    &:before, &:after {
       position: relative;
       content: "\”";
     }

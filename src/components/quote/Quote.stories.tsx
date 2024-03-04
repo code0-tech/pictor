@@ -24,6 +24,9 @@ const meta: Meta = {
         },
         outline: {
             type: "boolean"
+        },
+        inlineBorder: {
+            type: "boolean"
         }
     }
 }
@@ -44,6 +47,14 @@ export const QuoteSample: QuoteStory = {
             Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,
             which is important when it comes to mission-critical software.
         </Quote>
+    },
+    args: {
+        variant: "outlined",
+        color: "secondary",
+        outline: false,
+        gradient: true,
+        gradientPosition: "bottom-left",
+        inlineBorder: true
     }
 }
 

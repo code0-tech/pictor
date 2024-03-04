@@ -9,13 +9,15 @@ export interface QuoteType extends Omit<CardType, "children"> {
     logo: string
     name: string
     position: string
+    // defaults to true
+    inlineBorder?: boolean
 }
 
 export const Quote: React.FC<QuoteType> = (props) => {
-    const {logo, name, position, children, ...args} = props;
+    const {logo, name, position, inlineBorder = true, children, ...args} = props;
     return <Card {...args}>
         <div className={"quote"}>
-            <Card.Section border>
+            <Card.Section border={inlineBorder}>
                 <div className={"quote__text"}>
                     {children}
                 </div>

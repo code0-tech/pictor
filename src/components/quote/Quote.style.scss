@@ -2,20 +2,18 @@
 
   &__text {
     &:after {
-      right: 0;
-      top: 0;
       position: relative;
       content: "\”";
     }
     &:before {
-      right: 0;
-      top: 0;
       position: relative;
       content: "\”";
     }
   }
 
   &__img {
-    width: 2rem;
+    margin-top: 1rem;
+    width: 25%;
+    filter: brightness(0) invert(1);
   }
 }

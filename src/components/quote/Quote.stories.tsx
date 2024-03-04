@@ -1,22 +1,44 @@
 import {Meta, StoryObj} from "@storybook/react";
-import Menu from "../menu/Menu";
-import {Placement} from "react-aria";
 import {Quote} from "./Quote";
 import React from "react";
+import {Colors} from "../../utils/types";
 
 const meta: Meta = {
     title: "Quote",
     component: Quote,
+    argTypes: {
+        color: {
+            options: Colors,
+            control: {type: "radio"}
+        },
+        variant: {
+            options: ['none', 'normal', 'filled', 'outlined'],
+            control: {type: 'radio'},
+        },
+        gradient: {
+            type: "boolean"
+        },
+        gradientPosition: {
+            options: ["top-left", "top-right", "bottom-right", "bottom-left"],
+            control: {type: 'radio'},
+        },
+        outline: {
+            type: "boolean"
+        }
+    }
 }
 
 export default meta;
 
-type MenuStory = StoryObj
+type QuoteStory = StoryObj<typeof Quote>;
 
 
-export const MenuAccount: MenuStory = {
+export const QuoteSample: QuoteStory = {
     render: (args) => {
-        return <Quote name={"Name"} logo={"https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}  position={"Position"}>
+        return <Quote  {...args} name={"Gero Liebig"}
+                      logo={"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/GLS_Logo_2021.svg/2560px-GLS_Logo_2021.svg.png"}
+                      position={"Managing Board GLS Germany"}
+                      style={{width: "200px"}}>
             My favorite UX feedback from customers is:
             "How is the app so fast?"
             Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,

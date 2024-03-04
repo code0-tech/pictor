@@ -1,33 +1,32 @@
 import React from "react";
 import {TablerIconsProps} from "@tabler/icons-react";
-import Card from "../card/Card";
+import Card, {CardType} from "../card/Card";
 import "./Quote.style.scss"
+import Text from "../FontSizes/Text";
 
-export interface QuoteType {
-    children: React.ReactNode,
-    logo: string,
-    name: string,
-    position: string,
-}
-
-
-export interface QuoteLogo {
-    children: React.ReactElement<TablerIconsProps>
+export interface QuoteType extends Omit<CardType, "children"> {
+    children: string
+    logo: string
+    name: string
+    position: string
 }
 
 export const Quote: React.FC<QuoteType> = (props) => {
-    const {logo, children} = props;
-    return <Card>
+    const {logo, name, position, children, ...args} = props;
+    return <Card {...args}>
         <div className={"quote"}>
-            <Card.Section>
+            <Card.Section border>
                 <div className={"quote__text"}>
                     {children}
                 </div>
             </Card.Section>
             <Card.Section>
-                <img className={"quote__img"} src={logo} alt={"logo"}/>
+                <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
             </Card.Section>
-
+            <Card.Section>
+                <Text size={"md"} hierarchy={"primary"}>{name}</Text><br/>
+                <Text size={"sm"}>{position}</Text>
+            </Card.Section>
         </div>
     </Card>
 }

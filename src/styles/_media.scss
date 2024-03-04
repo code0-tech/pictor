@@ -1,0 +1,79 @@
+$breakpoints: (
+        xs: 0,
+        sm: 576px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1400px
+);
+
+@mixin respond-above($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media (min-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+    @if (is-number($breakpoint)) {
+      $breakpoint-value: $breakpoint+"px";
+      @media (min-width: $breakpoint-value) {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin respond-below($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media (max-width: ($breakpoint-value - 1)) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+    @if (is-number($breakpoint)) {
+      $breakpoint-value: $breakpoint+"px";
+      @media (max-width: ($breakpoint-value)) {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin respond-between($lower, $upper) {
+  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
+    $lower-breakpoint: map-get($breakpoints, $lower);
+    $upper-breakpoint: map-get($breakpoints, $upper);
+    @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint - 1)) {
+      @content;
+    }
+  } @else {
+    @if (map-has-key($breakpoints, $lower) == false) {
+      @warn 'Your lower breakpoint was invalid: #{$lower}.';
+    }
+    @if (map-has-key($breakpoints, $upper) == false) {
+      @warn 'Your upper breakpoint was invalid: #{$upper}.';
+    }
+    @if (is-number($lower) and is-number($upper)) {
+      $lower-breakpoint: $lower+"px";
+      $upper-breakpoint: $upper+"px";
+      @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint)) {
+        @content;
+      }
+    }
+    @if (is-absolute-length-in-px($lower) and is-absolute-length-in-px($upper)) {
+      $lower-breakpoint: $lower;
+      $upper-breakpoint: $upper;
+      @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint)) {
+        @content;
+      }
+    }
+  }
+}
+@function is-number($value) {
+  @return type-of($value) == 'number';
+}
+@function is-absolute-length-in-px($value) {
+  @return is-number($value) and index('px', unit($value)) != null;
+}

@@ -1,0 +1,48 @@
+@import "src/styles/media";
+
+.container {
+
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1320px;
+  min-width: 1320px;
+  padding: 4rem 1rem;
+  position: relative;
+  z-index: 1;
+
+  > * {
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @include respond-below(xxl) {
+    max-width: 1140px;
+    min-width: 1140px;
+  }
+
+  @include respond-below(xl) {
+    max-width: 960px;
+    min-width: 960px;
+  }
+
+  @include respond-below(lg) {
+    max-width: 720px;
+    min-width: 720px;
+  }
+
+  @include respond-below(md) {
+    max-width: 540px;
+    min-width: 540px;
+  }
+
+  @include respond-below(sm) {
+    max-width: 100%;
+    min-width: auto;
+  }
+
+}

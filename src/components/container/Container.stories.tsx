@@ -7,6 +7,8 @@ import ButtonGroup from "../button-group/ButtonGroup";
 import Button from "../button/Button";
 import {IconHeart, IconShare} from "@tabler/icons-react";
 import React from "react";
+import Row from "../row/Row";
+import Col from "../col/Col";
 
 const meta: Meta = {
     title: "Container",
@@ -57,4 +59,38 @@ export const ContainerWithNews = () => {
 
         </Card>
     </Container>
+}
+
+export const ContainerRowCol = () => {
+    return <div style={{background: "#ffffff1a", padding: "1rem 0"}}>
+        <Container>
+            <Row>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 1</Text>
+                    </Card>
+                </Col>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 2</Text>
+                    </Card>
+                </Col>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 2</Text>
+                    </Card>
+                </Col>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 2</Text>
+                    </Card>
+                </Col>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 2</Text>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
+    </div>
 }

@@ -1,0 +1,17 @@
+.quote {
+
+  position: relative;
+
+  &__text {
+    &:before, &:after {
+      position: relative;
+      content: "\”";
+    }
+  }
+
+  &__img {
+    width: 20%;
+    max-width: 100px;
+    filter: brightness(0) invert(1);
+  }
+}

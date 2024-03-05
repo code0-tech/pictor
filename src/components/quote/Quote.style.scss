@@ -1,5 +1,7 @@
 .quote {
 
+  position: relative;
+
   &__text {
     &:before, &:after {
       position: relative;
@@ -8,8 +10,8 @@
   }
 
   &__img {
-    margin-top: 1rem;
-    width: 25%;
+    width: 20%;
+    max-width: 100px;
     filter: brightness(0) invert(1);
   }
 }

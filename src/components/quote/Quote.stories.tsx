@@ -41,7 +41,7 @@ export const QuoteSample: QuoteStory = {
         return <Quote  {...args} name={"Nico Sammito"}
                       logo={"https://avatars.githubusercontent.com/u/150623800?s=200&v=4"}
                       position={"Co-founder"}
-                      style={{width: "200px"}}>
+                      style={{width: "300px"}}>
             My favorite UX feedback from customers is:
             "How is the app so fast?"
             Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,

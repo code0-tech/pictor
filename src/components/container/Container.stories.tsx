@@ -65,17 +65,17 @@ export const ContainerRowCol = () => {
     return <div style={{background: "#ffffff1a", padding: "1rem 0"}}>
         <Container>
             <Row>
-                <Col>
+                <Col xs={12} lg={4}>
                     <Card gradient variant={"outlined"} color={"info"}>
                         <Text size={"md"}>Heading 1</Text>
                     </Card>
                 </Col>
-                <Col>
+                <Col xs={12} lg={4}>
                     <Card gradient variant={"outlined"} color={"info"}>
                         <Text size={"md"}>Heading 2</Text>
                     </Card>
                 </Col>
-                <Col>
+                <Col xs={12} lg={4}>
                     <Card gradient variant={"outlined"} color={"info"}>
                         <Text size={"md"}>Heading 2</Text>
                     </Card>

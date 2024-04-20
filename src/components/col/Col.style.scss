@@ -1,0 +1,18 @@
+@use "sass:math";
+@import "../../styles/media";
+
+.col {
+  flex: 1 0 0;
+}
+
+@each $name, $breakpoint in $breakpoints {
+  @for $i from 1 through 12 {
+    .col-#{$name}-#{$i} {
+      @include respond-above($name) {
+        flex: 0 0 auto;
+        width: math.div($i, 12) * 100%;
+      }
+    }
+  }
+}
+

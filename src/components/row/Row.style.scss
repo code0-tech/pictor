@@ -1,0 +1,14 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+
+  + .row {
+    margin-top: 1rem;
+  }
+
+  > * {
+    flex-shrink: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+}

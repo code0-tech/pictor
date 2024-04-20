@@ -4,7 +4,7 @@ import {Color, Size} from "../../utils/types";
 
 
 export interface CardType extends HTMLProps<HTMLDivElement> {
-    children: ReactElement[]
+    children: ReactNode | ReactNode[]
     //defaults to secondary
     color?: Color,
     //defaults to normal

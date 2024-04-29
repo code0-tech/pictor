@@ -1,7 +1,7 @@
 import React, {ReactElement, ReactNode} from "react";
 import {IconAlertCircle, IconCircleCheck, IconCircleX, IconInfoCircle, IconX} from "@tabler/icons-react";
 import "./Alert.style.scss"
-import {Color} from "../../utils/utils";
+import {Color} from "../../utils/types";
 
 export interface AlertType {
 

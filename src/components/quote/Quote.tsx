@@ -13,7 +13,7 @@ export interface QuoteType extends Omit<CardType, "children"> {
     inlineBorder?: boolean
 }
 
-export const Quote: React.FC<QuoteType> = (props) => {
+const Quote: React.FC<QuoteType> = (props) => {
     const {logo, name, position, inlineBorder = true, children, ...args} = props;
     return <Card {...args}>
         <div className={"quote"}>
@@ -32,3 +32,5 @@ export const Quote: React.FC<QuoteType> = (props) => {
         </div>
     </Card>
 }
+
+export default Quote;

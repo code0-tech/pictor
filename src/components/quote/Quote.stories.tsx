@@ -1,5 +1,5 @@
 import {Meta, StoryObj} from "@storybook/react";
-import {Quote} from "./Quote";
+import Quote from "./Quote";
 import React from "react";
 import {Colors} from "../../utils/types";
 

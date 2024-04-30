@@ -1,8 +1,9 @@
-import React, {HTMLProps} from "react";
+import React from "react";
 import "./Badge.style.scss"
-import {Color} from "../../utils/types";
+import {Code0Component, Color} from "../../utils/types";
+import {mergeCode0Props} from "../../utils/utils";
 
-export interface BadgeType extends HTMLProps<HTMLSpanElement>{
+export interface BadgeType extends Code0Component<HTMLSpanElement>{
     children: string
     //defaults to primary
     color?: Color
@@ -12,7 +13,7 @@ const Badge: React.FC<BadgeType> = (props) => {
     
     const {color = "primary", children, ...args} = props
     
-    return <span {...args} className={`badge badge--${color}`}>
+    return <span {...mergeCode0Props(`badge badge--${color}`, args)}>
         {children}
     </span>
 }

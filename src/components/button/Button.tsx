@@ -1,13 +1,11 @@
 import "./Button.style.scss"
 import React, {
-    AnchorHTMLAttributes,
-    DetailedHTMLProps,
     ReactNode
 } from "react";
-import {getChild, getContent} from "../../utils/utils";
-import {Color} from "../../utils/types"
+import {getChild, getContent, mergeCode0Props} from "../../utils/utils";
+import {Code0Component, Color} from "../../utils/types"
 
-export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement> {
+export interface ButtonType extends Code0Component<HTMLAnchorElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
     color?: Color,
@@ -19,7 +17,7 @@ export interface ButtonType extends DetailedHTMLProps<AnchorHTMLAttributes<HTMLA
     disabled?: boolean
 }
 
-export interface ButtonIconType {
+export interface ButtonIconType extends Code0Component<HTMLSpanElement>{
     children: ReactNode
 }
 
@@ -29,16 +27,17 @@ const Button: React.FC<ButtonType> = (props) => {
     const icon = getChild(children, ButtonIcon)
     const content = getContent(children, ButtonIcon)
 
-    return <a {...args}
-              className={`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`}
+    return <a {...mergeCode0Props(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`, args)}
               aria-disabled={disabled ? "true" : "false"}>
         {icon}
         {content ? <span className={"button__content"}>{content}</span> : null}
     </a>
 }
 
-const ButtonIcon: React.FC<ButtonIconType> = ({children}) => {
-    return <span className={"button__icon"}>
+const ButtonIcon: React.FC<ButtonIconType> = (props) => {
+
+    const {children, ...args} = props
+    return <span {...mergeCode0Props("button__icon", args)}>
         {children}
     </span>
 }

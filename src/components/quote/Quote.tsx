@@ -1,5 +1,4 @@
 import React from "react";
-import {TablerIconsProps} from "@tabler/icons-react";
 import Card, {CardType} from "../card/Card";
 import "./Quote.style.scss"
 import Text from "../FontSizes/Text";

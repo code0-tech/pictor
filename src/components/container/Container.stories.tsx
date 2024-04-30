@@ -62,7 +62,7 @@ export const ContainerWithNews = () => {
 }
 
 export const ContainerRowCol = () => {
-    return <div style={{background: "#ffffff1a", padding: "1rem 0"}}>
+    return <div style={{background: "#ffffff1a"}}>
         <Container>
             <Row>
                 <Col xs={12} lg={4}>
@@ -77,17 +77,19 @@ export const ContainerRowCol = () => {
                 </Col>
                 <Col xs={12} lg={4}>
                     <Card gradient variant={"outlined"} color={"info"}>
-                        <Text size={"md"}>Heading 2</Text>
+                        <Text size={"md"}>Heading 3</Text>
+                    </Card>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Card gradient variant={"outlined"} color={"info"}>
+                        <Text size={"md"}>Heading 4</Text>
                     </Card>
                 </Col>
                 <Col>
                     <Card gradient variant={"outlined"} color={"info"}>
-                        <Text size={"md"}>Heading 2</Text>
-                    </Card>
-                </Col>
-                <Col>
-                    <Card gradient variant={"outlined"} color={"info"}>
-                        <Text size={"md"}>Heading 2</Text>
+                        <Text size={"md"}>Heading 5</Text>
                     </Card>
                 </Col>
             </Row>

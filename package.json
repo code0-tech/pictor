@@ -70,6 +70,7 @@
     "access": "public"
   },
   "dependencies": {
+    "merge-props": "^6.0.0",
     "react-aria": "^3.31.1",
     "react-stately": "^3.29.1",
     "rollup-plugin-visualizer": "^5.11.0"

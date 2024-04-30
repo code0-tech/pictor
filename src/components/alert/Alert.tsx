@@ -1,9 +1,10 @@
-import React, {ReactElement, ReactNode} from "react";
+import React, {ReactNode} from "react";
 import {IconAlertCircle, IconCircleCheck, IconCircleX, IconInfoCircle, IconX} from "@tabler/icons-react";
 import "./Alert.style.scss"
-import {Color} from "../../utils/types";
+import {Code0Component, Color} from "../../utils/types";
+import {mergeCode0Props} from "../../utils/utils";
 
-export interface AlertType {
+export interface AlertType extends Omit<Code0Component<HTMLDivElement>, "title"> {
 
     children?: ReactNode | ReactNode[]
     title: ReactNode
@@ -28,9 +29,9 @@ const IconColors = {
 
 const Alert: React.FC<AlertType> = (props) => {
 
-    const {color = "primary", dismissible = false, icon = true, title, onClose = (event) => {}, children} = props
+    const {color = "primary", dismissible = false, icon = true, title, onClose = (event) => {}, children, ...rest} = props
 
-    return <div className={`alert alert--${color}`}>
+    return <div {...mergeCode0Props(`alert alert--${color}`, rest)}>
         <div className={"alert__header"}>
             <div className={"alert__header-wrapper"}>
                 {icon ? <AlertIcon color={color}/> : null}
@@ -46,10 +47,6 @@ const Alert: React.FC<AlertType> = (props) => {
 
 }
 
-export interface AlertHeadingType {
-    children: ReactNode
-}
-
 export interface AlertIconType {
     color: Color
 }
@@ -59,7 +56,6 @@ const AlertIcon: React.FC<AlertIconType> = ({color}) => {
         {IconColors[color]}
     </span>
 }
-
 
 
 export default Alert

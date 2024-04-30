@@ -1,9 +1,10 @@
-import React, {HTMLProps, ReactElement, ReactNode} from "react";
+import React, {ReactNode} from "react";
 import "./Card.style.scss"
-import {Color, Size} from "../../utils/types";
+import {Code0Component, Color} from "../../utils/types";
+import {mergeCode0Props} from "../../utils/utils";
 
 
-export interface CardType extends HTMLProps<HTMLDivElement> {
+export interface CardType extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
     //defaults to secondary
     color?: Color,
@@ -18,7 +19,7 @@ export interface CardType extends HTMLProps<HTMLDivElement> {
 }
 
 
-export interface SectionType {
+export interface SectionType extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
     //defaults to false
     image?: boolean,
@@ -40,8 +41,7 @@ const Card: React.FC<CardType> = (props) => {
     } = props
 
     return <>
-        <div {...args}
-             className={`card ${outline && "card--outline"} ${gradient && "card--gradient"} ${gradient && `card--gradient-${gradientPosition}`} card--${color} card--${variant}`}>
+        <div {...mergeCode0Props(`card ${outline ? "card--outline" : ""} ${gradient ? "card--gradient" : ""} ${gradient ? `card--gradient-${gradientPosition}` : ""} card--${color} card--${variant}`, args)}>
             {children}
         </div>
     </>
@@ -52,12 +52,14 @@ const CardSection: React.FC<SectionType> = (props) => {
     const {
         image = false,
         border = false,
-        children
+        children,
+        ...args
     } = props;
 
     return <>
-        <div
-            className={`card__section ${border ? "card__section--border" : ""} ${image ? "card__section--image" : ""}`}>{children}</div>
+        <div {...mergeCode0Props(`card__section ${border ? "card__section--border" : ""} ${image ? "card__section--image" : ""}`, args)}>
+            {children}
+        </div>
     </>
 }
 

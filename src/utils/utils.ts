@@ -1,4 +1,6 @@
-import React, {ReactNode, useEffect, useMemo, useState} from "react";
+import React, {CSSProperties, HTMLProps, ReactNode, useMemo, useState} from "react";
+import mergeProps from "merge-props";
+import {Code0Component, Code0ComponentProps} from "./types";
 
 
 export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
@@ -33,6 +35,59 @@ export interface Positioning {
     width: number
     x: number
     y: number
+}
+
+const createStyle = (styles: Code0Component<any>): CSSProperties => ({
+    ...(styles.m ? {margin: `${styles.m}rem`} : {}),
+    ...(styles.my ? {marginTop: `${styles.my}rem`, marginBottom: `${styles.my}rem`} : {}),
+    ...(styles.mx ? {marginLeft: `${styles.mx}rem`, marginRight: `${styles.mx}rem`} : {}),
+    ...(styles.mt ? {marginTop: `${styles.mt}rem`} : {}),
+    ...(styles.mb ? {marginBottom: `${styles.mb}rem`} : {}),
+    ...(styles.ml ? {marginLeft: `${styles.ml}rem`} : {}),
+    ...(styles.mr ? {marginRight: `${styles.mr}rem`} : {}),
+    ...(styles.p ? {padding: `${styles.p}rem`} : {}),
+    ...(styles.py ? {paddingTop: `${styles.py}rem`, paddingBottom: `${styles.py}rem`} : {}),
+    ...(styles.px ? {paddingLeft: `${styles.px}rem`, paddingRight: `${styles.px}rem`} : {}),
+    ...(styles.pt ? {paddingTop: `${styles.pt}rem`} : {}),
+    ...(styles.pb ? {paddingBottom: `${styles.pb}rem`} : {}),
+    ...(styles.pl ? {paddingLeft: `${styles.pl}rem`} : {}),
+    ...(styles.pr ? {paddingRight: `${styles.pr}rem`} : {}),
+    ...(styles.bg ? {backgroundColor: styles.bg} : {}),
+    ...(styles.c ? {color: styles.c} : {}),
+    ...(styles.opacity ? {opacity: styles.opacity} : {}),
+    ...(styles.ff ? {fontFamily: styles.ff} : {}),
+    ...(styles.fz ? {fontSize: `${styles.fz}rem`} : {}),
+    ...(styles.ta ? {textAlign: styles.ta} : {}),
+    ...(styles.w ? {width: styles.w} : {}),
+    ...(styles.miw ? {minWidth: styles.miw} : {}),
+    ...(styles.maw ? {maxWidth: styles.maw} : {}),
+    ...(styles.h ? {height: styles.h} : {}),
+    ...(styles.mih ? {minHeight: styles.mih} : {}),
+    ...(styles.mah ? {maxHeight: styles.mah} : {}),
+    ...(styles.pos ? {position: styles.pos} : {}),
+    ...(styles.top ? {top: styles.top} : {}),
+    ...(styles.left ? {left: styles.left} : {}),
+    ...(styles.bottom ? {bottom: styles.bottom} : {}),
+    ...(styles.right ? {right: styles.right} : {}),
+    ...(styles.display ? {display: styles.display} : {}),
+    ...(styles.flex ? {flex: styles.flex} : {}),
+
+})
+
+export const mergeCode0Props = <T extends HTMLElement>(cn: string, rest: Code0Component<T>): HTMLProps<T> => {
+
+    const style = createStyle(rest)
+    const newProps: Code0Component<T> = rest;
+    const keys: (keyof Code0ComponentProps)[] = ["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex"]
+
+    keys.forEach(key => {
+        delete newProps[key]
+    })
+
+    return mergeProps(newProps, {
+        className: cn,
+        ...(Object.keys(style).length !== 0 ? {style: style} : {})
+    })
 }
 
 export const getWindowPositioning = (): Omit<Omit<Positioning, "x">, "y"> => {

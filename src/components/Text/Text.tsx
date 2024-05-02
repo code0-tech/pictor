@@ -4,7 +4,7 @@ import "./Text.style.scss"
 import {mergeCode0Props} from "../../utils/utils";
 
 export interface FontType extends Omit<Omit<Code0Component<HTMLSpanElement>, "children">, "size"> {
-    children: string,
+    children: React.ReactNode,
     size: Code0Sizes,
     hierarchy?: "primary" | "secondary" | "tertiary"
 }

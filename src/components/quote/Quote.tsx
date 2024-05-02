@@ -1,7 +1,7 @@
 import React from "react";
 import Card, {CardType} from "../card/Card";
 import "./Quote.style.scss"
-import Text from "../FontSizes/Text";
+import Text from "../Text/Text";
 
 export interface QuoteType extends Omit<CardType, "children"> {
     children: string

@@ -2,7 +2,7 @@ import {Meta, StoryObj} from "@storybook/react";
 import React, {useState} from "react";
 import Card, {CardType} from "./Card";
 import Badge from "../badge/Badge";
-import Text from "../FontSizes/Text";
+import Text from "../Text/Text";
 import {Colors} from "../../utils/types";
 import ButtonGroup from "../button-group/ButtonGroup";
 import Button from "../button/Button";

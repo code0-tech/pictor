@@ -71,6 +71,9 @@ const createStyle = (styles: Code0Component<any>): CSSProperties => ({
     ...(styles.right ? {right: styles.right} : {}),
     ...(styles.display ? {display: styles.display} : {}),
     ...(styles.flex ? {flex: styles.flex} : {}),
+    ...(styles.align ? {alignItems: styles.align} : {}),
+    ...(styles.justify ? {justifyContent: styles.justify} : {}),
+    ...(styles.tf ? {transform: styles.tf} : {}),
 
 })
 
@@ -78,7 +81,7 @@ export const mergeCode0Props = <T extends HTMLElement>(cn: string, rest: Code0Co
 
     const style = createStyle(rest)
     const newProps: Code0Component<T> = rest;
-    const keys: (keyof Code0ComponentProps)[] = ["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex"]
+    const keys: (keyof Code0ComponentProps)[] = ["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex", "align", "justify", "tf"]
 
     keys.forEach(key => {
         delete newProps[key]

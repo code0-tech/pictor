@@ -5,7 +5,7 @@ import Text from "../Text/Text";
 
 export interface QuoteType extends Omit<CardType, "children"> {
     children: string
-    logo: string
+    logo?: string
     name: string
     position: string
     // defaults to true
@@ -21,9 +21,11 @@ const Quote: React.FC<QuoteType> = (props) => {
                     {children}
                 </div>
             </Card.Section>
-            <Card.Section>
-                <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
-            </Card.Section>
+            {
+                !!logo ? <Card.Section>
+                    <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
+                </Card.Section> : null
+            }
             <Card.Section>
                 <Text size={"md"} hierarchy={"primary"}>{name}</Text><br/>
                 <Text size={"sm"}>{position}</Text>

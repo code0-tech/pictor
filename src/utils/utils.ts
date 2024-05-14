@@ -77,10 +77,10 @@ const createStyle = (styles: Code0Component<any>): CSSProperties => ({
 
 })
 
-export const mergeCode0Props = <T extends HTMLElement>(cn: string, rest: Code0Component<T>): HTMLProps<T> => {
+export const mergeCode0Props = (cn: string, rest: object) => {
 
     const style = createStyle(rest)
-    const newProps: Code0Component<T> = rest;
+    const newProps: Code0ComponentProps = {...rest};
     const keys: (keyof Code0ComponentProps)[] = ["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex", "align", "justify", "tf"]
 
     keys.forEach(key => {

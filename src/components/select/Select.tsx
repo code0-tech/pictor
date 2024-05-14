@@ -1,151 +1,41 @@
-import {Selection} from "react-stately"
-import React, {useState} from "react"
-import {Key} from "react-aria"
-import Menu, {MenuItemType} from "../menu/Menu"
-import Input from "../input/Input"
-import {IconSelector, IconX, TablerIconsProps} from "@tabler/icons-react"
+import React from "react";
+import {
+    Select as AriaKitSelect,
+    SelectItem as AKSelectItem,
+    SelectPopover as AKSelectPopover,
+    SelectSeparator as AKSelectSeparator,
+    SelectGroup as AKSelectGroup,
+    SelectGroupLabel as AKSelectGroupLabel,
+    SelectProps,
+    SelectItemProps,
+    SelectPopoverProps,
+    SelectSeparatorProps,
+    SelectGroupProps,
+    SelectGroupLabelProps
+} from "@ariakit/react";
+import {Code0ComponentProps} from "../../utils/types";
+import {mergeCode0Props} from "../../utils/utils";
+
 import "./Select.style.scss"
 
-export interface SelectType {
-    children: React.ReactElement<SelectIconType & MenuItemType>[] | React.ReactElement<SelectIconType & MenuItemType>,
-    defaultValue?: string, //Default value for the selection, if the value doesn't exist the value is still displayed in the select (don't use values which doesn't exist)
-    disabled?: boolean, //If true the select is disabled and cant be used
-    clearable?: boolean, //Adds an icon to clear the current selection
-    label?: string, //A text which is displayed above the input to give a short description
-    error?: React.ReactNode, //A Node which is displayed as an error
-    success?: React.ReactNode, //A Node which is displayed as a success
-    description?: string, //A description for the input
-    disallowDeselection?: boolean, //If true the user cant deselect an element
-    onDeselection?: (event: SelectEvent) => void, //this event is trigger if an element is deselected
-    onSelectionChange?: (event: SelectEvent, selection: Selection) => void, //this event is trigger if an element is changed
-}
+type SelectType = Code0ComponentProps & SelectProps
+type SelectItemType = Code0ComponentProps & SelectItemProps
+type SelectPopoverType = Code0ComponentProps & SelectPopoverProps
+type SelectSeparatorType = Code0ComponentProps & SelectSeparatorProps
+type SelectGroupType = Code0ComponentProps & SelectGroupProps
+type SelectGroupLabelType = Code0ComponentProps & SelectGroupLabelProps
 
-export interface SelectEvent {
-    isPrevented: () => boolean,
-    preventDefault: () => void,
-    setNewSelection: (selection: Selection) => void,
-    setNewSelectionAsString: (selection: string) => void,
-    getNewSelection: () => Selection,
-    getNewSelectionAsString: () => string,
-}
-
-export interface SelectIconType {
-    children: TablerIconsProps
-}
-
-//TODO implement label-, description-, error- and SuccessMessages
-//These components dont exists, waiting for Nico
-
-const Select: React.FC<SelectType> = (props) => {
-    const {
-        disabled = false, clearable = false, defaultValue,
-        onSelectionChange = () => {
-        }, onDeselection = () => {
-        },
-        children, label, disallowDeselection = false,
-        success, description,
-        error
-    } = props
-
-    const [selection, setSelection] = useState<Selection>(new Set([defaultValue ?? ""]))
-    const selectedArray = [...selection] as string[]
-
-
-    return <>
-        {disabled ? <Input disabled>
-                <Input.Control{...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
-                              value={selectedArray[0]} readOnly>
-                    <Input.Control.Icon>
-                        {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
-                    </Input.Control.Icon>
-                </Input.Control>
-            </Input> :
-            <Menu defaultSelectedKeys={[defaultValue ?? ""]} selectionMode={"single"} selectedKeys={selection}
-                  onSelectionChange={selection => {
-                      const keys: Set<Key> = selection as Set<Key>
-                      if (keys.size === 0 && disallowDeselection) return
-                      let newSelection = keys.size === 0 ? new Set([""]) : selection
-                      if (keys.size === 0) {
-                          const event = handleDeselectionEvent(onDeselection)
-                          if (event.isPrevented()) return
-                          newSelection = event.getNewSelection()
-
-                      } else {
-                          const event = handleSelectionChangeEvent(selection, onSelectionChange)
-                          if (event.isPrevented()) return
-                          newSelection = event.getNewSelection()
-                      }
-                      setSelection(newSelection)
-                  }}>
-                <Menu.Trigger>
-                    <Input>
-                        <Input.Control {...(label ? {label: label} : {label: ""})} placeholder={selectedArray[0]}
-                                      value={selectedArray[0]} readOnly>
-                            <Input.Control.Icon>
-                                {clearable && selectedArray[0] !== "" ? <IconX className={"xIcon"}/> : <IconSelector/>}
-                            </Input.Control.Icon>
-                        </Input.Control>
-                    </Input>
-                </Menu.Trigger>
-
-                <Menu.Content>
-                    {
-                        Array.of(children).flat().filter(child => child?.type === SelectionOption).map((child, index) => {
-                            return <Menu.Item {...child.props}
-                                              key={child.key ?? index}>{child.props.children}</Menu.Item>
-                        })
-                    }
-                </Menu.Content>
-            </Menu>
-        }
-    </>
-
-
-}
-
-const createCustomEvent = (newSelection: Selection): SelectEvent => {
-    let prevented = false
-    let selection = newSelection
-    return {
-        isPrevented: () => prevented,
-        preventDefault: () => {
-            prevented = true
-        },
-        setNewSelection: (newSelection: Selection) => {
-            selection = newSelection
-        },
-        setNewSelectionAsString: (newSelection: string) => {
-            selection = new Set([newSelection])
-        },
-        getNewSelection: (): Selection => {
-            return selection
-        },
-        getNewSelectionAsString: (): string => {
-            const selectionArray = [...selection] as string[]
-            return selectionArray[0]
-        }
-    }
-}
-
-const handleDeselectionEvent = (triggerMethod: (event: SelectEvent, newSelection: Selection) => void): SelectEvent => {
-    const event = createCustomEvent(new Set([""]))
-    triggerMethod(event, event.getNewSelection())
-    return event
-}
-
-const handleSelectionChangeEvent = (newSelection: Selection, triggerMethod: (event: SelectEvent, selection: Selection) => void): SelectEvent => {
-    const event = createCustomEvent(newSelection)
-    triggerMethod(event, event.getNewSelection())
-    return event
-}
-
-const SelectionOption: React.FC<MenuItemType> = (props) => {
-
-    const {children} = props
-
-    return <>{children}</>
-}
+const Select: React.FC<SelectType> = (props) => <AriaKitSelect {...mergeCode0Props("select", props)}/>
+const SelectItem: React.FC<SelectItemType> = (props) => <AKSelectItem {...mergeCode0Props("select__item", props)}/>
+const SelectPopover: React.FC<SelectPopoverType> = (props) => <AKSelectPopover {...mergeCode0Props("select__popover", props)}/>
+const SelectSeparator: React.FC<SelectSeparatorType> = (props) => <AKSelectSeparator {...mergeCode0Props("select__separator", props)}/>
+const SelectGroup: React.FC<SelectGroupType> = (props) => <AKSelectGroup {...mergeCode0Props("select__group", props)}/>
+const SelectGroupLabel: React.FC<SelectGroupLabelType> = (props) => <AKSelectGroupLabel {...mergeCode0Props("select__group-label", props)}/>
 
 export default Object.assign(Select, {
-    Option: SelectionOption,
+    Item: SelectItem,
+    Popover: SelectPopover,
+    Separator: SelectSeparator,
+    Group: SelectGroup,
+    GroupLabel: SelectGroupLabel,
 })

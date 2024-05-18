@@ -4,7 +4,12 @@ import Select from "./Select";
 import {Text} from "../../index";
 
 const meta: Meta = {
-    title: "Select"
+    title: "Select",
+    parameters: {
+        visualTest: {
+            selector: 'body'
+        }
+    }
 }
 
 export const BasicSelect = () => {

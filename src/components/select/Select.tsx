@@ -1,6 +1,7 @@
 import React from "react";
 import {
-    Select as AriaKitSelect,
+    SelectProvider as AKSelect,
+    Select as AKSelectButton,
     SelectItem as AKSelectItem,
     SelectPopover as AKSelectPopover,
     SelectSeparator as AKSelectSeparator,
@@ -19,14 +20,16 @@ import {mergeCode0Props} from "../../utils/utils";
 
 import "./Select.style.scss"
 
-type SelectType = Code0ComponentProps & SelectProps
+type SelectType = SelectProviderProps
+type SelectButtonType = Code0ComponentProps & SelectProps
 type SelectItemType = Code0ComponentProps & SelectItemProps
 type SelectPopoverType = Code0ComponentProps & SelectPopoverProps
 type SelectSeparatorType = Code0ComponentProps & SelectSeparatorProps
 type SelectGroupType = Code0ComponentProps & SelectGroupProps
 type SelectGroupLabelType = Code0ComponentProps & SelectGroupLabelProps
 
-const Select: React.FC<SelectType> = (props) => <AriaKitSelect {...mergeCode0Props("select", props)}/>
+const Select: React.FC<SelectType> = (props) => <AKSelect {...props}/>
+const SelectButton: React.FC<SelectButtonType> = (props) => <AKSelectButton {...mergeCode0Props("select", props)}/>
 const SelectItem: React.FC<SelectItemType> = (props) => <AKSelectItem {...mergeCode0Props("select__item", props)}/>
 const SelectPopover: React.FC<SelectPopoverType> = (props) => <AKSelectPopover {...mergeCode0Props("select__popover", props)}/>
 const SelectSeparator: React.FC<SelectSeparatorType> = (props) => <AKSelectSeparator {...mergeCode0Props("select__separator", props)}/>
@@ -34,6 +37,7 @@ const SelectGroup: React.FC<SelectGroupType> = (props) => <AKSelectGroup {...mer
 const SelectGroupLabel: React.FC<SelectGroupLabelType> = (props) => <AKSelectGroupLabel {...mergeCode0Props("select__group-label", props)}/>
 
 export default Object.assign(Select, {
+    Button: SelectButton,
     Item: SelectItem,
     Popover: SelectPopover,
     Separator: SelectSeparator,

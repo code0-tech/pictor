@@ -1,7 +1,6 @@
 import {Meta} from "@storybook/react";
 import React from "react";
 import Select from "./Select";
-import {SelectProvider} from "@ariakit/react";
 import {Text} from "../../index";
 
 const meta: Meta = {
@@ -9,8 +8,8 @@ const meta: Meta = {
 }
 
 export const BasicSelect = () => {
-    return <SelectProvider defaultOpen>
-        <Select/>
+    return <Select defaultOpen>
+        <Select.Button/>
         <Select.Popover>
             <Text size={"md"}>
                 Select whatever fruit you like <br/>
@@ -26,7 +25,7 @@ export const BasicSelect = () => {
             </Select.Group>
 
         </Select.Popover>
-    </SelectProvider>
+    </Select>
 }
 
 export default meta;

@@ -16,18 +16,6 @@ const preview: Preview = {
                 date: /Date$/i,
             },
         },
-        a11y: {
-            // Optional selector to inspect
-            element: '#storybook-root',
-            config: {
-                rules: [
-                    {id: 'landmark-one-main', enabled: false}, // not relevant to single components
-                    {id: 'page-has-heading-one', enabled: false}, // not relevant to single components
-                    {id: 'region', enabled: false}, // not relevant to single components
-                    {id: 'aria-allowed-attr', enabled: false} // disable all aria checks
-                ],
-            },
-        },
     },
 }
 

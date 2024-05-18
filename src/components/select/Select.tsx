@@ -7,6 +7,7 @@ import {
     SelectGroup as AKSelectGroup,
     SelectGroupLabel as AKSelectGroupLabel,
     SelectProps,
+    SelectProviderProps,
     SelectItemProps,
     SelectPopoverProps,
     SelectSeparatorProps,

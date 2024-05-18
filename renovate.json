@@ -1,6 +1,21 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":label(dependencies)",
+    ":assignee(nicosammito)"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "asdf",
+        "github-actions",
+        "gitlabci",
+        "gitlabci-include"
+      ],
+      "extends": [
+        ":assignee(Taucher2003)"
+      ]
+    }
   ]
 }

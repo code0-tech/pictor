@@ -12,7 +12,7 @@ docs:preview:
     - if: $C0_UPDATE_SNAPSHOTS == null && $C0_GH_REF != "refs/heads/main"
 
 storybook:build:
-  image: node:20.9.0
+  image: node:20.13.1
   stage: build
   script:
     - npm ci
@@ -33,7 +33,7 @@ storybook:build:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 .storybook:test:base:
-  image: ghcr.io/code0-tech/build-images/node-20.9-playwright:37.1
+  image: ghcr.io/code0-tech/build-images/node-playwright:43.1-node-20.13
   stage: test
   before_script:
     - source ~/.asdf/asdf.sh

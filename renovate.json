@@ -16,6 +16,12 @@
       "extends": [
         ":assignee(Taucher2003)"
       ]
+    },
+    {
+      "matchDepTypes": [
+        "devDependencies"
+      ],
+      "rangeStrategy": "bump"
     }
   ]
 }

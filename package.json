@@ -30,7 +30,7 @@
     "@storybook/manager-api": "^7.5.3",
     "@storybook/react": "^7.5.3",
     "@storybook/react-vite": "^7.6.19",
-    "@storybook/test-runner": "^0.16.0",
+    "@storybook/test-runner": "^0.18.0",
     "@storybook/testing-library": "^0.2.2",
     "@storybook/theming": "^7.5.3",
     "@tabler/icons-react": "^2.47.0",

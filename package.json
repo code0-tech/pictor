@@ -50,7 +50,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "@rollup/plugin-terser": "^0.4.4",
-    "sass": "^1.77.1",
+    "sass": "^1.77.2",
     "sass-loader": "^12.6.0",
     "storybook": "^7.6.19",
     "style-loader": "^3.3.4",

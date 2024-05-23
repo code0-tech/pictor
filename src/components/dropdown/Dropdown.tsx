@@ -105,7 +105,7 @@ const Dropdown: React.FC<DropdownType> = (props) => {
                 window.removeEventListener("mousedown", temp)
         })
 
-        //change position of menu when screen is resized
+        //change position of menu when d-screen is resized
         window.addEventListener("resize", function temp() {
             calculatePosition()
             if (!dropdown.classList.contains("dropdown--active"))

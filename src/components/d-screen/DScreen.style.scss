@@ -1,0 +1,100 @@
+@import "../../styles/helpers";
+
+.d-screen {
+  min-width: 100%;
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &__v-bar {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    overflow-y: hidden;
+    padding: .5rem;
+    background: $primary;
+    z-index: 999;
+
+    &--top {
+      border-bottom: 1px solid borderColor();
+    }
+
+    &--bottom {
+      border-top: 1px solid borderColor();
+    }
+  }
+
+  &__h-bar {
+    height: 100%;
+    position: relative;
+    padding: .5rem;
+    display: flex;
+    overflow-x: hidden;
+    gap: .5rem;
+    flex-direction: column;
+    background: $primary;
+    z-index: 999;
+
+    .d-screen__item {
+      writing-mode: vertical-rl;
+    }
+
+    &--left {
+      border-right: 1px solid borderColor();
+
+      .d-screen__item {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &--right {
+      border-left: 1px solid borderColor();
+    }
+  }
+
+  &__v-content {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+  }
+
+  &__h-content {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__content {
+    color: white;
+    height: 100%;
+    overflow: auto;
+    width: 100%;
+    position: absolute;
+  }
+
+  &__item {
+    @include box(true);
+    width: fit-content;
+    padding: .25rem;
+    font-size: .75rem;
+    gap: .25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}

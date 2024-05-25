@@ -1,6 +1,6 @@
 import React, {DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode, RefAttributes} from "react";
 import "./Input.style.scss"
-import {TablerIconsProps} from "@tabler/icons-react";
+import {TablerIcon} from "@tabler/icons-react";
 
 
 export type InputChildType = InputControlType | InputDescType | InputLabelType
@@ -111,7 +111,7 @@ const InputControlMessage: React.FC<InputControlMessageType> = ({children}) => {
 }
 
 export type InputControlIconType = {
-    children: ReactElement<TablerIconsProps>
+    children: ReactElement<TablerIcon>
 }
 
 const InputControlIcon: React.FC<InputControlIconType> = ({children}) => {

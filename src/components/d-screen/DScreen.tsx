@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {Code0Component} from "../../utils/types";
 import "./DScreen.style.scss"

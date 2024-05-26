@@ -49,7 +49,7 @@ export const DashboardScreenExample = () => {
                         Database
                     </DScreen.Item>
                 </div>
-                <div style={{display: "flex", flexDirection: "column", gap: ".25rem"}}>
+                <div style={{display: "flex", flexDirection: "column", gap: ".5rem"}}>
                     <DScreen.Item>
                         <IconSettings size={12}/>
                         Settings

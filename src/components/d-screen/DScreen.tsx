@@ -68,7 +68,9 @@ export interface VBar extends Code0Component<HTMLDivElement> {
 const VBar: React.FC<VBar> = (props) => {
     const {type, children, ...rest} = props
     return <div {...mergeCode0Props(`d-screen__v-bar d-screen__v-bar--${type}`, rest)}>
-        {children}
+        <div className={"d-screen__v-bar-content"}>
+            {children}
+        </div>
     </div>
 }
 
@@ -83,7 +85,9 @@ export interface HBar extends Code0Component<HTMLDivElement> {
 const HBar: React.FC<HBar> = (props) => {
     const {type, children, ...rest} = props
     return <div {...mergeCode0Props(`d-screen__h-bar d-screen__h-bar--${type}`, rest)}>
-        {children}
+        <div className={"d-screen__h-bar-content"}>
+            {children}
+        </div>
     </div>
 }
 

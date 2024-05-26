@@ -16,12 +16,15 @@
     box-sizing: border-box;
   }
 
-  &__v-bar {
+  &__v-bar-content {
     width: 100%;
-    height: fit-content;
+    overflow: auto;
     display: flex;
     align-items: center;
-    overflow-y: hidden;
+  }
+
+  &__v-bar {
+    width: 100%;
     padding: .5rem;
     background: $primary;
     z-index: 999;
@@ -35,14 +38,19 @@
     }
   }
 
+  &__h-bar-content {
+    overflow: auto;
+    display: flex;
+    gap: .5rem;
+    height: 100%;
+    position: relative;
+    flex-direction: column;
+  }
+
   &__h-bar {
     height: 100%;
     position: relative;
     padding: .5rem;
-    display: flex;
-    overflow-x: hidden;
-    gap: .5rem;
-    flex-direction: column;
     background: $primary;
     z-index: 999;
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Code0Component} from "../../utils/types";
 import "./DScreen.style.scss"
 import {getChild, mergeCode0Props} from "../../utils/utils";
@@ -60,37 +60,72 @@ const DScreen: React.FC<DScreenType> = (props) => {
     </div>
 }
 
-export interface VBar extends Code0Component<HTMLDivElement> {
+interface BarProps extends Omit<Code0Component<HTMLDivElement>, "children"> {
+    children: React.ReactNode[] | React.ReactNode | ((size: number, collapsed: boolean, collapse: () => void) => React.ReactNode | React.ReactNode[])
+    defaultSize?: number
+    maxSizes?: number[]
+}
+
+export interface VBar extends BarProps {
     type: 'top' | 'bottom'
-    children: React.ReactNode[] | React.ReactNode
+}
+
+export interface HBar extends BarProps {
+    type: 'left' | 'right'
 }
 
 const VBar: React.FC<VBar> = (props) => {
     const {type, children, ...rest} = props
     return <div {...mergeCode0Props(`d-screen__v-bar d-screen__v-bar--${type}`, rest)}>
         <div {...mergeCode0Props(`d-screen__v-bar-content`, rest)}>
-            {children}
+            {typeof children === "function" ? children(1, false, () => {}) : children}
         </div>
     </div>
 }
+const HBar: React.FC<HBar> = (props) => {
 
+    const {type, children, maxSizes, defaultSize = 0, ...rest} = props
+
+    const [size, setSize] = useState<number>(defaultSize)
+    const [collapsed, setCollapsed] = useState(false)
+    const barRef = useRef<HTMLDivElement | null>(null)
+
+    const callback = () => {
+        if (!barRef.current || collapsed) return
+        const width = window.innerWidth
+        const matchingSize = maxSizes?.sort((a, b) => b - a).find((size) => size <= width) ?? 0
+        setSize(matchingSize)
+    }
+
+    const collapse = () => {
+        setCollapsed(prevState => {
+            const newValue = !prevState
+            const minSize = maxSizes?.sort((a, b) => a - b)[0] ?? 0
+            newValue && setSize(minSize)
+            return newValue
+        })
+    }
+
+
+    useEffect(() => {
+        if (!barRef.current) return
+        window.addEventListener("resize", callback)
+        callback()
+        return () => {
+            window.removeEventListener("resize", callback)
+        }
+    }, [collapsed])
+
+    const child = typeof children === "function" ? useMemo(() => children(size, collapsed, collapse), [size, collapsed]) : children
+
+    return <div ref={barRef} {...mergeCode0Props(`d-screen__h-bar d-screen__h-bar--${type}`, rest)}>
+        <div {...mergeCode0Props(`d-screen__h-bar-content`, rest)}>
+            {child}
+        </div>
+    </div>
+}
 const VBarTop: React.FC<Omit<VBar, "type">> = (props) => <VBar type={"top"} {...props}/>
 const VBarBottom: React.FC<Omit<VBar, "type">> = (props) => <VBar type={"bottom"} {...props}/>
-
-export interface HBar extends Code0Component<HTMLDivElement> {
-    type: 'left' | 'right'
-    children: React.ReactNode[] | React.ReactNode
-}
-
-const HBar: React.FC<HBar> = (props) => {
-    const {type, children, ...rest} = props
-    return <div {...mergeCode0Props(`d-screen__h-bar d-screen__h-bar--${type}`, rest)}>
-        <div {...mergeCode0Props(`d-screen__h-bar-content`, rest)}>
-            {children}
-        </div>
-    </div>
-}
-
 const HBarLeft: React.FC<Omit<HBar, "type">> = (props) => <HBar type={"left"} {...props}/>
 const HBarRight: React.FC<Omit<HBar, "type">> = (props) => <HBar type={"right"} {...props}/>
 

@@ -1,21 +1,18 @@
-import React, {CSSProperties, HTMLProps, ReactNode, useMemo, useState} from "react";
+import React, {CSSProperties, ReactNode, useState} from "react";
 import mergeProps from "merge-props";
 import {Code0Component, Code0ComponentProps} from "./types";
 
 
 export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
 
-    const [childComponent, setChildComponent] = useState<React.ReactElement | undefined>()
-    useMemo(() => {
-        let found = false
-        React.Children.forEach(children, (childT, index) => {
-            if (React.isValidElement(childT) && childT.type == child) {
-                setChildComponent(childT)
-                found = true
-            }
-            else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)
-        })
-    }, [children, child])
+    let childComponent: React.ReactElement | undefined = undefined;
+    let found = false
+    React.Children.forEach(children, (childT, index) => {
+        if (React.isValidElement(childT) && childT.type == child) {
+            childComponent = childT
+            found = true
+        } else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)
+    })
 
     return childComponent
 }

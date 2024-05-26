@@ -4,6 +4,7 @@ import DScreen from "./DScreen";
 import Badge from "../badge/Badge";
 import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import Text from "../Text/Text";
+import DFullScreen from "../d-fullscreen/DFullScreen";
 
 const meta: Meta = {
     title: "Dashboard Screen",
@@ -17,7 +18,7 @@ const meta: Meta = {
 }
 
 export const DashboardScreenExample = () => {
-    return <div style={{width: "100vw", height: "100vh", position: "relative"}}>
+    return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
                 <Badge>Home</Badge>
@@ -94,7 +95,7 @@ export const DashboardScreenExample = () => {
 
             </DScreen.Content>
         </DScreen>
-    </div>
+    </DFullScreen>
 }
 
 export default meta

@@ -1,4 +1,5 @@
 @import "../../styles/helpers";
+@import "../../styles/media";
 
 .d-screen {
   min-width: 100%;
@@ -16,18 +17,18 @@
     box-sizing: border-box;
   }
 
-  &__v-bar-content {
-    width: 100%;
-    overflow: auto;
-    display: flex;
-    align-items: center;
-  }
 
   &__v-bar {
     width: 100%;
     padding: .5rem;
     background: $primary;
-    z-index: 999;
+
+    .d-screen__bar-content {
+      width: 100%;
+      overflow: auto;
+      display: none;
+      align-items: center;
+    }
 
     &--top {
       border-bottom: 1px solid borderColor();
@@ -38,24 +39,24 @@
     }
   }
 
-  &__h-bar-content {
-    overflow: auto;
-    display: flex;
-    gap: .5rem;
-    height: 100%;
-    position: relative;
-    flex-direction: column;
-  }
 
   &__h-bar {
     height: 100%;
     position: relative;
     padding: .5rem;
     background: $primary;
-    z-index: 999;
 
     .d-screen__item {
       writing-mode: vertical-rl;
+    }
+
+    .d-screen__bar-content {
+      overflow: auto;
+      display: none;
+      gap: .5rem;
+      height: 100%;
+      position: relative;
+      flex-direction: column;
     }
 
     &--left {
@@ -104,5 +105,16 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+  }
+
+  &__collapsable-item {
+    @include box(true);
+    width: fit-content;
+    padding: .25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
   }
 }

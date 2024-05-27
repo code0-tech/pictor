@@ -5,11 +5,11 @@ import {Code0Component} from "../../utils/types";
 import "./DScreen.style.scss"
 import {getChild, mergeCode0Props} from "../../utils/utils";
 
-export interface DScreenType extends Code0Component<HTMLDivElement> {
-    children: React.ReactElement<Omit<VBar, "type"> & Content>[]
+export interface DScreenProps extends Code0Component<HTMLDivElement> {
+    children: React.ReactElement<Omit<DScreenVBarProps, "type"> & DScreenContentProps>[]
 }
 
-const DScreen: React.FC<DScreenType> = (props) => {
+const DScreen: React.FC<DScreenProps> = (props) => {
     const {children} = props
     const vBarTop = getChild(children, VBarTop, false)
     const vBarBottom = getChild(children, VBarBottom, false)
@@ -31,55 +31,44 @@ const DScreen: React.FC<DScreenType> = (props) => {
     </div>
 }
 
-interface BarProps extends Omit<Code0Component<HTMLDivElement>, "children"> {
-    children: React.ReactElement<BarContentProps>[] | React.ReactElement<BarContentProps> | ((collapsed: boolean, collapse: () => void) => React.ReactElement<BarContentProps>[] | React.ReactElement<BarContentProps>)
+interface DScreenBarProps extends Omit<Code0Component<HTMLDivElement>, "children"> {
+    children: React.ReactElement<DScreenBarContentProps>[] | React.ReactElement<DScreenBarContentProps> | ((collapsed: boolean, collapse: () => void) => React.ReactElement<DScreenBarContentProps>[] | React.ReactElement<DScreenBarContentProps>)
+    //defaults to false
+    collapsed?: boolean
 }
 
-export interface VBar extends BarProps {
+export interface DScreenVBarProps extends DScreenBarProps {
     type: 'top' | 'bottom'
 }
 
-export interface HBar extends BarProps {
+export interface DScreenHBarProps extends DScreenBarProps {
     type: 'left' | 'right'
 }
 
-const VBar: React.FC<VBar> = (props) => {
-    const {type, children, ...rest} = props
-    const [collapsed, setCollapsed] = useState(false)
+const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (props) => {
+    const {type, children, collapsed = false, ...rest} = props
+    const [stateCollapsed, setStateCollapsed] = useState(collapsed)
     const barRef = useRef<HTMLDivElement | null>(null)
 
     const collapse = () => {
-        setCollapsed(prevState => !prevState)
+        setStateCollapsed(prevState => !prevState)
     }
 
-    const child = typeof children === "function" ? useMemo(() => children(collapsed, collapse), [collapsed]) : children
+    const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
-    return <div ref={barRef} {...mergeCode0Props(`d-screen__v-bar d-screen__v-bar--${type}`, rest)}>
+    return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
         {child}
     </div>
 }
-const HBar: React.FC<HBar> = (props) => {
 
-    const {type, children, ...rest} = props
-    const [collapsed, setCollapsed] = useState(false)
-    const barRef = useRef<HTMLDivElement | null>(null)
+const VBar: React.FC<DScreenVBarProps> = Bar("v")
+const HBar: React.FC<DScreenHBarProps> = Bar("h")
+const VBarTop: React.FC<Omit<DScreenVBarProps, "type">> = (props) => <VBar type={"top"} {...props}/>
+const VBarBottom: React.FC<Omit<DScreenVBarProps, "type">> = (props) => <VBar type={"bottom"} {...props}/>
+const HBarLeft: React.FC<Omit<DScreenHBarProps, "type">> = (props) => <HBar type={"left"} {...props}/>
+const HBarRight: React.FC<Omit<DScreenHBarProps, "type">> = (props) => <HBar type={"right"} {...props}/>
 
-    const collapse = () => {
-        setCollapsed(prevState => !prevState)
-    }
-
-    const child = typeof children === "function" ? useMemo(() => children(collapsed, collapse), [collapsed]) : children
-
-    return <div ref={barRef} {...mergeCode0Props(`d-screen__h-bar d-screen__h-bar--${type}`, rest)}>
-        {child}
-    </div>
-}
-const VBarTop: React.FC<Omit<VBar, "type">> = (props) => <VBar type={"top"} {...props}/>
-const VBarBottom: React.FC<Omit<VBar, "type">> = (props) => <VBar type={"bottom"} {...props}/>
-const HBarLeft: React.FC<Omit<HBar, "type">> = (props) => <HBar type={"left"} {...props}/>
-const HBarRight: React.FC<Omit<HBar, "type">> = (props) => <HBar type={"right"} {...props}/>
-
-export interface BarContentProps extends Code0Component<HTMLDivElement> {
+export interface DScreenBarContentProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
     mediaMinHeight?: number
     mediaMinWidth?: number
@@ -87,14 +76,15 @@ export interface BarContentProps extends Code0Component<HTMLDivElement> {
     mediaMaxWidth?: number
 }
 
-const BarContent: React.FC<BarContentProps> = props => {
+const BarContent: React.FC<DScreenBarContentProps> = props => {
     const {
         children,
         mediaMinHeight = 0,
         mediaMinWidth = 0,
         mediaMaxHeight = 0,
         mediaMaxWidth = 0,
-        ...rest} = props
+        ...rest
+    } = props
     const contentRef = useRef<HTMLDivElement | null>(null)
 
     const resizeCallback = () => {
@@ -118,35 +108,35 @@ const BarContent: React.FC<BarContentProps> = props => {
     </div>
 }
 
-export interface Content extends Code0Component<HTMLDivElement> {
+export interface DScreenContentProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode[] | React.ReactNode
 }
 
-const Content: React.FC<Content> = (props) => {
+const Content: React.FC<DScreenContentProps> = (props) => {
     const {children, ...rest} = props
     return <div {...mergeCode0Props(`d-screen__content`, rest)}>
         {children}
     </div>
 }
 
-export interface Item extends Code0Component<HTMLSpanElement> {
+export interface DScreenItemProps extends Code0Component<HTMLSpanElement> {
     children: React.ReactNode[] | React.ReactNode
     //defaults to false
     active?: boolean
 }
 
-const Item: React.FC<Item> = (props) => {
+const Item: React.FC<DScreenItemProps> = (props) => {
     const {children, active, ...rest} = props
     return <span {...mergeCode0Props(`d-screen__item ${active ? "d-screen__item--active" : ""}`, rest)}>
         {children}
     </span>
 }
 
-export interface CollapsableItemProps extends Code0Component<HTMLDivElement> {
+export interface DScreenCollapsableItemProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode[] | React.ReactNode
 }
 
-const CollapsableItem: React.FC<CollapsableItemProps> = props => {
+const CollapsableItem: React.FC<DScreenCollapsableItemProps> = props => {
     const {children, ...rest} = props
     return <div {...mergeCode0Props(`d-screen__collapsable-item`, rest)}>
         {children}

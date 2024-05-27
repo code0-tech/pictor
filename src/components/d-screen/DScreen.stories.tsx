@@ -6,7 +6,6 @@ import {
     IconApi,
     IconDatabase,
     IconHierarchy3,
-    IconLayoutNavbarCollapse,
     IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse,
     IconSettings,
     IconTicket

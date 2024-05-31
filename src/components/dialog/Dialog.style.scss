@@ -5,10 +5,12 @@
   @include box(false);
   z-index: 100;
 
+  position: relative;
   padding: .5rem;
   margin: auto;
   overflow: auto;
   inset: auto;
+  height: fit-content;
   max-height: none;
 
   @include respond-above(md) {
@@ -16,6 +18,7 @@
   }
 
   &__wrapper {
+    scroll-padding-top: 4rem;
     position: fixed;
     z-index: 100;
     overflow: auto;

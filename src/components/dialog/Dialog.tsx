@@ -24,7 +24,6 @@ const DialogModal: React.FC<DialogModalProps> = (props) => <AKDialog {...mergeCo
     ...props,
     ...(!props.render ? {
         render: (props: React.HTMLAttributes<HTMLDivElement>) => {
-            console.log(props)
             return <div className={"dialog__wrapper"} hidden={props.hidden}>
                 <div {...props}/>
             </div>

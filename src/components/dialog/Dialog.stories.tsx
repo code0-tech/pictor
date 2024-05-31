@@ -1,6 +1,6 @@
 import {Meta} from "@storybook/react";
 import Dialog from "./Dialog";
-import React from "react";
+import React, {useState} from "react";
 import Flex from "../flex/Flex";
 import Text from "../Text/Text";
 
@@ -26,6 +26,34 @@ export const ExampleDialog = () => {
             <Flex style={{gap: ".5rem"}}>
                 <Dialog.Dismiss color={"error"}>Remove</Dialog.Dismiss>
                 <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+            </Flex>
+        </Dialog.Modal>
+    </Dialog>
+}
+
+export const NestedDialog = () => {
+
+    const [firstOpen, setFirstOpen] = useState(true)
+
+    return <Dialog open={firstOpen}>
+        <Dialog.Disclosure onClick={() => setFirstOpen(true)}>Open</Dialog.Disclosure>
+        <Dialog.Modal onClose={() => setFirstOpen(false)}>
+            <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
+            <Text size={"md"} display={"block"} mb={1}>
+                Your payment has been successfully processed. We have emailed your receipt.
+            </Text>
+            <Flex style={{gap: ".5rem"}}>
+                <Dialog>
+                    <Dialog.Disclosure color={"error"}>Remove</Dialog.Disclosure>
+                    <Dialog.Modal>
+                        <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Are you sure?</Text>
+                        <Flex style={{gap: ".5rem"}}>
+                            <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"error"}>Yes, remove</Dialog.Dismiss>
+                            <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+                        </Flex>
+                    </Dialog.Modal>
+                </Dialog>
+                <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"secondary"}>Close</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>

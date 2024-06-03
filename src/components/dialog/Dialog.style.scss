@@ -17,6 +17,13 @@
     width: 420px;
   }
 
+  &__header {
+    position: fixed;
+    width: 420px;
+    top: 0;
+    background: mix($bodyBg, $secondary, 90%);
+  }
+
   &__wrapper {
     scroll-padding-top: 4rem;
     position: fixed;

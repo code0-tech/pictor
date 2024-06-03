@@ -8,16 +8,19 @@ import {
     DialogDisclosure as AKDialogDisclosure,
     DialogDismiss as AKDialogDismiss
 } from "@ariakit/react"
-import {Code0ComponentProps} from "../../utils/types";
+import {Code0Component, Code0ComponentProps} from "../../utils/types";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
-import "./Dialog.style.scss"
 import Button, {ButtonType} from "../button/Button";
+import "./Dialog.style.scss"
 
-type DialogProps = AKDialogProviderProps
-type DialogDisclosureProps = ButtonType & AKDialogDisclosureProps
-type DialogModalProps = Code0ComponentProps & AKDialogProps
-type DialogDismissProps = ButtonType & AKDialogDismissProps
+export type DialogProps = AKDialogProviderProps
+export type DialogDisclosureProps = ButtonType & AKDialogDisclosureProps
+export type DialogModalProps = Code0ComponentProps & AKDialogProps
+export type DialogDismissProps = ButtonType & AKDialogDismissProps
+export interface DialogHeaderProps extends Code0Component<HTMLDivElement> {
+    children: React.ReactNode | React.ReactNode[]
+}
 
 const Dialog: React.FC<DialogProps> = (props) => <AKDialogProvider {...props}/>
 const DialogModal: React.FC<DialogModalProps> = (props) => <AKDialog {...mergeCode0Props("dialog", {
@@ -45,8 +48,17 @@ const DialogDismiss: React.FC<DialogDismissProps> = (props) =>
         } : {render: props.render})
     })}/>
 
+const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
+
+    return <div className={"dialog__header"}>
+        {props.children}
+    </div>
+
+}
+
 export default Object.assign(Dialog, {
     Modal: DialogModal,
     Disclosure: DialogDisclosure,
-    Dismiss: DialogDismiss
+    Dismiss: DialogDismiss,
+    Header: DialogHeader,
 })

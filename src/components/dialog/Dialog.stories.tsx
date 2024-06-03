@@ -63,6 +63,12 @@ export const LongDialog = () => {
     return <Dialog defaultOpen>
         <Dialog.Disclosure>Open</Dialog.Disclosure>
         <Dialog.Modal>
+            <Dialog.Header>
+                <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
+                <Text size={"md"} display={"block"} mb={1}>
+                    Your payment has been successfully processed. We have emailed your receipt.
+                </Text>
+            </Dialog.Header>
             <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
                 vehicula nisl leo, eget posuere turpis suscipit id. Sed auctor purus

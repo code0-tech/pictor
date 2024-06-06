@@ -57,6 +57,7 @@ const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
     useEffect(() => {
         if (!headerRef.current || !headerPseudoRef.current) return
         const wrapper = document.querySelector(".dialog__wrapper")
+        headerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
         const yPos = headerRef.current.getBoundingClientRect().top
         const height = headerRef.current.getBoundingClientRect().bottom - headerRef.current.getBoundingClientRect().top - 24
         wrapper?.addEventListener("scroll", () => {
@@ -69,6 +70,10 @@ const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
                 headerRef.current.style.position = "relative"
                 headerPseudoRef.current.style.display = "none"
             }
+        })
+        window.addEventListener("resize", () => {
+            if (!headerRef.current) return
+            headerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
         })
     }, [headerRef, headerPseudoRef]);
 
@@ -89,6 +94,7 @@ const DialogFooter: React.FC<DialogHeaderProps> = (props) => {
     useEffect(() => {
         if (!footerRef.current || !footerPseudoRef.current) return
         const wrapper = document.querySelector(".dialog__wrapper")
+        footerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
         const yPos = footerRef.current.getBoundingClientRect().bottom
         const height = footerRef.current.getBoundingClientRect().bottom - footerRef.current.getBoundingClientRect().top
         wrapper?.addEventListener("scroll", () => {
@@ -102,6 +108,10 @@ const DialogFooter: React.FC<DialogHeaderProps> = (props) => {
                 footerRef.current.style.position = "relative"
                 footerPseudoRef.current.style.display = "none"
             }
+        })
+        window.addEventListener("resize", () => {
+            if (!footerRef.current) return
+            footerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
         })
     }, [footerRef, footerPseudoRef]);
 

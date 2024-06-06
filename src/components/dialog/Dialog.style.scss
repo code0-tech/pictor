@@ -18,9 +18,22 @@
   }
 
   &__header {
-    position: fixed;
+    position: relative;
+    margin: -0.5rem;
+    padding: .5rem;
     width: 420px;
+    border-bottom: 1px solid borderColor();
     top: 0;
+    background: mix($bodyBg, $secondary, 90%);
+  }
+
+  &__footer {
+    position: relative;
+    margin: -0.5rem;
+    padding: .5rem;
+    width: 420px;
+    border-top: 1px solid borderColor();
+    bottom: 0;
     background: mix($bodyBg, $secondary, 90%);
   }
 

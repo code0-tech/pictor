@@ -17,7 +17,7 @@
     cursor: pointer;
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: backgroundColor($secondary);
+      background: backgroundColor($secondary, true);
     }
 
     &[aria-disabled=true] {
@@ -36,6 +36,7 @@
     @include box(false);
     padding: .5rem;
     margin-top: .5rem;
+    outline: none;
   }
 
   &__group-label {

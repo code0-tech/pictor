@@ -23,6 +23,7 @@
       background: backgroundBorderColor($color, true);
       background-clip: padding-box, border-box;
       background-origin: padding-box, border-box;
+      outline: none;
     }
   }
 }
@@ -34,14 +35,15 @@
   //styling
   border-radius: $borderRadius;
   border: 1px solid rgba(if($color == $primary, $white, $color), .1);
-  background: mix($bodyBg, $color, 80%);
+  background: backgroundColor($color);
   color: rgba($white, .5);
   font-family: Ubuntu, sans-serif;
   font-size: $md;
 
   @if ($active == true) {
     &:hover, &:active, &--active, &:focus, &:focus-visible {
-      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 60%, 60%));
+      background: backgroundColor($color, true);
+      outline: none;
     }
 
     &:active, &--active, &:focus, &:focus-visible {

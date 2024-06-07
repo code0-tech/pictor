@@ -2,7 +2,7 @@
 @import "../../styles/media";
 
 .dialog {
-  @include borderBox(false);
+  @include box(false);
   z-index: 100;
 
   position: relative;

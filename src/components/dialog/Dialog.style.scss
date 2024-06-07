@@ -22,7 +22,6 @@
     margin: -0.5rem;
     padding: .5rem;
     border-bottom: 1px solid borderColor();
-    top: 0;
     background: mix($bodyBg, $secondary, 90%);
   }
 
@@ -31,7 +30,6 @@
     margin: -0.5rem;
     padding: .5rem;
     border-top: 1px solid borderColor();
-    bottom: 0;
     background: mix($bodyBg, $secondary, 90%);
   }
 

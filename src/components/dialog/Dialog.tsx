@@ -19,7 +19,7 @@ export type DialogDisclosureProps = ButtonType & AKDialogDisclosureProps
 export type DialogModalProps = Code0ComponentProps & AKDialogProps
 export type DialogDismissProps = ButtonType & AKDialogDismissProps
 
-export interface DialogHeaderProps extends Code0Component<HTMLDivElement> {
+export interface DialogStickyContentProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
@@ -49,75 +49,48 @@ const DialogDismiss: React.FC<DialogDismissProps> = (props) =>
         } : {render: props.render})
     })}/>
 
-const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
+const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogStickyContentProps> => (props) => {
 
-    const headerRef = React.useRef<HTMLDivElement>(null)
-    const headerPseudoRef = React.useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        if (!headerRef.current || !headerPseudoRef.current) return
-        const wrapper = document.querySelector(".dialog__wrapper")
-        headerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-        const yPos = headerRef.current.getBoundingClientRect().top
-        const height = headerRef.current.getBoundingClientRect().bottom - headerRef.current.getBoundingClientRect().top - 24
-        wrapper?.addEventListener("scroll", () => {
-            if (!headerRef.current || !headerPseudoRef.current) return
-            headerPseudoRef.current.style.height = `${height}px`
-            if (wrapper.scrollTop > yPos) {
-                headerRef.current.style.position = "fixed"
-                headerPseudoRef.current.style.display = "block"
-            } else {
-                headerRef.current.style.position = "relative"
-                headerPseudoRef.current.style.display = "none"
-            }
-        })
-        window.addEventListener("resize", () => {
-            if (!headerRef.current) return
-            headerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-        })
-    }, [headerRef, headerPseudoRef]);
-
-    return <>
-        <div ref={headerPseudoRef}/>
-        <div ref={headerRef} className={"dialog__header"}>
-            {props.children}
-        </div>
-    </>
-
-}
-
-const DialogFooter: React.FC<DialogHeaderProps> = (props) => {
-
-    const footerRef = React.useRef<HTMLDivElement>(null)
-    const footerPseudoRef = React.useRef<HTMLDivElement>(null)
+    const stickyRef = React.useRef<HTMLDivElement>(null)
+    const stickyPseudoRef = React.useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!footerRef.current || !footerPseudoRef.current) return
+        if (!stickyRef.current || !stickyPseudoRef.current) return
+
         const wrapper = document.querySelector(".dialog__wrapper")
-        footerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-        const yPos = footerRef.current.getBoundingClientRect().bottom
-        const height = footerRef.current.getBoundingClientRect().bottom - footerRef.current.getBoundingClientRect().top
-        wrapper?.addEventListener("scroll", () => {
-            console.log(height)
-            if (!footerRef.current || !footerPseudoRef.current) return
-            footerPseudoRef.current.style.height = `${height}px`
-            if (wrapper.scrollTop+ window.innerHeight < yPos) {
-                footerRef.current.style.position = "fixed"
-                footerPseudoRef.current.style.display = "block"
+        const yPos = contentType == 'header' ? stickyRef.current.getBoundingClientRect().top : stickyRef.current.getBoundingClientRect().bottom
+        const height = stickyRef.current.getBoundingClientRect().bottom - stickyRef.current.getBoundingClientRect().top
+        const scroll = () => {
+            if (!stickyRef.current || !stickyPseudoRef.current) return
+
+            if (contentType == 'header' ? (wrapper?.scrollTop ?? 0) > yPos : ((wrapper?.scrollTop ?? 0) + window.innerHeight) < yPos) {
+                stickyRef.current.style.position = "fixed"
+                stickyRef.current.style[contentType == 'header' ? 'top' : 'bottom'] = '.5rem'
+                stickyPseudoRef.current.style.display = "block"
             } else {
-                footerRef.current.style.position = "relative"
-                footerPseudoRef.current.style.display = "none"
+                stickyRef.current.style.position = "relative"
+                stickyRef.current.style[contentType == 'header' ? 'top' : 'bottom'] = '0'
+                stickyPseudoRef.current.style.display = "none"
             }
-        })
-        window.addEventListener("resize", () => {
-            if (!footerRef.current) return
-            footerRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-        })
-    }, [footerRef, footerPseudoRef]);
+        }
+        const resize = () => {
+            if (!stickyRef.current || !stickyPseudoRef.current) return
+            stickyRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
+            stickyPseudoRef.current.style.height = `${height}px`
+        }
+
+        stickyRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
+        stickyPseudoRef.current.style.height = `${height}px`
+        resize()
+        scroll()
+
+        wrapper?.addEventListener("scroll", scroll)
+        window.addEventListener("resize", resize)
+    }, [stickyRef, stickyPseudoRef]);
 
     return <>
-        <div ref={footerPseudoRef}/>
-        <div ref={footerRef} className={"dialog__footer"}>
+        <div style={{display: "none"}} ref={stickyPseudoRef}/>
+        <div ref={stickyRef} className={`dialog__${contentType}`}>
             {props.children}
         </div>
     </>
@@ -128,6 +101,6 @@ export default Object.assign(Dialog, {
     Modal: DialogModal,
     Disclosure: DialogDisclosure,
     Dismiss: DialogDismiss,
-    Header: DialogHeader,
-    Footer: DialogFooter
+    Header: DialogStickyContent("header"),
+    Footer: DialogStickyContent("footer")
 })

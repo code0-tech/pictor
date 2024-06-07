@@ -1,0 +1,50 @@
+@import "../../styles/helpers";
+@import "../../styles/media";
+
+.dialog {
+  @include box(false);
+  z-index: 100;
+
+  position: relative;
+  padding: .5rem;
+  margin: auto;
+  overflow: auto;
+  inset: auto;
+  height: fit-content;
+  max-height: none;
+
+  @include respond-above(md) {
+    width: 420px;
+  }
+
+  &__header {
+    position: relative;
+    margin: -0.5rem;
+    padding: .5rem;
+    border-bottom: 1px solid borderColor();
+    background: mix($bodyBg, $secondary, 90%);
+  }
+
+  &__footer {
+    position: relative;
+    margin: -0.5rem;
+    padding: .5rem;
+    border-top: 1px solid borderColor();
+    background: mix($bodyBg, $secondary, 90%);
+  }
+
+  &__wrapper {
+    scroll-padding-top: 4rem;
+    position: fixed;
+    z-index: 100;
+    overflow: auto;
+    padding: 4rem 1rem;
+    inset: 0;
+  }
+}
+
+[data-backdrop] {
+  background-color: rgba($primary, .2);
+  -webkit-backdrop-filter: blur(.1rem);
+  backdrop-filter: blur(.1rem);
+}

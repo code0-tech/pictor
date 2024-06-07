@@ -1,7 +1,7 @@
 @import "../../styles/helpers";
 
 .select {
-  @include box(true);
+  @include borderBox(true);
   display: flex;
   padding: .5rem;
   cursor: pointer;
@@ -17,7 +17,7 @@
     cursor: pointer;
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: mix($bodyBg, if($secondary == $primary, $white, $secondary), if($secondary == $primary, 90%, 80%));
+      background: backgroundColor($secondary);
     }
 
     &[aria-disabled=true] {

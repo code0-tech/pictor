@@ -2,7 +2,7 @@
 @import "../../styles/variables";
 
 .badge {
-  @include opacityBox(false);
+  @include box(false);
 
   padding: .25rem;
   display: inline-flex;
@@ -12,7 +12,7 @@
 
 @each $name, $color in $colors {
   .badge--#{$name} {
-    @include opacityBox(false, $color);
+    @include box(false, $color);
     font-size: $xs;
   }
 }

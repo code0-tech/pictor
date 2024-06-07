@@ -96,7 +96,7 @@
   }
 
   &__item {
-    @include box(true);
+    @include borderBox(true);
     width: fit-content;
     padding: .25rem;
     font-size: .75rem;
@@ -108,7 +108,7 @@
   }
 
   &__collapsable-item {
-    @include box(true);
+    @include borderBox(true);
     width: fit-content;
     padding: .25rem;
     display: inline-flex;

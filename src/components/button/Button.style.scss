@@ -21,7 +21,7 @@
     align-items: center;
     width: 1.25rem;
     height: 1.25rem;
-    color: color($white);
+    color: rgba($white, .5);
     cursor: pointer;
 
     > * {
@@ -31,41 +31,39 @@
   }
 }
 
-@function getMixedColor($color) {
-  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
-}
-
 @each $name, $color in $colors {
   .button--#{$name} {
-    @include box(true, $color);
+    @include borderBox(true, $color);
 
     &.button--filled {
-      border-color: transparent;
+      background: backgroundColor($color);
+      outline-color: transparent;
 
-      &:active {
-        @include border();
+      &:hover, &:active, &--active, &:focus, &:focus-visible {
+        background: backgroundColor($color, true);
       }
     }
 
     &.button--outlined {
-      background: transparent;
-      border-color: getMixedColor($color);
-      &:hover, &.button--none:hover {
-        background: getMixedColor($color);
-      }
-      &:active, &.button--none:active {
-        @include border();
+      border: 1px solid transparent;
+      background: backgroundBorderColorWithoutBackground($color);
+      background-clip: padding-box, border-box;
+      background-origin: padding-box, border-box;
+
+      &:hover, &:active, &--active, &:focus, &:focus-visible {
+        border: 1px solid transparent;
+        background: backgroundBorderColorWithoutBackground($color,true);
+        background-clip: padding-box, border-box;
+        background-origin: padding-box, border-box;
       }
     }
 
     &.button--none {
       background: transparent;
-      border-color: transparent;
-      &:hover {
-        background: getMixedColor($color);
-      }
-      &:active {
-        @include border();
+      outline-color: transparent;
+
+      &:hover, &:active, &--active, &:focus, &:focus-visible {
+        background: backgroundColor($color, true);
       }
     }
 

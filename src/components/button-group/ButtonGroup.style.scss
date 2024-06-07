@@ -1,7 +1,7 @@
 @import "../../styles/helpers";
 
 .button-group {
-  @include box(false, $primary);
+  @include borderBox(false, $primary);
 
   border: none;
   width: fit-content;

@@ -22,7 +22,7 @@
     margin: -0.5rem;
     padding: .5rem;
     border-bottom: 1px solid borderColor();
-    background: mix($bodyBg, $secondary, 90%);
+    background: backgroundColor($secondary);
   }
 
   &__footer {
@@ -30,7 +30,7 @@
     margin: -0.5rem;
     padding: .5rem;
     border-top: 1px solid borderColor();
-    background: mix($bodyBg, $secondary, 90%);
+    background: backgroundColor($secondary);
   }
 
   &__wrapper {

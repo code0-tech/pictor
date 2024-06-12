@@ -33,28 +33,19 @@
 
 @each $name, $color in $colors {
   .button--#{$name} {
-    @include borderBox(true, $color);
-
-    &.button--filled {
-      background: backgroundColor($color);
-      outline-color: transparent;
-
-      &:hover, &:active, &--active, &:focus, &:focus-visible {
-        background: backgroundColor($color, true);
-      }
-    }
+    @include box(true, $color);
 
     &.button--outlined {
-      border: 1px solid transparent;
-      background: backgroundBorderColorWithoutBackground($color);
-      background-clip: padding-box, border-box;
-      background-origin: padding-box, border-box;
+      border: 1px solid borderColor($color);
+      background: transparent;
 
       &:hover, &:active, &--active, &:focus, &:focus-visible {
-        border: 1px solid transparent;
-        background: backgroundBorderColorWithoutBackground($color,true);
-        background-clip: padding-box, border-box;
-        background-origin: padding-box, border-box;
+        border: 1px solid borderColor($color, true);
+      }
+
+      &:active, &--active, &:focus, &:focus-visible {
+        border: 1px solid borderColor($color, true);
+        background: backgroundColor($color, true);
       }
     }
 

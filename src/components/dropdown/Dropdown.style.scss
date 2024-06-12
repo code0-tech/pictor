@@ -75,7 +75,7 @@
   }
 
   &__menu {
-    @include borderBox(false, $color);
+    @include box(false, $color);
     box-shadow: 0 0 2rem .5rem rgba($bodyBg, 1);
 
     position: fixed;

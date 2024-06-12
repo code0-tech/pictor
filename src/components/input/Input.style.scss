@@ -14,7 +14,7 @@
     align-items: center;
     margin-bottom: .5rem;
 
-    @include borderBox();
+    @include box();
   }
 
   &__label {

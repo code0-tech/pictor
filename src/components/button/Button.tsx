@@ -10,7 +10,7 @@ export interface ButtonType extends Code0Component<HTMLAnchorElement> {
     //defaults to primary
     color?: Color,
     //default to normal
-    variant?: "none" | "normal" | "outlined" | "filled",
+    variant?: "none" | "normal" | "outlined",
     //defaults to false
     active?: boolean
     //defaults to false

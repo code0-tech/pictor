@@ -1,7 +1,7 @@
 @import "../../styles/helpers";
 
 .select {
-  @include borderBox(true);
+  @include box(true);
   display: flex;
   padding: .5rem;
   cursor: pointer;

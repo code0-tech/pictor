@@ -3,7 +3,7 @@
 .popover {
 
   &__content {
-    @include borderBox(false);
+    @include box(false);
     padding: .5rem;
     overflow-y: auto;
   }

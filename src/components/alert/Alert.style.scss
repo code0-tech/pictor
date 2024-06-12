@@ -37,7 +37,7 @@
   }
 
   &__dismissible {
-    @include borderBox();
+    @include box();
 
     width: 1rem;
     height: 1rem;
@@ -66,7 +66,7 @@
     }
 
     .alert__dismissible {
-      @include borderBox(true, $color);
+      @include box(true, $color);
     }
 
   }

@@ -1,8 +1,6 @@
 @import "../../styles/helpers";
 
 .alert {
-  @include box(false);
-
   padding: .5rem;
   margin-bottom: 1rem;
 

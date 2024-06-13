@@ -21,7 +21,7 @@
     align-items: center;
     width: 1.25rem;
     height: 1.25rem;
-    color: color($white);
+    color: rgba($white, .5);
     cursor: pointer;
 
     > * {
@@ -31,41 +31,30 @@
   }
 }
 
-@function getMixedColor($color) {
-  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
-}
-
 @each $name, $color in $colors {
   .button--#{$name} {
     @include box(true, $color);
 
-    &.button--filled {
-      border-color: transparent;
-
-      &:active {
-        @include border();
-      }
-    }
-
     &.button--outlined {
+      border: 1px solid borderColor($color);
       background: transparent;
-      border-color: getMixedColor($color);
-      &:hover, &.button--none:hover {
-        background: getMixedColor($color);
+
+      &:hover, &:active, &--active, &:focus, &:focus-visible {
+        border: 1px solid borderColor($color, true);
       }
-      &:active, &.button--none:active {
-        @include border();
+
+      &:active, &--active, &:focus, &:focus-visible {
+        border: 1px solid borderColor($color, true);
+        background: backgroundColor($color, true);
       }
     }
 
     &.button--none {
       background: transparent;
-      border-color: transparent;
-      &:hover {
-        background: getMixedColor($color);
-      }
-      &:active {
-        @include border();
+      outline-color: transparent;
+
+      &:hover, &:active, &--active, &:focus, &:focus-visible {
+        background: backgroundColor($color, true);
       }
     }
 

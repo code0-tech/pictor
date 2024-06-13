@@ -94,19 +94,19 @@
 
 
       &.card--gradient-top-left:before {
-        background: linear-gradient(135deg, getMixedColor($color) 0%, transparent 50%);
+        background: linear-gradient(135deg, backgroundColor($color) 0%, transparent 50%);
       }
 
       &.card--gradient-bottom-left:before {
-        background: linear-gradient(45deg, getMixedColor($color) 0%, transparent 50%);
+        background: linear-gradient(45deg, backgroundColor($color) 0%, transparent 50%);
       }
 
       &.card--gradient-top-right:before {
-        background: linear-gradient(225deg, getMixedColor($color) 0%, transparent 50%);
+        background: linear-gradient(225deg, backgroundColor($color) 0%, transparent 50%);
       }
 
       &.card--gradient-bottom-right:before {
-        background: linear-gradient(315deg, getMixedColor($color) 0%, transparent 50%);
+        background: linear-gradient(315deg, backgroundColor($color) 0%, transparent 50%);
       }
 
 

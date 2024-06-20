@@ -9,9 +9,20 @@
     }
   }
 
+  &__footer {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+  }
+
   &__img {
-    width: 20%;
-    max-width: 100px;
-    filter: brightness(0) invert(1);
+    height: 40px;
+    //filter: brightness(0) invert(1);
   }
 }

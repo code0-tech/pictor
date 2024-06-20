@@ -2,7 +2,7 @@ import {Meta} from "@storybook/react";
 import React from "react";
 import Dropdown from "./Dropdown";
 import Button from "../button/Button";
-import {IconAbc, IconMail, IconSearch} from "@tabler/icons-react";
+import {IconAbc, IconSearch} from "@tabler/icons-react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import Input from "../input/Input";
 
@@ -54,12 +54,12 @@ export const Dropdowns = () => {
                 ["secondary", "secondary", "secondary", "secondary"].map((value, index) => {
                     // @ts-ignore
                     return (index % 2 == 0) ? <Button disabled={(index % 2) == 0} color={value}>
-                        {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
+                        {(index % 2) == 0 ? <IconAbc/> : null}
                         {value}
                     </Button> : <Dropdown position={"bottom"} align={"start"}>
                         <Dropdown.Trigger>
                             <Button disabled={(index % 2) == 0} color={"secondary"}>
-                                {(index % 2) == 0 ? <Button.Icon><IconAbc/></Button.Icon> : null}
+                                {(index % 2) == 0 ? <IconAbc/> : null}
                                 {value}
                             </Button>
                         </Dropdown.Trigger>

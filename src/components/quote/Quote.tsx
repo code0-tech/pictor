@@ -21,14 +21,16 @@ const Quote: React.FC<QuoteType> = (props) => {
                     {children}
                 </div>
             </Card.Section>
-            {
-                !!logo ? <Card.Section>
-                    <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
-                </Card.Section> : null
-            }
-            <Card.Section>
-                <Text size={"md"} hierarchy={"primary"}>{name}</Text><br/>
-                <Text size={"sm"}>{position}</Text>
+            <Card.Section className={"quote__footer"}>
+                {
+                    !!logo ? <div>
+                        <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
+                    </div> : null
+                }
+                <div>
+                    <Text size={"md"} hierarchy={"primary"} m={0}>{name}</Text>
+                    <Text size={"sm"}>{position}</Text>
+                </div>
             </Card.Section>
         </div>
     </Card>

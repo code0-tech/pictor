@@ -36,7 +36,29 @@ export default meta;
 type QuoteStory = StoryObj<typeof Quote>;
 
 
-export const QuoteSample: QuoteStory = {
+export const QuoteWithLogo: QuoteStory = {
+    render: (args) => {
+        return <Quote {...args} name={"Nico Sammito"}
+                      position={"Co-founder"}
+                      logo={"https://code0.tech/code0_logo.png"}
+                      w={"300px"}>
+            My favorite UX feedback from customers is:
+            "How is the app so fast?"
+            Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,
+            which is important when it comes to mission-critical software.
+        </Quote>
+    },
+    args: {
+        variant: "outlined",
+        color: "secondary",
+        outline: false,
+        gradient: true,
+        gradientPosition: "bottom-left",
+        inlineBorder: true
+    }
+}
+
+export const QuoteWithoutLogo: QuoteStory = {
     render: (args) => {
         return <Quote {...args} name={"Nico Sammito"}
                       position={"Co-founder"}

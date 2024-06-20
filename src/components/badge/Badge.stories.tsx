@@ -26,9 +26,7 @@ export const Variants = () => {
 
 export const ButtonExample = () => {
     return <Button color={"primary"}>
-        <Button.Icon>
             <IconGitBranch/>
-        </Button.Icon>
         Merge Branch
         <Badge style={{marginLeft: ".5rem"}} color={"secondary"}>
             Badge

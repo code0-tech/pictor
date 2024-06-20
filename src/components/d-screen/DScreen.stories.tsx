@@ -103,7 +103,7 @@ export const DashboardScreenExample = () => {
                                     </DScreen.BarContent>
                                 ) : (
                                     <DScreen.BarContent>
-                                        <Button color={"info"}><Button.Icon><IconApi/></Button.Icon></Button>
+                                        <Button color={"info"}><IconApi/></Button>
                                     </DScreen.BarContent>
                                 )}
                             </>

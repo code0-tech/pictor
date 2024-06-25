@@ -36,7 +36,7 @@
     "@storybook/test-runner": "^0.18.1",
     "@storybook/testing-library": "^0.2.2",
     "@storybook/theming": "^8.1.9",
-    "@tabler/icons-react": "^3.6.0",
+    "@tabler/icons-react": "^3.7.0",
     "@types/react": "^18.3.3",
     "axe-playwright": "^2.0.1",
     "babel-loader": "^9.1.3",

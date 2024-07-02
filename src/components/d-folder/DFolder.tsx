@@ -1,14 +1,19 @@
 import "./DFolder.style.scss"
-import React from "react";
+import React, {useEffect} from "react";
 import {Code0Component} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 import {IconChevronDown, IconChevronRight, IconFolder} from "@tabler/icons-react";
 
-export interface DFolderProps extends Code0Component<HTMLDivElement> {
+// -1 means open all folders
+// -2 means close all folders
+export type DFolderControls = -1 | -2 | undefined
+
+export interface DFolderProps extends Omit<Code0Component<HTMLDivElement>, "controls"> {
     name: string
     children: React.ReactElement<DFolderItemProps> | React.ReactElement<DFolderItemProps>[] | React.ReactElement<DFolderProps> | React.ReactElement<DFolderProps>[]
     //defaults to false
     defaultOpen?: boolean
+    controls?: DFolderControls
 }
 
 export interface DFolderItemProps extends Code0Component<HTMLDivElement> {
@@ -18,10 +23,25 @@ export interface DFolderItemProps extends Code0Component<HTMLDivElement> {
     active?: boolean
 }
 
+export const useFolderControls = (): [DFolderControls, () => void, () => void] => {
+
+    const [folderControlState, setFolderControlState] = React.useState<DFolderControls>(undefined)
+    const openAll = () => setFolderControlState(-1)
+    const closeAll = () => setFolderControlState(-2)
+
+    return [folderControlState, openAll, closeAll]
+}
+
 const DFolder: React.FC<DFolderProps> = (props) => {
 
-    const {name, defaultOpen = false, children, ...rest} = props
+    const {name, defaultOpen = false, controls, children, ...rest} = props
     const [open, setOpen] = React.useState(defaultOpen);
+
+    useEffect(() => {
+        if (!controls) return
+        if (controls === -1) setOpen(true)
+        else if (controls === -2) setOpen(false)
+    }, [controls]);
 
     return <div>
         <div onDoubleClick={() => setOpen(prevState => !prevState)} {...mergeCode0Props(`d-folder`, rest)}>

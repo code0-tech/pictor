@@ -13,7 +13,7 @@ import {
 import Text from "../Text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import Button from "../button/Button";
-import DFolder from "../d-folder/DFolder";
+import DFolder, {useFolderControls} from "../d-folder/DFolder";
 
 const meta: Meta = {
     title: "Dashboard Screen",
@@ -27,6 +27,9 @@ const meta: Meta = {
 }
 
 export const DashboardScreenExample = () => {
+
+    const [controls, openAll, closeAll] = useFolderControls()
+
     return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
@@ -92,8 +95,12 @@ export const DashboardScreenExample = () => {
                             <DScreen>
                                 <DScreen.VBar.Top>
                                     <DScreen.BarContent>
-                                        <Badge>Test</Badge>
-                                        <Badge>Test</Badge>
+                                        <DScreen.Item>
+                                            Open All
+                                        </DScreen.Item>
+                                        <DScreen.Item>
+                                            Close All
+                                        </DScreen.Item>
                                     </DScreen.BarContent>
                                 </DScreen.VBar.Top>
                                 <DScreen.VBar.Bottom>
@@ -104,7 +111,7 @@ export const DashboardScreenExample = () => {
                                 </DScreen.VBar.Bottom>
                                 <DScreen.Content p={0.5}>
                                     {[1,1,1,1,1,1,1,1,1,1,1,1].map(() => {
-                                        return <DFolder name={"Google Cloud Flows"} defaultOpen>
+                                        return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
                                             <DFolder name={"Google Cloud Flows"} defaultOpen>
                                                 <DFolder.Item icon={<IconBrandAdobe size={12}/>} name={"Google Cloud Flows"}/>
                                                 <DFolder.Item active name={"Google Cloud Flows"}/>

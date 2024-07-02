@@ -23,12 +23,17 @@
     position: relative;
     background: $primary;
 
+    .d-screen__item {
+      writing-mode: unset !important;
+    }
+
     > .d-screen__bar-content {
       width: 100%;
       height: 100%;
       padding: .5rem;
       overflow: auto;
       display: none;
+      gap: .5rem;
       align-items: center;
     }
 
@@ -64,10 +69,6 @@
 
     &--left {
       border-right: 1px solid borderColor();
-
-      .d-screen__item {
-        transform: rotate(-180deg);
-      }
     }
 
     &--right {

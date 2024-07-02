@@ -1,12 +1,14 @@
+"use client"
+
 import "./DFolder.style.scss"
 import React, {useEffect} from "react";
 import {Code0Component} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 import {IconChevronDown, IconChevronRight, IconFolder} from "@tabler/icons-react";
 
-// -1 means open all folders
-// -2 means close all folders
-export type DFolderControls = -1 | -2 | undefined
+// -1 && -3 means open all folders
+// -2 && -4 means close all folders
+export type DFolderControls = -1 | -2 | -3 | -4 | undefined
 
 export interface DFolderProps extends Omit<Code0Component<HTMLDivElement>, "controls"> {
     name: string
@@ -26,8 +28,8 @@ export interface DFolderItemProps extends Code0Component<HTMLDivElement> {
 export const useFolderControls = (): [DFolderControls, () => void, () => void] => {
 
     const [folderControlState, setFolderControlState] = React.useState<DFolderControls>(undefined)
-    const openAll = () => setFolderControlState(-1)
-    const closeAll = () => setFolderControlState(-2)
+    const openAll = () => setFolderControlState(prevState => prevState === -1 ? -3 : -1)
+    const closeAll = () => setFolderControlState(prevState => prevState === -2 ? -4 : -2)
 
     return [folderControlState, openAll, closeAll]
 }
@@ -39,8 +41,8 @@ const DFolder: React.FC<DFolderProps> = (props) => {
 
     useEffect(() => {
         if (!controls) return
-        if (controls === -1) setOpen(true)
-        else if (controls === -2) setOpen(false)
+        if (controls === -1 || controls === -3) setOpen(true)
+        else if (controls === -2 || controls === -4) setOpen(false)
     }, [controls]);
 
     return <div>

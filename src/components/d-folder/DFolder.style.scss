@@ -1,0 +1,35 @@
+@import "../../styles/helpers";
+
+.d-folder {
+  @include box();
+  background: $primary;
+  padding: .25rem;
+  display: flex;
+  white-space: nowrap;
+  gap: .5rem;
+
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+
+  &__icon {
+    color: $info;
+  }
+
+  &__content {
+    padding-left: 1.25rem;
+  }
+}
+
+.d-folder-item {
+  @include box();
+  background: $primary;
+  padding: .25rem;
+  display: flex;
+  white-space: nowrap;
+  gap: .5rem;
+}

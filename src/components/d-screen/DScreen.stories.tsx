@@ -3,7 +3,7 @@ import React from "react";
 import DScreen from "./DScreen";
 import Badge from "../badge/Badge";
 import {
-    IconApi,
+    IconApi, IconBrandAdobe,
     IconDatabase,
     IconHierarchy3,
     IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse,
@@ -13,6 +13,7 @@ import {
 import Text from "../Text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import Button from "../button/Button";
+import DFolder, {useFolderControls} from "../d-folder/DFolder";
 
 const meta: Meta = {
     title: "Dashboard Screen",
@@ -26,6 +27,9 @@ const meta: Meta = {
 }
 
 export const DashboardScreenExample = () => {
+
+    const [controls, openAll, closeAll] = useFolderControls()
+
     return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
@@ -87,27 +91,36 @@ export const DashboardScreenExample = () => {
             <DScreen.Content>
                 <DScreen>
                     <DScreen.HBar.Left>
-                        {(collapsed, collapse) => {
-                            return <>
-                                <DScreen.CollapsableItem pos={"absolute"} right={"-17px"} top={"10%"} onClick={collapse}>
-                                    {collapsed ? <IconLayoutSidebarRightCollapse/> : <IconLayoutSidebarLeftCollapse/>}
-                                </DScreen.CollapsableItem>
-                                {!collapsed ? (
+                        <DScreen.BarContent w={"300px"} p={"0"}>
+                            <DScreen>
+                                <DScreen.VBar.Top>
                                     <DScreen.BarContent>
-                                        <Text size={"md"} hierarchy={"primary"}>
-                                            Sagittarius 200
-                                        </Text>
-                                        <Text size={"xs"}>
-                                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-                                        </Text>
+                                        <DScreen.Item onClick={openAll}>
+                                            Open All
+                                        </DScreen.Item>
+                                        <DScreen.Item onClick={closeAll}>
+                                            Close All
+                                        </DScreen.Item>
                                     </DScreen.BarContent>
-                                ) : (
+                                </DScreen.VBar.Top>
+                                <DScreen.VBar.Bottom>
                                     <DScreen.BarContent>
-                                        <Button color={"info"}><IconApi/></Button>
+                                        <Badge>Test</Badge>
+                                        <Badge>Test</Badge>
                                     </DScreen.BarContent>
-                                )}
-                            </>
-                        }}
+                                </DScreen.VBar.Bottom>
+                                <DScreen.Content p={0.5}>
+                                    {[1,1,1,1,1,1,1,1,1,1,1,1].map(() => {
+                                        return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
+                                            <DFolder controls={controls} name={"Google Cloud Flows"}>
+                                                <DFolder.Item icon={<IconBrandAdobe size={12}/>} name={"Google Cloud Flows"}/>
+                                                <DFolder.Item active name={"Google Cloud Flows"}/>
+                                            </DFolder>
+                                        </DFolder>
+                                    })}
+                                </DScreen.Content>
+                            </DScreen>
+                        </DScreen.BarContent>
                     </DScreen.HBar.Left>
                     <DScreen.Content>
                         <DScreen>

@@ -1,8 +1,8 @@
 import "./DFolder.style.scss"
-import React, {useEffect} from "react";
+import React from "react";
 import {Code0Component} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
-import {IconArrowDown, IconChevronDown, IconChevronRight, IconFolder} from "@tabler/icons-react";
+import {IconChevronDown, IconChevronRight, IconFolder} from "@tabler/icons-react";
 
 export interface DFolderProps extends Code0Component<HTMLDivElement> {
     name: string

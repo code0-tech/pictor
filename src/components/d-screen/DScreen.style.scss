@@ -20,11 +20,13 @@
 
   &__v-bar {
     width: 100%;
-    padding: .5rem;
+    position: relative;
     background: $primary;
 
-    .d-screen__bar-content {
+    > .d-screen__bar-content {
       width: 100%;
+      height: 100%;
+      padding: .5rem;
       overflow: auto;
       display: none;
       align-items: center;
@@ -43,18 +45,19 @@
   &__h-bar {
     height: 100%;
     position: relative;
-    padding: .5rem;
     background: $primary;
 
     .d-screen__item {
       writing-mode: vertical-rl;
     }
 
-    .d-screen__bar-content {
+    > .d-screen__bar-content {
       overflow: auto;
       display: none;
       gap: .5rem;
+      padding: .5rem;
       height: 100%;
+      width: 100%;
       position: relative;
       flex-direction: column;
     }

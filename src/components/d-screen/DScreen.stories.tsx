@@ -90,8 +90,8 @@ export const DashboardScreenExample = () => {
             </DScreen.HBar.Right>
             <DScreen.Content>
                 <DScreen>
-                    <DScreen.HBar.Left>
-                        <DScreen.BarContent w={"300px"} p={"0"}>
+                    <DScreen.HBar.Left resizeable w={"300px"}>
+                        <DScreen.BarContent p={"0"}>
                             <DScreen>
                                 <DScreen.VBar.Top>
                                     <DScreen.BarContent>

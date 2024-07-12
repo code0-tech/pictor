@@ -52,6 +52,37 @@
     position: relative;
     background: $primary;
 
+    &--resizable {
+      $width: 50px;
+
+      width: $width;
+      position: absolute;
+      background: transparent;
+      display: block;
+      height: 100%;
+      content: "";
+      top: 0;
+      right: ($width / 2) * -1;
+      z-index: 999999;
+      cursor: ew-resize;
+
+      &:hover {
+        //background: #29BF12;
+
+        &:after {
+          width: 1px;
+          height: 100%;
+          background: $info;
+          content: "";
+          position: absolute;
+          top: 0;
+          left: ($width / 2);
+        }
+      }
+
+      //border-color: $info !important;
+    }
+
     .d-screen__item {
       writing-mode: vertical-rl;
     }
@@ -62,6 +93,7 @@
       gap: .5rem;
       padding: .5rem;
       height: 100%;
+      z-index: 0;
       width: 100%;
       position: relative;
       flex-direction: column;

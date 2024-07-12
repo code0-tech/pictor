@@ -35,6 +35,7 @@ interface DScreenBarProps extends Omit<Code0Component<HTMLDivElement>, "children
     children: React.ReactElement<DScreenBarContentProps>[] | React.ReactElement<DScreenBarContentProps> | ((collapsed: boolean, collapse: () => void) => React.ReactElement<DScreenBarContentProps>[] | React.ReactElement<DScreenBarContentProps>)
     //defaults to false
     collapsed?: boolean
+    resizeable?: boolean
 }
 
 export interface DScreenVBarProps extends DScreenBarProps {
@@ -46,9 +47,59 @@ export interface DScreenHBarProps extends DScreenBarProps {
 }
 
 const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (props) => {
-    const {type, children, collapsed = false, ...rest} = props
+    const {type, children, collapsed = false, resizeable = false, ...rest} = props
     const [stateCollapsed, setStateCollapsed] = useState(collapsed)
     const barRef = useRef<HTMLDivElement | null>(null)
+    const resizeRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+
+        const minW = barRef.current?.style.minWidth ? parseFloat(barRef.current.style.minWidth) : 0
+        const maxW = barRef.current?.style.maxWidth ? parseFloat(barRef.current.style.maxWidth) : Infinity
+
+        const mouseDown = () => {
+            console.log("mousedown")
+            const selection = document.getSelection()
+            if (selection) selection.removeAllRanges()
+
+            const disableSelect = (event: MouseEvent) => {
+                event.preventDefault();
+            }
+
+            const mouseMove = (event: MouseEvent) => {
+
+                //calculate new width
+                const parentOfBar = barRef.current?.parentElement
+                const leftX = barRef.current?.getBoundingClientRect().left ?? 0
+                const horizontalX = event.clientX
+                const widthPixel = Math.max(Math.min((horizontalX - leftX), maxW), minW)
+                const widthPercent = Math.max(Math.min((((widthPixel) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+
+                //set new width
+                console.log(widthPercent)
+                if (barRef.current) barRef.current.style.minWidth = `${widthPercent}%`
+                if (barRef.current) barRef.current.style.width = `${widthPercent}%`
+
+            }
+
+            const mouseUpListener = (event: MouseEvent) => {
+                console.log("mouseup")
+                window.removeEventListener("mousemove", mouseMove)
+                window.removeEventListener("mouseup", mouseUpListener)
+                window.removeEventListener("selectstart", disableSelect)
+            }
+            window.addEventListener("mouseup", mouseUpListener)
+            window.addEventListener('selectstart', disableSelect);
+            barRef.current && window.addEventListener("mousemove", mouseMove)
+
+        }
+        resizeRef.current && resizeRef.current?.addEventListener("mousedown", mouseDown)
+
+        return () => {
+            window.removeEventListener("mousedown", mouseDown)
+        }
+
+    }, [barRef, resizeRef]);
 
     const collapse = () => {
         setStateCollapsed(prevState => !prevState)
@@ -57,6 +108,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
     return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
+        {resizeable && <div ref={resizeRef} className={`d-screen__${barType}-bar--resizable`}/>}
         {child}
     </div>
 }

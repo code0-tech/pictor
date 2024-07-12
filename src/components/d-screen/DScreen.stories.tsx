@@ -3,7 +3,7 @@ import React from "react";
 import DScreen from "./DScreen";
 import Badge from "../badge/Badge";
 import {
-    IconApi, IconArrowDown, IconBrandAdobe,
+    IconApi, IconBrandAdobe,
     IconDatabase,
     IconHierarchy3,
     IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse,
@@ -33,14 +33,14 @@ export const DashboardScreenExample = () => {
     return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
-                <DScreen.BarContent align={"center"} mediaMaxWidth={800}>
+                <DScreen.BarContent mediaMaxWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>...</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Sagittarius</Badge>
                 </DScreen.BarContent>
-                <DScreen.BarContent align={"center"} mediaMinWidth={800}>
+                <DScreen.BarContent mediaMinWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Organisations</Badge>
@@ -57,9 +57,9 @@ export const DashboardScreenExample = () => {
                     <Badge>Test</Badge>
                 </DScreen.BarContent>
             </DScreen.VBar.Bottom>
-            <DScreen.HBar.Left resizeable>
+            <DScreen.HBar.Left>
                 <DScreen.BarContent justify={"space-between"}>
-                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow:"hidden"}}>
+                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem"}}>
                         <DScreen.Item>
                             <IconHierarchy3 size={12}/>
                             Flows
@@ -73,7 +73,7 @@ export const DashboardScreenExample = () => {
                             Database
                         </DScreen.Item>
                     </div>
-                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow:"hidden"}}>
+                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem"}}>
                         <DScreen.Item>
                             <IconSettings size={12}/>
                             Settings
@@ -81,7 +81,7 @@ export const DashboardScreenExample = () => {
                     </div>
                 </DScreen.BarContent>
             </DScreen.HBar.Left>
-            <DScreen.HBar.Right resizeable>
+            <DScreen.HBar.Right>
                 <DScreen.BarContent>
                     <DScreen.Item>
                         Docs
@@ -90,70 +90,48 @@ export const DashboardScreenExample = () => {
             </DScreen.HBar.Right>
             <DScreen.Content>
                 <DScreen>
-                    <DScreen.HBar.Left resizeable>
-                        {(collapsed, collapse) => {
-                            return <>
-                                {!collapsed ?
-                                    <DScreen.BarContent p={"0"}>
-                                        <DScreen>
-                                            <DScreen.VBar.Top>
-                                                <DScreen.BarContent>
-                                                    <DScreen.Item onClick={openAll}>
-                                                        Open All
-                                                    </DScreen.Item>
-                                                    <DScreen.Item onClick={closeAll}>
-                                                        Close All
-                                                    </DScreen.Item>
-                                                </DScreen.BarContent>
-                                            </DScreen.VBar.Top>
-                                            <DScreen.VBar.Bottom>
-                                                <DScreen.BarContent>
-                                                    <DScreen.CollapsableItem onClick={collapse}>
-                                                        {collapsed ? <IconLayoutSidebarRightCollapse size={16}/> : <IconLayoutSidebarLeftCollapse size={16}/>}
-                                                    </DScreen.CollapsableItem>
-                                                </DScreen.BarContent>
-                                            </DScreen.VBar.Bottom>
-                                            <DScreen.Content p={0.5}>
-                                                {[1,1,1,1,1,1,1,1,1,1,1,1].map(() => {
-                                                    return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
-                                                        <DFolder controls={controls} name={"Google Cloud Flows"}>
-                                                            <DFolder.Item icon={<IconBrandAdobe size={12}/>} name={"Google Cloud Flows"}/>
-                                                            <DFolder.Item active name={"Google Cloud Flows"}/>
-                                                        </DFolder>
-                                                    </DFolder>
-                                                })}
-                                            </DScreen.Content>
-                                        </DScreen>
-                                    </DScreen.BarContent> : <DScreen.BarContent p={"0"}>
-                                        <DScreen>
-                                            <DScreen.VBar.Bottom>
-                                                <DScreen.BarContent>
-                                                    <DScreen.CollapsableItem onClick={collapse}>
-                                                        {collapsed ? <IconLayoutSidebarRightCollapse size={16}/> : <IconLayoutSidebarLeftCollapse size={16}/>}
-                                                    </DScreen.CollapsableItem>
-                                                </DScreen.BarContent>
-                                            </DScreen.VBar.Bottom>
-                                            <DScreen.Content>
-                                                <Button color={"info"}>
-                                                    <IconArrowDown/>
-                                                </Button>
-                                            </DScreen.Content>
-                                        </DScreen>
-                                    </DScreen.BarContent>}
-                            </>
-                        }}
-
+                    <DScreen.HBar.Left resizeable w={"300px"}>
+                        <DScreen.BarContent p={"0"}>
+                            <DScreen>
+                                <DScreen.VBar.Top>
+                                    <DScreen.BarContent>
+                                        <DScreen.Item onClick={openAll}>
+                                            Open All
+                                        </DScreen.Item>
+                                        <DScreen.Item onClick={closeAll}>
+                                            Close All
+                                        </DScreen.Item>
+                                    </DScreen.BarContent>
+                                </DScreen.VBar.Top>
+                                <DScreen.VBar.Bottom>
+                                    <DScreen.BarContent>
+                                        <Badge>Test</Badge>
+                                        <Badge>Test</Badge>
+                                    </DScreen.BarContent>
+                                </DScreen.VBar.Bottom>
+                                <DScreen.Content p={0.5}>
+                                    {[1,1,1,1,1,1,1,1,1,1,1,1].map(() => {
+                                        return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
+                                            <DFolder controls={controls} name={"Google Cloud Flows"}>
+                                                <DFolder.Item icon={<IconBrandAdobe size={12}/>} name={"Google Cloud Flows"}/>
+                                                <DFolder.Item active name={"Google Cloud Flows"}/>
+                                            </DFolder>
+                                        </DFolder>
+                                    })}
+                                </DScreen.Content>
+                            </DScreen>
+                        </DScreen.BarContent>
                     </DScreen.HBar.Left>
                     <DScreen.Content>
                         <DScreen>
-                            <DScreen.VBar.Top resizeable justify={"flex-end"}>
+                            <DScreen.VBar.Top justify={"flex-end"}>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Test Run
                                     </DScreen.Item>
                                 </DScreen.BarContent>
                             </DScreen.VBar.Top>
-                            <DScreen.VBar.Bottom resizeable>
+                            <DScreen.VBar.Bottom>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Logs

@@ -23,75 +23,6 @@
     position: relative;
     background: $primary;
 
-    &__resizable {
-      $height: 50px;
-
-      height: $height;
-      position: absolute;
-      background: transparent;
-      display: block;
-      width: 100%;
-      content: "";
-      left: 0;
-      cursor: ns-resize;
-
-      &-label {
-        @include box(false);
-        position: absolute;
-        z-index: 2;
-        left: 50%;
-        display: flex;
-        transform: translateX(-50%);
-        padding: .25rem;
-
-        &--top {
-          border-top-right-radius: 0;
-          border-top-left-radius: 0;
-          top: $height - ($height / 4);
-        }
-
-        &--bottom {
-          border-bottom-right-radius: 0;
-          border-bottom-left-radius: 0;
-          bottom: $height - ($height / 4);
-        }
-      }
-
-      &:hover {
-        //background: #29BF12;
-
-        &:after {
-          height: 1px;
-          width: 100%;
-          background: $info;
-          content: "";
-          position: absolute;
-          top: 0;
-        }
-      }
-
-      &--top {
-        bottom: ($height / 4) * -1;
-        z-index: 2;
-
-        &:hover::after {
-          top: $height - ($height / 4);
-        }
-      }
-
-      &--bottom {
-        top: ($height / 4) * -1;
-        z-index: 1;
-
-        &:hover::after {
-          top: ($height / 4) - 1px;
-        }
-      }
-
-
-      //border-color: $info !important;
-    }
-
     .d-screen__item {
       writing-mode: unset !important;
     }
@@ -103,9 +34,7 @@
       overflow: auto;
       display: none;
       gap: .5rem;
-      align-items: start;
-
-
+      align-items: center;
     }
 
     &--top {
@@ -123,7 +52,7 @@
     position: relative;
     background: $primary;
 
-    &__resizable {
+    &--resizable {
       $width: 50px;
 
       width: $width;
@@ -133,29 +62,9 @@
       height: 100%;
       content: "";
       top: 0;
+      right: ($width / 2) * -1;
+      z-index: 999999;
       cursor: ew-resize;
-
-      &-label {
-        @include box(false);
-        position: absolute;
-        top: 50%;
-        display: flex;
-        z-index: 2;
-        transform: translateY(-50%);
-        padding: .25rem;
-
-        &--left {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          left: $width - ($width / 4);
-        }
-
-        &--right {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-          right: $width - ($width / 4);
-        }
-      }
 
       &:hover {
         //background: #29BF12;
@@ -167,27 +76,9 @@
           content: "";
           position: absolute;
           top: 0;
+          left: ($width / 2);
         }
       }
-
-      &--left {
-        right: ($width / 4) * -1;
-        z-index: 2;
-
-        &:hover::after {
-          left: $width - ($width / 4);
-        }
-      }
-
-      &--right {
-        left: ($width / 4) * -1;
-        z-index: 1;
-
-        &:hover::after {
-          left: ($width / 4) - 1px;
-        }
-      }
-
 
       //border-color: $info !important;
     }
@@ -202,10 +93,10 @@
       gap: .5rem;
       padding: .5rem;
       height: 100%;
+      z-index: 0;
       width: 100%;
       position: relative;
       flex-direction: column;
-
     }
 
     &--left {
@@ -234,7 +125,6 @@
 
   &__content {
     color: white;
-    background: $primary;
     height: 100%;
     overflow: auto;
     width: 100%;
@@ -261,6 +151,6 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 9999999;
+    z-index: 2;
   }
 }

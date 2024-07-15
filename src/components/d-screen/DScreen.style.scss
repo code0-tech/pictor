@@ -52,7 +52,7 @@
     position: relative;
     background: $primary;
 
-    &--resizable {
+    &__resizable {
       $width: 50px;
 
       width: $width;
@@ -76,9 +76,25 @@
           content: "";
           position: absolute;
           top: 0;
-          left: ($width / 2);
         }
       }
+
+      &--left {
+        right: ($width / 2) * -1;
+
+        &:hover::after {
+          left: ($width / 2) + 1;
+        }
+      }
+
+      &--right {
+        left: ($width / 2) * -1;
+
+        &:hover::after {
+          left: ($width / 2) - 1;
+        }
+      }
+
 
       //border-color: $info !important;
     }

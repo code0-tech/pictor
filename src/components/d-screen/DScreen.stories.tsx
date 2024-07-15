@@ -81,7 +81,7 @@ export const DashboardScreenExample = () => {
                     </div>
                 </DScreen.BarContent>
             </DScreen.HBar.Left>
-            <DScreen.HBar.Right>
+            <DScreen.HBar.Right resizeable>
                 <DScreen.BarContent>
                     <DScreen.Item>
                         Docs

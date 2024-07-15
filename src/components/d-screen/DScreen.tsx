@@ -67,13 +67,22 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
 
             const mouseMove = (event: MouseEvent) => {
-
                 //calculate new width
                 const parentOfBar = barRef.current?.parentElement
-                const leftX = barRef.current?.getBoundingClientRect().left ?? 0
-                const horizontalX = event.clientX
-                const widthPixel = Math.max(Math.min((horizontalX - leftX), maxW), minW)
-                const widthPercent = Math.max(Math.min((((widthPixel) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+                let spacing, mousePosition, widthPixel, widthPercent
+
+                if (barType === "h" && type === "left") {
+                    spacing = barRef.current?.getBoundingClientRect().left ?? 0
+                    mousePosition = event.clientX
+                    widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
+                    widthPercent = Math.max(Math.min((((widthPixel) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+                } else if (barType === "h" && type === "right") {
+                    spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
+                    mousePosition = (parentOfBar?.offsetWidth ?? 0) - event.clientX
+                    widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
+                    widthPercent = Math.max(Math.min((((widthPixel) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
+                    console.log(widthPercent)
+                }
 
                 //set new width
                 console.log(widthPercent)
@@ -85,18 +94,24 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             const mouseUpListener = (event: MouseEvent) => {
                 console.log("mouseup")
                 window.removeEventListener("mousemove", mouseMove)
+                window.removeEventListener("touchmove", mouseMove)
                 window.removeEventListener("mouseup", mouseUpListener)
+                window.removeEventListener("touchend", mouseUpListener)
                 window.removeEventListener("selectstart", disableSelect)
             }
             window.addEventListener("mouseup", mouseUpListener)
+            window.addEventListener("touchend", mouseUpListener)
             window.addEventListener('selectstart', disableSelect);
             barRef.current && window.addEventListener("mousemove", mouseMove)
+            barRef.current && window.addEventListener("touchmove", mouseMove)
 
         }
         resizeRef.current && resizeRef.current?.addEventListener("mousedown", mouseDown)
+        resizeRef.current && resizeRef.current?.addEventListener("touchstart", mouseDown)
 
         return () => {
             window.removeEventListener("mousedown", mouseDown)
+            window.removeEventListener("touchstart", mouseDown)
         }
 
     }, [barRef, resizeRef]);
@@ -108,7 +123,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
     return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
-        {resizeable && <div ref={resizeRef} className={`d-screen__${barType}-bar--resizable`}/>}
+        {resizeable && <div ref={resizeRef} className={`d-screen__${barType}-bar__resizable d-screen__${barType}-bar__resizable--${type}`} {...rest}/>}
         {child}
     </div>
 }

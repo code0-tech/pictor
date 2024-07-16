@@ -54,8 +54,12 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
     useEffect(() => {
 
+        const startW = barRef.current?.offsetWidth ?? 0
+        const startH = barRef.current?.offsetHeight ?? 0
         const minW = barRef.current?.style.minWidth ? parseFloat(barRef.current.style.minWidth) : 0
         const maxW = barRef.current?.style.maxWidth ? parseFloat(barRef.current.style.maxWidth) : Infinity
+        const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current.style.minHeight) : 0
+        const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
 
         const mouseDown = () => {
             console.log("mousedown")
@@ -75,19 +79,37 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                     spacing = barRef.current?.getBoundingClientRect().left ?? 0
                     mousePosition = event.clientX
                     widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
-                    widthPercent = Math.max(Math.min((((widthPixel) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+                    const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
+                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
                 } else if (barType === "h" && type === "right") {
                     spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
                     mousePosition = (parentOfBar?.offsetWidth ?? 0) - event.clientX
                     widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
-                    widthPercent = Math.max(Math.min((((widthPixel) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
-                    console.log(widthPercent)
+                    const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
+                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
+                } else if (barType === "v" && type === "top") {
+                    spacing = barRef.current?.getBoundingClientRect().top ?? 0
+                    mousePosition = event.clientY
+                    widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
+                    const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
+                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetHeight ?? 0)) * 100), 100), 0)
+                } else if (barType === "v" && type === "bottom") {
+                    spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (parentOfBar?.offsetHeight ?? 0)
+                    mousePosition = (parentOfBar?.offsetHeight ?? 0) - event.clientY
+                    widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
+                    const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
+                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetHeight ?? 0))) * 100), 100), 0)
                 }
 
                 //set new width
-                console.log(widthPercent)
-                if (barRef.current) barRef.current.style.minWidth = `${widthPercent}%`
-                if (barRef.current) barRef.current.style.width = `${widthPercent}%`
+                if (barType === "h" && barRef.current) {
+                    barRef.current.style.minWidth = `${widthPercent}%`
+                    barRef.current.style.width = `${widthPercent}%`
+                } else if (barType === "v" && barRef.current) {
+                    barRef.current.style.minHeight = `${widthPercent}%`
+                    barRef.current.style.height = `${widthPercent}%`
+                }
+
 
             }
 

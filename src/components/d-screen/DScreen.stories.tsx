@@ -33,14 +33,14 @@ export const DashboardScreenExample = () => {
     return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
-                <DScreen.BarContent mediaMaxWidth={800}>
+                <DScreen.BarContent align={"center"} mediaMaxWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>...</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Sagittarius</Badge>
                 </DScreen.BarContent>
-                <DScreen.BarContent mediaMinWidth={800}>
+                <DScreen.BarContent align={"center"} mediaMinWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Organisations</Badge>
@@ -124,14 +124,14 @@ export const DashboardScreenExample = () => {
                     </DScreen.HBar.Left>
                     <DScreen.Content>
                         <DScreen>
-                            <DScreen.VBar.Top justify={"flex-end"}>
+                            <DScreen.VBar.Top resizeable justify={"flex-end"}>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Test Run
                                     </DScreen.Item>
                                 </DScreen.BarContent>
                             </DScreen.VBar.Top>
-                            <DScreen.VBar.Bottom>
+                            <DScreen.VBar.Bottom resizeable>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Logs

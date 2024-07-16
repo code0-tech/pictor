@@ -33,8 +33,6 @@
       width: 100%;
       content: "";
       left: 0;
-      bottom: ($height / 2) * -1;
-      z-index: 999999;
       cursor: ns-resize;
 
       &:hover {
@@ -51,18 +49,20 @@
       }
 
       &--top {
-        bottom: ($height / 2) * -1;
+        bottom: ($height / 4) * -1;
+        z-index: 999999;
 
         &:hover::after {
-          top: ($height / 2) - 1;
+          top: $height - ($height / 4);
         }
       }
 
       &--bottom {
-        top: ($height / 2) * -1;
+        top: ($height / 4) * -1;
+        z-index: 999998;
 
         &:hover::after {
-          top: ($height / 2) - 1;
+          top: ($height / 4);
         }
       }
 

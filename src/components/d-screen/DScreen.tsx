@@ -70,32 +70,32 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 event.preventDefault();
             }
 
-            const mouseMove = (event: MouseEvent) => {
+            const mouseMove = (event: MouseEvent | TouchEvent) => {
                 //calculate new width
                 const parentOfBar = barRef.current?.parentElement
                 let spacing, mousePosition, widthPixel, widthPercent
 
                 if (barType === "h" && type === "left") {
                     spacing = barRef.current?.getBoundingClientRect().left ?? 0
-                    mousePosition = event.clientX
+                    mousePosition = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
                     widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
                     const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
                     widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
                 } else if (barType === "h" && type === "right") {
                     spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
-                    mousePosition = (parentOfBar?.offsetWidth ?? 0) - event.clientX
+                    mousePosition = (parentOfBar?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
                     widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
                     const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
                     widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
                 } else if (barType === "v" && type === "top") {
                     spacing = barRef.current?.getBoundingClientRect().top ?? 0
-                    mousePosition = event.clientY
+                    mousePosition = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
                     widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
                     const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
                     widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetHeight ?? 0)) * 100), 100), 0)
                 } else if (barType === "v" && type === "bottom") {
                     spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (parentOfBar?.offsetHeight ?? 0)
-                    mousePosition = (parentOfBar?.offsetHeight ?? 0) - event.clientY
+                    mousePosition = (parentOfBar?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
                     widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
                     const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
                     widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetHeight ?? 0))) * 100), 100), 0)

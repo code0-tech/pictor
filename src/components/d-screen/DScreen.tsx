@@ -4,6 +4,7 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Code0Component} from "../../utils/types";
 import "./DScreen.style.scss"
 import {getChild, mergeCode0Props} from "../../utils/utils";
+import {IconLayoutBottombarExpand} from "@tabler/icons-react";
 
 export interface DScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactElement<Omit<DScreenVBarProps, "type"> & DScreenContentProps>[]
@@ -49,6 +50,7 @@ export interface DScreenHBarProps extends DScreenBarProps {
 const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (props) => {
     const {type, children, collapsed = false, resizeable = false, ...rest} = props
     const [stateCollapsed, setStateCollapsed] = useState(collapsed)
+    const [sizePercent, setSizePercent] = useState<number>(Infinity)
     const barRef = useRef<HTMLDivElement | null>(null)
     const resizeRef = useRef<HTMLDivElement | null>(null)
 
@@ -62,7 +64,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
 
         const mouseDown = () => {
-            console.log("mousedown")
             const selection = document.getSelection()
             if (selection) selection.removeAllRanges()
 
@@ -71,43 +72,50 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
 
             const mouseMove = (event: MouseEvent | TouchEvent) => {
+
+                setStateCollapsed(false)
+
                 //calculate new width
                 const parentOfBar = barRef.current?.parentElement
-                let spacing, mousePosition, widthPixel, widthPercent
+                let localSizePercent = Infinity
 
                 if (barType === "h" && type === "left") {
-                    spacing = barRef.current?.getBoundingClientRect().left ?? 0
-                    mousePosition = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
-                    widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
+                    const spacing = barRef.current?.getBoundingClientRect().left ?? 0
+                    const mousePosition = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
+                    const widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
                     const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
-                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+                    localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
                 } else if (barType === "h" && type === "right") {
-                    spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
-                    mousePosition = (parentOfBar?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
-                    widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
+                    const spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
+                    const mousePosition = (parentOfBar?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
+                    const widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
                     const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
-                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
+                    localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
                 } else if (barType === "v" && type === "top") {
-                    spacing = barRef.current?.getBoundingClientRect().top ?? 0
-                    mousePosition = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
-                    widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
+                    const spacing = barRef.current?.getBoundingClientRect().top ?? 0
+                    const mousePosition = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
+                    const widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
                     const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
-                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetHeight ?? 0)) * 100), 100), 0)
+                    localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetHeight ?? 0)) * 100), 100), 0)
                 } else if (barType === "v" && type === "bottom") {
-                    spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (parentOfBar?.offsetHeight ?? 0)
-                    mousePosition = (parentOfBar?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
-                    widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
+                    const spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (parentOfBar?.offsetHeight ?? 0)
+                    const mousePosition = (parentOfBar?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
+                    const widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
                     const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
-                    widthPercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetHeight ?? 0))) * 100), 100), 0)
+                    localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetHeight ?? 0))) * 100), 100), 0)
                 }
+
+                //set to state
+                setSizePercent(localSizePercent)
 
                 //set new width
                 if (barType === "h" && barRef.current) {
-                    barRef.current.style.minWidth = `${widthPercent}%`
-                    barRef.current.style.width = `${widthPercent}%`
+                    barRef.current.style.minWidth = `${localSizePercent}%`
+                    barRef.current.style.maxWidth = `${localSizePercent}%`
+                    barRef.current.style.width = `${localSizePercent}%`
                 } else if (barType === "v" && barRef.current) {
-                    barRef.current.style.minHeight = `${widthPercent}%`
-                    barRef.current.style.height = `${widthPercent}%`
+                    barRef.current.style.minHeight = `${localSizePercent}%`
+                    barRef.current.style.height = `${localSizePercent}%`
                 }
             }
 
@@ -137,13 +145,27 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     }, [barRef, resizeRef]);
 
     const collapse = () => {
-        setStateCollapsed(prevState => !prevState)
+        setStateCollapsed(prevState => {
+            if (!prevState && resizeable && barRef.current && barType === "h") {
+                barRef.current.style.minWidth = ""
+                barRef.current.style.width = ""
+            } else if (!prevState && resizeable && barRef.current && barType === "v") {
+                barRef.current.style.minHeight = ""
+                barRef.current.style.height = ""
+            }
+            return !prevState
+        })
+
     }
 
     const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
     return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
-        {resizeable && <div ref={resizeRef} className={`d-screen__${barType}-bar__resizable d-screen__${barType}-bar__resizable--${type}`} {...rest}/>}
+        {resizeable && <div ref={resizeRef} className={`d-screen__${barType}-bar__resizable d-screen__${barType}-bar__resizable--${type}`} {...rest}>
+            {sizePercent <= 1 && <div className={`d-screen__${barType}-bar__resizable-label d-screen__${barType}-bar__resizable-label--${type}`}>
+                <IconLayoutBottombarExpand/>
+            </div>}
+        </div>}
         {child}
     </div>
 }

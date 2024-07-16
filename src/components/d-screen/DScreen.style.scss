@@ -35,6 +35,28 @@
       left: 0;
       cursor: ns-resize;
 
+      &-label {
+        @include box(false);
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        display: flex;
+        transform: translateX(-50%);
+        padding: .25rem;
+
+        &--top {
+          border-top-right-radius: 0;
+          border-top-left-radius: 0;
+          top: $height - ($height / 4);
+        }
+
+        &--bottom {
+          border-bottom-right-radius: 0;
+          border-bottom-left-radius: 0;
+          bottom: $height - ($height / 4);
+        }
+      }
+
       &:hover {
         //background: #29BF12;
 
@@ -50,7 +72,7 @@
 
       &--top {
         bottom: ($height / 4) * -1;
-        z-index: 999999;
+        z-index: 2;
 
         &:hover::after {
           top: $height - ($height / 4);
@@ -59,10 +81,10 @@
 
       &--bottom {
         top: ($height / 4) * -1;
-        z-index: 999998;
+        z-index: 1;
 
         &:hover::after {
-          top: ($height / 4);
+          top: ($height / 4) - 1px;
         }
       }
 
@@ -82,6 +104,8 @@
       display: none;
       gap: .5rem;
       align-items: start;
+
+
     }
 
     &--top {
@@ -109,9 +133,29 @@
       height: 100%;
       content: "";
       top: 0;
-      right: ($width / 2) * -1;
-      z-index: 999999;
       cursor: ew-resize;
+
+      &-label {
+        @include box(false);
+        position: absolute;
+        top: 50%;
+        display: flex;
+        z-index: 2;
+        transform: translateY(-50%);
+        padding: .25rem;
+
+        &--left {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+          left: $width - ($width / 4);
+        }
+
+        &--right {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+          right: $width - ($width / 4);
+        }
+      }
 
       &:hover {
         //background: #29BF12;
@@ -127,18 +171,20 @@
       }
 
       &--left {
-        right: ($width / 2) * -1;
+        right: ($width / 4) * -1;
+        z-index: 2;
 
         &:hover::after {
-          left: ($width / 2) + 1;
+          left: $width - ($width / 4);
         }
       }
 
       &--right {
-        left: ($width / 2) * -1;
+        left: ($width / 4) * -1;
+        z-index: 1;
 
         &:hover::after {
-          left: ($width / 2) - 1;
+          left: ($width / 4) - 1px;
         }
       }
 
@@ -156,10 +202,10 @@
       gap: .5rem;
       padding: .5rem;
       height: 100%;
-      z-index: 0;
       width: 100%;
       position: relative;
       flex-direction: column;
+
     }
 
     &--left {
@@ -188,6 +234,7 @@
 
   &__content {
     color: white;
+    background: $primary;
     height: 100%;
     overflow: auto;
     width: 100%;
@@ -214,6 +261,6 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 2;
+    z-index: 9999999;
   }
 }

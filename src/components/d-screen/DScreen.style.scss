@@ -23,6 +23,53 @@
     position: relative;
     background: $primary;
 
+    &__resizable {
+      $height: 50px;
+
+      height: $height;
+      position: absolute;
+      background: transparent;
+      display: block;
+      width: 100%;
+      content: "";
+      left: 0;
+      bottom: ($height / 2) * -1;
+      z-index: 999999;
+      cursor: ns-resize;
+
+      &:hover {
+        //background: #29BF12;
+
+        &:after {
+          height: 1px;
+          width: 100%;
+          background: $info;
+          content: "";
+          position: absolute;
+          top: 0;
+        }
+      }
+
+      &--top {
+        bottom: ($height / 2) * -1;
+
+        &:hover::after {
+          top: ($height / 2) - 1;
+        }
+      }
+
+      &--bottom {
+        top: ($height / 2) * -1;
+
+        &:hover::after {
+          top: ($height / 2) - 1;
+        }
+      }
+
+
+      //border-color: $info !important;
+    }
+
     .d-screen__item {
       writing-mode: unset !important;
     }
@@ -34,7 +81,7 @@
       overflow: auto;
       display: none;
       gap: .5rem;
-      align-items: center;
+      align-items: start;
     }
 
     &--top {

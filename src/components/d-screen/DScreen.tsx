@@ -109,8 +109,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                     barRef.current.style.minHeight = `${widthPercent}%`
                     barRef.current.style.height = `${widthPercent}%`
                 }
-
-                event.preventDefault()
             }
 
             const mouseUpListener = (event: MouseEvent) => {

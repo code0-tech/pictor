@@ -19,9 +19,7 @@ const DFullScreen: React.FC<DFullScreenProps> = props => {
     }, [])
 
     return <div style={{
-        position: "relative",
-        overflow: "hidden",
-        overscrollBehavior: "contain",
+        position: "fixed",
         ...(dimensions[0] ? {width: dimensions[0]} : {}),
         ...(dimensions[1] ? {height: dimensions[1]} : {})
     }}>

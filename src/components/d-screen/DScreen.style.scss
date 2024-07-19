@@ -24,7 +24,7 @@
     background: $primary;
 
     &__resizable {
-      $height: 50px;
+      $height: .5rem;
 
       height: $height;
       position: absolute;
@@ -124,11 +124,11 @@
     background: $primary;
 
     &__resizable {
-      $width: 50px;
+      $width: .5rem;
 
       width: $width;
       position: absolute;
-      background: transparent;
+      background: red;
       display: block;
       height: 100%;
       content: "";
@@ -147,13 +147,13 @@
         &--left {
           border-top-left-radius: 0;
           border-bottom-left-radius: 0;
-          left: $width - ($width / 4);
+          left: calc($width - ($width / 4));
         }
 
         &--right {
           border-top-right-radius: 0;
           border-bottom-right-radius: 0;
-          right: $width - ($width / 4);
+          right: calc($width - ($width / 4));
         }
       }
 
@@ -171,20 +171,20 @@
       }
 
       &--left {
-        right: ($width / 4) * -1;
+        right: calc(($width / 4) * -1);
         z-index: 2;
 
         &:hover::after {
-          left: $width - ($width / 4);
+          left: calc($width - ($width / 4));
         }
       }
 
       &--right {
-        left: ($width / 4) * -1;
+        left: calc(($width / 4) * -1);
         z-index: 1;
 
         &:hover::after {
-          left: ($width / 4) - 1px;
+          left: calc(($width / 4) - 1px);
         }
       }
 

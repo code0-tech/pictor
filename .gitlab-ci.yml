@@ -12,7 +12,7 @@ docs:preview:
     - if: $C0_UPDATE_SNAPSHOTS == null && $C0_GH_REF != "refs/heads/main"
 
 storybook:build:
-  image: node:20.15.1
+  image: node:20.16.0
   stage: build
   script:
     - npm ci

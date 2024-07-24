@@ -24,7 +24,7 @@
     background: $primary;
 
     &__resizable {
-      $height: .5rem;
+      $height: .5rem + (.5rem / 4);
 
       height: $height;
       position: absolute;
@@ -124,7 +124,7 @@
     background: $primary;
 
     &__resizable {
-      $width: .5rem;
+      $width: .5rem + (.5rem / 4);
 
       width: $width;
       position: absolute;

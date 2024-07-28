@@ -23,73 +23,28 @@
     position: relative;
     background: $primary;
 
-    &__resizable {
-      $height: .5rem + (.5rem / 4);
-
-      height: $height;
+    &__resizable-label {
+      @include box(false);
       position: absolute;
-      background: transparent;
-      display: block;
-      width: 100%;
-      content: "";
-      left: 0;
-      cursor: ns-resize;
-
-      &-label {
-        @include box(false);
-        position: absolute;
-        z-index: 2;
-        left: 50%;
-        display: flex;
-        transform: translateX(-50%);
-        padding: .25rem;
-
-        &--top {
-          border-top-right-radius: 0;
-          border-top-left-radius: 0;
-          top: calc($height - ($height / 4));
-        }
-
-        &--bottom {
-          border-bottom-right-radius: 0;
-          border-bottom-left-radius: 0;
-          bottom: calc($height - ($height / 4));
-        }
-      }
-
-      &:hover {
-        //background: #29BF12;
-
-        &:after {
-          height: 1px;
-          width: 100%;
-          background: $info;
-          content: "";
-          position: absolute;
-          top: 0;
-        }
-      }
+      z-index: 2;
+      left: 50%;
+      display: flex;
+      transform: translateX(-50%);
+      padding: .25rem;
 
       &--top {
-        bottom: calc(($height / 4) * -1);
-        z-index: 2;
-
-        &:hover::after {
-          top: calc($height - ($height / 4));
-        }
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+        transform: translateX(-50%) translateY(100%);
+        bottom: 0;
       }
 
       &--bottom {
-        top: calc(($height / 4) * -1);
-        z-index: 1;
-
-        &:hover::after {
-          top: calc(($height / 4) - 1px);
-        }
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+        transform: translateX(-50%) translateY(-100%);
+        top: 0;
       }
-
-
-      //border-color: $info !important;
     }
 
     .d-screen__item {
@@ -123,73 +78,28 @@
     position: relative;
     background: $primary;
 
-    &__resizable {
-      $width: .5rem + (.5rem / 4);
-
-      width: $width;
+    &__resizable-label {
+      @include box(false);
       position: absolute;
-      background: transparent;
-      display: block;
-      height: 100%;
-      content: "";
-      top: 0;
-      cursor: ew-resize;
-
-      &-label {
-        @include box(false);
-        position: absolute;
-        top: 50%;
-        display: flex;
-        z-index: 2;
-        transform: translateY(-50%);
-        padding: .25rem;
-
-        &--left {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          left: calc($width - ($width / 4));
-        }
-
-        &--right {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-          right: calc($width - ($width / 4));
-        }
-      }
-
-      &:hover {
-        //background: #29BF12;
-
-        &:after {
-          width: 1px;
-          height: 100%;
-          background: $info;
-          content: "";
-          position: absolute;
-          top: 0;
-        }
-      }
+      top: 50%;
+      display: flex;
+      z-index: 2;
+      transform: translateY(-50%);
+      padding: .25rem;
 
       &--left {
-        right: calc(($width / 4) * -1);
-        z-index: 2;
-
-        &:hover::after {
-          left: calc($width - ($width / 4));
-        }
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        transform: translateY(-50%) translateX(100%);
+        right: 0;
       }
 
       &--right {
-        left: calc(($width / 4) * -1);
-        z-index: 1;
-
-        &:hover::after {
-          left: calc(($width / 4) - 1px);
-        }
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        transform: translateY(-50%) translateX(-100%);
+        left: 0;
       }
-
-
-      //border-color: $info !important;
     }
 
     .d-screen__item {

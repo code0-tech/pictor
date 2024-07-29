@@ -3,16 +3,14 @@ import React from "react";
 import DScreen from "./DScreen";
 import Badge from "../badge/Badge";
 import {
-    IconApi, IconArrowDown, IconBrandAdobe,
+    IconBrandAdobe,
     IconDatabase,
     IconHierarchy3,
-    IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse,
     IconSettings,
     IconTicket
 } from "@tabler/icons-react";
 import Text from "../Text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
-import Button from "../button/Button";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
 
 const meta: Meta = {

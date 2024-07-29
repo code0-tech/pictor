@@ -152,7 +152,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
 
             const resize = document.querySelector("[data-resize]")
-            if (resize) document.body.style.cursor = "ew-resize"
+            if (resize) document.body.style.cursor = resize.hasAttribute("data-horizontal-bar") ? "col-resize" : "row-resize"
             else document.body.style.cursor = ""
         }
 
@@ -276,7 +276,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
     const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
-    return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
+    return <div ref={barRef} {...(barType === "h" ? {"data-horizontal-bar": true} : {"data-vertical-bar": true})} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
 
         {sizePercent <= 1 && <div ref={barResizeRef}
                                   className={`d-screen__${barType}-bar__resizable-label d-screen__${barType}-bar__resizable-label--${type}`}>

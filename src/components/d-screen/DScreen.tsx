@@ -186,7 +186,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
 
             const mouseUpListener = (event: MouseEvent) => {
-                manageResizeStyle(false)
+                const inResizeArea = isInResizeArea(event)
+                manageResizeStyle(inResizeArea)
 
                 window.removeEventListener("touchcancel", mouseUpListener)
                 window.removeEventListener("touchend", mouseUpListener)

@@ -61,6 +61,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     const [stateCollapsed, setStateCollapsed] = useState(collapsed)
     const [sizePercent, setSizePercent] = useState<number>(Infinity)
     const barRef = useRef<HTMLDivElement | null>(null)
+    const barResizeRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
 
@@ -71,37 +72,69 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current.style.minHeight) : 0
         const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
 
+        const calcElementCoordinates = (element: HTMLElement | null) => {
+            const height = element?.offsetHeight ?? 0
+            const width = element?.offsetWidth ?? 0
+
+            const leftX = element?.getBoundingClientRect().left ?? 0
+            const rightX = leftX + width
+            const topY = element?.getBoundingClientRect().top ?? 0
+            const bottomY = topY + height
+
+            return {
+                height,
+                width,
+                leftX,
+                rightX,
+                topY,
+                bottomY
+            }
+        }
+
+        const mouseInArea = (coordinates: any, mouseX: number, mouseY: number) => {
+            return mouseX >= coordinates.leftX
+                && mouseX <= coordinates.rightX
+                && mouseY >= coordinates.topY
+                && mouseY <= coordinates.bottomY
+        }
+
         const isInResizeArea = (event: MouseEvent | TouchEvent) => {
             let inResizeArea = false
 
             const mousePositionY = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
             const mousePositionX = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
 
-            const height = barRef.current?.offsetHeight ?? 0
-            const width = barRef.current?.offsetWidth ?? 0
+            const barCoordinates = calcElementCoordinates(barRef.current)
+            const barResizeCoordinates = calcElementCoordinates(barResizeRef.current)
 
-            const leftX = barRef.current?.getBoundingClientRect().left ?? 0
-            const rightX = leftX + width
-            const topY = barRef.current?.getBoundingClientRect().top ?? 0
-            const bottomY = topY + height
+            const mouseOverResize = mouseInArea(barResizeCoordinates, mousePositionX, mousePositionY)
 
             if (barType === "h" && type === "left")
-                inResizeArea = mousePositionX >= (rightX - resizeAreaDimensions) && mousePositionX <= (rightX + resizeAreaDimensions)
+                inResizeArea = (mousePositionX >= (barCoordinates.rightX - resizeAreaDimensions)
+                    && mousePositionX <= (barCoordinates.rightX + resizeAreaDimensions))
+                    || mouseOverResize
             else if (barType === "h" && type === "right")
-                inResizeArea = mousePositionX >= (leftX - resizeAreaDimensions) && mousePositionX <= (leftX + resizeAreaDimensions)
+                inResizeArea = (mousePositionX >= (barCoordinates.leftX - resizeAreaDimensions)
+                    && mousePositionX <= (barCoordinates.leftX + resizeAreaDimensions))
+                    || mouseOverResize
             else if (barType === "v" && type === "top")
-                inResizeArea = mousePositionY >= (bottomY - resizeAreaDimensions) && mousePositionY <= (bottomY + resizeAreaDimensions) && mousePositionX >= leftX && mousePositionX <= rightX
+                inResizeArea = (mousePositionY >= (barCoordinates.bottomY - resizeAreaDimensions)
+                    && mousePositionY <= (barCoordinates.bottomY + resizeAreaDimensions)
+                    && mousePositionX >= barCoordinates.leftX
+                    && mousePositionX <= barCoordinates.rightX)
+                    || mouseOverResize
             else if (barType === "v" && type === "bottom")
-                inResizeArea = mousePositionY >= (topY - resizeAreaDimensions) && mousePositionY <= (topY + resizeAreaDimensions) && mousePositionX >= leftX && mousePositionX <= rightX
+                inResizeArea = (mousePositionY >= (barCoordinates.topY - resizeAreaDimensions)
+                    && mousePositionY <= (barCoordinates.topY + resizeAreaDimensions)
+                    && mousePositionX >= barCoordinates.leftX
+                    && mousePositionX <= barCoordinates.rightX)
+                    || mouseOverResize
 
-            if (inResizeArea && barRef.current) {
-                barRef.current.dataset!!.resize = 'true'
-            } else if (!inResizeArea && barRef.current) {
-                delete barRef.current.dataset!!.resize
-            }
+            if (inResizeArea && barRef.current) barRef.current.dataset!!.resize = 'true'
+            else if (!inResizeArea && barRef.current) delete barRef.current.dataset!!.resize
 
             const barParent = barRef.current?.parentElement
-            const barContent = barParent?.querySelectorAll(":scope > [data-content]")  ?? []
+            const barContent = barParent?.querySelectorAll(":scope > [data-content]") ?? []
             const barActiveChildrenBars = barContent[0]?.querySelectorAll("[data-resize]") ?? []
             const barActiveBars = barParent?.querySelectorAll("[data-resize]") ?? []
 
@@ -225,7 +258,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             window.removeEventListener("mousedown", mouseDown)
         }
 
-    }, [barRef]);
+    }, [barRef, barResizeRef]);
 
     const collapse = () => {
         setStateCollapsed(prevState => {
@@ -245,8 +278,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
     return <div ref={barRef} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
 
-        {sizePercent <= 1 && <div
-            className={`d-screen__${barType}-bar__resizable-label d-screen__${barType}-bar__resizable-label--${type}`}>
+        {sizePercent <= 1 && <div ref={barResizeRef}
+                                  className={`d-screen__${barType}-bar__resizable-label d-screen__${barType}-bar__resizable-label--${type}`}>
             <IconLayoutBottombarExpand/>
         </div>}
 

@@ -20,9 +20,9 @@ const DScreen: React.FC<DScreenProps> = (props) => {
     return <div className={"d-screen"}>
         {vBarTop ? vBarTop : null}
         {content ? (
-            <div className={"d-screen__v-content"}>
+            <div data-content className={"d-screen__v-content"}>
                 {hBarLeft ? hBarLeft : null}
-                <div className={"d-screen__h-content"}>
+                <div data-content className={"d-screen__h-content"}>
                     {content}
                 </div>
                 {hBarRight ? hBarRight : null}
@@ -72,6 +72,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
 
         const isInResizeArea = (event: MouseEvent | TouchEvent) => {
+            let inResizeArea = false
+
             const mousePositionY = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
             const mousePositionX = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
 
@@ -83,8 +85,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             const topY = barRef.current?.getBoundingClientRect().top ?? 0
             const bottomY = topY + height
 
-            let inResizeArea
-
             if (barType === "h" && type === "left")
                 inResizeArea = mousePositionX >= (rightX - resizeAreaDimensions) && mousePositionX <= (rightX + resizeAreaDimensions)
             else if (barType === "h" && type === "right")
@@ -94,20 +94,28 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             else if (barType === "v" && type === "bottom")
                 inResizeArea = mousePositionY >= (topY - resizeAreaDimensions) && mousePositionY <= (topY + resizeAreaDimensions) && mousePositionX >= leftX && mousePositionX <= rightX
 
-            return inResizeArea ?? false
+            if (inResizeArea && barRef.current) {
+                barRef.current.dataset!!.resize = 'true'
+            } else if (!inResizeArea && barRef.current) {
+                delete barRef.current.dataset!!.resize
+            }
+
+            const barParent = barRef.current?.parentElement
+            const barContent = barParent?.querySelectorAll(":scope > [data-content]")  ?? []
+            const barActiveChildrenBars = barContent[0]?.querySelectorAll("[data-resize]") ?? []
+            const barActiveBars = barParent?.querySelectorAll("[data-resize]") ?? []
+
+            return inResizeArea && (barActiveChildrenBars.length < 1) && (barActiveBars.length < 2)
         }
 
         const manageResizeStyle = (isInResizeArea: boolean) => {
             const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
             const border = `border${[...oppositeType][0].toUpperCase() + [...oppositeType].slice(1).join('')}Color` as "borderTopColor" | "borderLeftColor" | "borderBottomColor" | "borderRightColor"
 
-
             if (isInResizeArea && barRef.current) {
                 barRef.current.style[border] = "#70ffb2"
-                barRef.current.dataset!!.resize = 'true'
             } else if (!isInResizeArea && barRef.current) {
                 barRef.current.style[border] = ""
-                delete barRef.current.dataset!!.resize
             }
 
             const resize = document.querySelector("[data-resize]")

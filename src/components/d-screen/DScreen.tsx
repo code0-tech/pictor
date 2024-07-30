@@ -59,9 +59,11 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         ...rest
     } = props
     const [stateCollapsed, setStateCollapsed] = useState(collapsed)
-    const [sizePercent, setSizePercent] = useState<number>(Infinity)
+    const [sizePercent, setSizePercent] = useState<{left: number, right: number, top: number, bottom: number}>({left: Infinity, right: Infinity, top: Infinity, bottom: Infinity})
     const barRef = useRef<HTMLDivElement | null>(null)
     const barResizeRef = useRef<HTMLDivElement | null>(null)
+
+    const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
 
     useEffect(() => {
 
@@ -72,9 +74,9 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current.style.minHeight) : 0
         const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
 
-        const calcElementCoordinates = (element: HTMLElement | null) => {
-            const height = element?.offsetHeight ?? 0
-            const width = element?.offsetWidth ?? 0
+        const calcElementCoordinates = (element: Element | null | undefined) => {
+            const height = element?.clientHeight ?? 0
+            const width = element?.clientWidth ?? 0
 
             const leftX = element?.getBoundingClientRect().left ?? 0
             const rightX = leftX + width
@@ -109,6 +111,9 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
             const mouseOverResize = mouseInArea(barResizeCoordinates, mousePositionX, mousePositionY)
 
+            const barParent = barRef.current?.parentElement
+
+            //TODO: better implementation of dynamic resize areas
             if (barType === "h" && type === "left")
                 inResizeArea = (mousePositionX >= (barCoordinates.rightX - resizeAreaDimensions)
                     && mousePositionX <= (barCoordinates.rightX + resizeAreaDimensions))
@@ -117,23 +122,43 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 inResizeArea = (mousePositionX >= (barCoordinates.leftX - resizeAreaDimensions)
                     && mousePositionX <= (barCoordinates.leftX + resizeAreaDimensions))
                     || mouseOverResize
-            else if (barType === "v" && type === "top")
-                inResizeArea = (mousePositionY >= (barCoordinates.bottomY - resizeAreaDimensions)
-                    && mousePositionY <= (barCoordinates.bottomY + resizeAreaDimensions)
-                    && mousePositionX >= barCoordinates.leftX
-                    && mousePositionX <= barCoordinates.rightX)
+            else if (barType === "v" && type === "top") {
+
+                const bottomBar = barParent?.querySelector(".d-screen__v-bar--bottom")
+                const bottomBarCoordinates = calcElementCoordinates(bottomBar)
+
+                const bottomBarTopY = bottomBarCoordinates.topY - resizeAreaDimensions
+                const topBarBottomY = barCoordinates.bottomY + resizeAreaDimensions
+
+                const clampedDistance = Math.max(topBarBottomY - bottomBarTopY, 0)
+
+                inResizeArea = (mousePositionY >= (barCoordinates.bottomY - (resizeAreaDimensions + (clampedDistance / 2)))
+                        && mousePositionY <= (barCoordinates.bottomY + (resizeAreaDimensions - (clampedDistance / 2)))
+                        && mousePositionX >= barCoordinates.leftX
+                        && mousePositionX <= barCoordinates.rightX)
                     || mouseOverResize
-            else if (barType === "v" && type === "bottom")
-                inResizeArea = (mousePositionY >= (barCoordinates.topY - resizeAreaDimensions)
-                    && mousePositionY <= (barCoordinates.topY + resizeAreaDimensions)
-                    && mousePositionX >= barCoordinates.leftX
-                    && mousePositionX <= barCoordinates.rightX)
+            } else if (barType === "v" && type === "bottom"){
+
+                const topBar = barParent?.querySelector(".d-screen__v-bar--top")
+                const topBarCoordinates = calcElementCoordinates(topBar)
+
+                const topBarBottomY = topBarCoordinates.bottomY + resizeAreaDimensions
+                const bottomBarTopY = barCoordinates.topY - resizeAreaDimensions
+
+                const clampedDistance = Math.max(topBarBottomY - bottomBarTopY, 0)
+
+                inResizeArea = (mousePositionY >= (barCoordinates.topY - (resizeAreaDimensions - (clampedDistance / 2)))
+                        && mousePositionY <= (barCoordinates.topY + (resizeAreaDimensions + (clampedDistance / 2)))
+                        && mousePositionX >= barCoordinates.leftX
+                        && mousePositionX <= barCoordinates.rightX)
                     || mouseOverResize
+
+            }
+
 
             if (inResizeArea && barRef.current) barRef.current.dataset!!.resize = 'true'
             else if (!inResizeArea && barRef.current) delete barRef.current.dataset!!.resize
 
-            const barParent = barRef.current?.parentElement
             const barContent = barParent?.querySelectorAll(":scope > [data-content]") ?? []
             const barActiveChildrenBars = barContent[0]?.querySelectorAll("[data-resize]") ?? []
             const barActiveBars = barParent?.querySelectorAll("[data-resize]") ?? []
@@ -142,7 +167,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         }
 
         const manageResizeStyle = (isInResizeArea: boolean) => {
-            const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
             const border = `border${[...oppositeType][0].toUpperCase() + [...oppositeType].slice(1).join('')}Color` as "borderTopColor" | "borderLeftColor" | "borderBottomColor" | "borderRightColor"
 
             if (isInResizeArea && barRef.current) {
@@ -152,7 +176,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
 
             const resize = document.querySelector("[data-resize]")
-            if (resize) document.body.style.cursor = resize.hasAttribute("data-horizontal-bar") ? "col-resize" : "row-resize"
+            if (resize) document.body.style.cursor = resize.getAttribute("data-bar-axis") == "horizontal" ? "col-resize" : "row-resize"
             else document.body.style.cursor = ""
         }
 
@@ -161,7 +185,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             setStateCollapsed(false)
 
             //calculate new width
-            const parentOfBar = barRef.current?.parentElement
+            const barParent = barRef.current?.parentElement
             let localSizePercent = Infinity
 
             if (barType === "h" && type === "left") {
@@ -169,29 +193,26 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 const mousePosition = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
                 const widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
                 const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
-                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetWidth ?? 0)) * 100), 100), 0)
+                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (barParent?.offsetWidth ?? 0)) * 100), 100), 0)
             } else if (barType === "h" && type === "right") {
-                const spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (parentOfBar?.offsetWidth ?? 0)
-                const mousePosition = (parentOfBar?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
+                const spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (barParent?.offsetWidth ?? 0)
+                const mousePosition = (barParent?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
                 const widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
                 const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
-                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetWidth ?? 0))) * 100), 100), 0)
+                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((barParent?.offsetWidth ?? 0))) * 100), 100), 0)
             } else if (barType === "v" && type === "top") {
                 const spacing = barRef.current?.getBoundingClientRect().top ?? 0
                 const mousePosition = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
                 const widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
                 const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
-                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (parentOfBar?.offsetHeight ?? 0)) * 100), 100), 0)
+                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (barParent?.offsetHeight ?? 0)) * 100), 100), 0)
             } else if (barType === "v" && type === "bottom") {
-                const spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (parentOfBar?.offsetHeight ?? 0)
-                const mousePosition = (parentOfBar?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
+                const spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (barParent?.offsetHeight ?? 0)
+                const mousePosition = (barParent?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
                 const widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
                 const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
-                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((parentOfBar?.offsetHeight ?? 0))) * 100), 100), 0)
+                localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((barParent?.offsetHeight ?? 0))) * 100), 100), 0)
             }
-
-            //set to state
-            setSizePercent(localSizePercent)
 
             //set new width
             if (barType === "h" && barRef.current) {
@@ -202,6 +223,18 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 barRef.current.style.minHeight = `${localSizePercent}%`
                 barRef.current.style.height = `${localSizePercent}%`
             }
+
+        }
+
+        //TODO: add this listener only when currently an element is resized
+        const sizeListener = () => {
+            const barParent = barRef.current?.parentElement
+            const allBars = barParent?.querySelectorAll(":scope > [data-bar-axis]") ?? []
+            const allBarsSize = Array.from(allBars).map(bar => {
+                return {[bar.getAttribute("data-bar-position")?? ""] : bar.getAttribute("data-bar-axis")?.startsWith("h") ? (bar.clientWidth / (barParent?.clientWidth ?? 0)) * 100 : (bar.clientHeight / (barParent?.clientHeight ?? 0)) * 100}
+            }).reduce((a, v) => ({ ...a, ...v}))
+
+            setSizePercent(allBarsSize as {left: number, right: number, top: number, bottom: number})
         }
 
         const mouseDown = (event: MouseEvent | TouchEvent) => {
@@ -243,16 +276,19 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
         }
 
+        //TODO: remove this listener when mouseDown event is triggered in resize area and add it when mouse is up again
         const mouseMoveWindow = (event: MouseEvent | TouchEvent) => {
             const inResizeArea = isInResizeArea(event)
             manageResizeStyle(inResizeArea)
         }
 
+        window.addEventListener("mousemove", sizeListener)
         window.addEventListener("mousemove", mouseMoveWindow)
         window.addEventListener("touchstart", mouseDown)
         window.addEventListener("mousedown", mouseDown)
 
         return () => {
+            window.removeEventListener("mousemove", sizeListener)
             window.removeEventListener("mousemove", mouseMoveWindow)
             window.removeEventListener("touchstart", mouseDown)
             window.removeEventListener("mousedown", mouseDown)
@@ -276,9 +312,9 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
     const child = typeof children === "function" ? useMemo(() => children(stateCollapsed, collapse), [stateCollapsed]) : children
 
-    return <div ref={barRef} {...(barType === "h" ? {"data-horizontal-bar": true} : {"data-vertical-bar": true})} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
+    return <div ref={barRef} data-bar-position={type} data-bar-axis={barType === "h" ? "horizontal" : "vertical"} {...mergeCode0Props(`d-screen__${barType}-bar d-screen__${barType}-bar--${type}`, rest)}>
 
-        {sizePercent <= 1 && <div ref={barResizeRef}
+        {sizePercent[type as 'left' | "right" | "top" | "bottom"] <= 1 && sizePercent[oppositeType] <= 99 && <div ref={barResizeRef}
                                   className={`d-screen__${barType}-bar__resizable-label d-screen__${barType}-bar__resizable-label--${type}`}>
             <IconLayoutBottombarExpand/>
         </div>}

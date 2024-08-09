@@ -94,7 +94,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current!!.style.minHeight) : 0
         const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current!!.style.maxHeight) : Infinity
 
-        const calcElementCoordinates = (element: Element | null | undefined) => {
+        const getElementArea = (element: Element | null | undefined) => {
             const height = element?.clientHeight ?? 0
             const width = element?.clientWidth ?? 0
 
@@ -113,14 +113,14 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             }
         }
 
-        const mouseInArea = (coordinates: any, mouseX: number, mouseY: number) => {
+        const isMouseInArea = (coordinates: any, mouseX: number, mouseY: number) => {
             return mouseX >= coordinates.leftX
                 && mouseX <= coordinates.rightX
                 && mouseY >= coordinates.topY
                 && mouseY <= coordinates.bottomY
         }
 
-        const getOverlappingPercent = (firstArea: any, secondArea: any): number | undefined => {
+        const getOverlappingPercentage = (firstArea: any, secondArea: any): number | undefined => {
 
             const isLeft = firstArea.leftX <= secondArea.leftX
             const isTop = firstArea.topY <= secondArea.topY
@@ -140,25 +140,24 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             return shiftPercentage == 0 ? undefined : shiftPercentage
         }
 
-
         const getResizeArea = (element: Element | undefined | null, shiftPercentage: number | undefined) => {
 
             const type = element?.getAttribute("data-bar-position") as 'top' | 'bottom' | 'left' | 'right'
             const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
             const elementParent = element?.parentElement
-            const elementCoordinates = calcElementCoordinates(element)
+            const elementCoordinates = getElementArea(element)
             const defaultResizeArea: any = shiftPercentage == undefined ? getResizeArea(element, 0) : {}
 
             if (shiftPercentage == undefined) {
                 const elementsScope = elementParent?.querySelector(`:scope > [data-bar-position=${oppositeType}]`)
                 const resizeArea = getResizeArea(elementsScope, 0)
-                shiftPercentage = getOverlappingPercent(defaultResizeArea, resizeArea)
+                shiftPercentage = getOverlappingPercentage(defaultResizeArea, resizeArea)
             }
 
             if (shiftPercentage == undefined) {
                 shiftPercentage = Array.from(document.querySelectorAll(`[data-bar-axis=${element?.getAttribute("data-bar-axis")}]`)).filter(elementParent => elementParent != element).map(elementParent => {
                     const resizeArea: any = getResizeArea(elementParent, 0)
-                    return getOverlappingPercent(defaultResizeArea, resizeArea)
+                    return getOverlappingPercentage(defaultResizeArea, resizeArea)
                 }).filter(elementParent => !!elementParent)[0]
             }
 
@@ -208,15 +207,15 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             const mousePositionY = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
             const mousePositionX = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
 
-            const barResizeCoordinates = calcElementCoordinates(barResizeRef.current)
-            const mouseOverResize = mouseInArea(barResizeCoordinates, mousePositionX, mousePositionY)
+            const barResizeCoordinates = getElementArea(barResizeRef.current)
+            const mouseOverResize = isMouseInArea(barResizeCoordinates, mousePositionX, mousePositionY)
 
             const barParent = barRef.current?.parentElement
             const oppositeBar = barParent?.querySelector(`.d-screen__${barType}-bar--${oppositeType}`)
-            const oppositeBarResizeCoordinates = calcElementCoordinates(oppositeBar?.querySelector("[data-resize-label]"))
+            const oppositeBarResizeCoordinates = getElementArea(oppositeBar?.querySelector("[data-resize-label]"))
 
-            inResizeArea = !barRef.current?.ariaDisabled && (mouseInArea(getResizeArea(barRef.current, undefined), mousePositionX, mousePositionY))
-                && (!mouseInArea(oppositeBarResizeCoordinates, mousePositionX, mousePositionY)) || mouseOverResize
+            inResizeArea = !barRef.current?.ariaDisabled && (isMouseInArea(getResizeArea(barRef.current, undefined), mousePositionX, mousePositionY))
+                && (!isMouseInArea(oppositeBarResizeCoordinates, mousePositionX, mousePositionY)) || mouseOverResize
 
 
             if (inResizeArea && barRef.current) barRef.current!!.dataset.resize = 'true'
@@ -226,7 +225,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             return inResizeArea && (barActiveBars.length < 2)
         }
 
-        const manageResizeStyle = (isInResizeArea: boolean) => {
+        const setResizeStyle = (isInResizeArea: boolean) => {
             const border = `border${[...oppositeType][0].toUpperCase() + [...oppositeType].slice(1).join('')}Color` as "borderTopColor" | "borderLeftColor" | "borderBottomColor" | "borderRightColor"
 
             if (isInResizeArea && barRef.current) {
@@ -240,13 +239,18 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             else document.body.style.cursor = ""
         }
 
-        const mouseMove = (event: MouseEvent | TouchEvent) => {
+        const onResize = (event: MouseEvent | TouchEvent) => {
 
+            const barParent = barRef.current?.parentElement
+            const allBars = barParent?.querySelectorAll(":scope > [data-bar-axis]") ?? []
+            const allBarsSize = Array.from(allBars).map(bar => {
+                return {[bar.getAttribute("data-bar-position") ?? ""]: bar.getAttribute("data-bar-axis")?.startsWith("h") ? (bar.clientWidth / (barParent?.clientWidth ?? 0)) * 100 : (bar.clientHeight / (barParent?.clientHeight ?? 0)) * 100}
+            }).reduce((a, v) => ({...a, ...v}))
+            let localSizePercent = Infinity
+
+            setSizePercent(allBarsSize as { left: number, right: number, top: number, bottom: number })
             setStateCollapsed(false)
 
-            //calculate new width
-            const barParent = barRef.current?.parentElement
-            let localSizePercent = Infinity
 
             if (barType === "h" && type === "left") {
                 const spacing = barRef.current?.getBoundingClientRect().left ?? 0
@@ -286,32 +290,24 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
         }
 
-        //TODO: add this listener only when currently an element is resized
-        const sizeListener = () => {
-            const barParent = barRef.current?.parentElement
-            const allBars = barParent?.querySelectorAll(":scope > [data-bar-axis]") ?? []
-            const allBarsSize = Array.from(allBars).map(bar => {
-                return {[bar.getAttribute("data-bar-position") ?? ""]: bar.getAttribute("data-bar-axis")?.startsWith("h") ? (bar.clientWidth / (barParent?.clientWidth ?? 0)) * 100 : (bar.clientHeight / (barParent?.clientHeight ?? 0)) * 100}
-            }).reduce((a, v) => ({...a, ...v}))
-
-            setSizePercent(allBarsSize as { left: number, right: number, top: number, bottom: number })
+        //TODO: remove this listener when mouseDown event is triggered in resize area and add it when mouse is up again
+        const onCursorMove = (event: MouseEvent | TouchEvent) => {
+            const inResizeArea = isInResizeArea(event)
+            setResizeStyle(inResizeArea)
         }
 
-        const mouseDown = (event: MouseEvent | TouchEvent) => {
+        const onCursorDown = (event: MouseEvent | TouchEvent) => {
 
+            //check if mouse is over bars resize Area
             const inResizeArea = isInResizeArea(event)
             if (!inResizeArea) return
 
-            manageResizeStyle(inResizeArea)
-
+            //disable all text selections for a better resizing experience
             const selection = document.getSelection()
+            const disableSelect = (event: MouseEvent) => event.preventDefault();
             if (selection) selection.removeAllRanges()
 
-            const disableSelect = (event: MouseEvent) => {
-                event.preventDefault();
-            }
-
-            const mouseUpListener = (event: MouseEvent) => {
+            const onCursorUp = (event: MouseEvent | TouchEvent) => {
 
                 //get content of parent
                 const content = barRef.current?.parentElement?.querySelector(":scope > [data-content]")
@@ -324,7 +320,7 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
                     scopeBars.forEach((scopeBar: Element) => {
                         const barResizeArea = getResizeArea(scopeBar, undefined)
-                        const overlappingPercentage = getOverlappingPercent(barResizeArea, childResizeArea)
+                        const overlappingPercentage = getOverlappingPercentage(barResizeArea, childResizeArea)
 
 
                         if (overlappingPercentage && (overlappingPercentage <= -0.5 || overlappingPercentage >= 0.5)) {
@@ -337,46 +333,37 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
                 })
 
-                const inResizeArea = isInResizeArea(event)
-                manageResizeStyle(inResizeArea)
-
-                window.removeEventListener("touchcancel", mouseUpListener)
-                window.removeEventListener("touchend", mouseUpListener)
-                window.removeEventListener("mouseup", mouseUpListener)
+                window.removeEventListener("touchcancel", onCursorUp)
+                window.removeEventListener("touchend", onCursorUp)
+                window.removeEventListener("mouseup", onCursorUp)
 
                 window.removeEventListener("selectstart", disableSelect)
 
-                window.removeEventListener("mousemove", mouseMove)
-                window.removeEventListener("touchmove", mouseMove)
+                window.removeEventListener("mousemove", onResize)
+                window.removeEventListener("touchmove", onResize)
+                window.addEventListener("mousemove", onCursorMove)
             }
 
-            window.addEventListener("touchcancel", mouseUpListener)
-            window.addEventListener("touchend", mouseUpListener)
-            window.addEventListener("mouseup", mouseUpListener)
+            window.addEventListener("touchcancel", onCursorUp)
+            window.addEventListener("touchend", onCursorUp)
+            window.addEventListener("mouseup", onCursorUp)
 
             window.addEventListener('selectstart', disableSelect);
 
-            window.addEventListener("mousemove", mouseMove)
-            window.addEventListener("touchmove", mouseMove)
+            window.addEventListener("mousemove", onResize)
+            window.addEventListener("touchmove", onResize)
 
+            window.removeEventListener("mousemove", onCursorMove)
         }
 
-        //TODO: remove this listener when mouseDown event is triggered in resize area and add it when mouse is up again
-        const mouseMoveWindow = (event: MouseEvent | TouchEvent) => {
-            const inResizeArea = isInResizeArea(event)
-            manageResizeStyle(inResizeArea)
-        }
-
-        window.addEventListener("mousemove", sizeListener)
-        window.addEventListener("mousemove", mouseMoveWindow)
-        window.addEventListener("touchstart", mouseDown)
-        window.addEventListener("mousedown", mouseDown)
+        window.addEventListener("touchstart", onCursorDown)
+        window.addEventListener("mousedown", onCursorDown)
+        window.addEventListener("mousemove", onCursorMove)
 
         return () => {
-            window.removeEventListener("mousemove", sizeListener)
-            window.removeEventListener("mousemove", mouseMoveWindow)
-            window.removeEventListener("touchstart", mouseDown)
-            window.removeEventListener("mousedown", mouseDown)
+            window.removeEventListener("touchstart", onCursorDown)
+            window.removeEventListener("mousedown", onCursorDown)
+            window.removeEventListener("mousemove", onCursorMove)
         }
 
     }, [barRef, barResizeRef]);

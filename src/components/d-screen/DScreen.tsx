@@ -89,10 +89,10 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
         const startW = barRef.current?.offsetWidth ?? 0
         const startH = barRef.current?.offsetHeight ?? 0
-        const minW = barRef.current?.style.minWidth ? parseFloat(barRef.current.style.minWidth) : 0
-        const maxW = barRef.current?.style.maxWidth ? parseFloat(barRef.current.style.maxWidth) : Infinity
-        const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current.style.minHeight) : 0
-        const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current.style.maxHeight) : Infinity
+        const minW = barRef.current?.style.minWidth ? parseFloat(barRef.current!!.style.minWidth) : 0
+        const maxW = barRef.current?.style.maxWidth ? parseFloat(barRef.current!!.style.maxWidth) : Infinity
+        const minH = barRef.current?.style.minHeight ? parseFloat(barRef.current!!.style.minHeight) : 0
+        const maxH = barRef.current?.style.maxHeight ? parseFloat(barRef.current!!.style.maxHeight) : Infinity
 
         const calcElementCoordinates = (element: Element | null | undefined) => {
             const height = element?.clientHeight ?? 0
@@ -219,8 +219,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 && (!mouseInArea(oppositeBarResizeCoordinates, mousePositionX, mousePositionY)) || mouseOverResize
 
 
-            if (inResizeArea && barRef.current) barRef.current.dataset!!.resize = 'true'
-            else if (!inResizeArea && barRef.current) delete barRef.current.dataset!!.resize
+            if (inResizeArea && barRef.current) barRef.current!!.dataset.resize = 'true'
+            else if (!inResizeArea && barRef.current) delete barRef.current!!.dataset.resize
             const barActiveBars = barParent?.querySelectorAll("[data-resize]") ?? []
 
             return inResizeArea && (barActiveBars.length < 2)
@@ -230,9 +230,9 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
             const border = `border${[...oppositeType][0].toUpperCase() + [...oppositeType].slice(1).join('')}Color` as "borderTopColor" | "borderLeftColor" | "borderBottomColor" | "borderRightColor"
 
             if (isInResizeArea && barRef.current) {
-                barRef.current.style[border] = "#70ffb2"
+                barRef.current!!.style[border] = "#70ffb2"
             } else if (!isInResizeArea && barRef.current) {
-                barRef.current.style[border] = ""
+                barRef.current!!.style[border] = ""
             }
 
             const resize = document.querySelector("[data-resize]")
@@ -276,12 +276,12 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
             //set new width
             if (barType === "h" && barRef.current) {
-                barRef.current.style.minWidth = `${localSizePercent}%`
-                barRef.current.style.maxWidth = `${localSizePercent}%`
-                barRef.current.style.width = `${localSizePercent}%`
+                barRef.current!!.style.minWidth = `${localSizePercent}%`
+                barRef.current!!.style.maxWidth = `${localSizePercent}%`
+                barRef.current!!.style.width = `${localSizePercent}%`
             } else if (barType === "v" && barRef.current) {
-                barRef.current.style.minHeight = `${localSizePercent}%`
-                barRef.current.style.height = `${localSizePercent}%`
+                barRef.current!!.style.minHeight = `${localSizePercent}%`
+                barRef.current!!.style.height = `${localSizePercent}%`
             }
 
         }
@@ -384,11 +384,11 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     const collapse = () => {
         setStateCollapsed(prevState => {
             if (!prevState && resizeable && barRef.current && barType === "h") {
-                barRef.current.style.minWidth = ""
-                barRef.current.style.width = ""
+                barRef.current!!.style.minWidth = ""
+                barRef.current!!.style.width = ""
             } else if (!prevState && resizeable && barRef.current && barType === "v") {
-                barRef.current.style.minHeight = ""
-                barRef.current.style.height = ""
+                barRef.current!!.style.minHeight = ""
+                barRef.current!!.style.height = ""
             }
             return !prevState
         })

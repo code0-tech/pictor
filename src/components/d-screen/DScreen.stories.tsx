@@ -3,16 +3,14 @@ import React from "react";
 import DScreen from "./DScreen";
 import Badge from "../badge/Badge";
 import {
-    IconApi, IconBrandAdobe,
+    IconBrandAdobe,
     IconDatabase,
     IconHierarchy3,
-    IconLayoutSidebarLeftCollapse, IconLayoutSidebarRightCollapse,
     IconSettings,
     IconTicket
 } from "@tabler/icons-react";
 import Text from "../Text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
-import Button from "../button/Button";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
 
 const meta: Meta = {
@@ -33,14 +31,14 @@ export const DashboardScreenExample = () => {
     return <DFullScreen>
         <DScreen>
             <DScreen.VBar.Top>
-                <DScreen.BarContent mediaMaxWidth={800}>
+                <DScreen.BarContent align={"center"} mediaMaxWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>...</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Sagittarius</Badge>
                 </DScreen.BarContent>
-                <DScreen.BarContent mediaMinWidth={800}>
+                <DScreen.BarContent align={"center"} mediaMinWidth={800}>
                     <Badge>Home</Badge>
                     <Text size={"sm"} mx={0.5}>/</Text>
                     <Badge>Organisations</Badge>
@@ -57,9 +55,9 @@ export const DashboardScreenExample = () => {
                     <Badge>Test</Badge>
                 </DScreen.BarContent>
             </DScreen.VBar.Bottom>
-            <DScreen.HBar.Left>
+            <DScreen.HBar.Left resizeable>
                 <DScreen.BarContent justify={"space-between"}>
-                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem"}}>
+                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow: "hidden"}}>
                         <DScreen.Item>
                             <IconHierarchy3 size={12}/>
                             Flows
@@ -73,7 +71,7 @@ export const DashboardScreenExample = () => {
                             Database
                         </DScreen.Item>
                     </div>
-                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem"}}>
+                    <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow: "hidden"}}>
                         <DScreen.Item>
                             <IconSettings size={12}/>
                             Settings
@@ -81,7 +79,7 @@ export const DashboardScreenExample = () => {
                     </div>
                 </DScreen.BarContent>
             </DScreen.HBar.Left>
-            <DScreen.HBar.Right>
+            <DScreen.HBar.Right resizeable>
                 <DScreen.BarContent>
                     <DScreen.Item>
                         Docs
@@ -90,8 +88,8 @@ export const DashboardScreenExample = () => {
             </DScreen.HBar.Right>
             <DScreen.Content>
                 <DScreen>
-                    <DScreen.HBar.Left>
-                        <DScreen.BarContent w={"300px"} p={"0"}>
+                    <DScreen.HBar.Left resizeable>
+                        <DScreen.BarContent p={"0"}>
                             <DScreen>
                                 <DScreen.VBar.Top>
                                     <DScreen.BarContent>
@@ -103,17 +101,12 @@ export const DashboardScreenExample = () => {
                                         </DScreen.Item>
                                     </DScreen.BarContent>
                                 </DScreen.VBar.Top>
-                                <DScreen.VBar.Bottom>
-                                    <DScreen.BarContent>
-                                        <Badge>Test</Badge>
-                                        <Badge>Test</Badge>
-                                    </DScreen.BarContent>
-                                </DScreen.VBar.Bottom>
                                 <DScreen.Content p={0.5}>
-                                    {[1,1,1,1,1,1,1,1,1,1,1,1].map(() => {
+                                    {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map(() => {
                                         return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
                                             <DFolder controls={controls} name={"Google Cloud Flows"}>
-                                                <DFolder.Item icon={<IconBrandAdobe size={12}/>} name={"Google Cloud Flows"}/>
+                                                <DFolder.Item icon={<IconBrandAdobe size={12}/>}
+                                                              name={"Google Cloud Flows"}/>
                                                 <DFolder.Item active name={"Google Cloud Flows"}/>
                                             </DFolder>
                                         </DFolder>
@@ -124,14 +117,14 @@ export const DashboardScreenExample = () => {
                     </DScreen.HBar.Left>
                     <DScreen.Content>
                         <DScreen>
-                            <DScreen.VBar.Top justify={"flex-end"}>
+                            <DScreen.VBar.Top resizeable justify={"flex-end"}>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Test Run
                                     </DScreen.Item>
                                 </DScreen.BarContent>
                             </DScreen.VBar.Top>
-                            <DScreen.VBar.Bottom>
+                            <DScreen.VBar.Bottom resizeable>
                                 <DScreen.BarContent>
                                     <DScreen.Item>
                                         Logs

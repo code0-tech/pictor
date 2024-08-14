@@ -290,7 +290,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
         }
 
-        //TODO: remove this listener when mouseDown event is triggered in resize area and add it when mouse is up again
         const onCursorMove = (event: MouseEvent | TouchEvent) => {
             const inResizeArea = isInResizeArea(event)
             setResizeStyle(inResizeArea)

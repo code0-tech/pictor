@@ -99,6 +99,7 @@ const getResizeArea = (element: Element | undefined | null, shiftPercentage: num
 
     const type = element?.getAttribute("data-bar-position") as 'top' | 'bottom' | 'left' | 'right'
     const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
+
     const elementParent = element?.parentElement
     const elementCoordinates = getElementArea(element)
     const defaultResizeArea: any = shiftPercentage == undefined ? getResizeArea(element, 0) : {}
@@ -193,6 +194,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         ...rest
     } = props
     const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
+    const barRef = useRef<HTMLDivElement | null>(null)
+    const barResizeRef = useRef<HTMLDivElement | null>(null)
     const [stateCollapsed, setStateCollapsed] = useState(collapsed)
     const [sizePercent, setSizePercent] = useState<{
         left: number | undefined,
@@ -218,12 +221,19 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const barParent = barRef.current?.parentElement
         const oppositeBar = barParent?.querySelector(`:scope > [data-bar-position=${oppositeType}]`)
 
+        const barResizeArea = getResizeArea(barRef.current, undefined, resizeAreaDimensions)
+        const oppositeBarResizeArea = getResizeArea(oppositeBar, undefined, resizeAreaDimensions)
 
+        oppositeBar && console.log(barResizeArea)
+        const resizeAreasOverlappingPercentage = getOverlappingPercentage(barResizeArea, oppositeBarResizeArea)
+
+        oppositeBar && console.log(resizeAreasOverlappingPercentage)
+        //console.log(barRef.current, oppositeBar, resizeAreasOverlappingPercentage)
+
+        return resizeAreasOverlappingPercentage <= -0.90 || resizeAreasOverlappingPercentage >= 0.90
 
         return false
-    }, [sizePercent])
-    const barRef = useRef<HTMLDivElement | null>(null)
-    const barResizeRef = useRef<HTMLDivElement | null>(null)
+    }, [barRef, sizePercent])
 
 
     useEffect(() => {
@@ -334,7 +344,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
 
                         if (overlappingPercentage && (overlappingPercentage <= -0.5 || overlappingPercentage >= 0.5)) {
                             bar.ariaDisabled = "true"
-                            console.log(scopeBar, bar, overlappingPercentage)
                         } else {
                             bar.ariaDisabled = null
                         }

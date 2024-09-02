@@ -1,41 +1,45 @@
 import React from "react";
-import Input from "./Input";
-import {IconMail} from "@tabler/icons-react";
+import {Input, InputWrapper} from "./Input";
+import {useValidation} from "./useValidation";
 
 export default {
     title: "Input",
     component: Input
 };
 
-export const Mail = () => <Input>
-    <Input.Label>e-mail</Input.Label>
-    <Input.Control placeholder={"name@mail.com"}>
-        <Input.Control.Icon><IconMail/></Input.Control.Icon>
-    </Input.Control>
-    <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
-</Input>
+export const Default = () => {
+    const rules = [
+        (value: string) => ({
+            isValid: value.trim() !== "",
+            message: "Email is required"
+        }),
+        (value: string) => ({
+            isValid: value.includes("@"),
+            message: "Email is invalid"
+        })
+    ];
 
+    const { value, setValue, state, message, validateInput } = useValidation({
+        validationRules: rules,
+        successMessage: "Email is valid"
+    });
 
-export const Disabled = () => <Input disabled>
-    <Input.Control placeholder={"Your Mail"}>
-        <Input.Control.Icon><IconMail/></Input.Control.Icon>
-    </Input.Control>
-    <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
-</Input>
-
-export const NotValid = () => <Input valid={false}>
-    <Input.Control placeholder={"Your E-Mail"}>
-        <Input.Control.Icon><IconMail/></Input.Control.Icon>
-        <Input.Control.Message>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</Input.Control.Message>
-    </Input.Control>
-    <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
-</Input>
-
-export const Valid = () => <Input valid>
-    <Input.Control placeholder={"Your E-Mail"}>
-        <Input.Control.Message>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
-            invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</Input.Control.Message>
-    </Input.Control>
-    <Input.Desc>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam</Input.Desc>
-</Input>
+    return (
+        <InputWrapper
+            label="Email"
+            description="Please enter your email address"
+            success={{ value: state === "success", message }}
+            warning={{ value: state === "warning", message }}
+            error={{ value: state === "error", message }}
+        >
+            <Input
+                value={value}
+                onValueChange={(value: string) => {
+                    console.log(value);
+                    setValue(value);
+                }}
+                onBlur={validateInput}
+            />
+        </InputWrapper>
+    );
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import {Input, InputWrapper} from "./Input";
+import Input, {InputWrapper, PinInput} from "./Input";
 import {useValidation} from "./useValidation";
 
 export default {
@@ -7,7 +7,7 @@ export default {
     component: Input
 };
 
-export const Default = () => {
+export const DefaultInput = () => {
     const rules = [
         (value: string) => ({
             isValid: value.trim() !== "",
@@ -33,6 +33,39 @@ export const Default = () => {
             error={{ value: state === "error", message }}
         >
             <Input
+                value={value}
+                onValueChange={(value: string) => {
+                    console.log(value);
+                    setValue(value);
+                }}
+                onBlur={validateInput}
+            />
+        </InputWrapper>
+    );
+}
+
+export const DefaultPinInput = () => {
+    const rules = [
+        (value: string) => ({
+            isValid: value === "1234",
+            message: "Email is required"
+        })
+    ];
+
+    const { value, setValue, state, message, validateInput } = useValidation({
+        validationRules: rules,
+        successMessage: "Email is valid"
+    });
+
+    return (
+        <InputWrapper
+            label="Pin"
+            description="Please enter your pin"
+            success={{ value: state === "success", message }}
+            warning={{ value: state === "warning", message }}
+            error={{ value: state === "error", message }}
+        >
+            <PinInput
                 value={value}
                 onValueChange={(value: string) => {
                     console.log(value);

@@ -18,6 +18,12 @@
       ]
     },
     {
+      "matchPackageNames": [
+        "playwright"
+      ],
+      "dependencyDashboardApproval": true
+    },
+    {
       "matchDepTypes": [
         "devDependencies"
       ],

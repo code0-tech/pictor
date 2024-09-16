@@ -5,6 +5,7 @@ import {Code0Component} from "../../utils/types";
 import "./DScreen.style.scss"
 import {getChild, mergeCode0Props} from "../../utils/utils";
 import {IconLayoutBottombarExpand} from "@tabler/icons-react";
+import {getOverlapSize} from "overlap-area";
 
 export interface DScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactElement<Omit<DScreenVBarProps, "type"> & DScreenContentProps>[]
@@ -115,13 +116,13 @@ const getResizeArea = (element: Element | undefined | null, shiftPercentage: num
     if (shiftPercentage == undefined) {
         const elementsScope = elementParent?.querySelector(`:scope > [data-bar-position=${oppositeType}]`)
         const resizeArea = getResizeArea(elementsScope, 0)
-        shiftPercentage = getOverlappingPercentage(defaultResizeArea, resizeArea)
+        shiftPercentage = getShiftPercentage(defaultResizeArea, resizeArea)
     }
 
     if (shiftPercentage == undefined) {
         shiftPercentage = Array.from(document.querySelectorAll(`[data-bar-axis=${element?.getAttribute("data-bar-axis")}]`)).filter(elementParent => elementParent != element).map(elementParent => {
             const resizeArea: any = getResizeArea(elementParent, 0)
-            return getOverlappingPercentage(defaultResizeArea, resizeArea)
+            return getShiftPercentage(defaultResizeArea, resizeArea)
         }).filter(elementParent => !!elementParent)[0]
     }
 
@@ -213,34 +214,20 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
     }>({left: undefined, right: undefined, top: undefined, bottom: undefined})
     const showResizeLabel = useMemo(() => {
         const barSizePercent = sizePercent[type as "top" | "bottom" | "left" | "right"]
-        const oppositeBarSizePercent = sizePercent[oppositeType]
+        const oppositeBarSizePercent = sizePercent[oppositeType] ?? 0
 
         if (barSizePercent === undefined) return false
         if (barSizePercent > 1) return false
-        return !oppositeBarSizePercent || oppositeBarSizePercent <= 99;
+        return oppositeBarSizePercent + barSizePercent <= 99;
     }, [sizePercent])
     const showOppositeResizeLabel = useMemo(() => {
-        //const barSizePercent = sizePercent[type as "top" | "bottom" | "left" | "right"] ?? 0
-        //const oppositeBarSizePercent = sizePercent[oppositeType] ?? 0
-        //if (barSizePercent < 99) return false
-        //return oppositeBarSizePercent <= 1;
+        const barSizePercent = sizePercent[type as "top" | "bottom" | "left" | "right"] ?? 0
+        const oppositeBarSizePercent = sizePercent[oppositeType] ?? 0
 
-        //calculate touch zones for
-        const barParent = barRef.current?.parentElement
-        const oppositeBar = barParent?.querySelector(`:scope > [data-bar-position=${oppositeType}]`)
+        if (barSizePercent === undefined) return false
+        if (barSizePercent < 99) return false
+        return barSizePercent + oppositeBarSizePercent >= 99;
 
-        const barResizeArea = getResizeArea(barRef.current, undefined, resizeAreaDimensions)
-        const oppositeBarResizeArea = getResizeArea(oppositeBar, undefined, resizeAreaDimensions)
-
-        oppositeBar && console.log(barResizeArea)
-        const resizeAreasOverlappingPercentage = getOverlappingPercentage(barResizeArea, oppositeBarResizeArea)
-
-        oppositeBar && console.log(resizeAreasOverlappingPercentage)
-        //console.log(barRef.current, oppositeBar, resizeAreasOverlappingPercentage)
-
-        return resizeAreasOverlappingPercentage <= -0.90 || resizeAreasOverlappingPercentage >= 0.90
-
-        return false
     }, [barRef, sizePercent])
 
 
@@ -270,13 +257,8 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         const onResize = (event: MouseEvent | TouchEvent) => {
 
             const barParent = barRef.current?.parentElement
-            const allBars = barParent?.querySelectorAll(":scope > [data-bar-axis]") ?? []
-            const allBarsSize = Array.from(allBars).map(bar => {
-                return {[bar.getAttribute("data-bar-position") ?? ""]: bar.getAttribute("data-bar-axis")?.startsWith("h") ? (bar.clientWidth / (barParent?.clientWidth ?? 0)) * 100 : (bar.clientHeight / (barParent?.clientHeight ?? 0)) * 100}
-            }).reduce((a, v) => ({...a, ...v}))
             let localSizePercent = Infinity
 
-            setSizePercent(allBarsSize as { left: number, right: number, top: number, bottom: number })
             setStateCollapsed(false)
 
 
@@ -319,8 +301,15 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
         }
 
         const onCursorMove = (event: MouseEvent | TouchEvent) => {
+            const barParent = barRef.current?.parentElement
             const inResizeArea = isInResizeArea(barRef.current, event)
             setResizeStyle(inResizeArea)
+
+            const allBars = barParent?.querySelectorAll(":scope > [data-bar-axis]") ?? []
+            const allBarsSize = Array.from(allBars).map(bar => {
+                return {[bar.getAttribute("data-bar-position") ?? ""]: bar.getAttribute("data-bar-axis")?.startsWith("h") ? (bar.clientWidth / (barParent?.clientWidth ?? 0)) * 100 : (bar.clientHeight / (barParent?.clientHeight ?? 0)) * 100}
+            }).reduce((a, v) => ({...a, ...v})) as { left: number, right: number, top: number, bottom: number }
+            setSizePercent(allBarsSize)
         }
 
         const onCursorDown = (event: MouseEvent | TouchEvent) => {
@@ -357,7 +346,6 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                             bar.ariaDisabled = null
                         }
                     })
-
                 })
 
                 window.removeEventListener("touchcancel", onCursorUp)

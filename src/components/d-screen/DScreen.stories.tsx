@@ -146,4 +146,42 @@ export const DashboardScreenExample = () => {
     </DFullScreen>
 }
 
+export const DashboardResizeLabelTest = () => {
+    return <DFullScreen>
+        <DScreen>
+            <DScreen.VBar.Top>
+                <DScreen.BarContent align={"center"} mediaMaxWidth={800}>
+                    <Badge>Home</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>...</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>Sagittarius</Badge>
+                </DScreen.BarContent>
+                <DScreen.BarContent align={"center"} mediaMinWidth={800}>
+                    <Badge>Home</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>Organisations</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>Code0</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>Projects</Badge>
+                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <Badge>Sagittarius</Badge>
+                </DScreen.BarContent>
+            </DScreen.VBar.Top>
+            <DScreen.VBar.Bottom>
+                <DScreen.BarContent>
+                    <Badge>Test</Badge>
+                </DScreen.BarContent>
+            </DScreen.VBar.Bottom>
+            <DScreen.Content>
+                <Text size={"md"}>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+                    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                </Text>
+            </DScreen.Content>
+        </DScreen>
+    </DFullScreen>
+}
+
 export default meta

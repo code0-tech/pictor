@@ -75,24 +75,32 @@ const isMouseInArea = (coordinates: any, mouseX: number, mouseY: number) => {
         && mouseY <= coordinates.bottomY
 }
 
-const getOverlappingPercentage = (firstArea: any, secondArea: any): number | undefined => {
+const getShiftPercentage = (firstArea: any, secondArea: any): number | undefined => {
+
+    const points1 = [
+        [firstArea.leftX,firstArea.topY],
+        [firstArea.leftX, firstArea.bottomY],
+        [firstArea.rightX, firstArea.bottomY],
+        [firstArea.rightX,firstArea.topY],
+    ]
+
+    const points2 = [
+        [secondArea.leftX,secondArea.topY],
+        [secondArea.leftX, secondArea.bottomY],
+        [secondArea.rightX, secondArea.bottomY],
+        [secondArea.rightX, secondArea.topY],
+    ]
 
     const isLeft = firstArea.leftX <= secondArea.leftX
     const isTop = firstArea.topY <= secondArea.topY
-    let horizontalOverlap = 0
-    let verticalOverlap = 0
 
-    if (isLeft) horizontalOverlap = Math.max(firstArea.rightX - secondArea.leftX, 0)
-    else if (!isLeft) horizontalOverlap = Math.min(firstArea.leftX - secondArea.rightX, 0)
-
-    if (isTop) verticalOverlap = Math.max(firstArea.bottomY - secondArea.topY, 0)
-    else if (!isTop) verticalOverlap = Math.min(firstArea.topY - secondArea.bottomY, 0)
-
-    const overlapAreaInPxSquared = horizontalOverlap * verticalOverlap
+    const overlapAreaInPxSquared = getOverlapSize(points1, points2)
     const resizeAreaPxSquared = (firstArea.rightX - firstArea.leftX) * (firstArea.bottomY - firstArea.topY)
-    const shiftPercentage = Math.min(Math.max(overlapAreaInPxSquared / resizeAreaPxSquared, -1), 1)
+    const shiftPercentage = Math.min(overlapAreaInPxSquared / resizeAreaPxSquared, 1)
 
-    return shiftPercentage == 0 ? undefined : shiftPercentage
+    const negativePositiveNumber = isLeft && isTop ? shiftPercentage : -(shiftPercentage)
+
+    return shiftPercentage == 0 ? undefined : negativePositiveNumber
 }
 
 const getResizeArea = (element: Element | undefined | null, shiftPercentage: number | undefined, resizeAreaDimensions: number = 25) => {
@@ -331,18 +339,19 @@ const Bar = <T extends DScreenBarProps>(barType: 'v' | 'h'): React.FC<T> => (pro
                 //get content of parent
                 const content = barRef.current?.parentElement?.querySelector(":scope > [data-content]")
                 const childBars = content?.querySelectorAll("[data-bar-axis]") ?? []
+                const scopeBars = barRef.current?.parentElement?.querySelectorAll(":scope > [data-bar-axis]") ?? []
 
-                childBars.forEach((bar: Element) => {
+                scopeBars.forEach((scopeBar: Element) => {
 
-                    const childResizeArea = getResizeArea(bar, undefined)
-                    const scopeBars = barRef.current?.parentElement?.querySelectorAll(":scope > [data-bar-axis]") ?? []
+                    const barResizeArea = getResizeArea(scopeBar, undefined)
 
-                    scopeBars.forEach((scopeBar: Element) => {
-                        const barResizeArea = getResizeArea(scopeBar, undefined)
-                        const overlappingPercentage = getOverlappingPercentage(barResizeArea, childResizeArea)
+                    childBars.forEach((bar: Element) => {
+
+                        const childResizeArea = getResizeArea(bar, undefined)
+                        const overlappingPercentage = getShiftPercentage(barResizeArea, childResizeArea)
 
 
-                        if (overlappingPercentage && (overlappingPercentage <= -0.5 || overlappingPercentage >= 0.5)) {
+                        if (overlappingPercentage && (overlappingPercentage <= -0.4 || overlappingPercentage >= 0.4)) {
                             bar.ariaDisabled = "true"
                         } else {
                             bar.ariaDisabled = null

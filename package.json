@@ -81,5 +81,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "overlap-area": "^1.1.0"
   }
 }

@@ -48,21 +48,21 @@ export const DashboardScreenExample = () => {
             </DScreenBar>
             <DScreenBar type={"left"} justify={"space-between"} resizeable>
                 <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow: "hidden"}}>
-                    <DScreenButton color={"info"}>
+                    <DScreenButton color={"secondary"}>
                         <IconHierarchy3 size={12}/>
                         Flows
                     </DScreenButton>
-                    <DScreenButton>
+                    <DScreenButton color={"warning"}>
                         <IconTicket size={12}/>
                         Issues
                     </DScreenButton>
-                    <DScreenButton>
+                    <DScreenButton color={"info"}>
                         <IconDatabase size={12}/>
                         Database
                     </DScreenButton>
                 </div>
                 <div style={{display: "flex", flexDirection: "column", gap: ".5rem", overflow: "hidden"}}>
-                    <DScreenButton>
+                    <DScreenButton color={"primary"}>
                         <IconSettings size={12}/>
                         Settings
                     </DScreenButton>
@@ -77,7 +77,7 @@ export const DashboardScreenExample = () => {
             <DScreen>
                 <DScreenBar type={"left"} p={"0"} resizeable>
                     <DScreen>
-                        <DScreenBar type={"top"}>
+                        <DScreenBar miw={300} type={"top"}>
                             <DScreenButton onClick={openAll}>
                                 Open All
                             </DScreenButton>

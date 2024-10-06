@@ -3,10 +3,10 @@
 .d-folder {
   @include box();
   background: $primary;
-  padding: .25rem;
+  padding: $xxs;
   display: flex;
   white-space: nowrap;
-  gap: .5rem;
+  gap: $xs;
 
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -21,15 +21,15 @@
   }
 
   &__content {
-    padding-left: 1.25rem;
+    padding-left: $xs;
   }
 }
 
 .d-folder-item {
   @include box();
   background: $primary;
-  padding: .25rem;
+  padding: $xxs;
   display: flex;
   white-space: nowrap;
-  gap: .5rem;
+  gap: $xs;
 }

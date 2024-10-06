@@ -86,12 +86,12 @@ export const DashboardScreenExample = () => {
                             </DScreenButton>
                         </DScreenBar>
                         <div style={{padding: ".5rem"}}>
-                            {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map(() => {
+                            {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
                                 return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
                                     <DFolder controls={controls} name={"Google Cloud Flows"}>
                                         <DFolder.Item icon={<IconBrandAdobe size={12}/>}
                                                       name={"Google Cloud Flows"}/>
-                                        <DFolder.Item active name={"Google Cloud Flows"}/>
+                                        <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
                                     </DFolder>
                                 </DFolder>
                             })}

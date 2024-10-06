@@ -73,7 +73,7 @@
       padding: .25rem;
     }
 
-    .d-screen__item {
+    .d-screen__button {
       writing-mode: unset !important;
     }
 
@@ -82,7 +82,7 @@
       height: 100%;
       padding: .5rem;
       overflow: auto;
-      display: none;
+      display: flex;
       gap: .5rem;
       align-items: start;
 
@@ -149,13 +149,13 @@
       padding: .25rem;
     }
 
-    .d-screen__item {
+    .d-screen__button {
       writing-mode: vertical-rl;
     }
 
     > .d-screen__bar-content {
       overflow: auto;
-      display: none;
+      display: flex;
       gap: .5rem;
       padding: .5rem;
       height: 100%;
@@ -190,16 +190,12 @@
     position: absolute;
   }
 
-  &__item {
-    @include box(true);
+  &__button {
     width: fit-content;
-    padding: .25rem;
-    font-size: .75rem;
     gap: .25rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
   }
 
   &__collapsable-item {

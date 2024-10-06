@@ -1,11 +1,11 @@
 import React, {ReactElement} from "react";
-import {ButtonType} from "../button/Button";
+import {ButtonProps} from "../button/Button";
 import "./ButtonGroup.style.scss"
 import {Code0Component} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 
 export interface ButtonGroupType extends Code0Component<HTMLDivElement> {
-    children: ReactElement<ButtonType>[]
+    children: ReactElement<ButtonProps>[]
 }
 
 const ButtonGroup: React.FC<ButtonGroupType> = (props) => {

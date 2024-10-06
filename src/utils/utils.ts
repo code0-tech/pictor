@@ -3,12 +3,26 @@ import mergeProps from "merge-props";
 import {Code0Component, Code0ComponentProps} from "./types";
 
 
-export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean): React.ReactElement | undefined => {
+export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean, matchingProps?: Object): React.ReactElement | undefined => {
 
     let childComponent: React.ReactElement | undefined = undefined;
     let found = false
     React.Children.forEach(children, (childT, index) => {
-        if (React.isValidElement(childT) && childT.type == child) {
+
+        let matching = true
+
+        if (React.isValidElement(childT) && matchingProps) {
+            for (const key in matchingProps) {
+                const value = (matchingProps as any)[key as string]
+                if (!childT.props[key] || childT.props[key] != value) {
+                    matching = false
+                    break;
+                }
+            }
+        }
+
+
+        if (React.isValidElement(childT) && childT.type == child && matching) {
             childComponent = childT
             found = true
         } else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)

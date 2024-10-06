@@ -13,7 +13,7 @@
   color: rgba($white, .5);
   outline: none;
   font-family: Ubuntu, sans-serif;
-  font-size: $md;
+  font-size: $sm;
 
   @if ($active == true) {
     &:hover, &:active, &--active, &:focus, &:focus-visible {

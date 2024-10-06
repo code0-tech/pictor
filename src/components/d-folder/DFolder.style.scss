@@ -3,33 +3,44 @@
 .d-folder {
   @include box();
   background: $primary;
-  padding: .25rem;
+  padding: $xxs;
   display: flex;
   white-space: nowrap;
-  gap: .5rem;
+  gap: $xs;
 
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   &__icon {
     color: $info;
   }
 
   &__content {
-    padding-left: 1.25rem;
+    margin-left: $xs;
+    position: relative;
+
+    &:before {
+      z-index: 10;
+      height: 100%;
+      width: 1px;
+      background: backgroundColor($secondary);
+      position: absolute;
+      content: "";
+      left: 0;
+
+    }
   }
 }
 
 .d-folder-item {
   @include box();
   background: $primary;
-  padding: .25rem;
+  padding: $xxs;
   display: flex;
   white-space: nowrap;
-  gap: .5rem;
+  gap: $xs;
 }

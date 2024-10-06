@@ -5,7 +5,7 @@ import React, {
 import {mergeCode0Props} from "../../utils/utils";
 import {Code0Component, Color} from "../../utils/types"
 
-export interface ButtonType extends Code0Component<HTMLAnchorElement> {
+export interface ButtonProps extends Code0Component<HTMLAnchorElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
     color?: Color,
@@ -17,7 +17,7 @@ export interface ButtonType extends Code0Component<HTMLAnchorElement> {
     disabled?: boolean
 }
 
-const Button: React.FC<ButtonType> = (props) => {
+const Button: React.FC<ButtonProps> = (props) => {
 
     const {children, variant = "normal", color = "primary", active = false, disabled = false, ...args} = props
 

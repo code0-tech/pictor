@@ -10,11 +10,12 @@ $white: #ffffff;
 $bodyBg: $primary;
 //(font-)sizes
 
-$xs: .75rem;
-$sm: .8rem;
+$xxs: 0.35rem;
+$xs: 0.7rem;
+$sm: 0.8rem;
 $md: 1rem;
 $lg: 1.2rem;
-$xl: 1.25rem;
+$xl: 1.3rem;
 
 $sizes: (
         "xs": $xs,
@@ -32,7 +33,7 @@ $hierarchy: (
 
 
 //component styling
-$borderRadius: .5rem;
+$borderRadius: $xs;
 
 $colors: (
         "primary": $primary,

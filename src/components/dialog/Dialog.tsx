@@ -11,13 +11,13 @@ import {
 import {Code0Component, Code0ComponentProps} from "../../utils/types";
 import React, {useEffect} from "react";
 import {mergeCode0Props} from "../../utils/utils";
-import Button, {ButtonType} from "../button/Button";
+import Button, {ButtonProps} from "../button/Button";
 import "./Dialog.style.scss"
 
 export type DialogProps = AKDialogProviderProps
-export type DialogDisclosureProps = ButtonType & AKDialogDisclosureProps
+export type DialogDisclosureProps = ButtonProps & AKDialogDisclosureProps
 export type DialogModalProps = Code0ComponentProps & AKDialogProps
-export type DialogDismissProps = ButtonType & AKDialogDismissProps
+export type DialogDismissProps = ButtonProps & AKDialogDismissProps
 
 export interface DialogStickyContentProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
@@ -38,14 +38,14 @@ const DialogDisclosure: React.FC<DialogDisclosureProps> = (props) =>
     <AKDialogDisclosure {...mergeCode0Props("", {
         ...props,
         ...(!props.render ? {
-            render: (props: React.JSX.IntrinsicAttributes & ButtonType) => <Button {...props}/>
+            render: (props: React.JSX.IntrinsicAttributes & ButtonProps) => <Button {...props}/>
         } : {render: props.render})
     })}/>
 const DialogDismiss: React.FC<DialogDismissProps> = (props) =>
     <AKDialogDismiss {...mergeCode0Props("", {
         ...props,
         ...(!props.render ? {
-            render: (props: React.JSX.IntrinsicAttributes & ButtonType) => <Button {...props}/>
+            render: (props: React.JSX.IntrinsicAttributes & ButtonProps) => <Button {...props}/>
         } : {render: props.render})
     })}/>
 

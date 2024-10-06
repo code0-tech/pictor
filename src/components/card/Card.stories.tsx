@@ -90,7 +90,7 @@ export const CardNews: CardStory = {
     }
     ,
     args: {
-        variant: "outlined",
+        variant: "none",
         color: "secondary",
         outline: true,
         gradient: true,

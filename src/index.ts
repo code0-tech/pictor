@@ -7,7 +7,6 @@ export { default as Col} from "./components/col/Col"
 export { default as Container} from "./components/container/Container"
 export { default as Dropdown} from "./components/dropdown/Dropdown"
 export { default as Text} from "./components/Text/Text"
-export { default as Input } from "./components/input/Input";
 export { default as ListGroup} from "./components/list-group/ListGroup"
 export { default as Menu} from "./components/menu/Menu"
 export { default as Popover} from "./components/popover/Popover"

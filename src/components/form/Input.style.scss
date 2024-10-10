@@ -2,12 +2,9 @@
 
 .input {
 
-  $padding: $xs;
-
   @include box(true, $primary);
   display: flex;
-  z-index: 1;
-  align-items: stretch;
+  align-items: center;
 
 
   &:has(&__control:focus) {
@@ -20,7 +17,8 @@
 
   &__left, &__right {
     display: flex;
-    align-items: stretch;
+    height: 100%;
+    align-items: center;
 
     &--action {
       padding: 0;
@@ -28,22 +26,20 @@
 
     &--placeholder {
       @include box(false, $secondary);
-      padding: $padding;
+      padding: $xxs;
     }
 
   }
 
   &__left {
     &--icon {
-      align-items: center;
-      padding: $padding 0 $padding $padding;
+      padding: $xxs 0 $xxs $xxs;
     }
   }
 
   &__right {
     &--icon {
-      align-items: center;
-      padding: $padding $padding $padding 0;
+      padding: $xxs $xxs $xxs 0;
     }
   }
 
@@ -51,7 +47,7 @@
     background: none;
     border: none;
     outline: none;
-    padding: $padding $padding;
+    padding: $xs $xxs;
     flex: 1;
     box-shadow: none;
     font-size: $sm;
@@ -63,28 +59,25 @@
     text-transform: uppercase;
     color: rgba($white, .5);
     font-size: $xs;
-    //margin: $padding 0;
+    margin: $xxs 0;
     display: block;
   }
 
   &__description {
     color: rgba($white, .5);
     font-size: $sm;
-    margin: $padding/2 0 $padding;
+    margin: $xxs 0;
     display: block;
   }
 
   &__message {
     @include box(false, $error);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    padding: $padding * 2 $padding $padding;
-    top: -$padding;
-    z-index: 0;
+    padding: $xxs;
+    margin: $xxs 0;
     display: flex;
     align-items: center;
     font-size: $xs;
-    gap: $padding;
+    gap: $xxs;
 
     > svg {
       width: $xs;

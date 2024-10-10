@@ -2,6 +2,8 @@
 
 .input {
 
+  $padding: $xs;
+
   @include box(true, $primary);
   display: flex;
   align-items: center;

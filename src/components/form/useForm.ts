@@ -28,6 +28,7 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
 
     const {initialValues, validate} = props
 
+    const refs = Object.entries(initialValues).map(() =>  useRef<HTMLInputElement | null>(null))
     const [valuesState, setValuesStore] = useState<Values>(initialValues)
     const inputProps = useMemo<ValidationsProps<Values>>(() => {
 
@@ -37,13 +38,13 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
             name: k,
             initialValue: v,
             function: !!validate && !!validate[k] ? validate[k] : (value: typeof v) => null
-        })).forEach(item => {
+        })).forEach((item, index) => {
             Object.assign(inputProps, {
                 [item.name]: {
                     defaultValue: item.initialValue,
                     notValidMessage: item.function(item.initialValue),
                     valid: !item.function(item.initialValue),
-                    ref: useRef<HTMLInputElement>(null)
+                    ref: refs[index]
                 }
             })
         })
@@ -61,7 +62,7 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
             values[key] = inputRef.current?.value
         })
 
-        setValuesStore(values as Values)
+        setValuesStore(() => values as Values)
 
     }, [inputProps])
 

@@ -1,5 +1,5 @@
 import {Code0Component, Color} from "../../utils/types";
-import React from "react";
+import React, {LegacyRef} from "react";
 import {ValidationProps} from "./useForm";
 import {mergeCode0Props} from "../../utils/utils";
 import "./Input.style.scss"
@@ -7,7 +7,9 @@ import InputLabel from "./InputLabel";
 import InputDescription from "./InputDescription";
 import InputMessage from "./InputMessage";
 
-export interface InputProps<T> extends Omit<Code0Component<HTMLInputElement>, "label">, ValidationProps<T> {
+type Code0Input = Omit<Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "ref">, "left">, "right">, "label">
+
+export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
     right?: React.ReactNode | React.ReactElement
     left?: React.ReactNode | React.ReactElement
@@ -19,7 +21,7 @@ export interface InputProps<T> extends Omit<Code0Component<HTMLInputElement>, "l
 }
 
 
-const Input: React.FC<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref) => {
+const Input: React.ForwardRefExoticComponent<Omit<InputProps<any>, "ref">> = React.forwardRef((props: InputProps<any>, ref) => {
 
     const {
         label,
@@ -41,15 +43,15 @@ const Input: React.FC<InputProps<any>> = React.forwardRef((props: InputProps<any
 
         <div className={`input ${!valid ? "input--not-valid" : ""}`}>
 
-            {!!left ? <span className={`input__left input__left--${leftType}`}>
+            {!!left ? <div className={`input__left input__left--${leftType}`}>
                 {left}
-            </span>: null}
+            </div>: null}
 
-            <input ref={ref} {...mergeCode0Props("input__control", rest)}/>
+            <input ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
 
-            {!!right ? <span className={`input__right input__right--${rightType}`}>
+            {!!right ? <div className={`input__right input__right--${rightType}`}>
                 {right}
-            </span> : null}
+            </div> : null}
 
         </div>
 

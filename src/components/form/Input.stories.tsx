@@ -3,71 +3,124 @@ import useForm from "./useForm";
 import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
-import {IconEye, IconMail} from "@tabler/icons-react";
-import Select from "../select/Select";
-import {Text} from "../../index";
+import {IconEye, IconKey, IconLogin, IconMail, IconMinus, IconPlus, IconX} from "@tabler/icons-react";
+import ButtonGroup from "../button-group/ButtonGroup";
+import Text from "../Text/Text";
 
 export default {
     title: "Input",
     component: Input
 }
 
-export const Test = () => {
+export const Login = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            test: null
+            email: null,
+            password: null,
+            checkbox: true
         },
         validate: {
-            test: (value) => {
-                if (!value) return "Test is required"
+            email: (value) => {
+                if (!value) return "Email is required"
+                return null
+            },
+            password: (value) => {
+                if (!value) return "Password is required"
                 return null
             }
+        },
+        onSubmit: (values) => {
+            console.log(values)
         }
     })
 
-    return <Card>
+    return <Card maw={300}>
+        <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
+        <br/>
+        <Text size={"sm"} display={"block"}>
+            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+            dolore magna aliquyam erat, sed diam voluptua.
+        </Text>
+        <br/>
         <form>
             <Input
-                right={<IconMail size={13}/>}
-                left={
-                    <Button color={"primary"}><IconEye size={13}/></Button>
-                }
-                leftType={"action"}
-                rightType={"icon"}
+                placeholder={"Email"}
                 label={"Email"}
-                description={"Provide a valid email address"}
-                type={"text"}
-                placeholder={"test"}
-                required
-                {...(inputs.test)}/>
+                type={"checkbox"}
+                description={"Your Email address for login"}
+                left={<IconMail size={13}/>}
+                right={<Button><IconX size={13}/></Button>}
+                {...inputs.checkbox}
+            />
             <br/>
             <Input
-                right={
-                    <Select placement={"bottom-start"}>
-                        <Select.Button/>
-                        <Select.Popover>
-                            <Select.Group>
-                                <Select.GroupLabel>Fruits</Select.GroupLabel>
-                                <Select.Item value={"Apple"}/>
-                                <Select.Item value={"Banana"}/>
-                                <Select.Item disabled value={"Grape"}/>
-                                <Select.Item value={"Orange"}/>
-                            </Select.Group>
-
-                        </Select.Popover>
-                    </Select>
-                }
-                rightType={"action"}
+                placeholder={"Email"}
                 label={"Email"}
-                description={"Provide a valid email address"}
-                type={"text"}
-                placeholder={"test"}
-                required
-                {...(inputs.test)}/>
+                type={"email"}
+                description={"Your Email address for login"}
+                left={<IconMail size={13}/>}
+                right={<Button><IconX size={13}/></Button>}
+                {...inputs.email}
+            />
             <br/>
-            <Button color={"secondary"} onClick={validate}>Test form</Button>
+            <Input
+                placeholder={"Password"}
+                label={"Password"}
+                type={"password"}
+                description={"Your password for login"}
+                left={<IconKey size={13}/>}
+                right={<ButtonGroup>
+                    <Button><IconEye size={13}/></Button>
+                    <Button><IconX size={13}/></Button>
+                </ButtonGroup>}
+                {...inputs.password}
+            />
+            <br/>
+            <div style={{
+                display: "flex",
+                justifyContent:"end"
+            }}>
+                <Button color={"info"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+
         </form>
+    </Card>
+
+}
+
+export const WebsiteInput = () => {
+
+    return <Card maw={300}>
+        <Input
+            label={"website"}
+            description={"Your website for linking"}
+            type={"text"}
+            placeholder={"code0.tech"}
+            left={"https://"}
+            leftType={"placeholder"}
+            right={<Button><IconX size={13}/></Button>}
+        />
+    </Card>
+
+}
+
+export const NumberInput = () => {
+
+    return <Card maw={300}>
+        <Input
+            label={"number"}
+            description={"Increase and decrease your number"}
+            type={"number"}
+            placeholder={"code0.tech"}
+            left={<Button color={"secondary"}><IconMinus size={13}/></Button>}
+            leftType={"action"}
+            right={<Button color={"secondary"}><IconPlus size={13}/></Button>}
+        />
     </Card>
 
 }

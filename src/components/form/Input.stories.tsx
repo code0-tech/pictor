@@ -47,16 +47,6 @@ export const Login = () => {
             <Input
                 placeholder={"Email"}
                 label={"Email"}
-                type={"checkbox"}
-                description={"Your Email address for login"}
-                left={<IconMail size={13}/>}
-                right={<Button><IconX size={13}/></Button>}
-                {...inputs.checkbox}
-            />
-            <br/>
-            <Input
-                placeholder={"Email"}
-                label={"Email"}
                 type={"email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}

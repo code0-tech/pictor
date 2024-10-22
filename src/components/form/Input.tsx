@@ -11,6 +11,7 @@ type Code0Input = Omit<Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "de
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
+    wrapperComponent?: Code0Component<HTMLDivElement>
     right?: React.ReactNode | React.ReactElement
     left?: React.ReactNode | React.ReactElement
     leftType?: "action" | "placeholder" | "icon"
@@ -24,6 +25,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 const Input: React.ForwardRefExoticComponent<Omit<InputProps<any>, "ref">> = React.forwardRef((props: InputProps<any>, ref) => {
 
     const {
+        wrapperComponent = {},
         label,
         description,
         disabled = false,
@@ -32,7 +34,7 @@ const Input: React.ForwardRefExoticComponent<Omit<InputProps<any>, "ref">> = Rea
         leftType = "icon",
         rightType = "action",
         notValidMessage,
-        valid,
+        valid = true,
         ...rest
     } = props
 
@@ -41,7 +43,7 @@ const Input: React.ForwardRefExoticComponent<Omit<InputProps<any>, "ref">> = Rea
         {!!label ? <InputLabel children={label}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
-        <div className={`input ${!valid ? "input--not-valid" : ""}`}>
+        <div {...mergeCode0Props(`input ${!valid ? "input--not-valid" : ""}`, wrapperComponent)}>
 
             {!!left ? <div className={`input__left input__left--${leftType}`}>
                 {left}

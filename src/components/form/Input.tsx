@@ -1,4 +1,4 @@
-import {Code0Component, Color} from "../../utils/types";
+import {Code0Component} from "../../utils/types";
 import React, {LegacyRef} from "react";
 import {ValidationProps} from "./useForm";
 import {mergeCode0Props} from "../../utils/utils";
@@ -7,7 +7,7 @@ import InputLabel from "./InputLabel";
 import InputDescription from "./InputDescription";
 import InputMessage from "./InputMessage";
 
-type Code0Input = Omit<Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "ref">, "left">, "right">, "label">
+type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">, "label">
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
@@ -18,11 +18,10 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     rightType?: "action" | "placeholder" | "icon"
     label?: React.ReactNode | React.ReactElement
     description?: React.ReactNode | React.ReactElement
-    color?: Color
 }
 
 
-const Input: React.ForwardRefExoticComponent<Omit<InputProps<any>, "ref">> = React.forwardRef((props: InputProps<any>, ref) => {
+const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref) => {
 
     const {
         wrapperComponent = {},

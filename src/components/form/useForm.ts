@@ -16,7 +16,8 @@ export interface ValidationProps<Value> {
     defaultValue?: Value
     valid?: boolean
     notValidMessage?: string | null
-    ref?: RefObject<HTMLInputElement>
+    //ref?: RefObject<HTMLInputElement>,
+    required?: boolean
 }
 
 export type ValidationsProps<Values> = Partial<{

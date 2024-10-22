@@ -6,6 +6,7 @@ import Button from "../button/Button";
 import {IconEye, IconKey, IconLogin, IconMail, IconMinus, IconPlus, IconX} from "@tabler/icons-react";
 import ButtonGroup from "../button-group/ButtonGroup";
 import Text from "../Text/Text";
+import PasswordInput from "./PasswordInput";
 
 export default {
     title: "Input",
@@ -54,16 +55,11 @@ export const Login = () => {
                 {...inputs.email}
             />
             <br/>
-            <Input
+            <PasswordInput
                 placeholder={"Password"}
                 label={"Password"}
-                type={"password"}
                 description={"Your password for login"}
                 left={<IconKey size={13}/>}
-                right={<ButtonGroup>
-                    <Button><IconEye size={13}/></Button>
-                    <Button><IconX size={13}/></Button>
-                </ButtonGroup>}
                 {...inputs.password}
             />
             <br/>

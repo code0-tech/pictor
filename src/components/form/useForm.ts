@@ -43,7 +43,8 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
         Object.entries(initialValues).map(([k, v], index) => {
 
             const inputRef: RefObject<HTMLInputElement> = refs[index]
-            const currentValue = inputRef.current?.value
+            const type = inputRef.current?.type ?? "text"
+            const currentValue = (type == "checkbox" || type == "radio") ? inputRef.current?.checked : inputRef.current?.value
 
             return {
                 name: k,
@@ -61,7 +62,8 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
                     defaultValue: item.value,
                     notValidMessage: message,
                     valid: message === null ? true : !message,
-                    ref: refs[index]
+                    ref: refs[index],
+                    ...(!!validate ? {required: true} : {})
                 }
             })
 

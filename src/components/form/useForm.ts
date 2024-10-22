@@ -1,6 +1,6 @@
 "use client"
 
-import {RefObject, useCallback, useMemo, useRef, useState} from "react";
+import {RefObject, useCallback, useRef, useState} from "react";
 
 export type Validations<Values> = Partial<{
     [Key in keyof Values]: (value: Values[Key]) => string | null;
@@ -8,7 +8,8 @@ export type Validations<Values> = Partial<{
 
 export interface FormValidationProps<Values> {
     initialValues: Values
-    validate?: Validations<Values>
+    validate?: Validations<Values>,
+    onSubmit?: (values: Values) => void
 }
 
 export interface ValidationProps<Value> {
@@ -24,50 +25,58 @@ export type ValidationsProps<Values> = Partial<{
 
 export type FormValidationReturn<Values> = [ValidationsProps<Values>, () => void]
 
+
 const useForm = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
-    const {initialValues, validate} = props
+    const {initialValues, validate, onSubmit = () => {}} = props
 
     const refs = Object.entries(initialValues).map(() =>  useRef<HTMLInputElement | null>(null))
-    const [valuesState, setValuesStore] = useState<Values>(initialValues)
-    const inputProps = useMemo<ValidationsProps<Values>>(() => {
+    const [inputProps, setInputProps] = useState<ValidationsProps<Values>>({})
 
+    const validateFunction = useCallback(() => {
+
+        let submittable = true
         let inputProps: ValidationsProps<Values> = {}
+        let submitProps: Object = {}
 
-        Object.entries(valuesState).map(([k, v]) => ({
-            name: k,
-            initialValue: v,
-            function: !!validate && !!validate[k] ? validate[k] : (value: typeof v) => null
-        })).forEach((item, index) => {
+        Object.entries(initialValues).map(([k, v], index) => {
 
-            const message = item.initialValue !== null ? item.function(item.initialValue) : null
+            const inputRef: RefObject<HTMLInputElement> = refs[index]
+            const currentValue = inputRef.current?.value
+
+            return {
+                name: k,
+                value: currentValue as typeof v || undefined,
+                function: !!validate && !!validate[k] ? validate[k] : (value: typeof currentValue) => null
+            }
+
+        }).forEach((item, index) => {
+
+            const message = item.value !== null ? item.function(item.value) : null
+            submittable = submittable ? message === null ? true : !message : false
 
             Object.assign(inputProps, {
                 [item.name]: {
-                    defaultValue: item.initialValue,
+                    defaultValue: item.value,
                     notValidMessage: message,
                     valid: message === null ? true : !message,
                     ref: refs[index]
                 }
             })
+
+            Object.assign(submitProps, {
+                [item.name]: item.value
+            })
+
         })
 
-        return inputProps
+        setInputProps(() => inputProps)
 
-    }, [valuesState])
+        if (submittable) onSubmit(submitProps as Values)
 
-    const validateFunction = useCallback(() => {
 
-        let values: { [index: string]: any } = {...valuesState}
 
-        Object.entries(inputProps as ValidationsProps<Values>).forEach(([key, value]) => {
-            const inputRef: RefObject<HTMLInputElement> = value.ref
-            values[key] = inputRef.current?.value
-        })
-
-        setValuesStore(() => values as Values)
-
-    }, [inputProps])
+    }, [])
 
     return [
         inputProps,

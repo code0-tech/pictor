@@ -7,6 +7,7 @@ import {IconEye, IconKey, IconLogin, IconMail, IconMinus, IconPlus, IconX} from 
 import ButtonGroup from "../button-group/ButtonGroup";
 import Text from "../Text/Text";
 import PasswordInput from "./PasswordInput";
+import TextInput from "./TextInput";
 
 export default {
     title: "Input",
@@ -82,14 +83,14 @@ export const Login = () => {
 export const WebsiteInput = () => {
 
     return <Card maw={300}>
-        <Input
+        <TextInput
             label={"website"}
             description={"Your website for linking"}
             type={"text"}
+            clearable
             placeholder={"code0.tech"}
             left={"https://"}
             leftType={"placeholder"}
-            right={<Button><IconX size={13}/></Button>}
         />
     </Card>
 

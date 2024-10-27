@@ -3,11 +3,11 @@ import useForm from "./useForm";
 import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
-import {IconEye, IconKey, IconLogin, IconMail, IconMinus, IconPlus, IconX} from "@tabler/icons-react";
-import ButtonGroup from "../button-group/ButtonGroup";
+import {IconKey, IconLogin, IconMail, IconMinus, IconPlus} from "@tabler/icons-react";
 import Text from "../Text/Text";
 import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
+import EmailInput, {emailValidation} from "./EmailInput";
 
 export default {
     title: "Input",
@@ -25,6 +25,7 @@ export const Login = () => {
         validate: {
             email: (value) => {
                 if (!value) return "Email is required"
+                if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             },
             password: (value) => {
@@ -46,13 +47,12 @@ export const Login = () => {
         </Text>
         <br/>
         <form>
-            <Input
+            <EmailInput
                 placeholder={"Email"}
                 label={"Email"}
                 type={"email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
-                right={<Button><IconX size={13}/></Button>}
                 {...inputs.email}
             />
             <br/>

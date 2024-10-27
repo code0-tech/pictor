@@ -12,8 +12,8 @@ type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "default
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
     wrapperComponent?: Code0Component<HTMLDivElement>
-    right?: React.ReactNode | React.ReactElement
-    left?: React.ReactNode | React.ReactElement
+    right?: React.ReactNode | React.ReactElement | React.ReactElement[]
+    left?: React.ReactNode | React.ReactElement | React.ReactElement[]
     leftType?: "action" | "placeholder" | "icon"
     rightType?: "action" | "placeholder" | "icon"
     label?: React.ReactNode | React.ReactElement

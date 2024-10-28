@@ -3,11 +3,12 @@ import useForm from "./useForm";
 import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
-import {IconKey, IconLogin, IconMail, IconMinus, IconPlus} from "@tabler/icons-react";
+import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
 import Text from "../Text/Text";
 import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
+import NumberInput from "./NumberInput";
 
 export default {
     title: "Input",
@@ -80,7 +81,7 @@ export const Login = () => {
 
 }
 
-export const WebsiteInput = () => {
+export const Website = () => {
 
     return <Card maw={300}>
         <TextInput
@@ -96,17 +97,13 @@ export const WebsiteInput = () => {
 
 }
 
-export const NumberInput = () => {
+export const Number = () => {
 
     return <Card maw={300}>
-        <Input
+        <NumberInput
             label={"number"}
             description={"Increase and decrease your number"}
-            type={"number"}
             placeholder={"code0.tech"}
-            left={<Button color={"secondary"}><IconMinus size={13}/></Button>}
-            leftType={"action"}
-            right={<Button color={"secondary"}><IconPlus size={13}/></Button>}
         />
     </Card>
 

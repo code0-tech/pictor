@@ -11,6 +11,8 @@ interface TextInputProps extends Omit<InputProps<string | null>, "wrapperCompone
 
 const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
+    ref = ref || React.useRef(null)
+
     const {
         clearable = false,
         right,

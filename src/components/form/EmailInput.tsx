@@ -18,6 +18,8 @@ export const emailValidation = (email: string) => EMAIL_REGEX.test(email)
 
 const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
+    ref = ref || React.useRef(null)
+
     const {
         clearable = false,
         right,

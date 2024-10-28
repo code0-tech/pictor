@@ -11,6 +11,8 @@ interface PasswordInputProps extends Omit<InputProps<string | null>, "wrapperCom
 
 const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
+    ref = ref || React.useRef(null)
+
     const {
         clearable = true,
         visible = true,

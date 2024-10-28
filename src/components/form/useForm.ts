@@ -26,13 +26,48 @@ export type ValidationsProps<Values> = Partial<{
 
 export type FormValidationReturn<Values> = [ValidationsProps<Values>, () => void]
 
+const createInitialInputProps = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>, refs: RefObject<HTMLInputElement>[]) => {
+
+    const {initialValues, validate} = props
+
+    let inputProps: ValidationsProps<Values> = {}
+
+    Object.entries(initialValues).map(([k, v], index) => {
+
+        const inputRef: RefObject<HTMLInputElement> = refs[index]
+        const type = inputRef.current?.type ?? "text"
+        const currentValue = (type == "checkbox" || type == "radio") ? inputRef.current?.checked : inputRef.current?.value
+
+        return {
+            name: k,
+            value: currentValue as typeof v || undefined,
+            function: !!validate && !!validate[k] ? validate[k] : (value: typeof currentValue) => null
+        }
+
+    }).forEach((item, index) => {
+
+        Object.assign(inputProps, {
+            [item.name]: {
+                defaultValue: item.value,
+                //notValidMessage: message,
+                //valid: message === null ? true : !message,
+                ref: refs[index],
+                ...(!!validate ? {required: true} : {})
+            }
+        })
+
+    })
+
+    return inputProps
+
+}
 
 const useForm = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
     const {initialValues, validate, onSubmit = () => {}} = props
 
     const refs = Object.entries(initialValues).map(() =>  useRef<HTMLInputElement | null>(null))
-    const [inputProps, setInputProps] = useState<ValidationsProps<Values>>({})
+    const [inputProps, setInputProps] = useState<ValidationsProps<Values>>(createInitialInputProps(props, refs))
 
     const validateFunction = useCallback(() => {
 

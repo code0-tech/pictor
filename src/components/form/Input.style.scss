@@ -93,3 +93,54 @@
   }
 
 }
+
+.radio-input {
+
+  $padding: $xxs;
+
+  background: backgroundColor($secondary) !important;
+  border-radius: 0 !important;
+  border: none !important;
+  align-items: center;
+  box-sizing: border-box;
+  gap: $xxs;
+  padding: $padding 0;
+
+  .input__control {
+
+    $size: $sm;
+
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 1px 0;
+    width: $size;
+    height: $size;
+
+    appearance: none;
+    outline: none;
+
+    background-color: transparent;
+    border: 1px solid borderColor($secondary, true);
+    border-radius: 50%;
+
+    &:checked {
+      border-color: borderColor($info, true);
+
+      &:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: $size/2;
+        height: $size/2;
+        background: backgroundColor($info);
+      }
+    }
+
+  }
+
+}

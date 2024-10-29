@@ -9,6 +9,7 @@ import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
 import NumberInput from "./NumberInput";
+import RadioInput from "./RadioInput";
 
 export default {
     title: "Input",
@@ -19,7 +20,7 @@ export const Login = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            email: null,
+            email: "nicoq@",
             password: null,
             checkbox: true
         },
@@ -54,7 +55,7 @@ export const Login = () => {
                 type={"email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
-                {...inputs.email}
+                {...inputs.getInputProps("email")}
             />
             <br/>
             <PasswordInput
@@ -62,12 +63,12 @@ export const Login = () => {
                 label={"Password"}
                 description={"Your password for login"}
                 left={<IconKey size={13}/>}
-                {...inputs.password}
+                {...inputs.getInputProps("password")}
             />
             <br/>
             <div style={{
                 display: "flex",
-                justifyContent:"end"
+                justifyContent: "end"
             }}>
                 <Button color={"info"} onClick={validate}>
                     <IconLogin size={13}/>
@@ -107,4 +108,59 @@ export const Number = () => {
         />
     </Card>
 
+}
+
+export const Radio = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: null
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+
+    return <form>
+        <Card maw={300}>
+            <RadioInput
+                label={"Runtime"}
+                description={"Change runtime mode production version"}
+                value={"dynamic"}
+                name={"test1"}
+                text={"Dynamic"}
+                {...inputs.getInputProps("test", {type : "radio"})}
+            />
+            <RadioInput
+                value={"hybrid"}
+                name={"test1"}
+                text={"Hybrid"}
+                {...inputs.getInputProps("test", {type : "radio"})}
+            />
+            <RadioInput
+                value={"static"}
+                name={"test1"}
+                text={"Static"}
+                {...inputs.getInputProps("test", {type : "radio"})}
+            />
+            <br/>
+            <div style={{
+                display: "flex",
+                justifyContent: "end"
+            }}>
+                <Button color={"info"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+        </Card>
+    </form>
 }

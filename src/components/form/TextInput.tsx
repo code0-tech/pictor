@@ -20,7 +20,10 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
     } = props
 
     const toClearable = () => {
-        if (ref.current) ref.current.value = ""
+        if (ref.current) {
+            ref.current["setValue"](ref.current, "")
+            ref.current.dispatchEvent(new Event("change", { bubbles: true }));
+        }
     }
 
     const rightAction = [right]

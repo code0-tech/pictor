@@ -21,7 +21,11 @@ const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> = React
     } = props
 
     const toClearable = () => {
-        if (ref.current) ref.current.value = ""
+        if (ref.current) {
+            ref.current["setValue"](ref.current, "")
+            ref.current.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+
     }
 
     const toVisible = () => {

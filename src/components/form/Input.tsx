@@ -1,5 +1,5 @@
 import {Code0Component} from "../../utils/types";
-import React, {LegacyRef} from "react";
+import React, {LegacyRef, RefObject, useEffect} from "react";
 import {ValidationProps} from "./useForm";
 import {mergeCode0Props} from "../../utils/utils";
 import "./Input.style.scss"
@@ -21,7 +21,9 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 }
 
 
-const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref) => {
+const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
+
+    ref = ref || React.useRef(null)
 
     const {
         wrapperComponent = {},
@@ -32,23 +34,43 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
         right,
         leftType = "icon",
         rightType = "action",
-        notValidMessage,
-        valid = true,
+        formValidation = {
+            valid: true,
+            notValidMessage: null,
+            onChange: null
+        },
         ...rest
     } = props
+
+    useEffect(() => {
+
+        if (!HTMLInputElement.prototype["setValue"]) HTMLInputElement.prototype["setValue"] = (element, value) => {
+            const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+            const prototype = Object.getPrototypeOf(element);
+            const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+
+            if (valueSetter && valueSetter !== prototypeValueSetter) {
+                prototypeValueSetter?.call(element, value);
+            } else {
+                valueSetter?.call(element, value);
+            }
+        }
+    }, [])
+
 
     return <>
 
         {!!label ? <InputLabel children={label}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
-        <div {...mergeCode0Props(`input ${!valid ? "input--not-valid" : ""}`, wrapperComponent)}>
+        <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}>
 
             {!!left ? <div className={`input__left input__left--${leftType}`}>
                 {left}
-            </div>: null}
+            </div> : null}
 
-            <input ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
+            <input onChange={formValidation?.onChange}
+                   ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
 
             {!!right ? <div className={`input__right input__right--${rightType}`}>
                 {right}
@@ -56,7 +78,8 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
 
         </div>
 
-        {!valid && notValidMessage ? <InputMessage children={notValidMessage}/> : null}
+        {!formValidation?.valid && formValidation?.notValidMessage ?
+            <InputMessage children={formValidation.notValidMessage}/> : null}
     </>
 })
 

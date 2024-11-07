@@ -1,5 +1,5 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import Input, {InputProps, setElementKey} from "./Input";
 import {IconX} from "@tabler/icons-react";
 import Button from "../button/Button";
 
@@ -27,7 +27,7 @@ const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwa
     } = props
 
     const toClearable = () => {
-        if (ref.current) ref.current.value = ""
+        if (ref.current) setElementKey(ref.current, "", "change")
     }
 
     const rightAction = [right]

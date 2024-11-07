@@ -30,7 +30,7 @@ export type ValidationsProps<Values> = Partial<{
 export type FormValidationReturn<Values> = [IValidation<Values>, () => void]
 
 export interface IValidation<Values> {
-    getInputProps(key: keyof Values, options: { type: "input" | "checkbox" | "radio" }): ValidationProps<Values>
+    getInputProps<Key extends keyof Values>(key: Key, options: { type: "input" | "checkbox" | "radio" }): ValidationProps<Values[Key]>
 }
 
 class Validation<Values> implements IValidation<Values> {
@@ -40,19 +40,19 @@ class Validation<Values> implements IValidation<Values> {
     private readonly currentValues: Values
     private readonly currentValidations?: Validations<Values>
 
-    constructor(changeValue, values, validations, initial) {
+    constructor(changeValue: (key: string, value: any) => void, values: Values, validations: Validations<Values>, initial: boolean) {
         this.changeValue = changeValue
         this.currentValues = values
         this.currentValidations = validations
         this.initialRender = initial
     }
 
-    public getInputProps(key: keyof Values, options: {
+    public getInputProps<Key extends keyof Values>(key: Key, options: {
         type: "input" | "checkbox" | "radio"
-    }): ValidationProps<Values> {
+    }): ValidationProps<Values[Key]> {
 
-        const currentValue = (this.currentValues[key] as null) || undefined
-        const currentName = key
+        const currentValue = ((this.currentValues[key]) || undefined)!!
+        const currentName = key as string
         const currentFc = !!this.currentValidations && !!this.currentValidations[key] ? this.currentValidations[key] : (value: typeof currentValue) => null
         const message = !this.initialRender ? currentFc(currentValue) : null
 
@@ -76,9 +76,9 @@ class Validation<Values> implements IValidation<Values> {
 
 const useForm = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
-    const {initialValues, validate, onSubmit} = props
+    const {initialValues, validate = {}, onSubmit} = props
     const [values, setValues] = useState<Values>(initialValues)
-    const changeValue = (key: string, value: any) => setValues(prevState => {
+    const changeValue = (key: keyof Values, value: any) => setValues(prevState => {
         prevState[key] = value
         return prevState
     })

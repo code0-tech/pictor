@@ -14,10 +14,10 @@ export interface FormValidationProps<Values> {
 
 export interface ValidationProps<Value> {
     checked?: boolean
-    defaultValue?: Value
+    initialValue?: Value
     required?: boolean
     formValidation?: {
-        onChange: ChangeEventHandler
+        onChange: ChangeEventHandler<HTMLInputElement>
         valid?: boolean
         notValidMessage?: string | null
     }
@@ -30,7 +30,7 @@ export type ValidationsProps<Values> = Partial<{
 export type FormValidationReturn<Values> = [IValidation<Values>, () => void]
 
 export interface IValidation<Values> {
-    getInputProps<Key extends keyof Values>(key: Key, options: { type: "input" | "checkbox" | "radio" }): ValidationProps<Values[Key]>
+    getInputProps<Key extends keyof Values>(key: Key, options?: { type: "input" | "checkbox" | "radio" }): ValidationProps<Values[Key]>
 }
 
 class Validation<Values> implements IValidation<Values> {
@@ -49,7 +49,7 @@ class Validation<Values> implements IValidation<Values> {
 
     public getInputProps<Key extends keyof Values>(key: Key, options: {
         type: "input" | "checkbox" | "radio"
-    }): ValidationProps<Values[Key]> {
+    } = {type: "input"}): ValidationProps<Values[Key]> {
 
         const currentValue = ((this.currentValues[key]) || undefined)!!
         const currentName = key as string
@@ -57,7 +57,7 @@ class Validation<Values> implements IValidation<Values> {
         const message = !this.initialRender ? currentFc(currentValue) : null
 
         return {
-            defaultValue: currentValue,
+            initialValue: currentValue,
             formValidation: {
                 onChange: (event: ChangeEvent) => {
                     this.changeValue(currentName, (event.target as HTMLInputElement).value)

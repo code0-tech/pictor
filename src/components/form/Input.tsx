@@ -20,6 +20,20 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     description?: React.ReactNode | React.ReactElement
 }
 
+export const setElementKey = (element: HTMLElement, value: any, event: string) => {
+    const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+    const prototype = Object.getPrototypeOf(element);
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+
+    if (valueSetter && valueSetter !== prototypeValueSetter) {
+        prototypeValueSetter?.call(element, value);
+    } else {
+        valueSetter?.call(element, value);
+    }
+
+    element.dispatchEvent(new Event(event, { bubbles: true }));
+}
+
 
 const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
 
@@ -42,21 +56,6 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
         ...rest
     } = props
 
-    useEffect(() => {
-
-        if (!HTMLInputElement.prototype["setValue"]) HTMLInputElement.prototype["setValue"] = (element, value) => {
-            const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
-            const prototype = Object.getPrototypeOf(element);
-            const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
-
-            if (valueSetter && valueSetter !== prototypeValueSetter) {
-                prototypeValueSetter?.call(element, value);
-            } else {
-                valueSetter?.call(element, value);
-            }
-        }
-    }, [])
-
 
     return <>
 
@@ -69,7 +68,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
                 {left}
             </div> : null}
 
-            <input onChange={formValidation?.onChange}
+            <input {...formValidation ? {onChange: formValidation.onChange!!} : {}}
                    ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
 
             {!!right ? <div className={`input__right input__right--${rightType}`}>

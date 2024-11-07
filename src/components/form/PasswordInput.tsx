@@ -1,5 +1,5 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import Input, {InputProps, setElementKey} from "./Input";
 import {IconEye, IconX} from "@tabler/icons-react";
 import Button from "../button/Button";
 
@@ -21,11 +21,7 @@ const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> = React
     } = props
 
     const toClearable = () => {
-        if (ref.current) {
-            ref.current["setValue"](ref.current, "")
-            ref.current.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-
+        if (ref.current) setElementKey(ref.current, "", "change")
     }
 
     const toVisible = () => {

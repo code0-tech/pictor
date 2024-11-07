@@ -52,7 +52,6 @@ export const Login = () => {
             <EmailInput
                 placeholder={"Email"}
                 label={"Email"}
-                type={"email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
                 {...inputs.getInputProps("email")}
@@ -88,7 +87,6 @@ export const Website = () => {
         <TextInput
             label={"website"}
             description={"Your website for linking"}
-            type={"text"}
             clearable
             placeholder={"code0.tech"}
             left={"https://"}

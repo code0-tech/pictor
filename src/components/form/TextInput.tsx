@@ -1,5 +1,5 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import Input, {InputProps, setElementKey} from "./Input";
 import {IconX} from "@tabler/icons-react";
 import Button from "../button/Button";
 
@@ -20,10 +20,7 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
     } = props
 
     const toClearable = () => {
-        if (ref.current) {
-            ref.current["setValue"](ref.current, "")
-            ref.current.dispatchEvent(new Event("change", { bubbles: true }));
-        }
+        if (ref.current) setElementKey(ref.current, "", "change")
     }
 
     const rightAction = [right]

@@ -30,7 +30,7 @@ export type ValidationsProps<Values> = Partial<{
 export type FormValidationReturn<Values> = [IValidation<Values>, () => void]
 
 export interface IValidation<Values> {
-    getInputProps<Key extends keyof Values>(key: Key, options?: { type: "input" | "checkbox" | "radio" }): ValidationProps<Values[Key]>
+    getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]>
 }
 
 class Validation<Values> implements IValidation<Values> {
@@ -47,9 +47,7 @@ class Validation<Values> implements IValidation<Values> {
         this.initialRender = initial
     }
 
-    public getInputProps<Key extends keyof Values>(key: Key, options: {
-        type: "input" | "checkbox" | "radio"
-    } = {type: "input"}): ValidationProps<Values[Key]> {
+    public getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]> {
 
         const currentValue = ((this.currentValues[key]) || undefined)!!
         const currentName = key as string

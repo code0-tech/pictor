@@ -10,6 +10,7 @@ import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
 import NumberInput from "./NumberInput";
 import RadioInput from "./RadioInput";
+import CheckboxInput from "./CheckboxInput";
 
 export default {
     title: "Input",
@@ -134,19 +135,19 @@ export const Radio = () => {
                 value={"dynamic"}
                 name={"test1"}
                 text={"Dynamic"}
-                {...inputs.getInputProps("test", {type : "radio"})}
+                {...inputs.getInputProps("test")}
             />
             <RadioInput
                 value={"hybrid"}
                 name={"test1"}
                 text={"Hybrid"}
-                {...inputs.getInputProps("test", {type : "radio"})}
+                {...inputs.getInputProps("test")}
             />
             <RadioInput
                 value={"static"}
                 name={"test1"}
                 text={"Static"}
-                {...inputs.getInputProps("test", {type : "radio"})}
+                {...inputs.getInputProps("test")}
             />
             <br/>
             <div style={{
@@ -161,4 +162,47 @@ export const Radio = () => {
             </div>
         </Card>
     </form>
+}
+
+
+export const Checkbox = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: null
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+
+    return <form>
+        <Card maw={300}>
+            <CheckboxInput
+                label={"Runtime"}
+                description={"Change runtime mode production version"}
+                text={"Dynamic"}
+                {...inputs.getInputProps("test")}
+            />
+            <br/>
+            <div style={{
+                display: "flex",
+                justifyContent: "end"
+            }}>
+                <Button color={"info"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+        </Card>
+    </form>
+
 }

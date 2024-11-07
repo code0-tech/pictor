@@ -13,8 +13,6 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
     ref = ref || React.useRef(null)
 
     const {
-        left,
-        right,
         step = 1,
         ...rest
     } = props
@@ -22,14 +20,14 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
     const countUp = () => {
         if (ref.current) {
             if (!ref.current.value) ref.current.value = "0"
-            ref.current.value = (Number.parseInt(ref.current.value) + (step)).toString()
+            ref.current.value = (Number.parseInt(ref.current.value) + (step as number)).toString()
         }
     }
 
     const countDown = () => {
         if (ref.current) {
             if (!ref.current.value) ref.current.value = "0"
-            ref.current.value = (Number.parseInt(ref.current.value) - (step)).toString()
+            ref.current.value = (Number.parseInt(ref.current.value) - (step as number)).toString()
         }
     }
 

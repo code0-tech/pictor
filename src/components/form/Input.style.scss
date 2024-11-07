@@ -97,6 +97,7 @@
 .radio-input {
 
   $padding: $xxs;
+  $size: 0.9rem;
 
   background: backgroundColor($secondary) !important;
   border-radius: 0 !important;
@@ -107,8 +108,6 @@
   padding: $padding 0;
 
   .input__control {
-
-    $size: $sm;
 
     position: relative;
     flex: none;
@@ -142,5 +141,54 @@
     }
 
   }
+}
 
+.checkbox-input {
+
+  $padding: $xxs;
+  $size: 0.9rem;
+
+  background: backgroundColor($secondary) !important;
+  border-radius: 0 !important;
+  border: none !important;
+  align-items: center;
+  box-sizing: border-box;
+  gap: $xxs;
+  padding: $padding 0;
+
+  .input__control {
+
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 1px 0;
+    width: $size;
+    height: $size;
+
+    appearance: none;
+    outline: none;
+
+    background-color: transparent;
+    border: 1px solid borderColor($secondary, true);
+    border-radius: calc($borderRadius / 3);
+
+    &:checked {
+      border-color: borderColor($info, true);
+      background: backgroundColor($info);
+
+      &:before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: $size/2;
+        height: $size/2;
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        background: rgba($white, .5);
+      }
+    }
+
+  }
 }

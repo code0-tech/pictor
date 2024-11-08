@@ -9,6 +9,7 @@ import {IconHeart, IconShare} from "@tabler/icons-react";
 import React from "react";
 import Row from "../row/Row";
 import Col from "../col/Col";
+import CardSection from "../card/CardSection";
 
 const meta: Meta = {
     title: "Container",
@@ -26,11 +27,11 @@ export const ContainerWithNews = () => {
         }}>
 
 
-            <Card.Section image border>
+            <CardSection image border>
                 <img alt={""} width={"100%"}
                      src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
-            </Card.Section>
-            <Card.Section>
+            </CardSection>
+            <CardSection>
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -50,12 +51,12 @@ export const ContainerWithNews = () => {
                         </Button>
                     </ButtonGroup>
                 </div>
-            </Card.Section>
-            <Card.Section border>
+            </CardSection>
+            <CardSection border>
                 <Text hierarchy={"tertiary"} size={"md"}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
                     diam
                     nonumy eirmod tempor invidunt ut</Text>
-            </Card.Section>
+            </CardSection>
 
         </Card>
     </Container>

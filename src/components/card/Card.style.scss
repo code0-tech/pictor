@@ -1,14 +1,17 @@
 @import "../../styles/helpers";
 
+$padding: $xs;
+
 .card {
-  padding: .5rem;
+
+  display: block;
+  padding: $padding;
   position: relative;
-  overflow: hidden;
 
   * {
 
     &.card__section > img {
-      border-radius: .5rem;
+      border-radius: $borderRadius / 2;
     }
 
     &:first-child.card__section {
@@ -20,6 +23,7 @@
       }
 
     }
+
     &:last-child.card__section {
       margin-bottom: 0;
 
@@ -30,21 +34,15 @@
     }
   }
 
-  &--outline {
-    outline: 1px solid borderColor();
-    outline-offset: .5rem;
-    margin: .5rem;
-  }
-
   &__section {
-    margin-bottom: .5rem;
-    margin-top: .5rem;
+    margin-bottom: $padding;
+    margin-top: $padding;
     position: relative;
 
     &--border {
-      margin-right: -.5rem;
-      margin-left: -.5rem;
-      padding: .5rem;
+      margin-right: -1 * $padding;
+      margin-left: -1 * $padding;
+      padding: $padding;
 
       border-top: 1px solid borderColor();
       border-bottom: 1px solid borderColor();
@@ -58,13 +56,11 @@
 
 }
 
-@function getMixedColor($color) {
-  @return mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 90%, 80%));
-}
-
 @each $name, $color in $colors {
   .card--#{$name} {
     @include box(false, $color);
+
+    //variants
 
     &.card--none {
       background: transparent;
@@ -75,42 +71,36 @@
       border-color: transparent;
     }
 
+    &.card--outline {
+      outline: 1px solid borderColor();
+      outline-offset: $padding;
+      margin: $padding;
+    }
+
     &.card--outlined {
       background: transparent;
     }
 
+    //gradient
 
     &.card--gradient {
 
-      &:before {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        opacity: 75%;
-        content: "";
+      @each $firstGradientName, $firstGradientColor in $colors {
+
+        @each $secondGradientName, $secondGradientColor in $colors {
+
+          &--#{$firstGradientName}-#{$secondGradientName} {
+            box-shadow: inset $padding $padding $padding (-1 * $padding) backgroundColor($firstGradientColor),
+                        inset (-1 * $padding) (-1 * $padding) $padding (-1 * $padding) backgroundColor($secondGradientColor);
+          }
+
+        }
       }
-
-
-      &.card--gradient-top-left:before {
-        background: linear-gradient(135deg, backgroundColor($color) 0%, transparent 50%);
-      }
-
-      &.card--gradient-bottom-left:before {
-        background: linear-gradient(45deg, backgroundColor($color) 0%, transparent 50%);
-      }
-
-      &.card--gradient-top-right:before {
-        background: linear-gradient(225deg, backgroundColor($color) 0%, transparent 50%);
-      }
-
-      &.card--gradient-bottom-right:before {
-        background: linear-gradient(315deg, backgroundColor($color) 0%, transparent 50%);
-      }
-
-
     }
 
+  }
+
+  .card--border-#{$name} {
+    border-color: borderColor($color);
   }
 }

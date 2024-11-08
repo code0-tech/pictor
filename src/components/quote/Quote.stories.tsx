@@ -18,10 +18,6 @@ const meta: Meta = {
         gradient: {
             type: "boolean"
         },
-        gradientPosition: {
-            options: ["top-left", "top-right", "bottom-right", "bottom-left"],
-            control: {type: 'radio'},
-        },
         outline: {
             type: "boolean"
         },

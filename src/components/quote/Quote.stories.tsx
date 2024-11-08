@@ -18,10 +18,6 @@ const meta: Meta = {
         gradient: {
             type: "boolean"
         },
-        gradientPosition: {
-            options: ["top-left", "top-right", "bottom-right", "bottom-left"],
-            control: {type: 'radio'},
-        },
         outline: {
             type: "boolean"
         },
@@ -53,6 +49,8 @@ export const QuoteWithLogo: QuoteStory = {
         color: "secondary",
         outline: false,
         gradient: true,
+        borderColor: "secondary",
+        firstGradientColor: "secondary",
         gradientPosition: "bottom-left",
         inlineBorder: true
     }
@@ -73,6 +71,8 @@ export const QuoteWithoutLogo: QuoteStory = {
         variant: "outlined",
         color: "secondary",
         outline: false,
+        borderColor: "secondary",
+        firstGradientColor: "secondary",
         gradient: true,
         gradientPosition: "bottom-left",
         inlineBorder: true

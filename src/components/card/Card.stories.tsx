@@ -1,12 +1,13 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React, {useState} from "react";
-import Card, {CardType} from "./Card";
+import Card from "./Card";
 import Badge from "../badge/Badge";
 import Text from "../Text/Text";
 import {Colors} from "../../utils/types";
 import ButtonGroup from "../button-group/ButtonGroup";
 import Button from "../button/Button";
-import {IconHeart, IconHeartFilled, IconShare, IconStar, IconStarFilled} from "@tabler/icons-react";
+import {IconHeart, IconHeartFilled, IconShare} from "@tabler/icons-react";
+import CardSection from "./CardSection";
 
 const meta: Meta = {
     title: "Card",
@@ -23,10 +24,6 @@ const meta: Meta = {
         gradient: {
             type: "boolean"
         },
-        gradientPosition: {
-            options: ["top-left", "top-right", "bottom-right", "bottom-left"],
-            control: {type: 'radio'},
-        },
         outline: {
             type: "boolean"
         }
@@ -42,18 +39,18 @@ export const CardNews: CardStory = {
 
         const [heart, setHeart] = useState(false)
 
-        return <Card outline={props.outline} variant={props.variant} gradientPosition={props.gradientPosition} gradient={props.gradient}
+        return <Card outline={props.outline} variant={props.variant} gradient={props.gradient}
                      color={props.color} style={{
             width: "50vw",
             maxWidth: "350px"
         }}>
 
 
-            <Card.Section image border>
+            <CardSection image border>
                 <img alt={""} width={"100%"}
                      src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
-            </Card.Section>
-            <Card.Section>
+            </CardSection>
+            <CardSection>
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -79,20 +76,20 @@ export const CardNews: CardStory = {
                         </Button>
                     </ButtonGroup>
                 </div>
-            </Card.Section>
-            <Card.Section border>
+            </CardSection>
+            <CardSection border>
                 <Text hierarchy={"tertiary"} size={"md"}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
                     diam
                     nonumy eirmod tempor invidunt ut</Text>
-            </Card.Section>
+            </CardSection>
 
         </Card>
     }
     ,
     args: {
-        variant: "none",
+        variant: "normal",
         color: "secondary",
-        outline: true,
+        outline: false,
         gradient: true,
         gradientPosition: "top-right"
     }

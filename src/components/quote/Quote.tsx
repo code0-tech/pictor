@@ -2,6 +2,7 @@ import React from "react";
 import Card, {CardType} from "../card/Card";
 import "./Quote.style.scss"
 import Text from "../Text/Text";
+import CardSection from "../card/CardSection";
 
 export interface QuoteType extends Omit<CardType, "children"> {
     children: string
@@ -16,12 +17,12 @@ const Quote: React.FC<QuoteType> = (props) => {
     const {logo, name, position, inlineBorder = true, children, ...args} = props;
     return <Card {...args}>
         <div className={"quote"}>
-            <Card.Section border={inlineBorder}>
+            <CardSection border={inlineBorder}>
                 <div className={"quote__text"}>
                     {children}
                 </div>
-            </Card.Section>
-            <Card.Section className={"quote__footer"}>
+            </CardSection>
+            <CardSection className={"quote__footer"}>
                 {
                     !!logo ? <div>
                         <img className={"quote__img"} src={logo} alt={"logo of quote"}/>
@@ -31,7 +32,7 @@ const Quote: React.FC<QuoteType> = (props) => {
                     <Text size={"md"} hierarchy={"primary"} m={0}>{name}</Text>
                     <Text size={"sm"}>{position}</Text>
                 </div>
-            </Card.Section>
+            </CardSection>
         </div>
     </Card>
 }

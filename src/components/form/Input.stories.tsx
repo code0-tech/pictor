@@ -9,8 +9,10 @@ import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
 import NumberInput from "./NumberInput";
-import RadioInput from "./RadioInput";
+import RadioInput from "./radio/RadioInput";
 import CheckboxInput from "./CheckboxInput";
+import RadioGroup from "./radio/RadioGroup";
+import RadioButton from "./radio/RadioButton";
 
 export default {
     title: "Input",
@@ -109,11 +111,11 @@ export const Number = () => {
 
 }
 
-export const Radio = () => {
+export const RadioExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            test: null
+            test: "dynamic"
         },
         validate: {
             test: (value) => {
@@ -205,4 +207,58 @@ export const Checkbox = () => {
         </Card>
     </form>
 
+}
+
+
+export const RadioCard = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: "dynamic"
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <RadioGroup {...inputs.getInputProps("test")}>
+        {({activeRadio, setActiveRadio}) => {
+            return <>
+                <Card onClick={() => setActiveRadio("dynamic")} color={activeRadio == "dynamic" ? "secondary" : "primary"}>
+                    <Card.Section border>
+                        <RadioButton name={"test1"} value={"dynamic"}/>
+                    </Card.Section>
+                    <Card.Section>
+                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut
+                    </Card.Section>
+                </Card>
+                <Card onClick={() => setActiveRadio("hybrid")} color={activeRadio == "hybrid" ? "secondary" : "primary"}>
+                    <Card.Section border>
+                        <RadioButton name={"test1"} value={"hybrid"}/>
+                    </Card.Section>
+                    <Card.Section>
+                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut
+                    </Card.Section>
+                </Card>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "end"
+                }}>
+                    <Button color={"info"} onClick={validate}>
+                        <IconLogin size={13}/>
+                        Login
+                    </Button>
+
+                </div>
+            </>
+        }}
+    </RadioGroup>
 }

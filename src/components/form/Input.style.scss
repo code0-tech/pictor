@@ -8,6 +8,7 @@
   display: flex;
   z-index: 1;
   align-items: stretch;
+  cursor: pointer;
 
 
   &:has(&__control:focus) {
@@ -94,18 +95,18 @@
 
 }
 
-.radio-input {
+.radio-input, .radio-button {
 
   $padding: $xxs;
   $size: 0.9rem;
 
-  background: backgroundColor($secondary) !important;
+  background:transparent !important;
   border-radius: 0 !important;
   border: none !important;
   align-items: center;
   box-sizing: border-box;
-  gap: $xxs;
   padding: $padding 0;
+  gap: $xxs;
 
   .input__control {
 
@@ -141,6 +142,11 @@
     }
 
   }
+}
+
+.radio-button {
+  padding: 0;
+  display: inline-flex;
 }
 
 .checkbox-input {

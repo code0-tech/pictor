@@ -1,5 +1,5 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import Input, {InputProps} from "../Input";
 
 
 interface RadioInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type" | "left" | "leftType"> {

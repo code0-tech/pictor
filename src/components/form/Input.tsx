@@ -1,5 +1,5 @@
 import {Code0Component} from "../../utils/types";
-import React, {LegacyRef, RefObject, useEffect} from "react";
+import React, {ChangeEvent, LegacyRef, RefObject, useEffect} from "react";
 import {ValidationProps} from "./useForm";
 import {mergeCode0Props} from "../../utils/utils";
 import "./Input.style.scss"
@@ -20,10 +20,10 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     description?: React.ReactNode | React.ReactElement
 }
 
-export const setElementKey = (element: HTMLElement, value: any, event: string) => {
-    const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+export const setElementKey = (element: HTMLElement, key: string, value: any, event: string) => {
+    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set;
     const prototype = Object.getPrototypeOf(element);
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set;
 
     if (valueSetter && valueSetter !== prototypeValueSetter) {
         prototypeValueSetter?.call(element, value);
@@ -51,10 +51,20 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
         formValidation = {
             valid: true,
             notValidMessage: null,
-            onChange: null
+            setValue: null
         },
         ...rest
     } = props
+
+    useEffect(() => {
+        if (!ref) return
+        if (!ref.current) return
+        if (!formValidation) return
+        if (!formValidation.setValue) return
+
+        // @ts-ignore
+        ref.current.addEventListener("change", ev => formValidation.setValue(rest.type != "checkbox" ? ev.target.value : ev.target.checked))
+    }, [ref])
 
 
     return <>
@@ -68,8 +78,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
                 {left}
             </div> : null}
 
-            <input {...formValidation ? {onChange: formValidation.onChange!!} : {}}
-                   ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
+            <input ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
 
             {!!right ? <div className={`input__right input__right--${rightType}`}>
                 {right}

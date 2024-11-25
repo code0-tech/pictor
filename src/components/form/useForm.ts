@@ -13,11 +13,10 @@ export interface FormValidationProps<Values> {
 }
 
 export interface ValidationProps<Value> {
-    checked?: boolean
-    initialValue?: Value
+    initialValue?: Value | null
     required?: boolean
     formValidation?: {
-        onChange: ChangeEventHandler<HTMLInputElement>
+        setValue: (value: string) => void
         valid?: boolean
         notValidMessage?: string | null
     }
@@ -49,7 +48,7 @@ class Validation<Values> implements IValidation<Values> {
 
     public getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]> {
 
-        const currentValue = ((this.currentValues[key]) || undefined)!!
+        const currentValue = ((this.currentValues[key]) || null)!!
         const currentName = key as string
         const currentFc = !!this.currentValidations && !!this.currentValidations[key] ? this.currentValidations[key] : (value: typeof currentValue) => null
         const message = !this.initialRender ? currentFc(currentValue) : null
@@ -57,8 +56,8 @@ class Validation<Values> implements IValidation<Values> {
         return {
             initialValue: currentValue,
             formValidation: {
-                onChange: (event: ChangeEvent) => {
-                    this.changeValue(currentName, (event.target as HTMLInputElement).value)
+                setValue: (value: string) => {
+                    this.changeValue(currentName, value)
                 },
                 ...(!this.initialRender ? {
                     notValidMessage: message,

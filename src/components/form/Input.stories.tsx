@@ -13,6 +13,7 @@ import RadioInput from "./radio/RadioInput";
 import CheckboxInput from "./CheckboxInput";
 import RadioGroup from "./radio/RadioGroup";
 import RadioButton from "./radio/RadioButton";
+import CardSection from "../card/CardSection";
 
 export default {
     title: "Input",
@@ -207,4 +208,56 @@ export const Checkbox = () => {
         </Card>
     </form>
 
+}
+
+export const RadioCard = () => {
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: "dynamic"
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+    return <RadioGroup {...inputs.getInputProps("test")}>
+        {({activeRadio, setActiveRadio}) => {
+            return <>
+                <Card onClick={() => setActiveRadio("dynamic")} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
+                    <CardSection border>
+                        <RadioButton name={"test1"} value={"dynamic"}/>
+                    </CardSection>
+                    <CardSection>
+                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut
+                    </CardSection>
+                </Card>
+                <br/>
+                <Card onClick={() => setActiveRadio("hybrid")} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
+                    <CardSection border>
+                        <RadioButton name={"test1"} value={"hybrid"}/>
+                    </CardSection>
+                    <CardSection>
+                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut
+                    </CardSection>
+                </Card>
+                <br/>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "end"
+                }}>
+                    <Button color={"info"} onClick={validate}>
+                        <IconLogin size={13}/>
+                        Login
+                    </Button>
+                </div>
+            </>
+        }}
+    </RadioGroup>
 }

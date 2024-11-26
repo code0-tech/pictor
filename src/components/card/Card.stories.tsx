@@ -91,6 +91,5 @@ export const CardNews: CardStory = {
         color: "secondary",
         outline: false,
         gradient: true,
-        gradientPosition: "top-right"
     }
 }

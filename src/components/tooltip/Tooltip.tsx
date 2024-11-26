@@ -1,4 +1,4 @@
-import React, {cloneElement, ReactElement, ReactNode} from "react";
+import React, {ReactElement, ReactNode} from "react";
 import {getChild, getPositionAroundTarget} from "../../utils/utils";
 import "./Tooltip.style.scss"
 

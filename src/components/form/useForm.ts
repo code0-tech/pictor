@@ -1,6 +1,6 @@
 "use client"
 
-import {ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 
 export type Validations<Values> = Partial<{
     [Key in keyof Values]: (value: Values[Key]) => string | null;

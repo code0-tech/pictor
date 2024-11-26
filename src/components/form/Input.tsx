@@ -1,5 +1,5 @@
 import {Code0Component} from "../../utils/types";
-import React, {ChangeEvent, LegacyRef, RefObject, useEffect} from "react";
+import React, {LegacyRef, RefObject, useEffect} from "react";
 import {ValidationProps} from "./useForm";
 import {mergeCode0Props} from "../../utils/utils";
 import "./Input.style.scss"

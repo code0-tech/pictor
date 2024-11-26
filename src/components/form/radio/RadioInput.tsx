@@ -27,7 +27,7 @@ const RadioInput: React.ForwardRefExoticComponent<RadioInputProps> = React.forwa
         left={null}
         ref={ref}
         value={value}
-        {...(value === initialValue ? {defaultChecked: true} : {})}
+        {...(initialValue && value === initialValue ? {defaultChecked: true} : {})}
         {...rest}
     />
 

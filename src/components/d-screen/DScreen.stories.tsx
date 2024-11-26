@@ -1,7 +1,6 @@
 import {Meta} from "@storybook/react";
 import React from "react";
 import DScreen from "./DScreen";
-import Badge from "../badge/Badge";
 import {
     IconBrandAdobe,
     IconDatabase,

@@ -1,4 +1,4 @@
-import React, {CSSProperties, ReactNode, useState} from "react";
+import React, {CSSProperties, ReactNode} from "react";
 import mergeProps from "merge-props";
 import {Code0Component, Code0ComponentProps} from "./types";
 

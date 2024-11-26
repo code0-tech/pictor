@@ -15,6 +15,7 @@ import RadioGroup from "./radio/RadioGroup";
 import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
 import Flex from "../flex/Flex";
+import SwitchInput from "./SwitchInput";
 
 export default {
     title: "Form"
@@ -308,4 +309,46 @@ export const RadioWithoutInput = () => {
             </>
         }}
     </RadioGroup>
+}
+
+
+export const Switch = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: null
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+
+    return <form>
+        <Card maw={300}>
+            <SwitchInput
+                label={"Runtime"}
+                description={"Change runtime mode production version"}
+                {...inputs.getInputProps("test")}
+            />
+            <br/>
+            <div style={{
+                display: "flex",
+                justifyContent: "end"
+            }}>
+                <Button color={"info"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+        </Card>
+    </form>
+
 }

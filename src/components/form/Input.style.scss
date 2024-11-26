@@ -200,3 +200,74 @@
 
   }
 }
+
+.switch-input {
+
+  $padding: $xxs;
+  $size: 0.9rem;
+  background: transparent !important;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none !important;
+
+  .input__control {
+
+    position: relative;
+    box-sizing: border-box;
+    padding: 0;
+    width: $size;
+    height: $size;
+
+    appearance: none;
+    outline: none;
+
+    background-color: transparent;
+    border-radius: 50%;
+
+    &:checked{
+
+      &:after {
+        -webkit-transform: translateX(22.5px);
+        -ms-transform: translateX(22.5px);
+        transform: translateX(22.5px);
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+
+      &:before {
+        background-color: backgroundColor($info);
+        -webkit-transition: .4s;
+        transition: .4s;
+      }
+    }
+
+    &:after {
+      width: $size;
+      height: $size;
+      background-color: $white;
+      border-radius: 50%;
+      position: absolute;
+      content: "";
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    &:before {
+      background: backgroundColor($primary);
+      position: absolute;
+      border-radius: 50rem;
+      width: $size * 2.5 + $padding;
+      height: $size + $padding;
+      top: -1 * $padding/2;
+      left: -1 * $padding/2;
+      content: "";
+      z-index: -1;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+
+  }
+
+}

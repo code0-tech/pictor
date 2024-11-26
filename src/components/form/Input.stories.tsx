@@ -14,10 +14,10 @@ import CheckboxInput from "./CheckboxInput";
 import RadioGroup from "./radio/RadioGroup";
 import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
+import Flex from "../flex/Flex";
 
 export default {
-    title: "Input",
-    component: Input
+    title: "Form"
 }
 
 export const Login = () => {
@@ -247,6 +247,54 @@ export const RadioCard = () => {
                         ut
                     </CardSection>
                 </Card>
+                <br/>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "end"
+                }}>
+                    <Button color={"info"} onClick={validate}>
+                        <IconLogin size={13}/>
+                        Login
+                    </Button>
+                </div>
+            </>
+        }}
+    </RadioGroup>
+}
+
+export const RadioWithoutInput = () => {
+    const [inputs, validate] = useForm({
+        initialValues: {
+            test: "dynamic"
+        },
+        validate: {
+            test: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+    return <RadioGroup {...inputs.getInputProps("test")}>
+        {({activeRadio, setActiveRadio}) => {
+            return <>
+                <Flex style={{gap: ".5rem"}}>
+                    <Card onClick={() => setActiveRadio("dynamic")} maw={200} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
+                        <CardSection>
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                            ut
+                        </CardSection>
+                    </Card>
+                    <Card onClick={() => setActiveRadio("hybrid")} maw={200} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
+                        <CardSection>
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                            ut
+                        </CardSection>
+                    </Card>
+                </Flex>
+
                 <br/>
                 <div style={{
                     display: "flex",

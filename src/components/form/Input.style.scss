@@ -117,6 +117,7 @@
     margin: 1px 0;
     width: $size;
     height: $size;
+    aspect-ratio: 1/1;
 
     appearance: none;
     outline: none;
@@ -132,6 +133,7 @@
         content: "";
         position: absolute;
         left: 50%;
+        aspect-ratio: 1/1;
         border-radius: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);

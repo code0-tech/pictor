@@ -2,9 +2,8 @@ import {Meta} from "@storybook/react";
 import React from "react";
 import Dropdown from "./Dropdown";
 import Button from "../button/Button";
-import {IconAbc, IconSearch} from "@tabler/icons-react";
+import {IconAbc} from "@tabler/icons-react";
 import ButtonGroup from "../button-group/ButtonGroup";
-import Input from "../input/Input";
 
 const meta: Meta = {
     title: "Dropdown",
@@ -30,11 +29,6 @@ export const Dropdowns = () => {
                 <Button>Open Dropdown</Button>
             </Dropdown.Trigger>
             <Dropdown.Menu>
-                <Dropdown.Header>
-                    <Input.Control placeholder={"search..."}>
-                        <Input.Control.Icon><IconSearch/></Input.Control.Icon>
-                    </Input.Control>
-                </Dropdown.Header>
                 <Dropdown.Group>
                     <Dropdown.Group.Item>
                         Item 1

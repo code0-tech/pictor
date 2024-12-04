@@ -51,7 +51,6 @@ export const QuoteWithLogo: QuoteStory = {
         gradient: true,
         borderColor: "secondary",
         firstGradientColor: "secondary",
-        gradientPosition: "bottom-left",
         inlineBorder: true
     }
 }
@@ -74,7 +73,6 @@ export const QuoteWithoutLogo: QuoteStory = {
         borderColor: "secondary",
         firstGradientColor: "secondary",
         gradient: true,
-        gradientPosition: "bottom-left",
         inlineBorder: true
     }
 }

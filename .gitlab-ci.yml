@@ -50,7 +50,7 @@ storybook:test:
       if [[ $exit_code -ne 0 && -d "__snapshots__/__diff_output__" ]]; then
         echo -e "\e[0Ksection_start:`date +%s`:glpa_summary\r\e[0KHeader of the summary"
         echo "Storybook tests failed."
-        echo "Check for rendering differences at http://gitlab.com/code0-tech/development/pictor/-/jobs/$CI_JOB_ID/artifacts/browse/__snapshots__/__diff_output__/"
+        echo "Check for rendering differences at https://gitlab.com/code0-tech/development/pictor/-/jobs/$CI_JOB_ID/artifacts/browse/__snapshots__/__diff_output__/"
         echo "If the changes are intended, update the snapshots by adding the 'regenerate-snapshots' label."
         echo -e "\e[0Ksection_end:`date +%s`:glpa_summary\r\e[0K"
       fi

@@ -33,7 +33,7 @@
     "@storybook/manager-api": "^8.3.6",
     "@storybook/react": "^8.3.6",
     "@storybook/react-vite": "^8.3.6",
-    "@storybook/test-runner": "^0.19.1",
+    "@storybook/test-runner": "^0.21.0",
     "@storybook/testing-library": "^0.2.2",
     "@storybook/theming": "^8.3.6",
     "@tabler/icons-react": "^3.14.0",

@@ -5,7 +5,7 @@ enum EDataType {
     DATATYPE,
     ARRAY,
     GENERIC,
-    FUNCTION
+    NODE
 }
 
 enum EDataTypeRuleType {
@@ -34,6 +34,75 @@ interface DataType {
     inputTypes?: DataType[]
     returnType?: DataType
     parent?: DataType
+}
+
+
+interface RuntimeFunctionDefinition  {
+    runtime_id: string
+    parameters?: RuntimeParameterDefinition[]
+    return_type?: DataType
+}
+
+
+interface RuntimeParameterDefinition {
+    type: DataType
+    name: string
+}
+
+
+interface FunctionDefinition {
+    runtime_function: RuntimeFunctionDefinition
+    return_type?: DataType
+    parameters?: ParameterDefinition[]
+    name: Translation
+    description: Translation
+
+}
+
+interface ParameterDefinition {
+    type: DataType
+    name: Translation // overrides the runtime parameter name and ref to language entry
+    description: Translation
+    default_value: object
+}
+
+interface FlowType {
+    name: Translation
+    definition: FlowDefinition
+}
+
+interface FlowDefinition {
+    settings: FlowDefinitionSetting[]
+}
+
+interface FlowDefinitionSetting {
+    name: Translation
+    description: Translation
+    type: DataType
+    default_value: object
+}
+
+interface Flow {
+    type: FlowType //in the actual implementation we will just link the name or id
+    settings: FlowSetting[]
+    starting_node: Node
+}
+
+interface FlowSetting {
+    definition: FlowDefinitionSetting
+    value: object
+}
+
+interface Node {
+    function: FunctionDefinition
+    parameters?: Parameter[]
+    next_node?: Node
+}
+
+interface Parameter {
+    definition: ParameterDefinition
+    value?: object
+    sub_node?: Node
 }
 
 const userObject: DataType = {
@@ -76,7 +145,7 @@ const forLoopFunctionParameterType: DataType = {
         code: "en_US",
         text: "Function"
     }],
-    type: EDataType.FUNCTION,
+    type: EDataType.NODE,
     inputTypes: [{
         name: [{
             code: "en_US",

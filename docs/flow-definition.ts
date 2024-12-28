@@ -38,7 +38,7 @@ interface DataType {
 
 
 interface RuntimeFunctionDefinition  {
-    runtime_id: string
+    runtime_id: string //standard::math::add
     parameters?: RuntimeParameterDefinition[]
     return_type?: DataType
 }
@@ -54,20 +54,21 @@ interface FunctionDefinition {
     runtime_function: RuntimeFunctionDefinition
     return_type?: DataType
     parameters?: ParameterDefinition[]
-    name: Translation
-    description: Translation
+    name: Translation[]
+    description: Translation[]
+    documentation: Translation[] //as markdown
 
 }
 
 interface ParameterDefinition {
     type: DataType
-    name: Translation // overrides the runtime parameter name and ref to language entry
-    description: Translation
-    default_value: object
+    name: Translation[] // overrides the runtime parameter name and ref to language entry
+    description: Translation[]
+    default_value?: object
 }
 
 interface FlowType {
-    name: Translation
+    name: Translation[]
     definition: FlowDefinition
 }
 
@@ -76,10 +77,10 @@ interface FlowDefinition {
 }
 
 interface FlowDefinitionSetting {
-    name: Translation
-    description: Translation
+    name: Translation[]
+    description: Translation[]
     type: DataType
-    default_value: object
+    default_value?: object
 }
 
 interface Flow {
@@ -94,16 +95,18 @@ interface FlowSetting {
 }
 
 interface Node {
-    function: FunctionDefinition
+    function: Partial<FunctionDefinition> | string
     parameters?: Parameter[]
     next_node?: Node
 }
 
 interface Parameter {
-    definition: ParameterDefinition
+    definition: ParameterDefinition | string
     value?: object
     sub_node?: Node
 }
+
+
 
 const userObject: DataType = {
     name: [{
@@ -153,4 +156,40 @@ const forLoopFunctionParameterType: DataType = {
         }],
         type: EDataType.GENERIC
     }]
+}
+
+const flow: Flow = {
+
+    starting_node: {
+        function: "function::user::add", //-> standard::database::add
+        parameters: [{
+            definition: "function::user::add__user", // -> standard::database::add_object
+            value: {
+                firstname: "Nico",
+                lastname: "Sammito",
+                email: "nico@sammito.de",
+                age: 20
+            }
+        }]
+    }
+
+
+}
+
+const flow1: Flow = {
+
+    starting_node: {
+        function: "function::user::add", //-> standard::database::add
+        parameters: [{
+            definition: "function::user::add__user", // -> standard::database::add_object
+            sub_node: {
+                function: "function::user::get", //-> standard::database::get
+                parameters: [{
+                    definition: "function::user::get__id", //-> standard::database::get_key
+                    value: {id: 123456789}
+                }]
+            }
+        }]
+    }
+
 }

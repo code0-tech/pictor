@@ -84,26 +84,26 @@ interface FlowDefinitionSetting {
 }
 
 interface Flow {
-    type: FlowType //in the actual implementation we will just link the name or id
+    type: FlowType | string //in the actual implementation we will just link the name or id
     settings: FlowSetting[]
-    starting_node: Node
+    starting_node: NodeFunction
 }
 
 interface FlowSetting {
-    definition: FlowDefinitionSetting
+    definition: FlowDefinitionSetting | string
     value: object
 }
 
-interface Node {
+interface NodeFunction {
     function: Partial<FunctionDefinition> | string
     parameters?: Parameter[]
-    next_node?: Node
+    next_node?: NodeFunction
 }
 
 interface Parameter {
     definition: ParameterDefinition | string
     value?: object
-    sub_node?: Node
+    sub_node?: NodeFunction
 }
 
 
@@ -159,7 +159,11 @@ const forLoopFunctionParameterType: DataType = {
 }
 
 const flow: Flow = {
-
+    type: "",
+    settings: [{
+       definition: "",
+       value: {}
+    }],
     starting_node: {
         function: "function::user::add", //-> standard::database::add
         parameters: [{
@@ -177,7 +181,11 @@ const flow: Flow = {
 }
 
 const flow1: Flow = {
-
+    type: "",
+    settings: [{
+        definition: "",
+        value: {}
+    }],
     starting_node: {
         function: "function::user::add", //-> standard::database::add
         parameters: [{

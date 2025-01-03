@@ -91,6 +91,7 @@ interface Flow {
     type: FlowType | string //in the actual implementation we will just link the name or id
     settings: FlowSetting[]
     starting_node: NodeFunction
+    input_value?: object
 }
 
 interface FlowSetting {

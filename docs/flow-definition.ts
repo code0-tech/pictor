@@ -78,6 +78,7 @@ interface FlowDefinition {
 
 interface FlowDefinitionSetting {
     name: Translation[]
+    unique: boolean
     description: Translation[]
     type: DataType
     default_value?: object

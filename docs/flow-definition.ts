@@ -75,6 +75,8 @@ interface FlowType {
 
 interface FlowDefinition {
     settings: FlowDefinitionSetting[]
+    input_type: DataType
+    default_input_value: object
 }
 
 interface FlowDefinitionSetting {

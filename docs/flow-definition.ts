@@ -14,6 +14,7 @@ enum EDataTypeRuleType {
     ITEM_OF_COLLECTION,
     CONTAINS_TYPE,
     CONTAINS_KEY,
+    LOCK_KEY,
     //etc
 }
 

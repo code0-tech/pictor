@@ -2,7 +2,7 @@ import {Meta} from "@storybook/react";
 import Dialog from "./Dialog";
 import React, {useState} from "react";
 import Flex from "../flex/Flex";
-import Text from "../Text/Text";
+import Text from "../text/Text";
 
 export default {
     title: "Dialog",

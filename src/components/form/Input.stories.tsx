@@ -4,7 +4,7 @@ import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
 import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
-import Text from "../Text/Text";
+import Text from "../text/Text";
 import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";

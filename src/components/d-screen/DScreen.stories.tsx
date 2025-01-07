@@ -8,11 +8,11 @@ import {
     IconSettings,
     IconTicket
 } from "@tabler/icons-react";
-import Text from "../text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
 import DScreenBar from "./DScreenBar";
 import DScreenButton from "./DScreenButton";
+import Text from "../text/Text";
 
 const meta: Meta = {
     title: "Dashboard Screen",

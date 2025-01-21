@@ -1,5 +1,4 @@
 import React from "react";
-import FlowLines from "./FlowLines";
 import {Meta} from "@storybook/react";
 import DScreen from "../d-screen/DScreen";
 import DScreenBar from "../d-screen/DScreenBar";
@@ -7,6 +6,10 @@ import Text from "../text/Text";
 import DScreenButton from "../d-screen/DScreenButton";
 import {IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
+import FlowLinesProvider, {useFlowLines} from "./FlowLinesProvider"
+import Quote from "../quote/Quote";
+import Flex from "../flex/Flex";
+import {TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
 
 const meta: Meta = {
     title: "FlowLine",
@@ -16,7 +19,7 @@ const meta: Meta = {
         },
         layout: "fullscreen"
     },
-    component: FlowLines
+    component: FlowLinesProvider
 }
 
 export default meta
@@ -78,20 +81,71 @@ export const VerticalComplexFlowLine = () => {
                         Logs
                     </DScreenButton>
                 </DScreenBar>
-                <FlowLines lines={[
-                    {
-                        align: "horizontal",
-                        startPoint: {
-                            x: 200,
-                            y: 200
-                        },
-                        endPoint: {
-                            x: 100,
-                            y: 100
-                        }
-                    }
-                ]}/>
+                <TransformWrapper  initialScale={1}
+                                   centerOnInit={true}>
+                    <TransformComponent wrapperStyle={{width: "100%", height: "100%"}}>
+                        <FlowLinesProvider>
+                            <FlowLineExample/>
+
+                        </FlowLinesProvider>
+                    </TransformComponent>
+                </TransformWrapper>
             </DScreen>
         </DScreen>
     </DFullScreen>
+}
+
+const FlowLineExample = () => {
+
+    const {addFlowLine, removeFlowLine} = useFlowLines()
+    const firstRef = React.useRef<HTMLDivElement>(null)
+    const secondRef = React.useRef<HTMLDivElement>(null)
+
+    React.useEffect(() => {
+        if (!(firstRef.current && secondRef.current)) return
+
+        console.log(firstRef.current.getBoundingClientRect())
+        console.log(secondRef.current.getBoundingClientRect())
+        const id = addFlowLine({
+            align: "vertical",
+            startPoint: {
+                x: (firstRef.current.getBoundingClientRect().right - (firstRef.current.getBoundingClientRect().width / 2)),
+                y: firstRef.current.getBoundingClientRect().bottom
+            },
+            endPoint: {
+                x: (secondRef.current.getBoundingClientRect().right - (secondRef.current.getBoundingClientRect().width / 2)),
+                y: secondRef.current.getBoundingClientRect().y
+            }
+        })
+
+        return () => {
+            removeFlowLine(id)
+        }
+
+    }, [firstRef, secondRef]);
+
+    return <Flex p={1} style={{gap: "10rem", flexDirection: "column"}}>
+        <div ref={firstRef}>
+            <Quote name={"Nico Sammito"}
+                   position={"Co-founder"}
+                   logo={"https://code0.tech/code0_logo.png"}
+                   w={"300px"}>
+                My favorite UX feedback from customers is:
+                "How is the app so fast?"
+                Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,
+                which is important when it comes to mission-critical software.
+            </Quote>
+        </div>
+        <div ref={secondRef} style={{position: "relative", left: "10rem"}}>
+            <Quote name={"Nico Sammito"}
+                   position={"Co-founder"}
+                   logo={"https://code0.tech/code0_logo.png"}
+                   w={"300px"}>
+                My favorite UX feedback from customers is:
+                "How is the app so fast?"
+                Because we’ve built on Next.js and Vercel since day one, our pages load in an instant,
+                which is important when it comes to mission-critical software.
+            </Quote>
+        </div>
+    </Flex>
 }

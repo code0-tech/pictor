@@ -104,18 +104,16 @@ const FlowLineExample = () => {
     React.useEffect(() => {
         if (!(firstRef.current && secondRef.current)) return
 
-        console.log(firstRef.current.getBoundingClientRect())
-        console.log(secondRef.current.getBoundingClientRect())
         const id = addFlowLine({
             align: "vertical",
-            startPoint: {
-                x: (firstRef.current.getBoundingClientRect().right - (firstRef.current.getBoundingClientRect().width / 2)),
-                y: firstRef.current.getBoundingClientRect().bottom
+            startElement: {
+                element: firstRef.current,
+                orientation: "BOTTOM"
             },
-            endPoint: {
-                x: (secondRef.current.getBoundingClientRect().right - (secondRef.current.getBoundingClientRect().width / 2)),
-                y: secondRef.current.getBoundingClientRect().y
-            }
+            endElement: {
+                element: secondRef.current,
+                orientation: "TOP"
+            },
         })
 
         return () => {

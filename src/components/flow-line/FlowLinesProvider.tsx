@@ -3,19 +3,26 @@
 import React from "react";
 import "./FlowLines.style.scss"
 
-export interface Coordinates {
+interface Coordinates {
     x: number
     y: number
 }
 
-export interface FlowLine {
-    startPoint: Coordinates
-    endPoint: Coordinates
-    //defaults to vertical
+interface FlowLineStore {
+    startPoint?: Coordinates
+    endPoint?: Coordinates
     align?: 'vertical' | 'horizontal'
-    //defaults to code0 branding color
     color?: string
-    //TODO: labeling
+}
+
+export interface Element {
+    element: HTMLDivElement
+    orientation: 'TOP' | 'BOTTOM' | 'LEFT' | 'RIGHT'
+}
+
+export interface FlowLine extends FlowLineStore {
+    startElement: Element
+    endElement: Element
 }
 
 export interface FlowLinesContext {
@@ -45,31 +52,62 @@ export const useFlowLines = () => React.useContext(FlowLinesContext) as FlowLine
 const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
 
     const {children} = props
-    const [flowLines, setFlowLines] = React.useState<FlowLine[]>([])
-    const svgRef = React.useRef<SVGSVGElement>(null)
+    const [flowLines, setFlowLines] = React.useState<FlowLineStore[]>([])
+    const svgRef = React.useRef<SVGSVGElement | null>(null)
 
-    const addFlowLine = (flowLine: FlowLine): number => {
+    const calculateCoordinates = (element: Element): Coordinates => {
 
-        setFlowLines(prevState => {
-            return [
-                ...prevState,
-                {
-                    ...flowLine,
-                    startPoint: {
-                        x: flowLine.startPoint.x - (svgRef.current?.getBoundingClientRect().x ?? 0),
-                        y: flowLine.startPoint.y - (svgRef.current?.getBoundingClientRect().y ?? 0)
-                    },
-                    endPoint: {
-                        x: flowLine.endPoint.x - (svgRef.current?.getBoundingClientRect().x ?? 0),
-                        y: flowLine.endPoint.y - (svgRef.current?.getBoundingClientRect().y ?? 0)
-                    }
-                }
-            ]
-        })
+        const boundingBox = element.element.getBoundingClientRect()
+        const orientation = element.orientation
 
-        return flowLines.length
+        if (orientation === 'TOP') {
+            return {
+                x: (boundingBox.x + (boundingBox.width / 2)) - svgRef.current?.getBoundingClientRect().x,
+                y: (boundingBox.y) - svgRef.current?.getBoundingClientRect().y
+            }
+        } else if (orientation === 'BOTTOM') {
+            return {
+                x: (boundingBox.x + (boundingBox.width / 2)) - svgRef.current?.getBoundingClientRect().x,
+                y: (boundingBox.bottom) - svgRef.current?.getBoundingClientRect().y
+            }
+        } else if (orientation === 'LEFT') {
+            return {
+                x: (boundingBox.x) - svgRef.current?.getBoundingClientRect().x,
+                y: (boundingBox.y + (boundingBox.height / 2)) - svgRef.current?.getBoundingClientRect().y
+            }
+        }
+
+        return {
+            x: (boundingBox.right) - svgRef.current?.getBoundingClientRect().x,
+            y: (boundingBox.y + (boundingBox.height / 2)) - svgRef.current?.getBoundingClientRect().y
+        }
+
     }
 
+    /**
+     *
+     */
+    const addFlowLine = React.useCallback((flowLine: FlowLine): number => {
+        setFlowLines(prevState => {
+
+            const flowLineStore: FlowLineStore = {
+                startPoint: calculateCoordinates(flowLine.startElement),
+                endPoint: calculateCoordinates(flowLine.endElement),
+                align: flowLine.align,
+                color: flowLine.color
+            }
+
+            return [
+                ...prevState,
+                flowLineStore
+            ]
+        })
+        return flowLines.length
+    }, [])
+
+    /**
+     *
+     */
     const removeFlowLine = React.useCallback((id: number) => {
         setFlowLines(prevState => {
             prevState.splice(id, 1)
@@ -77,16 +115,15 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
         })
     }, [flowLines])
 
-    React.useEffect(() => {
-        console.log(flowLines)
-    }, [flowLines]);
-
+    /**
+     *
+     */
     const svgElement = React.useMemo(() => {
         return <svg ref={svgRef} className={"flow-lines"}>
             {
                 flowLines.map((line, index) => {
 
-                    const {color = '#70ffb2', align = 'vertical', startPoint, endPoint} = line
+                    const {color = '#70ffb2', align = 'vertical', startPoint = {x: 0, y: 0}, endPoint = {x: 0, y: 0}} = line
 
                     const isBottom = startPoint.y < endPoint.y
                     const isTop = startPoint.y > endPoint.y

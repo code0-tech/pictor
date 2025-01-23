@@ -62,7 +62,9 @@
     "sass-loader": "^16.0.2",
     "storybook": "^8.3.6",
     "style-loader": "^4.0.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "overlap-area": "^1.1.0",
+    "react-zoom-pan-pinch": "^3.6.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -77,13 +79,11 @@
     "react": "^18.0.0 || ^19.0.0",
     "react-aria": "^3.33.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-stately": "^3.31.0"
+    "react-stately": "^3.31.0",
+    "react-zoom-pan-pinch": "^3.6.1",
+    "overlap-area": "^1.1.0"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "dependencies": {
-    "overlap-area": "^1.1.0",
-    "react-zoom-pan-pinch": "^3.6.1"
   }
 }

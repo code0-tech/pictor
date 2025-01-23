@@ -9,7 +9,7 @@ import DFullScreen from "../d-fullscreen/DFullScreen";
 import FlowLinesProvider, {useFlowLines} from "./FlowLinesProvider"
 import Quote from "../quote/Quote";
 import Flex from "../flex/Flex";
-import {TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
+import DZoomPanPinch from "../d-zoom-pan-pinch/DZoomPanPinch";
 
 const meta: Meta = {
     title: "FlowLine",
@@ -81,15 +81,11 @@ export const VerticalComplexFlowLine = () => {
                         Logs
                     </DScreenButton>
                 </DScreenBar>
-                <TransformWrapper  initialScale={1}
-                                   centerOnInit={true}>
-                    <TransformComponent wrapperStyle={{width: "100%", height: "100%"}}>
-                        <FlowLinesProvider>
-                            <FlowLineExample/>
-
-                        </FlowLinesProvider>
-                    </TransformComponent>
-                </TransformWrapper>
+                <DZoomPanPinch>
+                    <FlowLinesProvider>
+                        <FlowLineExample/>
+                    </FlowLinesProvider>
+                </DZoomPanPinch>
             </DScreen>
         </DScreen>
     </DFullScreen>

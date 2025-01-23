@@ -33,16 +33,20 @@ export interface FlowLinesProvider {
 }
 
 /**
- *
+ * React context for storing flow-lines and making the functions accessible to
+ * child components
  */
 const FlowLinesContext = React.createContext<FlowLinesContext | null>(null)
 
 /**
- *
+ * React hook to get the stored functions to add and remove flow-lines
  */
 export const useFlowLines = () => React.useContext(FlowLinesContext) as FlowLinesContext
 
 /**
+ * The React component which renders the svg paths behind the connected elements.
+ *
+ * @todo rendering the labels for the connected lines as absolute elements between lines and childrens
  *
  * @param props
  * @constructor

@@ -8,21 +8,18 @@ interface Coordinates {
     y: number
 }
 
+type FlowLineAlignment = 'vertical' | 'horizontal'
+
 interface FlowLineStore {
     startPoint?: Coordinates
     endPoint?: Coordinates
-    align?: 'vertical' | 'horizontal'
+    align?: FlowLineAlignment
     color?: string
 }
 
-export interface Element {
-    element: HTMLDivElement
-    orientation: 'TOP' | 'BOTTOM' | 'LEFT' | 'RIGHT'
-}
-
 export interface FlowLine extends FlowLineStore {
-    startElement: Element
-    endElement: Element
+    startElement: HTMLDivElement
+    endElement: HTMLDivElement
 }
 
 export interface FlowLinesContext {
@@ -55,31 +52,31 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
     const [flowLines, setFlowLines] = React.useState<FlowLineStore[]>([])
     const svgRef = React.useRef<SVGSVGElement | null>(null)
 
-    const calculateCoordinates = (element: Element): Coordinates => {
+    const calculateCoordinates = (startElement: HTMLElement, endElement: HTMLElement, alignment: FlowLineAlignment = "vertical"): Coordinates => {
 
-        const boundingBox = element.element.getBoundingClientRect()
-        const orientation = element.orientation
+        const bBStartElement = startElement.getBoundingClientRect()
+        const bBEndElement = endElement.getBoundingClientRect()
 
-        if (orientation === 'TOP') {
+        if (alignment === 'vertical' && bBEndElement.y <= bBStartElement.y) {
             return {
-                x: (boundingBox.x + (boundingBox.width / 2)) - svgRef.current?.getBoundingClientRect().x,
-                y: (boundingBox.y) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x,
+                y: (bBStartElement.y) - svgRef.current?.getBoundingClientRect().y
             }
-        } else if (orientation === 'BOTTOM') {
+        } else if (alignment === 'vertical' && bBStartElement.y <= bBEndElement.y) {
             return {
-                x: (boundingBox.x + (boundingBox.width / 2)) - svgRef.current?.getBoundingClientRect().x,
-                y: (boundingBox.bottom) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x,
+                y: (bBStartElement.bottom) - svgRef.current?.getBoundingClientRect().y
             }
-        } else if (orientation === 'LEFT') {
+        } else if (alignment === 'horizontal' && bBEndElement.x >= bBStartElement.x) {
             return {
-                x: (boundingBox.x) - svgRef.current?.getBoundingClientRect().x,
-                y: (boundingBox.y + (boundingBox.height / 2)) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x) - svgRef.current?.getBoundingClientRect().x,
+                y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y
             }
         }
 
         return {
-            x: (boundingBox.right) - svgRef.current?.getBoundingClientRect().x,
-            y: (boundingBox.y + (boundingBox.height / 2)) - svgRef.current?.getBoundingClientRect().y
+            x: (bBStartElement.right) - svgRef.current?.getBoundingClientRect().x,
+            y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y
         }
 
     }
@@ -91,8 +88,8 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
         setFlowLines(prevState => {
 
             const flowLineStore: FlowLineStore = {
-                startPoint: calculateCoordinates(flowLine.startElement),
-                endPoint: calculateCoordinates(flowLine.endElement),
+                startPoint: calculateCoordinates(flowLine.startElement, flowLine.endElement, flowLine.align),
+                endPoint: calculateCoordinates(flowLine.endElement, flowLine.startElement, flowLine.align),
                 align: flowLine.align,
                 color: flowLine.color
             }

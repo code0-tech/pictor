@@ -107,26 +107,14 @@ const FlowLineExample = () => {
 
         const id1 = addFlowLine({
             align: "vertical",
-            startElement: {
-                element: firstRef.current,
-                orientation: "BOTTOM"
-            },
-            endElement: {
-                element: secondRef.current,
-                orientation: "TOP"
-            },
+            startElement: firstRef.current,
+            endElement: secondRef.current,
         })
 
         const id2 = addFlowLine({
             align: "vertical",
-            startElement: {
-                element: secondRef.current,
-                orientation: "BOTTOM"
-            },
-            endElement: {
-                element: thirdRef.current,
-                orientation: "TOP"
-            },
+            startElement: secondRef.current,
+            endElement: thirdRef.current,
         })
 
         return () => {

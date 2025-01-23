@@ -120,7 +120,12 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
             {
                 flowLines.map((line, index) => {
 
-                    const {color = '#70ffb2', align = 'vertical', startPoint = {x: 0, y: 0}, endPoint = {x: 0, y: 0}} = line
+                    const {
+                        color = '#70ffb2',
+                        align = 'vertical',
+                        startPoint = {x: 0, y: 0},
+                        endPoint = {x: 0, y: 0}
+                    } = line
 
                     const isBottom = startPoint.y < endPoint.y
                     const isTop = startPoint.y > endPoint.y

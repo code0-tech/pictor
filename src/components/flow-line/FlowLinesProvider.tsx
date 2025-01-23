@@ -8,16 +8,17 @@ interface Coordinates {
     y: number
 }
 
-type FlowLineAlignment = 'vertical' | 'horizontal'
 
 interface FlowLineStore {
-    startPoint?: Coordinates
-    endPoint?: Coordinates
+    startPoint: Coordinates
+    endPoint: Coordinates
     align?: FlowLineAlignment
     color?: string
 }
 
-export interface FlowLine extends FlowLineStore {
+export type FlowLineAlignment = 'vertical' | 'horizontal'
+
+export interface FlowLine extends Partial<FlowLineStore> {
     startElement: HTMLDivElement
     endElement: HTMLDivElement
 }
@@ -52,7 +53,18 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
     const [flowLines, setFlowLines] = React.useState<FlowLineStore[]>([])
     const svgRef = React.useRef<SVGSVGElement | null>(null)
 
-    const calculateCoordinates = (startElement: HTMLElement, endElement: HTMLElement, alignment: FlowLineAlignment = "vertical"): Coordinates => {
+    /**
+     *  This function calculates the linking coordinates within the starting element
+     *  in relation to the ending element.
+     *  For vertical alignment its only possible to connect from TOP to BOTTOM.
+     *  For horizontal alignment its only possible to connect from RIGHT to LEFT.
+     *  Also, the opposite is possible for both.
+     *
+     *  Currently, the default behaviour is the RIGHT connection coordinates.
+     *
+     *  This function is also memorized with no dependencies to increase performance.
+     */
+    const calculateCoordinates = React.useCallback((startElement: HTMLElement, endElement: HTMLElement, alignment: FlowLineAlignment = "vertical"): Coordinates => {
 
         const bBStartElement = startElement.getBoundingClientRect()
         const bBEndElement = endElement.getBoundingClientRect()
@@ -79,10 +91,11 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
             y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y
         }
 
-    }
+    }, [])
 
     /**
-     *
+     * Adds a line between to HTMLElements to the flow-line-store.
+     * It also transforms the elements to real calculated coordinates.
      */
     const addFlowLine = React.useCallback((flowLine: FlowLine): number => {
         setFlowLines(prevState => {
@@ -103,7 +116,9 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
     }, [])
 
     /**
+     * Removes a generated line from store based upon the line id.
      *
+     * @todo check if flowLines are needed as dependency to increase performance
      */
     const removeFlowLine = React.useCallback((id: number) => {
         setFlowLines(prevState => {
@@ -113,7 +128,10 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
     }, [flowLines])
 
     /**
+     * Rendered svg paths based on calculated start / end points.
+     * This function is memorized by flowLines to minimize the rendering.
      *
+     * @todo minimize mapping function to reduce overall complexity
      */
     const svgElement = React.useMemo(() => {
         return <svg ref={svgRef} className={"flow-lines"}>

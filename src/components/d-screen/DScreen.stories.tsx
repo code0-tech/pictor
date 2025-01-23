@@ -8,11 +8,11 @@ import {
     IconSettings,
     IconTicket
 } from "@tabler/icons-react";
-import Text from "../Text/Text";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
 import DScreenBar from "./DScreenBar";
 import DScreenButton from "./DScreenButton";
+import Text from "../text/Text";
 
 const meta: Meta = {
     title: "Dashboard Screen",
@@ -124,20 +124,20 @@ export const DashboardScreenExample = () => {
             <DScreen.VBar.Top>
                 <DScreen.BarContent align={"center"} mediaMaxWidth={800}>
                     <Badge>Home</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>...</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>Sagittarius</Badge>
                 </DScreen.BarContent>
                 <DScreen.BarContent align={"center"} mediaMinWidth={800}>
                     <Badge>Home</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>Organisations</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>Code0</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>Projects</Badge>
-                    <Text size={"sm"} mx={0.5}>/</Text>
+                    <text size={"sm"} mx={0.5}>/</text>
                     <Badge>Sagittarius</Badge>
                 </DScreen.BarContent>
             </DScreen.VBar.Top>
@@ -147,10 +147,10 @@ export const DashboardScreenExample = () => {
                 </DScreen.BarContent>
             </DScreen.VBar.Bottom>
             <DScreen.Content>
-                <Text >
+                <text >
                     Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
                     tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                </Text>
+                </text>
             </DScreen.Content>
         </DScreen>
     </DFullScreen>

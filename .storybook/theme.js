@@ -26,7 +26,7 @@ export default create({
     borderTopColor: '91949A',
     appBorderRadius: 0,
 
-    // Text colors
+    // text colors
     textColor: '#ffffff',
     textInverseColor: '#ffffff',
 

@@ -87,30 +87,6 @@ interface FlowDefinitionSetting {
     default_value?: object
 }
 
-interface Flow {
-    type: FlowType | string //in the actual implementation we will just link the name or id
-    settings: FlowSetting[]
-    starting_node: NodeFunction
-    input_value?: object
-}
-
-interface FlowSetting {
-    definition: FlowDefinitionSetting | string
-    value: object
-}
-
-interface NodeFunction {
-    function: Partial<FunctionDefinition> | string
-    parameters?: Parameter[]
-    next_node?: NodeFunction
-}
-
-interface Parameter {
-    definition: ParameterDefinition | string
-    value?: object
-    sub_node?: NodeFunction
-}
-
 
 
 const userObject: DataType = {
@@ -161,48 +137,4 @@ const forLoopFunctionParameterType: DataType = {
         }],
         type: EDataType.GENERIC
     }]
-}
-
-const flow: Flow = {
-    type: "",
-    settings: [{
-       definition: "",
-       value: {}
-    }],
-    starting_node: {
-        function: "function::user::add", //-> standard::database::add
-        parameters: [{
-            definition: "function::user::add__user", // -> standard::database::add_object
-            value: {
-                firstname: "Nico",
-                lastname: "Sammito",
-                email: "nico@sammito.de",
-                age: 20
-            }
-        }]
-    }
-
-
-}
-
-const flow1: Flow = {
-    type: "",
-    settings: [{
-        definition: "",
-        value: {}
-    }],
-    starting_node: {
-        function: "function::user::add", //-> standard::database::add
-        parameters: [{
-            definition: "function::user::add__user", // -> standard::database::add_object
-            sub_node: {
-                function: "function::user::get", //-> standard::database::get
-                parameters: [{
-                    definition: "function::user::get__id", //-> standard::database::get_key
-                    value: {id: 123456789}
-                }]
-            }
-        }]
-    }
-
 }

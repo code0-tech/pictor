@@ -17,17 +17,17 @@ interface NodeFunctionDefintion {
 
 interface NodeFunction {
     function: NodeFunctionDefintion
-    parameters?: Parameter[]
+    parameters?: NodeParameter[]
     next_node?: NodeFunction
 }
 
-interface ParameterDefintion {
+interface NodeParameterDefintion {
     parameter_id: string
     runtime_parameter_id: string
 }
 
-interface Parameter {
-    definition: ParameterDefintion
+interface NodeParameter {
+    definition: NodeParameterDefintion
     value?: object
     sub_node?: NodeFunction
 }

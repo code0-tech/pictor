@@ -17,6 +17,10 @@ const meta: Meta = {
             options: Colors,
             control: {type: "radio"}
         },
+        borderColor: {
+            options: Colors,
+            control: {type: "radio"}
+        },
         variant: {
             options: ['none', 'normal', 'filled', 'outlined'],
             control: {type: 'radio'},
@@ -24,7 +28,18 @@ const meta: Meta = {
         gradient: {
             type: "boolean"
         },
+        gradientColor: {
+            options: Colors,
+            control: {type: "radio"}
+        },
         outline: {
+            type: "boolean"
+        },
+        outlineColor: {
+            options: Colors,
+            control: {type: "radio"}
+        },
+        dashed: {
             type: "boolean"
         }
     }
@@ -39,8 +54,7 @@ export const CardNews: CardStory = {
 
         const [heart, setHeart] = useState(false)
 
-        return <Card outline={props.outline} variant={props.variant} gradient={props.gradient}
-                     color={props.color} style={{
+        return <Card {...props} style={{
             width: "50vw",
             maxWidth: "350px"
         }}>
@@ -89,7 +103,10 @@ export const CardNews: CardStory = {
     args: {
         variant: "normal",
         color: "secondary",
+        borderColor: "secondary",
         outline: false,
-        gradient: true,
+        outlineColor: "secondary",
+        gradient: false,
+        dashed: false,
     }
 }

@@ -4,7 +4,7 @@ import {Code0Component, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 
 
-export interface CardType extends Code0Component<HTMLDivElement> {
+export interface Card extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
     //defaults to secondary
     color?: Color,
@@ -12,25 +12,31 @@ export interface CardType extends Code0Component<HTMLDivElement> {
     variant?: "none" | "normal" | "outlined" | "filled"
     //defaults to false
     gradient?: boolean,
-    firstGradientColor?: Color
-    secondGradientColor?: Color
+    //defaults to secondary
+    gradientColor?: Color
+    //defaults to secondary
     borderColor?: Color
     //defaults to false
     outline?: boolean
+    //defaults to secondary
+    outlineColor?: Color
+    //defaults to false
+    dashed?: boolean
 }
 
 
-const Card: React.FC<CardType> = (props) => {
+const Card: React.FC<Card> = (props) => {
 
     const {
         children,
         color = "secondary",
         variant = "normal",
         gradient = false,
-        firstGradientColor = "info",
-        secondGradientColor = "secondary",
-        borderColor = "info",
+        gradientColor = "secondary",
+        borderColor = "secondary",
+        outlineColor = "secondary",
         outline = false,
+        dashed = false,
         ...args
     } = props
 
@@ -39,10 +45,11 @@ const Card: React.FC<CardType> = (props) => {
             `
                     card 
                     card--${color} card--${variant}
-                    ${outline ? "card--outline" : ""} 
+                    ${outline ? `card--outline-${outlineColor}` : ""} 
                     ${gradient ? "card--gradient" : ""} 
                     ${borderColor ? `card--border-${borderColor}` : ""} 
-                    ${gradient ? `card--gradient--${firstGradientColor}-${secondGradientColor}` : ""} 
+                    ${dashed ? `card--border--dashed` : ""} 
+                    ${gradient ? `card--gradient-${gradientColor}` : ""} 
                `
             , args)}>
             {children}

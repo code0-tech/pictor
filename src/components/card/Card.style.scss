@@ -71,12 +71,6 @@ $padding: $xs;
       border-color: transparent;
     }
 
-    &.card--outline {
-      outline: 1px solid borderColor();
-      outline-offset: $padding;
-      margin: $padding;
-    }
-
     &.card--outlined {
       background: transparent;
     }
@@ -85,22 +79,26 @@ $padding: $xs;
 
     &.card--gradient {
 
-      @each $firstGradientName, $firstGradientColor in $colors {
-
-        @each $secondGradientName, $secondGradientColor in $colors {
-
-          &--#{$firstGradientName}-#{$secondGradientName} {
-            box-shadow: inset $padding $padding $padding (-1 * $padding) backgroundColor($firstGradientColor),
-                        inset (-1 * $padding) (-1 * $padding) $padding (-1 * $padding) backgroundColor($secondGradientColor);
-          }
-
+      @each $gradientName, $gradientColor in $colors {
+        &-#{$gradientName} {
+          box-shadow: inset 0 0 ($padding * 2) ($padding / 2) backgroundColor($gradientColor);
         }
       }
     }
 
   }
 
+  .card--outline-#{$name} {
+    outline-offset: $padding;
+    margin: $padding;
+    outline: borderColor($color) solid 1px;
+  }
+
   .card--border-#{$name} {
     border-color: borderColor($color);
+  }
+
+  .card--border--dashed {
+    border-style: dashed;
   }
 }

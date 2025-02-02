@@ -1,16 +1,3 @@
-include:
-  - project: code0-tech/development/telescopium
-    ref: build-branch
-    file: ci-template.gitlab-ci.yml
-
-docs:
-  rules:
-    - if: $C0_UPDATE_SNAPSHOTS == null
-
-docs:preview:
-  rules:
-    - if: $C0_UPDATE_SNAPSHOTS == null && $C0_GH_REF != "refs/heads/main"
-
 storybook:build:
   image: node:22.12.0
   stage: build

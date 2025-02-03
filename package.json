@@ -40,7 +40,7 @@
     "@types/react": "^18.3.18",
     "axe-playwright": "^2.0.3",
     "babel-loader": "^9.2.1",
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.1.2",
     "css-loader": "^7.1.2",
     "html-webpack-plugin": "^5.6.3",
     "identity-obj-proxy": "^3.0.0",

@@ -1,5 +1,5 @@
 storybook:build:
-  image: node:22.12.0
+  image: node:22.13.1
   stage: build
   script:
     - npm ci

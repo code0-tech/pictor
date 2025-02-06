@@ -70,6 +70,8 @@ const getShiftPercentage = (firstArea: any, secondArea: any): number | undefined
     return shiftPercentage == 0 ? undefined : negativePositiveNumber
 }
 
+
+//TODO outsource functions to utils and remove type from bar calculation
 const getResizeArea = (element: Element | undefined | null, shiftPercentage: number | undefined, resizeAreaDimensions: number = 25) => {
 
     const type = element?.getAttribute("data-bar-position") as 'top' | 'bottom' | 'left' | 'right'

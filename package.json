@@ -62,7 +62,7 @@
     "style-loader": "^4.0.0",
     "typescript": "^5.7.3",
     "overlap-area": "^1.1.0",
-    "react-zoom-pan-pinch": "^3.6.1"
+    "react-zoom-pan-pinch": "^3.7.0"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

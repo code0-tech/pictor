@@ -38,7 +38,7 @@
     "@storybook/theming": "^8.5.3",
     "@tabler/icons-react": "^3.14.0",
     "@types/react": "^19.0.8",
-    "axe-playwright": "^2.0.3",
+    "axe-playwright": "^2.1.0",
     "babel-loader": "^9.2.1",
     "concurrently": "^9.1.2",
     "css-loader": "^7.1.2",

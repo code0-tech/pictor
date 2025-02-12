@@ -71,8 +71,7 @@ const getShiftPercentage = (firstArea: any, secondArea: any): number | undefined
 }
 
 
-//TODO outsource functions to utils and remove type from bar calculation
-const getResizeArea = (element: Element | undefined | null, shiftPercentage: number | undefined, resizeAreaDimensions: number = 25) => {
+const getResizeArea = (element: Element | undefined | null, shiftPercentage: number | undefined, resizeAreaDimensions: number = 25, areaPosition: number | undefined = undefined) => {
 
     const type = element?.getAttribute("data-bar-position") as 'top' | 'bottom' | 'left' | 'right'
     const oppositeType = type === "left" ? "right" : type === "right" ? "left" : type === "top" ? "bottom" : "top"
@@ -100,27 +99,27 @@ const getResizeArea = (element: Element | undefined | null, shiftPercentage: num
     if (type === 'top') return {
         leftX: elementCoordinates.leftX,
         rightX: elementCoordinates.rightX,
-        topY: elementCoordinates.bottomY - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
-        bottomY: elementCoordinates.bottomY + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions))
+        topY: (areaPosition ?? elementCoordinates.bottomY) - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
+        bottomY: (areaPosition ?? elementCoordinates.bottomY) + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions))
     }
 
     if (type === 'bottom') return {
         leftX: elementCoordinates.leftX,
         rightX: elementCoordinates.rightX,
-        topY: elementCoordinates.topY - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
-        bottomY: elementCoordinates.topY + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions))
+        topY: (areaPosition ?? elementCoordinates.topY) - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
+        bottomY: (areaPosition ?? elementCoordinates.topY) + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions))
     }
 
     if (type === 'left') return {
-        leftX: elementCoordinates.rightX - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
-        rightX: elementCoordinates.rightX + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions)),
+        leftX: (areaPosition ?? elementCoordinates.rightX) - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
+        rightX: (areaPosition ?? elementCoordinates.rightX) + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions)),
         topY: elementCoordinates.topY,
         bottomY: elementCoordinates.bottomY
     }
 
     if (type === 'right') return {
-        leftX: elementCoordinates.leftX - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
-        rightX: elementCoordinates.leftX + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions)),
+        leftX: (areaPosition ?? elementCoordinates.leftX) - (resizeAreaDimensions + (shiftPercentage * resizeAreaDimensions)),
+        rightX: (areaPosition ?? elementCoordinates.leftX) + (resizeAreaDimensions - (shiftPercentage * resizeAreaDimensions)),
         topY: elementCoordinates.topY,
         bottomY: elementCoordinates.bottomY
     }
@@ -228,36 +227,44 @@ const Bar: React.FC<DScreenBarProps> = (props) => {
         const onResize = (event: MouseEvent | TouchEvent) => {
 
             const barParent = barRef.current?.parentElement
+            const mousePositionX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
+            const mousePositionY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
             let localSizePercent = Infinity
 
             setStateCollapsed(false)
 
-
             if (barType === "h" && type === "left") {
                 const spacing = barRef.current?.getBoundingClientRect().left ?? 0
-                const mousePosition = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
-                const widthPixel = Math.max(Math.min((mousePosition - spacing), maxW), minW)
+                const widthPixel = Math.max(Math.min((mousePositionX - spacing), maxW), minW)
                 const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
                 localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (barParent?.offsetWidth ?? 0)) * 100), 100), 0)
             } else if (barType === "h" && type === "right") {
                 const spacing = (barRef.current?.getBoundingClientRect().right ?? 0) - (barParent?.offsetWidth ?? 0)
-                const mousePosition = (barParent?.offsetWidth ?? 0) - (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
+                const mousePosition = (barParent?.offsetWidth ?? 0) - mousePositionX
                 const widthPixel = Math.max(Math.min((spacing + mousePosition), maxW), minW)
                 const widthPixelAttaching = widthPixel <= (startW + 25) && widthPixel >= (startW - 25) ? startW : widthPixel
                 localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((barParent?.offsetWidth ?? 0))) * 100), 100), 0)
             } else if (barType === "v" && type === "top") {
                 const spacing = barRef.current?.getBoundingClientRect().top ?? 0
-                const mousePosition = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
-                const widthPixel = Math.max(Math.min((mousePosition - spacing), maxH), minH)
+                const widthPixel = Math.max(Math.min((mousePositionY - spacing), maxH), minH)
                 const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
                 localSizePercent = Math.max(Math.min((((widthPixelAttaching) / (barParent?.offsetHeight ?? 0)) * 100), 100), 0)
             } else if (barType === "v" && type === "bottom") {
                 const spacing = (barRef.current?.getBoundingClientRect().bottom ?? 0) - (barParent?.offsetHeight ?? 0)
-                const mousePosition = (barParent?.offsetHeight ?? 0) - (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
+                const mousePosition = (barParent?.offsetHeight ?? 0) - mousePositionY
                 const widthPixel = Math.max(Math.min((spacing + mousePosition), maxH), minH)
                 const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
                 localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((barParent?.offsetHeight ?? 0))) * 100), 100), 0)
             }
+
+            const oppositeBar = barParent?.querySelector(`.d-screen__${barType}-bar--${oppositeType}`)
+            const oppositeBarResizeArea = getResizeArea(oppositeBar, 0)
+            const barResizeArea = getResizeArea(barRef.current, 0, 25, barType === "h" ? mousePositionX : mousePositionY)
+
+            if (type === "left" && barResizeArea.rightX > oppositeBarResizeArea.leftX) return
+            if (type === "right" && barResizeArea.leftX < oppositeBarResizeArea.rightX) return
+            if (type === "top" && barResizeArea.bottomY > oppositeBarResizeArea.topY) return
+            if (type === "bottom" && barResizeArea.topY < oppositeBarResizeArea.bottomY) return
 
             //set new width
             if (barType === "h" && barRef.current) {

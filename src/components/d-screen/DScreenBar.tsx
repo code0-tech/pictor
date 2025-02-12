@@ -261,10 +261,10 @@ const Bar: React.FC<DScreenBarProps> = (props) => {
             const oppositeBarResizeArea = getResizeArea(oppositeBar, 0)
             const barResizeArea = getResizeArea(barRef.current, 0, 25, barType === "h" ? mousePositionX : mousePositionY)
 
-            if (type === "left" && barResizeArea.rightX > oppositeBarResizeArea.leftX) return
-            if (type === "right" && barResizeArea.leftX < oppositeBarResizeArea.rightX) return
-            if (type === "top" && barResizeArea.bottomY > oppositeBarResizeArea.topY) return
-            if (type === "bottom" && barResizeArea.topY < oppositeBarResizeArea.bottomY) return
+            if (oppositeBar && type === "left" && barResizeArea.rightX > oppositeBarResizeArea.leftX) return
+            if (oppositeBar && type === "right" && barResizeArea.leftX < oppositeBarResizeArea.rightX) return
+            if (oppositeBar && type === "top" && barResizeArea.bottomY > oppositeBarResizeArea.topY) return
+            if (oppositeBar && type === "bottom" && barResizeArea.topY < oppositeBarResizeArea.bottomY) return
 
             //set new width
             if (barType === "h" && barRef.current) {

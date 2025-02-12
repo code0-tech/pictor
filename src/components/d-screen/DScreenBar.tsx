@@ -227,8 +227,12 @@ const Bar: React.FC<DScreenBarProps> = (props) => {
         const onResize = (event: MouseEvent | TouchEvent) => {
 
             const barParent = barRef.current?.parentElement
-            const mousePositionX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
-            const mousePositionY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
+            const oppositeBar = barParent?.querySelector(`.d-screen__${barType}-bar--${oppositeType}`)
+            const oppositeBarResizeArea = getResizeArea(oppositeBar, 0)
+            const mousePositionX = oppositeBar ? type === "left" ? Math.min(event instanceof MouseEvent ? event.clientX : event.touches[0].clientX, oppositeBarResizeArea.leftX)
+                : Math.max(event instanceof MouseEvent ? event.clientX : event.touches[0].clientX, oppositeBarResizeArea.rightX) : event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
+            const mousePositionY = oppositeBar ? type === "top" ? Math.min(event instanceof MouseEvent ? event.clientY : event.touches[0].clientY, oppositeBarResizeArea.topY)
+                : Math.max(event instanceof MouseEvent ? event.clientY : event.touches[0].clientY, oppositeBarResizeArea.bottomY) : event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
             let localSizePercent = Infinity
 
             setStateCollapsed(false)
@@ -256,15 +260,6 @@ const Bar: React.FC<DScreenBarProps> = (props) => {
                 const widthPixelAttaching = widthPixel <= (startH + 25) && widthPixel >= (startH - 25) ? startH : widthPixel
                 localSizePercent = Math.max(Math.min((((widthPixelAttaching) / ((barParent?.offsetHeight ?? 0))) * 100), 100), 0)
             }
-
-            const oppositeBar = barParent?.querySelector(`.d-screen__${barType}-bar--${oppositeType}`)
-            const oppositeBarResizeArea = getResizeArea(oppositeBar, 0)
-            const barResizeArea = getResizeArea(barRef.current, 0, 25, barType === "h" ? mousePositionX : mousePositionY)
-
-            if (oppositeBar && type === "left" && barResizeArea.rightX > oppositeBarResizeArea.leftX) return
-            if (oppositeBar && type === "right" && barResizeArea.leftX < oppositeBarResizeArea.rightX) return
-            if (oppositeBar && type === "top" && barResizeArea.bottomY > oppositeBarResizeArea.topY) return
-            if (oppositeBar && type === "bottom" && barResizeArea.topY < oppositeBarResizeArea.bottomY) return
 
             //set new width
             if (barType === "h" && barRef.current) {

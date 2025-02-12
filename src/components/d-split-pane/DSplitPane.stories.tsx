@@ -1,9 +1,9 @@
 import React from "react";
 import {Meta} from "@storybook/react";
 import DScreenBar from "../d-screen/DScreenBar";
-import Button from "../button/Button";
 import DFullScreen from "../d-fullscreen/DFullScreen";
-import Flex from "../flex/Flex";
+import DScreen from "../d-screen/DScreen";
+import Text from "../text/Text";
 
 const meta: Meta = {
     title: "DSplitPane",
@@ -17,22 +17,29 @@ const meta: Meta = {
 
 export const test = () => {
 
-    return <DFullScreen style={{display: "flex"}}>
+    return <DFullScreen>
+        <DScreen>
+            <DScreenBar type={"left"} justify={"space-between"} resizeable>
 
-            <DScreenBar type={"left"} resizeable>
-                <Button>Test</Button>
+                <Text>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+                    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                </Text>
+            </DScreenBar>
+            <DScreenBar type={"right"} resizeable>
+                <Text>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+                    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                </Text>
             </DScreenBar>
 
-            <DScreenBar type={"left"} resizeable>
-                <Button>Test</Button>
-            </DScreenBar>
-
-            <DScreenBar type={"left"} resizeable>
-                <Button>Test</Button>
-            </DScreenBar>
-
-
-
+            <DScreen>
+                <Text>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
+                    tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                </Text>
+            </DScreen>
+        </DScreen>
     </DFullScreen>
 
 }

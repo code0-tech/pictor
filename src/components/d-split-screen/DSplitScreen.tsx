@@ -24,7 +24,8 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
         store.push({
             ref: (child as any).ref ?? React.useRef(null),
             key: index,
-            ...child.props
+            ...child.props,
+            direction: direction as DSplitScreenDirection
         })
 
     })

@@ -36,7 +36,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
             store.map((pane, index) => {
 
                 return <React.Fragment key={index}>
-                    <DSplitPane {...pane}/>
+                    <DSplitPane w={`${(1/store.length) * 100}%`} {...pane}/>
                     {/**display line splitter only between panes**/}
                     {index < store.length - 1 ? <DSplitter
                         direction={direction as DSplitScreenDirection}

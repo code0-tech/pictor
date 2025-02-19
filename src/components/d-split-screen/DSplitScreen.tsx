@@ -32,19 +32,28 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
 
     return <div className={`d-split-screen d-split-screen--${direction}`}>
-        {
-            store.map((pane, index) => {
+        <div>
+            {
+                store.map((pane, index) => {
 
-                return <React.Fragment key={index}>
-                    <DSplitPane w={`${(1/store.length) * 100}%`} {...pane}/>
-                    {/**display line splitter only between panes**/}
-                    {index < store.length - 1 ? <DSplitter
+                    return index < store.length - 1 ? <DSplitter
+                        key={index}
                         direction={direction as DSplitScreenDirection}
                         firstPane={pane.ref as React.RefObject<DSplitPaneHandle & HTMLDivElement>}
-                        secondPane={store[index + 1].ref as React.RefObject<DSplitPaneHandle & HTMLDivElement>}/> : null}
-                </React.Fragment>
-            })
-        }
+                        secondPane={store[index + 1].ref as React.RefObject<DSplitPaneHandle & HTMLDivElement>}/> : null
+                })
+            }
+        </div>
+        <div>
+
+            {
+                store.map((pane, index) => {
+
+                    /**@ts-ignore**/
+                    return <DSplitPane key={index} {...pane}/>
+                })
+            }
+        </div>
     </div>
 
 }

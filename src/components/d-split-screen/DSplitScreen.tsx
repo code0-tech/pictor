@@ -15,7 +15,13 @@ export interface DSplitScreenProps {
 const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     const {children, direction = "horizontal"} = props
+    const ref = React.useRef<HTMLDivElement | null>(null)
     const store: DSplitPaneProps[] = []
+
+    React.useEffect(() => {
+        if (!ref.current) return
+        ref.current?.classList.add("d-split-screen--absolute")
+    }, [ref])
 
     React.Children.forEach(children, (child, index) => {
 
@@ -30,8 +36,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     })
 
-
-    return <div className={`d-split-screen d-split-screen--${direction}`}>
+    return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
         <div>
             {
                 store.map((pane, index) => {

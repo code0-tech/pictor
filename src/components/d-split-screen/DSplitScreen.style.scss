@@ -1,15 +1,16 @@
 .d-split-screen {
-  display: flex;
   color: white;
   position: relative;
   width: 100%;
   height: 100%;
 
-  &--horizontal {
-    //maybe needed
+  * {
+    box-sizing: border-box;
   }
 
-  &--vertical {
-    flex-direction: column;
+  > div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
   }
 }

@@ -18,21 +18,14 @@ export const test = () => {
 
 
     return <DFullScreen>
-        <DSplitScreen>
-            <DSplitPane>
-                <DSplitScreen direction={"vertical"}>
-                    <DSplitPane>
-                        s
-                    </DSplitPane>
-                    <DSplitPane>
-                        s
-                    </DSplitPane>
-                </DSplitScreen>
+        <DSplitScreen direction={"horizontal"}>
+            <DSplitPane w={"33.3333333%"}>
+               s
             </DSplitPane>
-            <DSplitPane>
+            <DSplitPane w={"33.3333333%"}>
                 s
             </DSplitPane>
-            <DSplitPane>
+            <DSplitPane w={"33.3333333%"}>
                 s
             </DSplitPane>
         </DSplitScreen>

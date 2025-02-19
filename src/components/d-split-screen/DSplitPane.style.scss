@@ -1,5 +1,9 @@
+@import "../../styles/helpers";
+@import "../../styles/media";
+
 .d-split-pane {
-  position: relative;
-  width: 100%;
+  position: absolute;
+  overflow: hidden;
   height: 100%;
+  background: $primary;
 }

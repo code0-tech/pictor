@@ -12,5 +12,15 @@
     position: absolute;
     width: 100%;
     height: 100%;
+    display: flex;
+
+    &:last-of-type {
+      position: relative;
+    }
   }
+
+  &--absolute > * .d-split-pane {
+    position: absolute;
+  }
+
 }

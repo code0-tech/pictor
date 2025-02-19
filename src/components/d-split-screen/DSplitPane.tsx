@@ -35,10 +35,16 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
 
         useEffect(() => {
             if (!paneRef.current) return
-            if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
 
             const parentContainer = paneRef.current?.parentElement
             const bBContainer = parentContainer?.getBoundingClientRect()
+
+            //switch size to percentage
+            const size = paneRef.current?.getBoundingClientRect()
+            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
+            else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
+
+            if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
 
             //set initial left as percentage
             const bBPreviousElement: DOMRect = paneRef.current?.previousElementSibling?.getBoundingClientRect()
@@ -47,11 +53,6 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             else (paneRef.current as HTMLDivElement).style.top = bBPreviousElement ?
                 `${((bBPreviousElement.top + bBPreviousElement.height + 1) / bBContainer.height) * 100}%` : "0%"
 
-
-            //switch size to percentage
-            const size = paneRef.current?.getBoundingClientRect()
-            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
-            else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
 
         }, [paneRef]);
 
@@ -81,7 +82,7 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
         }
 
         const setSize = (size: number, position: number = 0) => {
-            const localRef = paneRef as HTMLDivElement
+            const localRef = document.getElementById(id) as HTMLDivElement
             const parentContainer = localRef.parentElement
             const bBContainer = parentContainer.getBoundingClientRect()
             const sizeContainer = direction == "horizontal" ? bBContainer?.width ?? 0 : bBContainer?.height ?? 0

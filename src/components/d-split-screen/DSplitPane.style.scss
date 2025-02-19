@@ -2,8 +2,8 @@
 @import "../../styles/media";
 
 .d-split-pane {
-  position: absolute;
   overflow: hidden;
   height: 100%;
+  flex: 1;
   background: $primary;
 }

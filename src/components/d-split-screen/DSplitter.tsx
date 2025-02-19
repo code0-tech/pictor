@@ -1,4 +1,6 @@
-import React, {useEffect} from "react";
+"use client"
+
+import React from "react";
 import {DSplitPaneHandle, DSplitPaneStatus} from "./DSplitPane";
 
 import "./DSplitter.style.scss"
@@ -57,7 +59,9 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
     const {firstPane, secondPane, direction} = props
     const ref = React.useRef<HTMLDivElement | null>(null)
 
-    useEffect(() => {
+    React.useEffect(() => {
+
+        if (!firstPane?.current || !secondPane?.current || !ref.current) return
 
         const disableSelect = (event: MouseEvent) => event.preventDefault();
 
@@ -81,7 +85,7 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             if (!firstPane?.current || !secondPane?.current || !ref.current) return
 
             const stackedSize = direction === "horizontal" ? bBSecond.right - bBFirst.left : bBSecond.bottom - bBFirst.top
-            const bBContainer =( ref.current as HTMLDivElement).parentElement.getBoundingClientRect()
+            const bBContainer = (ref.current as HTMLDivElement).parentElement.getBoundingClientRect()
 
             const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
             const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
@@ -156,10 +160,17 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
         //styling for resize areas
 
         if (firstPane && firstPane.current && ref.current) {
-            const bBFirst = firstPane.current.pane?.getBoundingClientRect()
-            if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(bBFirst.left + bBFirst.width)}px`
-        }
+            setTimeout(() => {
+                const bBFirst = firstPane.current!!.pane!!.getBoundingClientRect()
+                const bBContainer = (ref.current as HTMLDivElement).parentElement.getBoundingClientRect()
+                if (direction === "horizontal") {
+                    (ref.current as HTMLDivElement).style.left = `${((bBFirst.left + bBFirst.width) / bBContainer.width) * 100}%`
+                } else {
+                    (ref.current as HTMLDivElement).style.top = `${((bBFirst.top + bBFirst.height) / bBContainer.height) * 100}%`
+                }
+            }, 0)
 
+        }
 
         return () => {
             window.removeEventListener("touchstart", onCursorDown)

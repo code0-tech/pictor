@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {DSplitPaneHandle} from "./DSplitPane";
+import {DSplitPaneHandle, DSplitPaneStatus} from "./DSplitPane";
 
 import "./DSplitter.style.scss"
 import {DSplitScreenDirection} from "./DSplitScreen";
@@ -22,9 +22,11 @@ const getResizeArea = (
     element: HTMLElement | undefined | null,
     shiftPercentage: number | undefined = 0,
     resizeAreaDimensions: number = 25
-): DOMRect => {
+): DOMRect | null => {
 
     const bBElement = element?.getBoundingClientRect()
+
+    if (!bBElement) return null
 
     return direction == "horizontal" ? {
         left: bBElement.left - resizeAreaDimensions,
@@ -53,7 +55,6 @@ const getResizeArea = (
 const DSplitter: React.FC<DSplitterProps> = (props) => {
 
     const {firstPane, secondPane, direction} = props
-
     const ref = React.useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -67,7 +68,7 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             if (!ref.current) return
 
             const resizeArea = getResizeArea(direction as DSplitScreenDirection, ref.current)
-            if (isMouseInArea(resizeArea, mousePositionX, mousePositionY)) {
+            if (resizeArea && isMouseInArea(resizeArea, mousePositionX, mousePositionY)) {
                 ref.current!!.dataset.resize = 'true'
             } else {
                 delete ref.current!!.dataset.resize
@@ -75,46 +76,33 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
 
         }
 
-        const onCursorMove = (event: MouseEvent | TouchEvent) => {
-            const mPY = (event instanceof MouseEvent ? event.clientY : event.touches[0].clientY)
-            const mPX = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
+        const onCursorMove = (event: MouseEvent | TouchEvent, bBFirst: DOMRect, bBSecond: DOMRect) => {
 
-            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? mPX : mPY, "first") ?? 0
-            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? mPX : mPY, "second") ?? 0
+            if (!firstPane?.current || !secondPane?.current || !ref.current) return
 
-            /**
-             const scopeSplitters: NodeListOf<HTMLDivElement> = ref.current?.parentElement?.querySelectorAll(":scope > .d-splitter")
-             const isInContact = Array.from(scopeSplitters).filter(splitter => splitter != ref.current).map((splitter) => {
-             const resizeArea = getResizeArea(direction as DSplitScreenDirection, splitter)
-             return isMouseInArea(resizeArea, mPX, mPY)
-             }).reduce((previousValue, currentValue) => previousValue && currentValue)
+            const stackedSize = direction === "horizontal" ? bBSecond.right - bBFirst.left : bBSecond.bottom - bBFirst.top
+            const bBConatiner = ref.current.parentElement.getBoundingClientRect()
 
-             if (isInContact) return
-             **/
+            const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
+            const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
 
-            if ((sizeFirstPane?.status == "SHRINK" && sizeSecondPane?.status == "EXPAND") ||
-                (sizeSecondPane?.status == "SHRINK" && sizeFirstPane?.status == "EXPAND")) {
-                firstPane?.current?.setSize(sizeFirstPane.size)
-                secondPane?.current?.setSize(sizeSecondPane.size)
+            const framedmPY = Math.min(Math.max((mPY) - bBFirst.y, 0), stackedSize)
+            const framedPX = Math.min(Math.max((mPX) - bBFirst.x, 0), stackedSize)
+
+            const containerMPY = Math.min(Math.max((mPY) - bBConatiner.y, 0), bBConatiner.height)
+            const containerMPX = Math.min(Math.max((mPX) - bBConatiner.x, 0), bBConatiner.width)
+
+            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? framedPX : framedmPY, "first", stackedSize) ?? 0
+            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? framedPX : framedmPY, "second", stackedSize) ?? 0
+
+            if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) {
+                return
             }
 
+            ref.current.style.left = `${(containerMPX / bBConatiner.width) * 100}%`
+            firstPane?.current?.setSize(sizeFirstPane[0], bBFirst.x)
+            secondPane?.current?.setSize(sizeSecondPane[0], containerMPX)
 
-
-        }
-
-        const onCursorUp = (event: MouseEvent | TouchEvent) => {
-            //TODO
-            //disable child splitters if they are in contact with current
-            //level splitters
-
-            window.removeEventListener("touchcancel", onCursorUp)
-            window.removeEventListener("touchend", onCursorUp)
-            window.removeEventListener("mouseup", onCursorUp)
-
-            window.removeEventListener("selectstart", disableSelect)
-
-            window.removeEventListener("mousemove", onCursorMove)
-            window.removeEventListener("touchmove", onCursorMove)
         }
 
         const onCursorDown = (event: MouseEvent | TouchEvent) => {
@@ -123,11 +111,31 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
 
             //check if mouse is in resize area
             const resizeArea = getResizeArea(direction as DSplitScreenDirection, ref.current)
-            if (!isMouseInArea(resizeArea, mousePositionX, mousePositionY)) return
+            if (resizeArea && !isMouseInArea(resizeArea, mousePositionX, mousePositionY)) return
 
             //deselect text
             const selection = document.getSelection()
             if (selection) selection.removeAllRanges()
+
+            const bBFirst = firstPane.current.getDOM().getBoundingClientRect()
+            const bBSecond = secondPane.current.getDOM().getBoundingClientRect()
+
+            const moveEvent = (event: MouseEvent | TouchEvent) => onCursorMove(event, bBFirst, bBSecond)
+
+            const onCursorUp = (event: MouseEvent | TouchEvent) => {
+                //TODO
+                //disable child splitters if they are in contact with current
+                //level splitters
+
+                window.removeEventListener("touchcancel", onCursorUp)
+                window.removeEventListener("touchend", onCursorUp)
+                window.removeEventListener("mouseup", onCursorUp)
+
+                window.removeEventListener("selectstart", disableSelect)
+
+                window.removeEventListener("mousemove", moveEvent)
+                window.removeEventListener("touchmove", moveEvent)
+            }
 
             window.addEventListener("touchcancel", onCursorUp)
             window.addEventListener("touchend", onCursorUp)
@@ -135,8 +143,8 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
 
             window.addEventListener('selectstart', disableSelect);
 
-            window.addEventListener("touchmove", onCursorMove)
-            window.addEventListener("mousemove", onCursorMove)
+            window.addEventListener("touchmove", moveEvent)
+            window.addEventListener("mousemove", moveEvent)
         }
 
         window.addEventListener("touchstart", onCursorDown)
@@ -144,6 +152,13 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
         window.addEventListener("mousemove", onResizeAreaHover)
         window.addEventListener("touchmove", onResizeAreaHover)
         //styling for resize areas
+
+        if(firstPane && firstPane.current && ref && ref.current) {
+            const bBFirst = firstPane.current.getDOM().getBoundingClientRect()
+            ref.current.style.left = `${bBFirst.left + bBFirst.width}px`
+        }
+
+
 
         return () => {
             window.removeEventListener("touchstart", onCursorDown)

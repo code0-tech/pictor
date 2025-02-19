@@ -102,7 +102,7 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             calculateSize
         }), [paneRef]);
 
-        return <div id={id} {...mergeCode0Props("d-split-pane", props)} ref={paneRef}>
+        return <div id={id} {...mergeCode0Props(`d-split-pane d-split-pane--${direction}`, props)} ref={paneRef}>
             {children}
         </div>
     })

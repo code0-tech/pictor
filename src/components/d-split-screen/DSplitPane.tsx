@@ -1,5 +1,5 @@
 import {Code0Component} from "../../utils/types";
-import React, {useImperativeHandle} from "react";
+import React, {useEffect, useImperativeHandle} from "react";
 
 import "./DSplitPane.style.scss"
 import {DSplitScreenDirection} from "./DSplitScreen";
@@ -8,7 +8,6 @@ import {mergeCode0Props, parseUnit} from "../../utils/utils";
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode
     direction?: DSplitScreenDirection
-
     //defaults to true
     visible?: boolean
     //defaults to true
@@ -21,9 +20,9 @@ export enum DSplitPaneStatus {
 }
 
 export interface DSplitPaneHandle {
-    setSize: (sizeInPercent: number) => void
-    calculateSize: (position: number, pane: 'first' | 'second') => (number | DSplitPaneStatus)[]
-    getDOM: () => HTMLElement
+    setSize: (size: number, position: number) => void
+    calculateSize: (position: number, pane: 'first' | 'second', stackedSize: number) => (number | DSplitPaneStatus)[]
+    pane: HTMLDivElement | null
 }
 
 
@@ -31,14 +30,37 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
     React.forwardRef<DSplitPaneHandle, DSplitPaneProps>((props, ref) => {
 
         const {children, snap = true, visible = true, direction = "horizontal"} = props
+        const paneRef = React.useRef<HTMLDivElement | null>(null)
         const id = React.useId()
+
+        useEffect(() => {
+            if (!paneRef.current) return
+            if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
+
+            const parentContainer = paneRef.current?.parentElement
+            const bBContainer = parentContainer?.getBoundingClientRect()
+
+            //set initial left as percentage
+            const bBPreviousElement: DOMRect = paneRef.current?.previousElementSibling?.getBoundingClientRect()
+            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.left = bBPreviousElement ?
+                `${((bBPreviousElement.left + bBPreviousElement.width + 1) / bBContainer.width) * 100}%` : `0%`
+            else (paneRef.current as HTMLDivElement).style.top = bBPreviousElement ?
+                `${((bBPreviousElement.top + bBPreviousElement.height + 1) / bBContainer.height) * 100}%` : "0%"
+
+
+            //switch size to percentage
+            const size = paneRef.current?.getBoundingClientRect()
+            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
+            else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
+
+        }, [paneRef]);
 
         const calculateSize = (position: number, pane: 'first' | 'second' = 'first', stackedSize: number = 0): (number | DSplitPaneStatus)[] => {
 
-            const localRef = document.getElementById(id) as HTMLDivElement
-            const parentContainer = localRef?.parentElement
-            const bBContainer = parentContainer?.getBoundingClientRect()
-            const sizeContainer = direction == "horizontal" ? bBContainer?.width ?? 0 : bBContainer?.height ?? 0
+            const localRef = paneRef.current as HTMLDivElement
+            const parentContainer = localRef.parentElement
+            const bBContainer = parentContainer.getBoundingClientRect()
+            const sizeContainer = direction == "horizontal" ? bBContainer.width ?? 0 : bBContainer.height ?? 0
             const minSize = parseUnit(direction == "horizontal" ? getComputedStyle(localRef).minWidth : getComputedStyle(localRef).minHeight)
             const minSizeInPixel: number = !(minSize[1] as string).includes("px") ? sizeContainer * ((minSize[0] as number) / 100) : (minSize[0] as number)
             const maxSize = parseUnit(direction == "horizontal" ? getComputedStyle(localRef).maxWidth : getComputedStyle(localRef).maxHeight)
@@ -52,22 +74,16 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             //If snap is enabled and the new size is inside the snap position we snap
             //to the snap position, which is always the standard mount size
 
-            if (sizeInPixel <= minSizeInPixel) {
-                return [minSizeInPixel, DSplitPaneStatus.LIMIT]
-            }
-
-            if (sizeInPixel >= maxSizeInPixel) {
-                return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
-            }
-
+            if (sizeInPixel <= minSizeInPixel) return [minSizeInPixel, DSplitPaneStatus.LIMIT]
+            if (sizeInPixel >= maxSizeInPixel) return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
             return [sizeInPixel, DSplitPaneStatus.NORMAL]
 
         }
 
         const setSize = (size: number, position: number = 0) => {
-            const localRef = document.getElementById(id) as HTMLDivElement
-            const parentContainer = localRef?.parentElement
-            const bBContainer = parentContainer?.getBoundingClientRect()
+            const localRef = paneRef as HTMLDivElement
+            const parentContainer = localRef.parentElement
+            const bBContainer = parentContainer.getBoundingClientRect()
             const sizeContainer = direction == "horizontal" ? bBContainer?.width ?? 0 : bBContainer?.height ?? 0
 
             if (localRef && direction == "horizontal") {
@@ -79,25 +95,13 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             }
         }
 
-        const getDOM = () => {
-            const localRef = document.getElementById(id) as HTMLDivElement
-            return localRef
-        }
-
         useImperativeHandle(ref, () => ({
+            pane: paneRef.current,
             setSize,
-            calculateSize,
-            getDOM
-        }), []);
+            calculateSize
+        }), [paneRef]);
 
-        return <div id={id} {...mergeCode0Props("d-split-pane", props)} ref={instance => {
-
-            if (!instance || !instance.previousElementSibling) return
-
-            const previousWidth = instance.previousElementSibling.getBoundingClientRect()
-            instance.style.left = `${previousWidth.left + previousWidth.width + 1}px`
-
-        }}>
+        return <div id={id} {...mergeCode0Props("d-split-pane", props)} ref={paneRef}>
             {children}
         </div>
     })

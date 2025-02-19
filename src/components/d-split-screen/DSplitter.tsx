@@ -81,27 +81,29 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             if (!firstPane?.current || !secondPane?.current || !ref.current) return
 
             const stackedSize = direction === "horizontal" ? bBSecond.right - bBFirst.left : bBSecond.bottom - bBFirst.top
-            const bBConatiner = ref.current.parentElement.getBoundingClientRect()
+            const bBContainer =( ref.current as HTMLDivElement).parentElement.getBoundingClientRect()
 
             const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
             const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
 
-            const framedmPY = Math.min(Math.max((mPY) - bBFirst.y, 0), stackedSize)
-            const framedPX = Math.min(Math.max((mPX) - bBFirst.x, 0), stackedSize)
+            const framedMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), stackedSize)
+            const framedMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), stackedSize)
 
-            const containerMPY = Math.min(Math.max((mPY) - bBConatiner.y, 0), bBConatiner.height)
-            const containerMPX = Math.min(Math.max((mPX) - bBConatiner.x, 0), bBConatiner.width)
+            const containerMPY = Math.min(Math.max((mPY) - bBContainer.y, 0), bBContainer.height)
+            const containerMPX = Math.min(Math.max((mPX) - bBContainer.x, 0), bBContainer.width)
 
-            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? framedPX : framedmPY, "first", stackedSize) ?? 0
-            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? framedPX : framedmPY, "second", stackedSize) ?? 0
+            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? framedMPX : framedMPY, "first", stackedSize) ?? 0
+            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? framedMPX : framedMPY, "second", stackedSize) ?? 0
 
             if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) {
                 return
             }
 
-            ref.current.style.left = `${(containerMPX / bBConatiner.width) * 100}%`
-            firstPane?.current?.setSize(sizeFirstPane[0], bBFirst.x)
-            secondPane?.current?.setSize(sizeSecondPane[0], containerMPX)
+            if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(containerMPX / bBContainer.width) * 100}%`
+            else (ref.current as HTMLDivElement).style.top = `${(containerMPY / bBContainer.height) * 100}%`
+
+            firstPane?.current?.setSize(sizeFirstPane[0], direction === "horizontal" ? bBFirst.x : bBFirst.y)
+            secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? containerMPX : containerMPY)
 
         }
 
@@ -117,8 +119,8 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const selection = document.getSelection()
             if (selection) selection.removeAllRanges()
 
-            const bBFirst = firstPane.current.getDOM().getBoundingClientRect()
-            const bBSecond = secondPane.current.getDOM().getBoundingClientRect()
+            const bBFirst = firstPane.current.pane.getBoundingClientRect()
+            const bBSecond = secondPane.current.pane.getBoundingClientRect()
 
             const moveEvent = (event: MouseEvent | TouchEvent) => onCursorMove(event, bBFirst, bBSecond)
 
@@ -153,11 +155,10 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
         window.addEventListener("touchmove", onResizeAreaHover)
         //styling for resize areas
 
-        if(firstPane && firstPane.current && ref && ref.current) {
-            const bBFirst = firstPane.current.getDOM().getBoundingClientRect()
-            ref.current.style.left = `${bBFirst.left + bBFirst.width}px`
+        if (firstPane && firstPane.current && ref.current) {
+            const bBFirst = firstPane.current.pane?.getBoundingClientRect()
+            if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(bBFirst.left + bBFirst.width)}px`
         }
-
 
 
         return () => {

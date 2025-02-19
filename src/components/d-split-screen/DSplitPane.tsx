@@ -3,11 +3,11 @@ import React, {useImperativeHandle} from "react";
 
 import "./DSplitPane.style.scss"
 import {DSplitScreenDirection} from "./DSplitScreen";
-import {mergeCode0Props} from "../../utils/utils";
+import {mergeCode0Props, parseUnit} from "../../utils/utils";
 
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode
-    direction: DSplitScreenDirection
+    direction?: DSplitScreenDirection
 
     //defaults to true
     visible?: boolean
@@ -15,85 +15,89 @@ export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     snap?: boolean
 }
 
+export enum DSplitPaneStatus {
+    NORMAL,
+    LIMIT
+}
+
 export interface DSplitPaneHandle {
     setSize: (sizeInPercent: number) => void
-    calculateSize: (position: number, pane: 'first' | 'second') => { status: 'SHRINK' | 'EXPAND' | undefined, size: number }
+    calculateSize: (position: number, pane: 'first' | 'second') => (number | DSplitPaneStatus)[]
+    getDOM: () => HTMLElement
 }
+
 
 const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPaneProps> & React.RefAttributes<DSplitPaneHandle>> =
     React.forwardRef<DSplitPaneHandle, DSplitPaneProps>((props, ref) => {
 
-        const {children, snap = true, visible = true, direction} = props
+        const {children, snap = true, visible = true, direction = "horizontal"} = props
         const id = React.useId()
 
-        const calculateSize = (position: number, pane: 'first' | 'second' = 'first'): { status: 'SHRINK' | 'EXPAND' | undefined, size: number } => {
+        const calculateSize = (position: number, pane: 'first' | 'second' = 'first', stackedSize: number = 0): (number | DSplitPaneStatus)[] => {
 
             const localRef = document.getElementById(id) as HTMLDivElement
             const parentContainer = localRef?.parentElement
-            const bBPane = localRef?.getBoundingClientRect()
             const bBContainer = parentContainer?.getBoundingClientRect()
-            const sizePane = direction == "horizontal" ? bBPane.width : bBPane.height
-            const sizeContainer = direction == "horizontal" ? bBContainer.width : bBContainer.height
-            const framedPosition = Math.max(Math.min(position, sizeContainer), bBContainer.x)
-            let status: 'SHRINK' | 'EXPAND' | undefined = undefined
-            let sizeInPercent = Infinity
+            const sizeContainer = direction == "horizontal" ? bBContainer?.width ?? 0 : bBContainer?.height ?? 0
+            const minSize = parseUnit(direction == "horizontal" ? getComputedStyle(localRef).minWidth : getComputedStyle(localRef).minHeight)
+            const minSizeInPixel: number = !(minSize[1] as string).includes("px") ? sizeContainer * ((minSize[0] as number) / 100) : (minSize[0] as number)
+            const maxSize = parseUnit(direction == "horizontal" ? getComputedStyle(localRef).maxWidth : getComputedStyle(localRef).maxHeight)
+            const maxSizeInPixel: number = !(maxSize[1] as string).includes("px") ? sizeContainer * ((maxSize[0] as number) / 100) : (maxSize[0] as number)
 
-            //the position is either the x or y coordinate of the splitter
-            const firstBorder = direction == "horizontal" ? bBPane.left : bBPane.top
-            const secondBorder = direction == "horizontal" ? bBPane.right : bBPane.bottom
 
             //calculate new size based upon the new position
             //Pane can be scaled up or scaled down
-
-            if (framedPosition > firstBorder && framedPosition < secondBorder) {
-                const shift = pane === "first" ? secondBorder - framedPosition : framedPosition - firstBorder
-                const widthInPx = sizePane - shift
-                status = "SHRINK"
-                sizeInPercent = widthInPx / sizeContainer
-            }
-
-            if (framedPosition > firstBorder && framedPosition > secondBorder) {
-                console.log("EXPAND 1")
-                const shift = framedPosition - secondBorder
-                const widthInPx = sizePane + shift
-                status = "EXPAND"
-                sizeInPercent = widthInPx / sizeContainer
-            }
-
-            if (framedPosition < firstBorder && framedPosition < secondBorder) {
-                console.log("EXPAND 2")
-                const shift = firstBorder - framedPosition
-                const widthInPx = sizePane + shift
-                status = "EXPAND"
-                sizeInPercent = widthInPx / sizeContainer
-            }
+            const sizeInPixel = pane === "first" ? position : stackedSize - position
 
             //If snap is enabled and the new size is inside the snap position we snap
             //to the snap position, which is always the standard mount size
 
-            return {
-                status: status,
-                size: sizeInPercent
+            if (sizeInPixel <= minSizeInPixel) {
+                return [minSizeInPixel, DSplitPaneStatus.LIMIT]
             }
+
+            if (sizeInPixel >= maxSizeInPixel) {
+                return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
+            }
+
+            return [sizeInPixel, DSplitPaneStatus.NORMAL]
 
         }
 
-        const setSize = (sizeInPercent: number) => {
+        const setSize = (size: number, position: number = 0) => {
             const localRef = document.getElementById(id) as HTMLDivElement
+            const parentContainer = localRef?.parentElement
+            const bBContainer = parentContainer?.getBoundingClientRect()
+            const sizeContainer = direction == "horizontal" ? bBContainer?.width ?? 0 : bBContainer?.height ?? 0
 
             if (localRef && direction == "horizontal") {
-                localRef.style.width = `${sizeInPercent * 100}%`
+                localRef.style.width = `${(size / sizeContainer) * 100}%`
+                localRef.style.left = `${(position / sizeContainer) * 100}%`
             } else if (localRef && direction == "vertical") {
-                localRef.style.height = `${sizeInPercent * 100}%`
+                localRef.style.height = `${(size / sizeContainer) * 100}%`
+                localRef.style.top = `${(position / sizeContainer) * 100}%`
             }
+        }
+
+        const getDOM = () => {
+            const localRef = document.getElementById(id) as HTMLDivElement
+            return localRef
         }
 
         useImperativeHandle(ref, () => ({
             setSize,
-            calculateSize
+            calculateSize,
+            getDOM
         }), []);
 
-        return <div id={id} {...mergeCode0Props("d-split-pane", props)} ref={ref as React.LegacyRef<any>}>
+        return <div id={id} {...mergeCode0Props("d-split-pane", props)} ref={instance => {
+
+            if (!instance || !instance.previousElementSibling) return
+
+            const previousWidth = instance.previousElementSibling.getBoundingClientRect()
+            instance.style.left = `${previousWidth.left + previousWidth.width + 1}px`
+
+        }}>
             {children}
         </div>
     })

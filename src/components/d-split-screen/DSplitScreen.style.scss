@@ -8,7 +8,7 @@
     flex-direction: column;
   }
 
-  &--absolute > * .d-split-pane {
+  &--absolute > div > .d-split-pane {
     position: absolute;
   }
 

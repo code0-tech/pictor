@@ -44,6 +44,22 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
             else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
 
+            if (paneRef.current?.style.maxWidth == "fit-content") {
+                paneRef.current.style.maxWidth = paneRef.current?.style.width
+            }
+
+            if (paneRef.current?.style.minWidth == "fit-content") {
+                paneRef.current.style.minWidth = paneRef.current?.style.width
+            }
+
+            if (paneRef.current?.style.maxHeight == "fit-content") {
+                paneRef.current.style.maxHeight = paneRef.current?.style.height
+            }
+
+            if (paneRef.current?.style.minHeight == "fit-content") {
+                paneRef.current.style.minHeight = paneRef.current?.style.height
+            }
+
             if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
 
             //set initial left as percentage
@@ -66,7 +82,6 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             const minSizeInPixel: number = !(minSize[1] as string).includes("px") ? sizeContainer * ((minSize[0] as number) / 100) : (minSize[0] as number)
             const maxSize = parseUnit(direction == "horizontal" ? getComputedStyle(localRef).maxWidth : getComputedStyle(localRef).maxHeight)
             const maxSizeInPixel: number = !(maxSize[1] as string).includes("px") ? sizeContainer * ((maxSize[0] as number) / 100) : (maxSize[0] as number)
-
 
             //calculate new size based upon the new position
             //Pane can be scaled up or scaled down

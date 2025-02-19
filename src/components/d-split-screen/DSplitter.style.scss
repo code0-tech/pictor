@@ -2,11 +2,14 @@
 @import "../../styles/media";
 
 .d-splitter {
-  position: relative;
+  position: absolute;
   background: borderColor();
+  z-index: 999;
 
   &--horizontal {
     width: 1px;
+    min-width: 1px;
+    max-width: 1px;
     height: 100%;
     cursor: col-resize;
   }
@@ -14,6 +17,7 @@
   &--vertical {
     width: 100%;
     height: 1px;
+    max-height: 1px;
     cursor: row-resize;
   }
 

@@ -20,7 +20,10 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     React.useEffect(() => {
         if (!ref.current) return
-        ref.current?.classList.add("d-split-screen--absolute")
+        setTimeout(() => {
+            ref.current?.classList.add("d-split-screen--absolute")
+        }, 0)
+
     }, [ref])
 
     React.Children.forEach(children, (child, index) => {

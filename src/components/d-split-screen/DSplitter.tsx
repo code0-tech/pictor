@@ -5,6 +5,7 @@ import {DSplitPaneHandle, DSplitPaneStatus} from "./DSplitPane";
 
 import "./DSplitter.style.scss"
 import {DSplitScreenDirection} from "./DSplitScreen";
+import {getOverlapSize} from "overlap-area";
 
 export interface DSplitterProps {
     firstPane?: React.RefObject<DSplitPaneHandle & HTMLDivElement>
@@ -19,16 +20,108 @@ const isMouseInArea = (coordinates: DOMRect, mouseX: number, mouseY: number) => 
         && mouseY <= coordinates.bottom
 }
 
+const getShiftPercentage = (bBFirst: DOMRect, bBSecond: DOMRect): number | undefined => {
+
+    const points1 = [
+        [bBFirst.left, bBFirst.top],
+        [bBFirst.left, bBFirst.bottom],
+        [bBFirst.right, bBFirst.bottom],
+        [bBFirst.right, bBFirst.top],
+    ]
+
+    const points2 = [
+        [bBSecond.left, bBSecond.top],
+        [bBSecond.left, bBSecond.bottom],
+        [bBSecond.right, bBSecond.bottom],
+        [bBSecond.right, bBSecond.top],
+    ]
+
+    const isLeft = bBFirst.y <= bBSecond.y
+    const isTop = bBFirst.x <= bBSecond.x
+
+    const overlapAreaInPxSquared = getOverlapSize(points1, points2)
+    const resizeAreaPxSquared = (bBFirst.right - bBFirst.left) * (bBFirst.bottom - bBFirst.top)
+    const shiftPercentage = Math.min(overlapAreaInPxSquared / resizeAreaPxSquared, 1)
+
+    const negativePositiveNumber = isLeft && isTop ? shiftPercentage : -(shiftPercentage)
+
+    return shiftPercentage == 0 ? undefined : negativePositiveNumber
+}
+
 const getResizeArea = (
     direction: DSplitScreenDirection,
     element: HTMLElement | undefined | null,
-    shiftPercentage: number | undefined = 0,
+    shiftPercentage: number | undefined = undefined,
     resizeAreaDimensions: number = 25
-): DOMRect | null => {
+): DOMRect => {
 
-    const bBElement = element?.getBoundingClientRect()
+    const bBElement = element!!.getBoundingClientRect()
 
-    if (!bBElement) return null
+    if (shiftPercentage === undefined) {
+        const allScopeSplitters = element?.parentElement?.querySelectorAll('.d-splitter')
+        const shiftPercentageD = Array.from(allScopeSplitters).filter((splitter: HTMLDivElement) => splitter != element).map((splitter: HTMLDivElement) => {
+            return getShiftPercentage(getResizeArea(direction, element, 0), getResizeArea(direction, splitter, 0))
+        }).filter(shift => shift)
+
+        const minValue = Math.min(...(shiftPercentageD as number[]))
+        const maxValue = Math.max(...(shiftPercentageD as number[]))
+
+        if (minValue == maxValue || (minValue < 0 && maxValue < 0) || (minValue > 0 && maxValue > 0)) {
+            const value = minValue < 0 ? minValue : maxValue
+            return direction == "horizontal" ? {
+                left: bBElement.left - resizeAreaDimensions + (value * resizeAreaDimensions),
+                right: bBElement.right + resizeAreaDimensions + (value * resizeAreaDimensions),
+                top: bBElement.top,
+                bottom: bBElement.bottom,
+                x: bBElement.x - resizeAreaDimensions,
+                y: bBElement.y,
+                width: bBElement.width + (resizeAreaDimensions * 2),
+                height: bBElement.height,
+                toJSON: bBElement.toJSON
+            } : {
+                left: bBElement.left,
+                right: bBElement.right,
+                top: bBElement.top - resizeAreaDimensions + (value * resizeAreaDimensions),
+                bottom: bBElement.bottom + resizeAreaDimensions + (value * resizeAreaDimensions),
+                x: bBElement.x,
+                y: bBElement.y - resizeAreaDimensions,
+                width: bBElement.width,
+                height: bBElement.height + (resizeAreaDimensions * 2),
+                toJSON: bBElement.toJSON
+            }
+        } else {
+            //shrink from both sides instead of shift
+            if (minValue < -0.8) {
+                //set to 1
+            }
+
+            if (maxValue > 0.8) {
+                //set to 1
+            }
+
+            return direction == "horizontal" ? {
+                left: bBElement.left - resizeAreaDimensions + (minValue * resizeAreaDimensions),
+                right: bBElement.right + resizeAreaDimensions,
+                top: bBElement.top,
+                bottom: bBElement.bottom,
+                x: bBElement.x - resizeAreaDimensions,
+                y: bBElement.y,
+                width: bBElement.width + (resizeAreaDimensions * 2),
+                height: bBElement.height,
+                toJSON: bBElement.toJSON
+            } : {
+                left: bBElement.left,
+                right: bBElement.right,
+                top: bBElement.top - resizeAreaDimensions,
+                bottom: bBElement.bottom + resizeAreaDimensions,
+                x: bBElement.x,
+                y: bBElement.y - resizeAreaDimensions,
+                width: bBElement.width,
+                height: bBElement.height + (resizeAreaDimensions * 2),
+                toJSON: bBElement.toJSON
+            }
+        }
+    }
 
     return direction == "horizontal" ? {
         left: bBElement.left - resizeAreaDimensions,

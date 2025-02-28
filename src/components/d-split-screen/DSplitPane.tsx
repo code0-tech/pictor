@@ -61,6 +61,8 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
                     paneRef.current.style.minHeight = paneRef.current?.style.height
                 }
 
+                if (snap) paneRef.current!!.dataset.snap = `${direction === "horizontal" ? size.width : size.height}`
+
                 if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
 
                 //set initial left as percentage
@@ -70,9 +72,6 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
                 else (paneRef.current as HTMLDivElement).style.top = bBPreviousElement ?
                     `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer.height) * 100}%` : "0%"
             }, 0)
-
-
-
 
         }, [paneRef]);
 
@@ -90,10 +89,12 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             //calculate new size based upon the new position
             //Pane can be scaled up or scaled down
             const sizeInPixel = pane === "first" ? position : stackedSize - position
+            const isInSnapZone = snap && (sizeInPixel >= (Number(localRef.dataset.snap) - 25) && sizeInPixel <= (Number(localRef.dataset.snap) + 25))
 
             //If snap is enabled and the new size is inside the snap position we snap
             //to the snap position, which is always the standard mount size
 
+            if (isInSnapZone) return [Number(localRef.dataset.snap), DSplitPaneStatus.LIMIT]
             if (sizeInPixel <= minSizeInPixel) return [minSizeInPixel, DSplitPaneStatus.LIMIT]
             if (sizeInPixel >= maxSizeInPixel) return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
             return [sizeInPixel, DSplitPaneStatus.NORMAL]

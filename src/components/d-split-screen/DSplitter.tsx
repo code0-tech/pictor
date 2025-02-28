@@ -178,8 +178,8 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const containerMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), (bBSecond.bottom - bBFirst.y))
             const containerMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), (bBSecond.right - bBFirst.x))
 
-            const framedMPY = Math.min(Math.max(bBFirst.top + 1, mPY), bBSecond.bottom - 1)
-            const framedMPX = Math.min(Math.max(bBFirst.left + 1, mPX), bBSecond.right - 1)
+            const framedMPY = Math.min(Math.max(bBFirst.top <= 0 ? 0 : bBFirst.top + 0.1, mPY), bBSecond.bottom >= window.innerHeight ? bBSecond.bottom : bBSecond.bottom - 0.1)
+            const framedMPX = Math.min(Math.max(bBFirst.left <= 0 ? 0 : bBFirst.left + 0.1, mPX), bBSecond.right >= window.innerWidth ? bBSecond.right : bBSecond.right - 0.1)
 
             const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "first", stackedSize) ?? 0
             const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "second", stackedSize) ?? 0

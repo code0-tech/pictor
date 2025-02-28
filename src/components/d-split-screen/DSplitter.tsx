@@ -178,15 +178,13 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const containerMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), (bBSecond.bottom - bBFirst.y))
             const containerMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), (bBSecond.right - bBFirst.x))
 
-            const framedMPY = Math.min(Math.max(bBFirst.top + 1, mPY), bBSecond.bottom)
-            const framedMPX = Math.min(Math.max(bBFirst.left + 1, mPX), bBSecond.right)
+            const framedMPY = Math.min(Math.max(bBFirst.top + 1, mPY), bBSecond.bottom - 1)
+            const framedMPX = Math.min(Math.max(bBFirst.left + 1, mPX), bBSecond.right - 1)
 
             const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "first", stackedSize) ?? 0
             const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "second", stackedSize) ?? 0
 
-            if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) {
-                return
-            }
+            if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) return
 
             if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(framedMPX / bBContainer.width) * 100}%`
             else (ref.current as HTMLDivElement).style.top = `${(framedMPY / bBContainer.height) * 100}%`

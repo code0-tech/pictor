@@ -36,14 +36,14 @@ const getShiftPercentage = (bBFirst: DOMRect, bBSecond: DOMRect): number | undef
         [bBSecond.right, bBSecond.top],
     ]
 
-    const isLeft = bBFirst.y <= bBSecond.y
-    const isTop = bBFirst.x <= bBSecond.x
+    const isLeft = bBFirst.x < bBSecond.x
+    const isTop = bBFirst.y < bBSecond.y
 
     const overlapAreaInPxSquared = getOverlapSize(points1, points2)
     const resizeAreaPxSquared = (bBFirst.right - bBFirst.left) * (bBFirst.bottom - bBFirst.top)
     const shiftPercentage = Math.min(overlapAreaInPxSquared / resizeAreaPxSquared, 1)
 
-    const negativePositiveNumber = isLeft && isTop ? shiftPercentage : -(shiftPercentage)
+    const negativePositiveNumber = isLeft || isTop ? shiftPercentage : -(shiftPercentage)
 
     return shiftPercentage == 0 ? undefined : negativePositiveNumber
 }
@@ -63,14 +63,18 @@ const getResizeArea = (
             return getShiftPercentage(getResizeArea(direction, element, 0), getResizeArea(direction, splitter, 0))
         }).filter(shift => shift)
 
-        const minValue = Math.min(...(shiftPercentageD as number[]))
-        const maxValue = Math.max(...(shiftPercentageD as number[]))
+        const minValue = shiftPercentageD.length > 0 ? Math.min(...(shiftPercentageD as number[])) : undefined
+        const maxValue = shiftPercentageD.length > 0 ? Math.max(...(shiftPercentageD as number[])) : undefined
 
-        if (minValue == maxValue || (minValue < 0 && maxValue < 0) || (minValue > 0 && maxValue > 0)) {
-            const value = minValue < 0 ? minValue : maxValue
+
+        minValue && maxValue && console.log(element, minValue, maxValue)
+
+        if (minValue && maxValue && ((minValue < 0 && maxValue < 0) || (minValue > 0 && maxValue > 0))) {
+            const value = minValue!! < 0 ? minValue : maxValue
+            console.log(element, value)
             return direction == "horizontal" ? {
-                left: bBElement.left - resizeAreaDimensions + (value * resizeAreaDimensions),
-                right: bBElement.right + resizeAreaDimensions + (value * resizeAreaDimensions),
+                left: bBElement.left - resizeAreaDimensions - (value * resizeAreaDimensions),
+                right: bBElement.right + resizeAreaDimensions - (value * resizeAreaDimensions),
                 top: bBElement.top,
                 bottom: bBElement.bottom,
                 x: bBElement.x - resizeAreaDimensions,
@@ -81,27 +85,18 @@ const getResizeArea = (
             } : {
                 left: bBElement.left,
                 right: bBElement.right,
-                top: bBElement.top - resizeAreaDimensions + (value * resizeAreaDimensions),
-                bottom: bBElement.bottom + resizeAreaDimensions + (value * resizeAreaDimensions),
+                top: bBElement.top - resizeAreaDimensions - (value * resizeAreaDimensions),
+                bottom: bBElement.bottom + resizeAreaDimensions - (value * resizeAreaDimensions),
                 x: bBElement.x,
                 y: bBElement.y - resizeAreaDimensions,
                 width: bBElement.width,
                 height: bBElement.height + (resizeAreaDimensions * 2),
                 toJSON: bBElement.toJSON
             }
-        } else {
-            //shrink from both sides instead of shift
-            if (minValue < -0.8) {
-                //set to 1
-            }
-
-            if (maxValue > 0.8) {
-                //set to 1
-            }
-
+        } else if (minValue && maxValue) {
             return direction == "horizontal" ? {
-                left: bBElement.left - resizeAreaDimensions + (minValue * resizeAreaDimensions),
-                right: bBElement.right + resizeAreaDimensions,
+                left: bBElement.left - resizeAreaDimensions - ((minValue < -0.8 ? 1 : minValue) * resizeAreaDimensions),
+                right: bBElement.right + resizeAreaDimensions - ((maxValue > 0.8 ? 1 : maxValue) * resizeAreaDimensions),
                 top: bBElement.top,
                 bottom: bBElement.bottom,
                 x: bBElement.x - resizeAreaDimensions,
@@ -112,8 +107,8 @@ const getResizeArea = (
             } : {
                 left: bBElement.left,
                 right: bBElement.right,
-                top: bBElement.top - resizeAreaDimensions,
-                bottom: bBElement.bottom + resizeAreaDimensions,
+                top: bBElement.top - resizeAreaDimensions - ((minValue < -0.8 ? 1 : minValue) * resizeAreaDimensions),
+                bottom: bBElement.bottom + resizeAreaDimensions - ((maxValue > 0.8 ? 1 : maxValue) * resizeAreaDimensions),
                 x: bBElement.x,
                 y: bBElement.y - resizeAreaDimensions,
                 width: bBElement.width,
@@ -183,24 +178,24 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
             const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
 
-            const framedMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), stackedSize)
-            const framedMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), stackedSize)
+            const containerMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), (bBSecond.bottom - bBFirst.y))
+            const containerMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), (bBSecond.right - bBFirst.x))
 
-            const containerMPY = Math.min(Math.max((mPY) - bBContainer.y, 0), bBContainer.height)
-            const containerMPX = Math.min(Math.max((mPX) - bBContainer.x, 0), bBContainer.width)
+            const framedMPY = Math.min(Math.max(bBFirst.top + 1, mPY), bBSecond.bottom)
+            const framedMPX = Math.min(Math.max(bBFirst.left + 1, mPX), bBSecond.right)
 
-            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? framedMPX : framedMPY, "first", stackedSize) ?? 0
-            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? framedMPX : framedMPY, "second", stackedSize) ?? 0
+            const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "first", stackedSize) ?? 0
+            const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "second", stackedSize) ?? 0
 
             if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) {
                 return
             }
 
-            if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(containerMPX / bBContainer.width) * 100}%`
-            else (ref.current as HTMLDivElement).style.top = `${(containerMPY / bBContainer.height) * 100}%`
+            if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(framedMPX / bBContainer.width) * 100}%`
+            else (ref.current as HTMLDivElement).style.top = `${(framedMPY / bBContainer.height) * 100}%`
 
             firstPane?.current?.setSize(sizeFirstPane[0], direction === "horizontal" ? bBFirst.x : bBFirst.y)
-            secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? containerMPX : containerMPY)
+            secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? framedMPX : framedMPY)
 
         }
 

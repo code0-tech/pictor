@@ -67,11 +67,8 @@ const getResizeArea = (
         const maxValue = shiftPercentageD.length > 0 ? Math.max(...(shiftPercentageD as number[])) : undefined
 
 
-        minValue && maxValue && console.log(element, minValue, maxValue)
-
         if (minValue && maxValue && ((minValue < 0 && maxValue < 0) || (minValue > 0 && maxValue > 0))) {
             const value = minValue!! < 0 ? minValue : maxValue
-            console.log(element, value)
             return direction == "horizontal" ? {
                 left: bBElement.left - resizeAreaDimensions - (value * resizeAreaDimensions),
                 right: bBElement.right + resizeAreaDimensions - (value * resizeAreaDimensions),

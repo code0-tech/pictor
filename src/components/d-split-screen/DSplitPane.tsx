@@ -36,38 +36,42 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
         useEffect(() => {
             if (!paneRef.current) return
 
-            const parentContainer = paneRef.current?.parentElement
-            const bBContainer = parentContainer?.getBoundingClientRect()
+            setTimeout(() => {
+                const parentContainer = paneRef.current?.parentElement
+                const bBContainer = parentContainer?.getBoundingClientRect()
 
-            //switch size to percentage
-            const size = paneRef.current?.getBoundingClientRect()
-            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
-            else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
+                //switch size to percentage
+                const size = paneRef.current?.getBoundingClientRect()
+                if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.width = `${(size.width / bBContainer.width) * 100}%`
+                else (paneRef.current as HTMLDivElement).style.height = `${(size.height / bBContainer.height) * 100}%`
 
-            if (paneRef.current?.style.maxWidth == "fit-content") {
-                paneRef.current.style.maxWidth = paneRef.current?.style.width
-            }
+                if (paneRef.current?.style.maxWidth == "fit-content") {
+                    paneRef.current.style.maxWidth = paneRef.current?.style.width
+                }
 
-            if (paneRef.current?.style.minWidth == "fit-content") {
-                paneRef.current.style.minWidth = paneRef.current?.style.width
-            }
+                if (paneRef.current?.style.minWidth == "fit-content") {
+                    paneRef.current.style.minWidth = paneRef.current?.style.width
+                }
 
-            if (paneRef.current?.style.maxHeight == "fit-content") {
-                paneRef.current.style.maxHeight = paneRef.current?.style.height
-            }
+                if (paneRef.current?.style.maxHeight == "fit-content") {
+                    paneRef.current.style.maxHeight = paneRef.current?.style.height
+                }
 
-            if (paneRef.current?.style.minHeight == "fit-content") {
-                paneRef.current.style.minHeight = paneRef.current?.style.height
-            }
+                if (paneRef.current?.style.minHeight == "fit-content") {
+                    paneRef.current.style.minHeight = paneRef.current?.style.height
+                }
 
-            if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
+                if (!(paneRef.current as HTMLDivElement).previousElementSibling) return
 
-            //set initial left as percentage
-            const bBPreviousElement: DOMRect = paneRef.current?.previousElementSibling?.getBoundingClientRect()
-            if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.left = bBPreviousElement ?
-                `${((bBPreviousElement.left + bBPreviousElement.width + 1) / bBContainer.width) * 100}%` : `0%`
-            else (paneRef.current as HTMLDivElement).style.top = bBPreviousElement ?
-                `${((bBPreviousElement.top + bBPreviousElement.height + 1) / bBContainer.height) * 100}%` : "0%"
+                //set initial left as percentage
+                const bBPreviousElement: DOMRect = paneRef.current?.previousElementSibling?.getBoundingClientRect()
+                if (direction === "horizontal") (paneRef.current as HTMLDivElement).style.left = bBPreviousElement ?
+                    `${((bBPreviousElement.left + bBPreviousElement.width) / bBContainer.width) * 100}%` : `0%`
+                else (paneRef.current as HTMLDivElement).style.top = bBPreviousElement ?
+                    `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer.height) * 100}%` : "0%"
+            }, 0)
+
+
 
 
         }, [paneRef]);

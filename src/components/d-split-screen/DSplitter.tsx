@@ -157,11 +157,21 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             if (!ref.current) return
 
             const resizeArea = getResizeArea(direction as DSplitScreenDirection, ref.current)
-            if (resizeArea && isMouseInArea(resizeArea, mousePositionX, mousePositionY)) {
+            if (resizeArea && !ref.current.ariaDisabled && isMouseInArea(resizeArea, mousePositionX, mousePositionY)) {
                 ref.current!!.dataset.resize = 'true'
+                //disbale all child splitter
+                firstPane.current.pane.querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = "true")
+                secondPane.current.pane.querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = "true")
             } else {
                 delete ref.current!!.dataset.resize
+                //enable all child splitter
+                firstPane.current.pane.querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = null)
+                secondPane.current.pane.querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = null)
             }
+
+            const resize = document.querySelector("[data-resize]")
+            if (resize) document.body.style.cursor = resize.getAttribute("data-direction") == "horizontal" ? "col-resize" : "row-resize"
+            else document.body.style.cursor = ""
 
         }
 
@@ -216,7 +226,7 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
 
             //check if mouse is in resize area
             const resizeArea = getResizeArea(direction as DSplitScreenDirection, ref.current)
-            if (resizeArea && !isMouseInArea(resizeArea, mousePositionX, mousePositionY)) return
+            if (resizeArea && (ref.current.ariaDisabled || !isMouseInArea(resizeArea, mousePositionX, mousePositionY))) return
 
             //deselect text
             const selection = document.getSelection()
@@ -228,9 +238,6 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const moveEvent = (event: MouseEvent | TouchEvent) => onCursorMove(event, bBFirst, bBSecond)
 
             const onCursorUp = (event: MouseEvent | TouchEvent) => {
-                //TODO
-                //disable child splitters if they are in contact with current
-                //level splitters
 
                 window.removeEventListener("touchcancel", onCursorUp)
                 window.removeEventListener("touchend", onCursorUp)
@@ -281,7 +288,7 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
 
     }, [firstPane, secondPane, ref]);
 
-    return <div ref={ref} className={`d-splitter d-splitter--${direction}`}/>
+    return <div ref={ref} className={`d-splitter d-splitter--${direction}`} data-direction={direction}/>
 }
 
 export default DSplitter

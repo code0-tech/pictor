@@ -16,7 +16,8 @@ export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
 
 export enum DSplitPaneStatus {
     NORMAL,
-    LIMIT
+    LIMIT,
+    SNAP
 }
 
 export interface DSplitPaneHandle {
@@ -94,9 +95,9 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
             //If snap is enabled and the new size is inside the snap position we snap
             //to the snap position, which is always the standard mount size
 
-            if (isInSnapZone) return [Number(localRef.dataset.snap), DSplitPaneStatus.LIMIT]
-            if (sizeInPixel <= minSizeInPixel) return [minSizeInPixel, DSplitPaneStatus.LIMIT]
-            if (sizeInPixel >= maxSizeInPixel) return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
+            if (isInSnapZone) return [Number(localRef.dataset.snap), DSplitPaneStatus.SNAP]
+            if (sizeInPixel <= minSizeInPixel && (localRef.style.minWidth || localRef.style.minHeight)) return [minSizeInPixel, DSplitPaneStatus.LIMIT]
+            if (sizeInPixel >= maxSizeInPixel && (localRef.style.maxWidth || localRef.style.maxHeight)) return [maxSizeInPixel, DSplitPaneStatus.LIMIT]
             return [sizeInPixel, DSplitPaneStatus.NORMAL]
 
         }

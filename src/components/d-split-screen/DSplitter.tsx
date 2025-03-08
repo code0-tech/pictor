@@ -184,6 +184,22 @@ const DSplitter: React.FC<DSplitterProps> = (props) => {
             const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "first", stackedSize) ?? 0
             const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "second", stackedSize) ?? 0
 
+            if (sizeFirstPane[1] === DSplitPaneStatus.SNAP) {
+                firstPane?.current?.setSize(sizeFirstPane[0], direction === "horizontal" ? bBFirst.x : bBFirst.y)
+                secondPane?.current?.setSize(stackedSize - sizeFirstPane[0], direction === "horizontal" ? bBFirst.x + sizeFirstPane[0] : bBFirst.y + sizeFirstPane[0])
+                if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${((bBFirst.x + sizeFirstPane[0]) / bBContainer.width) * 100}%`
+                else (ref.current as HTMLDivElement).style.top = `${((bBFirst.y + sizeFirstPane[0]) / bBContainer.height) * 100}%`
+                return
+            }
+
+            if (sizeSecondPane[1] === DSplitPaneStatus.SNAP) {
+                firstPane?.current?.setSize((stackedSize - sizeSecondPane[0]), direction === "horizontal" ? bBFirst.x : bBFirst.y)
+                secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? bBFirst.x + (stackedSize - sizeSecondPane[0]) : bBFirst.y + (stackedSize - sizeSecondPane[0]))
+                if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${((bBFirst.x + (stackedSize - sizeSecondPane[0])) / bBContainer.width) * 100}%`
+                else (ref.current as HTMLDivElement).style.top = `${((bBFirst.y + (stackedSize - sizeSecondPane[0])) / bBContainer.height) * 100}%`
+                return
+            }
+
             if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) return
 
             if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(framedMPX / bBContainer.width) * 100}%`

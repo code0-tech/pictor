@@ -33,6 +33,7 @@ const DSplitPane: React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPa
         const {children, snap = true, visible = true, direction = "horizontal"} = props
         const paneRef = React.useRef<HTMLDivElement | null>(null)
         const id = React.useId()
+        React.useState()
 
         useEffect(() => {
             if (!paneRef.current) return

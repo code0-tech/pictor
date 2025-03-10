@@ -3,7 +3,7 @@ import {Service, Store} from "../../utils/store";
 class DSplitPaneModel {
 
     private readonly dom: HTMLDivElement
-    private readonly default v Size: DOMRect
+    private readonly defaultSize: DOMRect
     private readonly renderedMinSize?: number
     private readonly rendredMaxSize?: number
     private readonly minSize?: string

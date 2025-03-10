@@ -2,6 +2,24 @@ import React, {CSSProperties, ReactNode} from "react";
 import mergeProps from "merge-props";
 import {Code0Component, Code0ComponentProps} from "./types";
 
+export const parseUnit = (str: string): (number | string)[] => {
+
+    const NUMBER_REGEX = /-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/
+
+    // parse the number at the start of the string (this could return it in exponential notation)
+    const val = parseFloat(str)
+
+    // this is the actual number string,
+    // might not be the same length as val if val is in exponential notation
+    const numberStrings = str.match(NUMBER_REGEX) || []
+
+    // get everything after this number
+    const unit = numberStrings.length > 0
+        ? str.substr(numberStrings[0]?.length ?? 0).trim()
+        : ''
+
+    return [val, unit];
+}
 
 export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean, matchingProps?: Object): React.ReactElement | undefined => {
 

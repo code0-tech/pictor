@@ -3,6 +3,8 @@ import DSplitPane, {DSplitPaneHandle, DSplitPaneProps} from "./DSplitPane";
 import DSplitter from "./DSplitter";
 
 import "./DSplitScreen.style.scss"
+import {DSplitPaneView, DSplitScreenService, DSplitView} from "./DSplitScreen.service";
+import {createStore} from "../../utils/store";
 
 export type DSplitScreenDirection = 'vertical' | 'horizontal'
 
@@ -16,7 +18,11 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     const {children, direction = "horizontal"} = props
     const ref = React.useRef<HTMLDivElement | null>(null)
-    const store: DSplitPaneProps[] = []
+    const service = createStore<DSplitView, DSplitScreenService>(DSplitScreenService, (store) => {
+        return new DSplitScreenService(store, direction)
+    })
+
+    const store: DSplitPaneView[] = []
 
     React.useEffect(() => {
         if (!ref.current) return
@@ -27,28 +33,28 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
     }, [ref])
 
     React.Children.forEach(children, (child, index) => {
-
         if (!React.isValidElement(child)) return
+        store.push(new DSplitPaneView(
+            direction === "horizontal" ? child.props.miw as string : child.props.mih as string,
+            direction === "horizontal" ? child.props.maw as string : child.props.mah as string,
+            child.props.snap
+        ))
+    })
 
-        store.push({
-            ref: (child as any).ref ?? React.useRef(null),
-            key: index,
-            ...child.props,
-            direction: direction as DSplitScreenDirection
-        })
-
+    React.Children.forEach(children, (child, index) => {
+        if (!React.isValidElement(child)) return
+        !!store[index + 1] && service.addSplitView(new DSplitView(
+            service,
+            store[index],
+            store[index + 1]
+        ))
     })
 
     return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
         <div>
             {
-                store.map((pane, index) => {
-
-                    return index < store.length - 1 ? <DSplitter
-                        key={index}
-                        direction={direction as DSplitScreenDirection}
-                        firstPane={pane.ref as React.RefObject<DSplitPaneHandle & HTMLDivElement>}
-                        secondPane={store[index + 1].ref as React.RefObject<DSplitPaneHandle & HTMLDivElement>}/> : null
+                Array.from(service.getAllSplitViews()).map((view, index) => {
+                    return index < store.length - 1 ? <DSplitter key={index} view={view}/> : null
                 })
             }
         </div>

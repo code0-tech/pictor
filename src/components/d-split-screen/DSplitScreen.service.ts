@@ -9,14 +9,14 @@ export class DSplitPaneView {
     private _element: HTMLDivElement
     private _defaultSize: DOMRect
 
-    constructor(minSize?, maxSize?, snap = false) {
+    constructor(minSize?: string, maxSize?: string, snap = false) {
         this.minSize = minSize
         this.maxSize = maxSize
         this.snap = snap
     }
 
 
-    setElement(element) {
+    setElement(element: HTMLDivElement) {
         this._element = element;
     }
 
@@ -42,13 +42,13 @@ export class DSplitView {
 
     private _element: HTMLDivElement
 
-    constructor(service, firstPane, secondPane) {
+    constructor(service: DSplitScreenService, firstPane: DSplitPaneView, secondPane: DSplitPaneView) {
         this._service = service
         this._firstPane = firstPane
         this._secondPane = secondPane
     }
 
-    public setElement(element) {
+    public setElement(element: HTMLDivElement) {
         this._element = element;
     }
 
@@ -74,7 +74,7 @@ export class DSplitScreenService extends Service<DSplitView> {
 
     private _split: 'horizontal' | 'vertical'
 
-    constructor(store: Store<DSplitView>, split) {
+    constructor(store: Store<DSplitView>, split: 'horizontal' | 'vertical') {
         super(store)
         this._split = split
     }
@@ -84,7 +84,7 @@ export class DSplitScreenService extends Service<DSplitView> {
         store.current.set(store.current.size, splitter)
     }
 
-    public getAllSplitViews(): MapIterator<DSplitView> {
+    public getAllSplitViews(): Iterable<DSplitView> {
         return this.store.current.values()
     }
 

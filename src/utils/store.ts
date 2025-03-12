@@ -18,5 +18,5 @@ export class Service<T> {
 
 export const createStore = <K, T extends Service<K>>(service: T, callback?: (store: Store<K>) => T): T => {
     const store = React.useRef<Map<number, K>>(new Map())
-    return callback ? callback(store) : new service(store)
+    return (callback ? callback(store) : new service(store)) as T
 }

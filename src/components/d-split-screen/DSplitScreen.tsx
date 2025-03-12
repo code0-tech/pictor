@@ -1,10 +1,9 @@
 import React from "react";
-import DSplitPane, {DSplitPaneHandle, DSplitPaneProps} from "./DSplitPane";
+import DSplitPane, {DSplitPaneProps} from "./DSplitPane";
 import DSplitter from "./DSplitter";
-
-import "./DSplitScreen.style.scss"
 import {DSplitPaneView, DSplitScreenService, DSplitView} from "./DSplitScreen.service";
 import {createStore} from "../../utils/store";
+import "./DSplitScreen.style.scss"
 
 export type DSplitScreenDirection = 'vertical' | 'horizontal'
 
@@ -18,11 +17,36 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     const {children, direction = "horizontal"} = props
     const ref = React.useRef<HTMLDivElement | null>(null)
+    const paneRef = React.useRef(new Map<number, HTMLDivElement>())
+    const splitterRef = React.useRef(new Map<number, HTMLDivElement>())
     const service = createStore<DSplitView, DSplitScreenService>(DSplitScreenService, (store) => {
         return new DSplitScreenService(store, direction)
     })
+    const childrenArray = React.Children.map(children, (child) => {
+        return child
+    })
 
-    const store: DSplitPaneView[] = []
+    React.useEffect(() => {
+        if (paneRef.current.size != React.Children.count(children)) return
+        if (splitterRef.current.size != (React.Children.count(children) - 1)) return
+
+        splitterRef.current.forEach((splitter, index) => {
+            service.addSplitView(new DSplitView(
+                splitter,
+                service,
+                new DSplitPaneView(
+                    paneRef.current.get(index - 1)!!,
+                    service,
+                    childrenArray[index - 1].props.snap
+                ),
+                new DSplitPaneView(
+                    paneRef.current.get(index)!!,
+                    service,
+                    childrenArray[index].props.snap
+                ),
+            ))
+        })
+    }, [paneRef, splitterRef, children])
 
     React.useEffect(() => {
         if (!ref.current) return
@@ -32,39 +56,31 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     }, [ref])
 
-    React.Children.forEach(children, (child, index) => {
-        if (!React.isValidElement(child)) return
-        store.push(new DSplitPaneView(
-            direction === "horizontal" ? child.props.miw as string : child.props.mih as string,
-            direction === "horizontal" ? child.props.maw as string : child.props.mah as string,
-            child.props.snap
-        ))
-    })
-
-    React.Children.forEach(children, (child, index) => {
-        if (!React.isValidElement(child)) return
-        !!store[index + 1] && service.addSplitView(new DSplitView(
-            service,
-            store[index],
-            store[index + 1]
-        ))
-    })
-
     return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
         <div>
             {
-                Array.from(service.getAllSplitViews()).map((view, index) => {
-                    return index < store.length - 1 ? <DSplitter key={index} view={view}/> : null
+                React.Children.map(children, (child, index) => {
+                    return index > 0 ? <DSplitter
+                        key={index}
+                        ref={(ele) => {
+                            splitterRef.current.set(index, ele)
+                        }}
+                        split={direction}
+                    /> : null
                 })
             }
         </div>
         <div>
 
             {
-                store.map((pane, index) => {
-
-                    /**@ts-ignore**/
-                    return <DSplitPane key={index} {...pane}/>
+                React.Children.map(children, (child, index) => {
+                    return <DSplitPane
+                        key={index}
+                        ref={(ele) => {
+                            paneRef.current.set(index, ele!!)
+                        }}
+                        children={child.props.children}
+                    />
                 })
             }
         </div>

@@ -2,26 +2,44 @@ import {Service, Store} from "../../utils/store";
 
 export class DSplitPaneView {
 
+    private readonly _service: DSplitScreenService
     private readonly minSize?: string
     private readonly maxSize?: string
     private readonly snap: boolean
 
-    private _element: HTMLDivElement
+    private readonly _element: HTMLDivElement
     private _defaultSize: DOMRect
 
-    constructor(minSize?: string, maxSize?: string, snap = false) {
-        this.minSize = minSize
-        this.maxSize = maxSize
+    constructor(element: HTMLDivElement, service: DSplitScreenService, snap = false) {
+        this._element = element
+        this._service = service
         this.snap = snap
+
+        this.calculatePosition()
     }
 
+    private calculatePosition() {
+        const parentContainer = this._element.parentElement
+        const bBContainer = parentContainer?.getBoundingClientRect()
+        const size = this.getSize()
+        const split = this._service.getSplit()
 
-    setElement(element: HTMLDivElement) {
-        this._element = element;
-    }
+        this._defaultSize = size
 
-    public setDefaultSize(value: DOMRect) {
-        this._defaultSize = value;
+        if (split === "horizontal") this._element.style.width = `${(size.width / bBContainer!!.width) * 100}%`
+        else this._element.style.height = `${(size.height / bBContainer!!.height) * 100}%`
+
+        this._element.classList.add(`d-split-pane--${this._service.getSplit()}`)
+
+        if (this._element.previousElementSibling) {
+            //set initial left as percentage
+            const bBPreviousElement: DOMRect = this._element.previousElementSibling!!.getBoundingClientRect()
+            if (split === "horizontal") this._element.style.left = bBPreviousElement ?
+                `${((bBPreviousElement.left + bBPreviousElement.width) / bBContainer!!.width) * 100}%` : `0%`
+            else this._element.style.top = bBPreviousElement ?
+                `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer!!.height) * 100}%` : "0%"
+        }
+
     }
 
     public getElement(): HTMLDivElement {
@@ -39,24 +57,29 @@ export class DSplitView {
     private readonly _service: DSplitScreenService
     private readonly _firstPane: DSplitPaneView
     private readonly _secondPane: DSplitPaneView
+    private readonly _element: HTMLDivElement
 
-    private _element: HTMLDivElement
-
-    constructor(service: DSplitScreenService, firstPane: DSplitPaneView, secondPane: DSplitPaneView) {
+    constructor(element: HTMLDivElement, service: DSplitScreenService, firstPane: DSplitPaneView, secondPane: DSplitPaneView) {
+        this._element = element
         this._service = service
         this._firstPane = firstPane
         this._secondPane = secondPane
+
+        this.calculatePosition()
     }
 
-    public setElement(element: HTMLDivElement) {
-        this._element = element;
+    private calculatePosition() {
+
+        const bBFirst = this._firstPane.getSize()
+        const bBContainer = this._element!!.parentElement!!.getBoundingClientRect()
+        if (this._service.getSplit() === "horizontal") {
+            this._element.style.left = `${((bBFirst.left + bBFirst.width) / bBContainer.width) * 100}%`
+        } else {
+            this._element.style.top = `${((bBFirst.top + bBFirst.height) / bBContainer.height) * 100}%`
+        }
     }
 
-    public getService(): DSplitScreenService {
-        return this._service;
-    }
-
-    public getElement(): HTMLDivElement {
+    public getSplitter(): HTMLDivElement {
         return this._element;
     }
 
@@ -66,6 +89,75 @@ export class DSplitView {
 
     public getSecondPane(): DSplitPaneView {
         return this._secondPane;
+    }
+
+    public onResizeAreaEnter(event: MouseEvent | TouchEvent) {
+        this._element.dataset.resize = 'true'
+        //disbale all child splitter
+        this._firstPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = "true")
+        this._secondPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = "true")
+    }
+
+    public onResizeAreaLeave(event: MouseEvent | TouchEvent) {
+        delete this._element.dataset.resize
+        //enable all child splitter
+        this._firstPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = null)
+        this._secondPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = null)
+    }
+
+    public onDrag(event: MouseEvent | TouchEvent) {
+        /**
+         if (!firstPaneElement || !secondPaneElement || !ref.current) return
+
+         const stackedSize = split === "horizontal" ? bBSecond.right - bBFirst.left : bBSecond.bottom - bBFirst.top
+         const bBContainer = (ref.current as HTMLDivElement).parentElement.getBoundingClientRect()
+
+         const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
+         const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
+
+         const containerMPY = Math.min(Math.max((mPY) - bBFirst.y, 0), (bBSecond.bottom - bBFirst.y))
+         const containerMPX = Math.min(Math.max((mPX) - bBFirst.x, 0), (bBSecond.right - bBFirst.x))
+
+         const framedMPY = Math.min(Math.max(bBFirst.top <= 0 ? 0 : bBFirst.top + 0.1, mPY), bBSecond.bottom >= window.innerHeight ? bBSecond.bottom : bBSecond.bottom - 0.1)
+         const framedMPX = Math.min(Math.max(bBFirst.left <= 0 ? 0 : bBFirst.left + 0.1, mPX), bBSecond.right >= window.innerWidth ? bBSecond.right : bBSecond.right - 0.1)
+
+         const sizeFirstPane = firstPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "first", stackedSize) ?? 0
+         const sizeSecondPane = secondPane?.current?.calculateSize(direction == "horizontal" ? containerMPX : containerMPY, "second", stackedSize) ?? 0
+
+         if (sizeFirstPane[1] === DSplitPaneStatus.SNAP) {
+         firstPane?.current?.setSize(sizeFirstPane[0], direction === "horizontal" ? bBFirst.x : bBFirst.y)
+         secondPane?.current?.setSize(stackedSize - sizeFirstPane[0], direction === "horizontal" ? bBFirst.x + sizeFirstPane[0] : bBFirst.y + sizeFirstPane[0])
+         if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${((bBFirst.x + sizeFirstPane[0]) / bBContainer.width) * 100}%`
+         else (ref.current as HTMLDivElement).style.top = `${((bBFirst.y + sizeFirstPane[0]) / bBContainer.height) * 100}%`
+         return
+         }
+
+         if (sizeSecondPane[1] === DSplitPaneStatus.SNAP) {
+         firstPane?.current?.setSize((stackedSize - sizeSecondPane[0]), direction === "horizontal" ? bBFirst.x : bBFirst.y)
+         secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? bBFirst.x + (stackedSize - sizeSecondPane[0]) : bBFirst.y + (stackedSize - sizeSecondPane[0]))
+         if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${((bBFirst.x + (stackedSize - sizeSecondPane[0])) / bBContainer.width) * 100}%`
+         else (ref.current as HTMLDivElement).style.top = `${((bBFirst.y + (stackedSize - sizeSecondPane[0])) / bBContainer.height) * 100}%`
+         return
+         }
+
+         if (sizeFirstPane[1] === DSplitPaneStatus.LIMIT || sizeSecondPane[1] === DSplitPaneStatus.LIMIT) return
+
+         if (direction === "horizontal") (ref.current as HTMLDivElement).style.left = `${(framedMPX / bBContainer.width) * 100}%`
+         else (ref.current as HTMLDivElement).style.top = `${(framedMPY / bBContainer.height) * 100}%`
+
+         firstPane?.current?.setSize(sizeFirstPane[0], direction === "horizontal" ? bBFirst.x : bBFirst.y)
+         secondPane?.current?.setSize(sizeSecondPane[0], direction === "horizontal" ? framedMPX : framedMPY)
+
+         */
+    }
+
+    public onDragStart(event: MouseEvent | TouchEvent) {
+        const selection = document.getSelection()
+        if (selection) selection.removeAllRanges()
+    }
+
+    public onDragEnd(event: MouseEvent | TouchEvent) {
+        //nothing to add so far
     }
 
 }

@@ -9,7 +9,6 @@ import {DSplitView} from "./DSplitScreen.service";
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode,
     snap?: boolean
-    view?: DSplitView
 }
 
 export enum DSplitPaneStatus {
@@ -19,12 +18,11 @@ export enum DSplitPaneStatus {
 }
 
 
-const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwardRef<>((props, ref) => {
+const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwardRef((props, ref) => {
 
-    const {children, view} = props
-    const paneRef = React.useRef<HTMLDivElement | null>(null)
-    const id = React.useId()
+    const {children} = props
 
+    /**
     useEffect(() => {
         if (!paneRef.current) return
 
@@ -114,7 +112,9 @@ const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwa
         calculateSize
     }), [paneRef]);
 
-    return <div id={id} {...mergeCode0Props(`d-split-pane d-split-pane--${direction}`, props)} ref={paneRef}>
+        */
+
+    return <div {...mergeCode0Props(`d-split-pane`, props)} ref={ref}>
         {children}
     </div>
 })

@@ -60,7 +60,7 @@
     "sass-loader": "^16.0.5",
     "storybook": "^8.6.3",
     "style-loader": "^4.0.0",
-    "typescript": "^5.7.3",
+    "typescript": "^5.8.2",
     "overlap-area": "^1.1.0",
     "react-zoom-pan-pinch": "^3.7.0"
   },

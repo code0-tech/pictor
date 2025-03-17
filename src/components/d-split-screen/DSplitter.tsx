@@ -3,16 +3,13 @@
 import React from "react";
 import {DSplitScreenDirection} from "./DSplitScreen";
 import {getOverlapSize} from "overlap-area";
-
+import {DSplitView} from "./DSplitScreen.service";
 import "./DSplitter.style.scss"
 
 export interface DSplitterProps {
-    onDrag: (event: MouseEvent | TouchEvent) => void
-    onDragStart: (event: MouseEvent | TouchEvent) => void
-    onDragEnd: (event: MouseEvent | TouchEvent) => void
-    onResizeAreaEnter: (event: MouseEvent | TouchEvent) => void
-    onResizeAreaLeave: (event: MouseEvent | TouchEvent) => void
+    splitView: DSplitView
     split: 'vertical' | 'horizontal'
+    ref: React.RefCallback<HTMLDivElement>
 }
 
 const isMouseInArea = (coordinates: DOMRect, mouseX: number, mouseY: number) => {
@@ -143,7 +140,7 @@ const getResizeArea = (
 
 const DSplitter: React.ForwardRefExoticComponent<DSplitterProps> = React.forwardRef((props, ref: React.RefCallback<HTMLDivElement>) => {
 
-    const {onDrag = () => {}, onDragStart = () => {}, onDragEnd = () => {}, onResizeAreaEnter = () => {}, onResizeAreaLeave = () => {}, split} = props
+    const {splitView, split} = props
     const splitterRef = React.useRef<HTMLDivElement>(null)
 
     React.useEffect(() => {
@@ -156,13 +153,12 @@ const DSplitter: React.ForwardRefExoticComponent<DSplitterProps> = React.forward
             const mousePositionX = (event instanceof MouseEvent ? event.clientX : event.touches[0].clientX)
 
             if (!splitterRef.current) return
-            console.log(JSON.stringify(event))
 
             const resizeArea = getResizeArea(split as DSplitScreenDirection, splitterRef.current)
             if (resizeArea && !splitterRef.current!!.ariaDisabled && isMouseInArea(resizeArea, mousePositionX, mousePositionY)) {
-                splitterRef.current.dispatchEvent()
+                splitView.onResizeAreaEnter(event)
             } else {
-                splitterRef.current.dispatchEvent(new Event("resizearealeave"))
+                splitView.onResizeAreaLeave(event)
             }
 
             const resize = document.querySelector("[data-resize]")
@@ -179,13 +175,13 @@ const DSplitter: React.ForwardRefExoticComponent<DSplitterProps> = React.forward
             const resizeArea = getResizeArea(split as DSplitScreenDirection, splitterRef.current)
             if (resizeArea && (splitterRef.current!!.ariaDisabled!! || !isMouseInArea(resizeArea, mousePositionX, mousePositionY))) return
 
-            onDragStart(event)
+            splitView.onDragStart(event)
 
-            const moveEvent = (event: MouseEvent | TouchEvent) => onDrag(event)
+            const moveEvent = (event: MouseEvent | TouchEvent) => splitView.onDrag(event)
 
             const onCursorUp = (event: MouseEvent | TouchEvent) => {
 
-                onDragEnd(event)
+                splitView.onDragEnd(event)
                 window.removeEventListener("touchcancel", onCursorUp)
                 window.removeEventListener("touchend", onCursorUp)
                 window.removeEventListener("mouseup", onCursorUp)
@@ -220,7 +216,7 @@ const DSplitter: React.ForwardRefExoticComponent<DSplitterProps> = React.forward
         }
 
 
-    }, [splitterRef]);
+    }, [splitterRef, splitView]);
 
     return <div ref={(element) => {
         splitterRef.current = element

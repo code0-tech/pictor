@@ -1,24 +1,21 @@
 import {Service, Store} from "../../utils/store";
+import {DSplitPaneProps} from "./DSplitPane";
 
 export class DSplitPaneView {
 
     private readonly _service: DSplitScreenService
-    private readonly minSize?: string
-    private readonly maxSize?: string
-    private readonly snap: boolean
 
-    private readonly _element: HTMLDivElement
+    private _props: DSplitPaneProps
+    private _element: HTMLDivElement
     private _defaultSize: DOMRect
 
-    constructor(element: HTMLDivElement, service: DSplitScreenService, snap = false) {
-        this._element = element
+    constructor(service: DSplitScreenService, props: DSplitPaneProps) {
         this._service = service
-        this.snap = snap
-
-        this.calculatePosition()
+        this._props = props
     }
 
-    private calculatePosition() {
+    public setElement(element: HTMLDivElement) {
+        this._element = element
         const parentContainer = this._element.parentElement
         const bBContainer = parentContainer?.getBoundingClientRect()
         const size = this.getSize()
@@ -50,6 +47,9 @@ export class DSplitPaneView {
         return this._element.getBoundingClientRect()
     }
 
+    public getProps(): DSplitPaneProps {
+        return this._props;
+    }
 }
 
 export class DSplitView {
@@ -57,19 +57,17 @@ export class DSplitView {
     private readonly _service: DSplitScreenService
     private readonly _firstPane: DSplitPaneView
     private readonly _secondPane: DSplitPaneView
-    private readonly _element: HTMLDivElement
+    private _element: HTMLDivElement
 
-    constructor(element: HTMLDivElement, service: DSplitScreenService, firstPane: DSplitPaneView, secondPane: DSplitPaneView) {
-        this._element = element
+    constructor(service: DSplitScreenService, firstPane: DSplitPaneView, secondPane: DSplitPaneView) {
         this._service = service
         this._firstPane = firstPane
         this._secondPane = secondPane
 
-        this.calculatePosition()
     }
 
-    private calculatePosition() {
-
+    public setSplitter(splitter: HTMLDivElement) {
+        this._element = splitter
         const bBFirst = this._firstPane.getSize()
         const bBContainer = this._element!!.parentElement!!.getBoundingClientRect()
         if (this._service.getSplit() === "horizontal") {
@@ -164,7 +162,7 @@ export class DSplitView {
 
 export class DSplitScreenService extends Service<DSplitView> {
 
-    private _split: 'horizontal' | 'vertical'
+    private readonly _split: 'horizontal' | 'vertical'
 
     constructor(store: Store<DSplitView>, split: 'horizontal' | 'vertical') {
         super(store)
@@ -176,12 +174,23 @@ export class DSplitScreenService extends Service<DSplitView> {
         store.current.set(store.current.size, splitter)
     }
 
-    public getAllSplitViews(): Iterable<DSplitView> {
-        return this.store.current.values()
+    public setSplitView(key: number, splitter: DSplitView) {
+        const store = this.store
+        store.current.set(key, splitter)
     }
 
+    public getAllSplitViews(): Array<DSplitView> {
+        return Array.from(this.store.current.values())
+    }
 
-    getSplit(): "horizontal" | "vertical" {
+    public getAllPaneViews(): Array<DSplitPaneView> {
+        return [
+            ...Array.from(this.store.current.values()).map((value) => value.getFirstPane()),
+            this.store.current.get(this.store.current.size - 1)?.getSecondPane() as DSplitPaneView,
+        ]
+    }
+
+    public getSplit(): "horizontal" | "vertical" {
         return this._split;
     }
 }

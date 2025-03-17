@@ -17,69 +17,75 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
     const {children, direction = "horizontal"} = props
     const ref = React.useRef<HTMLDivElement | null>(null)
-    const paneRef = React.useRef(new Map<number, HTMLDivElement>())
-    const splitterRef = React.useRef(new Map<number, HTMLDivElement>())
+    const paneElementRef = React.useRef(new Map<number, HTMLDivElement>())
+    const splitterElementRef = React.useRef(new Map<number, HTMLDivElement>())
+    const paneRef = React.useRef(new Map<number, DSplitPaneView>())
     const service = createStore<DSplitView, DSplitScreenService>(DSplitScreenService, (store) => {
         return new DSplitScreenService(store, direction)
     })
-    const childrenArray = React.Children.map(children, (child) => {
-        return child
-    })
 
     React.useEffect(() => {
-        if (paneRef.current.size != React.Children.count(children)) return
-        if (splitterRef.current.size != (React.Children.count(children) - 1)) return
+        if (paneElementRef.current.size != React.Children.count(children)) return
+        if (splitterElementRef.current.size != (React.Children.count(children) - 1)) return
 
-        splitterRef.current.forEach((splitter, index) => {
-            service.addSplitView(new DSplitView(
-                splitter,
-                service,
-                new DSplitPaneView(
-                    paneRef.current.get(index - 1)!!,
-                    service,
-                    childrenArray[index - 1].props.snap
-                ),
-                new DSplitPaneView(
-                    paneRef.current.get(index)!!,
-                    service,
-                    childrenArray[index].props.snap
-                ),
-            ))
+        service.getAllPaneViews().forEach((paneView, index) => {
+            paneView.setElement(paneElementRef.current.get(index) as HTMLDivElement)
         })
-    }, [paneRef, splitterRef, children])
+
+        service.getAllSplitViews().forEach((splitView, index) => {
+            splitView.setSplitter(splitterElementRef.current.get(index) as HTMLDivElement)
+        })
+
+    }, [splitterElementRef, splitterElementRef])
 
     React.useEffect(() => {
         if (!ref.current) return
-        setTimeout(() => {
-            ref.current?.classList.add("d-split-screen--absolute")
-        }, 0)
-
+        setTimeout(() => ref.current?.classList.add("d-split-screen--absolute"), 0)
     }, [ref])
+
+    //create a view element for every pane
+    React.Children.forEach(children, (child, index) => {
+        paneRef.current.set(index, new DSplitPaneView(
+            service,
+            child.props
+        ))
+    })
+
+    //register split view with panes into the store
+    paneRef.current.forEach((paneView, key) => {
+        key < paneRef.current.size - 1 && service.setSplitView(key, new DSplitView(
+            service,
+            paneView,
+            paneRef.current.get(key + 1) as DSplitPaneView,
+        ))
+    })
+
 
     return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
         <div>
             {
-                React.Children.map(children, (child, index) => {
-                    return index > 0 ? <DSplitter
+                service.getAllSplitViews().map((view, index) => {
+                    return <DSplitter
                         key={index}
-                        ref={(ele) => {
-                            splitterRef.current.set(index, ele)
+                        splitView={view}
+                        ref={(ele: HTMLDivElement) => {
+                            splitterElementRef.current.set(index, ele)
                         }}
                         split={direction}
-                    /> : null
+                    />
                 })
             }
         </div>
         <div>
 
             {
-                React.Children.map(children, (child, index) => {
+                service.getAllPaneViews().map((paneView, index) => {
                     return <DSplitPane
                         key={index}
                         ref={(ele) => {
-                            paneRef.current.set(index, ele!!)
+                            paneElementRef.current.set(index, ele!!)
                         }}
-                        children={child.props.children}
+                        {...paneView.getProps()}
                     />
                 })
             }

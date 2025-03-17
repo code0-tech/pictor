@@ -20,7 +20,6 @@ const meta: Meta = {
 
 export const test = () => {
 
-
     return <DFullScreen>
         <DSplitScreen direction={"horizontal"}>
             <DSplitPane miw={"fit-content"}>

@@ -52,7 +52,8 @@ export const Dashboard = () => {
 
     return <DFullScreen>
         <DSplitScreen>
-            <DSplitPane maw={"fit-content"} p={0.5} justify={"space-between"} style={{writingMode: "vertical-rl", display: "flex"}}>
+            <DSplitPane maw={"fit-content"} p={0.5} justify={"space-between"}
+                        style={{writingMode: "vertical-rl", display: "flex"}}>
                 <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
                     <DScreenButton color={"secondary"}>
                         <IconHierarchy3 size={12}/>

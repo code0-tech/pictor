@@ -22,16 +22,8 @@ export const test = () => {
 
     return <DFullScreen>
         <DSplitScreen direction={"horizontal"}>
-            <DSplitPane miw={"fit-content"}>
-                <DSplitScreen direction={"vertical"}>
-                    <DSplitPane>
-                        Lorem Ipsum dolar set amit
-                        Lorem Ipsum dolar set amit
-                    </DSplitPane>
-                    <DSplitPane>
-                        s
-                    </DSplitPane>
-                </DSplitScreen>
+            <DSplitPane>
+                s
             </DSplitPane>
             <DSplitPane>
                 s

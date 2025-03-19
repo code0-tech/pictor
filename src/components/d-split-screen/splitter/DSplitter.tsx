@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import {DSplitScreenDirection} from "./DSplitScreen";
+import {DSplitScreenDirection} from "../DSplitScreen";
 import {getOverlapSize} from "overlap-area";
 import {DSplitView} from "./DSplitter.view";
 import "./DSplitter.style.scss"

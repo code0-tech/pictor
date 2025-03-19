@@ -1,10 +1,10 @@
 import React from "react";
 import DSplitPane, {DSplitPaneProps} from "./pane/DSplitPane";
-import DSplitter from "./DSplitter";
+import DSplitter from "./splitter/DSplitter";
 import {DSplitPaneView, DSplitScreenService} from "./DSplitScreen.service";
 import {createStore} from "../../utils/store";
 import "./DSplitScreen.style.scss"
-import {DSplitView} from "./DSplitter.view";
+import {DSplitView} from "./splitter/DSplitter.view";
 
 export type DSplitScreenDirection = 'vertical' | 'horizontal'
 

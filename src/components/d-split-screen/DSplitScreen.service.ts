@@ -1,6 +1,6 @@
 import {Service, Store} from "../../utils/store";
 import {DSplitPaneProps} from "./pane/DSplitPane";
-import {DSplitView} from "./DSplitter.view";
+import {DSplitView} from "./splitter/DSplitter.view";
 
 export class DSplitPaneView {
 

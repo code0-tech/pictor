@@ -1,21 +1,14 @@
 import {Code0Component} from "../../utils/types";
-import React, {useEffect, useImperativeHandle} from "react";
+import React from "react";
 
 import "./DSplitPane.style.scss"
-import {DSplitScreenDirection} from "./DSplitScreen";
-import {mergeCode0Props, parseUnit} from "../../utils/utils";
-import {DSplitView} from "./DSplitScreen.service";
+import {mergeCode0Props} from "../../utils/utils";
 
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode,
     snap?: boolean
 }
 
-export enum DSplitPaneStatus {
-    NORMAL,
-    LIMIT,
-    SNAP
-}
 
 
 const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwardRef((props, ref) => {

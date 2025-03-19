@@ -5,8 +5,8 @@ import {parseUnit} from "../../../utils/utils";
 export class DSplitPaneView {
 
     private readonly _service: DSplitScreenService
+    private readonly _props: DSplitPaneProps
 
-    private _props: DSplitPaneProps
     private _element: HTMLDivElement
     private _minSize: number
     private _maxSize: number

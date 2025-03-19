@@ -1,57 +1,6 @@
 import {Service, Store} from "../../utils/store";
-import {DSplitPaneProps} from "./pane/DSplitPane";
 import {DSplitView} from "./splitter/DSplitter.view";
-
-export class DSplitPaneView {
-
-    private readonly _service: DSplitScreenService
-
-    private _props: DSplitPaneProps
-    private _element: HTMLDivElement
-    private _defaultSize: DOMRect
-
-    constructor(service: DSplitScreenService, props: DSplitPaneProps) {
-        this._service = service
-        this._props = props
-    }
-
-    public setElement(element: HTMLDivElement) {
-        this._element = element
-        const parentContainer = this._element.parentElement
-        const bBContainer = parentContainer?.getBoundingClientRect()
-        const size = this.getSize()
-        const split = this._service.getSplit()
-
-        this._defaultSize = size
-
-        if (split === "horizontal") this._element.style.width = `${(size.width / bBContainer!!.width) * 100}%`
-        else this._element.style.height = `${(size.height / bBContainer!!.height) * 100}%`
-
-        this._element.classList.add(`d-split-pane--${this._service.getSplit()}`)
-
-        if (this._element.previousElementSibling) {
-            //set initial left as percentage
-            const bBPreviousElement: DOMRect = this._element.previousElementSibling!!.getBoundingClientRect()
-            if (split === "horizontal") this._element.style.left = bBPreviousElement ?
-                `${((bBPreviousElement.left + bBPreviousElement.width) / bBContainer!!.width) * 100}%` : `0%`
-            else this._element.style.top = bBPreviousElement ?
-                `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer!!.height) * 100}%` : "0%"
-        }
-
-    }
-
-    public getElement(): HTMLDivElement {
-        return this._element
-    }
-
-    public getSize(): DOMRect {
-        return this._element.getBoundingClientRect()
-    }
-
-    public getProps(): DSplitPaneProps {
-        return this._props;
-    }
-}
+import {DSplitPaneView} from "./pane/DSplitPane.view";
 
 export class DSplitScreenService extends Service<DSplitView> {
 

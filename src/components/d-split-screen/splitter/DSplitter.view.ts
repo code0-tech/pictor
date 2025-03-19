@@ -1,4 +1,5 @@
-import {DSplitPaneView, DSplitScreenService} from "../DSplitScreen.service";
+import {DSplitScreenService} from "../DSplitScreen.service";
+import {DSplitPaneView} from "../pane/DSplitPane.view";
 
 export class DSplitView {
 

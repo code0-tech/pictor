@@ -65,37 +65,38 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
         ))
     })
 
+    return React.useMemo(() => {
+        return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
+            <div>
+                {
+                    service.getAllSplitViews().map((view, index) => {
+                        return <DSplitter
+                            key={index}
+                            splitView={view}
+                            ref={(ele: HTMLDivElement) => {
+                                splitterElementRef.current.set(index, ele)
+                            }}
+                            split={direction}
+                        />
+                    })
+                }
+            </div>
+            <div>
 
-    return <div className={`d-split-screen d-split-screen--${direction}`} ref={ref}>
-        <div>
-            {
-                service.getAllSplitViews().map((view, index) => {
-                    return <DSplitter
-                        key={index}
-                        splitView={view}
-                        ref={(ele: HTMLDivElement) => {
-                            splitterElementRef.current.set(index, ele)
-                        }}
-                        split={direction}
-                    />
-                })
-            }
+                {
+                    service.getAllPaneViews().map((paneView, index) => {
+                        return <DSplitPane
+                            key={index}
+                            ref={(ele) => {
+                                paneElementRef.current.set(index, ele!!)
+                            }}
+                            {...paneView.getProps()}
+                        />
+                    })
+                }
+            </div>
         </div>
-        <div>
-
-            {
-                service.getAllPaneViews().map((paneView, index) => {
-                    return <DSplitPane
-                        key={index}
-                        ref={(ele) => {
-                            paneElementRef.current.set(index, ele!!)
-                        }}
-                        {...paneView.getProps()}
-                    />
-                })
-            }
-        </div>
-    </div>
+    }, [service])
 
 }
 

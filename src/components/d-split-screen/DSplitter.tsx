@@ -3,11 +3,16 @@
 import React from "react";
 import {DSplitScreenDirection} from "./DSplitScreen";
 import {getOverlapSize} from "overlap-area";
-import {DSplitView} from "./DSplitScreen.service";
+import {DSplitView} from "./DSplitter.view";
 import "./DSplitter.style.scss"
 
 export interface DSplitterProps {
     splitView: DSplitView
+    onDrag?: (event: MouseEvent | TouchEvent) => void
+    onDragStart?: (event: MouseEvent | TouchEvent) => void
+    onDragEnd?: (event: MouseEvent | TouchEvent) => void
+    onResizeAreaEnter?: (event: MouseEvent | TouchEvent) => void
+    onResizeAreaLeave?: (event: MouseEvent | TouchEvent) => void
     split: 'vertical' | 'horizontal'
     ref: React.RefCallback<HTMLDivElement>
 }

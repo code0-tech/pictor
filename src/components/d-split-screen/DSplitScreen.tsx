@@ -1,5 +1,5 @@
 import React from "react";
-import DSplitPane, {DSplitPaneProps} from "./DSplitPane";
+import DSplitPane, {DSplitPaneProps} from "./pane/DSplitPane";
 import DSplitter from "./DSplitter";
 import {DSplitPaneView, DSplitScreenService} from "./DSplitScreen.service";
 import {createStore} from "../../utils/store";

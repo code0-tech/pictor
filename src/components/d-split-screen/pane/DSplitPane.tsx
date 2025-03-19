@@ -1,8 +1,8 @@
-import {Code0Component} from "../../utils/types";
+import {Code0Component} from "../../../utils/types";
 import React from "react";
 
 import "./DSplitPane.style.scss"
-import {mergeCode0Props} from "../../utils/utils";
+import {mergeCode0Props} from "../../../utils/utils";
 
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode,

@@ -1,12 +1,12 @@
 import React from "react";
 import {Meta} from "@storybook/react";
-import DFullScreen from "../d-fullscreen/DFullScreen";
-import DSplitScreen from "./DSplitScreen";
+import DFullScreen from "../../d-fullscreen/DFullScreen";
+import DSplitScreen from "../DSplitScreen";
 import DSplitPane from "./DSplitPane";
-import DFolder, {useFolderControls} from "../d-folder/DFolder";
-import DScreenButton from "../d-screen/DScreenButton";
+import DFolder, {useFolderControls} from "../../d-folder/DFolder";
+import DScreenButton from "../../d-screen/DScreenButton";
 import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
-import {ZoomPanPinchExample} from "../d-zoom-pan-pinch/DZoomPanPinch.stories";
+import {ZoomPanPinchExample} from "../../d-zoom-pan-pinch/DZoomPanPinch.stories";
 
 const meta: Meta = {
     title: "DSplitPane",

@@ -68,11 +68,6 @@ export class DSplitView {
         const containerMPY = Math.min(Math.max((mPY) - this._firstPaneSize.y, 0), (this._secondPaneSize.bottom - this._firstPaneSize.y))
         const containerMPX = Math.min(Math.max((mPX) - this._firstPaneSize.x, 0), (this._secondPaneSize.right - this._firstPaneSize.x))
 
-        //the coordinates similar to the container but with some extra padding for the splitter
-        //and the coordinates are not subtracted to the area.
-        //Are always referred to the complete document
-        const framedMPY = Math.min(Math.max(this._firstPaneSize.top <= 0 ? 0 : this._firstPaneSize.top + 0.1, mPY), this._secondPaneSize.bottom >= window.innerHeight ? this._secondPaneSize.bottom : this._secondPaneSize.bottom - 0.1)
-        const framedMPX = Math.min(Math.max(this._firstPaneSize.left <= 0 ? 0 : this._firstPaneSize.left + 0.1, mPX), this._secondPaneSize.right >= window.innerWidth ? this._secondPaneSize.right : this._secondPaneSize.right - 0.1)
 
         const firstPaneSize = Math.min(Math.max(containerMPX, this._firstPane.minSize, stackedSize - this._secondPane.maxSize), this._firstPane.maxSize, stackedSize - this._secondPane.minSize)
         const secondPaneSize = Math.min(Math.max(stackedSize - firstPaneSize, this._secondPane.minSize), this._secondPane.maxSize)
@@ -83,7 +78,9 @@ export class DSplitView {
         this._secondPane.getElement().style.width = `${(secondPaneSize / bBContainer.width) * 100}%`
         this._secondPane.getElement().style.left = `${((this._firstPaneSize.x + firstPaneSize) / bBContainer.width) * 100}%`
 
-        this._element.style.left = `${((this._firstPaneSize.x + firstPaneSize + 0.1) / bBContainer.width) * 100}%`
+        console.log(secondPaneSize)
+
+        this._element.style.left = `${((secondPaneSize <= 0 ? ((this._firstPaneSize.x + firstPaneSize) - 0.1) : (this._firstPaneSize.x + firstPaneSize + 0.1)) / bBContainer.width) * 100}%`
     }
 
     public onDragStart(event: MouseEvent | TouchEvent) {

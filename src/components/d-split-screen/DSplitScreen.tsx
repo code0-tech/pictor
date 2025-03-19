@@ -1,9 +1,10 @@
 import React from "react";
 import DSplitPane, {DSplitPaneProps} from "./DSplitPane";
 import DSplitter from "./DSplitter";
-import {DSplitPaneView, DSplitScreenService, DSplitView} from "./DSplitScreen.service";
+import {DSplitPaneView, DSplitScreenService} from "./DSplitScreen.service";
 import {createStore} from "../../utils/store";
 import "./DSplitScreen.style.scss"
+import {DSplitView} from "./DSplitter.view";
 
 export type DSplitScreenDirection = 'vertical' | 'horizontal'
 
@@ -24,6 +25,9 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
         return new DSplitScreenService(store, direction)
     })
 
+    //if every splitter and pane element is rendered
+    //set the panes and splitter elements together in their respected views
+    //to prevent issues with not be able to access the elements
     React.useEffect(() => {
         if (paneElementRef.current.size != React.Children.count(children)) return
         if (splitterElementRef.current.size != (React.Children.count(children) - 1)) return

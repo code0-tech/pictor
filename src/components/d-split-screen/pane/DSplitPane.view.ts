@@ -1,28 +1,27 @@
 import {DSplitPaneProps} from "./DSplitPane";
-import {DSplitScreenService} from "../DSplitScreen.service";
 import {parseUnit} from "../../../utils/utils";
 
 export class DSplitPaneView {
 
-    private readonly _service: DSplitScreenService
-    private readonly _props: DSplitPaneProps
+    private readonly _split: 'horizontal' | 'vertical'
+    private _props: DSplitPaneProps
 
     private _element: HTMLDivElement
     private _minSize: number
     private _maxSize: number
     private _defaultSize: DOMRect
 
-    constructor(service: DSplitScreenService, props: DSplitPaneProps) {
-        this._service = service
+    constructor(split: 'horizontal' | 'vertical', props: DSplitPaneProps) {
+        this._split = split
         this._props = props
     }
 
     public setElement(element: HTMLDivElement) {
-        this._element = element
+        this._element = element ?? this._element
         const parentContainer = this._element.parentElement
         const bBContainer = parentContainer?.getBoundingClientRect()
         const size = this.getSize()
-        const split = this._service.getSplit()
+        const split = this._split
         const sizeContainer = split == "horizontal" ? bBContainer!!.width ?? 0 : bBContainer!!.height ?? 0
 
         this._defaultSize = size
@@ -64,6 +63,10 @@ export class DSplitPaneView {
 
     public getProps(): DSplitPaneProps {
         return this._props;
+    }
+
+    set props(props: DSplitPaneProps) {
+        this._props = props;
     }
 
     get minSize(): number {

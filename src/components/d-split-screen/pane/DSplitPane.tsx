@@ -6,7 +6,8 @@ import {mergeCode0Props} from "../../../utils/utils";
 
 export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode,
-    snap?: boolean
+    snap?: boolean,
+    hide?: boolean,
 }
 
 

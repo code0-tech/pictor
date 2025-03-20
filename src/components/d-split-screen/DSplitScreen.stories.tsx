@@ -1,12 +1,14 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Meta} from "@storybook/react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import DSplitScreen from "./DSplitScreen";
-import DSplitPane from "./pane/DSplitPane";
+import DSplitPane, {DSplitPaneHandle} from "./pane/DSplitPane";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
 import DScreenButton from "../d-screen/DScreenButton";
 import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import {ZoomPanPinchExample} from "../d-zoom-pan-pinch/DZoomPanPinch.stories";
+import Button from "../button/Button";
+import ButtonGroup from "../button-group/ButtonGroup";
 
 const meta: Meta = {
     title: "DSplitPane",
@@ -20,26 +22,39 @@ const meta: Meta = {
 
 export const test = () => {
 
+    const ref = React.useRef<DSplitPaneHandle>(null);
+
     return <DFullScreen>
+        <div style={{
+            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+            padding: ".5rem",
+            display: "flex",
+            justifyContent: "flex-end"
+        }}>
+            <ButtonGroup>
+                <Button onClick={() => {
+                    ref!!.current!!.show()
+                }}>Show</Button>
+                <Button onClick={() => {
+                    // @ts-ignore
+                    ref!!.current!!.add()
+                }}>Add First</Button>
+                <Button>Add Last</Button>
+                <Button color={"error"}>Reset</Button>
+            </ButtonGroup>
+        </div>
         <DSplitScreen>
-            <DSplitPane>
-                <DSplitScreen direction={"vertical"}>
-                    <DSplitPane>
-                        s
-                    </DSplitPane>
-                    <DSplitPane>
-                        s
-                    </DSplitPane>
-                </DSplitScreen>
+            <DSplitPane ref={ref}>
+                <Button onClick={() => ref!!.current!!.hide()}>Hide</Button>
             </DSplitPane>
-            <DSplitPane miw={"100px"}>
-                s
+            <DSplitPane miw={"50%"}>
+                2
             </DSplitPane>
             <DSplitPane>
-                s
+                3
             </DSplitPane>
             <DSplitPane>
-                s
+                4
             </DSplitPane>
         </DSplitScreen>
     </DFullScreen>

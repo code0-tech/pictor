@@ -19,14 +19,14 @@ export class DSplitView {
     private getStackedSize(): number {
         const firstSize = this._firstPaneSize
         const secondSize = this._secondPaneSize
-        return this._service.getSplit() === "horizontal" ? secondSize.right - firstSize.left : secondSize.bottom - firstSize.top
+        return this._service.split === "horizontal" ? secondSize.right - firstSize.left : secondSize.bottom - firstSize.top
     }
 
     public setSplitter(splitter: HTMLDivElement) {
-        this._element = splitter
+        this._element = splitter ?? this._element
         const bBFirst = this._firstPane.getSize()
         const bBContainer = this._element!!.parentElement!!.getBoundingClientRect()
-        if (this._service.getSplit() === "horizontal") {
+        if (this._service.split === "horizontal") {
             this._element.style.left = `${((bBFirst.left + bBFirst.width) / bBContainer.width) * 100}%`
         } else {
             this._element.style.top = `${((bBFirst.top + bBFirst.height) / bBContainer.height) * 100}%`
@@ -42,6 +42,7 @@ export class DSplitView {
     }
 
     public onResizeAreaEnter(event: MouseEvent | TouchEvent) {
+        if (!this._element) return
         this._element.dataset.resize = 'true'
         //disbale all child splitter
         this._firstPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = "true")
@@ -49,6 +50,7 @@ export class DSplitView {
     }
 
     public onResizeAreaLeave(event: MouseEvent | TouchEvent) {
+        if (!this._element) return
         delete this._element.dataset.resize
         //enable all child splitter
         this._firstPane.getElement().querySelectorAll(".d-splitter").forEach(splitter => splitter.ariaDisabled = null)
@@ -57,7 +59,9 @@ export class DSplitView {
 
     public onDrag(event: MouseEvent | TouchEvent) {
 
-        const split = this._service.getSplit()
+        if (!this._element) return
+
+        const split = this._service.split
         const stackedSize = this.getStackedSize()
         const bBContainer = this._element.parentElement!!.getBoundingClientRect()
 

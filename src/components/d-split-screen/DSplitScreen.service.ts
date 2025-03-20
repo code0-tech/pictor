@@ -2,37 +2,67 @@ import {Service, Store} from "../../utils/store";
 import {DSplitView} from "./splitter/DSplitter.view";
 import {DSplitPaneView} from "./pane/DSplitPane.view";
 
-export class DSplitScreenService extends Service<DSplitView> {
+export class DSplitScreenService extends Service<DSplitPaneView> {
 
     private readonly _split: 'horizontal' | 'vertical'
+    private _splitViews: DSplitView[]
 
-    constructor(store: Store<DSplitView>, split: 'horizontal' | 'vertical') {
+    constructor(store: Store<DSplitPaneView>, split: 'horizontal' | 'vertical') {
         super(store)
         this._split = split
+        this.generateSplitViews()
     }
 
-    public addSplitView(splitter: DSplitView) {
-        const store = this.store
-        store.current.set(store.current.size, splitter)
+    /** private methods **/
+    private generateSplitViews() {
+        this._splitViews = this.activePaneViews.map((pane, index) => {
+            return index < (this.activePaneViews.length - 1) ? new DSplitView(
+                this,
+                pane,
+                this.activePaneViews[index + 1]
+            ) : null
+        }).filter(value => !!value)
     }
 
-    public setSplitView(key: number, splitter: DSplitView) {
-        const store = this.store
-        store.current.set(key, splitter)
+    /** constructing methods **/
+
+    public setPaneView(key: number, paneView: DSplitPaneView) {
+        this.set(key, paneView)
     }
 
-    public getAllSplitViews(): Array<DSplitView> {
-        return Array.from(this.store.current.values())
+    public showPaneView(key: number) {
+        if (!this.has(key)) return
+        const paneView = this.get(key)
+        paneView!!.props = {
+            ...paneView!!.getProps(),
+            hide: false
+        }
+        this.set(key, paneView!!)
+        this.generateSplitViews()
     }
 
-    public getAllPaneViews(): Array<DSplitPaneView> {
-        return [
-            ...Array.from(this.store.current.values()).map((value) => value.getFirstPane()),
-            this.store.current.get(this.store.current.size - 1)?.getSecondPane() as DSplitPaneView,
-        ]
+    public hidePaneView(key: number) {
+        if (!this.has(key)) return
+        const paneView = this.get(key)
+        paneView!!.props = {
+            ...paneView!!.getProps(),
+            hide: true
+        }
+        this.set(key, paneView!!)
+        this.generateSplitViews()
     }
 
-    public getSplit(): "horizontal" | "vertical" {
+    /** getter / setter methods **/
+
+    get activePaneViews(): Array<DSplitPaneView> {
+        return Array.from(this.values()).filter(pane => !pane.getProps().hide)
+    }
+
+    get splitViews(): DSplitView[] {
+        return this._splitViews;
+    }
+
+    get split(): "horizontal" | "vertical" {
         return this._split;
     }
 }

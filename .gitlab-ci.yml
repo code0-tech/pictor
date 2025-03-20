@@ -20,7 +20,7 @@ storybook:build:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 .storybook:test:base:
-  image: ghcr.io/code0-tech/build-images/node-playwright:109.1-node-22.14
+  image: ghcr.io/code0-tech/build-images/node-playwright:112.1-node-22.14
   stage: test
   before_script:
     - source ~/.asdf/asdf.sh

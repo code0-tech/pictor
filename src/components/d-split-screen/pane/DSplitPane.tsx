@@ -10,6 +10,11 @@ export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     hide?: boolean,
 }
 
+export interface DSplitPaneHandle {
+    show: () => void
+    hide: () => void
+}
+
 
 const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwardRef((props, ref) => {
 
@@ -20,4 +25,4 @@ const DSplitPane: React.ForwardRefExoticComponent<DSplitPaneProps> = React.forwa
     </div>
 })
 
-export default React.memo(DSplitPane)
+export default React.memo(DSplitPane) as React.ForwardRefExoticComponent<React.PropsWithoutRef<DSplitPaneProps> & React.RefAttributes<DSplitPaneHandle>>

@@ -25,12 +25,12 @@ export class DSplitView {
     public setSplitter(splitter: HTMLDivElement) {
         this._element = splitter ?? this._element
         const bBFirst = this._firstPane.getSize()
+        const bBSecond = this._firstPane.getSize()
+        const split = this._service.split
         const bBContainer = this._element!!.parentElement!!.getBoundingClientRect()
-        if (this._service.split === "horizontal") {
-            this._element.style.left = `${((bBFirst.left + bBFirst.width) / bBContainer.width) * 100}%`
-        } else {
-            this._element.style.top = `${((bBFirst.top + bBFirst.height) / bBContainer.height) * 100}%`
-        }
+
+        this._element.style[split === "horizontal" ? "left": "top"] = `${((bBSecond[split === "horizontal" ? "width": "height"] <= 0 ? ((bBFirst[split === "horizontal" ? "x": "y"] + bBFirst[split === "horizontal" ? "width": "height"]) + 0.1) :
+            (bBFirst[split === "horizontal" ? "x": "y"] + bBFirst[split === "horizontal" ? "width": "height"] - 0.1)) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
     }
 
     public getFirstPane(): DSplitPaneView {

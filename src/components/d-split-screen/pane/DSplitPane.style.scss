@@ -1,0 +1,15 @@
+@import "../../../styles/helpers";
+@import "../../../styles/media";
+
+.d-split-pane {
+  overflow: hidden;
+  background: $primary;
+
+  &--horizontal {
+    height: 100%;
+  }
+
+  &--vertical {
+    width: 100%;
+  }
+}

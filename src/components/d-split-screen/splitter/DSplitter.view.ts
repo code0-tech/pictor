@@ -73,7 +73,6 @@ export class DSplitView {
         const containerMPY = Math.min(Math.max((mPY) - this._firstPaneSize.y, 0), (this._secondPaneSize.bottom - this._firstPaneSize.y))
         const containerMPX = Math.min(Math.max((mPX) - this._firstPaneSize.x, 0), (this._secondPaneSize.right - this._firstPaneSize.x))
 
-
         const firstPaneSize = Math.min(Math.max(split === "horizontal" ? containerMPX : containerMPY, this._firstPane.minSize, stackedSize - this._secondPane.maxSize), this._firstPane.maxSize, stackedSize - this._secondPane.minSize)
         const secondPaneSize = Math.min(Math.max(stackedSize - firstPaneSize, this._secondPane.minSize), this._secondPane.maxSize)
 
@@ -98,6 +97,9 @@ export class DSplitView {
     public onDragEnd(event: MouseEvent | TouchEvent) {
         const selection = document.getSelection()
         if (selection) selection.removeAllRanges()
+
+        this._firstPane.setPreferredSize()
+        this._secondPane.setPreferredSize()
     }
 
 }

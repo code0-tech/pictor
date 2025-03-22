@@ -29,7 +29,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
     //when the component is rendered
     //set the panes and splitter elements together in their respected views
     //to prevent issues with not be able to access the elements
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
 
         const childrenVisible = service.activePaneViews.length
 
@@ -43,27 +43,18 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
         service.splitViews.forEach((splitView, index) => {
             splitView.setSplitter(splitterElementRef.current.get(index) as HTMLDivElement)
         })
-
-        setTimeout(() => ref.current?.classList.add("d-split-screen--absolute"), 0)
-
     })
 
     React.Children.forEach(children, (child, index) =>
         // @ts-ignore
         React.useImperativeHandle(child.props.ref, () => ({
             show: () => service.showPaneView(index),
-            hide: () => service.hidePaneView(index),
-            add: () => service.add(new DSplitPaneView(
-                direction,
-                {
-                    children: <>h1</>
-                }
-            ))
+            hide: () => service.hidePaneView(index)
         }))
     )
 
 
-    return <div className={`d-split-screen d-split-screen--${direction}`}
+    return <div className={`d-split-screen d-split-screen--absolute d-split-screen--${direction}`}
                 ref={ref}
                 key={service.activePaneViews.length}>
         <div>

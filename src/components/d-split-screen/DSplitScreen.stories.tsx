@@ -35,11 +35,6 @@ export const test = () => {
                 <Button onClick={() => {
                     ref!!.current!!.show()
                 }}>Show</Button>
-                <Button onClick={() => {
-                    // @ts-ignore
-                    ref!!.current!!.add()
-                }}>Add First</Button>
-                <Button>Add Last</Button>
                 <Button color={"error"}>Reset</Button>
             </ButtonGroup>
         </div>
@@ -47,7 +42,7 @@ export const test = () => {
             <DSplitPane ref={ref}>
                 <Button onClick={() => ref!!.current!!.hide()}>Hide</Button>
             </DSplitPane>
-            <DSplitPane miw={"50%"}>
+            <DSplitPane miw={"20px"} w={"50px"}>
                 2
             </DSplitPane>
             <DSplitPane>

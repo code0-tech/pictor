@@ -51,6 +51,9 @@ export const test = () => {
             <DSplitPane>
                 4
             </DSplitPane>
+            <DSplitPane>
+                5
+            </DSplitPane>
         </DSplitScreen>
     </DFullScreen>
 

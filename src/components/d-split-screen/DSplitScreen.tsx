@@ -29,7 +29,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
     //when the component is rendered
     //set the panes and splitter elements together in their respected views
     //to prevent issues with not be able to access the elements
-    React.useLayoutEffect(() => {
+    React.useEffect(() => {
 
         const childrenVisible = service.activePaneViews.length
 

@@ -8,6 +8,7 @@ export interface DSplitPaneProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode,
     snap?: boolean,
     hide?: boolean,
+    "data-preferred-size"?: number,
 }
 
 export interface DSplitPaneHandle {

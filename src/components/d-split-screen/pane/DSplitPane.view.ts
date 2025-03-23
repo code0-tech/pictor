@@ -9,7 +9,7 @@ export class DSplitPaneView {
     private _element: HTMLDivElement
     private _minSize: number
     private _maxSize: number
-    private _preferredSize: DOMRect
+    private _size: number
 
     constructor(split: 'horizontal' | 'vertical', props: DSplitPaneProps) {
         this._split = split
@@ -25,10 +25,8 @@ export class DSplitPaneView {
         const parentContainer = this._element.parentElement
         const bBContainer = parentContainer?.getBoundingClientRect()
         const split = this._split
-        const size = this.getSize()
         const sizeContainer = split == "horizontal" ? bBContainer!!.width ?? 0 : bBContainer!!.height ?? 0
-        const standardSize = sizeContainer / parentContainer!!.querySelectorAll(":scope > .d-split-pane").length
-        let countZeroPanes = 0
+        const preferredSize = this._element.dataset.preferredSize ? Number(this._element.dataset.preferredSize) : undefined
 
         if (this._element.style.maxWidth == "fit-content") this._element.style.maxWidth = this._element.style.width
         if (this._element.style.minWidth == "fit-content") this._element.style.minWidth = this._element.style.width
@@ -41,7 +39,53 @@ export class DSplitPaneView {
         const maxSize = parseUnit(split == "horizontal" ? getComputedStyle(this._element).maxWidth : getComputedStyle(this._element).maxHeight)
         this._maxSize = !(maxSize[1] as string).includes("px") ? sizeContainer * ((maxSize[0] as number) / 100) : (maxSize[0] as number)
 
-        const allPanes = Array.from(parentContainer!!.querySelectorAll(":scope > .d-split-pane")).map((pane: HTMLDivElement) => {
+        //width is greater than preferred size and is inside the limit of min and max
+        //set preferred size
+        const [numberZeroPanes, standardSize] = this.standardSize
+
+        const size = parseUnit(split == "horizontal" ? (getComputedStyle(this._element).width) : getComputedStyle(this._element).height)
+        this._size = !(size[1] as string).includes("px") ? sizeContainer * ((size[0] as number) / 100) : (size[0] as number)
+
+        if (split === "horizontal") {
+            this._element.style.width = `${((this._element.style.width ? this._size : standardSize) / bBContainer!!.width) * 100}%`
+        } else if (split === "vertical") {
+            this._element.style.height = `${(this._element.style.height ? this._size : standardSize / bBContainer!!.height) * 100}%`
+        }
+
+        //width is greater than preferred size and is inside the limit of min and max
+        //set preferred size
+        if (preferredSize && numberZeroPanes > 1 && split === "horizontal" && standardSize > preferredSize) {
+            this._element.style.width = `${(preferredSize / bBContainer!!.width) * 100}%`
+        } else if (preferredSize && numberZeroPanes > 1 && split === "vertical" && standardSize > preferredSize) {
+            this._element.style.height = `${(preferredSize / bBContainer!!.height) * 100}%`
+        }
+
+        if (this._element.previousElementSibling) {
+            //set initial left as percentage
+            const bBPreviousElement: DOMRect = this._element.previousElementSibling!!.getBoundingClientRect()
+            if (split === "horizontal") this._element.style.left = bBPreviousElement ?
+                `${Math.min(((bBPreviousElement.right) / bBContainer!!.width) * 100, 100)}%` : `0%`
+            else this._element.style.top = bBPreviousElement ?
+                `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer!!.height) * 100}%` : "0%"
+        }
+
+        this._element.classList.add(`d-split-pane--${split}`)
+    }
+
+    public getElement(): HTMLDivElement {
+        return this._element
+    }
+
+    private get standardSize(): [number, number] {
+        const split = this._split
+        const parentContainer = this._element.parentElement
+        const bBContainer = parentContainer?.getBoundingClientRect()
+        let sizeContainer = split == "horizontal" ? bBContainer!!.width ?? 0 : bBContainer!!.height ?? 0
+        let internalSizeContainer = split == "horizontal" ? bBContainer!!.width ?? 0 : bBContainer!!.height ?? 0
+        let standardSize = sizeContainer / parentContainer!!.querySelectorAll(":scope > .d-split-pane").length
+        let countZeroPanes: number = 0
+
+        Array.from(parentContainer!!.querySelectorAll(":scope > .d-split-pane")).forEach((pane: HTMLDivElement) => {
 
             //calculate min and max sizes
             const minSizeUnit = parseUnit(split == "horizontal" ? getComputedStyle(pane).minWidth : getComputedStyle(pane).minHeight)
@@ -50,62 +94,37 @@ export class DSplitPaneView {
             const maxSize = !(maxSizeUnit[1] as string).includes("px") ? sizeContainer * ((maxSizeUnit[0] as number) / 100) : (maxSizeUnit[0] as number)
             const sizeUnit = parseUnit(split == "horizontal" ? (pane.style.width ? getComputedStyle(pane).width : "undefined") : (pane.style.height ? getComputedStyle(pane).height : "undefined"))
             const sizePane = !(sizeUnit[1] as string).includes("px") ? sizeContainer * ((sizeUnit[0] as number) / 100) : (sizeUnit[0] as number)
+            const preferredSize = (pane.dataset.preferredSize && standardSize > Number(pane.dataset.preferredSize) ? Number(pane.dataset.preferredSize) : undefined) as number
+            let size = 0
 
-            if (minSize > standardSize && sizePane <= minSize) {
+            if (minSize > standardSize && (sizePane || preferredSize) <= minSize) {
                 //subtract minSize - standardSize and subtract it from container size
-                return minSize
-            } else if (minSize > standardSize && sizePane > minSize) {
+                size = minSize
+            } else if (minSize > standardSize && (sizePane || preferredSize) > minSize) {
                 //subtract sizePane - standardSize and subtract it from container size
-                return sizePane
-            } else if (maxSize < standardSize && sizePane >= maxSize) {
+                size = (sizePane || preferredSize)
+            } else if (maxSize < standardSize && (sizePane || preferredSize) >= maxSize) {
                 //subtract standardSize - maxSize and add it to container size
-                return maxSize
-            } else if (maxSize < standardSize && sizePane < maxSize) {
+                size = maxSize
+            } else if (maxSize < standardSize && (sizePane || preferredSize) < maxSize) {
                 //subtract standardSize - sizePane and add it to container size
-                return sizePane
-            } else if (sizePane > standardSize) {
+                size = (sizePane || preferredSize)
+            } else if ((sizePane || preferredSize) > standardSize) {
                 //subtract sizePane - standardSize and subtract it from container size
-                return sizePane
-            } else if (sizePane < standardSize) {
+                size = (sizePane || preferredSize)
+            } else if ((sizePane || preferredSize) < standardSize) {
                 //subtract standardSize - sizePane and add it to container size
-                return sizePane
+                size = (sizePane || preferredSize)
             }
 
-            countZeroPanes++
-            return 0
+            sizeContainer = sizeContainer - size
+            internalSizeContainer = sizeContainer + size
+            standardSize = internalSizeContainer / parentContainer!!.querySelectorAll(":scope > .d-split-pane").length
+            if (size === 0) countZeroPanes++
 
-        }).reduce((a, b) => a + b);
+        })
 
-        const realStandardSize = (sizeContainer - allPanes) / countZeroPanes
-
-        if (split === "horizontal" && !this._element.style.width) {
-            this._element.style.width = `${(realStandardSize / bBContainer!!.width) * 100}%`
-        } else if (split === "vertical" && !this._element.style.height) {
-            this._element.style.height = `${(realStandardSize / bBContainer!!.height) * 100}%`
-        }
-
-        if (this._element.previousElementSibling) {
-            //set initial left as percentage
-            const bBPreviousElement: DOMRect = this._element.previousElementSibling!!.getBoundingClientRect()
-            if (split === "horizontal") this._element.style.left = bBPreviousElement ?
-                `${((bBPreviousElement.right) / bBContainer!!.width) * 100}%` : `0%`
-            else this._element.style.top = bBPreviousElement ?
-                `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer!!.height) * 100}%` : "0%"
-        }
-
-        //width is greater than preferred size and is inside the limit of min and max
-        //set preferred size
-        if (this._preferredSize && split === "horizontal" && this.isSizeWithinLimits(this._preferredSize.width)) {
-            this._element.style.width = `${(this._preferredSize.width / bBContainer!!.width) * 100}%`
-        } else if (this._preferredSize && split === "vertical" && this.isSizeWithinLimits(this._preferredSize.height)) {
-            this._element.style.height = `${(this._preferredSize.height / bBContainer!!.height) * 100}%`
-        }
-
-        this._element.classList.add(`d-split-pane--${split}`)
-    }
-
-    public getElement(): HTMLDivElement {
-        return this._element
+        return [countZeroPanes, sizeContainer / countZeroPanes]
     }
 
     public getSize(): DOMRect {
@@ -116,12 +135,22 @@ export class DSplitPaneView {
         return this._props;
     }
 
-    get preferredSize(): DOMRect {
-        return this._preferredSize;
-    }
-
     public setPreferredSize() {
-        this._preferredSize = this.getSize();
+        const preferredSize = this.getSize();
+
+        //width is greater than preferred size and is inside the limit of min and max
+        //set preferred size
+        if (this._split === "horizontal" && this.isSizeWithinLimits(preferredSize.width)) {
+            this.props = {
+                ...this._props,
+                "data-preferred-size": preferredSize.width
+            }
+        } else if (this._split === "vertical" && this.isSizeWithinLimits(preferredSize.height)) {
+            this.props = {
+                ...this._props,
+                "data-preferred-size": preferredSize.height
+            }
+        }
     }
 
     set props(props: DSplitPaneProps) {

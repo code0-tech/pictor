@@ -65,6 +65,9 @@ export class DSplitView {
         const stackedSize = this.getStackedSize()
         const bBContainer = this._element.parentElement!!.getBoundingClientRect()
 
+        const offsetX = event instanceof MouseEvent ? event.pageX - event.clientX : event.touches[0].pageX - event.touches[0].clientX
+        const offsetY = event instanceof MouseEvent ? event.pageY - event.clientY : event.touches[0].pageY - event.touches[0].clientY
+
         //real coordinates within the document
         const mPY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY
         const mPX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX
@@ -76,14 +79,16 @@ export class DSplitView {
         const firstPaneSize = Math.min(Math.max(split === "horizontal" ? containerMPX : containerMPY, this._firstPane.minSize, stackedSize - this._secondPane.maxSize), this._firstPane.maxSize, stackedSize - this._secondPane.minSize)
         const secondPaneSize = Math.min(Math.max(stackedSize - firstPaneSize, this._secondPane.minSize), this._secondPane.maxSize)
 
+        const firstPaneXY = this._firstPaneSize[split === "horizontal" ? "x": "y"] + (split === "horizontal" ? offsetX : offsetY)
+
         this._firstPane.getElement().style[split === "horizontal" ? "width": "height"] = `${(firstPaneSize / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
-        this._firstPane.getElement().style[split === "horizontal" ? "left": "top"] = `${(this._firstPaneSize.x / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
+        this._firstPane.getElement().style[split === "horizontal" ? "left": "top"] = `${(firstPaneXY / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
 
         this._secondPane.getElement().style[split === "horizontal" ? "width": "height"] = `${(secondPaneSize / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
-        this._secondPane.getElement().style[split === "horizontal" ? "left": "top"] = `${((this._firstPaneSize.x + firstPaneSize) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
+        this._secondPane.getElement().style[split === "horizontal" ? "left": "top"] = `${((firstPaneXY + firstPaneSize) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
 
-        this._element.style[split === "horizontal" ? "left": "top"] = `${((secondPaneSize <= 0 ? ((this._firstPaneSize[split === "horizontal" ? "x": "y"] + firstPaneSize) - 0.1) : 
-            (this._firstPaneSize[split === "horizontal" ? "x": "y"] + firstPaneSize + 0.1)) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
+        this._element.style[split === "horizontal" ? "left": "top"] = `${((secondPaneSize <= 0 ? ((firstPaneXY + firstPaneSize) - 0.1) : 
+            (firstPaneXY + firstPaneSize + 0.1)) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
     }
 
     public onDragStart(event: MouseEvent | TouchEvent) {

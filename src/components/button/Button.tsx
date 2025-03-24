@@ -5,7 +5,7 @@ import React, {
 import {mergeCode0Props} from "../../utils/utils";
 import {Code0Component, Color} from "../../utils/types"
 
-export interface ButtonProps extends Code0Component<HTMLAnchorElement> {
+export interface ButtonProps extends Code0Component<HTMLButtonElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
     color?: Color,
@@ -17,15 +17,15 @@ export interface ButtonProps extends Code0Component<HTMLAnchorElement> {
     disabled?: boolean
 }
 
-const Button: React.FC<ButtonProps> = (props) => {
+const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
 
     const {children, variant = "normal", color = "primary", active = false, disabled = false, ...args} = props
 
-    return <a {...mergeCode0Props(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`, args)}
+    return <button ref={ref} {...mergeCode0Props(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`, args)}
               aria-disabled={disabled ? "true" : "false"}>
         {children}
-    </a>
-}
+    </button>
+})
 
 
 

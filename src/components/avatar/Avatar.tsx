@@ -2,6 +2,7 @@ import React from "react";
 import {Code0Component} from "../../utils/types";
 import {md5} from 'js-md5';
 import "./Avatar.style.scss"
+import {mergeCode0Props} from "../../utils/utils";
 
 interface AvatarImageProps {
     src: string
@@ -85,9 +86,9 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
 
 const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
 
-    const {identifier, src, size = 25} = props
+    const {identifier, src, size = 25, ...rest} = props
 
-    return <div className={`avatar ${!identifier && src ? "avatar--image" : ""}`}>
+    return <div {...mergeCode0Props(`avatar ${!identifier && src ? "avatar--image" : ""}`, rest)}>
         {identifier ?
             <AvatarIdenticon identifier={identifier} size={size}/> :
             src ? <AvatarImage src={src} size={size + 13}/> : null

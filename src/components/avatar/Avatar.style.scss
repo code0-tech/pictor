@@ -1,0 +1,15 @@
+@import "../../styles/helpers";
+
+.avatar {
+  @include box(false);
+  aspect-ratio: 50 / 50;
+  padding: $xxs;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  &--image {
+    padding: 0;
+  }
+}

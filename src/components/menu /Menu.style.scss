@@ -6,6 +6,7 @@
 
   &__item {
     @include box(false);
+    border-radius: $borderRadius - $xxs;
     padding: .5rem;
     background-color: transparent;
     border-color: transparent;

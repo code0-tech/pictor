@@ -5,10 +5,12 @@ import {DSplitScreenService} from "./DSplitScreen.service";
 import {createService} from "../../utils/store";
 import {DSplitPaneView} from "./pane/DSplitPane.view";
 import "./DSplitScreen.style.scss"
+import {Code0Component} from "../../utils/types";
+import {mergeCode0Props} from "../../utils/utils";
 
 export type DSplitScreenDirection = 'vertical' | 'horizontal'
 
-export interface DSplitScreenProps {
+export interface DSplitScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactElement<DSplitPaneProps>[]
     //defaults to horizontal
     direction?: DSplitScreenDirection
@@ -16,7 +18,7 @@ export interface DSplitScreenProps {
 
 const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
 
-    const {children, direction = "horizontal"} = props
+    const {children, direction = "horizontal", ...rest} = props
     const ref = React.useRef<HTMLDivElement | null>(null)
     const paneElementRef = React.useRef(new Map<number, HTMLDivElement>())
     const splitterElementRef = React.useRef(new Map<number, HTMLDivElement>())
@@ -54,7 +56,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
     )
 
 
-    return <div className={`d-split-screen d-split-screen--absolute d-split-screen--${direction}`}
+    return <div {...mergeCode0Props(`d-split-screen d-split-screen--absolute d-split-screen--${direction}`, rest)}
                 ref={ref}
                 key={service.activePaneViews.length}>
         <div>

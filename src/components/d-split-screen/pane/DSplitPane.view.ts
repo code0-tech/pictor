@@ -28,10 +28,13 @@ export class DSplitPaneView {
         const sizeContainer = split == "horizontal" ? bBContainer!!.width ?? 0 : bBContainer!!.height ?? 0
         const preferredSize = this._element.dataset.preferredSize ? Number(this._element.dataset.preferredSize) : undefined
 
-        if (this._element.style.maxWidth == "fit-content") this._element.style.maxWidth = this._element.style.width
-        if (this._element.style.minWidth == "fit-content") this._element.style.minWidth = this._element.style.width
-        if (this._element.style.maxHeight == "fit-content") this._element.style.maxHeight = this._element.style.height
-        if (this._element.style.minHeight == "fit-content") this._element.style.minHeight = this._element.style.height
+        const size = parseUnit(split == "horizontal" ? (getComputedStyle(this._element).width) : getComputedStyle(this._element).height)
+        this._size = !(size[1] as string).includes("px") ? sizeContainer * ((size[0] as number) / 100) : (size[0] as number)
+
+        if (this._element.style.maxWidth == "fit-content") this._element.style.maxWidth = `${this._size}px`
+        if (this._element.style.minWidth == "fit-content") this._element.style.minWidth = `${this._size}px`
+        if (this._element.style.maxHeight == "fit-content") this._element.style.maxHeight = `${this._size}px`
+        if (this._element.style.minHeight == "fit-content") this._element.style.minHeight = `${this._size}px`
 
         //calculate min and max sizes
         const minSize = parseUnit(split == "horizontal" ? getComputedStyle(this._element).minWidth : getComputedStyle(this._element).minHeight)
@@ -42,9 +45,6 @@ export class DSplitPaneView {
         //width is greater than preferred size and is inside the limit of min and max
         //set preferred size
         const [numberZeroPanes, standardSize] = this.standardSize
-
-        const size = parseUnit(split == "horizontal" ? (getComputedStyle(this._element).width) : getComputedStyle(this._element).height)
-        this._size = !(size[1] as string).includes("px") ? sizeContainer * ((size[0] as number) / 100) : (size[0] as number)
 
         if (split === "horizontal") {
             this._element.style.width = `${((this._element.style.width ? this._size : standardSize) / bBContainer!!.width) * 100}%`
@@ -63,11 +63,25 @@ export class DSplitPaneView {
         if (this._element.previousElementSibling) {
             //set initial left as percentage
             const bBPreviousElement: DOMRect = this._element.previousElementSibling!!.getBoundingClientRect()
+            console.log(this._element.previousElementSibling, bBPreviousElement)
             if (split === "horizontal") this._element.style.left = bBPreviousElement ?
-                `${Math.min(((bBPreviousElement.right) / bBContainer!!.width) * 100, 100)}%` : `0%`
+                `${Math.min(((bBPreviousElement.right - bBContainer!!.x) / bBContainer!!.width) * 100, 100)}%` : `0%`
             else this._element.style.top = bBPreviousElement ?
                 `${((bBPreviousElement.top + bBPreviousElement.height) / bBContainer!!.height) * 100}%` : "0%"
         }
+
+        /**
+        const container = (this._element.firstElementChild as HTMLDivElement)
+
+        if (split === "horizontal") {
+            container.style.minWidth = "fit-content"
+            container.style.height = "100%"
+        } else if (split === "vertical") {
+            container.style.height = "fit-content"
+            container.style.width = "100%"
+        }
+
+            */
 
         this._element.classList.add(`d-split-pane--${split}`)
     }

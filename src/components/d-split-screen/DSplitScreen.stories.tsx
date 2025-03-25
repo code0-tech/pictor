@@ -1,14 +1,15 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Meta} from "@storybook/react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import DSplitScreen from "./DSplitScreen";
-import DSplitPane, {DSplitPaneHandle} from "./pane/DSplitPane";
+import DSplitPane from "./pane/DSplitPane";
 import DFolder, {useFolderControls} from "../d-folder/DFolder";
-import DScreenButton from "../d-screen/DScreenButton";
 import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import {ZoomPanPinchExample} from "../d-zoom-pan-pinch/DZoomPanPinch.stories";
 import Button from "../button/Button";
-import ButtonGroup from "../button-group/ButtonGroup";
+import DBar from "../d-bar/DBar";
+import Flex from "../flex/Flex";
+import Text from "../text/Text";
 
 const meta: Meta = {
     title: "DSplitPane",
@@ -20,96 +21,84 @@ const meta: Meta = {
     },
 }
 
-export const test = () => {
-
-    const ref = React.useRef<DSplitPaneHandle>(null);
-
-    return <DFullScreen>
-        <div style={{
-            borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-            padding: ".5rem",
-            display: "flex",
-            justifyContent: "flex-end"
-        }}>
-            <ButtonGroup>
-                <Button onClick={() => {
-                    ref!!.current!!.show()
-                }}>Show</Button>
-                <Button color={"error"}>Reset</Button>
-            </ButtonGroup>
-        </div>
-        <DSplitScreen>
-            <DSplitPane ref={ref}>
-                <Button onClick={() => ref!!.current!!.hide()}>Hide</Button>
-            </DSplitPane>
-            <DSplitPane miw={"20px"} w={"50px"}>
-                2
-            </DSplitPane>
-            <DSplitPane>
-                3
-            </DSplitPane>
-            <DSplitPane>
-                4
-            </DSplitPane>
-            <DSplitPane>
-                5
-            </DSplitPane>
-        </DSplitScreen>
-    </DFullScreen>
-
-}
 export const Dashboard = () => {
 
     const [controls, openAll, closeAll] = useFolderControls()
 
     return <DFullScreen>
-        <DSplitScreen>
-            <DSplitPane maw={"fit-content"} p={0.5} justify={"space-between"}
-                        style={{writingMode: "vertical-rl", display: "flex"}}>
-                <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
-                    <DScreenButton color={"secondary"}>
-                        <IconHierarchy3 size={12}/>
-                        Flows
-                    </DScreenButton>
-                    <DScreenButton color={"warning"}>
-                        <IconTicket size={12}/>
-                        Issues
-                    </DScreenButton>
-                    <DScreenButton color={"info"}>
-                        <IconDatabase size={12}/>
-                        Database
-                    </DScreenButton>
-                </div>
-                <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
-                    <DScreenButton color={"primary"}>
-                        <IconSettings size={12}/>
-                        Settings
-                    </DScreenButton>
-                </div>
-            </DSplitPane>
-            <DSplitPane maw={"fit-content"}>
-                <div style={{padding: ".5rem"}}>
-                    <DScreenButton onClick={openAll}>
-                        Open All
-                    </DScreenButton>
-                    <DScreenButton onClick={closeAll}>
-                        Close All
-                    </DScreenButton>
-                    {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
-                        return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
-                            <DFolder controls={controls} name={"Google Cloud Flows"}>
-                                <DFolder.Item icon={<IconBrandAdobe size={12}/>}
-                                              name={"Google Cloud Flows"}/>
-                                <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
-                            </DFolder>
-                        </DFolder>
-                    })}
-                </div>
-            </DSplitPane>
-            <DSplitPane>
-                <ZoomPanPinchExample/>
-            </DSplitPane>
-        </DSplitScreen>
+        <Flex style={{ width: "100%", height: "100%"}}>
+            <DBar orientation={"right"} style={{writingMode: "vertical-rl"}}>
+                <Flex justify={"space-between"} h={"100%"}>
+                    <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
+                        <Button color={"secondary"}>
+                            <IconHierarchy3 size={12}/>
+                            Flows
+                        </Button>
+                        <Button color={"warning"}>
+                            <IconTicket size={12}/>
+                            Issues
+                        </Button>
+                        <Button color={"info"}>
+                            <IconDatabase size={12}/>
+                            Database
+                        </Button>
+                    </div>
+                    <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
+                        <Button color={"primary"}>
+                            <IconSettings size={12}/>
+                            Settings
+                        </Button>
+                    </div>
+                </Flex>
+            </DBar>
+            <Flex style={{flexDirection: "column", width: "100%", height: "100%"}}>
+                <DBar>
+                    <Text>Home</Text>
+                    <Text mx={0.5}>/</Text>
+                    <Text>Organisations</Text>
+                    <Text mx={0.5}>/</Text>
+                    <Text>Code0</Text>
+                    <Text mx={0.5}>/</Text>
+                    <Text>Projects</Text>
+                    <Text mx={0.5}>/</Text>
+                    <Text>Sagittarius</Text>
+                </DBar>
+                <DSplitScreen>
+                    <DSplitPane maw={"fit-content"}>
+                        <DBar>
+                            <Button onClick={openAll}>
+                                Open All
+                            </Button>
+                            <Button onClick={closeAll}>
+                                Close All
+                            </Button>
+                        </DBar>
+                        <div style={{padding: ".5rem"}}>
+                            {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
+                                return <DFolder controls={controls} name={"Google Cloud Flows"} defaultOpen>
+                                    <DFolder controls={controls} name={"Google Cloud Flows"}>
+                                        <DFolder.Item icon={<IconBrandAdobe size={12}/>}
+                                                      name={"Google Cloud Flows"}/>
+                                        <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
+                                    </DFolder>
+                                </DFolder>
+                            })}
+                        </div>
+                    </DSplitPane>
+                    <DSplitPane>
+                        <ZoomPanPinchExample/>
+                    </DSplitPane>
+                </DSplitScreen>
+                <DBar orientation={"top"}>
+                    <Text>Test</Text>
+                </DBar>
+            </Flex>
+            <DBar orientation={"left"} display={"flex"} style={{flexDirection: "column"}}>
+                <Button>Docs</Button>
+            </DBar>
+        </Flex>
+
+
     </DFullScreen>
 
 }

@@ -29,8 +29,10 @@ export class DSplitView {
         const split = this._service.split
         const bBContainer = this._element!!.parentElement!!.getBoundingClientRect()
 
-        this._element.style[split === "horizontal" ? "left": "top"] = `${((bBSecond[split === "horizontal" ? "width": "height"] <= 0 ? ((bBFirst[split === "horizontal" ? "x": "y"] + bBFirst[split === "horizontal" ? "width": "height"]) + 0.1) :
-            (bBFirst[split === "horizontal" ? "x": "y"] + bBFirst[split === "horizontal" ? "width": "height"] - 0.1)) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
+        const bBFirstPosition = bBFirst[split === "horizontal" ? "right": "bottom"] - bBContainer[split === "horizontal" ? "x": "y"]
+
+        this._element.style[split === "horizontal" ? "left": "top"] = `${((bBSecond[split === "horizontal" ? "width": "height"] <= 0 ? (bBFirstPosition + 0.1) :
+            (bBFirstPosition - 0.1)) / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
     }
 
     public getFirstPane(): DSplitPaneView {
@@ -79,7 +81,7 @@ export class DSplitView {
         const firstPaneSize = Math.min(Math.max(split === "horizontal" ? containerMPX : containerMPY, this._firstPane.minSize, stackedSize - this._secondPane.maxSize), this._firstPane.maxSize, stackedSize - this._secondPane.minSize)
         const secondPaneSize = Math.min(Math.max(stackedSize - firstPaneSize, this._secondPane.minSize), this._secondPane.maxSize)
 
-        const firstPaneXY = this._firstPaneSize[split === "horizontal" ? "x": "y"] + (split === "horizontal" ? offsetX : offsetY)
+        const firstPaneXY = bBContainer[split === "horizontal" ? "x": "y"] - this._firstPaneSize[split === "horizontal" ? "x": "y"] + (split === "horizontal" ? offsetX : offsetY)
 
         this._firstPane.getElement().style[split === "horizontal" ? "width": "height"] = `${(firstPaneSize / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`
         this._firstPane.getElement().style[split === "horizontal" ? "left": "top"] = `${(firstPaneXY / bBContainer[split === "horizontal" ? "width": "height"]) * 100}%`

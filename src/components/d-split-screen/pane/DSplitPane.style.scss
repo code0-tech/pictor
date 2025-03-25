@@ -2,8 +2,9 @@
 @import "../../../styles/media";
 
 .d-split-pane {
-  overflow: hidden;
+  overflow: scroll;
   background: $primary;
+
 
   &--horizontal {
     height: 100%;

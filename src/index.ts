@@ -15,7 +15,6 @@ export {default as DScreenCollapsableItem} from "./components/d-screen/DScreenCo
 export {default as DZoomPanPinch} from "./components/d-zoom-pan-pinch/DZoomPanPinch"
 
 export { default as Dialog} from "./components/dialog/Dialog"
-export { default as Dropdown} from "./components/dropdown/Dropdown"
 export { default as Flex} from "./components/flex/Flex"
 export { default as ListGroup} from "./components/list-group/ListGroup"
 export { default as Quote} from "./components/quote/Quote"

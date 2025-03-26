@@ -1,0 +1,11 @@
+@import "../../styles/helpers";
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $xs;
+
+  &__splitter {
+    color: color($secondary)
+  }
+}

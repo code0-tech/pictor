@@ -1,0 +1,9 @@
+@import "../../styles/helpers";
+.popover {
+  @include box(false);
+  padding: $xxs;
+
+  &__arrow {
+    color: backgroundColor($primary);
+  }
+}

@@ -8,10 +8,6 @@ export { default as Container} from "./components/container/Container"
 
 export {default as DFolder} from "./components/d-folder/DFolder"
 export {default as DFullScreen} from "./components/d-fullscreen/DFullScreen"
-export {default as DScreen} from "./components/d-screen/DScreen"
-export {default as DScreenButton} from "./components/d-screen/DScreenButton"
-export {default as DScreenBar} from "./components/d-screen/DScreenBar"
-export {default as DScreenCollapsableItem} from "./components/d-screen/DScreenCollapsableItem"
 export {default as DZoomPanPinch} from "./components/d-zoom-pan-pinch/DZoomPanPinch"
 
 export { default as Dialog} from "./components/dialog/Dialog"

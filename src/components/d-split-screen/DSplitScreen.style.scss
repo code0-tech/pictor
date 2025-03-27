@@ -1,0 +1,27 @@
+.d-split-screen {
+  color: white;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+
+  &--vertical > div {
+    flex-direction: column;
+  }
+
+  &--absolute > div > .d-split-pane {
+    position: absolute;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  > div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+
+}

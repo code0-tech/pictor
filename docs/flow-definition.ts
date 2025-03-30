@@ -42,16 +42,24 @@ interface RuntimeFunctionDefinition  {
     runtime_id: string //standard::math::add
     parameters?: RuntimeParameterDefinition[]
     return_type?: DataType
+    throwing?: DataType[]
+    deprecated?: boolean
+    name: Translation[]
+    description: Translation[]
+    documentation: Translation[] //as markdown
 }
 
 
 interface RuntimeParameterDefinition {
+    runtime_id: string //standard::math::add
     type: DataType
-    name: string
+    name: Translation[]
+    description: Translation[]
 }
 
 
 interface FunctionDefinition {
+    id: string
     runtime_function: RuntimeFunctionDefinition
     return_type?: DataType
     parameters?: ParameterDefinition[]
@@ -62,6 +70,7 @@ interface FunctionDefinition {
 }
 
 interface ParameterDefinition {
+    id: string
     type: DataType
     name: Translation[] // overrides the runtime parameter name and ref to language entry
     description: Translation[]

@@ -117,10 +117,10 @@ export const RadioExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            test: "dynamic"
+            radio: "dynamic"
         },
         validate: {
-            test: (value) => {
+            radio: (value) => {
                 if (!value) return "Error"
                 return null
             }
@@ -139,19 +139,19 @@ export const RadioExample = () => {
                 value={"dynamic"}
                 name={"test1"}
                 text={"Dynamic"}
-                {...inputs.getInputProps("test")}
+                {...inputs.getInputProps("radio")}
             />
             <RadioInput
                 value={"hybrid"}
                 name={"test1"}
                 text={"Hybrid"}
-                {...inputs.getInputProps("test")}
+                {...inputs.getInputProps("radio")}
             />
             <RadioInput
                 value={"static"}
                 name={"test1"}
                 text={"Static"}
-                {...inputs.getInputProps("test")}
+                {...inputs.getInputProps("radio")}
             />
             <br/>
             <div style={{
@@ -173,10 +173,10 @@ export const Checkbox = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            test: null
+            checkbox: null
         },
         validate: {
-            test: (value) => {
+            checkbox: (value) => {
                 if (!value) return "Error"
                 return null
             }
@@ -193,7 +193,7 @@ export const Checkbox = () => {
                 label={"Runtime"}
                 description={"Change runtime mode production version"}
                 text={"Dynamic"}
-                {...inputs.getInputProps("test")}
+                {...inputs.getInputProps("checkbox")}
             />
             <br/>
             <div style={{
@@ -214,10 +214,10 @@ export const Checkbox = () => {
 export const RadioCard = () => {
     const [inputs, validate] = useForm({
         initialValues: {
-            test: "dynamic"
+            radio: "dynamic"
         },
         validate: {
-            test: (value) => {
+            radio: (value) => {
                 if (!value) return "Error"
                 return null
             }
@@ -226,7 +226,7 @@ export const RadioCard = () => {
             console.log(values)
         }
     })
-    return <RadioGroup {...inputs.getInputProps("test")}>
+    return <RadioGroup {...inputs.getInputProps("radio")}>
         {({activeRadio, setActiveRadio}) => {
             return <>
                 <Card onClick={() => setActiveRadio("dynamic")} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
@@ -266,10 +266,10 @@ export const RadioCard = () => {
 export const RadioWithoutInput = () => {
     const [inputs, validate] = useForm({
         initialValues: {
-            test: "dynamic"
+            radio: "dynamic"
         },
         validate: {
-            test: (value) => {
+            radio: (value) => {
                 if (!value) return "Error"
                 return null
             }
@@ -278,7 +278,7 @@ export const RadioWithoutInput = () => {
             console.log(values)
         }
     })
-    return <RadioGroup {...inputs.getInputProps("test")}>
+    return <RadioGroup {...inputs.getInputProps("radio")}>
         {({activeRadio, setActiveRadio}) => {
             return <>
                 <Flex style={{gap: ".5rem"}}>
@@ -316,10 +316,10 @@ export const Switch = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            test: null
+            switch: null
         },
         validate: {
-            test: (value) => {
+            switch: (value) => {
                 if (!value) return "Error"
                 return null
             }
@@ -335,7 +335,7 @@ export const Switch = () => {
             <SwitchInput
                 label={"Runtime"}
                 description={"Change runtime mode production version"}
-                {...inputs.getInputProps("test")}
+                {...inputs.getInputProps("switch")}
             />
             <br/>
             <div style={{

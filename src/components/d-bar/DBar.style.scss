@@ -1,0 +1,37 @@
+@import "../../styles/helpers";
+
+.d-bar {
+  position: relative;
+  background: $primary;
+  border-color: borderColor();
+  padding: $xs;
+  box-sizing: border-box;
+
+  &--top, &--bottom {
+    width: 100%;
+  }
+
+  &--left, &--right {
+    height: 100%;
+  }
+
+  &--top {
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
+
+  &--bottom {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  &--left {
+    border-left-width: 1px;
+    border-left-style: solid;
+  }
+
+  &--right {
+    border-right-width: 1px;
+    border-right-style: solid;
+  }
+}

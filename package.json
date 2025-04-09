@@ -17,7 +17,7 @@
   },
   "author": "Code0",
   "devDependencies": {
-    "@ariakit/react": "^0.4.15",
+    "@ariakit/react": "^0.4.17",
     "@mdx-js/react": "^3.1.0",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",

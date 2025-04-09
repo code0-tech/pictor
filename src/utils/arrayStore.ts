@@ -4,13 +4,13 @@ import React from "react";
  * using a React ref as a store in combination with a map
  * to be able to access and modify the store easily
  */
-export type Store<T> = [T[], React.Dispatch<React.SetStateAction<T[]>>]
+export type ArrayStore<T> = [T[], React.Dispatch<React.SetStateAction<T[]>>]
 
-export class Service<T> {
+export class ArrayService<T> {
 
-    protected readonly store: Store<T>
+    protected readonly store: ArrayStore<T>
 
-    constructor(store: Store<T>) {
+    constructor(store: ArrayStore<T>) {
         this.store = store
     }
 
@@ -56,7 +56,7 @@ export class Service<T> {
 }
 
 // @ts-ignore
-export const createService = <K, T extends Service<K>>(service: typeof T, callback?: (store: Store<K>) => T, initial?: K[]): [K[] | undefined, T] => {
+export const createArrayService = <K, T extends ArrayService<K>>(service: typeof T, callback?: (store: ArrayStore<K>) => T, initial?: K[]): [K[] | undefined, T] => {
     const store = React.useState<K[]>(initial ?? [])
     return [store[0], (callback ? callback(store) : new service(store)) as T]
 }

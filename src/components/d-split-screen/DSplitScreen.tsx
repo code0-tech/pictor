@@ -2,7 +2,7 @@ import React from "react";
 import DSplitPane, {DSplitPaneProps} from "./pane/DSplitPane";
 import DSplitter from "./splitter/DSplitter";
 import {DSplitScreenService} from "./DSplitScreen.service";
-import {createArrayService} from "../../utils/arrayStore";
+import {createReactiveArrayService} from "../../utils/reactiveArrayStore";
 import {DSplitPaneView} from "./pane/DSplitPane.view";
 import "./DSplitScreen.style.scss"
 import {Code0Component} from "../../utils/types";
@@ -22,7 +22,7 @@ const DSplitScreen: React.FC<Readonly<DSplitScreenProps>> = (props) => {
     const ref = React.useRef<HTMLDivElement | null>(null)
     const paneElementRef = React.useRef(new Map<number, HTMLDivElement>())
     const splitterElementRef = React.useRef(new Map<number, HTMLDivElement>())
-    const [_, service] = createArrayService<DSplitPaneView, DSplitScreenService>(DSplitScreenService, (store) => {
+    const [_, service] = createReactiveArrayService<DSplitPaneView, DSplitScreenService>(DSplitScreenService, (store) => {
         return new DSplitScreenService(store, direction)
     }, React.Children.map(children, (child) => {
         return new DSplitPaneView(direction, child.props)

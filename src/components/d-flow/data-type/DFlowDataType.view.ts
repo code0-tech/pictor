@@ -5,7 +5,7 @@ export interface RawRefObject {
     type: string
     primaryLevel: number
     secondaryLevel: number
-    territoryLevel?: number
+    tertiaryLevel?: number
 }
 
 export type RawObject = {[key: string]: RawDataTypes}

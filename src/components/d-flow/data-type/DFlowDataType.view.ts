@@ -1,5 +1,6 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
+import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRule";
 
 /**
  * This interface represents a reference value coming from either
@@ -57,8 +58,7 @@ export enum EDataTypeRuleType {
 
 export interface DataTypeRuleObject {
     type: EDataTypeRuleType
-    config: object
-
+    config: CombinesRuleConfig
 }
 
 export interface DataTypeObject {

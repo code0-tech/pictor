@@ -9,7 +9,7 @@ export interface DFlowDataTypeItemOfCollectionRuleConfig {
  * @todo deep equality check for arrays and objects
  */
 @staticImplements<DFlowDataTypeRule>()
-export class DFlowDataTypeRangeRule {
+export class DFlowDataTypeItemOfCollectionRule {
     public static validate(value: RawDataTypes, config: DFlowDataTypeItemOfCollectionRuleConfig): boolean {
         return config.items.includes(value)
     }

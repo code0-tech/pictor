@@ -49,6 +49,20 @@ export const dataTypes: DataTypeObject[] = [{
     type: EDataType.PRIMITIVE,
     rules: [{
         type: EDataTypeRuleType.REGEX,
-        config: {regex: "/(.*)/"}
+        config: {pattern: "/(.*)/"}
+    }]
+}, {
+    data_type_id: "ERROR",
+    type: EDataType.ERROR,
+    parent: "OBJECT",
+    rules: [{
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {key: "name ", type: "TRANSLATION"}
+    }, {
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {key: "message", type: "TRANSLATION"}
+    }, {
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {key: "suggestion", type: "TRANSLATION"}
     }]
 }]

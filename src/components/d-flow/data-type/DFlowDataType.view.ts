@@ -1,6 +1,23 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 
+/**
+ * This interface represents a reference value coming from either
+ * the return or from the input of a node.
+ * Because references, don't hold the actual value we perform just a {@link DataType#validateDataType}
+ * check against the {@link RawRefObject#type}.
+ *
+ * Every possible reference can be tracked down via it's depth inside the flow.
+ *
+ * {@link RawRefObject#primaryLevel} links to the context of the node inside the flow
+ * starting at 0.
+ *
+ * {@link RawRefObject#secondaryLevel} links to the node inside the flow
+ * starting at 0.
+ *
+ * {@link RawRefObject#secondaryLevel} links to an {@link DataTypeObject#inputTypes} of the node
+ * starting at 0.
+ */
 export interface RawRefObject {
     type: string
     primaryLevel: number
@@ -8,6 +25,11 @@ export interface RawRefObject {
     tertiaryLevel?: number
 }
 
+/**
+ * This type represents a raw object including the rule
+ * that every key has to be of type string and every value must be of type
+ * {@link RawDataTypes}.
+ */
 export type RawObject = {[key: string]: RawDataTypes}
 
 export type RawDataTypes = number | boolean | string | RawObject | Array<RawDataTypes> | RawRefObject
@@ -124,7 +146,7 @@ export class DataType {
         return arraysEqual(this.allRules as [], dataType.allRules as [])
     }
 
-    public validateValue(value: string): boolean {
+    public validateValue(value: RawDataTypes): boolean {
         return false
     }
 

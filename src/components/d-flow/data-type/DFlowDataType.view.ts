@@ -147,7 +147,12 @@ export class DataType {
     }
 
     public validateValue(value: RawDataTypes): boolean {
-        return false
+
+        //TODO structural checking of value
+
+        return this.allRules.every(rule => {
+            RuleMap.get(rule.type)?.validate(value, rule.config, this._service)
+        })
     }
 
 

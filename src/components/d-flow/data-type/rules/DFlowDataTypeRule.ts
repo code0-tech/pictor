@@ -1,10 +1,13 @@
 import {EDataType, EDataTypeRuleType, RawDataTypes} from "../DFlowDataType.view";
-import {DFlowDataTypeRegexRule} from "./DFlowDataTypeRegexRule";
-import {DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
-import {DFlowDataTypeItemOfCollectionRule} from "./DFlowDataTypeItemOfCollectionRule";
+import {DFlowDataTypeRegexRule, DFlowDataTypeRegexRuleConfig} from "./DFlowDataTypeRegexRule";
+import {DFlowDataTypeNumberRangeRuleConfig, DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
+import {
+    DFlowDataTypeItemOfCollectionRule,
+    DFlowDataTypeItemOfCollectionRuleConfig
+} from "./DFlowDataTypeItemOfCollectionRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
-import {DFlowDataTypeContainsTypeRule} from "./DFlowDataTypeContainsTypeRule";
-import {DFlowDataTypeContainsKeyRule} from "./DFlowDataTypeContainsKeyRule";
+import {DFlowDataTypeContainsTypeRule, DFlowDataTypeContainsTypeRuleConfig} from "./DFlowDataTypeContainsTypeRule";
+import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 
 export interface DFlowDataTypeRule {
     validate(value: RawDataTypes, config: object, service: DFlowDataTypeService): boolean
@@ -22,3 +25,9 @@ export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
     [EDataTypeRuleType.CONTAINS_KEY, DFlowDataTypeContainsKeyRule]
 
 ])
+
+export type CombinesRuleConfig = DFlowDataTypeRegexRuleConfig
+    | DFlowDataTypeNumberRangeRuleConfig
+    | DFlowDataTypeItemOfCollectionRuleConfig
+    | DFlowDataTypeContainsTypeRuleConfig
+    | DFlowDataTypeContainsKeyRuleConfig

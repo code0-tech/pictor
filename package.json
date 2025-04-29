@@ -19,6 +19,7 @@
   "author": "Code0",
   "devDependencies": {
     "@ariakit/react": "^0.4.15",
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-6f0b32a0eb18c9c3569a090f089c6adf1b4d666c",
     "@mdx-js/react": "^3.1.0",
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
@@ -76,6 +77,7 @@
   ],
   "types": "dist/index.d.ts",
   "peerDependencies": {
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-6f0b32a0eb18c9c3569a090f089c6adf1b4d666c",
     "@ariakit/react": "^0.4.5",
     "@tabler/icons-react": "^3.5.0",
     "js-md5": "^0.8.3",

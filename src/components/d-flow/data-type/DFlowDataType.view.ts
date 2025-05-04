@@ -24,6 +24,7 @@ export interface RawRefObject {
     primaryLevel: number
     secondaryLevel: number
     tertiaryLevel?: number
+    path?: string //TODO: should be array of refpaths
 }
 
 /**

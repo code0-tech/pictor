@@ -201,7 +201,7 @@ export class DataType {
 
 
     get rules(): DataTypeRuleObject[] | undefined {
-        return this._rules;
+        return this._rules
     }
 
     get allRules(): DataTypeRuleObject[] {
@@ -209,6 +209,10 @@ export class DataType {
     }
 
     get id(): string {
-        return this._id;
+        return this._id
+    }
+
+    get service(): DFlowDataTypeService {
+        return this._service
     }
 }

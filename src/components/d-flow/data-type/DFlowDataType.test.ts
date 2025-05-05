@@ -51,3 +51,17 @@ describe('data type validation against data type', () => {
         expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("TEXT") as DataType)).toBe(false)
     })
 })
+
+describe('value validation against data type', () => {
+
+    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+
+    dataTypes.forEach((dataType) => {
+        service.add(new DataType(dataType, service))
+    })
+
+    test('1 is of type NUMBER', () => {
+        expect(service.getDataType("NUMBER")?.validateValue(1)).toBeTruthy()
+    })
+
+})

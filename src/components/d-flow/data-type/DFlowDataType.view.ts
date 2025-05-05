@@ -1,6 +1,12 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRule";
+import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
+
+export interface RefPath {
+    path?: string
+    index?: number
+}
 
 /**
  * This interface represents a reference value coming from either
@@ -24,7 +30,7 @@ export interface RefObject {
     primaryLevel: number
     secondaryLevel: number
     tertiaryLevel?: number
-    path?: string //TODO: should be array of refpaths
+    path?: RefPath[]
 }
 
 export const isRefObject = (v: any): v is RefObject =>

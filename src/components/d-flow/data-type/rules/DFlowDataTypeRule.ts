@@ -1,4 +1,4 @@
-import {EDataType, EDataTypeRuleType, RawDataTypes} from "../DFlowDataType.view";
+import {EDataType, EDataTypeRuleType, Values} from "../DFlowDataType.view";
 import {DFlowDataTypeRegexRule, DFlowDataTypeRegexRuleConfig} from "./DFlowDataTypeRegexRule";
 import {DFlowDataTypeNumberRangeRuleConfig, DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
 import {
@@ -10,7 +10,7 @@ import {DFlowDataTypeContainsTypeRule, DFlowDataTypeContainsTypeRuleConfig} from
 import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 
 export interface DFlowDataTypeRule {
-    validate(value: RawDataTypes, config: object, service: DFlowDataTypeService): boolean
+    validate(value: Values, config: object, service: DFlowDataTypeService): boolean
 }
 
 export const staticImplements = <T>(...types: EDataType[]) => {

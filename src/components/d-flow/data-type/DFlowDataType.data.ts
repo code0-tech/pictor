@@ -5,7 +5,7 @@ export const dataTypes: DataTypeObject[] = [{
     type: EDataType.PRIMITIVE,
     rules: [{
         type: EDataTypeRuleType.REGEX,
-        config: {pattern: "/^(?:-(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))|(?:0|(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))))(?:.\d+|)$/"}
+        config: {pattern: "^(?:-(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))|(?:0|(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))))(?:.\d+|)$"}
     }]
 }, {
     data_type_id: "HTTP_METHOD",
@@ -19,7 +19,7 @@ export const dataTypes: DataTypeObject[] = [{
     type: EDataType.TYPE,
     rules: [{
         type: EDataTypeRuleType.REGEX,
-        config: {pattern: "/^\/\w+(?:[.:~-]\w+)*(?:\/\w+(?:[.:~-]\w+)*)*$/"}
+        config: {pattern: "^\/\w+(?:[.:~-]\w+)*(?:\/\w+(?:[.:~-]\w+)*)*$"}
     }]
 }, {
     data_type_id: "REQ_OBJECT",
@@ -49,7 +49,7 @@ export const dataTypes: DataTypeObject[] = [{
     type: EDataType.PRIMITIVE,
     rules: [{
         type: EDataTypeRuleType.REGEX,
-        config: {pattern: "/(.*)/"}
+        config: {pattern: "(.*)"}
     }]
 }, {
     data_type_id: "ERROR",

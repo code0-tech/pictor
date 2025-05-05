@@ -65,4 +65,11 @@ export const dataTypes: DataTypeObject[] = [{
         type: EDataTypeRuleType.CONTAINS_KEY,
         config: {key: "suggestion", type: "TRANSLATION"}
     }]
+}, {
+    data_type_id: "NUMBER_NODE",
+    type: EDataType.NODE,
+    rules: [{
+        type: EDataTypeRuleType.RETURNS_TYPE,
+        config: {type: "NUMBER"}
+    }]
 }]

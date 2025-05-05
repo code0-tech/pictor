@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {EDataType, RawDataTypes} from "../DFlowDataType.view";
+import {EDataType, Values} from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 
 export interface DFlowDataTypeContainsKeyRuleConfig {
@@ -12,7 +12,7 @@ export interface DFlowDataTypeContainsKeyRuleConfig {
  */
 @staticImplements<DFlowDataTypeRule>(EDataType.OBJECT)
 export class DFlowDataTypeContainsKeyRule {
-    public static validate(value: RawDataTypes, config: DFlowDataTypeContainsKeyRuleConfig, service: DFlowDataTypeService): boolean {
+    public static validate(value: Values, config: DFlowDataTypeContainsKeyRuleConfig, service: DFlowDataTypeService): boolean {
         if (!(typeof value === "object")) return false
         if (!service.getDataType(config.type)) return false
         return (config.key in value) && (!!service.getDataType(config.type)?.validateValue(value))

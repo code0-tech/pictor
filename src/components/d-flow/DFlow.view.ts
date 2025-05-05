@@ -42,8 +42,7 @@ export interface NodeParameterObject {
 }
 
 export const isNodeFunctionObject = (
-    v: NodeFunctionObject,
-    expectedReturnTypeDataType?: DataType
+    v: NodeFunctionObject
 ): v is NodeFunctionObject => {
     if (
         !v || typeof v !== 'object' ||
@@ -54,21 +53,8 @@ export const isNodeFunctionObject = (
     if (v.parameters && (!Array.isArray(v.parameters) || !v.parameters.every(p => isNodeParameterObject(p))))
         return false
 
-    if (v.next_node && !isNodeFunctionObject(v.next_node, expectedReturnTypeDataType))
-        return false
+    return !(v.next_node && !isNodeFunctionObject(v.next_node));
 
-    if (expectedReturnTypeDataType) {
-        const foundReturnFunction = findReturnNode(v)
-        if (!foundReturnFunction) return false
-
-        if (isRefObject(foundReturnFunction.parameters!![0].value!!)
-            && !expectedReturnTypeDataType.validateDataType(expectedReturnTypeDataType.service.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!))
-            return false
-
-        if (!expectedReturnTypeDataType.validateValue(foundReturnFunction.parameters!![0].value!!)) return false
-    }
-
-    return true
 }
 
 const isNodeParameterObject = (v: NodeParameterObject): boolean =>
@@ -79,17 +65,6 @@ const isNodeParameterObject = (v: NodeParameterObject): boolean =>
         v.value === undefined ||
         isValue(v.value)
     )
-
-const findReturnNode = (n: NodeFunctionObject): NodeFunctionObject | undefined => {
-    if (n.function.runtime_function_id === 'RETURN') return n
-
-    if (n.next_node) {
-        const found = findReturnNode(n.next_node)
-        if (found) return found
-    }
-
-    return undefined
-}
 
 
 export class Flow {

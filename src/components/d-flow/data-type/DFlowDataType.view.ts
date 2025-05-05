@@ -87,6 +87,8 @@ export enum EDataTypeRuleType {
     CONTAINS_TYPE,
     CONTAINS_KEY,
     LOCK_KEY,
+    RETURNS_TYPE,
+    INPUT_TYPES
     //etc
 }
 

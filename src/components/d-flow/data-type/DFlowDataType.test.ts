@@ -64,4 +64,43 @@ describe('value validation against data type', () => {
         expect(service.getDataType("NUMBER")?.validateValue(1)).toBeTruthy()
     })
 
+    test('does node return number', () => {
+        expect(service.getDataType("NUMBER_NODE")?.validateValue({
+            function: {
+                function_id: "some_database_id",
+                runtime_function_id: "math::add"
+            },
+            parameters: [{
+                definition: {
+                    parameter_id: "some_database_id",
+                    runtime_parameter_id: "math::add__firstValue"
+                },
+                value: 1
+            }, {
+                definition: {
+                    parameter_id: "some_database_id",
+                    runtime_parameter_id: "math::add__secondValue"
+                },
+                value: 1
+            }],
+            next_node: {
+                function: {
+                    function_id: "some_database_id",
+                    runtime_function_id: "RETURN"
+                },
+                parameters: [{
+                    definition: {
+                        parameter_id: "string",
+                        runtime_parameter_id: "RETURN_VALUE"
+                    },
+                    value: {
+                        type: "NUMBER",
+                        primaryLevel: 0,
+                        secondaryLevel: 1
+                    }
+                }]
+            }
+        })).toBeTruthy()
+    })
+
 })

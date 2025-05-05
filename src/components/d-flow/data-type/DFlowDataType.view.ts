@@ -134,11 +134,12 @@ export class DataType {
 
     /**
      * @todo check if EDataType is equal
+     * @todo on deep equal do type checking
      */
     public validateDataType(dataType: DataType): boolean {
 
         //all rules need to match
-        const isDeepEqual = (object1: {[index: string]:any}, object2: {[index: string]:any}) => {
+        const isDeepEqual = (object1: { [index: string]: any }, object2: { [index: string]: any }) => {
             const objKeys1 = Object.keys(object1)
             const objKeys2 = Object.keys(object2)
 

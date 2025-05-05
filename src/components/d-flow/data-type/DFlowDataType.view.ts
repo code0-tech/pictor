@@ -1,6 +1,6 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
-import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRule";
+import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
 export interface RefPath {
@@ -69,8 +69,8 @@ export const isValue = (v: any): boolean =>
     isObject(v) ||
     isNodeFunctionObject(v)
 
-export enum EDataType {
-    PRIMITIVE, //number, boolean, text
+export const enum EDataType {
+    PRIMITIVE,
     TYPE,
     OBJECT,
     DATATYPE,
@@ -80,7 +80,7 @@ export enum EDataType {
     ERROR
 }
 
-export enum EDataTypeRuleType {
+export const enum EDataTypeRuleType {
     REGEX,
     NUMBER_RANGE,
     ITEM_OF_COLLECTION,
@@ -189,13 +189,12 @@ export class DataType {
             return false
         }
 
-        //
-        if (this._type === EDataType.NODE && !isNodeFunctionObject(value as NodeFunctionObject, this.service.getDataType(this._returnType as string))) {
+        if (this._type === EDataType.NODE && !isNodeFunctionObject(value as NodeFunctionObject)) {
             return false
         }
 
         return this.allRules.every(rule => {
-            RuleMap.get(rule.type)?.validate(value, rule.config, this._service)
+            return RuleMap.get(rule.type)?.validate(value, rule.config, this._service)
         })
     }
 

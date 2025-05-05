@@ -6,20 +6,20 @@ import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRule";
  * This interface represents a reference value coming from either
  * the return or from the input of a node.
  * Because references, don't hold the actual value we perform just a {@link DataType#validateDataType}
- * check against the {@link RawRefObject#type}.
+ * check against the {@link RefObject#type}.
  *
  * Every possible reference can be tracked down via it's depth inside the flow.
  *
- * {@link RawRefObject#primaryLevel} links to the context of the node inside the flow
+ * {@link RefObject#primaryLevel} links to the context of the node inside the flow
  * starting at 0.
  *
- * {@link RawRefObject#secondaryLevel} links to the node inside the flow
+ * {@link RefObject#secondaryLevel} links to the node inside the flow
  * starting at 0.
  *
- * {@link RawRefObject#secondaryLevel} links to an {@link DataTypeObject#inputTypes} of the node
+ * {@link RefObject#secondaryLevel} links to an {@link DataTypeObject#inputTypes} of the node
  * starting at 0.
  */
-export interface RawRefObject {
+export interface RefObject {
     type: string
     primaryLevel: number
     secondaryLevel: number
@@ -27,14 +27,41 @@ export interface RawRefObject {
     path?: string //TODO: should be array of refpaths
 }
 
+export const isRefObject = (v: any): v is RefObject =>
+    v && typeof v === 'object' &&
+    typeof v.type === 'string' &&
+    typeof v.primaryLevel === 'number' &&
+    typeof v.secondaryLevel === 'number' &&
+    (v.tertiaryLevel === undefined || typeof v.tertiaryLevel === 'number') &&
+    Object.keys(v).every(k => ['type', 'primaryLevel', 'secondaryLevel', 'tertiaryLevel'].includes(k))
+
 /**
  * This type represents a raw object including the rule
  * that every key has to be of type string and every value must be of type
- * {@link RawDataTypes}.
+ * {@link Values}.
  */
-export type RawObject = {[key: string]: RawDataTypes}
+export type Object = { [key: string]: Values }
 
-export type RawDataTypes = number | boolean | string | RawObject | Array<RawDataTypes> | RawRefObject
+export const isObject = (v: any): v is Object =>
+    v && typeof v === 'object' && !Array.isArray(v) &&
+    Object.keys(v).every(k => typeof k === 'string') &&
+    Object.values(v).every(isValue)
+
+export type Values =
+    number
+    | boolean
+    | string
+    | Object
+    | Array<Values>
+    | RefObject
+    | NodeFunctionObject
+
+export const isValue = (v: any): boolean =>
+    ['string', 'number', 'boolean'].includes(typeof v) ||
+    Array.isArray(v) && v.every(isValue) ||
+    isRefObject(v) ||
+    isObject(v) ||
+    isNodeFunctionObject(v)
 
 export enum EDataType {
     PRIMITIVE, //number, boolean, text
@@ -147,9 +174,16 @@ export class DataType {
         return arraysEqual(this.allRules as [], dataType.allRules as [])
     }
 
-    public validateValue(value: RawDataTypes): boolean {
+    public validateValue(value: Values): boolean {
 
-        //TODO structural checking of value
+        if (this._type === EDataType.OBJECT && !isObject(value)) {
+            return false
+        }
+
+        //
+        if (this._type === EDataType.NODE && !isNodeFunctionObject(value as NodeFunctionObject, this.service.getDataType(this._returnType as string))) {
+            return false
+        }
 
         return this.allRules.every(rule => {
             RuleMap.get(rule.type)?.validate(value, rule.config, this._service)

@@ -3,6 +3,18 @@ import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
+export interface GenericMapper {
+    generic_source: string
+    generic_target: string
+}
+
+export interface GenericType {
+    type: string
+    generic_mapper?: GenericMapper[]
+}
+
+export type Type = GenericType | string
+
 export interface RefPath {
     path?: string
     index?: number
@@ -26,7 +38,7 @@ export interface RefPath {
  * starting at 0.
  */
 export interface RefObject {
-    type: string
+    type: Type
     primaryLevel: number
     secondaryLevel: number
     tertiaryLevel?: number
@@ -105,6 +117,7 @@ export interface DataTypeObject {
     inputTypes?: string[] // data type id
     returnType?: string // data type id
     parent?: string // data type id
+    genericKeys?: string[]
 }
 
 /*
@@ -134,7 +147,7 @@ export class DataType {
 
     /**
      * @todo check if EDataType is equal
-     * @todo on deep equal do type checking
+     * @todo on deep equal do type checking and also disregard set genericKeys
      */
     public validateDataType(dataType: DataType): boolean {
 

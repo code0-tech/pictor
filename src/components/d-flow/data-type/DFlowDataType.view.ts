@@ -44,21 +44,21 @@ export const isRefObject = (v: any): v is RefObject =>
 /**
  * This type represents a raw object including the rule
  * that every key has to be of type string and every value must be of type
- * {@link Values}.
+ * {@link Value}.
  */
-export type Object = { [key: string]: Values }
+export type Object = { [key: string]: Value }
 
 export const isObject = (v: any): v is Object =>
     v && typeof v === 'object' && !Array.isArray(v) &&
     Object.keys(v).every(k => typeof k === 'string') &&
     Object.values(v).every(isValue)
 
-export type Values =
+export type Value =
     number
     | boolean
     | string
     | Object
-    | Array<Values>
+    | Array<Value>
     | RefObject
     | NodeFunctionObject
 
@@ -183,7 +183,7 @@ export class DataType {
         return arraysEqual(this.allRules as [], dataType.allRules as [])
     }
 
-    public validateValue(value: Values): boolean {
+    public validateValue(value: Value): boolean {
 
         if (this._type === EDataType.OBJECT && !isObject(value)) {
             return false

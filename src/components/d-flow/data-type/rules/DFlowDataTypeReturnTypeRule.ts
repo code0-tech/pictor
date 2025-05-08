@@ -9,7 +9,7 @@ export interface DFlowDataTypeReturnTypeRuleConfig {
 
 @staticImplements<DFlowDataTypeRule>(EDataType.NODE)
 export class DFlowDataTypeReturnTypeRule {
-    public static validate(value: Values, config: DFlowDataTypeReturnTypeRuleConfig, service: DFlowDataTypeService): boolean {
+    public static validate(value: Value, config: DFlowDataTypeReturnTypeRuleConfig, service: DFlowDataTypeService): boolean {
         if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
         if (!service.getDataType(config.type)) return false
 

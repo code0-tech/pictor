@@ -1,4 +1,4 @@
-import {DataType, DataTypeObject, isValue, isRefObject, Values} from "./data-type/DFlowDataType.view";
+import {DataTypeObject, isValue, Value} from "./data-type/DFlowDataType.view";
 
 export interface FlowObject {
     flow_id: string
@@ -38,7 +38,7 @@ export interface NodeParameterDefinitionObject {
 
 export interface NodeParameterObject {
     definition: NodeParameterDefinitionObject
-    value?: Values
+    value?: Value
 }
 
 export const isNodeFunctionObject = (

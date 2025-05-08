@@ -1,8 +1,8 @@
-import {Values} from "../DFlowDataType.view";
+import {Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 
 export interface DFlowDataTypeItemOfCollectionRuleConfig {
-    items: Values[]
+    items: Value[]
 }
 
 /**
@@ -10,7 +10,7 @@ export interface DFlowDataTypeItemOfCollectionRuleConfig {
  */
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeItemOfCollectionRule {
-    public static validate(value: Values, config: DFlowDataTypeItemOfCollectionRuleConfig): boolean {
+    public static validate(value: Value, config: DFlowDataTypeItemOfCollectionRuleConfig): boolean {
         return config.items.includes(value)
     }
 }

@@ -1,11 +1,12 @@
-import {EDataType, isRefObject, Values} from "../DFlowDataType.view";
+import {EDataType, isRefObject, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
 
 export interface DFlowDataTypeReturnTypeRuleConfig {
-    type: string
+    type: Type
 }
+
 
 @staticImplements<DFlowDataTypeRule>(EDataType.NODE)
 export class DFlowDataTypeReturnTypeRule {

@@ -66,10 +66,30 @@ export const dataTypes: DataTypeObject[] = [{
         config: {key: "suggestion", type: "TRANSLATION"}
     }]
 }, {
-    data_type_id: "NUMBER_NODE",
-    type: EDataType.NODE,
+    data_type_id: "ARRAY",
+    type: EDataType.ARRAY,
+    genericKeys: ["T"],
     rules: [{
+        type: EDataTypeRuleType.CONTAINS_TYPE,
+        config: {type: "T"}
+    }]
+}, {
+    data_type_id: "MAP_GENERIC_INPUT_NODE",
+    type: EDataType.NODE,
+    genericKeys: ["V", "S"],
+    rules: [{
+        type: EDataTypeRuleType.INPUT_TYPES,
+        config: {type: "V"}
+    }, {
         type: EDataTypeRuleType.RETURNS_TYPE,
-        config: {type: "NUMBER"}
+        config: {
+            type: {
+                type: "ARRAY",
+                generic_mapper: [{
+                    generic_source: "S",
+                    generic_target: "T"
+                }]
+            }
+        }
     }]
 }]

@@ -7,6 +7,10 @@ export const REST_FLOW_TYPE: FlowType = {
         text: "REST",
         code: "de_de"
     }],
+    description: [{
+        text: "REST",
+        code: "de_de"
+    }],
     settings: [{
         flow_definition_settings_id: "rest_setting_1",
         key: "HTTP_METHOD",

@@ -1,9 +1,9 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {EDataType, Values} from "../DFlowDataType.view";
+import {EDataType, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 
 export interface DFlowDataTypeContainsTypeRuleConfig {
-    type: string
+    type: Type
 }
 
 @staticImplements<DFlowDataTypeRule>(EDataType.ARRAY)

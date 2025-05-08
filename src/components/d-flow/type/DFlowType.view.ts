@@ -4,6 +4,7 @@ import {DataTypeObject} from "../data-type/DFlowDataType.view";
 export interface FlowType {
     flow_type_id: string
     name: Translation[]
+    description: Translation[]
     settings: FlowTypeSetting[]
     input_type?: DataTypeObject // data type
     return_type?: DataTypeObject

@@ -15,6 +15,11 @@ export interface GenericType {
 
 export type Type = GenericType | string
 
+export interface GenericTypeMapper {
+    type: string
+    generic_target: string
+}
+
 export interface RefPath {
     path?: string
     index?: number
@@ -196,7 +201,7 @@ export class DataType {
         return arraysEqual(this.allRules as [], dataType.allRules as [])
     }
 
-    public validateValue(value: Value): boolean {
+    public validateValue(value: Value, generics?: GenericTypeMapper[]): boolean {
 
         if (this._type === EDataType.OBJECT && !isObject(value)) {
             return false
@@ -206,8 +211,10 @@ export class DataType {
             return false
         }
 
+        const map = new Map<string, string>(generics?.map(generic => [generic.generic_target, generic.type]))
+
         return this.allRules.every(rule => {
-            return RuleMap.get(rule.type)?.validate(value, rule.config, this._service)
+            return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)
         })
     }
 

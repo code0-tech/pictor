@@ -71,6 +71,20 @@ describe('value validation against data type', () => {
         }])).toBeTruthy()
     })
 
+    test('Array of numbers and text against number array', () => {
+        expect(service.getDataType('ARRAY')?.validateValue([1, "test", "test"], [{
+            type: "NUMBER",
+            generic_target: "T"
+        }])).toBeFalsy()
+    })
+
+    test('Array of text against text array', () => {
+        expect(service.getDataType('ARRAY')?.validateValue(["1", "2"], [{
+            type: "TEXT",
+            generic_target: "T"
+        }])).toBeTruthy()
+    })
+
     test('does node return number', () => {
         expect(service.getDataType("NUMBER_NODE")?.validateValue({
             function: {

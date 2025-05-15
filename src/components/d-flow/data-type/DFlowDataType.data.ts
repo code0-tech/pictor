@@ -71,7 +71,9 @@ export const dataTypes: DataTypeObject[] = [{
     genericKeys: ["T"],
     rules: [{
         type: EDataTypeRuleType.CONTAINS_TYPE,
-        config: {type: "T"}
+        config: {
+            type: "T"
+        }
     }]
 }, {
     data_type_id: "MAP_GENERIC_INPUT_NODE",

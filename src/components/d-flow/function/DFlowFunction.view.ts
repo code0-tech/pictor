@@ -1,7 +1,7 @@
 import {Translation} from "../../../utils/translation";
 import {GenericMapper} from "../data-type/DFlowDataType.view";
 
-export interface FunctionGenericMap extends GenericMapper{
+export interface FunctionGenericMapper extends GenericMapper {
     parameter_id?: string
 }
 
@@ -16,7 +16,7 @@ export interface FunctionDefinition {
     description?: Translation[]
     documentation?: Translation[] //as markdown
     generic_keys?: string[]
-    generic_mapper?: FunctionGenericMap[]
+    generic_mapper?: FunctionGenericMapper[]
 }
 
 export interface ParameterDefinition {

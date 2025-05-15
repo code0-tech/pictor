@@ -1,27 +1,65 @@
-import {EDataType, isRefObject, Type, Value} from "../DFlowDataType.view";
+import {EDataType, GenericTypeMapper, isRefObject, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
 
 export interface DFlowDataTypeReturnTypeRuleConfig {
-    type: Type
+    type: Type // can be a key, a type or a generic type
 }
 
 
 @staticImplements<DFlowDataTypeRule>(EDataType.NODE)
 export class DFlowDataTypeReturnTypeRule {
-    public static validate(value: Value, config: DFlowDataTypeReturnTypeRuleConfig, service: DFlowDataTypeService): boolean {
+    public static validate(
+        value: Value,
+        config: DFlowDataTypeReturnTypeRuleConfig,
+        generics?: Map<string, string>,
+        service?: DFlowDataTypeService
+    ): boolean {
         if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
-        if (!service.getDataType(config.type)) return false
+        if (!(service?.getDataType(config.type) || generics?.get(config.type as string))) return false
+
+        //use of generic key but datatype does not exist
+        if (generics?.get(config.type as string) && !service?.getDataType(generics?.get(config.type as string)!!)) return false
 
         const foundReturnFunction = findReturnNode(value as NodeFunctionObject)
         if (!foundReturnFunction) return false
 
-        if (isRefObject(foundReturnFunction.parameters!![0].value!!)
-            && service.getDataType(config.type)?.validateDataType(service.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!))
-            return true
+        if (isRefObject(foundReturnFunction.parameters!![0].value!!)) {
 
-        return <boolean>service.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+            //use generic given type for checking against value
+            if (generics?.get(config.type as string)) {
+                return !!service?.getDataType(generics?.get(config.type as string)!!)?.validateDataType(service?.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!)
+            }
+
+            if (typeof config.type === "string") {
+                return !!service?.getDataType(config.type)?.validateDataType(service?.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!)
+            }
+
+        } else {
+
+            //use generic given type for checking against value
+            if (generics?.get(config.type as string)) {
+                return <boolean>service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+            }
+
+            if (typeof config.type === "string") {
+                return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+            }
+
+            //mapping generics to generic type
+            const genericsMapper: GenericTypeMapper[] | undefined = config.type.generic_mapper?.map(generic => {
+                return {
+                    generic_target: generic.generic_target,
+                    type: generics?.get(generic.generic_source)!!
+                }
+            })
+
+            return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!, genericsMapper)
+
+        }
+
+        return false
 
     }
 }

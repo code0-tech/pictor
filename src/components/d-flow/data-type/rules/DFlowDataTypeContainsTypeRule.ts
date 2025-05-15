@@ -1,6 +1,7 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {EDataType, Type, Value} from "../DFlowDataType.view";
+import {EDataType, GenericTypeMapper, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
+import {DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 
 export interface DFlowDataTypeContainsTypeRuleConfig {
     type: Type
@@ -8,9 +9,31 @@ export interface DFlowDataTypeContainsTypeRuleConfig {
 
 @staticImplements<DFlowDataTypeRule>(EDataType.ARRAY)
 export class DFlowDataTypeContainsTypeRule {
-    public static validate(value: Value, config: DFlowDataTypeContainsTypeRuleConfig, service: DFlowDataTypeService): boolean {
+    public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, string>, service?: DFlowDataTypeService): boolean {
         if (!(Array.isArray(value))) return false
-        if (!service.getDataType(config.type)) return false
-        return value.every(value1 => service.getDataType(config.type)?.validateValue(value1))
+        if (!(service?.getDataType(config.type) || generics?.get(config.type as string))) return false
+
+        //use of generic key but datatype does not exist
+        if (generics?.get(config.type as string) && !service?.getDataType(generics?.get(config.type as string)!!)) return false
+
+        if (generics?.get(config.type as string)) {
+            return value.every(value1 => service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(value1))
+        }
+
+        //normal datatype link
+        if (typeof config.type === "string") {
+            return value.every(value1 => service?.getDataType(config.type)?.validateValue(value1))
+        }
+
+        //mapping generics to generic type
+        const genericsMapper: GenericTypeMapper[] | undefined = config.type.generic_mapper?.map(generic => {
+            return {
+                generic_target: generic.generic_target,
+                type: generics?.get(generic.generic_source)!!
+            }
+        })
+
+        return value.every(value1 => service?.getDataType(config.type)?.validateValue(value1, genericsMapper))
+
     }
 }

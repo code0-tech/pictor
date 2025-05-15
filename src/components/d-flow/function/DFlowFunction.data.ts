@@ -33,6 +33,15 @@ const functionData: FunctionDefinition[] = [{
             generic_source: "T",
             generic_target: "V",
             parameter_id: "test"
+        },
+        {
+            generic_source: "K",
+            generic_target: "S",
+            parameter_id: "test"
+        },
+        {
+            generic_source: "K",
+            generic_target: "T",
         }
     ]
 }]

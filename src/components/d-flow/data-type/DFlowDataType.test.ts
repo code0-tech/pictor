@@ -8,7 +8,7 @@ import {
 } from "../../../utils/nonReactiveArrayStore";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 
-class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService{
+class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService {
 
     constructor(store: NonReactiveArrayStore<DataType>) {
         super(store);
@@ -62,6 +62,13 @@ describe('value validation against data type', () => {
 
     test('1 is of type NUMBER', () => {
         expect(service.getDataType("NUMBER")?.validateValue(1)).toBeTruthy()
+    })
+
+    test('Array of numbers against number array', () => {
+        expect(service.getDataType('ARRAY')?.validateValue([1, 2], [{
+            type: "NUMBER",
+            generic_target: "T"
+        }])).toBeTruthy()
     })
 
     test('does node return number', () => {

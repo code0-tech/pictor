@@ -1,8 +1,8 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayStore";
-import {DataType} from "./DFlowDataType.view";
+import {DataType, Type} from "./DFlowDataType.view";
 
 export interface DFlowDataTypeService {
-    getDataType(id: string): DataType | undefined
+    getDataType(type: Type): DataType | undefined
 }
 
 export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType> implements DFlowDataTypeService {
@@ -11,8 +11,8 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
         super(store);
     }
 
-    public getDataType = (id: string): DataType | undefined => {
-        return this.values().find(value => value.id === id)
+    public getDataType = (type: Type): DataType | undefined => {
+        return this.values().find(value => value.id === (typeof type === "string" ? type : type.type));
     }
 
 }

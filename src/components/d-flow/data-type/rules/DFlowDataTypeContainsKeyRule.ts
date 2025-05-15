@@ -13,6 +13,7 @@ export class DFlowDataTypeContainsKeyRule {
     public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, string>, service?: DFlowDataTypeService): boolean {
         if (!(isObject(value))) return false
         if (!(service?.getDataType(config.type) || generics?.get(config.type as string))) return false
+
         //use of generic key but datatype does not exist
         if (generics?.get(config.type as string) && !service?.getDataType(generics?.get(config.type as string)!!)) return false
 
@@ -21,6 +22,7 @@ export class DFlowDataTypeContainsKeyRule {
             return (config.key in value) && (!!service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(value))
         }
 
+        //normal datatype link
         if (typeof config.type === "string") {
             return (config.key in value) && (!!service?.getDataType(config.type)?.validateValue(value))
         }

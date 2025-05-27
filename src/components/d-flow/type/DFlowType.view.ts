@@ -5,6 +5,7 @@ export interface FlowType {
     flow_type_id: string
     name: Translation[]
     description: Translation[]
+    documentation?: Translation[] //as markdown
     settings: FlowTypeSetting[]
     input_type?: DataTypeObject // data type
     return_type?: DataTypeObject

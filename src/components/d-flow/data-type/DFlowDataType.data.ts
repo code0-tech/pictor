@@ -76,6 +76,15 @@ export const dataTypes: DataTypeObject[] = [{
         }
     }]
 }, {
+    data_type_id: "NUMBER_ARRAY",
+    type: EDataType.ARRAY,
+    rules: [{
+        type: EDataTypeRuleType.CONTAINS_TYPE,
+        config: {
+            type: "NUMBER"
+        }
+    }]
+}, {
     data_type_id: "MAP_GENERIC_INPUT_NODE",
     type: EDataType.NODE,
     genericKeys: ["V", "S"],
@@ -88,7 +97,7 @@ export const dataTypes: DataTypeObject[] = [{
             type: {
                 type: "ARRAY",
                 generic_mapper: [{
-                    generic_source: "S",
+                    type: "S",
                     generic_target: "T"
                 }]
             }
@@ -100,5 +109,20 @@ export const dataTypes: DataTypeObject[] = [{
     rules: [{
         type: EDataTypeRuleType.RETURNS_TYPE,
         config: {type: "NUMBER"}
+    }]
+}, {
+    data_type_id: "TEST_OBJECT",
+    type: EDataType.OBJECT,
+    rules: [{
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {key: "number", type: "NUMBER"}
+    }]
+}, {
+    data_type_id: "GENERIC_OBJECT",
+    type: EDataType.OBJECT,
+    genericKeys: ["D"],
+    rules: [{
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {key: "generic_value", type: "D"}
     }]
 }]

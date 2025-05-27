@@ -4,7 +4,7 @@ import {EDataType, Value} from "../DFlowDataType.view";
 export interface DFlowDataTypeNumberRangeRuleConfig {
     from: number
     to: number
-    step?: number
+    step?: number //TODO
 }
 
 @staticImplements<DFlowDataTypeRule>(EDataType.PRIMITIVE, EDataType.TYPE)

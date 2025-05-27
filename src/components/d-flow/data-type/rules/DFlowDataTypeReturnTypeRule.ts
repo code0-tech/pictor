@@ -1,4 +1,4 @@
-import {EDataType, GenericTypeMapper, isRefObject, Type, Value} from "../DFlowDataType.view";
+import {EDataType, GenericMapper, GenericType, isRefObject, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
@@ -13,7 +13,7 @@ export class DFlowDataTypeReturnTypeRule {
     public static validate(
         value: Value,
         config: DFlowDataTypeReturnTypeRuleConfig,
-        generics?: Map<string, string>,
+        generics?: Map<string, Type>,
         service?: DFlowDataTypeService
     ): boolean {
         if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
@@ -40,7 +40,7 @@ export class DFlowDataTypeReturnTypeRule {
 
             //use generic given type for checking against value
             if (generics?.get(config.type as string)) {
-                return <boolean>service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+                return <boolean>service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(foundReturnFunction.parameters!![0].value!!, ((generics?.get(config.type as string) as GenericType)!!.generic_mapper as GenericMapper[]))
             }
 
             if (typeof config.type === "string") {
@@ -48,10 +48,10 @@ export class DFlowDataTypeReturnTypeRule {
             }
 
             //mapping generics to generic type
-            const genericsMapper: GenericTypeMapper[] | undefined = config.type.generic_mapper?.map(generic => {
+            const genericsMapper: GenericMapper[] | undefined = config.type.generic_mapper?.map(generic => {
                 return {
                     generic_target: generic.generic_target,
-                    type: generics?.get(generic.generic_source)!!
+                    type: generics?.get(generic.generic_target)!!
                 }
             })
 

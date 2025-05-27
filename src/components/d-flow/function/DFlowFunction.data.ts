@@ -30,18 +30,50 @@ const functionData: FunctionDefinition[] = [{
     generic_keys: ["K", "T"],
     generic_mapper: [
         {
-            generic_source: "T",
+            type: "T",
             generic_target: "V",
             parameter_id: "test"
         },
         {
-            generic_source: "K",
+            type: "K",
             generic_target: "S",
             parameter_id: "test"
         },
         {
-            generic_source: "K",
+            type: "K",
             generic_target: "T",
+        }
+    ]
+}, {
+    function_id: "",
+    runtime_function: "bla",
+    return_type: "ARRAY",
+    parameters: [{
+        parameter_id: "",
+        runtime_parameter_id: "array",
+        type: "ARRAY",
+    }],
+    generic_mapper: [
+        {
+            type: "NUMBER",
+            generic_target: "T",
+            parameter_id: "array"
+        }
+    ]
+}, {
+    function_id: "",
+    runtime_function: "bla",
+    return_type: "ARRAY",
+    parameters: [{
+        parameter_id: "",
+        runtime_parameter_id: "array",
+        type: "ARRAY",
+    }],
+    generic_mapper: [
+        {
+            type: "NUMBER",
+            generic_target: "T",
+            parameter_id: "array"
         }
     ]
 }]

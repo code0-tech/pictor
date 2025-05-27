@@ -4,7 +4,7 @@ import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
 export interface GenericMapper {
-    generic_source: string
+    type: Type
     generic_target: string
 }
 
@@ -14,11 +14,6 @@ export interface GenericType {
 }
 
 export type Type = GenericType | string
-
-export interface GenericTypeMapper {
-    type: string
-    generic_target: string
-}
 
 export interface RefPath {
     path?: string
@@ -92,7 +87,6 @@ export const enum EDataType {
     OBJECT,
     DATATYPE,
     ARRAY,
-    GENERIC,
     NODE,
     ERROR
 }
@@ -201,7 +195,7 @@ export class DataType {
         return arraysEqual(this.allRules as [], dataType.allRules as [])
     }
 
-    public validateValue(value: Value, generics?: GenericTypeMapper[]): boolean {
+    public validateValue(value: Value, generics?: GenericMapper[]): boolean {
 
         if (this._type === EDataType.OBJECT && !isObject(value)) {
             return false
@@ -211,7 +205,7 @@ export class DataType {
             return false
         }
 
-        const map = new Map<string, string>(generics?.map(generic => [generic.generic_target, generic.type]))
+        const map = new Map<string, Type>(generics?.map(generic => [generic.generic_target, generic.type]))
 
         return this.allRules.every(rule => {
             return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)

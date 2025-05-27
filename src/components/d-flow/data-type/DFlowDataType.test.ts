@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals'
-import {DataType, EDataType, EDataTypeRuleType} from "./DFlowDataType.view";
+import {DataType, EDataType, EDataTypeRuleType, Type} from "./DFlowDataType.view";
 import {dataTypes} from "./DFlowDataType.data";
 import {
     createNonReactiveArrayService,
@@ -14,8 +14,8 @@ class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> imple
         super(store);
     }
 
-    public getDataType = (id: string): DataType | undefined => {
-        return this.values().find(value => value.id === id)
+    public getDataType = (type: Type): DataType | undefined => {
+        return this.values().find(value => value.id === (typeof type === "string" ? type : (type?.type ?? "")));
     }
 
 
@@ -124,4 +124,59 @@ describe('value validation against data type', () => {
         })).toBeTruthy()
     })
 
+})
+
+describe('generics', () => {
+
+    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+
+    dataTypes.forEach((dataType) => {
+        service.add(new DataType(dataType, service))
+    })
+
+    test('Array of array numbers against two dimensional number array', () => {
+        expect(service.getDataType('ARRAY')?.validateValue([[1], [1]], [{
+            type: {
+                type: "ARRAY",
+                generic_mapper: [{
+                    type: "NUMBER",
+                    generic_target: "T"
+                }]
+            },
+            generic_target: "T"
+        }])).toBeTruthy()
+
+        expect(service.getDataType('ARRAY')?.validateValue([[[1]], [[1]]], [{
+            type: {
+                type: "ARRAY",
+                generic_mapper: [{
+                    type: {
+                        type: "ARRAY",
+                        generic_mapper: [{
+                            type: "NUMBER",
+                            generic_target: "T"
+                        }]
+                    },
+                    generic_target: "T"
+                }]
+            },
+            generic_target: "T"
+        }])).toBeTruthy()
+
+        expect(service.getDataType('ARRAY')?.validateValue([{"number": 1}, {"number": 1}], [{
+            type: "TEST_OBJECT",
+            generic_target: "T"
+        }])).toBeTruthy()
+
+        expect(service.getDataType('ARRAY')?.validateValue([{"generic_value": "11"}, {"generic_value": "1"}], [{
+            type: {
+                type: "GENERIC_OBJECT",
+                generic_mapper: [{
+                    type: "TEXT",
+                    generic_target: "D"
+                }]
+            },
+            generic_target: "T"
+        }])).toBeTruthy()
+    })
 })

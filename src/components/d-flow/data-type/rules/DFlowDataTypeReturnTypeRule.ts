@@ -1,5 +1,14 @@
-import {EDataType, GenericMapper, GenericType, isRefObject, Type, Value} from "../DFlowDataType.view";
-import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
+import {
+    EDataType,
+    GenericCombinationStrategy,
+    GenericMapper,
+    GenericType,
+    isRefObject,
+    RefObject,
+    Type,
+    Value
+} from "../DFlowDataType.view";
+import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
 
@@ -13,14 +22,23 @@ export class DFlowDataTypeReturnTypeRule {
     public static validate(
         value: Value,
         config: DFlowDataTypeReturnTypeRuleConfig,
-        generics?: Map<string, Type>,
+        generics?: Map<string, GenericMapper>,
         service?: DFlowDataTypeService
     ): boolean {
-        if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
-        if (!(service?.getDataType(config.type) || generics?.get(config.type as string))) return false
 
-        //use of generic key but datatype does not exist
-        if (generics?.get(config.type as string) && !service?.getDataType(generics?.get(config.type as string)!!)) return false
+        const genericMapper = generics?.get(config.type as string)
+        const genericTypes = generics?.get(config.type as string)?.types
+        const genericCombination = generics?.get(config.type as string)?.generic_combination
+
+        if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
+
+        if (!(service?.getDataType(config.type) || genericMapper)) return false
+
+        //use of generic key but datatypes does not exist
+        if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
+
+        //check if all generic combinations are set
+        if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
 
         const foundReturnFunction = findReturnNode(value as NodeFunctionObject)
         if (!foundReturnFunction) return false
@@ -28,8 +46,19 @@ export class DFlowDataTypeReturnTypeRule {
         if (isRefObject(foundReturnFunction.parameters!![0].value!!)) {
 
             //use generic given type for checking against value
-            if (generics?.get(config.type as string)) {
-                return !!service?.getDataType(generics?.get(config.type as string)!!)?.validateDataType(service?.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!)
+            if (typeof config.type === "string" && genericMapper && genericTypes) {
+
+                const checkAllTypes: boolean[] = genericTypes.map(genericType => {
+                    return !!service?.getDataType(genericType)?.validateDataType(service?.getDataType((foundReturnFunction.parameters!![0].value as RefObject).type)!!)
+                })
+
+                return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
+                    if (genericCombination && genericCombination[currentIndex - 1] == GenericCombinationStrategy.OR) {
+                        return previousValue || currentValue
+                    }
+
+                    return previousValue && currentValue
+                }) : checkAllTypes[0]
             }
 
             if (typeof config.type === "string") {
@@ -39,23 +68,26 @@ export class DFlowDataTypeReturnTypeRule {
         } else {
 
             //use generic given type for checking against value
-            if (generics?.get(config.type as string)) {
-                return <boolean>service?.getDataType(generics?.get(config.type as string)!!)?.validateValue(foundReturnFunction.parameters!![0].value!!, ((generics?.get(config.type as string) as GenericType)!!.generic_mapper as GenericMapper[]))
+            if (typeof config.type === "string" && genericMapper && genericTypes) {
+
+                const checkAllTypes: boolean[] = genericTypes.map(genericType => {
+                    return !!service?.getDataType(genericType)?.validateValue(foundReturnFunction.parameters!![0].value!!, ((genericType as GenericType)!!.generic_mapper as GenericMapper[]))
+                })
+
+                return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
+                    if (genericCombination && genericCombination[currentIndex - 1] == GenericCombinationStrategy.OR) {
+                        return previousValue || currentValue
+                    }
+
+                    return previousValue && currentValue
+                }) : checkAllTypes[0]
             }
 
             if (typeof config.type === "string") {
                 return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!)
             }
 
-            //mapping generics to generic type
-            const genericsMapper: GenericMapper[] | undefined = config.type.generic_mapper?.map(generic => {
-                return {
-                    generic_target: generic.generic_target,
-                    type: generics?.get(generic.generic_target)!!
-                }
-            })
-
-            return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!, genericsMapper)
+            return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!, genericMapping(config.type.generic_mapper, generics))
 
         }
 

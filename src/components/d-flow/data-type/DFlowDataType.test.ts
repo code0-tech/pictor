@@ -1,5 +1,16 @@
 import {describe, expect, test} from '@jest/globals'
-import {DataType, EDataType, EDataTypeRuleType, Type} from "./DFlowDataType.view";
+import {
+    DataType,
+    DataTypeRuleObject,
+    EDataType,
+    EDataTypeRuleType,
+    GenericCombinationStrategy,
+    GenericMapper,
+    isObject,
+    Object,
+    Type,
+    Value
+} from "./DFlowDataType.view";
 import {dataTypes} from "./DFlowDataType.data";
 import {
     createNonReactiveArrayService,
@@ -7,8 +18,10 @@ import {
     NonReactiveArrayStore
 } from "../../../utils/nonReactiveArrayStore";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
+import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
+import {NodeFunctionObject} from "../DFlow.view";
 
-class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService {
+export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService {
 
     constructor(store: NonReactiveArrayStore<DataType>) {
         super(store);
@@ -16,6 +29,87 @@ class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> imple
 
     public getDataType = (type: Type): DataType | undefined => {
         return this.values().find(value => value.id === (typeof type === "string" ? type : (type?.type ?? "")));
+    }
+
+    public getDataTypeFromValue = (value: Value): DataType | undefined => {
+
+        //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
+        if (typeof value === "string") return this.getDataType("TEXT")
+        if (typeof value === "number") return this.getDataType("NUMBER")
+        if (typeof value === "boolean") return this.getDataType("BOOLEAN")
+
+        //TODO: get datatype with highest depth based on parent datatypes
+        //if value is array search through all array types
+        if (Array.isArray(value)) {
+            this.values().filter(type => {
+                //TODO: no need to define generics but need to adjust rules because
+                //TODO: if a rule has generics and they are not included we just ignore the type validation
+                return type.validateValue(value)
+            })
+        }
+
+        //if value is object search through all array types
+        if (isObject(value)) {
+
+        }
+
+        //fallback: search all registered datatypes
+
+        return undefined
+
+    }
+
+    public getTypeFromValue = (value: Value): Type => {
+
+        const dataType = this.getDataTypeFromValue(value)
+        if (!dataType?.genericKeys) return dataType?.id ?? ""
+
+        const genericMapper: GenericMapper[] = dataType.genericKeys.map(genericKey => {
+
+            const ruleThatIncludesGenericKey = dataType.allRules.find((rule: DataTypeRuleObject) => {
+                return "type" in rule.config && rule.config.type === genericKey
+            })
+
+            if (ruleThatIncludesGenericKey
+                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.CONTAINS_TYPE
+                && dataType.type === EDataType.ARRAY) {
+                return {
+                    types: [this.getTypeFromValue((value as Array<any>)[0])],
+                    generic_target: genericKey
+                }
+            }
+
+            if (ruleThatIncludesGenericKey
+                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.CONTAINS_TYPE
+                && dataType.type === EDataType.OBJECT) {
+                return {
+                    types: [this.getTypeFromValue((value as Object)[(ruleThatIncludesGenericKey.config as DFlowDataTypeContainsKeyRuleConfig).key])],
+                    generic_target: genericKey
+                }
+            }
+
+            if (ruleThatIncludesGenericKey
+                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.RETURNS_TYPE
+                && dataType.type === EDataType.NODE) {
+                return {
+                    types: [this.getTypeFromValue((value as NodeFunctionObject))],
+                    generic_target: genericKey
+                }
+            }
+            return null
+        }).filter(mapper => !!mapper)
+
+        return {
+            type: dataType?.id ?? "",
+            generic_mapper: genericMapper
+        }
+
+    }
+
+    public hasDataTypes = (types: Type[]): boolean => {
+        return types.every(type => {
+            return this.values().find(value => value.id === (typeof type === "string" ? type : type.type))
+        })
     }
 
 
@@ -66,21 +160,21 @@ describe('value validation against data type', () => {
 
     test('Array of numbers against number array', () => {
         expect(service.getDataType('ARRAY')?.validateValue([1, 2], [{
-            type: "NUMBER",
+            types: ["NUMBER"],
             generic_target: "T"
         }])).toBeTruthy()
     })
 
     test('Array of numbers and text against number array', () => {
         expect(service.getDataType('ARRAY')?.validateValue([1, "test", "test"], [{
-            type: "NUMBER",
+            types: ["NUMBER"],
             generic_target: "T"
         }])).toBeFalsy()
     })
 
     test('Array of text against text array', () => {
         expect(service.getDataType('ARRAY')?.validateValue(["1", "2"], [{
-            type: "TEXT",
+            types: ["TEXT"],
             generic_target: "T"
         }])).toBeTruthy()
     })
@@ -136,47 +230,102 @@ describe('generics', () => {
 
     test('Array of array numbers against two dimensional number array', () => {
         expect(service.getDataType('ARRAY')?.validateValue([[1], [1]], [{
-            type: {
+            types: [{
                 type: "ARRAY",
                 generic_mapper: [{
-                    type: "NUMBER",
+                    types: ["NUMBER"],
                     generic_target: "T"
                 }]
-            },
+            }],
             generic_target: "T"
         }])).toBeTruthy()
 
         expect(service.getDataType('ARRAY')?.validateValue([[[1]], [[1]]], [{
-            type: {
+            types: [{
                 type: "ARRAY",
                 generic_mapper: [{
-                    type: {
+                    types: [{
                         type: "ARRAY",
                         generic_mapper: [{
-                            type: "NUMBER",
+                            types: ["NUMBER"],
                             generic_target: "T"
                         }]
-                    },
+                    }],
                     generic_target: "T"
                 }]
-            },
+            }],
             generic_target: "T"
         }])).toBeTruthy()
 
         expect(service.getDataType('ARRAY')?.validateValue([{"number": 1}, {"number": 1}], [{
-            type: "TEST_OBJECT",
+            types: ["TEST_OBJECT"],
             generic_target: "T"
         }])).toBeTruthy()
 
         expect(service.getDataType('ARRAY')?.validateValue([{"generic_value": "11"}, {"generic_value": "1"}], [{
-            type: {
+            types: [{
                 type: "GENERIC_OBJECT",
                 generic_mapper: [{
-                    type: "TEXT",
+                    types: ["TEXT"],
                     generic_target: "D"
                 }]
-            },
+            }],
             generic_target: "T"
         }])).toBeTruthy()
+    })
+})
+
+describe('test1', () => {
+    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+
+    dataTypes.forEach((dataType) => {
+        service.add(new DataType(dataType, service))
+    })
+
+    test('test', () => {
+
+        expect(service.getDataType("GENERIC_OBJECT")?.validateValue({generic_value: {generic_value: "sd"}}, [{
+            types: [{
+                type: "NUMBER"
+            }, {
+                type: "TEXT"
+            }, {
+                type: "GENERIC_OBJECT",
+                generic_mapper: [{
+                    types: [{
+                        type: "NUMBER"
+                    }, {
+                        type: "TEXT"
+                    }],
+                    generic_combination: [GenericCombinationStrategy.OR],
+                    generic_target: "D"
+                }]
+            }],
+            generic_combination: [GenericCombinationStrategy.OR, GenericCombinationStrategy.OR],
+            generic_target: "D"
+        }])).toBeTruthy()
+
+    })
+})
+
+describe('test2', () => {
+    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+
+    dataTypes.forEach((dataType) => {
+        service.add(new DataType(dataType, service))
+    })
+
+    test('test', () => {
+
+        expect(service.getDataType("GENERIC_OBJECT_GENERIC")?.validateValue({generic_value: [1,2,3]}, [{
+            types: [{
+                type: "NUMBER"
+            }, {
+                type: "TEXT"
+            }],
+            generic_combination: [GenericCombinationStrategy.OR],
+            generic_target: "D"
+        }])).toBeTruthy()
+
     })
 })

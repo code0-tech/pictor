@@ -1,79 +1,44 @@
-import {FunctionDefinition} from "./DFlowFunction.view";
+import {FunctionDefinitionObject} from "./DFlowFunction.view";
+import {GenericCombinationStrategy} from "../data-type/DFlowDataType.view";
 
-const functionData: FunctionDefinition[] = [{
-    function_id: "",
-    runtime_function: "std::array::concat",
-    return_type: "ARRAY<K>",
+export const functionData: FunctionDefinitionObject[] = [{
+    function_id: "std::math::add",
+    runtime_function_id: "std::math::add",
+    return_type: "NUMBER",
     parameters: [{
-        parameter_id: "",
+        parameter_id: "std::math::add__firstValue",
+        runtime_parameter_id: "std::math::add__firstValue",
+        type: "NUMBER"
+    }, {
+        parameter_id: "std::math::add__secondValue",
+        runtime_parameter_id: "std::math::add__secondValue",
+        type: "NUMBER"
+    }]
+}, {
+    function_id: "concat",
+    runtime_function_id: "concat",
+    return_type: "OBJECT",
+    parameters: [{
+        parameter_id: "first",
         runtime_parameter_id: "first",
-        type: "ARRAY<K>",
+        type: "OBJECT",
     }, {
-        parameter_id: "",
+        parameter_id: "second",
         runtime_parameter_id: "second",
-        type: "ARRAY<K>",
+        type: "OBJECT",
     }],
-    generic_keys: ["K"]
-}, {
-    function_id: "",
-    runtime_function: "std::array::map",
-    return_type: "ARRAY",
-    parameters: [{
-        parameter_id: "",
-        runtime_parameter_id: "array",
-        type: "ARRAY",
+    generic_keys: ["1", "2"],
+    generic_mapper: [{
+        parameter_id: "first",
+        types: ["1"],
+        generic_target: "O",
     }, {
-        parameter_id: "test",
-        runtime_parameter_id: "node",
-        type: "MAP_GENERIC_INPUT_NODE",
+        parameter_id: "second",
+        types: ["2"],
+        generic_target: "O",
+    }, {
+        types: ["1", "2"],
+        generic_combination: [GenericCombinationStrategy.AND],
+        generic_target: "O",
     }],
-    generic_keys: ["K", "T"],
-    generic_mapper: [
-        {
-            type: "T",
-            generic_target: "V",
-            parameter_id: "test"
-        },
-        {
-            type: "K",
-            generic_target: "S",
-            parameter_id: "test"
-        },
-        {
-            type: "K",
-            generic_target: "T",
-        }
-    ]
-}, {
-    function_id: "",
-    runtime_function: "bla",
-    return_type: "ARRAY",
-    parameters: [{
-        parameter_id: "",
-        runtime_parameter_id: "array",
-        type: "ARRAY",
-    }],
-    generic_mapper: [
-        {
-            type: "NUMBER",
-            generic_target: "T",
-            parameter_id: "array"
-        }
-    ]
-}, {
-    function_id: "",
-    runtime_function: "bla",
-    return_type: "ARRAY",
-    parameters: [{
-        parameter_id: "",
-        runtime_parameter_id: "array",
-        type: "ARRAY",
-    }],
-    generic_mapper: [
-        {
-            type: "NUMBER",
-            generic_target: "T",
-            parameter_id: "array"
-        }
-    ]
 }]

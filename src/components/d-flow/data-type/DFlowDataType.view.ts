@@ -3,9 +3,15 @@ import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
+export enum GenericCombinationStrategy {
+    AND,
+    OR
+}
+
 export interface GenericMapper {
-    type: Type
+    types: Type[]
     generic_target: string
+    generic_combination?: GenericCombinationStrategy[]
 }
 
 export interface GenericType {
@@ -115,7 +121,7 @@ export interface DataTypeObject {
     rules?: DataTypeRuleObject[]
     inputTypes?: string[] // data type id
     returnType?: string // data type id
-    parent?: string // data type id
+    parent?: Type // data type id
     genericKeys?: string[]
 }
 
@@ -131,7 +137,8 @@ export class DataType {
     private readonly _rules?: DataTypeRuleObject[]
     private readonly _inputTypes?: string[] // are only in use if Type is NODE
     private readonly _returnType?: string // are only in use if Type is NODE
-    private readonly _parent?: string
+    private readonly _parent?: Type
+    private readonly _generic_keys?: string[]
 
     constructor(dataType: DataTypeObject, service: DFlowDataTypeService) {
         this._id = dataType.data_type_id
@@ -205,7 +212,7 @@ export class DataType {
             return false
         }
 
-        const map = new Map<string, Type>(generics?.map(generic => [generic.generic_target, generic.type]))
+        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
 
         return this.allRules.every(rule => {
             return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)
@@ -218,7 +225,7 @@ export class DataType {
     }
 
     get allRules(): DataTypeRuleObject[] {
-        return [...(this._rules || []), ...(this._service.getDataType(this._parent as string)?.rules || [])]
+        return [...(this._rules || []), ...(this._service.getDataType(this._parent as string)?.allRules || [])]
     }
 
     get id(): string {
@@ -227,5 +234,13 @@ export class DataType {
 
     get service(): DFlowDataTypeService {
         return this._service
+    }
+
+    get genericKeys(): string[] | undefined {
+        return this._generic_keys
+    }
+
+    get type(): EDataType {
+        return this._type;
     }
 }

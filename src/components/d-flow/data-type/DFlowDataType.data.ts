@@ -43,7 +43,9 @@ export const dataTypes: DataTypeObject[] = [{
     }]
 }, {
     data_type_id: "OBJECT",
-    type: EDataType.OBJECT
+    type: EDataType.OBJECT,
+    genericKeys: ["O"],
+    parent: "O"
 }, {
     data_type_id: "TEXT",
     type: EDataType.PRIMITIVE,
@@ -97,7 +99,7 @@ export const dataTypes: DataTypeObject[] = [{
             type: {
                 type: "ARRAY",
                 generic_mapper: [{
-                    type: "S",
+                    types: ["S"],
                     generic_target: "T"
                 }]
             }
@@ -124,5 +126,21 @@ export const dataTypes: DataTypeObject[] = [{
     rules: [{
         type: EDataTypeRuleType.CONTAINS_KEY,
         config: {key: "generic_value", type: "D"}
+    }]
+}, {
+    data_type_id: "GENERIC_OBJECT_GENERIC",
+    type: EDataType.OBJECT,
+    genericKeys: ["D"],
+    rules: [{
+        type: EDataTypeRuleType.CONTAINS_KEY,
+        config: {
+            key: "generic_value", type: {
+                type: "ARRAY",
+                generic_mapper: [{
+                    types: ["D"],
+                    generic_target: "T"
+                }]
+            }
+        }
     }]
 }]

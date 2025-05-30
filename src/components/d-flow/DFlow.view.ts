@@ -12,7 +12,7 @@ export interface FlowObject {
 
 export interface FlowSettingObject {
     definition: FlowSettingDefinition
-    value: object | string | number | boolean
+    value: Value
 }
 
 export interface FlowSettingDefinition {

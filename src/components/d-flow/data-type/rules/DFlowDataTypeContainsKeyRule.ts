@@ -25,6 +25,9 @@ export class DFlowDataTypeContainsKeyRule {
 
         if (!(isObject(value))) return false
 
+        //TODO: only if its really a generic key
+        if (config.key in value && typeof config.type === "string" && !genericMapper && !service?.getDataType(config.type)) return true
+
         if (!(service?.getDataType(config.type) || genericMapper)) return false
 
         //use of generic key but datatypes does not exist

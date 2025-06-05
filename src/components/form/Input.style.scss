@@ -1,22 +1,26 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "sass:math";
 
 .input {
 
-  $padding: $xs;
+  $padding: variables.$xs;
 
-  @include box(true, $primary);
-  display: flex;
-  z-index: 1;
-  align-items: stretch;
-  cursor: pointer;
+  @include helpers.box(true, variables.$primary);
 
+  & {
+    display: flex;
+    z-index: 1;
+    align-items: stretch;
+    cursor: pointer;
+  }
 
   &:has(&__control:focus) {
-    border: 1px solid borderColor($primary, true);
+    border: 1px solid helpers.borderColor(variables.$primary, true);
   }
 
   &--not-valid {
-    border: 1px solid borderColor($error, true);
+    border: 1px solid helpers.borderColor(variables.$error, true);
   }
 
   &__left, &__right {
@@ -28,7 +32,7 @@
     }
 
     &--placeholder {
-      @include box(false, $secondary);
+      @include helpers.box(false, variables.$secondary);
       padding: $padding;
     }
 
@@ -55,28 +59,28 @@
     padding: $padding $padding;
     flex: 1;
     box-shadow: none;
-    font-size: $sm;
-    color: rgba($white, .5);
+    font-size: variables.$sm;
+    color: rgba(variables.$white, .5);
   }
 
 
   &__label {
     text-transform: uppercase;
-    color: rgba($white, .5);
-    font-size: $xs;
+    color: rgba(variables.$white, .5);
+    font-size: variables.$xs;
     //margin: $padding 0;
     display: block;
   }
 
   &__description {
-    color: rgba($white, .5);
-    font-size: $sm;
-    margin: $padding/2 0 $padding;
+    color: rgba(variables.$white, .5);
+    font-size: variables.$sm;
+    margin: calc($padding / 2) 0 $padding;
     display: block;
   }
 
   &__message {
-    @include box(false, $error);
+    @include helpers.box(false, variables.$error);
     border-top-right-radius: 0;
     border-top-left-radius: 0;
     padding: $padding * 2 $padding $padding;
@@ -84,12 +88,12 @@
     z-index: 0;
     display: flex;
     align-items: center;
-    font-size: $xs;
+    font-size: variables.$xs;
     gap: $padding;
 
     > svg {
-      width: $xs;
-      height: $xs;
+      width: variables.$xs;
+      height: variables.$xs;
     }
   }
 
@@ -97,7 +101,7 @@
 
 .radio-input, .radio-button {
 
-  $padding: $xxs;
+  $padding: variables.$xxs;
   $size: 0.9rem;
 
   background:transparent !important;
@@ -106,7 +110,7 @@
   align-items: center;
   box-sizing: border-box;
   padding: $padding 0;
-  gap: $xxs;
+  gap: variables.$xxs;
 
   .input__control {
 
@@ -123,11 +127,11 @@
     outline: none;
 
     background-color: transparent;
-    border: 1px solid borderColor($secondary, true);
+    border: 1px solid helpers.borderColor(variables.$secondary, true);
     border-radius: 50%;
 
     &:checked {
-      border-color: borderColor($info, true);
+      border-color: helpers.borderColor(variables.$info, true);
 
       &:before {
         content: "";
@@ -137,9 +141,9 @@
         border-radius: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        width: $size/2;
-        height: $size/2;
-        background: backgroundColor($info);
+        width: calc($size/2);
+        height: calc($size/2);
+        background: helpers.backgroundColor(variables.$info);
       }
     }
 
@@ -153,15 +157,15 @@
 
 .checkbox-input {
 
-  $padding: $xxs;
+  $padding: variables.$xxs;
   $size: 0.9rem;
 
-  background: backgroundColor($secondary) !important;
+  background: helpers.backgroundColor(variables.$secondary) !important;
   border-radius: 0 !important;
   border: none !important;
   align-items: center;
   box-sizing: border-box;
-  gap: $xxs;
+  gap: variables.$xxs;
   padding: $padding 0;
 
   .input__control {
@@ -178,12 +182,12 @@
     outline: none;
 
     background-color: transparent;
-    border: 1px solid borderColor($secondary, true);
-    border-radius: calc($borderRadius / 3);
+    border: 1px solid helpers.borderColor(variables.$secondary, true);
+    border-radius: math.div(variables.$borderRadius, 3);
 
     &:checked {
-      border-color: borderColor($info, true);
-      background: backgroundColor($info);
+      border-color: helpers.borderColor(variables.$info, true);
+      background: helpers.backgroundColor(variables.$info);
 
       &:before {
         content: "";
@@ -191,10 +195,10 @@
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        width: $size/2;
-        height: $size/2;
+        width: calc($size/2);
+        height: calc($size/2);
         clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        background: rgba($white, .5);
+        background: rgba(variables.$white, .5);
       }
     }
 
@@ -203,7 +207,7 @@
 
 .switch-input {
 
-  $padding: $xxs;
+  $padding: variables.$xxs;
   $size: 0.9rem;
   background: transparent !important;
   display: inline-flex;
@@ -236,7 +240,7 @@
       }
 
       &:before {
-        background-color: backgroundColor($info);
+        background-color: helpers.backgroundColor(variables.$info);
         -webkit-transition: .4s;
         transition: .4s;
       }
@@ -245,7 +249,7 @@
     &:after {
       width: $size;
       height: $size;
-      background-color: $white;
+      background-color: variables.$white;
       border-radius: 50%;
       position: absolute;
       content: "";
@@ -254,13 +258,13 @@
     }
 
     &:before {
-      background: backgroundColor($primary);
+      background: helpers.backgroundColor(variables.$primary);
       position: absolute;
       border-radius: 50rem;
       width: $size * 2.5 + $padding;
       height: $size + $padding;
-      top: -1 * $padding/2;
-      left: -1 * $padding/2;
+      top: calc(-1 * $padding/2);
+      left: calc(-1 * $padding/2);
       content: "";
       z-index: -1;
       -webkit-transition: .4s;

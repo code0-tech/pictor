@@ -1,10 +1,11 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .d-bar {
   position: relative;
-  background: $primary;
-  border-color: borderColor();
-  padding: $xs;
+  background: variables.$primary;
+  border-color: helpers.borderColor();
+  padding: variables.$xs;
   box-sizing: border-box;
 
   &--top, &--bottom {

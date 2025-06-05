@@ -1,8 +1,9 @@
-@import "../../styles/helpers";
-@import "../../styles/media";
+@use "../../styles/helpers";
+@use "../../styles/media";
+@use "../../styles/variables";
 
 .dialog {
-  @include box(false);
+  @include helpers.box(false);
   z-index: 100;
 
   position: relative;
@@ -13,7 +14,7 @@
   height: fit-content;
   max-height: none;
 
-  @include respond-above(md) {
+  @include media.respond-above(md) {
     width: 420px;
   }
 
@@ -21,16 +22,16 @@
     position: relative;
     margin: -0.5rem;
     padding: .5rem;
-    border-bottom: 1px solid borderColor();
-    background: backgroundColor($secondary);
+    border-bottom: 1px solid helpers.borderColor();
+    background: helpers.backgroundColor(variables.$secondary);
   }
 
   &__footer {
     position: relative;
     margin: -0.5rem;
     padding: .5rem;
-    border-top: 1px solid borderColor();
-    background: backgroundColor($secondary);
+    border-top: 1px solid helpers.borderColor();
+    background: helpers.backgroundColor(variables.$secondary);
   }
 
   &__wrapper {
@@ -44,7 +45,7 @@
 }
 
 [data-backdrop] {
-  background-color: rgba($primary, .2);
+  background-color: rgba(variables.$primary, .2);
   -webkit-backdrop-filter: blur(.1rem);
   backdrop-filter: blur(.1rem);
 }

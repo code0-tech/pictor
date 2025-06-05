@@ -1,31 +1,32 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .button {
-  padding: $xxs;
+  padding: variables.$xxs;
   gap: .5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   width: fit-content;
 
-  @include disabled;
+  @include helpers.disabled;
 }
 
-@each $name, $color in $colors {
+@each $name, $color in variables.$colors {
   .button--#{$name} {
-    @include box(true, $color);
+    @include helpers.box(true, $color);
 
     &.button--outlined {
-      border: 1px solid borderColor($color);
+      border: 1px solid helpers.borderColor($color);
       background: transparent;
 
       &:hover, &:active, &--active, &:focus, &:focus-visible {
-        border: 1px solid borderColor($color, true);
+        border: 1px solid helpers.borderColor($color, true);
       }
 
       &:active, &--active, &:focus, &:focus-visible {
-        border: 1px solid borderColor($color, true);
-        background: backgroundColor($color, true);
+        border: 1px solid helpers.borderColor($color, true);
+        background: helpers.backgroundColor($color, true);
       }
     }
 
@@ -34,7 +35,7 @@
       outline-color: transparent;
 
       &:hover, &:active, &--active, &:focus, &:focus-visible {
-        background: backgroundColor($color, true);
+        background: helpers.backgroundColor($color, true);
       }
     }
 

@@ -1,4 +1,4 @@
-@import "../../styles/media";
+@use "../../styles/media";
 
 .container {
 
@@ -21,27 +21,27 @@
     }
   }
 
-  @include respond-below(xxl) {
+  @include media.respond-below(xxl) {
     max-width: 1140px;
     min-width: 1140px;
   }
 
-  @include respond-below(xl) {
+  @include media.respond-below(xl) {
     max-width: 960px;
     min-width: 960px;
   }
 
-  @include respond-below(lg) {
+  @include media.respond-below(lg) {
     max-width: 720px;
     min-width: 720px;
   }
 
-  @include respond-below(md) {
+  @include media.respond-below(md) {
     max-width: 540px;
     min-width: 540px;
   }
 
-  @include respond-below(sm) {
+  @include media.respond-below(sm) {
     max-width: 100%;
     min-width: auto;
   }

@@ -1,9 +1,10 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .avatar {
-  @include box(false);
+  @include helpers.box(false);
   aspect-ratio: 50 / 50;
-  padding: $xxs;
+  padding: variables.$xxs;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,33 +1,38 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .d-folder {
-  @include box();
-  background: $primary;
-  padding: $xxs;
-  display: flex;
-  white-space: nowrap;
-  gap: $xs;
+  @include helpers.box();
 
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  & {
+    background: variables.$primary;
+    padding: variables.$xxs;
+    display: flex;
+    white-space: nowrap;
+    gap: variables.$xs;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
 
   &__icon {
-    color: $info;
+    color: variables.$info;
   }
 
   &__content {
-    margin-left: $xs;
+    margin-left: variables.$xs;
     position: relative;
 
     &:before {
       z-index: 10;
       height: 100%;
       width: 1px;
-      background: backgroundColor($secondary);
+      background: helpers.backgroundColor(variables.$secondary);
       position: absolute;
       content: "";
       left: 0;
@@ -37,10 +42,13 @@
 }
 
 .d-folder-item {
-  @include box();
-  background: $primary;
-  padding: $xxs;
-  display: flex;
-  white-space: nowrap;
-  gap: $xs;
+  @include helpers.box();
+
+  & {
+    background: variables.$primary;
+    padding: variables.$xxs;
+    display: flex;
+    white-space: nowrap;
+    gap: variables.$xs;
+  }
 }

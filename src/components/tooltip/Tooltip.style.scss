@@ -1,8 +1,9 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .tooltip {
 
-  $color: $secondary;
+  $color: variables.$secondary;
   width: fit-content;
 
   &__trigger {
@@ -19,8 +20,8 @@
   }
 
   &__menu {
-    @include box(false, $color);
-    box-shadow: 0 0 2rem .5rem rgba($bodyBg, 1);
+    @include helpers.box(false, $color);
+    box-shadow: 0 0 2rem .5rem rgba(variables.$bodyBg, 1);
 
     position: fixed;
     top: 0;

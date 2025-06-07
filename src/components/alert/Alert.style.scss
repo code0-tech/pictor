@@ -1,4 +1,5 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .alert {
   padding: .5rem;
@@ -25,7 +26,7 @@
   }
 
   &__icon {
-    color: color($white);
+    color: helpers.color(variables.$white);
     width: 1.25rem;
     height: 1.25rem;
     margin-right: .5rem;
@@ -37,36 +38,37 @@
   }
 
   &__dismissible {
-    @include box();
+    @include helpers.box();
 
-    width: 1rem;
-    height: 1rem;
-    padding: .25rem;
-    cursor: pointer;
-    margin-left: .5rem;
+    & {
+      width: 1rem;
+      height: 1rem;
+      padding: .25rem;
+      cursor: pointer;
+      margin-left: .5rem;
+    }
 
     > * {
       width: 1rem;
       height: 1rem;
     }
   }
-
 }
 
-@each $name, $color in $colors {
+@each $name, $color in variables.$colors {
   .alert--#{$name} {
-    @include box(false, $color);
+    @include helpers.box(false, $color);
 
     .alert__icon {
-      color: color($color);
+      color: helpers.color($color);
     }
 
     .alert__content {
-      border-top: 1px solid borderColor();
+      border-top: 1px solid helpers.borderColor();
     }
 
     .alert__dismissible {
-      @include box(true, $color);
+      @include helpers.box(true, $color);
     }
 
   }

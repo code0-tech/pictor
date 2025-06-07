@@ -1,6 +1,8 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "sass:math";
 
-$padding: $xs;
+$padding: variables.$xs;
 
 .card {
 
@@ -11,7 +13,7 @@ $padding: $xs;
   * {
 
     &.card__section > img {
-      border-radius: $borderRadius / 2;
+      border-radius: math.div(variables.$borderRadius, 2);
     }
 
     &:first-child.card__section {
@@ -44,8 +46,8 @@ $padding: $xs;
       margin-left: -1 * $padding;
       padding: $padding;
 
-      border-top: 1px solid borderColor();
-      border-bottom: 1px solid borderColor();
+      border-top: 1px solid helpers.borderColor();
+      border-bottom: 1px solid helpers.borderColor();
 
       + .card__section--border {
         border-top: none;
@@ -56,9 +58,9 @@ $padding: $xs;
 
 }
 
-@each $name, $color in $colors {
+@each $name, $color in variables.$colors {
   .card--#{$name} {
-    @include box(false, $color);
+    @include helpers.box(false, $color);
 
     //variants
 
@@ -79,9 +81,9 @@ $padding: $xs;
 
     &.card--gradient {
 
-      @each $gradientName, $gradientColor in $colors {
+      @each $gradientName, $gradientColor in variables.$colors {
         &-#{$gradientName} {
-          box-shadow: inset 0 0 ($padding * 2) ($padding / 2) backgroundColor($gradientColor);
+          box-shadow: inset 0 0 ($padding * 2) math.div($padding, 2) helpers.backgroundColor($gradientColor);
         }
       }
     }
@@ -91,11 +93,11 @@ $padding: $xs;
   .card--outline-#{$name} {
     outline-offset: $padding;
     margin: $padding;
-    outline: borderColor($color) solid 1px;
+    outline: helpers.borderColor($color) solid 1px;
   }
 
   .card--border-#{$name} {
-    border-color: borderColor($color);
+    border-color: helpers.borderColor($color);
   }
 
   .card--border--dashed {

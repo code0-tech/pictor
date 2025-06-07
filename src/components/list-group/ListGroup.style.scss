@@ -1,8 +1,9 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .list-group {
 
-  border-bottom: 1px solid borderColor();
+  border-bottom: 1px solid helpers.borderColor();
   margin: 0 calc(-1 * var(--padding));
   padding: 0 var(--padding);
 
@@ -16,10 +17,10 @@
     padding: var(--padding);
     cursor: pointer;
 
-    border-bottom: 1px solid borderColor();
+    border-bottom: 1px solid helpers.borderColor();
 
-    @include hoverAndActiveContent {
-      background: rgba($white, .1);
+    @include helpers.hoverAndActiveContent {
+      background: rgba(variables.$white, .1);
     }
 
     &:last-of-type {

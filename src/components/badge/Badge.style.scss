@@ -1,18 +1,18 @@
-@import "../../styles/helpers";
-@import "../../styles/variables";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .badge {
-  @include box(false);
+  @include helpers.box(false);
 
   padding: .25rem;
   display: inline-flex;
-  font-size: $xs;
+  font-size: variables.$xs;
   width: fit-content;
 }
 
-@each $name, $color in $colors {
+@each $name, $color in variables.$colors {
   .badge--#{$name} {
-    @include box(false, $color);
-    font-size: $xs;
+    @include helpers.box(false, $color);
+    font-size: variables.$xs;
   }
 }

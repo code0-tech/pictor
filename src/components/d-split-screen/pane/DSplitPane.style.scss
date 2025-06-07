@@ -1,9 +1,10 @@
-@import "../../../styles/helpers";
-@import "../../../styles/media";
+@use "../../../styles/helpers";
+@use "../../../styles/media";
+@use "../../../styles/variables";
 
 .d-split-pane {
   overflow: scroll;
-  background: $primary;
+  background: variables.$primary;
 
 
   &--horizontal {

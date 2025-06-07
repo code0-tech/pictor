@@ -16,6 +16,7 @@ import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
 import Flex from "../flex/Flex";
 import SwitchInput from "./SwitchInput";
+import PinInput from "./PinInput";
 
 export default {
     title: "Form"
@@ -351,4 +352,30 @@ export const Switch = () => {
         </Card>
     </form>
 
+}
+
+export const Pin = () => {
+    return (
+        <Card maw={300}>
+            <PinInput
+                label={"Pin"}
+                description={"Please input your pin for confirming your action"}
+                inputLength={6}
+                splitFields={false}
+            />
+        </Card>
+    )
+}
+
+export const SplitPin = () => {
+    return (
+        <Card maw={300}>
+            <PinInput
+                label={"Pin"}
+                description={"Please input your pin for confirming your action"}
+                inputLength={6}
+                splitFields={true}
+            />
+        </Card>
+    )
 }

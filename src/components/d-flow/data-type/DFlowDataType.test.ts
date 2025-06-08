@@ -38,24 +38,13 @@ export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType
         if (typeof value === "number") return this.getDataType("NUMBER")
         if (typeof value === "boolean") return this.getDataType("BOOLEAN")
 
-        //TODO: get datatype with highest depth based on parent datatypes
-        //if value is array search through all array types
-        if (Array.isArray(value)) {
-            this.values().filter(type => {
-                //TODO: no need to define generics but need to adjust rules because
-                //TODO: if a rule has generics and they are not included we just ignore the type validation
-                return type.validateValue(value)
-            })
-        }
+        const matchingDataTypes = this.values().filter(type => {
+            return type.validateValue(value)
+        }).sort((a, b) => {
+            return a.depth - b.depth
+        })
 
-        //if value is object search through all array types
-        if (isObject(value)) {
-
-        }
-
-        //fallback: search all registered datatypes
-
-        return undefined
+        return matchingDataTypes[matchingDataTypes.length - 1]
 
     }
 
@@ -317,7 +306,7 @@ describe('test2', () => {
 
     test('test', () => {
 
-        expect(service.getDataType("GENERIC_OBJECT_GENERIC")?.validateValue({generic_value: [1,2,3]}, [{
+        expect(service.getDataType("GENERIC_OBJECT_GENERIC")?.validateValue({generic_value: [1, 2, 3]}, [{
             types: [{
                 type: "NUMBER"
             }, {

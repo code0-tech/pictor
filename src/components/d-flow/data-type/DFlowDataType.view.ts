@@ -119,8 +119,6 @@ export interface DataTypeObject {
     type: EDataType
     name?: Translation[]
     rules?: DataTypeRuleObject[]
-    inputTypes?: string[] // data type id
-    returnType?: string // data type id
     parent?: Type // data type id
     genericKeys?: string[]
 }
@@ -135,8 +133,6 @@ export class DataType {
     private readonly _type: EDataType
     private readonly _name?: Translation[]
     private readonly _rules?: DataTypeRuleObject[]
-    private readonly _inputTypes?: string[] // are only in use if Type is NODE
-    private readonly _returnType?: string // are only in use if Type is NODE
     private readonly _parent?: Type
     private readonly _generic_keys?: string[]
 
@@ -145,10 +141,9 @@ export class DataType {
         this._type = dataType.type
         this._name = dataType.name
         this._rules = dataType.rules
-        this._inputTypes = dataType.inputTypes
-        this._returnType = dataType.returnType
         this._parent = dataType.parent
         this._service = service
+        this._generic_keys = dataType.genericKeys
     }
 
     /**
@@ -182,6 +177,7 @@ export class DataType {
             a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
 
         //check input types
+        /*
         if (this._inputTypes?.length !== dataType._inputTypes?.length) return false
 
         const notMatchingInputTypes = this._inputTypes?.map((id, index) => {
@@ -195,6 +191,8 @@ export class DataType {
 
         if ((this._returnType && dataType._returnType) && !(this._service.getDataType(this._returnType as string)?.validateDataType(this._service.getDataType(dataType._returnType as string) as DataType)))
             return false
+            */
+
 
         if (this.allRules && !dataType.allRules) return false
         if (!this.allRules && dataType.allRules) return false
@@ -242,5 +240,9 @@ export class DataType {
 
     get type(): EDataType {
         return this._type;
+    }
+
+    get depth(): number {
+        return this._parent ? 1 + (this._service.getDataType(this._parent as string)?.depth ?? 0) : 0
     }
 }

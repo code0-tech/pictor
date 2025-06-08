@@ -20,6 +20,7 @@ export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
 
 ])
 
+//TODO: add input type rule
 export type CombinesRuleConfig = DFlowDataTypeRegexRuleConfig
     | DFlowDataTypeNumberRangeRuleConfig
     | DFlowDataTypeItemOfCollectionRuleConfig

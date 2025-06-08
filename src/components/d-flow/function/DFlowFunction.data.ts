@@ -1,5 +1,4 @@
 import {FunctionDefinitionObject} from "./DFlowFunction.view";
-import {GenericCombinationStrategy} from "../data-type/DFlowDataType.view";
 
 export const functionData: FunctionDefinitionObject[] = [{
     function_id: "std::math::add",
@@ -15,30 +14,25 @@ export const functionData: FunctionDefinitionObject[] = [{
         type: "NUMBER"
     }]
 }, {
-    function_id: "concat",
-    runtime_function_id: "concat",
-    return_type: "OBJECT",
+    function_id: "std::array::add",
+    runtime_function_id: "std::math::add",
+    return_type: "ARRAY",
     parameters: [{
-        parameter_id: "first",
-        runtime_parameter_id: "first",
-        type: "OBJECT",
+        parameter_id: "std::array::add__array",
+        runtime_parameter_id: "std::array::add__array",
+        type: "ARRAY"
     }, {
-        parameter_id: "second",
-        runtime_parameter_id: "second",
-        type: "OBJECT",
+        parameter_id: "std::array::add__value",
+        runtime_parameter_id: "std::array::add__value",
+        type: "D"
     }],
-    generic_keys: ["1", "2"],
+    generic_keys: ["D"],
     generic_mapper: [{
-        parameter_id: "first",
-        types: ["1"],
-        generic_target: "O",
+        parameter_id: "std::array::add__array",
+        types: ["D"],
+        generic_target: "T"
     }, {
-        parameter_id: "second",
-        types: ["2"],
-        generic_target: "O",
-    }, {
-        types: ["1", "2"],
-        generic_combination: [GenericCombinationStrategy.AND],
-        generic_target: "O",
-    }],
+        types: ["D"],
+        generic_target: "T"
+    }]
 }]

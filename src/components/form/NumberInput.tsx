@@ -5,7 +5,7 @@ import Button from "../button/Button";
 
 
 interface NumberInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type" | "left" | "right" | "leftType" | "rightType"> {
-    withToggleButtons?: boolean
+
 }
 
 const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
@@ -14,7 +14,6 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
 
     const {
         step = 1,
-        withToggleButtons = true,
         ...rest
     } = props
 
@@ -32,22 +31,11 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
         }
     }
 
-    if (withToggleButtons) {
-        return <Input
-            right={<Button onClick={countUp}><IconPlus size={13}/></Button>}
-            left={<Button onClick={countDown}><IconMinus size={13}/></Button>}
-            leftType={"action"}
-            type={"text"}
-            inputMode={"numeric"}
-            ref={ref}
-            {...rest}
-        />
-    }
-
     return <Input
+        right={<Button onClick={countUp}><IconPlus size={13}/></Button>}
+        left={<Button onClick={countDown}><IconMinus size={13}/></Button>}
         leftType={"action"}
-        type={"text"}
-        inputMode={"numeric"}
+        type={"number"}
         ref={ref}
         {...rest}
     />

@@ -81,7 +81,6 @@ const PinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forwardRe
         }
 
         useEffect(() => {
-            console.log("PIN value updated:", pin.join(""));
             props.formValidation?.setValue(pin.join(""))
         }, [pin]);
 

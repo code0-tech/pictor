@@ -1,18 +1,7 @@
 import {Flow} from "../DFlow.view";
+import {ValidationResult} from "../../../utils/inspection";
 
-export const enum DFlowInspectionSeverity {
-    TYPO,
-    GRAMMAR,
-    WEAK,
-    WARNING,
-    ERROR
-}
-
-export interface FlowValidation {
-
-}
-
-export const useValidation = (flow: Flow) => {
+export const useValidation = (flow: Flow): ValidationResult[] => {
 
     //syntactic checking
     // - structure
@@ -22,4 +11,5 @@ export const useValidation = (flow: Flow) => {
     // - go throw semantic rules and check if they
     //   are all fine
 
+    return []
 }

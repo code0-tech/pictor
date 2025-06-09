@@ -1,9 +1,10 @@
-@import "../../../styles/helpers";
-@import "../../../styles/media";
+@use "../../../styles/helpers";
+@use "../../../styles/media";
+@use "../../../styles/variables";
 
 .d-splitter {
   position: absolute;
-  background: borderColor();
+  background: helpers.borderColor();
   z-index: 999;
 
   &--horizontal {
@@ -20,6 +21,6 @@
   }
 
   &[data-resize="true"] {
-    background: $info;
+    background: variables.$info;
   }
 }

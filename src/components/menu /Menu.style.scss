@@ -1,19 +1,20 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .menu {
-  @include box(false);
-  padding: $xxs;
+  @include helpers.box(false);
+  padding: variables.$xxs;
 
   &__item {
-    @include box(false);
-    border-radius: $borderRadius - $xxs;
+    @include helpers.box(false);
+    border-radius: variables.$borderRadius - variables.$xxs;
     padding: .5rem;
     background-color: transparent;
     border-color: transparent;
     cursor: pointer;
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: backgroundColor($secondary, true);
+      background: helpers.backgroundColor(variables.$secondary, true);
     }
 
     &[aria-disabled=true] {
@@ -23,7 +24,7 @@
 
   &__separator {
     border: none;
-    margin: $xxs (-1 * $xxs);
+    margin: variables.$xxs (-1 * variables.$xxs);
     color: rgba(white, .1);
     height: 1px;
     background-color: rgba(white, .1);

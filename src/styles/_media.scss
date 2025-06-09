@@ -1,3 +1,7 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "sass:meta";
 $breakpoints: (
         xs: 0,
         sm: 576px,
@@ -8,8 +12,8 @@ $breakpoints: (
 );
 
 @mixin respond-above($breakpoint) {
-  @if map-has-key($breakpoints, $breakpoint) {
-    $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
     @media (min-width: $breakpoint-value) {
       @content;
     }
@@ -25,8 +29,8 @@ $breakpoints: (
 }
 
 @mixin respond-below($breakpoint) {
-  @if map-has-key($breakpoints, $breakpoint) {
-    $breakpoint-value: map-get($breakpoints, $breakpoint);
+  @if map.has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map.get($breakpoints, $breakpoint);
     @media (max-width: ($breakpoint-value - 1)) {
       @content;
     }
@@ -42,17 +46,17 @@ $breakpoints: (
 }
 
 @mixin respond-between($lower, $upper) {
-  @if map-has-key($breakpoints, $lower) and map-has-key($breakpoints, $upper) {
-    $lower-breakpoint: map-get($breakpoints, $lower);
-    $upper-breakpoint: map-get($breakpoints, $upper);
+  @if map.has-key($breakpoints, $lower) and map.has-key($breakpoints, $upper) {
+    $lower-breakpoint: map.get($breakpoints, $lower);
+    $upper-breakpoint: map.get($breakpoints, $upper);
     @media (min-width: $lower-breakpoint) and (max-width: ($upper-breakpoint - 1)) {
       @content;
     }
   } @else {
-    @if (map-has-key($breakpoints, $lower) == false) {
+    @if (map.has-key($breakpoints, $lower) == false) {
       @warn 'Your lower breakpoint was invalid: #{$lower}.';
     }
-    @if (map-has-key($breakpoints, $upper) == false) {
+    @if (map.has-key($breakpoints, $upper) == false) {
       @warn 'Your upper breakpoint was invalid: #{$upper}.';
     }
     @if (is-number($lower) and is-number($upper)) {
@@ -72,8 +76,8 @@ $breakpoints: (
   }
 }
 @function is-number($value) {
-  @return type-of($value) == 'number';
+  @return meta.type-of($value) == 'number';
 }
 @function is-absolute-length-in-px($value) {
-  @return is-number($value) and index('px', unit($value)) != null;
+  @return is-number($value) and list.index('px', math.unit($value)) != null;
 }

@@ -1,28 +1,38 @@
 @use "sass:math";
-@import "variables";
+@use "sass:color";
+@use "variables";
 
 
-@mixin box($active: true, $color: $secondary) {
+@mixin box($active: true, $color: variables.$secondary) {
   //positioning
   position: relative;
 
   //styling
-  border-radius: $borderRadius;
+  border-radius: variables.$borderRadius;
   border: 1px solid transparent;
   background: backgroundColor($color);
-  color: rgba($white, .5);
+  color: rgba(variables.$white, .5);
   outline: none;
   font-family: Ubuntu, sans-serif;
-  font-size: $sm;
+  font-size: variables.$sm;
 
   @if ($active == true) {
-    &:hover, &:active, &--active, &:focus, &:focus-visible {
-      background: backgroundColor($color, true);
-      outline: none;
-    }
+    @if ($active == true) {
+      &:hover,
+      &:active,
+      &--active,
+      &:focus,
+      &:focus-visible {
+        background: backgroundColor($color, true);
+        outline: none;
+      }
 
-    &:active, &--active, &:focus, &:focus-visible {
-      border: 1px solid borderColor($color, true);
+      &:active,
+      &--active,
+      &:focus,
+      &:focus-visible {
+        border: 1px solid borderColor($color, true);
+      }
     }
   }
 }
@@ -40,16 +50,16 @@
   }
 }
 
-@function borderColor($color: $secondary, $interacted: false) {
-  @return rgba(if($color == $primary, $white, $color), if($interacted, if($color == $primary or $color == $secondary, 20%, 40%), if($color == $primary or $color == $secondary, 10%, 30%)))
+@function borderColor($color: variables.$secondary, $interacted: false) {
+  @return rgba(if($color == variables.$primary, variables.$white, $color), if($interacted, if($color == variables.$primary or $color == variables.$secondary, 20%, 40%), if($color == variables.$primary or $color == variables.$secondary, 10%, 30%)))
 }
 
-@function backgroundColor($color: $primary, $interacted: false) {
-  @return if($interacted, mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary or $color == $secondary, 80%, 60%)), mix($bodyBg, $color, if($color == $primary or $color == $secondary, 90%, 70%)))
+@function backgroundColor($color: variables.$primary, $interacted: false) {
+  @return if($interacted, color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary or $color == variables.$secondary, 80%, 60%)), color.mix(variables.$bodyBg, $color, if($color == variables.$primary or $color == variables.$secondary, 90%, 70%)))
 }
 
 
-@mixin border($color: $secondary, $interact: true) {
+@mixin border($color: variables.$secondary, $interact: true) {
 
   border: 1px solid borderColor($color);
 
@@ -61,15 +71,15 @@
 }
 
 @function color($color, $opacity: 0.5) {
-  @return rgba(if($color == $primary, $white, $color), $opacity)
+  @return rgba(if($color == variables.$primary, variables.$white, $color), $opacity)
 }
 
-@mixin background($color: $primary, $interact: true) {
-  background: mix($bodyBg, $color, 90%);
+@mixin background($color: variables.$primary, $interact: true) {
+  background: color.mix(variables.$bodyBg, $color, 90%);
 
   @if ($interact == true) {
     &:hover, &:active, &--active {
-      background: mix($bodyBg, if($color == $primary, $white, $color), if($color == $primary, 95%, 85%));
+      background: color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary, 95%, 85%));
     }
   }
 }

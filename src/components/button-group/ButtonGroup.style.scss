@@ -1,7 +1,8 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .button-group {
-  @include box(false, $primary);
+  @include helpers.box(false, variables.$primary);
 
   border: none;
   width: fit-content;
@@ -25,15 +26,15 @@
 
   &__first {
     .button {
-      border-top-left-radius: $borderRadius !important;
-      border-bottom-left-radius: $borderRadius !important;
+      border-top-left-radius: variables.$borderRadius !important;
+      border-bottom-left-radius: variables.$borderRadius !important;
     }
   }
 
   &__last {
     .button {
-      border-top-right-radius: $borderRadius !important;
-      border-bottom-right-radius: $borderRadius !important;
+      border-top-right-radius: variables.$borderRadius !important;
+      border-bottom-right-radius: variables.$borderRadius !important;
     }
   }
 

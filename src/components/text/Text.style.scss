@@ -1,17 +1,17 @@
-@import "../../styles/variables";
+@use "../../styles/variables";
 
 .text {
   font-family: Ubuntu, sans-serif;
 }
 
-@each $name, $font in $sizes {
+@each $name, $font in variables.$sizes {
   .text--#{$name} {
     font-size: $font;
   }
 }
-@each $name, $opacity in $hierarchy {
+@each $name, $opacity in variables.$hierarchy {
   .text--#{$name} {
-    color: rgba($white, $opacity);
+    color: rgba(variables.$white, $opacity);
   }
 }
 

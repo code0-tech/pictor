@@ -1,23 +1,30 @@
-@import "../../styles/helpers";
+@use "../../styles/helpers";
+@use "../../styles/variables";
 
 .select {
-  @include box(true);
-  display: flex;
-  padding: .5rem;
-  cursor: pointer;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: center;
+  @include helpers.box(true);
+
+  & {
+    display: flex;
+    padding: .5rem;
+    cursor: pointer;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+  }
 
   &__item {
-    @include box(false);
-    padding: .5rem;
-    background-color: transparent;
-    border-color: transparent;
-    cursor: pointer;
+    @include helpers.box(false);
+
+    & {
+      padding: .5rem;
+      background-color: transparent;
+      border-color: transparent;
+      cursor: pointer;
+    }
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: backgroundColor($secondary, true);
+      background: helpers.backgroundColor(variables.$secondary, true);
     }
 
     &[aria-disabled=true] {
@@ -33,14 +40,14 @@
   }
 
   &__popover {
-    @include box(false);
+    @include helpers.box(false);
     padding: .5rem;
     margin-top: .5rem;
     outline: none;
   }
 
   &__group-label {
-    font-size: $xs;
+    font-size: variables.$xs;
     color: rgba(white, .25);
     margin-bottom: .5rem;
   }

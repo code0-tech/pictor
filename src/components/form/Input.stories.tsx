@@ -355,27 +355,73 @@ export const Switch = () => {
 }
 
 export const Pin = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            number: null
+        },
+        validate: {
+            number: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
     return (
         <Card maw={300}>
+         <CardSection>
             <PinInput
                 label={"Pin"}
                 description={"Please input your pin for confirming your action"}
                 inputLength={6}
                 splitFields={false}
+                {...inputs.getInputProps("number")}
             />
+        </CardSection>
+            <Button color={"info"} onClick={validate}>
+                <IconKey size={13}/>
+                Confirm
+            </Button>
         </Card>
     )
 }
 
 export const SplitPin = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            number: null
+        },
+        validate: {
+            number: (value) => {
+                if (!value) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
     return (
         <Card maw={300}>
-            <PinInput
-                label={"Pin"}
-                description={"Please input your pin for confirming your action"}
-                inputLength={6}
-                splitFields={true}
-            />
+            <CardSection>
+                <PinInput
+                    label={"Pin"}
+                    description={"Please input your pin for confirming your action"}
+                    inputLength={6}
+                    splitFields={true}
+                    {...inputs.getInputProps("number")}
+                />
+            </CardSection>
+            <Button color={"info"} onClick={validate}>
+                <IconKey size={13}/>
+                Confirm
+            </Button>
         </Card>
     )
 }

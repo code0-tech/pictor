@@ -78,15 +78,6 @@ export const dataTypes: DataTypeObject[] = [{
         }
     }]
 }, {
-    data_type_id: "NUMBER_ARRAY",
-    type: EDataType.ARRAY,
-    rules: [{
-        type: EDataTypeRuleType.CONTAINS_TYPE,
-        config: {
-            type: "NUMBER"
-        }
-    }]
-}, {
     data_type_id: "MAP_GENERIC_INPUT_NODE",
     type: EDataType.NODE,
     genericKeys: ["V", "S"],

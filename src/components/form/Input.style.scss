@@ -275,3 +275,13 @@
   }
 
 }
+
+.pin-input-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pin-input {
+  padding-left: variables.$lg;
+  width: variables.$md;
+}

@@ -16,6 +16,7 @@ import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
 import Flex from "../flex/Flex";
 import SwitchInput from "./SwitchInput";
+import PinInput from "./PinInput";
 
 export default {
     title: "Form"
@@ -351,4 +352,80 @@ export const Switch = () => {
         </Card>
     </form>
 
+}
+
+export const Pin = () => {
+
+    const length = 6
+    const [inputs, validate] = useForm({
+        initialValues: {
+            number: null
+        },
+        validate: {
+            number: (value) => {
+                if (!value) return "Error"
+                if (value.length != length) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return (
+        <Card maw={300}>
+         <CardSection>
+            <PinInput
+                label={"Pin"}
+                description={"Please input your pin for confirming your action"}
+                inputLength={length}
+                splitFields={false}
+                {...inputs.getInputProps("number")}
+            />
+        </CardSection>
+            <Button color={"info"} onClick={validate}>
+                <IconKey size={13}/>
+                Confirm
+            </Button>
+        </Card>
+    )
+}
+
+export const SplitPin = () => {
+
+    const length = 6
+    const [inputs, validate] = useForm({
+        initialValues: {
+            number: null
+        },
+        validate: {
+            number: (value) => {
+                if (!value) return "Error"
+                if (value.length != length) return "Error"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return (
+        <Card maw={300}>
+            <CardSection>
+                <PinInput
+                    label={"Pin"}
+                    description={"Please input your pin for confirming your action"}
+                    inputLength={length}
+                    splitFields={true}
+                    {...inputs.getInputProps("number")}
+                />
+            </CardSection>
+            <Button color={"info"} onClick={validate}>
+                <IconKey size={13}/>
+                Confirm
+            </Button>
+        </Card>
+    )
 }

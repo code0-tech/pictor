@@ -356,6 +356,7 @@ export const Switch = () => {
 
 export const Pin = () => {
 
+    const length = 6
     const [inputs, validate] = useForm({
         initialValues: {
             number: null
@@ -363,6 +364,7 @@ export const Pin = () => {
         validate: {
             number: (value) => {
                 if (!value) return "Error"
+                if (value.length != length) return "Error"
                 return null
             }
         },
@@ -377,7 +379,7 @@ export const Pin = () => {
             <PinInput
                 label={"Pin"}
                 description={"Please input your pin for confirming your action"}
-                inputLength={6}
+                inputLength={length}
                 splitFields={false}
                 {...inputs.getInputProps("number")}
             />
@@ -392,6 +394,7 @@ export const Pin = () => {
 
 export const SplitPin = () => {
 
+    const length = 6
     const [inputs, validate] = useForm({
         initialValues: {
             number: null
@@ -399,6 +402,7 @@ export const SplitPin = () => {
         validate: {
             number: (value) => {
                 if (!value) return "Error"
+                if (value.length != length) return "Error"
                 return null
             }
         },
@@ -413,7 +417,7 @@ export const SplitPin = () => {
                 <PinInput
                     label={"Pin"}
                     description={"Please input your pin for confirming your action"}
-                    inputLength={6}
+                    inputLength={length}
                     splitFields={true}
                     {...inputs.getInputProps("number")}
                 />

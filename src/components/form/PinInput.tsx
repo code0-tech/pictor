@@ -11,14 +11,21 @@ interface PinInputProps extends Omit<InputProps<string | null>, "wrapperComponen
     splitFields: boolean
 }
 
+//TODO initial Value for pin
+//TODO go befor a character press backspace will skip back without removing the char
+
 const PinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
     ref = ref || React.useRef(null)
     return <>{(props.splitFields) ? <SplitPinInput {...props} ref={ref}/> : <SinglePinInput {...props} ref={ref}/>}</>
 })
 
 const SplitPinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
-    const [pin, setPin] = useState<string[]>(Array(props.inputLength).fill(""));
-    const indexes = Array.from({length: props.inputLength}, (_, i) => i);
+    const initialPin = props.initialValue
+        ? props.initialValue.slice(0, props.inputLength).split("")
+        : Array(props.inputLength).fill("");
+
+    const [pin, setPin] = useState<string[]>(initialPin);
+    const indexes = Array.from({ length: props.inputLength }, (_, i) => i);
     const inputsRef = useRef<HTMLInputElement[]>([]);
 
     const updateValue = (valArr: string[]) => {
@@ -26,33 +33,42 @@ const SplitPinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forw
         props.formValidation?.setValue(valArr.join(""));
     };
 
-    const getInput = (index: number): HTMLInputElement => {
-        return inputsRef.current[index]
-    };
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-        if (e.key !== "Backspace") return
+        if (e.key !== "Backspace") return;
+
+        const inputEl = e.currentTarget;
+        const cursorAtStart = inputEl.selectionStart === 0;
+        const hasValue = inputEl.value.length > 0;
+
         const newPin = [...pin];
 
-        if (pin[index]) {
-            newPin[index] = "";
-            updateValue(newPin);
+        if (cursorAtStart) {
+            if (index > 0) {
+                e.preventDefault();
+                newPin[index - 1] = "";
+                updateValue(newPin);
+                inputsRef.current[index - 1]?.focus();
+            } else {
+                newPin[index] = "";
+                updateValue(newPin);
+            }
             return;
         }
 
-        if (index > 0) {
-            newPin[index - 1] = "";
+        if (hasValue) {
+            newPin[index] = "";
             updateValue(newPin);
-            inputsRef.current[index - 1]?.focus();
+            e.preventDefault();
         }
     };
 
     const onChange = (e: React.FormEvent<HTMLInputElement>, index: number) => {
-        const input = e.target as HTMLInputElement
+        const input = e.target as HTMLInputElement;
         const val = input.value;
+
         if (!val.match(allowedCharacters)) {
-            input.value = ""
-            return
+            input.value = "";
+            return;
         }
 
         const newPin = [...pin];
@@ -62,74 +78,70 @@ const SplitPinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forw
         if (val && index < props.inputLength - 1) {
             inputsRef.current[index + 1]?.focus();
         }
-    }
+    };
 
     const onPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
-        const text = event.clipboardData.getData("text")
-        const min = Math.min(props.inputLength, text.length)
+        const text = event.clipboardData.getData("text");
+        const cutString = text.slice(0, props.inputLength);
+        const newPin = cutString.split("").map((char) =>
+            char.match(allowedCharacters) ? char : ""
+        );
 
-        for (let i = 0; i < min; i++) {
-            const input = getInput(i)
-            const char = text[i]
-            if (char) {
-                input.value = char
-            }
-
-            const cutString = text.substring(0, min)
-            inputsRef.current[min - 1]?.focus();
-            updateValue(cutString.split(""))
-        }
-    }
+        updateValue(newPin);
+        inputsRef.current[newPin.length - 1]?.focus();
+    };
 
     useEffect(() => {
-        props.formValidation?.setValue(pin.join(""))
+        props.formValidation?.setValue(pin.join(""));
     }, [pin]);
 
-    return <>
-        {!!props.label ? <InputLabel children={props.label}/> : null}
-        {!!props.description ? <InputDescription children={props.description}/> : null}
-        <div className={"pin-input-group"}>
-            {indexes.map((index) => (
-                <Input
-                    className={"pin-input"}
-                    leftType={"action"}
-                    type={"text"}
-                    inputMode={"numeric"}
-                    maxLength={1}
-                    onChange={event => onChange(event, index)}
-                    ref={(el) => {
-                        if (el) inputsRef.current[index] = el;
-                    }}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    onPaste={event => onPaste(event)}
-                />
-            ))}
-        </div>
-        {!props.formValidation?.valid && props.formValidation?.notValidMessage ?
-            <InputMessage children={props.formValidation.notValidMessage}/> : null}
-    </>
-})
+    return (
+        <>
+            {props.label && <InputLabel>{props.label}</InputLabel>}
+            {props.description && <InputDescription>{props.description}</InputDescription>}
+            <div className={"pin-input-group"}>
+                {indexes.map((index) => (
+                    <Input
+                        key={index}
+                        className={"pin-input"}
+                        leftType={"action"}
+                        type={"text"}
+                        inputMode={"numeric"}
+                        maxLength={1}
+                        value={pin[index]}
+                        onChange={(event) => onChange(event, index)}
+                        ref={(el) => {
+                            if (el) inputsRef.current[index] = el;
+                        }}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        onPaste={(event) => onPaste(event)}
+                    />
+                ))}
+            </div>
+            {!props.formValidation?.valid && props.formValidation?.notValidMessage && (
+                <InputMessage>{props.formValidation.notValidMessage}</InputMessage>
+            )}
+        </>
+    );
+});
+
 
 
 const SinglePinInput: React.ForwardRefExoticComponent<PinInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+    const [value, setValue] = useState<string>(props.initialValue?.slice(0, props.inputLength) || "");
 
     const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-        const input = e.target as HTMLInputElement
-        const value = input.value
+        const input = e.target as HTMLInputElement;
+        const raw = input.value;
+        const filtered = raw
+            .split("")
+            .filter((char) => char.match(allowedCharacters))
+            .join("")
+            .slice(0, props.inputLength);
 
-        if (!value.match(allowedCharacters)) {
-            let sanitised = ""
-
-            input.value.split("").forEach((char) => {
-                if (char.match(allowedCharacters)) {
-                    sanitised += char
-                }
-            })
-
-            input.value = sanitised
-            return
-        }
-    }
+        setValue(filtered);
+        props.formValidation?.setValue(filtered);
+    };
 
     return <Input
         leftType={"action"}
@@ -137,9 +149,10 @@ const SinglePinInput: React.ForwardRefExoticComponent<PinInputProps> = React.for
         inputMode={"numeric"}
         maxLength={props.inputLength}
         ref={ref}
+        value={value}
+        onChange={onChange}
         {...props}
-        onChange={event => onChange(event)}
     />
-})
+});
 
 export default PinInput

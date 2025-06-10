@@ -16,23 +16,27 @@ export const functionData: FunctionDefinitionObject[] = [{
 }, {
     function_id: "std::array::add",
     runtime_function_id: "std::math::add",
-    return_type: "ARRAY",
+    return_type: {
+        type: "ARRAY",
+        generic_mapper: [{
+            types: ["D"],
+            generic_target: "T"
+        }]
+    },
     parameters: [{
         parameter_id: "std::array::add__array",
         runtime_parameter_id: "std::array::add__array",
-        type: "ARRAY"
+        type: {
+            type: "ARRAY",
+            generic_mapper: [{
+                types: ["D"],
+                generic_target: "T"
+            }]
+        }
     }, {
         parameter_id: "std::array::add__value",
         runtime_parameter_id: "std::array::add__value",
         type: "D"
     }],
     generic_keys: ["D"],
-    generic_mapper: [{
-        parameter_id: "std::array::add__array",
-        types: ["D"],
-        generic_target: "T"
-    }, {
-        types: ["D"],
-        generic_target: "T"
-    }]
 }]

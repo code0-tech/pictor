@@ -1,5 +1,5 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {GenericType, Value} from "../data-type/DFlowDataType.view";
+import {GenericMapper, GenericType, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {ValidationResult} from "../../../utils/inspection";
 
@@ -9,10 +9,15 @@ export const useFunctionValidation = (
     dataTypeService: DFlowDataTypeService
 ): ValidationResult[] | null => {
 
+    const genericMap = new Map<string, GenericMapper>()
 
     func.parameters?.every((parameter, index) => {
 
         const typeFromValue = dataTypeService.getTypeFromValue(values[index])
+        const parameterDataType = dataTypeService.getDataType(parameter.type)
+
+        //check if parameter datatype exists
+        if (!parameterDataType) return false
 
         //check if parameter is generic or non-generic
         if (func.genericKeys?.includes(String(parameter.type))
@@ -25,7 +30,13 @@ export const useFunctionValidation = (
                 && "type" in (typeFromValue as GenericType)
                 && dataTypeService.getDataType(parameter.type)) {
 
+
                 //parameter and value is generic
+
+                //check if generic key count is equal
+                if (parameterDataType.genericKeys?.length != typeFromValue.generic_mapper?.length)
+                    return false
+
 
             } else if (dataTypeService.getDataType(typeFromValue)) {
 

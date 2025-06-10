@@ -39,7 +39,8 @@ export const useFunctionValidation = (
                 const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
                 return dataTypeService.getDataType(parameter.type)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
 
-            } else if (dataTypeService.getDataType(typeFromValue)) {
+            } else if (func.genericKeys?.includes(String(parameter.type))) {
+
                 const genericTypes = resolveGenericKeyMappings(parameterType, typeFromValue, func.genericKeys!!)
 
                 //store generic mapped real type in map
@@ -50,6 +51,8 @@ export const useFunctionValidation = (
                 const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as Type
                 return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
 
+            } else if (dataTypeService.getDataType(typeFromValue)) {
+                return true
             }
 
         } else if (dataTypeService.getDataType(parameter.type)) {

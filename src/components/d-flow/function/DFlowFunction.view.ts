@@ -16,7 +16,7 @@ export interface FunctionDefinitionObject {
     description?: Translation[]
     documentation?: Translation[] //as markdown
     generic_keys?: string[]
-    generic_mapper?: FunctionGenericMapper[]
+    generic_mapper?: FunctionGenericMapper[] //TODO: remove
 }
 
 export interface ParameterDefinitionObject {

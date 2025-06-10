@@ -10,5 +10,5 @@ export const enum InspectionSeverity {
 
 export interface ValidationResult {
     type: InspectionSeverity
-    message: Translation
+    message: Translation[]
 }

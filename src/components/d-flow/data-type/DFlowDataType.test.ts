@@ -6,7 +6,7 @@ import {
     EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
-    isObject,
+    isObject, isRefObject,
     Object,
     Type,
     Value
@@ -49,6 +49,8 @@ export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType
     }
 
     public getTypeFromValue = (value: Value): Type => {
+
+        if (isRefObject(value)) return value.type
 
         const dataType = this.getDataTypeFromValue(value)
         if (!dataType?.genericKeys) return dataType?.id ?? ""

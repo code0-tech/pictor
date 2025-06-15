@@ -23,9 +23,9 @@ export const ExampleDialog = () => {
             <Text size={"md"} display={"block"} mb={1}>
                 Your payment has been successfully processed. We have emailed your receipt.
             </Text>
-            <Flex style={{gap: ".5rem"}}>
-                <Dialog.Dismiss color={"error"}>Remove</Dialog.Dismiss>
-                <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+            <Flex justify={"space-between"} style={{gap: ".5rem"}}>
+                <Dialog.Dismiss w={"100%"} color={"secondary"} variant={"none"}>Cancel</Dialog.Dismiss>
+                <Dialog.Dismiss w={"100%"} color={"error"} variant={"none"}>Remove</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>
@@ -42,18 +42,31 @@ export const NestedDialog = () => {
             <Text size={"md"} display={"block"} mb={1}>
                 Your payment has been successfully processed. We have emailed your receipt.
             </Text>
-            <Flex style={{gap: ".5rem"}}>
+            <Flex justify={"space-between"} style={{gap: ".5rem"}}>
                 <Dialog>
-                    <Dialog.Disclosure color={"error"}>Remove</Dialog.Disclosure>
+                    <Dialog.Disclosure w={"100%"} color={"error"}>Remove</Dialog.Disclosure>
                     <Dialog.Modal>
                         <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Are you sure?</Text>
-                        <Flex style={{gap: ".5rem"}}>
-                            <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"error"}>Yes, remove</Dialog.Dismiss>
-                            <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+                        <Text size={"md"} display={"block"} mb={1}>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
+                            vehicula nisl leo, eget posuere turpis suscipit id. Sed auctor purus
+                            urna, imperdiet consectetur est laoreet id. Donec vehicula enim vitae
+                            sem molestie commodo quis in lacus. Vestibulum ligula felis, interdum
+                            non risus ut, ultrices euismod urna. Aenean euismod elit tortor, in
+                            porttitor risus ornare in. Maecenas condimentum a enim a lacinia.
+                            Pellentesque volutpat hendrerit suscipit. Cras pulvinar nunc vitae
+                            justo semper, eu fermentum lorem vulputate. Nulla facilisi. Etiam
+                            vestibulum tellus congue urna consectetur, ac mattis massa varius.
+                            Etiam vel tellus arcu. Donec a vestibulum orci, ut fringilla sem. Sed
+                            vitae augue id lorem tempor imperdiet at et quam.
+                        </Text>
+                        <Flex justify={"space-between"} style={{gap: ".5rem"}}>
+                            <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} color={"error"}>Yes, remove</Dialog.Dismiss>
+                            <Dialog.Dismiss w={"100%"} variant={"outlined"} color={"secondary"}>Close</Dialog.Dismiss>
                         </Flex>
                     </Dialog.Modal>
                 </Dialog>
-                <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"secondary"}>Close</Dialog.Dismiss>
+                <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} variant={"outlined"} color={"secondary"}>Close</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>

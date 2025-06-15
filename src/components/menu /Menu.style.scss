@@ -2,19 +2,25 @@
 @use "../../styles/variables";
 
 .menu {
-  @include helpers.box(false);
-  padding: variables.$xxs;
+  @include helpers.glassBoxTransparent(variables.$secondary);
+  @include helpers.borderRadius();
+  padding: variables.$xs;
+  position: relative;
+  box-sizing: border-box;
 
   &__item {
-    @include helpers.box(false);
+    @include helpers.glassBoxWithoutShadowAndBorder(variables.$secondary);
     border-radius: variables.$borderRadius - variables.$xxs;
-    padding: .5rem;
+    padding: variables.$xxs variables.$xs;
     background-color: transparent;
-    border-color: transparent;
     cursor: pointer;
+    width: 100%;
+    display: flex;
+    gap: variables.$xs;
+    align-items: center;
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: helpers.backgroundColor(variables.$secondary, true);
+      background-color: inherit;
     }
 
     &[aria-disabled=true] {
@@ -24,7 +30,7 @@
 
   &__separator {
     border: none;
-    margin: variables.$xxs (-1 * variables.$xxs);
+    margin: variables.$xxs 0;
     color: rgba(white, .1);
     height: 1px;
     background-color: rgba(white, .1);

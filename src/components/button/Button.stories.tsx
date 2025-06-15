@@ -2,7 +2,7 @@ import Button from "./Button";
 import {StoryObj} from "@storybook/react";
 import React from "react";
 import ButtonGroup from "../button-group/ButtonGroup";
-import {IconAbc} from "@tabler/icons-react";
+import {IconAbc, IconPhoneFilled} from "@tabler/icons-react";
 import {Colors} from "../../utils/types";
 
 const meta = {
@@ -35,7 +35,7 @@ export const Buttons: ButtonStory = {
 
         const {icon, disabled, variant} = args
 
-        return <>
+        return <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {
                 Colors.map(value => {
                     // @ts-ignore
@@ -45,13 +45,17 @@ export const Buttons: ButtonStory = {
                     </Button>
                 })
             }
-        </>
+        </div>
     },
     args: {
         icon: true,
         disabled: false,
         variant: "normal"
     }
+}
+
+export const ButtonIcon = () => {
+    return <Button color={"secondary"} variant={"outlined"} style={{aspectRatio: "1/1"}}><IconPhoneFilled/></Button>
 }
 
 export const ButtonGroups: ButtonGroupStory = {

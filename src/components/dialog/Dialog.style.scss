@@ -3,11 +3,14 @@
 @use "../../styles/variables";
 
 .dialog {
-  @include helpers.box(false);
+  @include helpers.glassBoxTransparent(variables.$white, variables.$white, variables.$white);
+  @include helpers.borderRadius();
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   z-index: 100;
 
   position: relative;
-  padding: .5rem;
+  padding: variables.$xs;
   margin: auto;
   overflow: auto;
   inset: auto;
@@ -45,7 +48,7 @@
 }
 
 [data-backdrop] {
-  background-color: rgba(variables.$primary, .2);
-  -webkit-backdrop-filter: blur(.1rem);
-  backdrop-filter: blur(.1rem);
+  background-color: rgba(variables.$primary, .75);
+  -webkit-backdrop-filter: blur(variables.$xxs);
+  backdrop-filter: blur(variables.$xxs);
 }

@@ -55,7 +55,7 @@
 }
 
 @function backgroundColor($color: variables.$primary, $interacted: false) {
-  @return if($interacted, color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary or $color == variables.$secondary, 80%, 60%)), color.mix(variables.$bodyBg, $color, if($color == variables.$primary or $color == variables.$secondary, 90%, 70%)))
+  @return if($interacted, color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary or $color == variables.$secondary, 95%, 90%)), color.mix(variables.$bodyBg, $color, if($color == variables.$primary or $color == variables.$secondary, 95%, 90%)))
 }
 
 
@@ -91,4 +91,87 @@
     pointer-events: none;
   }
 
+}
+
+@mixin glassBoxTransparent(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+
+  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
+  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
+
+  background: rgba($background, .1);
+  border: none;
+  color: rgba($color, .75);
+  position: relative;
+  backdrop-filter: blur(variables.$xxs);
+  -webkit-backdrop-filter: blur(variables.$xxs);
+  width: fit-content;
+  font-family: Arial, sans-serif;
+  font-size: variables.$md;
+  z-index: 1;
+  box-sizing: border-box;
+  box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
+
+  &:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(150deg, rgba($mixedBorderWhite, .75) 0%, rgba($mixedBorderWhite, 0) 20%, rgba($mixedBorderWhite, 0) 80%, rgba($mixedBorderWhite, .75) 100%),
+    linear-gradient(-150deg, rgba($mixedBorderBlack, .75) 0%, rgba($mixedBorderBlack, 0) 20%, rgba($mixedBorderBlack, 0) 80%, rgba($mixedBorderBlack, .75) 100%); /* gradient border */
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .3);
+  }
+
+  &:active, &:focus {
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
+    outline: none;
+  }
+}
+
+@mixin glassBox(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+  @include glassBoxTransparent($background, $color, $borderColor);
+  background: rgba($background, 1);
+  color: rgba($color, 1);
+}
+
+@mixin glassBoxWithoutShadowAndBorder(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+
+  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
+  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
+
+  @include glassBoxTransparent($background, $color, $borderColor);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+
+  &:before {
+    display: none;
+  }
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
+  }
+
+}
+
+@mixin borderRadius() {
+  border-radius: variables.$borderRadius;
 }

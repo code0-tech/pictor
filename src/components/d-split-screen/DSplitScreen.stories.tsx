@@ -10,6 +10,7 @@ import Button from "../button/Button";
 import DBar from "../d-bar/DBar";
 import Flex from "../flex/Flex";
 import Text from "../text/Text";
+import Dialog from "../dialog/Dialog";
 
 const meta: Meta = {
     title: "DSplitPane",
@@ -30,23 +31,19 @@ export const Dashboard = () => {
             <DBar orientation={"right"} style={{writingMode: "vertical-rl"}}>
                 <Flex justify={"space-between"} h={"100%"}>
                     <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
-                        <Button color={"secondary"}>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"secondary"}>
                             <IconHierarchy3 size={12}/>
-                            Flows
                         </Button>
-                        <Button color={"warning"}>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"warning"}>
                             <IconTicket size={12}/>
-                            Issues
                         </Button>
-                        <Button color={"info"}>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
                             <IconDatabase size={12}/>
-                            Database
                         </Button>
                     </div>
                     <div style={{display: "flex", gap: ".5rem", overflow: "hidden"}}>
-                        <Button color={"primary"}>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"primary"}>
                             <IconSettings size={12}/>
-                            Settings
                         </Button>
                     </div>
                 </Flex>

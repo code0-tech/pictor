@@ -29,7 +29,7 @@ const DZoomPanPinch: React.FC<DZoomPanPinchProps> = (props) => {
     }}>
         {({zoomIn, zoomOut, resetTransform}) => (
             <>
-                <div style={{position: "absolute", zIndex: 999, bottom: ".5rem", left: ".5rem"}}>
+                <div style={{position: "absolute", zIndex: 1, bottom: ".5rem", left: ".5rem"}}>
                     <ButtonGroup>
                         <Button color={"secondary"} onClick={() => zoomIn(1)}><IconPlus size={12}/></Button>
                         <Button color={"secondary"} onClick={() => zoomOut(1)}><IconMinus size={12}/></Button>

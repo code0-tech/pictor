@@ -2,10 +2,9 @@
 @use "../../styles/variables";
 
 .button-group {
-  @include helpers.box(false, variables.$primary);
-
   border: none;
   width: fit-content;
+  background: transparent;
   position: relative;
   display: flex;
 

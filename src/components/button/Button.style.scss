@@ -2,42 +2,34 @@
 @use "../../styles/variables";
 
 .button {
-  padding: variables.$xxs;
+  padding: variables.$xxs variables.$xs;
   gap: .5rem;
   cursor: pointer;
   display: flex;
+  font-size: 1rem;
   align-items: center;
   width: fit-content;
+  border-radius: 50rem;
+  justify-content: center;
 
   @include helpers.disabled;
 }
 
+
 @each $name, $color in variables.$colors {
   .button--#{$name} {
-    @include helpers.box(true, $color);
+    @if ($name == secondary or $name == info) {
+      @include helpers.glassBox($color, variables.$black, variables.$black);
+    } @else {
+      @include helpers.glassBox($color, variables.$white, variables.$white);
+    }
 
     &.button--outlined {
-      border: 1px solid helpers.borderColor($color);
-      background: transparent;
-
-      &:hover, &:active, &--active, &:focus, &:focus-visible {
-        border: 1px solid helpers.borderColor($color, true);
-      }
-
-      &:active, &--active, &:focus, &:focus-visible {
-        border: 1px solid helpers.borderColor($color, true);
-        background: helpers.backgroundColor($color, true);
-      }
+      @include helpers.glassBoxTransparent($color, variables.$white, $color);
     }
 
     &.button--none {
-      background: transparent;
-      outline-color: transparent;
-
-      &:hover, &:active, &--active, &:focus, &:focus-visible {
-        background: helpers.backgroundColor($color, true);
-      }
+      @include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
     }
-
   }
 }

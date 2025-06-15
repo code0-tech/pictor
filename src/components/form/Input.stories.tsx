@@ -25,9 +25,8 @@ export const Login = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            email: "nicoq@",
+            email: "nicoq@de.de",
             password: null,
-            checkbox: true
         },
         validate: {
             email: (value) => {
@@ -72,10 +71,13 @@ export const Login = () => {
             <br/>
             <div style={{
                 display: "flex",
-                justifyContent: "end"
+                justifyContent: "space-between",
+                gap: ".75rem",
             }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
+                <Button w={"100%"} variant={"none"} color={"primary"} onClick={validate}>
+                    Clear
+                </Button>
+                <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
                     Login
                 </Button>
 

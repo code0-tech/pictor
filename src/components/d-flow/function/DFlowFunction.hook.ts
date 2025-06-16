@@ -1,5 +1,13 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {EDataTypeRuleType, GenericCombinationStrategy, GenericType, Type, Value} from "../data-type/DFlowDataType.view";
+import {
+    DataTypeObject,
+    EDataTypeRuleType,
+    GenericCombinationStrategy,
+    GenericMapper,
+    GenericType,
+    Type,
+    Value
+} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 
@@ -230,6 +238,70 @@ const replaceGenericKeysInType = (
         ...type,
         generic_mapper: newGenericMapper
     }
+}
+
+/**
+ * Resolves all generic keys in a DataTypeObject, comparing the generic definition and the instantiated version.
+ *
+ * @param genericObj    The DataTypeObject with generic keys
+ * @param concreteObj   The concrete DataTypeObject
+ * @param genericKeys   All generic keys to resolve
+ * @returns             Map from genericKey to resolved concrete type
+ */
+const resolveAllGenericKeysInDataTypeObject = (
+    genericObj: DataTypeObject,
+    concreteObj: DataTypeObject,
+    genericKeys: string[]
+): Record<string, Type> => {
+    const result: Record<string, Type> = {}
+
+    function recurse(genericNode: any, concreteNode: any) {
+        if (!genericNode || !concreteNode) return
+
+        // Check for rules array
+        if (Array.isArray(genericNode.rules) && Array.isArray(concreteNode.rules)) {
+            for (let i = 0; i < genericNode.rules.length; i++) {
+                recurse(genericNode.rules[i], concreteNode.rules[i])
+            }
+        }
+
+        // Check for parent property
+        if (genericNode.parent && concreteNode.parent) {
+            recurse(genericNode.parent, concreteNode.parent)
+        }
+
+        // Check for config.type
+        if (
+            genericNode.config && concreteNode.config &&
+            genericNode.config.type !== undefined && concreteNode.config.type !== undefined
+        ) {
+            recurse(genericNode.config.type, concreteNode.config.type)
+        }
+
+        // If generic node is a string and matches a generic key, assign the value
+        if (typeof genericNode === "string" && genericKeys.includes(genericNode)) {
+            result[genericNode] = concreteNode
+        }
+
+        // For nested generic_mapper
+        if (
+            typeof genericNode === "object" && typeof concreteNode === "object" && concreteNode !== null && Array.isArray(genericNode.generic_mapper) && Array.isArray(concreteNode.generic_mapper)
+        ) {
+            for (let i = 0; i < genericNode.generic_mapper.length; i++) {
+                const genericMapper: GenericMapper = genericNode.generic_mapper[i]
+                const concreteMapper = (concreteNode.generic_mapper as GenericMapper[]).find(
+                    (m: GenericMapper) => m.generic_target === genericMapper.generic_target
+                )
+                if (!concreteMapper) continue
+                for (let j = 0; j < genericMapper.types.length; j++) {
+                    recurse(genericMapper.types[j], concreteMapper.types[j])
+                }
+            }
+        }
+    }
+
+    recurse(genericObj, concreteObj)
+    return result
 }
 
 

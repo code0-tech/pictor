@@ -5,7 +5,6 @@
 .input {
 
   $padding: variables.$xs;
-
   @include helpers.box(true, variables.$primary);
 
   & {

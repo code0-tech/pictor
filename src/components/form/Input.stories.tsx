@@ -283,7 +283,7 @@ export const RadioWithoutInput = () => {
     return <RadioGroup {...inputs.getInputProps("radio")}>
         {({activeRadio, setActiveRadio}) => {
             return <>
-                <Flex style={{gap: ".5rem"}}>
+                <Flex style={{gap: ".5rem", flexDirection: "column"}}>
                     <Card onClick={() => setActiveRadio("dynamic")} maw={200} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
                         <CardSection>
                             Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt

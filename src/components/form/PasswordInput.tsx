@@ -31,7 +31,7 @@ const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> = React
 
     const rightAction = [right]
     visible && rightAction.push(<Button variant={"none"} onClick={toVisible}><IconEye size={13}/></Button>)
-    clearable && rightAction.push(<Button variant={"outlined"} color={"error"} onClick={toClearable}><IconX size={13}/></Button>)
+    clearable && rightAction.push(<Button variant={"none"} color={"error"} onClick={toClearable}><IconX size={13}/></Button>)
 
 
     return <Input

@@ -241,60 +241,93 @@ const replaceGenericKeysInType = (
 }
 
 /**
- * Resolves all generic keys in a DataTypeObject, comparing the generic definition and the instantiated version.
+ * Resolves all occurrences of specified generic keys within a DataTypeObject structure,
+ * comparing a generic (template) DataTypeObject with a concrete (instantiated) DataTypeObject.
+ * Returns either the concrete Type or GenericMapper found at the matching position.
  *
- * @param genericObj    The DataTypeObject with generic keys
- * @param concreteObj   The concrete DataTypeObject
- * @param genericKeys   All generic keys to resolve
- * @returns             Map from genericKey to resolved concrete type
+ * Performance:
+ * - Stops recursion for each key as soon as a match is found (early return)
+ * - Traverses rules, parent, config.type, and generic_mapper branches recursively
+ *
+ * @param genericObj   The generic DataTypeObject (may use generic keys in its type tree)
+ * @param concreteObj  The instantiated DataTypeObject (with all generics resolved)
+ * @param genericKeys  The list of all generic keys to resolve (e.g. ["D", "O", "T"])
+ * @returns            Record mapping each generic key to its resolved Type or GenericMapper (or undefined if not found)
  */
 const resolveAllGenericKeysInDataTypeObject = (
     genericObj: DataTypeObject,
     concreteObj: DataTypeObject,
     genericKeys: string[]
-): Record<string, Type> => {
-    const result: Record<string, Type> = {}
+): Record<string, Type | GenericMapper | undefined> => {
+    const result: Record<string, Type | GenericMapper | undefined> = {}
 
-    function recurse(genericNode: any, concreteNode: any) {
-        if (!genericNode || !concreteNode) return
+    // Track which keys are still missing for early return optimization
+    const unresolved = new Set(genericKeys)
 
-        // Check for rules array
+    function recurse(
+        genericNode: any,
+        concreteNode: any,
+        parentConcreteMapper?: GenericMapper
+    ) {
+        if (!genericNode || !concreteNode || unresolved.size === 0) return
+
+        // 1. If the current node matches a generic key and was not resolved yet
+        if (typeof genericNode === "string" && unresolved.has(genericNode)) {
+            if (parentConcreteMapper) {
+                result[genericNode] = parentConcreteMapper
+            } else if (typeof concreteNode === "string") {
+                result[genericNode] = concreteNode
+            } else if (
+                typeof concreteNode === "object" && !Array.isArray(concreteNode) &&
+                !("generic_target" in concreteNode)
+            ) {
+                result[genericNode] = concreteNode
+            } else if (
+                typeof concreteNode === "object" &&
+                "generic_target" in concreteNode
+            ) {
+                result[genericNode] = concreteNode as GenericMapper
+            }
+            unresolved.delete(genericNode)
+            if (unresolved.size === 0) return
+        }
+
+        // 2. Traverse rules array
         if (Array.isArray(genericNode.rules) && Array.isArray(concreteNode.rules)) {
             for (let i = 0; i < genericNode.rules.length; i++) {
                 recurse(genericNode.rules[i], concreteNode.rules[i])
+                if (unresolved.size === 0) return
             }
         }
 
-        // Check for parent property
+        // 3. Traverse parent property
         if (genericNode.parent && concreteNode.parent) {
             recurse(genericNode.parent, concreteNode.parent)
+            if (unresolved.size === 0) return
         }
 
-        // Check for config.type
+        // 4. Traverse config.type property
         if (
             genericNode.config && concreteNode.config &&
             genericNode.config.type !== undefined && concreteNode.config.type !== undefined
         ) {
             recurse(genericNode.config.type, concreteNode.config.type)
+            if (unresolved.size === 0) return
         }
 
-        // If generic node is a string and matches a generic key, assign the value
-        if (typeof genericNode === "string" && genericKeys.includes(genericNode)) {
-            result[genericNode] = concreteNode
-        }
-
-        // For nested generic_mapper
+        // 5. Traverse generic_mapper arrays
         if (
-            typeof genericNode === "object" && typeof concreteNode === "object" && concreteNode !== null && Array.isArray(genericNode.generic_mapper) && Array.isArray(concreteNode.generic_mapper)
+            typeof genericNode === "object" && typeof concreteNode === "object" && Array.isArray(genericNode.generic_mapper) && Array.isArray(concreteNode.generic_mapper)
         ) {
-            for (let i = 0; i < genericNode.generic_mapper.length; i++) {
+            outer: for (let i = 0; i < genericNode.generic_mapper.length; i++) {
                 const genericMapper: GenericMapper = genericNode.generic_mapper[i]
                 const concreteMapper = (concreteNode.generic_mapper as GenericMapper[]).find(
                     (m: GenericMapper) => m.generic_target === genericMapper.generic_target
                 )
                 if (!concreteMapper) continue
                 for (let j = 0; j < genericMapper.types.length; j++) {
-                    recurse(genericMapper.types[j], concreteMapper.types[j])
+                    recurse(genericMapper.types[j], concreteMapper.types[j], concreteMapper)
+                    if (unresolved.size === 0) break outer
                 }
             }
         }
@@ -303,6 +336,7 @@ const resolveAllGenericKeysInDataTypeObject = (
     recurse(genericObj, concreteObj)
     return result
 }
+
 
 
 

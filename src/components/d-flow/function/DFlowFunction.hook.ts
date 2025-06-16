@@ -1,5 +1,5 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {GenericCombinationStrategy, GenericType, Type, Value} from "../data-type/DFlowDataType.view";
+import {EDataTypeRuleType, GenericCombinationStrategy, GenericType, Type, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 
@@ -14,7 +14,9 @@ export const useFunctionValidation = (
     const parameterValidation = func.parameters?.every((parameter, index) => {
 
         const typeFromValue = dataTypeService.getTypeFromValue(values[index])
-        const parameterType = parameter.type
+        const dataTypeFromValue = dataTypeService.getDataType(typeFromValue)
+        const typeFromParameter = parameter.type
+        const dataTypeFromParameter = dataTypeService.getDataType(typeFromParameter)
 
         //check if parameter is generic or non-generic
         if (func.genericKeys?.includes(String(parameter.type))
@@ -29,7 +31,7 @@ export const useFunctionValidation = (
                 && "type" in (typeFromValue as GenericType)
                 && dataTypeService.getDataType(parameter.type)) {
 
-                const genericTypes = resolveGenericKeyMappings(parameterType, typeFromValue, func.genericKeys!!)
+                const genericTypes = resolveGenericKeyMappings(typeFromParameter, typeFromValue, func.genericKeys!!)
 
                 //store generic mapped real type in map
                 func.genericKeys?.forEach(genericKey => {
@@ -41,7 +43,7 @@ export const useFunctionValidation = (
 
             } else if (func.genericKeys?.includes(String(parameter.type))) {
 
-                const genericTypes = resolveGenericKeyMappings(parameterType, typeFromValue, func.genericKeys!!)
+                const genericTypes = resolveGenericKeyMappings(typeFromParameter, typeFromValue, func.genericKeys!!)
 
                 //store generic mapped real type in map
                 func.genericKeys?.forEach(genericKey => {
@@ -52,6 +54,26 @@ export const useFunctionValidation = (
                 return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
 
             } else if (dataTypeService.getDataType(typeFromValue)) {
+
+                const foundMatchingRule = dataTypeFromParameter?.allRules.find(parameterRule => {
+
+                    for (const valueRule of dataTypeFromValue?.allRules!!) {
+                        if (parameterRule.type == valueRule.type) {
+                            switch (parameterRule.type) {
+                                case EDataTypeRuleType.RETURNS_TYPE:
+                                    return true
+                                case EDataTypeRuleType.INPUT_TYPES:
+                                    return true
+                                case EDataTypeRuleType.CONTAINS_KEY:
+                                    return true
+                                case EDataTypeRuleType.CONTAINS_TYPE:
+                                    return true
+                            }
+                        }
+                    }
+                    return false
+                })
+
                 return true
             }
 

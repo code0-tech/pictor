@@ -3,6 +3,9 @@ import Dialog from "./Dialog";
 import React, {useState} from "react";
 import Flex from "../flex/Flex";
 import Text from "../text/Text";
+import EmailInput from "../form/EmailInput";
+import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
+import PasswordInput from "../form/PasswordInput";
 
 export default {
     title: "Dialog",
@@ -19,11 +22,30 @@ export const ExampleDialog = () => {
     return <Dialog defaultOpen>
         <Dialog.Disclosure>Open</Dialog.Disclosure>
         <Dialog.Modal>
-            <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
-            <Text size={"md"} display={"block"} mb={1}>
-                Your payment has been successfully processed. We have emailed your receipt.
+
+            <Flex justify={"center"} mb={1}><IconLogin size={32}/></Flex>
+            <Text style={{textAlign: "center"}} size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>LOGIN</Text>
+            <Text style={{textAlign: "center"}} size={"md"} display={"block"} mb={1}>
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+                labore et dolore magna aliquyam erat, sed diam voluptua.
             </Text>
-            <Flex justify={"space-between"} style={{gap: ".5rem"}}>
+            <form>
+                <EmailInput
+                    placeholder={"Email"}
+                    label={"Email"}
+                    description={"Your Email address for login"}
+                    left={<IconMail size={13}/>}
+
+                />
+                <br/>
+                <PasswordInput
+                    placeholder={"Password"}
+                    label={"Password"}
+                    description={"Your password for login"}
+                    left={<IconKey size={13}/>}
+                />
+            </form>
+            <Flex justify={"space-between"} mt={1} style={{gap: ".5rem"}}>
                 <Dialog.Dismiss w={"100%"} color={"secondary"} variant={"none"}>Cancel</Dialog.Dismiss>
                 <Dialog.Dismiss w={"100%"} color={"error"} variant={"none"}>Remove</Dialog.Dismiss>
             </Flex>
@@ -61,12 +83,14 @@ export const NestedDialog = () => {
                             vitae augue id lorem tempor imperdiet at et quam.
                         </Text>
                         <Flex justify={"space-between"} style={{gap: ".5rem"}}>
-                            <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} color={"error"}>Yes, remove</Dialog.Dismiss>
+                            <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} color={"error"}>Yes,
+                                remove</Dialog.Dismiss>
                             <Dialog.Dismiss w={"100%"} variant={"outlined"} color={"secondary"}>Close</Dialog.Dismiss>
                         </Flex>
                     </Dialog.Modal>
                 </Dialog>
-                <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} variant={"outlined"} color={"secondary"}>Close</Dialog.Dismiss>
+                <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} variant={"outlined"}
+                                color={"secondary"}>Close</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>

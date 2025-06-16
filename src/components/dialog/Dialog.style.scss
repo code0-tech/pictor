@@ -1,21 +1,35 @@
 @use "../../styles/helpers";
 @use "../../styles/media";
 @use "../../styles/variables";
+@use "sass:color";
 
 .dialog {
   @include helpers.glassBoxTransparent(variables.$white, variables.$white, variables.$white);
   @include helpers.borderRadius();
+
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   z-index: 100;
 
   position: relative;
-  padding: variables.$xs;
+  padding: variables.$xl variables.$xs;
   margin: auto;
   overflow: auto;
   inset: auto;
   height: fit-content;
   max-height: none;
+
+  &:after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    backdrop-filter: blur(variables.$xs);
+  }
+
 
   @include media.respond-above(md) {
     width: 420px;
@@ -48,7 +62,5 @@
 }
 
 [data-backdrop] {
-  background-color: rgba(variables.$primary, .75);
-  -webkit-backdrop-filter: blur(variables.$xxs);
-  backdrop-filter: blur(variables.$xxs);
+  background-color: rgba(variables.$primary, .5);
 }

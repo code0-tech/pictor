@@ -1,13 +1,13 @@
-import {Service, Store} from "../../utils/store";
+import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayStore";
 import {DSplitView} from "./splitter/DSplitter.view";
 import {DSplitPaneView} from "./pane/DSplitPane.view";
 
-export class DSplitScreenService extends Service<DSplitPaneView> {
+export class DSplitScreenService extends ReactiveArrayService<DSplitPaneView> {
 
     private readonly _split: 'horizontal' | 'vertical'
     private _splitViews: DSplitView[]
 
-    constructor(store: Store<DSplitPaneView>, split: 'horizontal' | 'vertical') {
+    constructor(store: ReactiveArrayStore<DSplitPaneView>, split: 'horizontal' | 'vertical') {
         super(store)
         this._split = split
         this.generateSplitViews()

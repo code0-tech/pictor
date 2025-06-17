@@ -5,7 +5,7 @@ import {
     EDataType,
     EDataTypeRuleType,
     GenericMapper,
-    isObject,
+    isRefObject,
     Object,
     Type,
     Value
@@ -30,13 +30,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
     }
 
     public getDataType = (type: Type): DataType | undefined => {
-        return this.values().find(value => value.id === (typeof type === "string" ? type : type.type))
-    }
-
-    public hasDataTypes = (types: Type[]): boolean => {
-        return types.every(type => {
-            return this.values().find(value => value.id === (typeof type === "string" ? type : type.type))
-        })
+        return this.values().find(value => value.id === (typeof type === "string" ? type : (type?.type ?? "")));
     }
 
     public getDataTypeFromValue = (value: Value): DataType | undefined => {
@@ -46,28 +40,19 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
         if (typeof value === "number") return this.getDataType("NUMBER")
         if (typeof value === "boolean") return this.getDataType("BOOLEAN")
 
-        //TODO: get datatype with highest depth based on parent datatypes
-        //if value is array search through all array types
-        if (Array.isArray(value)) {
-            this.values().filter(type => {
-                //TODO: no need to define generics but need to adjust rules because
-                //TODO: if a rule has generics and they are not included we just ignore the type validation
-                return type.validateValue(value)
-            })
-        }
+        const matchingDataTypes = this.values().filter(type => {
+            return type.validateValue(value)
+        }).sort((a, b) => {
+            return a.depth - b.depth
+        })
 
-        //if value is object search through all array types
-        if (isObject(value)) {
-
-        }
-
-        //fallback: search all registered datatypes
-
-        return undefined
+        return matchingDataTypes[matchingDataTypes.length - 1]
 
     }
 
     public getTypeFromValue = (value: Value): Type => {
+
+        if (isRefObject(value)) return value.type
 
         const dataType = this.getDataTypeFromValue(value)
         if (!dataType?.genericKeys) return dataType?.id ?? ""
@@ -112,6 +97,12 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
             generic_mapper: genericMapper
         }
 
+    }
+
+    public hasDataTypes = (types: Type[]): boolean => {
+        return types.every(type => {
+            return this.values().find(value => value.id === (typeof type === "string" ? type : type.type))
+        })
     }
 
 }

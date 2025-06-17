@@ -84,8 +84,8 @@ export const useFunctionValidation = (
                 && "type" in (typeFromValue as GenericType)
                 && dataTypeService.getDataType(parameter.type)) {
 
-                //parameter is non-generic but value is
-                return true
+                //parameter and value are non-generic
+                return dataTypeFromParameter?.validateValue(values[index])
 
             } else if (dataTypeService.getDataType(typeFromValue)) {
 

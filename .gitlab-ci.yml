@@ -19,6 +19,15 @@ storybook:build:
   rules:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
+test:
+  image: node:22.16.0
+  stage: test
+  script:
+    - npm ci
+    - npm run test -- --ci
+  rules:
+    - if: $C0_UPDATE_SNAPSHOTS == null
+
 .storybook:test:base:
   image: ghcr.io/code0-tech/build-images/node-playwright:158.1-node-22.16
   stage: test

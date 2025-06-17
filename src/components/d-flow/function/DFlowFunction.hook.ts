@@ -1,7 +1,6 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
 import {
     DataTypeObject,
-    EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -17,7 +16,7 @@ export const useFunctionValidation = (
     dataTypeService: DFlowDataTypeService
 ): ValidationResult[] | null => {
 
-    const genericMap = new Map<string, Type>()
+    const genericMap = new Map<string, Type | GenericMapper>()
 
     const parameterValidation = func.parameters?.every((parameter, index) => {
 
@@ -25,6 +24,8 @@ export const useFunctionValidation = (
         const dataTypeFromValue = dataTypeService.getDataType(typeFromValue)
         const typeFromParameter = parameter.type
         const dataTypeFromParameter = dataTypeService.getDataType(typeFromParameter)
+
+        console.log(typeFromParameter, typeFromValue)
 
         //check if parameter is generic or non-generic
         if (func.genericKeys?.includes(String(parameter.type))
@@ -61,28 +62,19 @@ export const useFunctionValidation = (
                 const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as Type
                 return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
 
-            } else if (dataTypeService.getDataType(typeFromValue)) {
+            } else if (dataTypeService.getDataType(typeFromValue) && dataTypeFromParameter && dataTypeFromValue && dataTypeFromParameter.genericKeys) {
 
-                const foundMatchingRule = dataTypeFromParameter?.allRules.find(parameterRule => {
+                //parameter is generic but value not
+                const genericTypes = resolveAllGenericKeysInDataTypeObject(dataTypeFromParameter.json, dataTypeFromValue.json, dataTypeFromParameter.genericKeys)
 
-                    for (const valueRule of dataTypeFromValue?.allRules!!) {
-                        if (parameterRule.type == valueRule.type) {
-                            switch (parameterRule.type) {
-                                case EDataTypeRuleType.RETURNS_TYPE:
-                                    return true
-                                case EDataTypeRuleType.INPUT_TYPES:
-                                    return true
-                                case EDataTypeRuleType.CONTAINS_KEY:
-                                    return true
-                                case EDataTypeRuleType.CONTAINS_TYPE:
-                                    return true
-                            }
-                        }
-                    }
-                    return false
+                //store generic mapped real type in map
+                func.genericKeys?.forEach(genericKey => {
+                    if (genericTypes[genericKey])
+                        genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
                 })
 
-                return true
+                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as Type
+                return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
             }
 
         } else if (dataTypeService.getDataType(parameter.type)) {
@@ -98,7 +90,7 @@ export const useFunctionValidation = (
             } else if (dataTypeService.getDataType(typeFromValue)) {
 
                 //parameter and value are non-generic
-                return true
+                return dataTypeFromParameter?.validateValue(values[index])
 
             }
 
@@ -209,36 +201,86 @@ const resolveGenericKeyMappings = (
 }
 
 /**
- * Replaces all generic keys in a parameter type with their resolved concrete types.
+ * Recursively replaces all generic keys in a parameter type tree with their resolved concrete types.
+ * If a mapping entry for a generic key is a GenericMapper, its types are inlined into the parent mapper,
+ * but the parent's generic_target and other properties are preserved. This function guarantees
+ * that the resulting structure is always a valid Type (never a standalone GenericMapper).
  *
- * @param type         The parameter type (could be string or type object)
- * @param genericMap   Map from generic key (e.g. "D") to resolved concrete type (as Map)
- * @returns            New type with generics replaced by their concrete types
+ * @param type       The parameter type to process (could be a string or a type object)
+ * @param genericMap A Map where each generic key maps to a Type or a GenericMapper as replacement
+ * @returns          The type tree with all generic keys replaced by their resolved form
  */
 const replaceGenericKeysInType = (
     type: Type,
-    genericMap: Map<string, Type>
+    genericMap: Map<string, Type | GenericMapper>
 ): Type => {
-    // If type is a string and is present in the map, replace with the mapped type
+    // If this node is a generic key and there's a replacement in the map...
     if (typeof type === "string" && genericMap.has(type)) {
-        return <GenericType | string>genericMap.get(type)
+        const replacement = genericMap.get(type)
+        // If the replacement is a valid Type (string or has a 'type' field), just use it directly
+        if (
+            typeof replacement === "string" ||
+            (typeof replacement === "object" && replacement !== null && "type" in replacement)
+        ) {
+            return replacement as Type
+        }
+        // If the replacement is a GenericMapper, we DO NOT return it directly
+        // (It will be inlined in the parent generic_mapper context—handled below)
+        // Fallback: return the generic key as-is, which is safe in this edge-case
+        return type
     }
-    // If type is a string but not in the map, return as is
+    // If this node is a string and not a generic key, return as-is
     if (typeof type === "string") {
         return type
     }
 
-    // Recursively replace in all generic_mapper entries
-    const newGenericMapper = (type.generic_mapper ?? []).map(gm => ({
-        ...gm,
-        types: gm.types.map(t => replaceGenericKeysInType(t, genericMap))
-    }))
+    // If this node is a type object, process all its generic_mapper entries recursively
+    const newGenericMapper = (type.generic_mapper ?? []).map(gm => {
+        let resultTypes: Type[] = []
+        for (const t of gm.types) {
+            // Check if 't' is a generic key with a mapping
+            if (typeof t === "string" && genericMap.has(t)) {
+                const replacement = genericMap.get(t)
+                if (
+                    replacement &&
+                    typeof replacement === "object" &&
+                    "types" in replacement &&
+                    Array.isArray(replacement.types)
+                ) {
+                    // If replacement is a GenericMapper: inline all its types into the parent
+                    resultTypes.push(...replacement.types)
+                } else if (
+                    typeof replacement === "string" ||
+                    (typeof replacement === "object" && replacement !== null && "type" in replacement)
+                ) {
+                    // If replacement is a valid Type: insert it
+                    resultTypes.push(replacement as Type)
+                } else {
+                    // Defensive fallback: insert the original key
+                    resultTypes.push(t)
+                }
+            } else if (typeof t === "object" && t !== null) {
+                // Recursively process any nested type objects
+                resultTypes.push(replaceGenericKeysInType(t, genericMap))
+            } else {
+                // Fallback for unknown values (shouldn't happen)
+                resultTypes.push(t)
+            }
+        }
+        // Always preserve all other properties of the parent GenericMapper
+        return {
+            ...gm,
+            types: resultTypes
+        }
+    })
 
+    // Return the new type object with all generics replaced/inlined
     return {
         ...type,
         generic_mapper: newGenericMapper
     }
 }
+
 
 /**
  * Resolves all occurrences of specified generic keys within a DataTypeObject structure,
@@ -247,7 +289,7 @@ const replaceGenericKeysInType = (
  *
  * Performance:
  * - Stops recursion for each key as soon as a match is found (early return)
- * - Traverses rules, parent, config.type, and generic_mapper branches recursively
+ * - Traverses rules, parent, config. Type, and generic_mapper branches recursively
  *
  * @param genericObj   The generic DataTypeObject (may use generic keys in its type tree)
  * @param concreteObj  The instantiated DataTypeObject (with all generics resolved)
@@ -336,11 +378,3 @@ const resolveAllGenericKeysInDataTypeObject = (
     recurse(genericObj, concreteObj)
     return result
 }
-
-
-
-
-
-
-
-

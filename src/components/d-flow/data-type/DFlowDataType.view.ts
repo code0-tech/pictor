@@ -245,4 +245,15 @@ export class DataType {
     get depth(): number {
         return this._parent ? 1 + (this._service.getDataType(this._parent as string)?.depth ?? 0) : 0
     }
+
+    get json(): DataTypeObject {
+        return {
+            type: this._type,
+            data_type_id: this._id,
+            name: this._name,
+            rules: this._rules,
+            parent: this._parent,
+            genericKeys: this._generic_keys
+        }
+    }
 }

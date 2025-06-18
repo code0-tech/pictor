@@ -2,6 +2,8 @@
 
 import {Code0Component} from "../../utils/types";
 import React from "react";
+import {mergeCode0Props} from "../../utils/utils";
+import "./DFullScreen.style.scss"
 
 export interface DFullScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
@@ -9,22 +11,20 @@ export interface DFullScreenProps extends Code0Component<HTMLDivElement> {
 
 const DFullScreen: React.FC<DFullScreenProps> = props => {
 
-    const [dimensions, setDimensions] = React.useState<number[]>([])
+    const divRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        window.addEventListener("resize", () => {
-            setDimensions([window.innerWidth, window.innerHeight])
-        })
-        setDimensions([window.innerWidth, window.innerHeight])
-    }, [])
+        if (!divRef.current) return
 
-    return <div style={{
-        position: "relative",
-        overflow: "hidden",
-        overscrollBehavior: "contain",
-        ...(dimensions[0] ? {width: dimensions[0]} : {}),
-        ...(dimensions[1] ? {height: dimensions[1]} : {})
-    }}>
+        window.addEventListener("resize", () => {
+            divRef.current!!.style.height = window.innerHeight + "px";
+            divRef.current!!.style.width = window.innerWidth + "px";
+        })
+        divRef.current!!.style.height = window.innerHeight + "px";
+        divRef.current!!.style.width = window.innerWidth + "px";
+    }, [divRef])
+
+    return <div {...mergeCode0Props("d-full-screen", props)} ref={divRef}>
         {props.children}
     </div>
 }

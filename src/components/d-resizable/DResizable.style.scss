@@ -1,0 +1,65 @@
+@use "../../styles/variables";
+@use "../../styles/helpers";
+@use "sass:color";
+
+.d-resizable {
+
+  &__panel {
+    background: rgba(variables.$white, .05);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+
+    & {
+      @include helpers.borderRadius();
+    }
+
+    &:has(.d-resizable__panel) {
+      background: variables.$primary;
+    }
+
+  }
+
+  &__handle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &[data-panel-group-direction=horizontal] {
+      width: 1rem;
+      height: 100%;
+    }
+
+    &[data-panel-group-direction=vertical] {
+      height: 1rem;
+      width: 100%;
+    }
+  }
+
+  &__handle-bar {
+    z-index: 1;
+    position: relative;
+    display: block;
+    padding: .25rem;
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
+      @include helpers.borderRadius();
+    }
+  }
+
+  &[data-panel-group-direction=horizontal] * &__handle-bar {
+    min-height: 3rem;
+    height: 15%;
+  }
+
+  &[data-panel-group-direction=vertical] * &__handle-bar {
+    min-width: 3rem;
+    min-height: auto;
+    height: auto;
+    width: 15%;
+  }
+
+}

@@ -32,7 +32,7 @@ export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>
         if (React.isValidElement(childT) && matchingProps) {
             for (const key in matchingProps) {
                 const value = (matchingProps as any)[key as string]
-                if (!childT.props[key] || childT.props[key] != value) {
+                if (!(childT.props as any)[key] || (childT.props as any)[key] != value) {
                     matching = false
                     break;
                 }

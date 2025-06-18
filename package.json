@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run storybook:dev",
     "build": "npm run clear && npm run rollup",
+    "test": "jest",
     "clear": "concurrently --kill-others \"rimraf ./dist\" \"rimraf ./storybook-static\"",
     "rollup": "rollup -c",
     "storybook:dev": "storybook dev -p 6006",
@@ -64,6 +65,7 @@
     "sass-loader": "^16.0.5",
     "storybook": "^8.6.14",
     "style-loader": "^4.0.0",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.7.3"
   },
   "main": "dist/cjs/index.js",

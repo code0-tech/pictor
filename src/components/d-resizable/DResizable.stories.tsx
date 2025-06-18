@@ -111,11 +111,11 @@ export const Dashboard = () => {
                 </div>
                 <div style={{position: "relative", overflow: "auto", flex: "1 1 auto", boxSizing: "border-box"}}>
                     <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
-                        <DResizablePanel>
+                        <DResizablePanel collapsible collapsedSize={0} minSize={10}>
                             <ZoomPanPinchExample/>
                         </DResizablePanel>
                         <DResizableHandle/>
-                        <DResizablePanel collapsible collapsedSize={10}>
+                        <DResizablePanel>
                             <DResizablePanelGroup direction={"vertical"}>
                                 <DResizablePanel>
                                     <ZoomPanPinchExample/>
@@ -128,20 +128,6 @@ export const Dashboard = () => {
                         </DResizablePanel>
                     </DResizablePanelGroup>
                 </div>
-                {/*<Text style={{flexShrink: 0}}>Test</Text>
-                <div style={{position: "relative", background: "black", flexShrink: 0}}>
-                    <DResizablePanelGroup direction={"horizontal"}>
-                        <DResizablePanel>
-                            <ZoomPanPinchExample/>
-                        </DResizablePanel>
-                        <DResizableHandle/>
-                        <DResizablePanel>
-                            <ZoomPanPinchExample/>
-                        </DResizablePanel>
-                    </DResizablePanelGroup>
-                </div>
-                */}
-
             </Flex>
 
         </Flex>

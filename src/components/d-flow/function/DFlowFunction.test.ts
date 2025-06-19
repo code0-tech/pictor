@@ -7,10 +7,11 @@ import {
 import {FunctionDefinition} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";
-import {DataType} from "../data-type/DFlowDataType.view";
+import {DataType, RefObject} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
 import {useFunctionValidation} from "./DFlowFunction.hook";
+import {ValidationResult} from "../../../utils/inspection";
 
 class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
 
@@ -39,10 +40,20 @@ describe('function', () => {
         dataTypeService.add(new DataType(dataType, dataTypeService))
     })
 
-    test('test', () => {
-        expect(functionService.getFunctionDefinition('std::array::add')).toBeInstanceOf(FunctionDefinition)
-
+    test('', () => {
         expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[1, 2, 3], 1], dataTypeService)).toBeNull()
+    })
+
+    test('', () => {
+        expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[[1], [2], [3]], [1]], dataTypeService)).toBeNull()
+    })
+
+    test('', () => {
+        expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[1, 2, 3], {type: "NUMBER", primaryLevel: 0, secondaryLevel: 1}], dataTypeService)).toBeNull()
+    })
+
+    test('', () => {
+        expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[[1], 2, 3], {type: "NUMBER", primaryLevel: 0, secondaryLevel: 1}], dataTypeService)).toMatchObject([{"message": [{"code": "de_DE", "text": "Not working"}], "type": 4}])
     })
 
 

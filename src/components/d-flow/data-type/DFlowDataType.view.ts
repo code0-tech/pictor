@@ -146,11 +146,13 @@ export class DataType {
         this._generic_keys = dataType.genericKeys
     }
 
-    /**
-     * @todo check if EDataType is equal
-     * @todo on deep equal do type checking and also disregard set genericKeys
-     */
     public validateDataType(dataType: DataType): boolean {
+
+        if (this._type != dataType.type) return false
+
+        const isObject = (object: object) => {
+            return object != null && typeof object === "object";
+        }
 
         //all rules need to match
         const isDeepEqual = (object1: { [index: string]: any }, object2: { [index: string]: any }) => {
@@ -169,29 +171,8 @@ export class DataType {
             return true
         }
 
-        const isObject = (object: object) => {
-            return object != null && typeof object === "object";
-        }
-
         const arraysEqual = (a1: [], a2: []): boolean =>
             a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
-
-        //check input types
-        /*
-        if (this._inputTypes?.length !== dataType._inputTypes?.length) return false
-
-        const notMatchingInputTypes = this._inputTypes?.map((id, index) => {
-            return this._service.getDataType(id)?.validateDataType(this._service.getDataType(dataType._inputTypes!![index] as string) as DataType)
-        }).includes(false)
-        if (notMatchingInputTypes === false) return false
-
-        //check return type
-        if ((this._returnType && !dataType._returnType) || !this._returnType && dataType._returnType)
-            return false
-
-        if ((this._returnType && dataType._returnType) && !(this._service.getDataType(this._returnType as string)?.validateDataType(this._service.getDataType(dataType._returnType as string) as DataType)))
-            return false
-            */
 
 
         if (this.allRules && !dataType.allRules) return false
@@ -223,7 +204,7 @@ export class DataType {
     }
 
     get allRules(): DataTypeRuleObject[] {
-        return [...(this._rules || []), ...(this._service.getDataType(this._parent as string)?.allRules || [])]
+        return [...(this._rules || []), ...((this._parent ? this._service.getDataType(this._parent)?.allRules : []) || [])]
     }
 
     get id(): string {

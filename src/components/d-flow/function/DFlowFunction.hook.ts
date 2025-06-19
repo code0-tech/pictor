@@ -48,10 +48,10 @@ export const useFunctionValidation = (
                     const tempDataTypeFromParameter = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromParameter?.json!!, genericMap), dataTypeService)
                     const tempDataTypeFromValue = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromValue?.json!!, genericMap), dataTypeService)
                     return tempDataTypeFromParameter?.validateDataType(tempDataTypeFromValue)
-                } else {
-                    const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
-                    return dataTypeService.getDataType(parameter.type)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
                 }
+
+                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
+                return dataTypeService.getDataType(parameter.type)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
 
             } else if (func.genericKeys?.includes(String(parameter.type))) {
 
@@ -71,7 +71,20 @@ export const useFunctionValidation = (
             } else if (dataTypeService.getDataType(typeFromValue) && dataTypeFromParameter && dataTypeFromValue && dataTypeFromParameter.genericKeys) {
 
                 //parameter is generic but value not
-                const genericTypes = resolveAllGenericKeysInDataTypeObject(dataTypeFromParameter.json, dataTypeFromValue.json, dataTypeFromParameter.genericKeys)
+                const genericParameterTypes = resolveAllGenericKeysInDataTypeObject(dataTypeFromParameter.json, dataTypeFromValue.json, dataTypeFromParameter.genericKeys)
+                const genericTypes = resolveGenericKeyMappings(typeFromParameter, {
+                    ...(typeFromParameter as GenericType),
+                    generic_mapper: (typeFromParameter as GenericType).generic_mapper?.map(mapper => {
+                        if (genericParameterTypes[mapper.generic_target]) {
+                            return {
+                                types: [genericParameterTypes[mapper.generic_target]],
+                                generic_target: mapper.generic_target,
+                                generic_combination: mapper.generic_combination
+                            } as GenericMapper
+                        }
+                        return mapper
+                    })
+                }, func.genericKeys!!)
 
                 //store generic mapped real type in map
                 func.genericKeys?.forEach(genericKey => {
@@ -82,10 +95,10 @@ export const useFunctionValidation = (
                 if (isRefObject(values[index])) {
                     const tempDataTypeFromParameter = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromParameter?.json!!, genericMap), dataTypeService)
                     return tempDataTypeFromParameter?.validateDataType(dataTypeFromValue)
-                } else {
-                    const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
-                    return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
                 }
+
+                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
+                return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
 
             }
         } else if (dataTypeService.getDataType(parameter.type)) {
@@ -94,13 +107,6 @@ export const useFunctionValidation = (
             if (typeof typeFromValue == "object"
                 && "type" in (typeFromValue as GenericType)
                 && dataTypeService.getDataType(parameter.type)) {
-
-                const genericTypes = resolveGenericKeyMappings(typeFromParameter, typeFromValue, func.genericKeys!!)
-
-                //store generic mapped real type in map
-                func.genericKeys?.forEach(genericKey => {
-                    genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
-                })
 
                 if (isRefObject(values[index])) {
                     const tempDataTypeFromValue = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromValue?.json!!, genericMap), dataTypeService)

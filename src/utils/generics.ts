@@ -272,3 +272,50 @@ export const resolveAllGenericKeysInDataTypeObject = (
     recurse(genericObj, concreteObj)
     return result
 }
+
+/**
+ * Recursively replaces all generic keys in a DataTypeObject tree
+ * (in parent and all nested rules/config.type fields) using the provided genericMap.
+ * Types are replaced according to the logic in replaceGenericKeysInType.
+ *
+ * @param dataType   The DataTypeObject to process
+ * @param genericMap Map from generic key to Type or GenericMapper
+ * @returns          A new DataTypeObject with all generics replaced by their resolved form
+ */
+export const replaceGenericKeysInDataTypeObject = (
+    dataType: DataTypeObject,
+    genericMap: Map<string, Type | GenericMapper>
+): DataTypeObject => {
+    // Helper to handle the parent, which may be a generic key or a full Type
+    const resolvedParent =
+        dataType.parent !== undefined
+            ? replaceGenericKeysInType(dataType.parent, genericMap)
+            : undefined
+
+    // Helper for rules (which may be deeply nested)
+    const resolvedRules = (dataType.rules ?? []).map(rule => {
+        const newRule = { ...rule }
+        // Only replace if config has a 'type' field
+        if (
+            newRule.config &&
+            typeof newRule.config === "object" &&
+            "type" in newRule.config
+        ) {
+            newRule.config = {
+                ...newRule.config,
+                type: replaceGenericKeysInType(
+                    (newRule.config as { type: Type }).type,
+                    genericMap
+                )
+            }
+        }
+        return newRule
+    })
+
+    return {
+        ...dataType,
+        parent: resolvedParent,
+        rules: resolvedRules
+    }
+}
+

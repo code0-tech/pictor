@@ -7,11 +7,10 @@ import {
 import {FunctionDefinition} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";
-import {DataType, RefObject} from "../data-type/DFlowDataType.view";
+import {DataType} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
-import {useFunctionValidation} from "./DFlowFunction.hook";
-import {ValidationResult} from "../../../utils/inspection";
+import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
 
 class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
 

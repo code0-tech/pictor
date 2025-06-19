@@ -7,11 +7,11 @@ import {
 import {FunctionDefinition} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";
-import {DataType, RefObject} from "../data-type/DFlowDataType.view";
+import {DataType} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
-import {useFunctionValidation} from "./DFlowFunction.hook";
-import {ValidationResult} from "../../../utils/inspection";
+import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
+import {useReturnType} from "./DFlowFunction.return.hook";
 
 class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
 
@@ -55,6 +55,23 @@ describe('function', () => {
     test('', () => {
         expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[[1], 2, 3], {type: "NUMBER", primaryLevel: 0, secondaryLevel: 1}], dataTypeService)).toMatchObject([{"message": [{"code": "de_DE", "text": "Not working"}], "type": 4}])
     })
+})
 
+describe('return type', () => {
 
+    const [__, functionService] = createNonReactiveArrayService<FunctionDefinition, DFlowFunctionNonReactiveService>(DFlowFunctionNonReactiveService);
+
+    functionData.forEach((functionData) => {
+        functionService.add(new FunctionDefinition(functionData));
+    })
+
+    const [_, dataTypeService] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+
+    dataTypes.forEach((dataType) => {
+        dataTypeService.add(new DataType(dataType, dataTypeService))
+    })
+
+    test('', () => {
+        expect(useReturnType(functionService.getFunctionDefinition('std::array::add')!!, [[1, 2, 3], 1], dataTypeService)).toMatchObject( {"type":"ARRAY","generic_mapper":[{"types":["NUMBER"],"generic_target":"T"}]})
+    })
 })

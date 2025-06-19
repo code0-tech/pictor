@@ -2,8 +2,12 @@ import {
     DataTypeObject,
     GenericCombinationStrategy,
     GenericMapper,
-    Type
+    GenericType,
+    Type,
+    Value
 } from "../components/d-flow/data-type/DFlowDataType.view";
+import {FunctionDefinition} from "../components/d-flow/function/DFlowFunction.view";
+import {DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -294,7 +298,7 @@ export const replaceGenericKeysInDataTypeObject = (
 
     // Helper for rules (which may be deeply nested)
     const resolvedRules = (dataType.rules ?? []).map(rule => {
-        const newRule = { ...rule }
+        const newRule = {...rule}
         // Only replace if config has a 'type' field
         if (
             newRule.config &&
@@ -318,4 +322,100 @@ export const replaceGenericKeysInDataTypeObject = (
         rules: resolvedRules
     }
 }
+
+/**
+ * Resolves all generic keys for a given function definition based on the parameter values and data type service.
+ *
+ * For each function parameter, this method matches generic parameter types with their corresponding
+ * concrete types derived from the provided values array, using a given data type service.
+ * The result is a map from each generic key to its resolved concrete Type or GenericMapper.
+ *
+ * Performance optimizations:
+ * - Avoids repeated calls to dataTypeService
+ * - Does not overwrite previously found mappings in the Map
+ * - Minimizes branching and redundant logic
+ *
+ * @param func              Function definition (with parameters, genericKeys, etc.)
+ * @param values            Array of concrete values to match against function parameters
+ * @param dataTypeService   Service for resolving types and data type metadata
+ * @returns                 Map from generic key to its resolved Type or GenericMapper
+ */
+export const resolveGenericKeys = (
+    func: FunctionDefinition,
+    values: Value[],
+    dataTypeService: DFlowDataTypeService
+): Map<string, Type | GenericMapper> => {
+    const genericMap = new Map<string, Type | GenericMapper>()
+    const genericKeys = func.genericKeys ?? []
+
+    if (!func.parameters) return genericMap
+
+    for (let i = 0; i < func.parameters.length; i++) {
+        const parameter = func.parameters[i]
+        const paramType = parameter.type
+        const value = values[i]
+        const valueType = dataTypeService.getTypeFromValue(value)
+        const valueDataType = dataTypeService.getDataType(valueType)
+        const paramDataType = dataTypeService.getDataType(paramType)
+
+        // Only process if the parameter type or the value type is generic
+        const paramIsGeneric = typeof paramType === "string"
+            ? genericKeys.includes(paramType)
+            : !!paramDataType
+
+        if (!paramIsGeneric) continue
+
+        // CASE 1: Both parameter and value are generic
+        const valueIsGeneric = typeof valueType === "object"
+            && valueType !== null
+            && "type" in valueType
+            && !!dataTypeService.getDataType(paramType)
+
+        if (valueIsGeneric || (typeof paramType === "string" && genericKeys.includes(paramType))) {
+            const genericTypes = resolveGenericKeyMappings(paramType, valueType, genericKeys)
+            for (const genericKey of genericKeys) {
+                if (!genericMap.has(genericKey) && genericTypes[genericKey]) {
+                    genericMap.set(genericKey, genericTypes[genericKey])
+                }
+            }
+            continue
+        }
+
+        // CASE 2: Parameter is generic, value is concrete
+        if (valueDataType && paramDataType && valueDataType.json && paramDataType.json && Array.isArray(paramDataType.genericKeys)) {
+            // Resolve all generic key mappings for the parameter's data type structure
+            const genericParameterTypes = resolveAllGenericKeysInDataTypeObject(
+                paramDataType.json,
+                valueDataType.json,
+                paramDataType.genericKeys
+            )
+
+            // Build a new parameter type object where each mapper's types is replaced by the resolved mapping if available
+            const mappedParamType = {
+                ...(paramType as GenericType),
+                generic_mapper: (paramType as GenericType).generic_mapper?.map(mapper => {
+                    const mapped = genericParameterTypes[mapper.generic_target]
+                    if (mapped) {
+                        return {
+                            ...mapper,
+                            types: [mapped]
+                        } as GenericMapper
+                    }
+                    return mapper
+                })
+            }
+
+            // Resolve the final generic mappings for this parameter
+            const genericTypes = resolveGenericKeyMappings(paramType, mappedParamType, genericKeys)
+            for (const genericKey of genericKeys) {
+                if (!genericMap.has(genericKey) && genericTypes[genericKey]) {
+                    genericMap.set(genericKey, genericTypes[genericKey])
+                }
+            }
+        }
+    }
+
+    return genericMap
+}
+
 

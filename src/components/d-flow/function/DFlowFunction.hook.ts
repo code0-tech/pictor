@@ -1,13 +1,9 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {
-    GenericMapper,
-    GenericType,
-    Type,
-    Value
-} from "../data-type/DFlowDataType.view";
+import {DataType, GenericMapper, GenericType, isRefObject, Type, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 import {
+    replaceGenericKeysInDataTypeObject,
     replaceGenericKeysInType,
     resolveAllGenericKeysInDataTypeObject,
     resolveGenericKeyMappings
@@ -27,8 +23,6 @@ export const useFunctionValidation = (
         const dataTypeFromValue = dataTypeService.getDataType(typeFromValue)
         const typeFromParameter = parameter.type
         const dataTypeFromParameter = dataTypeService.getDataType(typeFromParameter)
-
-        console.log(typeFromParameter, typeFromValue)
 
         //check if parameter is generic or non-generic
         if (func.genericKeys?.includes(String(parameter.type))
@@ -50,8 +44,14 @@ export const useFunctionValidation = (
                     genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
                 })
 
-                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
-                return dataTypeService.getDataType(parameter.type)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
+                if (isRefObject(values[index])) {
+                    const tempDataTypeFromParameter = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromParameter?.json!!, genericMap), dataTypeService)
+                    const tempDataTypeFromValue = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromValue?.json!!, genericMap), dataTypeService)
+                    return tempDataTypeFromParameter?.validateDataType(tempDataTypeFromValue)
+                } else {
+                    const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
+                    return dataTypeService.getDataType(parameter.type)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
+                }
 
             } else if (func.genericKeys?.includes(String(parameter.type))) {
 
@@ -62,9 +62,12 @@ export const useFunctionValidation = (
                     genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
                 })
 
-                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as Type
-                return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
-
+                if (isRefObject(values[index])) {
+                    return true
+                } else {
+                    const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
+                    return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
+                }
             } else if (dataTypeService.getDataType(typeFromValue) && dataTypeFromParameter && dataTypeFromValue && dataTypeFromParameter.genericKeys) {
 
                 //parameter is generic but value not
@@ -76,10 +79,15 @@ export const useFunctionValidation = (
                         genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
                 })
 
-                const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as Type
-                return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index])
-            }
+                if (isRefObject(values[index])) {
+                    const tempDataTypeFromParameter = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromParameter?.json!!, genericMap), dataTypeService)
+                    return tempDataTypeFromParameter?.validateDataType(dataTypeFromValue)
+                } else {
+                    const replacedGenericMapper = replaceGenericKeysInType(parameter.type, genericMap) as GenericType
+                    return dataTypeService.getDataType(replacedGenericMapper)?.validateValue(values[index], replacedGenericMapper.generic_mapper)
+                }
 
+            }
         } else if (dataTypeService.getDataType(parameter.type)) {
 
             //check linked value if generic or non-generic
@@ -87,22 +95,30 @@ export const useFunctionValidation = (
                 && "type" in (typeFromValue as GenericType)
                 && dataTypeService.getDataType(parameter.type)) {
 
-                //parameter and value are non-generic
-                return dataTypeFromParameter?.validateValue(values[index])
+                const genericTypes = resolveGenericKeyMappings(typeFromParameter, typeFromValue, func.genericKeys!!)
 
+                //store generic mapped real type in map
+                func.genericKeys?.forEach(genericKey => {
+                    genericMap.set(genericKey, genericMap.get(genericKey) || genericTypes[genericKey])
+                })
+
+                if (isRefObject(values[index])) {
+                    const tempDataTypeFromValue = new DataType(replaceGenericKeysInDataTypeObject(dataTypeFromValue?.json!!, genericMap), dataTypeService)
+                    return dataTypeFromParameter?.validateDataType(tempDataTypeFromValue)
+                }
+
+                return dataTypeFromParameter?.validateValue(values[index])
             } else if (dataTypeService.getDataType(typeFromValue)) {
 
-                //parameter and value are non-generic
+                if (isRefObject(values[index]) && dataTypeFromValue) {
+                    return dataTypeFromParameter?.validateDataType(dataTypeFromValue)
+                }
+
                 return dataTypeFromParameter?.validateValue(values[index])
-
             }
-
         }
-
         return false
     })
-
-    console.log(genericMap, parameterValidation)
 
     return parameterValidation ? null : [{
         type: InspectionSeverity.ERROR,

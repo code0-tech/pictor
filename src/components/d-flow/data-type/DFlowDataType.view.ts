@@ -146,11 +146,13 @@ export class DataType {
         this._generic_keys = dataType.genericKeys
     }
 
-    /**
-     * @todo check if EDataType is equal
-     * @todo on deep equal do type checking and also disregard set genericKeys
-     */
-    public validateDataType(dataType: DataType, generics?: GenericMapper[]): boolean {
+    public validateDataType(dataType: DataType): boolean {
+
+        if (this._type != dataType.type) return false
+
+        const isObject = (object: object) => {
+            return object != null && typeof object === "object";
+        }
 
         //all rules need to match
         const isDeepEqual = (object1: { [index: string]: any }, object2: { [index: string]: any }) => {
@@ -167,15 +169,6 @@ export class DataType {
                 if ((isObjects && !isDeepEqual(value1, value2)) || (!isObjects && value1 !== value2)) return false
             }
             return true
-        }
-
-        const dataTypeObject = this.json
-        const parameterDataTypeObject = dataType.json
-
-
-
-        const isObject = (object: object) => {
-            return object != null && typeof object === "object";
         }
 
         const arraysEqual = (a1: [], a2: []): boolean =>
@@ -211,7 +204,7 @@ export class DataType {
     }
 
     get allRules(): DataTypeRuleObject[] {
-        return [...(this._rules || []), ...(this._service.getDataType(this._parent as string)?.allRules || [])]
+        return [...(this._rules || []), ...((this._parent ? this._service.getDataType(this._parent)?.allRules : []) || [])]
     }
 
     get id(): string {

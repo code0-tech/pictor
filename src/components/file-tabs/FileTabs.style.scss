@@ -1,0 +1,72 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+
+.file-tabs {
+
+  position: absolute;
+  width: 100%;
+
+  &__list {
+
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: scroll;
+    position: relative;
+    gap: .5rem;
+    padding: variables.$xs;
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */
+
+    &::-webkit-scrollbar {
+      display: none;  /* Older Safari and Chromium */
+    }
+  }
+
+  &__trigger {
+
+    padding: variables.$xxs variables.$xs;
+    display: flex;
+    gap: variables.$xs;
+    align-items: center;
+    text-wrap: nowrap;
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include helpers.borderRadius();
+      background: transparent;
+    }
+
+    &[data-state="active"] {
+      background: rgba(variables.$secondary, .1);
+
+      .file-tabs__trigger-icon {
+        opacity: 1;
+      }
+    }
+
+    &:hover, &:active {
+      .file-tabs__trigger-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__trigger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .1rem;
+    opacity: 0;
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__content {
+    padding: variables.$xs + variables.$xs;
+  }
+
+}

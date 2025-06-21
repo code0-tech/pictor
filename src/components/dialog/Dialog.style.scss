@@ -4,15 +4,14 @@
 @use "sass:color";
 
 .dialog {
-  @include helpers.glassBoxTransparent(variables.$white, variables.$white, variables.$white);
+  @include helpers.glassBoxTransparent(variables.$primary, variables.$primary, variables.$secondary);
   @include helpers.borderRadius();
 
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  z-index: 100;
 
   position: relative;
-  padding: variables.$xl variables.$xs;
+  padding: variables.$xl;
   margin: auto;
   overflow: auto;
   inset: auto;
@@ -27,7 +26,7 @@
     top: 0;
     left: 0;
     z-index: -2;
-    backdrop-filter: blur(variables.$xs);
+    backdrop-filter: blur(variables.$xxs);
   }
 
 

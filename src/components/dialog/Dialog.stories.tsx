@@ -4,8 +4,9 @@ import React, {useState} from "react";
 import Flex from "../flex/Flex";
 import Text from "../text/Text";
 import EmailInput from "../form/EmailInput";
-import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
+import {IconAlarmFilled, IconChartDonutFilled, IconKey, IconMail} from "@tabler/icons-react";
 import PasswordInput from "../form/PasswordInput";
+import Button from "../button/Button";
 
 export default {
     title: "Dialog",
@@ -20,15 +21,18 @@ export default {
 
 export const ExampleDialog = () => {
     return <Dialog defaultOpen>
-        <Dialog.Disclosure>Open</Dialog.Disclosure>
+        <Dialog.Disclosure variant={"outlined"} color={"primary"}>Open</Dialog.Disclosure>
         <Dialog.Modal>
 
-            <Flex justify={"center"} mb={1}><IconLogin size={32}/></Flex>
-            <Text style={{textAlign: "center"}} size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>LOGIN</Text>
-            <Text style={{textAlign: "center"}} size={"md"} display={"block"} mb={1}>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
-                labore et dolore magna aliquyam erat, sed diam voluptua.
-            </Text>
+            <Flex justify={"space-between"} mb={1} c={"rgba(255,255,255, 0.75)"} style={{gap: "1rem"}} align={"center"}>
+                <Flex style={{gap: "1rem"}} align={"center"}>
+                    <Flex style={{background: "rgba(255,255,255, 0.05)", borderRadius: "0.5rem"}} p={0.35}>
+                        <IconChartDonutFilled size={24}/>
+                    </Flex>
+                    <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={0.25}>Some Model</Text>
+                </Flex>
+                <Button variant={"none"} color={"secondary"}>Amazing Button</Button>
+            </Flex>
             <form>
                 <EmailInput
                     placeholder={"Email"}

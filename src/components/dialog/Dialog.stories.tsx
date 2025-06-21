@@ -20,7 +20,7 @@ export default {
 } as Meta
 
 export const ExampleDialog = () => {
-    return <Dialog defaultOpen>
+    return <Dialog>
         <Dialog.Disclosure variant={"outlined"} color={"primary"}>Open</Dialog.Disclosure>
         <Dialog.Modal>
 

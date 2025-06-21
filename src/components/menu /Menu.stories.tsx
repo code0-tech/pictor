@@ -22,9 +22,9 @@ export default meta
 
 export const MenuExample = () => {
 
-    return <Menu defaultOpen placement={"right-end"}>
+    return <Menu placement={"bottom-start"}>
         <MenuTrigger>
-            <Button variant="outlined" color="secondary">
+            <Button variant="outlined" color="primary">
                 Menu
                 <MenuTriggerArrow/>
             </Button>

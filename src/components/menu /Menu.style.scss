@@ -2,14 +2,15 @@
 @use "../../styles/variables";
 
 .menu {
-  @include helpers.glassBoxTransparent(variables.$secondary);
+  @include helpers.glassBoxTransparent(variables.$primary, variables.$primary, variables.$secondary);
   @include helpers.borderRadius();
   padding: variables.$xs;
   position: relative;
   box-sizing: border-box;
+  z-index: 100;
 
   &__item {
-    @include helpers.glassBoxWithoutShadowAndBorder(variables.$secondary);
+    @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
     border-radius: variables.$borderRadius - variables.$xxs;
     padding: variables.$xxs variables.$xs;
     background-color: transparent;
@@ -20,7 +21,8 @@
     align-items: center;
 
     &[data-focus-visible], &[aria-selected=true], &:hover {
-      background-color: inherit;
+      @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
+      width: 100%;
     }
 
     &[aria-disabled=true] {

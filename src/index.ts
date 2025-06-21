@@ -1,4 +1,3 @@
-export { default as Alert} from "./components/alert/Alert"
 export { default as Badge} from "./components/badge/Badge"
 export { default as Button} from "./components/button/Button"
 export { default as ButtonGroup} from "./components/button-group/ButtonGroup"

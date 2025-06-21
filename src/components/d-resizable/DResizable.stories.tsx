@@ -9,6 +9,7 @@ import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} 
 import Flex from "../flex/Flex";
 import {MenuExample} from "../menu /Menu.stories";
 import {ExampleDialog} from "../dialog/Dialog.stories";
+import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -68,15 +69,7 @@ export const Dashboard = () => {
                         </DResizablePanel>
                         <DResizableHandle/>
                         <DResizablePanel>
-                            <DResizablePanelGroup direction={"vertical"}>
-                                <DResizablePanel>
-                                    <ZoomPanPinchExample/>
-                                </DResizablePanel>
-                                <DResizableHandle/>
-                                <DResizablePanel>
-                                    <ZoomPanPinchExample/>
-                                </DResizablePanel>
-                            </DResizablePanelGroup>
+                            <ExampleFileTabs/>
                         </DResizablePanel>
                     </DResizablePanelGroup>
                 </div>

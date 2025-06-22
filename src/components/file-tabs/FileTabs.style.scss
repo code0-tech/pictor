@@ -1,0 +1,85 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+
+.file-tabs {
+
+  position: absolute;
+  width: 100%;
+
+  &__list {
+
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    gap: variables.$xs;
+    padding: variables.$xs;
+
+    &-content {
+      display: flex;
+      overflow-x: scroll;
+      flex-wrap: nowrap;
+      gap: variables.$xxs;
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+      scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
+      &::-webkit-scrollbar {
+        display: none; /* Older Safari and Chromium */
+      }
+    }
+
+    &-controls {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: variables.$xxs;
+    }
+  }
+
+  &__trigger {
+
+    padding: variables.$xxs variables.$xs;
+    display: flex;
+    gap: variables.$xs;
+    align-items: center;
+    text-wrap: nowrap;
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include helpers.borderRadius();
+      background: transparent;
+    }
+
+    &[data-state="active"] {
+      background: rgba(variables.$secondary, .1);
+
+      .file-tabs__trigger-icon {
+        opacity: 1;
+      }
+    }
+
+    &:hover, &:active {
+      .file-tabs__trigger-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__trigger-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .1rem;
+    opacity: 0;
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__content {
+    padding: variables.$xxs variables.$xs + variables.$xs;
+  }
+
+}

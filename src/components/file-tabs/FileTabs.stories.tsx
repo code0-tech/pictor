@@ -1,0 +1,96 @@
+import {Meta} from "@storybook/react";
+import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "./FileTabs";
+import React from "react";
+import {IconChevronDown, IconDotsVertical, IconFileLambdaFilled} from "@tabler/icons-react";
+import Flex from "../flex/Flex";
+import {createReactiveArrayService} from "../../utils/reactiveArrayStore";
+import {FileTabsView} from "./FileTabs.view";
+import {FileTabsService} from "./FileTabs.service";
+import Button from "../button/Button";
+import Menu, {MenuBody, MenuItem, MenuTrigger} from "../menu /Menu";
+
+export default {
+    title: "File Tabs",
+} as Meta
+
+
+export const ExampleFileTabs = () => {
+
+    const [store, service] = createReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
+
+    const fileTabsList = React.useMemo(() => {
+        return service.values().map((value, index) => {
+            return <FileTabsTrigger closable={value.closeable} onClose={() => {
+                service.delete(index)
+            }} value={value.id!!}>{value.children}</FileTabsTrigger>
+        })
+    }, [store])
+
+    const fileTabsContent = React.useMemo(() => {
+        return service.values().map((value, index) => {
+            return <FileTabsContent value={value.id!!}>
+                {value.content}
+            </FileTabsContent>
+        })
+    }, [store])
+
+    const fileTabs = React.useMemo(() => {
+        return <FileTabs value={service.getActiveTab()?.id} onValueChange={(value) => {
+            service.activateTab(value)
+            service.update()
+        }}>
+            <FileTabsList controls={<>
+                <Menu>
+                    <MenuTrigger>
+                        <Button color={"primary"} style={{aspectRatio: "1/1"}}>
+                            <IconChevronDown size={12}/>
+                        </Button>
+                    </MenuTrigger>
+                    <MenuBody gutter={8}>
+                        {service.values().reverse().map((value) => {
+                           return <MenuItem onClick={() => {
+                               service.activateTab(value.id!!)
+                               service.update()
+                           }}>{value.children}</MenuItem>
+                        })}
+                    </MenuBody>
+                </Menu>
+                <Menu>
+                    <MenuTrigger>
+                        <Button color={"primary"} style={{aspectRatio: "1/1"}}>
+                            <IconDotsVertical size={12}/>
+                        </Button>
+                    </MenuTrigger>
+                    <MenuBody gutter={8}>
+                        <MenuItem onClick={() => service.clear()}> Close all tabs</MenuItem>
+                    </MenuBody>
+                </Menu>
+            </>}>
+                {fileTabsList}
+            </FileTabsList>
+            {fileTabsContent}
+        </FileTabs>
+    }, [store])
+
+    const onClick = React.useCallback(() => {
+        service.add({
+            id: String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0",
+            active: true,
+            children: <Flex style={{gap: "0.35rem"}} align={"center"}>
+                <IconFileLambdaFilled color={"#70ffb2"} size={16}/>
+                std::math::add
+            </Flex>,
+            content: <>Flow
+                Content {String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0"}</>,
+            closeable: true
+        })
+    }, [store])
+
+    return <>
+        <Flex p={0.7} pos={"absolute"} bottom={"0"}>
+            <Button onClick={onClick}>Add new FileTab</Button>
+        </Flex>
+
+        {fileTabs}
+    </>
+}

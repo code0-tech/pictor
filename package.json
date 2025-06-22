@@ -67,7 +67,7 @@
     "style-loader": "^4.0.0",
     "ts-jest": "^29.4.0",
     "typescript": "^5.7.3",
-    "react-resizable-panels": "^3.0.3"
+    "@radix-ui/react-tabs": "^1.1.12"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -83,8 +83,9 @@
     "overlap-area": "^1.1.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
+    "react-resizable-panels": "^3.0.3",
     "react-zoom-pan-pinch": "^3.6.1",
-    "react-resizable-panels": "^3.0.3"
+    "@radix-ui/react-tabs": "^1.1.12"
   },
   "publishConfig": {
     "access": "public"

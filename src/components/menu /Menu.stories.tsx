@@ -4,13 +4,8 @@ import Menu, {MenuBody, MenuItem, MenuSeparator, MenuTrigger, MenuTriggerArrow} 
 import Button from "../button/Button";
 import {
     IconCheck,
-    IconFolder,
-    IconLicense,
-    IconMenu,
     IconStar,
-    IconUser,
     IconUserCircle,
-    IconUserFilled
 } from "@tabler/icons-react";
 
 const meta: Meta = {

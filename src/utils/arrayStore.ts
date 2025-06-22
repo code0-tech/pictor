@@ -6,4 +6,5 @@ export interface ArrayService<T> {
     get(index: number): T
     values(): T[]
     update(): void
+    clear(): void
 }

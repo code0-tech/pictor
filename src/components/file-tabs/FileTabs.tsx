@@ -15,8 +15,8 @@ import "./FileTabs.style.scss"
 import {IconX} from "@tabler/icons-react";
 
 type FileTabsProps = Code0ComponentProps & TabsProps
-type FileTabsListProps = Code0ComponentProps & TabsListProps
-type FileTabsTriggerProps = Code0ComponentProps & TabsTriggerProps
+type FileTabsListProps = Code0ComponentProps & TabsListProps & { controls?: React.ReactNode };
+type FileTabsTriggerProps = Code0ComponentProps & TabsTriggerProps & { onClose?: () => void, closable?: boolean }
 type FileTabsContentProps = Code0ComponentProps & TabsContentProps
 
 export const FileTabs: React.FC<FileTabsProps> = (props) => {
@@ -24,15 +24,20 @@ export const FileTabs: React.FC<FileTabsProps> = (props) => {
 }
 
 export const FileTabsList: React.FC<FileTabsListProps> = (props) => {
-    return <List data-slot="tabs" {...mergeCode0Props("file-tabs__list", props)}/>
+    return <List data-slot="tabs" {...mergeCode0Props("file-tabs__list", props)}>
+        <div className={"file-tabs__list-content"}> {props.children}</div>
+        {props.controls ? <div className={"file-tabs__list-controls"}>
+            {props.controls}
+        </div> : null}
+    </List>
 }
 
 export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
     return <Trigger data-slot="tabs" {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
         {props.children}
-        <div className={"file-tabs__trigger-icon"}>
+        {props.closable ? <div className={"file-tabs__trigger-icon"} onClick={props.onClose}>
             <IconX size={16}/>
-        </div>
+        </div> : null}
     </Trigger>
 }
 

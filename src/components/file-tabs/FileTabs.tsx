@@ -33,7 +33,7 @@ export const FileTabsList: React.FC<FileTabsListProps> = (props) => {
 }
 
 export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
-    return <Trigger data-slot="tabs" {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
+    return <Trigger data-slot="tabs" data-value={props.value} {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
         {props.children}
         {props.closable ? <div className={"file-tabs__trigger-icon"} onClick={props.onClose}>
             <IconX size={16}/>

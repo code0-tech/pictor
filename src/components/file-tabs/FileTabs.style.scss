@@ -44,6 +44,7 @@
     gap: variables.$xs;
     align-items: center;
     text-wrap: nowrap;
+    margin-bottom: 1px;
 
     & {
       @include helpers.glassBoxWithoutShadowAndBorder();

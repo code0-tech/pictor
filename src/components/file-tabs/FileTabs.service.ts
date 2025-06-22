@@ -57,7 +57,8 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
     }
 
     public getActiveTab(): FileTabsView | undefined {
-        return this.values().reverse().find((item: FileTabsView) => {
+        const values = [...this.values()]
+        return values.reverse().find((item: FileTabsView) => {
             return item.active
         })
     }

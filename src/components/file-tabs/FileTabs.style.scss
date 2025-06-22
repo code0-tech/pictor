@@ -16,6 +16,7 @@
     position: relative;
     gap: variables.$xs;
     padding: variables.$xs;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
 
     &-content {
       display: flex;
@@ -79,7 +80,7 @@
   }
 
   &__content {
-    padding: variables.$xxs variables.$xs + variables.$xs;
+    padding: variables.$xs + variables.$xs;
   }
 
 }

@@ -7,7 +7,7 @@ import {createReactiveArrayService} from "../../utils/reactiveArrayStore";
 import {FileTabsView} from "./FileTabs.view";
 import {FileTabsService} from "./FileTabs.service";
 import Button from "../button/Button";
-import Menu, {MenuBody, MenuItem, MenuTrigger} from "../menu /Menu";
+import Menu, {MenuBody, MenuItem, MenuSeparator, MenuTrigger} from "../menu /Menu";
 
 export default {
     title: "File Tabs",
@@ -63,6 +63,10 @@ export const ExampleFileTabs = () => {
                     </MenuTrigger>
                     <MenuBody gutter={8}>
                         <MenuItem onClick={() => service.clear()}> Close all tabs</MenuItem>
+                        <MenuItem onClick={() => service.clearWithoutActive()}> Close other tabs</MenuItem>
+                        <MenuSeparator/>
+                        <MenuItem onClick={() => service.clearLeft()}> Close all tabs to left </MenuItem>
+                        <MenuItem onClick={() => service.clearRight()}> Close all tabs to right </MenuItem>
                     </MenuBody>
                 </Menu>
             </>}>

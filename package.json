@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run storybook:dev",
     "build": "npm run clear && npm run rollup",
+    "test": "jest",
     "clear": "concurrently --kill-others \"rimraf ./dist\" \"rimraf ./storybook-static\"",
     "rollup": "rollup -c",
     "storybook:dev": "storybook dev -p 6006",

@@ -8,18 +8,31 @@
 
   &__list {
 
+    box-sizing: border-box;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    overflow-x: scroll;
+    justify-content: space-between;
     position: relative;
-    gap: .5rem;
+    gap: variables.$xs;
     padding: variables.$xs;
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox, Safari 18.2+, Chromium 121+ */
 
-    &::-webkit-scrollbar {
-      display: none;  /* Older Safari and Chromium */
+    &-content {
+      display: flex;
+      overflow-x: scroll;
+      flex-wrap: nowrap;
+      gap: variables.$xxs;
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+      scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
+      &::-webkit-scrollbar {
+        display: none; /* Older Safari and Chromium */
+      }
+    }
+
+    &-controls {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: variables.$xxs;
     }
   }
 
@@ -66,7 +79,7 @@
   }
 
   &__content {
-    padding: variables.$xs + variables.$xs;
+    padding: variables.$xxs variables.$xs + variables.$xs;
   }
 
 }

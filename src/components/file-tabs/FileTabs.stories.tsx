@@ -17,6 +17,16 @@ export default {
 export const ExampleFileTabs = () => {
 
     const [store, service] = createReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
+    const id = React.useId()
+
+    React.useEffect(() => {
+        console.log(store)
+        const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
+        const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
+        const trigger = tabList.querySelector("[data-value=" + '"' + service.getActiveTab()?.id + '"' + "]") as HTMLDivElement
+
+        if (tabList && trigger) tabList.scrollLeft = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
+    }, [service.getActiveTab()])
 
     const fileTabsList = React.useMemo(() => {
         return service.values().map((value, index) => {
@@ -35,7 +45,7 @@ export const ExampleFileTabs = () => {
     }, [store])
 
     const fileTabs = React.useMemo(() => {
-        return <FileTabs value={service.getActiveTab()?.id} onValueChange={(value) => {
+        return <FileTabs data-id={id} value={service.getActiveTab()?.id} onValueChange={(value) => {
             service.activateTab(value)
             service.update()
         }}>
@@ -47,7 +57,7 @@ export const ExampleFileTabs = () => {
                         </Button>
                     </MenuTrigger>
                     <MenuBody gutter={8}>
-                        {service.values().reverse().map((value) => {
+                        {service.values().map((value) => {
                            return <MenuItem onClick={() => {
                                service.activateTab(value.id!!)
                                service.update()
@@ -82,7 +92,7 @@ export const ExampleFileTabs = () => {
             active: true,
             children: <Flex style={{gap: "0.35rem"}} align={"center"}>
                 <IconFileLambdaFilled color={"#70ffb2"} size={16}/>
-                std::math::add
+                {Array(service.values().length + 1).fill(0).map(() => <>Test</>)}
             </Flex>,
             content: <>Flow
                 Content {String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0"}</>,

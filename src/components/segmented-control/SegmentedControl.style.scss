@@ -1,0 +1,29 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+
+.segmented-control {
+
+  padding: variables.$xxs variables.$xxs;
+  gap: variables.$xxs;
+  display: flex;
+  flex-wrap: nowrap;
+
+  & {
+    @include helpers.glassBoxTransparent(variables.$primary, variables.$primary, variables.$primary, false);
+    @include helpers.borderRadius();
+  }
+
+  &__item {
+
+    & {
+      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include helpers.borderRadius();
+    }
+
+    &[data-state="off"] {
+      background: transparent;
+    }
+
+  }
+
+}

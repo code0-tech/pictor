@@ -96,7 +96,8 @@
 @mixin glassBoxTransparent(
   $background: variables.$secondary,
   $color: variables.$secondary,
-  $borderColor: variables.$secondary
+  $borderColor: variables.$secondary,
+  $active: true
 ) {
 
   $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
@@ -128,14 +129,17 @@
     box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
   }
 
-  &:hover {
-    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .3);
+  @if($active == true) {
+    &:hover {
+      box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .3);
+    }
+
+    &:active {
+      box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
+      outline: none;
+    }
   }
 
-  &:active {
-    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
-    outline: none;
-  }
 }
 
 @mixin glassBox(

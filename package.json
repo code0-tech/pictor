@@ -20,6 +20,8 @@
   "devDependencies": {
     "@ariakit/react": "^0.4.17",
     "@mdx-js/react": "^3.1.0",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toggle-group": "^1.1.10",
     "@storybook/addon-a11y": "^8.6.14",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",
@@ -71,6 +73,8 @@
   "types": "dist/index.d.ts",
   "peerDependencies": {
     "@ariakit/react": "^0.4.5",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toggle-group": "^1.1.10",
     "@tabler/icons-react": "^3.5.0",
     "js-md5": "^0.8.3",
     "merge-props": "^6.0.0",
@@ -78,8 +82,7 @@
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-resizable-panels": "^3.0.3",
-    "react-zoom-pan-pinch": "^3.6.1",
-    "@radix-ui/react-tabs": "^1.1.12"
+    "react-zoom-pan-pinch": "^3.6.1"
   },
   "publishConfig": {
     "access": "public"

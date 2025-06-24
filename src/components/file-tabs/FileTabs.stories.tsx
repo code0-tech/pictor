@@ -8,6 +8,7 @@ import {FileTabsView} from "./FileTabs.view";
 import {FileTabsService} from "./FileTabs.service";
 import Button from "../button/Button";
 import Menu, {MenuBody, MenuItem, MenuSeparator, MenuTrigger} from "../menu /Menu";
+import Text from "../text/Text";
 
 export default {
     title: "File Tabs",
@@ -20,7 +21,6 @@ export const ExampleFileTabs = () => {
     const id = React.useId()
 
     React.useEffect(() => {
-        console.log(store)
         const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
         const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
         const trigger = tabList.querySelector("[data-value=" + '"' + service.getActiveTab()?.id + '"' + "]") as HTMLDivElement
@@ -94,15 +94,24 @@ export const ExampleFileTabs = () => {
                 <IconFileLambdaFilled color={"#70ffb2"} size={16}/>
                 {Array(service.values().length + 1).fill(0).map(() => <>Test</>)}
             </Flex>,
-            content: <>Flow
-                Content {String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0"}</>,
+            content: <>
+                <Flex>
+                    <div>
+                        <Text size={"xl"} hierarchy={"primary"} display={"block"}>Your Flow under</Text>
+                        <Text size={"xl"} hierarchy={"tertiary"}>Your Control</Text>
+                    </div>
+                    <Flex ml={1}>
+                        <Text size={"md"}hierarchy={"tertiary"}>Build business flows <br/> in no-time with <br/> CodeZero.</Text>
+                    </Flex>
+                </Flex>
+            </>,
             closeable: true
         })
     }, [store])
 
     return <>
         <Flex p={0.7} pos={"absolute"} bottom={"0"}>
-            <Button onClick={onClick}>Add new FileTab</Button>
+            <Button color={"primary"} onClick={onClick}>Add new FileTab</Button>
         </Flex>
 
         {fileTabs}

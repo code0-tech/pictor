@@ -26,14 +26,14 @@ $sizes: (
 );
 
 $hierarchy: (
-        "primary": 0.75,
-        "secondary": 0.5,
-        "tertiary": 0.25,
+        "primary": 1,
+        "secondary": 0.75,
+        "tertiary": 0.5,
 );
 
 
 //component styling
-$borderRadius: $xl;
+$borderRadius: $md;
 
 $colors: (
         "primary": $primary,

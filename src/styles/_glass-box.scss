@@ -1,0 +1,67 @@
+@use "variables";
+@use "sass:color";
+
+@mixin glassBox(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+
+  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
+  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
+
+  background: rgba($background, .1);
+  border: none;
+  color: rgba($color, .75);
+  position: relative;
+  backdrop-filter: blur(variables.$xxs);
+  -webkit-backdrop-filter: blur(variables.$xxs);
+  width: fit-content;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: variables.$sm;
+  z-index: 1;
+  box-sizing: border-box;
+
+  &:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(140deg, rgba($mixedBorderWhite, .75) 0, rgba($mixedBorderWhite, 0) calc(1rem + 5%)), linear-gradient(300deg, rgba($mixedBorderWhite, .75) 0, rgba($mixedBorderWhite, 0) calc(1rem + 5%)),
+    linear-gradient(-150deg, rgba($mixedBorderBlack, .75) 0%, rgba($mixedBorderBlack, 0) 20%, rgba($mixedBorderBlack, 0) 80%, rgba($mixedBorderBlack, .75) 100%); /* gradient border */
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: -1;
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
+  }
+}
+
+@mixin glassBoxHover(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
+  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .3);
+  }
+}
+
+@mixin glassBoxActive(
+  $background: variables.$secondary,
+  $color: variables.$secondary,
+  $borderColor: variables.$secondary
+) {
+  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
+  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
+
+  &:active {
+    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
+    outline: none;
+  }
+}

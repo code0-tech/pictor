@@ -1,5 +1,6 @@
 @use "../../styles/variables";
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "sass:color";
 
 .d-resizable {
@@ -45,7 +46,7 @@
     padding: .25rem;
 
     & {
-      @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
+      @include box.box(variables.$white, variables.$white, variables.$white);
       @include helpers.borderRadius();
     }
   }

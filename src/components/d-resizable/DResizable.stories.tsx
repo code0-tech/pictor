@@ -5,11 +5,17 @@ import DFullScreen from "../d-fullscreen/DFullScreen";
 import {ZoomPanPinchExample} from "../d-zoom-pan-pinch/DZoomPanPinch.stories";
 import DFolder from "../d-folder/DFolder";
 import Button from "../button/Button";
-import {IconBrandAdobe, IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
+import {
+    IconDatabase,
+    IconFileFilled,
+    IconHierarchy3,
+    IconSettings,
+    IconTicket
+} from "@tabler/icons-react";
 import Flex from "../flex/Flex";
-import {MenuExample} from "../menu /Menu.stories";
-import {ExampleDialog} from "../dialog/Dialog.stories";
 import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
+import Text from "../text/Text";
+import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -46,22 +52,30 @@ export const Dashboard = () => {
                     </Button>
                 </div>
             </Flex>
-            <div>
-                {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
-                    return <DFolder name={"Google Cloud Flows"} defaultOpen>
-                        <DFolder name={"Google Cloud Flows"}>
-                            <DFolder.Item icon={<IconBrandAdobe size={12}/>}
-                                          name={"Google Cloud Flows"}/>
-                            <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
+            <ScrollArea>
+                <ScrollAreaViewport>
+                    {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
+                        return <DFolder name={"Google Cloud Flows"} defaultOpen>
+                            <DFolder name={"Google Cloud Flows"}>
+                                <DFolder.Item icon={<IconFileFilled size={12}/>}
+                                              name={"Google Cloud Flows"}/>
+                                <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
+                            </DFolder>
                         </DFolder>
-                    </DFolder>
-                })}
-            </div>
-            <Flex style={{position: "relative", flex: 1, flexDirection: "column", width: "100%", height: "100%", boxSizing: "border-box"}}>
-                <Flex>
-                    <MenuExample/>
-                    <ExampleDialog/>
-                </Flex>
+                    })}
+                </ScrollAreaViewport>
+                <ScrollAreaScrollbar orientation={"vertical"}>
+                    <ScrollAreaThumb/>
+                </ScrollAreaScrollbar>
+            </ScrollArea>
+            <Flex style={{
+                position: "relative",
+                flex: 1,
+                flexDirection: "column",
+                width: "100%",
+                height: "100%",
+                boxSizing: "border-box"
+            }}>
                 <div style={{position: "relative", overflow: "auto", flex: "1 1 auto", boxSizing: "border-box"}}>
                     <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
                         <DResizablePanel collapsible collapsedSize={0} minSize={10}>

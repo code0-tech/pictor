@@ -6,6 +6,7 @@ import ButtonGroup from "../button-group/ButtonGroup";
 import Button from "../button/Button";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
 import "./DZoomPanPinch.style.scss"
+import Flex from "../flex/Flex";
 
 export interface DZoomPanPinchProps {
 
@@ -29,13 +30,15 @@ const DZoomPanPinch: React.FC<DZoomPanPinchProps> = (props) => {
     }}>
         {({zoomIn, zoomOut, resetTransform}) => (
             <>
-                <div style={{position: "absolute", zIndex: 1, bottom: ".5rem", left: ".5rem"}}>
-                    <ButtonGroup>
-                        <Button color={"secondary"} onClick={() => zoomIn(1)}><IconPlus size={12}/></Button>
-                        <Button color={"secondary"} onClick={() => zoomOut(1)}><IconMinus size={12}/></Button>
-                        <Button color={"secondary"} onClick={() => resetTransform()}><IconFocusCentered size={12}/></Button>
-                        <Button color={"secondary"}>{memorizedScale}</Button>
-                    </ButtonGroup>
+                <div style={{position: "absolute", zIndex: 1, bottom: ".7rem", left: ".7rem"}}>
+                    <Flex align="center" style={{gap: ".35rem"}}>
+                        <ButtonGroup>
+                            <Button color={"primary"} onClick={() => zoomIn(1)}><IconPlus size={15}/></Button>
+                            <Button color={"primary"} onClick={() => zoomOut(1)}><IconMinus size={15}/></Button>
+                            <Button color={"primary"} onClick={() => resetTransform()}><IconFocusCentered size={15}/></Button>
+                        </ButtonGroup>
+                        <Button color={"primary"}>{memorizedScale}</Button>
+                    </Flex>
                 </div>
                 <TransformComponent wrapperClass={"d-zoom-pan-pinch"}>
                     {memorizedChildren}

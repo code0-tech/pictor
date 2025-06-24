@@ -2,181 +2,28 @@
 @use "sass:color";
 @use "variables";
 
-
-@mixin box($active: true, $color: variables.$secondary) {
-  //positioning
-  position: relative;
-
-  //styling
-  border-radius: variables.$borderRadius;
-  border: 1px solid transparent;
-  background: backgroundColor($color);
-  color: rgba(variables.$white, .5);
-  outline: none;
-  font-family: Ubuntu, sans-serif;
-  font-size: variables.$sm;
-
-  @if ($active == true) {
-    @if ($active == true) {
-      &:hover,
-      &:active,
-      &--active,
-      &:focus,
-      &:focus-visible {
-        background: backgroundColor($color, true);
-        outline: none;
-      }
-
-      &:active,
-      &--active,
-      &:focus,
-      &:focus-visible {
-        border: 1px solid borderColor($color, true);
-      }
-    }
-  }
-}
-
-@mixin hoverAndActiveContent() {
-  &:hover, &:active, &--active, &:focus, &:focus-visible {
-    @content;
-    outline: none;
-  }
-}
-
-@mixin activeContent() {
-  &:active, &--active {
-    @content
-  }
-}
-
-@function borderColor($color: variables.$secondary, $interacted: false) {
-  @return rgba(if($color == variables.$primary, variables.$white, $color), if($interacted, if($color == variables.$primary or $color == variables.$secondary, 20%, 40%), if($color == variables.$primary or $color == variables.$secondary, 10%, 30%)))
-}
-
-@function backgroundColor($color: variables.$primary, $interacted: false) {
-  @return if($interacted, color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary or $color == variables.$secondary, 95%, 90%)), color.mix(variables.$bodyBg, $color, if($color == variables.$primary or $color == variables.$secondary, 95%, 90%)))
-}
-
-
-@mixin border($color: variables.$secondary, $interact: true) {
-
-  border: 1px solid borderColor($color);
-
-  @if ($interact) {
-    &:active, &--active {
-      border: 1px solid borderColor($color, true);
-    }
-  }
-}
-
-@function color($color, $opacity: 0.5) {
-  @return rgba(if($color == variables.$primary, variables.$white, $color), $opacity)
-}
-
-@mixin background($color: variables.$primary, $interact: true) {
-  background: color.mix(variables.$bodyBg, $color, 90%);
-
-  @if ($interact == true) {
-    &:hover, &:active, &--active {
-      background: color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary, 95%, 85%));
-    }
-  }
-}
-
-@mixin disabled {
-
-  &--disabled {
+@mixin disabled() {
+  &--disabled, &[data-disabled] {
     opacity: 50%;
     pointer-events: none;
   }
-
-}
-
-@mixin glassBoxTransparent(
-  $background: variables.$secondary,
-  $color: variables.$secondary,
-  $borderColor: variables.$secondary,
-  $active: true
-) {
-
-  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
-  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
-
-  background: rgba($background, .1);
-  border: none;
-  color: rgba($color, .75);
-  position: relative;
-  backdrop-filter: blur(variables.$xxs);
-  -webkit-backdrop-filter: blur(variables.$xxs);
-  width: fit-content;
-  font-family: Arial, sans-serif;
-  font-size: variables.$sm;
-  z-index: 1;
-  box-sizing: border-box;
-
-  &:before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    padding: 1px;
-    border-radius: inherit;
-    background: linear-gradient(140deg, rgba($mixedBorderWhite, .75) 0, rgba($mixedBorderWhite, 0) calc(1rem + 5%)), linear-gradient(300deg, rgba($mixedBorderWhite, .75) 0, rgba($mixedBorderWhite, 0) calc(1rem + 5%)),
-    linear-gradient(-150deg, rgba($mixedBorderBlack, .75) 0%, rgba($mixedBorderBlack, 0) 20%, rgba($mixedBorderBlack, 0) 80%, rgba($mixedBorderBlack, .75) 100%); /* gradient border */
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
-  }
-
-  @if($active == true) {
-    &:hover {
-      box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .3);
-    }
-
-    &:active {
-      box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
-      outline: none;
-    }
-  }
-
-}
-
-@mixin glassBox(
-  $background: variables.$secondary,
-  $color: variables.$secondary,
-  $borderColor: variables.$secondary
-) {
-  @include glassBoxTransparent($background, $color, $borderColor);
-  background: rgba($background, 1);
-  color: rgba($color, 1);
-}
-
-@mixin glassBoxWithoutShadowAndBorder(
-  $background: variables.$secondary,
-  $color: variables.$secondary,
-  $borderColor: variables.$secondary
-) {
-
-  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
-  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
-
-  @include glassBoxTransparent($background, $color, $borderColor);
-  background: rgba($background, .1);
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-
-  &:before {
-    display: none;
-  }
-
-  &:hover {
-    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05);
-  }
-
 }
 
 @mixin borderRadius() {
   border-radius: variables.$borderRadius;
+}
+
+@mixin fontStyle() {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+}
+
+@function borderColor($color: variables.$secondary) {
+  $mixedBorderWhite: color.mix($color, variables.$white, 25%);
+  @return rgba($mixedBorderWhite, .1)
+}
+
+@function backgroundColor($color: variables.$secondary) {
+  @return color.mix($color, variables.$primary, 10%)
 }

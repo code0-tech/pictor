@@ -1,27 +1,41 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .d-folder {
-  @include helpers.box();
+  padding: variables.$xxs variables.$xs;
+  display: flex;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  gap: variables.$xxs;
+  cursor: pointer;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   & {
+    @include helpers.borderRadius();
+    @include box.box(variables.$primary);
+    @include box.boxHover(variables.$secondary);
+    @include helpers.fontStyle();
+    box-shadow: none;
     background: variables.$primary;
-    padding: variables.$xxs;
-    display: flex;
-    white-space: nowrap;
-    gap: variables.$xs;
-
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
   }
 
 
-  &__icon {
+  &__icon, &__status, &__item-icon {
     color: variables.$info;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__status, &__item-icon {
+    color: variables.$white;
   }
 
   &__content {
@@ -31,24 +45,30 @@
     &:before {
       z-index: 10;
       height: 100%;
-      width: 1px;
+      width: 2px;
       background: helpers.backgroundColor(variables.$secondary);
       position: absolute;
       content: "";
-      left: 0;
+      left: 5px;
 
     }
   }
-}
 
-.d-folder-item {
-  @include helpers.box();
-
-  & {
-    background: variables.$primary;
-    padding: variables.$xxs;
+  &__item {
+    padding: variables.$xxs variables.$xs;
     display: flex;
     white-space: nowrap;
-    gap: variables.$xs;
+    flex-wrap: nowrap;
+    gap: variables.$xxs;
+    align-items: center;
+    cursor: pointer;
+
+    & {
+      @include helpers.borderRadius();
+      @include box.box(variables.$primary);
+      @include box.boxHover(variables.$secondary);
+      box-shadow: none;
+      background: transparent;
+    }
   }
 }

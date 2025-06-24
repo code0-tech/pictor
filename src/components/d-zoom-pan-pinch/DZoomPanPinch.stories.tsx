@@ -46,7 +46,7 @@ const FlowLineExample = () => {
         const id2 = addFlowLine({
             align: "vertical",
             startElement: secondRef.current,
-            endElement: thirdRef.current,
+            endElement: thirdRef.current!!,
         })
 
         return () => {

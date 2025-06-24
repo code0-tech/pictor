@@ -1,11 +1,12 @@
 @use "../../styles/helpers";
 @use "../../styles/variables";
+@use "../../styles/box";
 @use "sass:math";
 
 .input {
 
   $padding: variables.$xs;
-  @include helpers.box(true, variables.$primary);
+  @include box.box(variables.$primary);
 
   & {
     display: flex;
@@ -15,11 +16,11 @@
   }
 
   &:has(&__control:focus) {
-    border: 1px solid helpers.borderColor(variables.$primary, true);
+    border: 1px solid helpers.borderColor(variables.$primary);
   }
 
   &--not-valid {
-    border: 1px solid helpers.borderColor(variables.$error, true);
+    border: 1px solid helpers.borderColor(variables.$error);
   }
 
   &__left, &__right {
@@ -31,7 +32,7 @@
     }
 
     &--placeholder {
-      @include helpers.box(false, variables.$secondary);
+      @include box.box(variables.$secondary);
       padding: $padding;
     }
 
@@ -79,7 +80,7 @@
   }
 
   &__message {
-    @include helpers.box(false, variables.$error);
+    @include box.box(variables.$error);
     border-top-right-radius: 0;
     border-top-left-radius: 0;
     padding: $padding * 2 $padding $padding;
@@ -126,11 +127,11 @@
     outline: none;
 
     background-color: transparent;
-    border: 1px solid helpers.borderColor(variables.$secondary, true);
+    border: 1px solid helpers.borderColor(variables.$secondary);
     border-radius: 50%;
 
     &:checked {
-      border-color: helpers.borderColor(variables.$info, true);
+      border-color: helpers.borderColor(variables.$info);
 
       &:before {
         content: "";
@@ -181,11 +182,11 @@
     outline: none;
 
     background-color: transparent;
-    border: 1px solid helpers.borderColor(variables.$secondary, true);
+    border: 1px solid helpers.borderColor(variables.$secondary);
     border-radius: math.div(variables.$borderRadius, 3);
 
     &:checked {
-      border-color: helpers.borderColor(variables.$info, true);
+      border-color: helpers.borderColor(variables.$info);
       background: helpers.backgroundColor(variables.$info);
 
       &:before {

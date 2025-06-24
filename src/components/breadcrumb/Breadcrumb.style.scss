@@ -7,6 +7,6 @@
   gap: variables.$xs;
 
   &__splitter {
-    color: helpers.color(variables.$secondary)
+    color: variables.$secondary;
   }
 }

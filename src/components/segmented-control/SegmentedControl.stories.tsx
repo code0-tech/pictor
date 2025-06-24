@@ -7,7 +7,7 @@ export default {
 } as Meta
 
 export const SegmentedControlExample = () => {
-    return <SegmentedControl  type={"single"}>
+    return <SegmentedControl defaultValue={"codezero"} type={"single"}>
         <SegmentedControlItem value={"codezero"}>
             CodeZero
         </SegmentedControlItem>

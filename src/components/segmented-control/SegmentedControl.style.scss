@@ -1,4 +1,5 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .segmented-control {
@@ -9,17 +10,21 @@
   flex-wrap: nowrap;
 
   & {
-    @include helpers.glassBoxTransparent(variables.$primary, variables.$primary, variables.$primary, false);
+    @include box.box(variables.$primary, variables.$primary, variables.$primary);
     @include helpers.borderRadius();
   }
 
   &__item {
 
     cursor: pointer;
+    padding: variables.$xxs variables.$xs;
 
     & {
-      @include helpers.glassBoxWithoutShadowAndBorder();
+      @include box.box();
       @include helpers.borderRadius();
+      @include helpers.fontStyle();
+      font-size: variables.$sm;
+      box-shadow: none;
     }
 
     &[data-state="off"] {

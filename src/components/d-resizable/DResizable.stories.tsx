@@ -14,9 +14,8 @@ import {
 } from "@tabler/icons-react";
 import Flex from "../flex/Flex";
 import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
-import Text from "../text/Text";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
-import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 
 const meta: Meta = {
     title: "Dashboard Resizable",

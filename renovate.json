@@ -34,6 +34,13 @@
         "rollup-plugin-dts"
       ],
       "groupName": "rollup"
+    },
+    {
+      "matchDepNames": [
+        "storybook",
+        "@storybook/**"
+      ],
+      "groupName": "storybook"
     }
   ]
 }

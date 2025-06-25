@@ -1,0 +1,25 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.tooltip {
+
+  &__content {
+
+    padding: variables.$xxs variables.$xs;
+
+    & {
+      @include box.box(variables.$secondary);
+      @include helpers.fontStyle();
+      @include helpers.borderRadius();
+      box-shadow: none;
+    }
+  }
+
+  &__arrow {
+    & {
+      fill: helpers.backgroundColor(variables.$secondary);
+    }
+  }
+
+}

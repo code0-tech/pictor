@@ -16,6 +16,7 @@ import Flex from "../flex/Flex";
 import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
 import Text from "../text/Text";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -36,20 +37,56 @@ export const Dashboard = () => {
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
             <Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
                 <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
-                    <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"secondary"}>
-                        <IconHierarchy3 size={12}/>
-                    </Button>
-                    <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"warning"}>
-                        <IconTicket size={12}/>
-                    </Button>
-                    <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
-                        <IconDatabase size={12}/>
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"secondary"}>
+                                <IconHierarchy3 size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                All Flows
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"warning"}>
+                                <IconTicket size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Issue Management
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
+                                <IconDatabase size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Database
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
                 </Flex>
                 <div>
-                    <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"primary"}>
-                        <IconSettings size={12}/>
-                    </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"primary"}>
+                                <IconSettings size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Settings
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
                 </div>
             </Flex>
             <ScrollArea>

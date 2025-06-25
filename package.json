@@ -41,7 +41,7 @@
     "@tabler/icons-react": "3.34.0",
     "@types/react": "^19.1.8",
     "axe-playwright": "^2.1.0",
-    "babel-loader": "^9.2.1",
+    "babel-loader": "^10.0.0",
     "concurrently": "^9.1.2",
     "css-loader": "^7.1.2",
     "html-webpack-plugin": "^5.6.3",

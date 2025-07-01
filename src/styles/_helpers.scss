@@ -3,9 +3,9 @@
 @use "variables";
 
 @mixin disabled() {
-  &--disabled, &[data-disabled] {
-    opacity: 50%;
-    pointer-events: none;
+  &:disabled, &[data-disabled], &[aria-disabled=true], &--disabled {
+    cursor: not-allowed;
+    opacity: 25%;
   }
 }
 
@@ -21,9 +21,19 @@
 
 @function borderColor($color: variables.$secondary) {
   $mixedBorderWhite: color.mix($color, variables.$white, 25%);
-  @return rgba($mixedBorderWhite, .1)
+  @return rgba($mixedBorderWhite, .1);
+}
+
+@function color($color: variables.$white, $hierarchy: variables.$hierarchyTertiary) {
+  @return rgba($color, $hierarchy);
 }
 
 @function backgroundColor($color: variables.$secondary) {
-  @return color.mix($color, variables.$primary, 10%)
+  @return color.mix($color, variables.$primary, 10%);
+}
+
+@mixin noFocusStyle() {
+  &:focus {
+    outline: none;
+  }
 }

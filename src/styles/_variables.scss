@@ -17,6 +17,10 @@ $md: 1rem;
 $lg: 1.2rem;
 $xl: 1.3rem;
 
+$hierarchyPrimary: 1;
+$hierarchySecondary: 0.75;
+$hierarchyTertiary: 0.5;
+
 $sizes: (
         "xs": $xs,
         "sm": $sm,
@@ -26,9 +30,9 @@ $sizes: (
 );
 
 $hierarchy: (
-        "primary": 1,
-        "secondary": 0.75,
-        "tertiary": 0.5,
+        "primary": $hierarchyPrimary,
+        "secondary": $hierarchySecondary,
+        "tertiary": $hierarchyTertiary,
 );
 
 

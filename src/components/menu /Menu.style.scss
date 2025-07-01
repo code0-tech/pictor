@@ -3,17 +3,32 @@
 @use "../../styles/variables";
 
 .menu {
-  padding: variables.$xxs;
-  position: relative;
-  box-sizing: border-box;
   z-index: 100;
 
-  & {
-    @include box.box(variables.$primary, variables.$primary, variables.$primary);
-    @include helpers.borderRadius();
+  &__content, &__sub-content {
+    padding: variables.$xxs;
+    position: relative;
+    box-sizing: border-box;
+
+    & {
+      @include box.box(variables.$primary, variables.$primary, variables.$primary);
+      @include helpers.borderRadius();
+    }
   }
 
-  &__item {
+  &__label {
+    text-transform: uppercase;
+    font-size: variables.$xs;
+    display: block;
+    padding: variables.$xxs variables.$xs;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__item, &__sub-trigger {
     border-radius: variables.$borderRadius - variables.$xxs;
     padding: variables.$xxs variables.$xs;
     gap: variables.$xs;
@@ -24,17 +39,15 @@
 
     & {
       @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.disabled();
       box-shadow: none;
     }
 
-    &[data-focus-visible], &[aria-selected=true], &:hover {
+    &:focus {
       @include box.box(variables.$white, variables.$white, variables.$white);
       box-shadow: none;
       width: 100%;
-    }
-
-    &[aria-disabled=true] {
-      opacity: 50%;
     }
   }
 

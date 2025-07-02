@@ -1,3 +1,12 @@
+build:
+  image: node:22.16.0
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+  rules:
+    - if: $C0_UPDATE_SNAPSHOTS == null
+
 storybook:build:
   image: node:22.16.0
   stage: build

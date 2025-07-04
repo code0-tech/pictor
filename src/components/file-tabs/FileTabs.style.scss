@@ -46,11 +46,13 @@
     text-wrap: nowrap;
     margin-bottom: 1px;
     cursor: pointer;
+    font-size: variables.$sm;
 
     & {
       @include box.box(variables.$primary);
       @include box.boxHover(variables.$primary, variables.$primary, variables.$primary);
       @include helpers.borderRadius();
+      @include helpers.fontStyle();
       background: transparent;
       box-shadow: none;
     }

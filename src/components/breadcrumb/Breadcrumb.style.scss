@@ -6,6 +6,10 @@
   align-items: center;
   gap: variables.$xs;
 
+  & {
+    @include helpers.fontStyle();
+  }
+
   &__splitter {
     color: variables.$secondary;
   }

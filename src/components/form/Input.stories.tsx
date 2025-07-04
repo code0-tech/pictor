@@ -9,13 +9,13 @@ import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
 import NumberInput from "./NumberInput";
 import RadioInput from "./radio/RadioInput";
-import CheckboxInput from "./CheckboxInput";
 import RadioGroup from "./radio/RadioGroup";
 import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
 import Flex from "../flex/Flex";
 import SwitchInput from "./SwitchInput";
 import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
+import {CheckboxInput} from "./CheckboxInput";
 
 export default {
     title: "Form"
@@ -172,7 +172,7 @@ export const Checkbox = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            checkbox: null
+            checkbox: false
         },
         validate: {
             checkbox: (value) => {
@@ -186,27 +186,28 @@ export const Checkbox = () => {
     })
 
 
-    return <form>
-        <Card maw={300}>
-            <CheckboxInput
-                label={"Runtime"}
-                description={"Change runtime mode production version"}
-                text={"Dynamic"}
-                {...inputs.getInputProps("checkbox")}
-            />
-            <br/>
-            <div style={{
-                display: "flex",
-                justifyContent: "end"
-            }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
-                    Login
-                </Button>
+    return <Card maw={300}>
 
-            </div>
-        </Card>
-    </form>
+        <CheckboxInput
+            label={"Runtime"}
+            description={"Change runtime mode production version"}
+            text={"Dynamic"}
+            {...inputs.getInputProps("checkbox")}
+        />
+
+        <br/>
+        <div style={{
+            display: "flex",
+            justifyContent: "end"
+        }}>
+            <Button color={"info"} onClick={validate}>
+                <IconLogin size={13}/>
+                Login
+            </Button>
+
+        </div>
+    </Card>
+
 
 }
 
@@ -378,7 +379,8 @@ export const PinInputExample = () => {
 
     return <>
         <Card maw={300}>
-            <PinInput label={"OTP"} description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
+            <PinInput label={"OTP"}
+                      description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
                 <PinInputField/>
                 <PinInputField/>
                 <PinInputField/>

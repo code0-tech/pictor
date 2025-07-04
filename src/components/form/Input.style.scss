@@ -6,49 +6,62 @@
 .input {
 
   $padding: variables.$xs;
-  @include box.box(variables.$primary);
+  display: flex;
+  z-index: 1;
+  align-items: stretch;
+  cursor: pointer;
+  box-sizing: border-box;
 
   & {
-    display: flex;
-    z-index: 1;
-    align-items: stretch;
-    cursor: pointer;
+    @include box.box(variables.$secondary, variables.$white, variables.$white);
+    @include box.boxHover(variables.$primary, variables.$white, variables.$white);
+    @include box.boxActive(variables.$primary, variables.$white, variables.$white);
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
   }
 
   &:has(&__control:focus) {
-    border: 1px solid helpers.borderColor(variables.$primary);
-  }
-
-  &--not-valid {
-    border: 1px solid helpers.borderColor(variables.$error);
+    @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
   }
 
   &__left, &__right {
     display: flex;
     align-items: stretch;
+    margin: $padding / 4;
+    gap: $padding;
+
+    > button {
+      height: 100%;
+      padding-left: 0;
+      padding-right: 0;
+    }
 
     &--action {
       padding: 0;
     }
 
     &--placeholder {
-      @include box.box(variables.$secondary);
+      @include box.box(variables.$primary);
+      @include helpers.fontStyle();
+      border-radius: variables.$borderRadius - ($padding / 4);
       padding: $padding;
     }
 
   }
 
   &__left {
+    padding-left: $padding;
+
     &--icon {
       align-items: center;
-      padding: $padding 0 $padding $padding;
     }
   }
 
   &__right {
+    padding-right: $padding;
+
     &--icon {
       align-items: center;
-      padding: $padding $padding $padding 0;
     }
   }
 
@@ -58,9 +71,14 @@
     outline: none;
     padding: $padding $padding;
     flex: 1;
+    width: 100%;
     box-shadow: none;
     font-size: variables.$sm;
     color: rgba(variables.$white, .5);
+
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
 
@@ -70,6 +88,10 @@
     font-size: variables.$xs;
     //margin: $padding 0;
     display: block;
+
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
   &__description {
@@ -77,26 +99,59 @@
     font-size: variables.$sm;
     margin: calc($padding / 2) 0 $padding;
     display: block;
+
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
   &__message {
-    @include box.box(variables.$error);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    padding: $padding * 2 $padding $padding;
-    top: -$padding;
+    padding: $padding;
     z-index: 0;
     display: flex;
     align-items: center;
     font-size: variables.$xs;
-    gap: $padding;
+    gap: $padding / 2;
+    margin-top: $padding;
+
+    & {
+      @include box.box(variables.$error, variables.$white, variables.$error);
+      @include helpers.borderRadius();
+      @include helpers.fontStyle();
+    }
 
     > svg {
-      width: variables.$xs;
-      height: variables.$xs;
+      width: variables.$sm;
+      height: variables.$sm;
     }
   }
 
+}
+
+.pin-input {
+  display: flex;
+  justify-content: space-between;
+  gap: variables.$xs;
+  position: relative;
+  background: transparent;
+
+  &__field {
+    flex: 1;
+    width: 100%;
+    aspect-ratio: 1/1;
+    text-align: center;
+  }
+}
+
+.number-input {
+  &::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 .radio-input, .radio-button {
@@ -104,7 +159,7 @@
   $padding: variables.$xxs;
   $size: 0.9rem;
 
-  background:transparent !important;
+  background: transparent !important;
   border-radius: 0 !important;
   border: none !important;
   align-items: center;
@@ -141,8 +196,8 @@
         border-radius: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        width: calc($size/2);
-        height: calc($size/2);
+        width: calc($size / 2);
+        height: calc($size / 2);
         background: helpers.backgroundColor(variables.$info);
       }
     }
@@ -195,8 +250,8 @@
         left: 50%;
         top: 50%;
         transform: translateX(-50%) translateY(-50%);
-        width: calc($size/2);
-        height: calc($size/2);
+        width: calc($size / 2);
+        height: calc($size / 2);
         clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         background: rgba(variables.$white, .5);
       }
@@ -229,7 +284,7 @@
     background-color: transparent;
     border-radius: 50%;
 
-    &:checked{
+    &:checked {
 
       &:after {
         -webkit-transform: translateX(22.5px);
@@ -263,8 +318,8 @@
       border-radius: 50rem;
       width: $size * 2.5 + $padding;
       height: $size + $padding;
-      top: calc(-1 * $padding/2);
-      left: calc(-1 * $padding/2);
+      top: calc(-1 * $padding / 2);
+      left: calc(-1 * $padding / 2);
       content: "";
       z-index: -1;
       -webkit-transition: .4s;

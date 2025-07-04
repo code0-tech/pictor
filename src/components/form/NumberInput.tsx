@@ -32,8 +32,9 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
     }
 
     return <Input
-        right={<Button variant={"outlined"} color={"secondary"} onClick={countUp}><IconPlus size={13}/></Button>}
-        left={<Button variant={"outlined"} color={"secondary"} onClick={countDown}><IconMinus size={13}/></Button>}
+        className={"number-input"}
+        right={<Button variant={"none"} onClick={countUp}><IconPlus size={13}/></Button>}
+        left={<Button variant={"none"} onClick={countDown}><IconMinus size={13}/></Button>}
         leftType={"action"}
         type={"number"}
         ref={ref}

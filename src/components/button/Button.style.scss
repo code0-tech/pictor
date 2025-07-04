@@ -1,4 +1,5 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .button {
@@ -7,11 +8,11 @@
   cursor: pointer;
   height: fit-content;
   display: flex;
-  font-size: 1rem;
   align-items: center;
   width: fit-content;
   border-radius: 50rem;
   justify-content: center;
+  font-size: variables.$sm;
 
   @include helpers.disabled;
 }
@@ -19,18 +20,18 @@
 
 @each $name, $color in variables.$colors {
   .button--#{$name} {
-    @if ($name == secondary or $name == info) {
-      @include helpers.glassBox($color, variables.$black, variables.$black);
-    } @else {
-      @include helpers.glassBox($color, variables.$white, variables.$white);
-    }
+      @include box.box($color, variables.$white, variables.$white);
+      @include box.boxHover($color, variables.$white, variables.$white);
+      @include box.boxActive($color, variables.$white, variables.$white);
 
     &.button--outlined {
-      @include helpers.glassBoxTransparent($color, variables.$white, $color);
+      //@include helpers.glassBox($color, variables.$white, $color);
     }
 
     &.button--none {
-      @include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
+      background: transparent;
+      box-shadow: none;
+      //@include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
     }
   }
 }

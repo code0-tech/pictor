@@ -1,32 +1,55 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .menu {
-  @include helpers.glassBoxTransparent(variables.$primary, variables.$primary, variables.$secondary);
-  @include helpers.borderRadius();
-  padding: variables.$xs;
-  position: relative;
-  box-sizing: border-box;
   z-index: 100;
 
-  &__item {
-    @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
+  &__content, &__sub-content {
+    padding: variables.$xxs;
+    position: relative;
+    box-sizing: border-box;
+
+    & {
+      @include box.box(variables.$primary, variables.$primary, variables.$primary);
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__label {
+    text-transform: uppercase;
+    font-size: variables.$xs;
+    display: block;
+    padding: variables.$xxs variables.$xs;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__item, &__sub-trigger {
     border-radius: variables.$borderRadius - variables.$xxs;
     padding: variables.$xxs variables.$xs;
-    background-color: transparent;
+    gap: variables.$xs;
     cursor: pointer;
     width: 100%;
     display: flex;
-    gap: variables.$xs;
     align-items: center;
+    font-size: variables.$sm;
 
-    &[data-focus-visible], &[aria-selected=true], &:hover {
-      @include helpers.glassBoxWithoutShadowAndBorder(variables.$white, variables.$white, variables.$white);
-      width: 100%;
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+      box-shadow: none;
     }
 
-    &[aria-disabled=true] {
-      opacity: 50%;
+    &:focus {
+      @include box.box(variables.$white, variables.$white, variables.$white);
+      box-shadow: none;
+      width: 100%;
     }
   }
 

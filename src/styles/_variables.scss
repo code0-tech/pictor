@@ -17,6 +17,10 @@ $md: 1rem;
 $lg: 1.2rem;
 $xl: 1.3rem;
 
+$hierarchyPrimary: 1;
+$hierarchySecondary: 0.75;
+$hierarchyTertiary: 0.5;
+
 $sizes: (
         "xs": $xs,
         "sm": $sm,
@@ -26,14 +30,14 @@ $sizes: (
 );
 
 $hierarchy: (
-        "primary": 0.75,
-        "secondary": 0.5,
-        "tertiary": 0.25,
+        "primary": $hierarchyPrimary,
+        "secondary": $hierarchySecondary,
+        "tertiary": $hierarchyTertiary,
 );
 
 
 //component styling
-$borderRadius: $xl;
+$borderRadius: $md;
 
 $colors: (
         "primary": $primary,

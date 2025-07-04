@@ -1,55 +1,27 @@
 import {Meta} from "@storybook/react";
-import Tooltip from "./Tooltip";
 import Button from "../button/Button";
 import React from "react";
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "./Tooltip";
 
-const meta: Meta = {
-    title: "Tooltip"
+export default {
+    title: "Tooltip",
+} as Meta
+
+
+export const ExampleTooltip = () => {
+
+    return <Tooltip>
+        <TooltipTrigger asChild>
+            <Button>
+                Simple Button
+            </Button>
+        </TooltipTrigger>
+        <TooltipPortal>
+            <TooltipContent sideOffset={5.6}>
+                Help
+                <TooltipArrow/>
+            </TooltipContent>
+        </TooltipPortal>
+    </Tooltip>
+
 }
-
-export const TooltipExample = () => {
-    return <>
-        <Tooltip position={"top"}>
-            <Tooltip.Trigger>
-                <Button>
-                    Test
-                </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Menu>
-                Test 2
-            </Tooltip.Menu>
-        </Tooltip>
-        <Tooltip position={"left"}>
-            <Tooltip.Trigger>
-                <Button>
-                    Test
-                </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Menu>
-                Test 2
-            </Tooltip.Menu>
-        </Tooltip>
-        <Tooltip position={"bottom"}>
-            <Tooltip.Trigger>
-                <Button>
-                    Test
-                </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Menu>
-                Test 2
-            </Tooltip.Menu>
-        </Tooltip>
-        <Tooltip position={"right"}>
-            <Tooltip.Trigger>
-                <Button>
-                    Test
-                </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Menu>
-                Test 2
-            </Tooltip.Menu>
-        </Tooltip>
-    </>
-}
-
-export default meta

@@ -1,0 +1,43 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.scroll-area {
+  overflow: hidden;
+
+  &__viewport {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__scrollbar {
+    display: flex;
+    /* ensures no selection */
+    user-select: none;
+    /* disable browser handling of all panning and zooming gestures on touch devices */
+    touch-action: none;
+
+    &[data-orientation="vertical"] {
+      width: .5rem;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: column;
+      height: .5rem;
+    }
+  }
+
+  &__thumb {
+    flex: 1;
+    cursor: grabbing;
+
+    & {
+      @include box.box();
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__corner {
+
+  }
+}

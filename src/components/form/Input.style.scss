@@ -215,48 +215,37 @@
   $padding: variables.$xxs;
   $size: 0.9rem;
 
-  background: helpers.backgroundColor(variables.$secondary) !important;
-  border-radius: 0 !important;
-  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
   align-items: center;
   box-sizing: border-box;
   gap: variables.$xxs;
   padding: $padding 0;
 
-  .input__control {
+  &__button {
 
-    position: relative;
-    flex: none;
-    box-sizing: border-box;
-    padding: 0;
-    margin: 1px 0;
-    width: $size;
-    height: $size;
+    aspect-ratio: 1/1;
+    width: 17px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    appearance: none;
-    outline: none;
-
-    background-color: transparent;
-    border: 1px solid helpers.borderColor(variables.$secondary);
-    border-radius: math.div(variables.$borderRadius, 3);
-
-    &:checked {
-      border-color: helpers.borderColor(variables.$info);
-      background: helpers.backgroundColor(variables.$info);
-
-      &:before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translateX(-50%) translateY(-50%);
-        width: calc($size / 2);
-        height: calc($size / 2);
-        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        background: rgba(variables.$white, .5);
-      }
+    & {
+      @include helpers.fontStyle();
+      @include box.boxActive();
+      @include box.box();
+      @include helpers.borderRadius();
     }
 
+  }
+
+  &__indicator {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 1px;
   }
 }
 

@@ -2,7 +2,6 @@ import {Meta} from "@storybook/react";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
-import {ZoomPanPinchExample} from "../d-zoom-pan-pinch/DZoomPanPinch.stories";
 import DFolder from "../d-folder/DFolder";
 import Button from "../button/Button";
 import {
@@ -16,6 +15,7 @@ import Flex from "../flex/Flex";
 import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
+import {ExampleFlowLine} from "../flow-line/FlowLines.stories";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -115,7 +115,7 @@ export const Dashboard = () => {
                 <div style={{position: "relative", overflow: "auto", flex: "1 1 auto", boxSizing: "border-box"}}>
                     <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
                         <DResizablePanel collapsible collapsedSize={0} minSize={10}>
-                            <ZoomPanPinchExample/>
+                            <ExampleFlowLine/>
                         </DResizablePanel>
                         <DResizableHandle/>
                         <DResizablePanel>

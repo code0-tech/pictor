@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {Meta} from "@storybook/react";
 import FlowLinesProvider, {useFlowLines} from "./FlowLinesProvider"
@@ -18,7 +20,7 @@ const meta: Meta = {
 
 export default meta
 
-export const VerticalComplexFlowLine = () => {
+export const ExampleFlowLine = () => {
 
     return <DZoomPanPinch>
         <FlowLinesProvider>
@@ -27,7 +29,7 @@ export const VerticalComplexFlowLine = () => {
     </DZoomPanPinch>
 }
 
-export const FlowLineExample = () => {
+const FlowLineExample = () => {
 
     const {addFlowLine, removeFlowLine} = useFlowLines()
     const firstRef = React.useRef<HTMLDivElement>(null)

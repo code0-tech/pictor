@@ -75,24 +75,24 @@ const FlowLinesProvider: React.FC<FlowLinesProvider> = (props) => {
 
         if (alignment === 'vertical' && bBEndElement.y <= bBStartElement.y) {
             return {
-                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x,
-                y: (bBStartElement.y) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x!!,
+                y: (bBStartElement.y) - svgRef.current?.getBoundingClientRect().y!!
             }
         } else if (alignment === 'vertical' && bBStartElement.y <= bBEndElement.y) {
             return {
-                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x,
-                y: (bBStartElement.bottom) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x + (bBStartElement.width / 2)) - svgRef.current?.getBoundingClientRect().x!!,
+                y: (bBStartElement.bottom) - svgRef.current?.getBoundingClientRect().y!!
             }
         } else if (alignment === 'horizontal' && bBEndElement.x >= bBStartElement.x) {
             return {
-                x: (bBStartElement.x) - svgRef.current?.getBoundingClientRect().x,
-                y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y
+                x: (bBStartElement.x) - svgRef.current?.getBoundingClientRect().x!!,
+                y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y!!
             }
         }
 
         return {
-            x: (bBStartElement.right) - svgRef.current?.getBoundingClientRect().x,
-            y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y
+            x: (bBStartElement.right) - svgRef.current?.getBoundingClientRect().x!!,
+            y: (bBStartElement.y + (bBStartElement.height / 2)) - svgRef.current?.getBoundingClientRect().y!!
         }
 
     }, [])

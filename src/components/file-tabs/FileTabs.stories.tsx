@@ -61,12 +61,12 @@ export const ExampleFileTabs = () => {
             <FileTabsList controls={<>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"primary"} style={{aspectRatio: "1/1"}}>
+                        <Button variant={"none"} color={"primary"} style={{aspectRatio: "1/1"}}>
                             <IconChevronDown size={12}/>
                         </Button>
                     </MenuTrigger>
                     <MenuPortal>
-                        <MenuContent>
+                        <MenuContent align={"end"} sideOffset={8}>
                             {service.values().map((value) => {
                                 return <MenuItem onClick={() => {
                                     service.activateTab(value.id!!)
@@ -78,12 +78,12 @@ export const ExampleFileTabs = () => {
                 </Menu>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"primary"} style={{aspectRatio: "1/1"}}>
+                        <Button variant={"none"} color={"primary"} style={{aspectRatio: "1/1"}}>
                             <IconDotsVertical size={12}/>
                         </Button>
                     </MenuTrigger>
                     <MenuPortal>
-                        <MenuContent>
+                        <MenuContent align={"end"} sideOffset={8}>
                             <MenuItem onClick={() => service.clear()}> Close all tabs</MenuItem>
                             <MenuItem onClick={() => service.clearWithoutActive()}> Close other tabs</MenuItem>
                             <MenuSeparator/>
@@ -124,7 +124,7 @@ export const ExampleFileTabs = () => {
 
     return <>
         <Flex p={0.7} pos={"absolute"} bottom={"0"}>
-            <Button color={"primary"} onClick={onClick}>Add new FileTab</Button>
+            <Button color={"secondary"} onClick={onClick}>Add new FileTab</Button>
         </Flex>
 
         {fileTabs}

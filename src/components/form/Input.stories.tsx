@@ -1,6 +1,5 @@
 import React from "react";
 import useForm from "./useForm";
-import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
 import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
@@ -16,6 +15,7 @@ import RadioButton from "./radio/RadioButton";
 import CardSection from "../card/CardSection";
 import Flex from "../flex/Flex";
 import SwitchInput from "./SwitchInput";
+import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 
 export default {
     title: "Form"
@@ -44,7 +44,7 @@ export const Login = () => {
         }
     })
 
-    return <Card maw={300}>
+    return <Card color={"primary"} maw={300}>
         <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
         <br/>
         <Text size={"sm"} display={"block"}>
@@ -74,9 +74,6 @@ export const Login = () => {
                 justifyContent: "space-between",
                 gap: ".75rem",
             }}>
-                <Button w={"100%"} variant={"none"} color={"primary"} onClick={validate}>
-                    Clear
-                </Button>
                 <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
                     Login
                 </Button>
@@ -231,7 +228,8 @@ export const RadioCard = () => {
     return <RadioGroup {...inputs.getInputProps("radio")}>
         {({activeRadio, setActiveRadio}) => {
             return <>
-                <Card onClick={() => setActiveRadio("dynamic")} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
+                <Card onClick={() => setActiveRadio("dynamic")}
+                      borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
                     <CardSection border>
                         <RadioButton name={"test1"} value={"dynamic"}/>
                     </CardSection>
@@ -241,7 +239,8 @@ export const RadioCard = () => {
                     </CardSection>
                 </Card>
                 <br/>
-                <Card onClick={() => setActiveRadio("hybrid")} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
+                <Card onClick={() => setActiveRadio("hybrid")}
+                      borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
                     <CardSection border>
                         <RadioButton name={"test1"} value={"hybrid"}/>
                     </CardSection>
@@ -284,15 +283,19 @@ export const RadioWithoutInput = () => {
         {({activeRadio, setActiveRadio}) => {
             return <>
                 <Flex style={{gap: ".5rem", flexDirection: "column"}}>
-                    <Card onClick={() => setActiveRadio("dynamic")} maw={200} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
+                    <Card onClick={() => setActiveRadio("dynamic")} maw={200}
+                          borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
                         <CardSection>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+                            invidunt
                             ut
                         </CardSection>
                     </Card>
-                    <Card onClick={() => setActiveRadio("hybrid")} maw={200} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
+                    <Card onClick={() => setActiveRadio("hybrid")} maw={200}
+                          borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
                         <CardSection>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor
+                            invidunt
                             ut
                         </CardSection>
                     </Card>
@@ -352,5 +355,50 @@ export const Switch = () => {
             </div>
         </Card>
     </form>
+
+}
+
+
+export const PinInputExample = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            pinInput: null
+        },
+        validate: {
+            pinInput: (value: string | null) => {
+                if (!value || value.length != 6) return "Please type or paste your 6-digit code"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <>
+        <Card maw={300}>
+            <PinInput label={"OTP"} description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputHiddenField/>
+            </PinInput>
+            <div style={{
+                display: "flex",
+                justifyContent: "end",
+                marginTop: ".7rem"
+            }}>
+                <Button color={"secondary"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+        </Card>
+    </>
 
 }

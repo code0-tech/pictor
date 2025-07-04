@@ -16,7 +16,7 @@ export interface ValidationProps<Value> {
     initialValue?: Value | null
     required?: boolean
     formValidation?: {
-        setValue: (value: string) => void
+        setValue: (value: any) => void
         valid?: boolean
         notValidMessage?: string | null
     }
@@ -56,7 +56,7 @@ class Validation<Values> implements IValidation<Values> {
         return {
             initialValue: currentValue,
             formValidation: {
-                setValue: (value: string) => {
+                setValue: (value: any) => {
                     this.changeValue(currentName, value)
                 },
                 ...(!this.initialRender ? {

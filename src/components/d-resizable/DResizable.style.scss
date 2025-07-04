@@ -6,13 +6,13 @@
 .d-resizable {
 
   &__panel {
-    background: rgba(variables.$white, .05);
     color: white;
     position: relative;
     overflow: hidden;
     z-index: 0;
 
     & {
+      @include box.box(variables.$primary);
       @include helpers.borderRadius();
     }
 

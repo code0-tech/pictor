@@ -6,7 +6,7 @@ import {mergeCode0Props} from "../../utils/utils";
 
 export interface Card extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
-    //defaults to secondary
+    //defaults to primary
     color?: Color,
     //defaults to normal
     variant?: "none" | "normal" | "outlined" | "filled"
@@ -29,7 +29,7 @@ const Card: React.FC<Card> = (props) => {
 
     const {
         children,
-        color = "secondary",
+        color = "primary",
         variant = "normal",
         gradient = false,
         gradientColor = "secondary",

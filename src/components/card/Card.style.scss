@@ -3,13 +3,18 @@
 @use "../../styles/variables";
 @use "sass:math";
 
-$padding: variables.$xs;
+$padding: variables.$md;
 
 .card {
 
   display: block;
   padding: $padding;
   position: relative;
+  font-size: variables.$sm;
+
+  & {
+    @include helpers.fontStyle();
+  }
 
   * {
 

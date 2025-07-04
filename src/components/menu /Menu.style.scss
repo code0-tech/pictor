@@ -36,10 +36,12 @@
     width: 100%;
     display: flex;
     align-items: center;
+    font-size: variables.$sm;
 
     & {
       @include box.box(variables.$primary, variables.$white, variables.$primary);
       @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
       @include helpers.disabled();
       box-shadow: none;
     }

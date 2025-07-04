@@ -27,13 +27,6 @@
         "devDependencies"
       ],
       "rangeStrategy": "bump"
-    },
-    {
-      "matchDepNames": [
-        "rollup",
-        "rollup-plugin-dts"
-      ],
-      "groupName": "rollup"
     }
   ]
 }

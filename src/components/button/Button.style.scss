@@ -8,11 +8,11 @@
   cursor: pointer;
   height: fit-content;
   display: flex;
-  font-size: 1rem;
   align-items: center;
   width: fit-content;
   border-radius: 50rem;
   justify-content: center;
+  font-size: variables.$sm;
 
   @include helpers.disabled;
 }
@@ -29,6 +29,8 @@
     }
 
     &.button--none {
+      background: transparent;
+      box-shadow: none;
       //@include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
     }
   }

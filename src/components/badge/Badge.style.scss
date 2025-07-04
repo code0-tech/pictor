@@ -3,18 +3,23 @@
 @use "../../styles/variables";
 
 .badge {
-  @include box.box();
-
   padding: variables.$xxs variables.$xs;
   display: inline-flex;
   font-size: variables.$xs;
   width: fit-content;
+
+  & {
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
+  }
 }
 
 @each $name, $color in variables.$colors {
   .badge--#{$name} {
-    @include box.box($color);
-    @include helpers.borderRadius();
-    font-size: variables.$xs;
+
+    & {
+      @include box.box($color);
+      box-shadow: none;
+    }
   }
 }

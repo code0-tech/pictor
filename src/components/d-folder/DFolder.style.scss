@@ -9,6 +9,7 @@
   flex-wrap: nowrap;
   gap: variables.$xxs;
   cursor: pointer;
+  font-size: variables.$sm;
 
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -62,11 +63,13 @@
     gap: variables.$xxs;
     align-items: center;
     cursor: pointer;
+    font-size: variables.$sm;
 
     & {
       @include helpers.borderRadius();
       @include box.box(variables.$primary);
       @include box.boxHover(variables.$secondary);
+      @include helpers.fontStyle();
       box-shadow: none;
       background: transparent;
     }

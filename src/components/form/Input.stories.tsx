@@ -172,7 +172,7 @@ export const Checkbox = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            checkbox: false
+            checkbox: true
         },
         validate: {
             checkbox: (value) => {

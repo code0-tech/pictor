@@ -1,18 +1,35 @@
 @use "../../styles/helpers";
 @use "../../styles/media";
+@use "../../styles/box";
 @use "../../styles/variables";
+@use "sass:color";
 
 .dialog {
-  @include helpers.box(false);
-  z-index: 100;
+  @include box.box(variables.$primary, variables.$primary, variables.$secondary);
+  @include helpers.borderRadius();
+
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   position: relative;
-  padding: .5rem;
+  padding: variables.$xl;
   margin: auto;
   overflow: auto;
   inset: auto;
   height: fit-content;
   max-height: none;
+
+  &:after {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    backdrop-filter: blur(variables.$xxs);
+  }
+
 
   @include media.respond-above(md) {
     width: 420px;
@@ -45,7 +62,5 @@
 }
 
 [data-backdrop] {
-  background-color: rgba(variables.$primary, .2);
-  -webkit-backdrop-filter: blur(.1rem);
-  backdrop-filter: blur(.1rem);
+  background-color: rgba(variables.$primary, .5);
 }

@@ -1,4 +1,3 @@
-export { default as Alert} from "./components/alert/Alert"
 export { default as Badge} from "./components/badge/Badge"
 export { default as Button} from "./components/button/Button"
 export { default as ButtonGroup} from "./components/button-group/ButtonGroup"
@@ -12,8 +11,6 @@ export {default as DZoomPanPinch} from "./components/d-zoom-pan-pinch/DZoomPanPi
 
 export { default as Dialog} from "./components/dialog/Dialog"
 export { default as Flex} from "./components/flex/Flex"
-export { default as ListGroup} from "./components/list-group/ListGroup"
 export { default as Quote} from "./components/quote/Quote"
 export { default as Row} from "./components/row/Row"
 export { default as Text} from "./components/text/Text"
-export { default as Tooltip} from "./components/tooltip/Tooltip"

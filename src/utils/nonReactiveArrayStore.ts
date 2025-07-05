@@ -42,6 +42,10 @@ export class NonReactiveArrayService<T> implements ArrayService<T> {
         this.store = [...this.store]
     }
 
+    clear(): void {
+        this.store = []
+    }
+
 }
 
 // @ts-ignore

@@ -2,93 +2,40 @@
 @use "sass:color";
 @use "variables";
 
-
-@mixin box($active: true, $color: variables.$secondary) {
-  //positioning
-  position: relative;
-
-  //styling
-  border-radius: variables.$borderRadius;
-  border: 1px solid transparent;
-  background: backgroundColor($color);
-  color: rgba(variables.$white, .5);
-  outline: none;
-  font-family: Ubuntu, sans-serif;
-  font-size: variables.$sm;
-
-  @if ($active == true) {
-    @if ($active == true) {
-      &:hover,
-      &:active,
-      &--active,
-      &:focus,
-      &:focus-visible {
-        background: backgroundColor($color, true);
-        outline: none;
-      }
-
-      &:active,
-      &--active,
-      &:focus,
-      &:focus-visible {
-        border: 1px solid borderColor($color, true);
-      }
-    }
+@mixin disabled() {
+  &:disabled, &[data-disabled], &[aria-disabled=true], &--disabled {
+    cursor: not-allowed;
+    opacity: 25%;
+    pointer-events: unset;
   }
 }
 
-@mixin hoverAndActiveContent() {
-  &:hover, &:active, &--active, &:focus, &:focus-visible {
-    @content;
+@mixin borderRadius() {
+  border-radius: variables.$borderRadius;
+}
+
+@mixin fontStyle() {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  line-height: 1.5;
+}
+
+@function borderColor($color: variables.$secondary) {
+  $mixedBorderWhite: color.mix($color, variables.$white, 25%);
+  @return rgba($mixedBorderWhite, .1);
+}
+
+@function color($color: variables.$white, $hierarchy: variables.$hierarchyTertiary) {
+  @return rgba($color, $hierarchy);
+}
+
+@function backgroundColor($color: variables.$secondary) {
+  @return color.mix($color, variables.$primary, 10%);
+}
+
+@mixin noFocusStyle() {
+  &:focus {
     outline: none;
   }
-}
-
-@mixin activeContent() {
-  &:active, &--active {
-    @content
-  }
-}
-
-@function borderColor($color: variables.$secondary, $interacted: false) {
-  @return rgba(if($color == variables.$primary, variables.$white, $color), if($interacted, if($color == variables.$primary or $color == variables.$secondary, 20%, 40%), if($color == variables.$primary or $color == variables.$secondary, 10%, 30%)))
-}
-
-@function backgroundColor($color: variables.$primary, $interacted: false) {
-  @return if($interacted, color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary or $color == variables.$secondary, 80%, 60%)), color.mix(variables.$bodyBg, $color, if($color == variables.$primary or $color == variables.$secondary, 90%, 70%)))
-}
-
-
-@mixin border($color: variables.$secondary, $interact: true) {
-
-  border: 1px solid borderColor($color);
-
-  @if ($interact) {
-    &:active, &--active {
-      border: 1px solid borderColor($color, true);
-    }
-  }
-}
-
-@function color($color, $opacity: 0.5) {
-  @return rgba(if($color == variables.$primary, variables.$white, $color), $opacity)
-}
-
-@mixin background($color: variables.$primary, $interact: true) {
-  background: color.mix(variables.$bodyBg, $color, 90%);
-
-  @if ($interact == true) {
-    &:hover, &:active, &--active {
-      background: color.mix(variables.$bodyBg, if($color == variables.$primary, variables.$white, $color), if($color == variables.$primary, 95%, 85%));
-    }
-  }
-}
-
-@mixin disabled {
-
-  &--disabled {
-    opacity: 50%;
-    pointer-events: none;
-  }
-
 }

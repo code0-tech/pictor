@@ -1,14 +1,20 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .avatar {
-  @include helpers.box(false);
-  aspect-ratio: 50 / 50;
+  aspect-ratio: 1 / 1;
   padding: variables.$xxs;
   display: flex;
+  width: 38px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  & {
+    @include box.box();
+    @include helpers.borderRadius();
+  }
 
   &--image {
     padding: 0;

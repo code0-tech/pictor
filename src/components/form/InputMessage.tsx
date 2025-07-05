@@ -10,7 +10,7 @@ const InputMessage: React.FC<InputMessageProps> = (props) => {
     const {children} = props
 
     return <span className={"input__message"}>
-        <IconExclamationCircle/>
+        <IconExclamationCircle size={16}/>
         {children}
     </span>
 

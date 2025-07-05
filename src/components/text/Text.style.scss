@@ -1,7 +1,7 @@
 @use "../../styles/variables";
 
 .text {
-  font-family: Ubuntu, sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 @each $name, $font in variables.$sizes {
@@ -9,8 +9,14 @@
     font-size: $font;
   }
 }
+
 @each $name, $opacity in variables.$hierarchy {
   .text--#{$name} {
+    @if ($name == "primary") {
+      font-family: "Inter", sans-serif;
+    }
+    line-height: 1.1;
+    letter-spacing: -0.75px;
     color: rgba(variables.$white, $opacity);
   }
 }

@@ -2,3 +2,14 @@ html {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+.sb-show-main {
+  background: url(https://applescoop.org/image/wallpapers/mac/windows-10-stock-hd-cells-glowing-dark-22-09-2024-1727068449-hd-wallpaper.jpeg);
+  transition: background-color 0.3s;
+  background-position: center;
+  background-size: cover;
+}
+
+.sb-main-fullscreen {
+  background: #030014 !important;
+}

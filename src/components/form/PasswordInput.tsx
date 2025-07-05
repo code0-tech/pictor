@@ -20,18 +20,24 @@ const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> = React
         ...rest
     } = props
 
-    const toClearable = () => {
+    const toClearable = (event: MouseEvent) => {
         if (ref.current) setElementKey(ref.current, "value", "", "change")
+        event.stopPropagation()
+        event.preventDefault()
+        return false
     }
 
-    const toVisible = () => {
+    const toVisible = (event: MouseEvent) => {
         if (ref.current && ref.current.type == "password") ref.current.type = "text"
         else if (ref.current && ref.current.type == "text") ref.current.type = "password"
+        event.stopPropagation()
+        event.preventDefault()
+        return false
     }
 
     const rightAction = [right]
-    visible && rightAction.push(<Button onClick={toVisible}><IconEye size={13}/></Button>)
-    clearable && rightAction.push(<Button onClick={toClearable}><IconX size={13}/></Button>)
+    visible && rightAction.push(<Button variant={"none"} onClick={toVisible}><IconEye size={13}/></Button>)
+    clearable && rightAction.push(<Button variant={"none"} onClick={toClearable}><IconX size={13}/></Button>)
 
 
     return <Input

@@ -63,9 +63,9 @@ const DFolderItem: React.FC<DFolderItemProps> = (props) => {
 
     const {name, icon, active, ...rest} = props
 
-    return <div {...mergeCode0Props(`d-folder-item ${active ? "d-folder-item--active" : ""}`, rest)}>
-        {icon? <span className={"d-folder-item__icon"}>{icon}</span> : null}
-        <span className={"d-folder-item__name"}>{name}</span>
+    return <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)}>
+        {icon? <span className={"d-folder__item-icon"}>{icon}</span> : null}
+        <span className={"d-folder__item-name"}>{name}</span>
     </div>
 }
 

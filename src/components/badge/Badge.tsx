@@ -4,7 +4,7 @@ import {Code0Component, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 
 export interface BadgeType extends Code0Component<HTMLSpanElement>{
-    children: string
+    children: React.ReactNode
     //defaults to primary
     color?: Color
 }

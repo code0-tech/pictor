@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {Meta} from "@storybook/react";
 import FlowLinesProvider, {useFlowLines} from "./FlowLinesProvider"
@@ -18,7 +20,7 @@ const meta: Meta = {
 
 export default meta
 
-export const VerticalComplexFlowLine = () => {
+export const ExampleFlowLine = () => {
 
     return <DZoomPanPinch>
         <FlowLinesProvider>
@@ -46,7 +48,7 @@ const FlowLineExample = () => {
         const id2 = addFlowLine({
             align: "vertical",
             startElement: secondRef.current,
-            endElement: thirdRef.current,
+            endElement: thirdRef.current!!,
         })
 
         return () => {
@@ -59,6 +61,7 @@ const FlowLineExample = () => {
     return <Flex p={1} style={{gap: "10rem", flexDirection: "column"}}>
         <div ref={firstRef}>
             <Quote name={"Nico Sammito"}
+                   color={"secondary"}
                    position={"Co-founder"}
                    logo={"https://code0.tech/code0_logo.png"}
                    w={"300px"}>
@@ -70,6 +73,7 @@ const FlowLineExample = () => {
         </div>
         <div ref={secondRef} style={{position: "relative", left: "10rem"}}>
             <Quote name={"Nico Sammito"}
+                   color={"secondary"}
                    position={"Co-founder"}
                    logo={"https://code0.tech/code0_logo.png"}
                    w={"300px"}>
@@ -81,6 +85,7 @@ const FlowLineExample = () => {
         </div>
         <div ref={thirdRef} style={{position: "relative", left: "10rem"}}>
             <Quote name={"Nico Sammito"}
+                   color={"secondary"}
                    position={"Co-founder"}
                    logo={"https://code0.tech/code0_logo.png"}
                    w={"300px"}>

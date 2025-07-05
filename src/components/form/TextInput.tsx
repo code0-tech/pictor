@@ -24,7 +24,7 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
     }
 
     const rightAction = [right]
-    clearable && rightAction.push(<Button onClick={toClearable}><IconX size={13}/></Button>)
+    clearable && rightAction.push(<Button variant={"none"} onClick={toClearable}><IconX size={13}/></Button>)
 
 
     return <Input

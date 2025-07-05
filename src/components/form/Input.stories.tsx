@@ -1,6 +1,5 @@
 import React from "react";
 import useForm from "./useForm";
-import Input from "./Input";
 import Card from "../card/Card";
 import Button from "../button/Button";
 import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
@@ -9,13 +8,11 @@ import PasswordInput from "./PasswordInput";
 import TextInput from "./TextInput";
 import EmailInput, {emailValidation} from "./EmailInput";
 import NumberInput from "./NumberInput";
-import RadioInput from "./radio/RadioInput";
-import CheckboxInput from "./CheckboxInput";
-import RadioGroup from "./radio/RadioGroup";
-import RadioButton from "./radio/RadioButton";
-import CardSection from "../card/CardSection";
-import Flex from "../flex/Flex";
 import SwitchInput from "./SwitchInput";
+import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
+import {CheckboxInput} from "./CheckboxInput";
+import {RadioGroup} from "./RadioGroup";
+import {RadioInput} from "./RadioInput";
 
 export default {
     title: "Form"
@@ -25,9 +22,8 @@ export const Login = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            email: "nicoq@",
+            email: "nicoq@de.de",
             password: null,
-            checkbox: true
         },
         validate: {
             email: (value) => {
@@ -45,7 +41,7 @@ export const Login = () => {
         }
     })
 
-    return <Card maw={300}>
+    return <Card color={"primary"} maw={300}>
         <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
         <br/>
         <Text size={"sm"} display={"block"}>
@@ -56,7 +52,7 @@ export const Login = () => {
         <form>
             <EmailInput
                 placeholder={"Email"}
-                label={"Email"}
+                title={"Email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
                 {...inputs.getInputProps("email")}
@@ -64,7 +60,7 @@ export const Login = () => {
             <br/>
             <PasswordInput
                 placeholder={"Password"}
-                label={"Password"}
+                title={"Password"}
                 description={"Your password for login"}
                 left={<IconKey size={13}/>}
                 {...inputs.getInputProps("password")}
@@ -72,10 +68,10 @@ export const Login = () => {
             <br/>
             <div style={{
                 display: "flex",
-                justifyContent: "end"
+                justifyContent: "space-between",
+                gap: ".75rem",
             }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
+                <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
                     Login
                 </Button>
 
@@ -90,7 +86,7 @@ export const Website = () => {
 
     return <Card maw={300}>
         <TextInput
-            label={"website"}
+            title={"website"}
             description={"Your website for linking"}
             clearable
             placeholder={"code0.tech"}
@@ -105,7 +101,7 @@ export const Number = () => {
 
     return <Card maw={300}>
         <NumberInput
-            label={"number"}
+            title={"number"}
             description={"Increase and decrease your number"}
             placeholder={"code0.tech"}
         />
@@ -117,7 +113,7 @@ export const RadioExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            radio: "dynamic"
+            radio: null
         },
         validate: {
             radio: (value) => {
@@ -131,28 +127,23 @@ export const RadioExample = () => {
     })
 
 
-    return <form>
-        <Card maw={300}>
-            <RadioInput
-                label={"Runtime"}
-                description={"Change runtime mode production version"}
-                value={"dynamic"}
-                name={"test1"}
-                text={"Dynamic"}
-                {...inputs.getInputProps("radio")}
-            />
-            <RadioInput
-                value={"hybrid"}
-                name={"test1"}
-                text={"Hybrid"}
-                {...inputs.getInputProps("radio")}
-            />
-            <RadioInput
-                value={"static"}
-                name={"test1"}
-                text={"Static"}
-                {...inputs.getInputProps("radio")}
-            />
+    return <Card maw={300}>
+            <RadioGroup title={"Runtime"}
+                        description={"Change runtime mode production version"}
+                        {...inputs.getInputProps("radio")}>
+                <RadioInput
+                    value={"dynamic"}
+                    label={"Dynamic"}
+                />
+                <RadioInput
+                    value={"hybrid"}
+                    label={"Hybrid"}
+                />
+                <RadioInput
+                    value={"static"}
+                    label={"Static"}
+                />
+            </RadioGroup>
             <br/>
             <div style={{
                 display: "flex",
@@ -165,7 +156,7 @@ export const RadioExample = () => {
 
             </div>
         </Card>
-    </form>
+
 }
 
 
@@ -173,7 +164,7 @@ export const Checkbox = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            checkbox: null
+            checkbox: true
         },
         validate: {
             checkbox: (value) => {
@@ -187,128 +178,29 @@ export const Checkbox = () => {
     })
 
 
-    return <form>
-        <Card maw={300}>
-            <CheckboxInput
-                label={"Runtime"}
-                description={"Change runtime mode production version"}
-                text={"Dynamic"}
-                {...inputs.getInputProps("checkbox")}
-            />
-            <br/>
-            <div style={{
-                display: "flex",
-                justifyContent: "end"
-            }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
-                    Login
-                </Button>
+    return <Card maw={300}>
 
-            </div>
-        </Card>
-    </form>
+        <CheckboxInput
+            title={"Runtime"}
+            description={"Change runtime mode production version"}
+            label={"Dynamic"}
+            {...inputs.getInputProps("checkbox")}
+        />
 
-}
+        <br/>
+        <div style={{
+            display: "flex",
+            justifyContent: "end"
+        }}>
+            <Button color={"info"} onClick={validate}>
+                <IconLogin size={13}/>
+                Login
+            </Button>
 
-export const RadioCard = () => {
-    const [inputs, validate] = useForm({
-        initialValues: {
-            radio: "dynamic"
-        },
-        validate: {
-            radio: (value) => {
-                if (!value) return "Error"
-                return null
-            }
-        },
-        onSubmit: (values) => {
-            console.log(values)
-        }
-    })
-    return <RadioGroup {...inputs.getInputProps("radio")}>
-        {({activeRadio, setActiveRadio}) => {
-            return <>
-                <Card onClick={() => setActiveRadio("dynamic")} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
-                    <CardSection border>
-                        <RadioButton name={"test1"} value={"dynamic"}/>
-                    </CardSection>
-                    <CardSection>
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                        ut
-                    </CardSection>
-                </Card>
-                <br/>
-                <Card onClick={() => setActiveRadio("hybrid")} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
-                    <CardSection border>
-                        <RadioButton name={"test1"} value={"hybrid"}/>
-                    </CardSection>
-                    <CardSection>
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                        ut
-                    </CardSection>
-                </Card>
-                <br/>
-                <div style={{
-                    display: "flex",
-                    justifyContent: "end"
-                }}>
-                    <Button color={"info"} onClick={validate}>
-                        <IconLogin size={13}/>
-                        Login
-                    </Button>
-                </div>
-            </>
-        }}
-    </RadioGroup>
-}
+        </div>
+    </Card>
 
-export const RadioWithoutInput = () => {
-    const [inputs, validate] = useForm({
-        initialValues: {
-            radio: "dynamic"
-        },
-        validate: {
-            radio: (value) => {
-                if (!value) return "Error"
-                return null
-            }
-        },
-        onSubmit: (values) => {
-            console.log(values)
-        }
-    })
-    return <RadioGroup {...inputs.getInputProps("radio")}>
-        {({activeRadio, setActiveRadio}) => {
-            return <>
-                <Flex style={{gap: ".5rem"}}>
-                    <Card onClick={() => setActiveRadio("dynamic")} maw={200} borderColor={activeRadio == "dynamic" ? "info" : "primary"} color={"secondary"}>
-                        <CardSection>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                            ut
-                        </CardSection>
-                    </Card>
-                    <Card onClick={() => setActiveRadio("hybrid")} maw={200} borderColor={activeRadio == "hybrid" ? "info" : "primary"} color={"secondary"}>
-                        <CardSection>
-                            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                            ut
-                        </CardSection>
-                    </Card>
-                </Flex>
 
-                <br/>
-                <div style={{
-                    display: "flex",
-                    justifyContent: "end"
-                }}>
-                    <Button color={"info"} onClick={validate}>
-                        <IconLogin size={13}/>
-                        Login
-                    </Button>
-                </div>
-            </>
-        }}
-    </RadioGroup>
 }
 
 
@@ -316,7 +208,7 @@ export const Switch = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            switch: null
+            switch: true
         },
         validate: {
             switch: (value) => {
@@ -330,10 +222,9 @@ export const Switch = () => {
     })
 
 
-    return <form>
-        <Card maw={300}>
+    return <Card maw={300}>
             <SwitchInput
-                label={"Runtime"}
+                title={"Runtime"}
                 description={"Change runtime mode production version"}
                 {...inputs.getInputProps("switch")}
             />
@@ -349,6 +240,51 @@ export const Switch = () => {
 
             </div>
         </Card>
-    </form>
+
+}
+
+
+export const PinInputExample = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            pinInput: null
+        },
+        validate: {
+            pinInput: (value: string | null) => {
+                if (!value || value.length != 6) return "Please type or paste your 6-digit code"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <>
+        <Card maw={300}>
+            <PinInput title={"OTP"}
+                      description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputField/>
+                <PinInputHiddenField/>
+            </PinInput>
+            <div style={{
+                display: "flex",
+                justifyContent: "end",
+                marginTop: ".7rem"
+            }}>
+                <Button color={"secondary"} onClick={validate}>
+                    <IconLogin size={13}/>
+                    Login
+                </Button>
+
+            </div>
+        </Card>
+    </>
 
 }

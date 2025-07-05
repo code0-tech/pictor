@@ -7,7 +7,7 @@ import InputLabel from "./InputLabel";
 import InputDescription from "./InputDescription";
 import InputMessage from "./InputMessage";
 
-type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">, "label">
+type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">, "title">
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
@@ -16,7 +16,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     left?: React.ReactNode | React.ReactElement | React.ReactElement[]
     leftType?: "action" | "placeholder" | "icon"
     rightType?: "action" | "placeholder" | "icon"
-    label?: React.ReactNode | React.ReactElement
+    title?: React.ReactNode | React.ReactElement
     description?: React.ReactNode | React.ReactElement
 }
 
@@ -41,7 +41,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
 
     const {
         wrapperComponent = {},
-        label,
+        title,
         description,
         disabled = false,
         left,
@@ -69,7 +69,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
 
     return <>
 
-        {!!label ? <InputLabel children={label}/> : null}
+        {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
         <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}>

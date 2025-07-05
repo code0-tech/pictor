@@ -3,6 +3,10 @@ import Dialog from "./Dialog";
 import React, {useState} from "react";
 import Flex from "../flex/Flex";
 import Text from "../text/Text";
+import EmailInput from "../form/EmailInput";
+import {IconAlarmFilled, IconChartDonutFilled, IconKey, IconMail} from "@tabler/icons-react";
+import PasswordInput from "../form/PasswordInput";
+import Button from "../button/Button";
 
 export default {
     title: "Dialog",
@@ -16,16 +20,38 @@ export default {
 } as Meta
 
 export const ExampleDialog = () => {
-    return <Dialog defaultOpen>
-        <Dialog.Disclosure>Open</Dialog.Disclosure>
+    return <Dialog>
+        <Dialog.Disclosure variant={"outlined"} color={"primary"}>Open</Dialog.Disclosure>
         <Dialog.Modal>
-            <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
-            <Text size={"md"} display={"block"} mb={1}>
-                Your payment has been successfully processed. We have emailed your receipt.
-            </Text>
-            <Flex style={{gap: ".5rem"}}>
-                <Dialog.Dismiss color={"error"}>Remove</Dialog.Dismiss>
-                <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+
+            <Flex justify={"space-between"} mb={1} c={"rgba(255,255,255, 0.75)"} style={{gap: "1rem"}} align={"center"}>
+                <Flex style={{gap: "1rem"}} align={"center"}>
+                    <Flex style={{background: "rgba(255,255,255, 0.05)", borderRadius: "0.5rem"}} p={0.35}>
+                        <IconChartDonutFilled size={24}/>
+                    </Flex>
+                    <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={0.25}>Some Model</Text>
+                </Flex>
+                <Button variant={"none"} color={"secondary"}>Amazing Button</Button>
+            </Flex>
+            <form>
+                <EmailInput
+                    placeholder={"Email"}
+                    title={"Email"}
+                    description={"Your Email address for login"}
+                    left={<IconMail size={13}/>}
+
+                />
+                <br/>
+                <PasswordInput
+                    placeholder={"Password"}
+                    title={"Password"}
+                    description={"Your password for login"}
+                    left={<IconKey size={13}/>}
+                />
+            </form>
+            <Flex justify={"space-between"} mt={1} style={{gap: ".5rem"}}>
+                <Dialog.Dismiss w={"100%"} color={"secondary"} variant={"none"}>Cancel</Dialog.Dismiss>
+                <Dialog.Dismiss w={"100%"} color={"error"} variant={"none"}>Remove</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>
@@ -42,18 +68,33 @@ export const NestedDialog = () => {
             <Text size={"md"} display={"block"} mb={1}>
                 Your payment has been successfully processed. We have emailed your receipt.
             </Text>
-            <Flex style={{gap: ".5rem"}}>
+            <Flex justify={"space-between"} style={{gap: ".5rem"}}>
                 <Dialog>
-                    <Dialog.Disclosure color={"error"}>Remove</Dialog.Disclosure>
+                    <Dialog.Disclosure w={"100%"} color={"error"}>Remove</Dialog.Disclosure>
                     <Dialog.Modal>
                         <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Are you sure?</Text>
-                        <Flex style={{gap: ".5rem"}}>
-                            <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"error"}>Yes, remove</Dialog.Dismiss>
-                            <Dialog.Dismiss color={"secondary"}>Close</Dialog.Dismiss>
+                        <Text size={"md"} display={"block"} mb={1}>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
+                            vehicula nisl leo, eget posuere turpis suscipit id. Sed auctor purus
+                            urna, imperdiet consectetur est laoreet id. Donec vehicula enim vitae
+                            sem molestie commodo quis in lacus. Vestibulum ligula felis, interdum
+                            non risus ut, ultrices euismod urna. Aenean euismod elit tortor, in
+                            porttitor risus ornare in. Maecenas condimentum a enim a lacinia.
+                            Pellentesque volutpat hendrerit suscipit. Cras pulvinar nunc vitae
+                            justo semper, eu fermentum lorem vulputate. Nulla facilisi. Etiam
+                            vestibulum tellus congue urna consectetur, ac mattis massa varius.
+                            Etiam vel tellus arcu. Donec a vestibulum orci, ut fringilla sem. Sed
+                            vitae augue id lorem tempor imperdiet at et quam.
+                        </Text>
+                        <Flex justify={"space-between"} style={{gap: ".5rem"}}>
+                            <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} color={"error"}>Yes,
+                                remove</Dialog.Dismiss>
+                            <Dialog.Dismiss w={"100%"} variant={"outlined"} color={"secondary"}>Close</Dialog.Dismiss>
                         </Flex>
                     </Dialog.Modal>
                 </Dialog>
-                <Dialog.Dismiss onClick={() => setFirstOpen(false)} color={"secondary"}>Close</Dialog.Dismiss>
+                <Dialog.Dismiss w={"100%"} onClick={() => setFirstOpen(false)} variant={"outlined"}
+                                color={"secondary"}>Close</Dialog.Dismiss>
             </Flex>
         </Dialog.Modal>
     </Dialog>

@@ -1,30 +1,61 @@
 @use "../../styles/helpers";
+@use "../../styles/box";
 @use "../../styles/variables";
 
 .menu {
-  @include helpers.box(false);
-  padding: variables.$xxs;
+  z-index: 100;
 
-  &__item {
-    @include helpers.box(false);
+  &__content, &__sub-content {
+    padding: variables.$xxs;
+    position: relative;
+    box-sizing: border-box;
+
+    & {
+      @include box.box(variables.$primary, variables.$primary, variables.$primary);
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__label {
+    text-transform: uppercase;
+    font-size: variables.$xs;
+    display: block;
+    padding: variables.$xxs variables.$xs;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__item, &__sub-trigger {
     border-radius: variables.$borderRadius - variables.$xxs;
-    padding: .5rem;
-    background-color: transparent;
-    border-color: transparent;
+    padding: variables.$xxs variables.$xs;
+    gap: variables.$xs;
     cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: variables.$sm;
 
-    &[data-focus-visible], &[aria-selected=true], &:hover {
-      background: helpers.backgroundColor(variables.$secondary, true);
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+      box-shadow: none;
     }
 
-    &[aria-disabled=true] {
-      opacity: 50%;
+    &:focus {
+      @include box.box(variables.$white, variables.$white, variables.$white);
+      box-shadow: none;
+      width: 100%;
     }
   }
 
   &__separator {
     border: none;
-    margin: variables.$xxs (-1 * variables.$xxs);
+    margin: variables.$xxs 0;
     color: rgba(white, .1);
     height: 1px;
     background-color: rgba(white, .1);

@@ -58,6 +58,10 @@ export class ReactiveArrayService<T> implements ArrayService<T> {
         this.store[1](prevState => [...prevState])
     }
 
+    clear(): void {
+        this.store[1](_ => [])
+    }
+
 }
 
 // @ts-ignore

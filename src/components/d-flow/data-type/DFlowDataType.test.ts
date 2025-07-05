@@ -6,7 +6,7 @@ import {
     EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
-    isObject, isRefObject,
+    isRefObject,
     Object,
     Type,
     Value
@@ -14,9 +14,9 @@ import {
 import {dataTypes} from "./DFlowDataType.data";
 import {
     createNonReactiveArrayService,
-    NonReactiveArrayService,
-    NonReactiveArrayStore
-} from "../../../utils/nonReactiveArrayStore";
+    NonReactiveArrayStore,
+    NonReactiveArrayService
+} from "../../../utils/nonReactiveArrayService";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
 import {NodeFunctionObject} from "../DFlow.view";

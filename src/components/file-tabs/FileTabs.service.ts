@@ -1,5 +1,5 @@
 import {FileTabsView} from "./FileTabs.view";
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayStore";
+import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 
 export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 

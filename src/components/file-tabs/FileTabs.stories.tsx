@@ -3,7 +3,7 @@ import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "./FileTa
 import React from "react";
 import {IconChevronDown, IconDotsVertical, IconFileLambdaFilled} from "@tabler/icons-react";
 import Flex from "../flex/Flex";
-import {createReactiveArrayService} from "../../utils/reactiveArrayStore";
+import {createReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "./FileTabs.view";
 import {FileTabsService} from "./FileTabs.service";
 import Button from "../button/Button";

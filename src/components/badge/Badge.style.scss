@@ -3,7 +3,7 @@
 @use "../../styles/variables";
 
 .badge {
-  padding: variables.$xxs variables.$xs;
+  padding: variables.$xxs / 2 variables.$xs;
   display: inline-flex;
   font-size: variables.$xs;
   width: fit-content;

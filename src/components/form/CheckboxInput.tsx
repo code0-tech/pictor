@@ -20,7 +20,6 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
     const {
         label,
         description,
-        disabled = false,
         formValidation = {
             valid: true,
             notValidMessage: null,

@@ -9,7 +9,6 @@
   display: flex;
   z-index: 1;
   align-items: stretch;
-  cursor: pointer;
   box-sizing: border-box;
 
   & {
@@ -235,6 +234,7 @@
       @include helpers.fontStyle();
       @include box.boxActive();
       @include box.box();
+      @include helpers.disabled();
       @include helpers.borderRadius();
     }
 

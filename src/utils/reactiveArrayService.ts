@@ -1,5 +1,5 @@
 import React from "react";
-import {ArrayService} from "./arrayStore";
+import {ArrayService} from "./arrayService";
 
 /**
  * using a React ref as a store in combination with a map

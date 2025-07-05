@@ -1,4 +1,4 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayStore";
+import {ReactiveArrayStore, ReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {
     DataType,
     DataTypeRuleObject,

@@ -1,5 +1,5 @@
 import {Flow} from "./DFlow.view";
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayStore";
+import {ReactiveArrayStore, ReactiveArrayService} from "../../utils/reactiveArrayService";
 
 export class DFlowService extends ReactiveArrayService<Flow> {
 

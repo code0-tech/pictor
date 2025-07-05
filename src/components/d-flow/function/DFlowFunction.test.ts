@@ -1,9 +1,9 @@
 import {describe, expect, test} from '@jest/globals'
 import {
     createNonReactiveArrayService,
-    NonReactiveArrayService,
-    NonReactiveArrayStore
-} from "../../../utils/nonReactiveArrayStore";
+    NonReactiveArrayStore,
+    NonReactiveArrayService
+} from "../../../utils/nonReactiveArrayService";
 import {FunctionDefinition} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";

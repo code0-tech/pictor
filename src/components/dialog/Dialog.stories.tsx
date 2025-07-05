@@ -36,7 +36,7 @@ export const ExampleDialog = () => {
             <form>
                 <EmailInput
                     placeholder={"Email"}
-                    label={"Email"}
+                    title={"Email"}
                     description={"Your Email address for login"}
                     left={<IconMail size={13}/>}
 
@@ -44,7 +44,7 @@ export const ExampleDialog = () => {
                 <br/>
                 <PasswordInput
                     placeholder={"Password"}
-                    label={"Password"}
+                    title={"Password"}
                     description={"Your password for login"}
                     left={<IconKey size={13}/>}
                 />

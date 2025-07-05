@@ -55,7 +55,7 @@ export const Login = () => {
         <form>
             <EmailInput
                 placeholder={"Email"}
-                label={"Email"}
+                title={"Email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
                 {...inputs.getInputProps("email")}
@@ -63,7 +63,7 @@ export const Login = () => {
             <br/>
             <PasswordInput
                 placeholder={"Password"}
-                label={"Password"}
+                title={"Password"}
                 description={"Your password for login"}
                 left={<IconKey size={13}/>}
                 {...inputs.getInputProps("password")}
@@ -89,7 +89,7 @@ export const Website = () => {
 
     return <Card maw={300}>
         <TextInput
-            label={"website"}
+            title={"website"}
             description={"Your website for linking"}
             clearable
             placeholder={"code0.tech"}
@@ -104,7 +104,7 @@ export const Number = () => {
 
     return <Card maw={300}>
         <NumberInput
-            label={"number"}
+            title={"number"}
             description={"Increase and decrease your number"}
             placeholder={"code0.tech"}
         />
@@ -133,7 +133,7 @@ export const RadioExample = () => {
     return <form>
         <Card maw={300}>
             <RadioInput
-                label={"Runtime"}
+                title={"Runtime"}
                 description={"Change runtime mode production version"}
                 value={"dynamic"}
                 name={"test1"}
@@ -189,9 +189,9 @@ export const Checkbox = () => {
     return <Card maw={300}>
 
         <CheckboxInput
-            label={"Runtime"}
+            title={"Runtime"}
             description={"Change runtime mode production version"}
-            text={"Dynamic"}
+            label={"Dynamic"}
             {...inputs.getInputProps("checkbox")}
         />
 
@@ -339,7 +339,7 @@ export const Switch = () => {
     return <form>
         <Card maw={300}>
             <SwitchInput
-                label={"Runtime"}
+                title={"Runtime"}
                 description={"Change runtime mode production version"}
                 {...inputs.getInputProps("switch")}
             />
@@ -379,7 +379,7 @@ export const PinInputExample = () => {
 
     return <>
         <Card maw={300}>
-            <PinInput label={"OTP"}
+            <PinInput title={"OTP"}
                       description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
                 <PinInputField/>
                 <PinInputField/>

@@ -30,7 +30,7 @@ const RadioGroup: React.FC<RadioGroupProps> = (props) => {
         formValidation,
         initialValue = null,
         required,
-        label,
+        title,
         description
     } = props
     const [radioStore, setRadioStore] = React.useState<string | null>(initialValue)

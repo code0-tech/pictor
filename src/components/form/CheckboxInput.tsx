@@ -11,14 +11,13 @@ import {IconCheck, IconMinus} from "@tabler/icons-react";
 export type CheckboxInputProps =
     Omit<InputProps<CheckedState>, "wrapperComponent" | "type" | "left" | "right" | "leftType" | "rightType">
     & Omit<CheckboxProps, 'defaultChecked' | 'value' | 'defaultValue'>
-    & { text: React.ReactNode }
 
 export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
 
     const [checked, setChecked] = React.useState<CheckedState>(props.initialValue ?? "indeterminate");
 
     const {
-        label,
+        title,
         description,
         formValidation = {
             valid: true,
@@ -30,7 +29,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
     } = props
 
     return <>
-        {!!label ? <InputLabel children={label}/> : null}
+        {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
         <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""} checkbox-input`, {})}>
@@ -43,13 +42,13 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
                 }
             })}>
                 <CheckboxIndicator className={"checkbox-input__indicator"}>
-                    {checked === "indeterminate" && <IconMinus size={10} />}
-                    {checked === true && <IconCheck size={10} />}
+                    {checked === "indeterminate" && <IconMinus size={10}/>}
+                    {checked === true && <IconCheck size={10}/>}
                 </CheckboxIndicator>
             </Checkbox>
 
             <div className={`input__right input__right--action}`}>
-                {props.text}
+                {props.label}
             </div>
         </div>
 

@@ -22,7 +22,7 @@ type PinInputHiddenFieldProps = Code0ComponentProps & OneTimePasswordFieldHidden
 export const PinInput: React.FC<PinInputProps> = (props) => {
 
     const {
-        label,
+        title,
         description,
         disabled = false,
         formValidation = {
@@ -34,7 +34,7 @@ export const PinInput: React.FC<PinInputProps> = (props) => {
     } = props
 
     return <>
-        {!!label ? <InputLabel children={label}/> : null}
+        {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
         <div {...mergeCode0Props(`${!formValidation?.valid ? "input--not-valid" : ""}`, {})}>

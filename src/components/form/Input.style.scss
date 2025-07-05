@@ -153,55 +153,55 @@
   }
 }
 
-.radio-input, .radio-button {
+.radio-group {
 
-  $padding: variables.$xxs;
-  $size: 0.9rem;
+}
 
+.radio-input {
   background: transparent !important;
-  border-radius: 0 !important;
-  border: none !important;
+  box-shadow: none !important;
+  display: flex;
   align-items: center;
   box-sizing: border-box;
-  padding: $padding 0;
   gap: variables.$xxs;
+  position: relative;
 
-  .input__control {
+  &__button {
+    top: -1px;
+    width: 18px;
+    height: 18px;
+    padding: variables.$xxs;
 
+    & {
+      @include helpers.fontStyle();
+      @include box.boxActive();
+      @include box.box();
+      @include helpers.disabled();
+      @include helpers.borderRadius();
+    }
+
+    &[data-state="checked"] {
+      @include box.boxActiveStyle();
+    }
+
+  }
+
+  &__indicator {
+    height: 100%;
     position: relative;
-    flex: none;
-    box-sizing: border-box;
-    padding: 0;
-    margin: 1px 0;
-    width: $size;
-    height: $size;
+    display: block;
     aspect-ratio: 1/1;
 
-    appearance: none;
-    outline: none;
+    &[data-state="checked"] {
+      background-color: variables.$info;
 
-    background-color: transparent;
-    border: 1px solid helpers.borderColor(variables.$secondary);
-    border-radius: 50%;
-
-    &:checked {
-      border-color: helpers.borderColor(variables.$info);
-
-      &:before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        aspect-ratio: 1/1;
-        border-radius: 50%;
-        top: 50%;
-        transform: translateX(-50%) translateY(-50%);
-        width: calc($size / 2);
-        height: calc($size / 2);
-        background: helpers.backgroundColor(variables.$info);
+      & {
+        @include helpers.borderRadius();
       }
     }
 
   }
+
 }
 
 .radio-button {

@@ -253,11 +253,10 @@
 
   $padding: variables.$xxs;
   $size: 0.9rem;
+
   background: transparent !important;
-  display: inline-flex;
-  align-items: center;
-  padding: 0;
-  border: none !important;
+  box-shadow: none !important;
+
 
   .input__control {
 
@@ -269,6 +268,7 @@
 
     appearance: none;
     outline: none;
+    cursor: pointer;
 
     background-color: transparent;
     border-radius: 50%;
@@ -276,18 +276,23 @@
     &:checked {
 
       &:after {
-        -webkit-transform: translateX(22.5px);
-        -ms-transform: translateX(22.5px);
-        transform: translateX(22.5px);
+        -webkit-transform: translateX(22px);
+        -ms-transform: translateX(22px);
+        transform: translateX(22px);
         -webkit-transition: .4s;
         transition: .4s;
       }
 
       &:before {
-        background-color: helpers.backgroundColor(variables.$info);
-        -webkit-transition: .4s;
-        transition: .4s;
+
+        & {
+          @include box.box(variables.$info);
+          position: absolute;
+          width: $size * 2.5 + $padding;
+          height: $size + $padding;
+        }
       }
+
     }
 
     &:after {
@@ -302,17 +307,21 @@
     }
 
     &:before {
-      background: helpers.backgroundColor(variables.$primary);
-      position: absolute;
-      border-radius: 50rem;
-      width: $size * 2.5 + $padding;
-      height: $size + $padding;
-      top: calc(-1 * $padding / 2);
-      left: calc(-1 * $padding / 2);
+
       content: "";
       z-index: -1;
       -webkit-transition: .4s;
       transition: .4s;
+      top: calc(-1 * $padding / 2);
+      left: calc(-1 * $padding / 2);
+
+      & {
+        @include box.box();
+        @include helpers.borderRadius();
+        position: absolute;
+        width: $size * 2.5 + $padding;
+        height: $size + $padding;
+      }
     }
 
 

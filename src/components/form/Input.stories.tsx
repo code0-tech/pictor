@@ -208,7 +208,7 @@ export const Switch = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            switch: null
+            switch: true
         },
         validate: {
             switch: (value) => {
@@ -222,8 +222,7 @@ export const Switch = () => {
     })
 
 
-    return <form>
-        <Card maw={300}>
+    return <Card maw={300}>
             <SwitchInput
                 title={"Runtime"}
                 description={"Change runtime mode production version"}
@@ -241,7 +240,6 @@ export const Switch = () => {
 
             </div>
         </Card>
-    </form>
 
 }
 

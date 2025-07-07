@@ -209,8 +209,20 @@ describe("useTypeHash", () => {
     })
 
     test("useTypeHash returns same hash for OBJECT twice", () => {
-        const t1 = "OBJECT";
-        const t2 = "OBJECT";
+        const t1: Type = {
+            type: "OBJECT",
+            generic_mapper: [{
+                generic_target: "O",
+                types: ["TEST_OBJECT"]
+            }]
+        }
+        const t2: Type = {
+            type: "OBJECT",
+            generic_mapper: [{
+                generic_target: "O",
+                types: ["TEST_OBJECT"]
+            }]
+        }
         const hash1 = useTypeHash(t1);
         const hash2 = useTypeHash(t2);
         expect(hash1).toBe(hash2);

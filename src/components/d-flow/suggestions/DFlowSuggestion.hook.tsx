@@ -183,9 +183,9 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
     // 1. Expand all aliases and deeply unify generics
     const expandedType = expandTypeAliases(type, dataTypeService)
     // 2. Replace generics and sort keys for canonicalization
-    const canonicalized = replaceGenericsAndSortTypeObject(expandedType, generic_keys)
+    const canonical = replaceGenericsAndSortTypeObject(expandedType, generic_keys)
     // 3. Stable stringification for MD5
-    const stableString = JSON.stringify(canonicalized)
+    const stableString = JSON.stringify(canonical)
 
     // 4. MD5 hash
     return md5(stableString)

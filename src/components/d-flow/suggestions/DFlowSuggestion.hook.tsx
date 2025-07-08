@@ -4,17 +4,31 @@ import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {EDataTypeRuleType, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
+import React from "react";
 
 export const useSuggestions = (type: Type): DFlowSuggestion[] | undefined => {
 
     const suggestionService = useService(DFlowSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const hashedType = useTypeHash(type);
+    const cached = suggestionService.getSuggestionsByHash(hashedType || "");
+    const [state, setState] = React.useState(() => {
+        if (!hashedType) return [];
+        return cached || [];
+    })
 
-    //hash this type
-    const hashedType = useTypeHash(type)
-    if (!hashedType) return undefined
+    React.useEffect(() => {
 
-    return suggestionService.getSuggestionsByHash(hashedType)
+        //check for possible direct values. Currently only for step rules
+
+        //check for functions that return a matching type
+
+        //check for ref objects
+
+    }, [type, suggestionService, dataTypeService])
+
+
+    return state
 
 }
 
@@ -161,6 +175,7 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
             // 4. Primitives
             return node;
         }
+
         return deepReplaceAndSort(type);
     }
 

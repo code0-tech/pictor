@@ -1,7 +1,7 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 
-export class DFlowSuggestionService extends ReactiveArrayService<DFlowSuggestion> {
+export class DFlowReactiveSuggestionService extends ReactiveArrayService<DFlowSuggestion> {
 
     constructor(store: ReactiveArrayStore<DFlowSuggestion>) {
         super(store);

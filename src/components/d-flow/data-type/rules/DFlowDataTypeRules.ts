@@ -9,6 +9,7 @@ import {DFlowDataTypeContainsTypeRule, DFlowDataTypeContainsTypeRuleConfig} from
 import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 import {DFlowDataTypeRule} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReturnTypeRule, DFlowDataTypeReturnTypeRuleConfig} from "./DFlowDataTypeReturnTypeRule";
+import {DFlowDataTypeParentRule, DFlowDataTypeParentRuleConfig} from "./DFlowDataTypeParentRule";
 
 export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
     [EDataTypeRuleType.REGEX, DFlowDataTypeRegexRule],
@@ -16,7 +17,8 @@ export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
     [EDataTypeRuleType.ITEM_OF_COLLECTION, DFlowDataTypeItemOfCollectionRule],
     [EDataTypeRuleType.CONTAINS_TYPE, DFlowDataTypeContainsTypeRule],
     [EDataTypeRuleType.CONTAINS_KEY, DFlowDataTypeContainsKeyRule],
-    [EDataTypeRuleType.RETURNS_TYPE, DFlowDataTypeReturnTypeRule]
+    [EDataTypeRuleType.RETURNS_TYPE, DFlowDataTypeReturnTypeRule],
+    [EDataTypeRuleType.PARENT, DFlowDataTypeParentRule]
 
 ])
 
@@ -27,3 +29,4 @@ export type CombinesRuleConfig = DFlowDataTypeRegexRuleConfig
     | DFlowDataTypeContainsTypeRuleConfig
     | DFlowDataTypeContainsKeyRuleConfig
     | DFlowDataTypeReturnTypeRuleConfig
+    | DFlowDataTypeParentRuleConfig

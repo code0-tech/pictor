@@ -1,29 +1,94 @@
 import {useService} from "../../../utils/contextStore";
-import {DFlowSuggestionService} from "./DFlowSuggestion.service";
+import {DFlowReactiveSuggestionService} from "./DFlowReactiveSuggestionService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataTypeRuleType, Type} from "../data-type/DFlowDataType.view";
+import {EDataTypeRuleType, GenericMapper, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
-import {DFlowSuggestion} from "./DFlowSuggestion.view";
+import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import React from "react";
+import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
+import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
+import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {
+    isMatchingDataTypeObject,
+    replaceGenericKeysInDataTypeObject,
+    replaceGenericKeysInType
+} from "../../../utils/generics";
+import {NodeFunctionObject} from "../DFlow.view";
 
-export const useSuggestions = (type: Type): DFlowSuggestion[] | undefined => {
+//TODO: instead of GENERIC use some uuid or hash for replacement
 
-    const suggestionService = useService(DFlowSuggestionService)
+export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>): DFlowSuggestion[] => {
+
+    const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const hashedType = useTypeHash(type);
-    const cached = suggestionService.getSuggestionsByHash(hashedType || "");
+    const functionService = useService(DFlowFunctionReactiveService)
+
+    const replacedTyp = replaceGenericKeysInType(type, genericMapper)
+    const dataType = dataTypeService?.getDataType(replacedTyp)
+    if (!dataType || !suggestionService || !dataTypeService) return []
+
+    const hashedType = useTypeHash(replacedTyp)
+    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
     const [state, setState] = React.useState(() => {
-        if (!hashedType) return [];
-        return cached || [];
+        if (!hashedType) return []
+        return cached || []
     })
+    if (!hashedType) return []
+
 
     React.useEffect(() => {
 
-        //check for possible direct values. Currently only for step rules
 
-        //check for functions that return a matching type
+        if (!cached) {
 
-        //check for ref objects
+            //calculate VALUE
+            dataType.rules?.forEach(rule => {
+                if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
+                    (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
+                        const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE);
+                        suggestionService.addSuggestion(suggestion)
+                        setState(prevState => [...prevState, suggestion])
+                    })
+                } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
+                    const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
+                    const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE)
+                    suggestionService.addSuggestion(suggestion)
+                    setState(prevState => [...prevState, suggestion])
+                }
+            })
+
+            //calculate FUNCTION
+            //get the replacedTyp and check all possible return types of functions against it
+            //use the DataTypeObject for this with deep rule checking
+            //generics to be replaced with GENERIC todo is written on top
+            const replacedDataType = replaceGenericKeysInDataTypeObject(dataType.json, genericMapper)
+            const matchingFunctions = functionService.values().filter(funcDefinition => {
+                if (!funcDefinition.return_type) return false
+                const funcType = dataTypeService.getDataType(funcDefinition.return_type)?.json
+                if (!funcType) return false
+
+                return isMatchingDataTypeObject(replacedDataType, funcType)
+
+            })
+
+            matchingFunctions.forEach(funcDefinition => {
+                const suggestion = new DFlowSuggestion(hashedType, [], {
+                    function: {
+                        function_id: funcDefinition.function_id,
+                        runtime_function_id: funcDefinition.runtime_function_id
+                    },
+                } as NodeFunctionObject, DFlowSuggestionType.FUNCTION)
+                suggestionService.addSuggestion(suggestion)
+                setState(prevState => [...prevState, suggestion])
+            })
+
+
+
+            //calculate FUNCTION_COMBINATION deepness max 2
+
+        }
+
+        //calculate REF_OBJECTS && FUNCTION_COMBINATION
 
     }, [type, suggestionService, dataTypeService])
 

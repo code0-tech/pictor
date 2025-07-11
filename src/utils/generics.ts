@@ -1,5 +1,5 @@
 import {
-    DataTypeObject,
+    DataTypeObject, DataTypeRuleObject, EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -8,6 +8,9 @@ import {
 } from "../components/d-flow/data-type/DFlowDataType.view";
 import {FunctionDefinition} from "../components/d-flow/function/DFlowFunction.view";
 import {DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {
+    DFlowDataTypeItemOfCollectionRuleConfig
+} from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -416,4 +419,81 @@ export const resolveGenericKeys = (
     }
 
     return genericMap
+}
+
+/**
+ * Checks if a source DataTypeObject matches a target DataTypeObject with the following semantics:
+ * - Only the fields 'type' and 'rules' are considered.
+ * - All rules in the target must be matched by at least one rule in the source.
+ * - Target rules may be more generic (contain "GENERIC" as type/key), whereas source rules can be more specific.
+ * - For rules with a 'type' or 'key', a GENERIC in target matches any value in source.
+ * - Source must have at least as many or more specific rules than the target.
+ * - This function supports all rule types defined in the EDataTypeRuleType enum.
+ *
+ * @param source Source DataTypeObject (potentially more specific)
+ * @param target Target DataTypeObject (potentially generic, e.g., contains "GENERIC" in rules)
+ * @returns True if source matches all relevant constraints in target, otherwise false
+ */
+export function isMatchingDataTypeObject(
+    source: DataTypeObject,
+    target: DataTypeObject
+): boolean {
+    if (source.type !== target.type) return false;
+    if (!Array.isArray(target.rules) || target.rules.length === 0) return true;
+
+    for (const targetRule of target.rules) {
+        const found = source.rules?.some(sourceRule =>
+            ruleMatches(sourceRule, targetRule)
+        );
+        if (!found) return false;
+    }
+    return true;
+
+    // Rule comparison logic supporting all relevant EDataTypeRuleType configs
+    function ruleMatches(sourceRule: DataTypeRuleObject, targetRule: DataTypeRuleObject): boolean {
+        if (sourceRule.type !== targetRule.type) return false;
+        switch (targetRule.type) {
+            case EDataTypeRuleType.CONTAINS_TYPE:
+            case EDataTypeRuleType.RETURNS_TYPE:
+            case EDataTypeRuleType.PARENT:
+                if ("type" in targetRule.config && targetRule.config.type === "GENERIC") return true;
+                if ("type" in sourceRule.config && "type" in targetRule.config)
+                    return sourceRule.config.type === targetRule.config.type;
+                return false;
+            case EDataTypeRuleType.CONTAINS_KEY:
+                if ("key" in sourceRule.config && "key" in targetRule.config) {
+                    if (sourceRule.config.key !== targetRule.config.key) return false;
+                    if ("type" in targetRule.config && targetRule.config.type === "GENERIC") return true;
+                    if ("type" in sourceRule.config && "type" in targetRule.config)
+                        return sourceRule.config.type === targetRule.config.type;
+                }
+                return false;
+            case EDataTypeRuleType.REGEX:
+                if ("pattern" in sourceRule.config && "pattern" in targetRule.config)
+                    return sourceRule.config.pattern === targetRule.config.pattern;
+                return false;
+            case EDataTypeRuleType.NUMBER_RANGE:
+                if ("from" in sourceRule.config && "from" in targetRule.config &&
+                    "to" in sourceRule.config && "to" in targetRule.config) {
+                    return (
+                        sourceRule.config.from === targetRule.config.from &&
+                        sourceRule.config.to === targetRule.config.to &&
+                        ("step" in sourceRule.config ? sourceRule.config.step : undefined) ===
+                        ("step" in targetRule.config ? targetRule.config.step : undefined)
+                    );
+                }
+                return false;
+            case EDataTypeRuleType.ITEM_OF_COLLECTION:
+                if ("items" in sourceRule.config && "items" in targetRule.config) {
+                    return Array.isArray(sourceRule.config.items)
+                        && Array.isArray(targetRule.config.items)
+                        && sourceRule.config.items.length === targetRule.config.items.length
+                        && sourceRule.config.items.every((v: any, i: number) => v === (targetRule.config as DFlowDataTypeItemOfCollectionRuleConfig).items[i]);
+                }
+                return false;
+            default:
+                // Fallback: exact deep equality for other configs
+                return JSON.stringify(sourceRule.config) === JSON.stringify(targetRule.config);
+        }
+    }
 }

@@ -146,7 +146,7 @@ export class NodeFunctionParameter {
 
     private readonly _id: string
     private readonly _runtime_id: string
-    private _value: object | string | number | boolean | undefined
+    private _value: Value | undefined
     private _subNode: NodeFunction | undefined
 
     constructor(nodeParameter: NodeParameterObject) {
@@ -164,11 +164,11 @@ export class NodeFunctionParameter {
         return this._runtime_id;
     }
 
-    get value(): object | string | number | boolean | undefined {
+    get value(): Value | undefined {
         return this._value;
     }
 
-    set value(value: object | string | number | boolean | undefined) {
+    set value(value: Value) {
         this._value = value;
     }
 

@@ -40,14 +40,14 @@ export interface RefPath {
  * {@link RefObject#secondaryLevel} links to the node inside the flow
  * starting at 0.
  *
- * {@link RefObject#secondaryLevel} links to an {@link DataTypeObject#inputTypes} of the node
+ * {@link RefObject#tertiaryLevel} links to an {@link DataTypeObject#rule#inputtype} of the node
  * starting at 0.
  */
 export interface RefObject {
     type: Type
     primaryLevel: number
     secondaryLevel: number
-    tertiaryLevel?: number
+    tertiaryLevel?: string
     path?: RefPath[]
 }
 

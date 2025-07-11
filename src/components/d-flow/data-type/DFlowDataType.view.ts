@@ -176,10 +176,10 @@ export class DataType {
             a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
 
 
-        if (this.allRules && !dataType.allRules) return false
-        if (!this.allRules && dataType.allRules) return false
+        if (this._rules && !dataType._rules) return false
+        if (!this._rules && dataType._rules) return false
 
-        return arraysEqual(this.allRules as [], dataType.allRules as [])
+        return arraysEqual(this.rules as [], dataType.rules as [])
     }
 
     public validateValue(value: Value, generics?: GenericMapper[]): boolean {
@@ -194,18 +194,14 @@ export class DataType {
 
         const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
 
-        return this.allRules.every(rule => {
+        return this.rules.every(rule => {
             return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)
         })
     }
 
 
-    get rules(): DataTypeRuleObject[] | undefined {
-        return this._rules
-    }
-
-    get allRules(): DataTypeRuleObject[] {
-        return [...(this._rules || []), ...((this._parent ? this._service.getDataType(this._parent)?.allRules : []) || [])]
+    get rules(): DataTypeRuleObject[] {
+        return this._rules || []
     }
 
     get id(): string {

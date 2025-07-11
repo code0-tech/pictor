@@ -57,7 +57,7 @@ export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType
 
         const genericMapper: GenericMapper[] = dataType.genericKeys.map(genericKey => {
 
-            const ruleThatIncludesGenericKey = dataType.allRules.find((rule: DataTypeRuleObject) => {
+            const ruleThatIncludesGenericKey = dataType.rules.find((rule: DataTypeRuleObject) => {
                 return "type" in rule.config && rule.config.type === genericKey
             })
 

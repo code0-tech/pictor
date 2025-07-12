@@ -13,7 +13,7 @@ import {
     replaceGenericKeysInDataTypeObject,
     replaceGenericKeysInType
 } from "../../../utils/generics";
-import {NodeFunctionObject} from "../DFlow.view";
+import {NodeFunction, NodeFunctionObject} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
@@ -265,66 +265,107 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
     return md5(stableString)
 }
 
+/**
+ * Traverses a flow (starting from its startingNode as NodeFunction) and collects all RefObjects ("variables") that are in scope.
+ * - Each context (primaryLevel) starts at 0 for the main flow.
+ * - Every parameter of a NodeFunction with DataType NODE creates a *new* context (new primaryLevel, incrementing globally).
+ * - secondaryLevel is the position of the Node within its vertical context (starts at 1, increments down the block).
+ * - Each context number (primaryLevel) is unique, incrementing depth-first, left-to-right through parameters/subNodes.
+ * - Handles recursive/branching contexts via NodeFunctionParameter.subNode.
+ *
+ * @param flowId The ID of the flow to traverse.
+ * @returns Array of RefObject (all collected variables/outputs with contextual levels)
+ */
 export const useRefObjects = (flowId: string): Array<RefObject> => {
+    const dataTypeService = useService(DFlowDataTypeReactiveService);
+    const flowService = useService(DFlowReactiveService);
+    const functionService = useService(DFlowFunctionReactiveService);
 
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const array = new Array<RefObject>();
-
-    if (!dataTypeService || !flowService || !functionService) return array
+    const refObjects: Array<RefObject> = [];
+    if (!dataTypeService || !flowService || !functionService) return refObjects;
 
     const flow = flowService.values().find(f => f.id === flowId);
-    let currentContextDepth = 0;
-    let currentNodeDepth = 1;
-    let nextNode = flow?.startingNode;
+    if (!flow?.startingNode) return refObjects;
 
-    //vertical travers
-    while (nextNode) {
-        const functionDefinition = functionService.getFunctionDefinition(nextNode.id);
-        const returnType = functionDefinition?.return_type
+    let contextCounter = 0; // Global context counter for primaryLevel
 
-        if (!returnType) continue;
+    /**
+     * Recursively traverses a vertical block (nextNode chain) and collects RefObjects,
+     * entering new contexts on each NODE-typed parameter via NodeFunctionParameter.subNode.
+     * @param node The starting NodeFunction of this context/block
+     * @param primaryLevel The context number (scope/block)
+     */
+    function traverseBlock(node: NodeFunction | undefined, primaryLevel: number) {
+        let currentNode = node;
+        let secondaryLevel = 1; // Node position within the context
 
-        functionDefinition.parameters?.map(parameterDefinition => {
-            const parameterDataType = dataTypeService.getDataType(parameterDefinition.type)
-            if (!parameterDataType || parameterDataType.type !== EDataType.NODE) return
+        while (currentNode) {
+            const functionDefinition = functionService.getFunctionDefinition(currentNode.id);
+            if (!functionDefinition) break;
 
+            // Handle NODE-typed parameters (start new context for each subNode)
+            if (currentNode.parameters && functionDefinition.parameters) {
+                for (const paramDef of functionDefinition.parameters) {
+                    const paramType = dataTypeService.getDataType(paramDef.type);
+                    if (paramType && paramType.type === EDataType.NODE) {
+                        // Finde passendes Parameter-Objekt
+                        const paramInstance = currentNode.parameters.find(p => p.id === paramDef.parameter_id);
+                        if (paramInstance?.subNode) {
+                            contextCounter++; // neuer Kontext
+                            traverseBlock(paramInstance.subNode, contextCounter);
+                        }
+                    }
+                }
+            }
 
-            const inputTypeRules = parameterDataType.rules.filter(rule => rule.type == EDataTypeRuleType.INPUT_TYPE)
+            // Handle INPUT_TYPE rules (RefObject for each input-type parameter)
+            if (currentNode.parameters && functionDefinition.parameters) {
+                for (const paramDef of functionDefinition.parameters) {
+                    const paramType = dataTypeService.getDataType(paramDef.type);
+                    if (!paramType || paramType.type === EDataType.NODE) continue;
+                    const inputTypeRules = paramType.rules?.filter(
+                        rule => rule.type === EDataTypeRuleType.INPUT_TYPE
+                    ) || [];
+                    for (const rule of inputTypeRules) {
+                        const config = rule.config as DFlowDataTypeInputTypeRuleConfig;
+                        const paramInstance = currentNode.parameters.find(p => p.id === paramDef.parameter_id);
+                        const paramValue = paramInstance?.value;
+                        const resolvedInputType = useInputType(
+                            config.type,
+                            functionDefinition,
+                            paramValue !== undefined ? [paramValue] : [],
+                            dataTypeService
+                        );
+                        if (resolvedInputType) {
+                            refObjects.push({
+                                type: resolvedInputType,
+                                primaryLevel,
+                                secondaryLevel,
+                                tertiaryLevel: config.key
+                            });
+                        }
+                    }
+                }
+            }
 
-            inputTypeRules.forEach((rule) => {
-                const config = rule.config as DFlowDataTypeInputTypeRuleConfig
+            // Handle return type (main output of this node)
+            const paramValues = currentNode.parameters?.map(p => p.value).filter(v => v !== undefined) || [];
+            const resolvedReturnType = useReturnType(functionDefinition, paramValues, dataTypeService);
+            if (resolvedReturnType) {
+                refObjects.push({
+                    type: resolvedReturnType,
+                    primaryLevel,
+                    secondaryLevel
+                });
+            }
 
-                const functionValues: Value[] = nextNode!!.parameters?.map(p => p.value!!).filter(value => value) || []
-                const resolvedInputType = useInputType(config.type, functionDefinition, functionValues, dataTypeService)
-
-                if (!resolvedInputType) return
-
-                array.push({
-                    type: resolvedInputType,
-                    primaryLevel: currentContextDepth,
-                    secondaryLevel: currentNodeDepth,
-                    tertiaryLevel: config.key
-                })
-            })
-
-        })
-
-        const functionValues: Value[] = nextNode.parameters?.map(p => p.value!!).filter(value => value) || []
-        const resolvedReturnType = useReturnType(functionDefinition, functionValues, dataTypeService)
-
-        if (!resolvedReturnType) continue
-
-        array.push({
-            type: resolvedReturnType,
-            primaryLevel: 0,
-            secondaryLevel: currentNodeDepth,
-        })
-
-        nextNode = nextNode.nextNode;
-        currentNodeDepth++
+            currentNode = currentNode.nextNode;
+            secondaryLevel++;
+        }
     }
 
-    return array
-}
+    // Start main context (0)
+    traverseBlock(flow.startingNode, 0);
+
+    return refObjects;
+};

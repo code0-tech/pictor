@@ -1,7 +1,7 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowReactiveSuggestionService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataTypeRuleType, GenericMapper, Type} from "../data-type/DFlowDataType.view";
+import {EDataType, EDataTypeRuleType, GenericMapper, RefObject, Type, Value} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import React from "react";
@@ -14,14 +14,20 @@ import {
     replaceGenericKeysInType
 } from "../../../utils/generics";
 import {NodeFunctionObject} from "../DFlow.view";
+import {DFlowReactiveService} from "../DFlow.service";
+import {useReturnType} from "../function/DFlowFunction.return.hook";
+import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
+import {useInputType} from "../function/DFlowFunction.input.hook";
 
 //TODO: instead of GENERIC use some uuid or hash for replacement
+//TODO: deep type search
 
-export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>, flowId: string, depth: number[]): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
+    const flowService = useService(DFlowReactiveService)
 
     const replacedTyp = replaceGenericKeysInType(type, genericMapper)
     const dataType = dataTypeService?.getDataType(replacedTyp)
@@ -58,8 +64,6 @@ export const useSuggestions = (type: Type, genericMapper: Map<string, Type | Gen
             })
 
             //calculate FUNCTION
-            //get the replacedTyp and check all possible return types of functions against it
-            //use the DataTypeObject for this with deep rule checking
             //generics to be replaced with GENERIC todo is written on top
             const replacedDataType = replaceGenericKeysInDataTypeObject(dataType.json, genericMapper)
             const matchingFunctions = functionService.values().filter(funcDefinition => {
@@ -81,7 +85,6 @@ export const useSuggestions = (type: Type, genericMapper: Map<string, Type | Gen
                 suggestionService.addSuggestion(suggestion)
                 setState(prevState => [...prevState, suggestion])
             })
-
 
 
             //calculate FUNCTION_COMBINATION deepness max 2
@@ -254,4 +257,68 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
 
     // 4. MD5 hash
     return md5(stableString)
+}
+
+export const useRefObjects = (flowId: string, depth: number[]): Map<number[], RefObject> => {
+
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const flowService = useService(DFlowReactiveService)
+    const functionService = useService(DFlowFunctionReactiveService)
+    const map = new Map<number[], RefObject>();
+
+    if (!dataTypeService || !flowService || !functionService) return map
+
+    const flow = flowService.values().find(f => f.id === flowId);
+    let currentContextDepth = 0;
+    let currentNodeDepth = 1;
+    let nextNode = flow?.startingNode;
+
+    //vertical travers
+    while (nextNode) {
+        const functionDefinition = functionService.getFunctionDefinition(nextNode.id);
+        const returnType = functionDefinition?.return_type
+
+        if (!returnType) continue;
+
+        functionDefinition.parameters?.map(parameterDefinition => {
+            const parameterDataType = dataTypeService.getDataType(parameterDefinition.type)
+            if (!parameterDataType || parameterDataType.type !== EDataType.NODE) return
+
+
+            const inputTypeRules = parameterDataType.rules.filter(rule => rule.type == EDataTypeRuleType.INPUT_TYPE)
+
+            inputTypeRules.forEach((rule) => {
+                const config = rule.config as DFlowDataTypeInputTypeRuleConfig
+
+                const functionValues: Value[] = nextNode!!.parameters?.map(p => p.value!!).filter(value => value) || []
+                const resolvedInputType = useInputType(config.type, functionDefinition, functionValues, dataTypeService)
+
+                if (!resolvedInputType) return
+
+                map.set([currentContextDepth, currentNodeDepth], {
+                    type: resolvedInputType,
+                    primaryLevel: currentContextDepth,
+                    secondaryLevel: currentNodeDepth,
+                    tertiaryLevel: config.key
+                })
+            })
+
+        })
+
+        const functionValues: Value[] = nextNode.parameters?.map(p => p.value!!).filter(value => value) || []
+        const resolvedReturnType = useReturnType(functionDefinition, functionValues, dataTypeService)
+
+        if (!resolvedReturnType) continue
+
+        map.set([currentContextDepth, currentNodeDepth], {
+            type: resolvedReturnType,
+            primaryLevel: currentContextDepth,
+            secondaryLevel: currentNodeDepth,
+        })
+
+        nextNode = nextNode.nextNode;
+        currentNodeDepth++
+    }
+
+    return map
 }

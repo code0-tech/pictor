@@ -501,6 +501,54 @@ export function isMatchingDataTypeObject(
 }
 
 /**
+ * Checks if a source Type matches a target Type with the following semantics:
+ * - Only the structure (type and generic_mapper, etc.) is considered, not DataTypeObject metadata.
+ * - All values in the target must be matched by at least one corresponding value in the source.
+ * - "GENERIC" in the target matches anything in the source at the same location.
+ * - Recursively checks all nested types (e.g. in generic_mapper[].types).
+ * - Source can be more specific, target can be more generic (with "GENERIC").
+ * - Arrays must match in order and length unless the target is "GENERIC".
+ *
+ * @param source Source Type (potentially more specific)
+ * @param target Target Type (potentially generic, e.g., contains "GENERIC" somewhere)
+ * @returns True if source matches all relevant constraints in target, otherwise false
+ */
+export function isMatchingType(
+    source: Type,
+    target: Type
+): boolean {
+    // Helper: Recursively deep compare with GENERIC wildcard logic
+    function deepMatch(s: any, t: any): boolean {
+        // GENERIC wildcard: target accepts anything at this position
+        if (t === "GENERIC") return true;
+
+        // Null/undefined check
+        if (s == null || t == null) return s === t;
+
+        // If both are arrays, match by length and recurse
+        if (Array.isArray(t)) {
+            if (!Array.isArray(s) || s.length !== t.length) return false;
+            return s.every((sElem, idx) => deepMatch(sElem, t[idx]));
+        }
+
+        // If both are objects (but not arrays), compare all keys in target
+        if (typeof t === "object" && typeof s === "object") {
+            const tKeys = Object.keys(t);
+            for (const key of tKeys) {
+                // Only compare keys present in target (ignore extra keys in source)
+                if (!deepMatch(s[key], t[key])) return false;
+            }
+            return true;
+        }
+
+        // Primitive comparison
+        return s === t;
+    }
+
+    return deepMatch(source, target);
+}
+
+/**
  * Recursively expands all type aliases (e.g. "NUMBER_ARRAY" → ARRAY<NUMBER>).
  * Ensures every alias in the tree is fully expanded.
  *

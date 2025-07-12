@@ -270,13 +270,8 @@ describe("useTypeHash", () => {
 describe("useSuggestions", () => {
 
     test("returns FUNCTION suggestion for NUMBER_ARRAY", () => {
-        const result = useSuggestions({
-            type: "ARRAY", generic_mapper: [{
-                types: ["NUMBER"],
-                generic_target: "T"
-            }]
-        } as GenericType, ["D"], "some_database_id", 0);
-        console.log(JSON.stringify(result))
+        const result = useSuggestions("NUMBER", [], "some_database_id", 0);
+        expect(result).toHaveLength(2);
     })
 
 })

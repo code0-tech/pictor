@@ -22,7 +22,7 @@ import {useInputType} from "../function/DFlowFunction.input.hook";
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 
-export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>, flowId: string, depth: number[]): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>, flowId: string, contextLevel: number): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -92,6 +92,12 @@ export const useSuggestions = (type: Type, genericMapper: Map<string, Type | Gen
         }
 
         //calculate REF_OBJECTS && FUNCTION_COMBINATION
+        const refObjects = useRefObjects(flowId)
+        refObjects.forEach(value => {
+            if (value.primaryLevel > contextLevel) return
+            const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
+            setState(prevState => [...prevState, suggestion])
+        })
 
     }, [type, suggestionService, dataTypeService])
 
@@ -259,14 +265,14 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
     return md5(stableString)
 }
 
-export const useRefObjects = (flowId: string, depth: number[]): Map<number[], RefObject> => {
+export const useRefObjects = (flowId: string): Array<RefObject> => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-    const map = new Map<number[], RefObject>();
+    const array = new Array<RefObject>();
 
-    if (!dataTypeService || !flowService || !functionService) return map
+    if (!dataTypeService || !flowService || !functionService) return array
 
     const flow = flowService.values().find(f => f.id === flowId);
     let currentContextDepth = 0;
@@ -295,7 +301,7 @@ export const useRefObjects = (flowId: string, depth: number[]): Map<number[], Re
 
                 if (!resolvedInputType) return
 
-                map.set([currentContextDepth, currentNodeDepth], {
+                array.push({
                     type: resolvedInputType,
                     primaryLevel: currentContextDepth,
                     secondaryLevel: currentNodeDepth,
@@ -310,9 +316,9 @@ export const useRefObjects = (flowId: string, depth: number[]): Map<number[], Re
 
         if (!resolvedReturnType) continue
 
-        map.set([currentContextDepth, currentNodeDepth], {
+        array.push({
             type: resolvedReturnType,
-            primaryLevel: currentContextDepth,
+            primaryLevel: 0,
             secondaryLevel: currentNodeDepth,
         })
 
@@ -320,5 +326,5 @@ export const useRefObjects = (flowId: string, depth: number[]): Map<number[], Re
         currentNodeDepth++
     }
 
-    return map
+    return array
 }

@@ -17,7 +17,7 @@ import {useInputType} from "../function/DFlowFunction.input.hook";
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 
-export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -32,8 +32,6 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
     const cached = suggestionService.getSuggestionsByHash(hashedType || "")
     const state: DFlowSuggestion[] = []
     if (!hashedType) return []
-
-    console.log(cached)
 
     if (cached.length <= 0) {
 
@@ -58,9 +56,6 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!funcDefinition.return_type) return false
             const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
-
-            console.log(funcDefinition.function_id, JSON.stringify(resolvedType), JSON.stringify(resolvedReturnType), isMatchingType(resolvedType, resolvedReturnType))
-            //TODO: use is matching type with replaced generics use expandTypeAliases to generify both the target and the source
             return isMatchingType(resolvedType, resolvedReturnType)
 
         })
@@ -84,7 +79,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
     const refObjects = useRefObjects(flowId)
     refObjects.forEach(value => {
-        if (value.primaryLevel > contextLevel) return
+        if (value.primaryLevel > contextLevel && value.secondaryLevel > nodeLevel) return
         const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
         state.push(suggestion)
     })

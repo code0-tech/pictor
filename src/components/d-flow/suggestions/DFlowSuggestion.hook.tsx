@@ -1,5 +1,5 @@
 import {useService} from "../../../utils/contextStore";
-import {DFlowSuggestionService} from "./DFlowSuggestion.service";
+import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {EDataType, EDataTypeRuleType, RefObject, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
@@ -19,7 +19,7 @@ import {useInputType} from "../function/DFlowFunction.input.hook";
 
 export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
 
-    const suggestionService = useService(DFlowSuggestionService)
+    const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
 

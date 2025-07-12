@@ -1,32 +1,69 @@
 import {beforeEach, describe, expect, jest, test} from "@jest/globals"
-import {useTypeHash} from "./DFlowSuggestion.hook" // ← dein Hook
+import {useSuggestions, useTypeHash} from "./DFlowSuggestion.hook" // ← dein Hook
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test"
-import {createNonReactiveArrayService} from "../../../utils/nonReactiveArrayService"
-import {DataType, EDataType, EDataTypeRuleType, Type} from "../data-type/DFlowDataType.view"
+import {
+    createNonReactiveArrayService,
+    NonReactiveArrayService,
+    NonReactiveArrayStore
+} from "../../../utils/nonReactiveArrayService"
+import {DataType, GenericType, Type} from "../data-type/DFlowDataType.view"
 import {dataTypes} from "../data-type/DFlowDataType.data"
+import {functionData} from "../function/DFlowFunction.data"
+import {flow} from "../DFlow.data"
 import {useService} from "../../../utils/contextStore"
+import {DFlowSuggestionService} from "./DFlowReactiveSuggestionService";
+import {FunctionDefinition} from "../function/DFlowFunction.view";
+import {Flow} from "../DFlow.view";
+import {DFlowFunctionNonReactiveService} from "../function/DFlowFunction.test";
+import {DFlowNonReactiveService} from "../DFlow.test";
+import {DFlowSuggestion} from "./DFlowSuggestion.view";
+
+
+export class DFlowNonReactiveSuggestionService extends NonReactiveArrayService<DFlowSuggestion> implements DFlowSuggestionService {
+
+    constructor(store: NonReactiveArrayStore<DFlowSuggestion>) {
+        super(store);
+    }
+
+    //get all suggestions with matching hash
+    public getSuggestionsByHash(hash: string): DFlowSuggestion[] {
+        return this.values().filter(suggestion => suggestion.hash === hash);
+    }
+
+
+    //add suggestion with hash
+    public addSuggestion(suggestion: DFlowSuggestion): void {
+        this.add(suggestion)
+    }
+
+}
 
 // Mock useService to inject our test service
 jest.mock("../../../utils/contextStore", () => ({
     useService: jest.fn()
 }))
 
-const [_, testService] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService)
-dataTypes.forEach((dt) => testService.add(new DataType(dt, testService)))
+// ---- Service Instanzen vorbereiten ----
+const [_, dataTypeService] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+const [__, functionService] = createNonReactiveArrayService<any, DFlowFunctionNonReactiveService>(DFlowFunctionNonReactiveService);
+const [___, flowService] = createNonReactiveArrayService<any, DFlowNonReactiveService>(DFlowNonReactiveService);
+const [____, suggestionService] = createNonReactiveArrayService<any, DFlowNonReactiveSuggestionService>(DFlowNonReactiveSuggestionService);
 
-// Add a simple "NUMBER_ARRAY" alias for a nested structure example
-testService.add(new DataType({
-    data_type_id: "NUMBER_ARRAY",
-    type: EDataType.ARRAY,
-    rules: [{
-        type: EDataTypeRuleType.CONTAINS_TYPE,
-        config: { type: "NUMBER" }
-    }]
-}, testService))
+dataTypes.forEach((dt) => dataTypeService.add(new DataType(dt, dataTypeService)))
+functionData.forEach((dt) => functionService.add(new FunctionDefinition(dt)))
+flowService.add(new Flow(flow))
 
 beforeEach(() => {
-    (useService as jest.Mock).mockReturnValue(testService)
-})
+    (useService as jest.Mock).mockImplementation((serviceType?: any) => {
+        if (!serviceType) return undefined;
+        if (serviceType.name?.includes("DFlowDataTypeReactiveService")) return dataTypeService;
+        if (serviceType.name?.includes("DFlowFunctionReactiveService")) return functionService;
+        if (serviceType.name?.includes("DFlowReactiveService")) return flowService;
+        if (serviceType.name?.includes("DFlowReactiveSuggestionService")) return suggestionService;
+        return undefined;
+    });
+    suggestionService.clear();
+});
 
 describe("useTypeHash", () => {
 
@@ -226,6 +263,20 @@ describe("useTypeHash", () => {
         const hash1 = useTypeHash(t1);
         const hash2 = useTypeHash(t2);
         expect(hash1).toBe(hash2);
+    })
+
+})
+
+describe("useSuggestions", () => {
+
+    test("returns FUNCTION suggestion for NUMBER_ARRAY", () => {
+        const result = useSuggestions({
+            type: "ARRAY", generic_mapper: [{
+                types: ["NUMBER"],
+                generic_target: "T"
+            }]
+        } as GenericType, "some_database_id", 0);
+        console.log(JSON.stringify(result))
     })
 
 })

@@ -105,7 +105,7 @@ export const enum EDataTypeRuleType {
     CONTAINS_KEY,
     LOCK_KEY,
     RETURNS_TYPE,
-    INPUT_TYPES,
+    INPUT_TYPE,
     PARENT
     //etc
 }

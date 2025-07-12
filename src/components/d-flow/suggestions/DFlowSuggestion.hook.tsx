@@ -1,17 +1,23 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowReactiveSuggestionService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, EDataTypeRuleType, GenericMapper, RefObject, Type, Value} from "../data-type/DFlowDataType.view";
+import {
+    EDataType,
+    EDataTypeRuleType,
+    GenericMapper,
+    GenericType,
+    RefObject,
+    Type
+} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import React from "react";
 import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {
-    isMatchingDataTypeObject,
+    isMatchingDataTypeObject, isMatchingType,
     replaceGenericKeysInDataTypeObject,
-    replaceGenericKeysInType
+    replaceGenericKeysInType, resolveType
 } from "../../../utils/generics";
 import {NodeFunction, NodeFunctionObject} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
@@ -22,84 +28,78 @@ import {useInputType} from "../function/DFlowFunction.input.hook";
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 
-export const useSuggestions = (type: Type, genericMapper: Map<string, Type | GenericMapper>, flowId: string, contextLevel: number): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type, flowId: string, contextLevel: number): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
 
-    const replacedTyp = replaceGenericKeysInType(type, genericMapper)
-    const dataType = dataTypeService?.getDataType(replacedTyp)
+    const dataType = dataTypeService?.getDataType(type)
+
     if (!dataType || !suggestionService || !dataTypeService) return []
 
-    const hashedType = useTypeHash(replacedTyp)
+    const hashedType = useTypeHash(type)
+    const resolvedType = resolveType(type, dataTypeService)
     const cached = suggestionService.getSuggestionsByHash(hashedType || "")
-    const [state, setState] = React.useState(() => {
-        if (!hashedType) return []
-        return cached || []
-    })
+    const state: DFlowSuggestion[] = []
     if (!hashedType) return []
 
+    console.log(cached)
 
-    React.useEffect(() => {
+    if (cached.length <= 0) {
 
-
-        if (!cached) {
-
-            //calculate VALUE
-            dataType.rules?.forEach(rule => {
-                if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
-                    (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
-                        const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE);
-                        suggestionService.addSuggestion(suggestion)
-                        setState(prevState => [...prevState, suggestion])
-                    })
-                } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
-                    const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
-                    const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE)
+        //calculate VALUE
+        dataType.rules?.forEach(rule => {
+            if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
+                (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
+                    const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE);
                     suggestionService.addSuggestion(suggestion)
-                    setState(prevState => [...prevState, suggestion])
-                }
-            })
-
-            //calculate FUNCTION
-            //generics to be replaced with GENERIC todo is written on top
-            const replacedDataType = replaceGenericKeysInDataTypeObject(dataType.json, genericMapper)
-            const matchingFunctions = functionService.values().filter(funcDefinition => {
-                if (!funcDefinition.return_type) return false
-                const funcType = dataTypeService.getDataType(funcDefinition.return_type)?.json
-                if (!funcType) return false
-
-                return isMatchingDataTypeObject(replacedDataType, funcType)
-
-            })
-
-            matchingFunctions.forEach(funcDefinition => {
-                const suggestion = new DFlowSuggestion(hashedType, [], {
-                    function: {
-                        function_id: funcDefinition.function_id,
-                        runtime_function_id: funcDefinition.runtime_function_id
-                    },
-                } as NodeFunctionObject, DFlowSuggestionType.FUNCTION)
+                    state.push(suggestion)
+                })
+            } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
+                const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
+                const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE)
                 suggestionService.addSuggestion(suggestion)
-                setState(prevState => [...prevState, suggestion])
-            })
-
-
-            //calculate FUNCTION_COMBINATION deepness max 2
-
-        }
-
-        //calculate REF_OBJECTS && FUNCTION_COMBINATION
-        const refObjects = useRefObjects(flowId)
-        refObjects.forEach(value => {
-            if (value.primaryLevel > contextLevel) return
-            const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
-            setState(prevState => [...prevState, suggestion])
+                state.push(suggestion)
+            }
         })
 
-    }, [type, suggestionService, dataTypeService])
+        //calculate FUNCTION
+        //generics to be replaced with GENERIC todo is written on top
+        const matchingFunctions = functionService.values().filter(funcDefinition => {
+            if (!funcDefinition.return_type) return false
+            const resolvedReturnType = resolveType(funcDefinition.return_type, dataTypeService)
+            if (!resolvedReturnType) return false
+
+            console.log(funcDefinition.function_id, JSON.stringify(resolvedType), JSON.stringify(resolvedReturnType))
+            //TODO: use is matching type with replaced generics use expandTypeAliases to generify both the target and the source
+            return isMatchingType(resolvedType, resolvedReturnType)
+
+        })
+
+        matchingFunctions.forEach(funcDefinition => {
+            const suggestion = new DFlowSuggestion(hashedType, [], {
+                function: {
+                    function_id: funcDefinition.function_id,
+                    runtime_function_id: funcDefinition.runtime_function_id
+                },
+            } as NodeFunctionObject, DFlowSuggestionType.FUNCTION)
+            suggestionService.addSuggestion(suggestion)
+            state.push(suggestion)
+        })
+
+
+        //calculate FUNCTION_COMBINATION deepness max 2
+
+    }
+
+    //calculate REF_OBJECTS && FUNCTION_COMBINATION
+    const refObjects = useRefObjects(flowId)
+    refObjects.forEach(value => {
+        if (value.primaryLevel > contextLevel) return
+        const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
+        state.push(suggestion)
+    })
 
 
     return state
@@ -123,77 +123,6 @@ export const useSuggestions = (type: Type, genericMapper: Map<string, Type | Gen
 export const useTypeHash = (type: Type, generic_keys?: string[]): string | undefined => {
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     if (!type || !dataTypeService) return undefined
-
-    /**
-     * Recursively expands all type aliases (e.g. "NUMBER_ARRAY" → ARRAY<NUMBER>).
-     * Ensures every alias in the tree is fully expanded.
-     *
-     * @param type     The Type or type alias to expand
-     * @param service  Data type service (for lookup)
-     * @returns        Deeply expanded Type object (with aliases replaced)
-     */
-    function expandTypeAliases(type: Type, service: DFlowDataTypeReactiveService): Type {
-        // Alias (string): try to expand via CONTAINS_TYPE recursively
-        if (typeof type === "string") {
-            const dt = service.getDataType(type)
-            if (
-                dt &&
-                dt.rules &&
-                dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
-            ) {
-                // Find most generic DataType with matching type and generics
-                const genericDT = service.values().find(
-                    dt2 => dt2.type === dt.type && dt2.genericKeys && dt2.genericKeys.length > 0
-                )
-                if (genericDT && genericDT.genericKeys!!.length) {
-                    const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
-                    if (rule) {
-                        // Recursively expand inner type
-                        //@ts-ignore
-                        const expandedInner = expandTypeAliases(rule.config.type, service)
-                        return {
-                            type: genericDT.id,
-                            generic_mapper: [{
-                                types: [expandedInner],
-                                generic_target: "GENERIC"
-                            }]
-                        }
-                    }
-                }
-            }
-            // Not an alias or cannot expand further
-            return type
-        }
-        // If already a GenericType object: expand all generic_mapper[].types recursively
-        if (typeof type === "object" && type !== null) {
-            const result: any = {}
-            for (const key of Object.keys(type)) {
-                if (key === "generic_mapper" && Array.isArray(type[key])) {
-                    result[key] = type[key].map((gm: any) => ({
-                        ...gm,
-                        types: Array.isArray(gm.types)
-                            ? gm.types.map((t: any) => expandTypeAliases(t, service))
-                            : expandTypeAliases(gm.types, service),
-                        generic_target: "GENERIC" // Normalize all generic_target to "GENERIC"
-                    }))
-                } else if (key === "type") {
-                    // Always expand nested type to primitive string (no nested objects)
-                    if (typeof type[key] === "object") {
-                        result[key] = (type[key] as any).type || type[key]
-                    } else {
-                        result[key] = type[key]
-                    }
-                } else {
-                    // Recursively handle all other fields
-                    //@ts-ignore
-                    result[key] = expandTypeAliases(type[key], service)
-                }
-            }
-            return result
-        }
-        // Primitive (number/boolean): just return as-is
-        return type
-    }
 
     function replaceGenericsAndSortTypeObject(
         type: Type,
@@ -255,7 +184,7 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
 
 
     // 1. Expand all aliases and deeply unify generics
-    const expandedType = expandTypeAliases(type, dataTypeService)
+    const expandedType = resolveType(type, dataTypeService)
     // 2. Replace generics and sort keys for canonicalization
     const canonical = replaceGenericsAndSortTypeObject(expandedType, generic_keys)
     // 3. Stable stringification for MD5

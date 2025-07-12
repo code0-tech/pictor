@@ -1,5 +1,7 @@
 import {
-    DataTypeObject, DataTypeRuleObject, EDataTypeRuleType,
+    DataTypeObject,
+    DataTypeRuleObject,
+    EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -7,7 +9,7 @@ import {
     Value
 } from "../components/d-flow/data-type/DFlowDataType.view";
 import {FunctionDefinition} from "../components/d-flow/function/DFlowFunction.view";
-import {DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
 import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
@@ -496,4 +498,75 @@ export function isMatchingDataTypeObject(
                 return JSON.stringify(sourceRule.config) === JSON.stringify(targetRule.config);
         }
     }
+}
+
+/**
+ * Recursively expands all type aliases (e.g. "NUMBER_ARRAY" → ARRAY<NUMBER>).
+ * Ensures every alias in the tree is fully expanded.
+ *
+ * @param type     The Type or type alias to expand
+ * @param service  Data type service (for lookup)
+ * @returns        Deeply expanded Type object (with aliases replaced)
+ */
+export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): Type => {
+    // Alias (string): try to expand via CONTAINS_TYPE recursively
+    if (typeof type === "string") {
+        const dt = service.getDataType(type)
+        if (
+            dt &&
+            dt.rules &&
+            dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+        ) {
+            // Find most generic DataType with matching type and generics
+            const genericDT = service.values().find(
+                dt2 => dt2.type === dt.type && dt2.genericKeys && dt2.genericKeys.length > 0
+            )
+            if (genericDT && genericDT.genericKeys!!.length) {
+                const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+                if (rule) {
+                    // Recursively expand inner type
+                    //@ts-ignore
+                    const expandedInner = resolveType(rule.config.type, service)
+                    return {
+                        type: genericDT.id,
+                        generic_mapper: [{
+                            types: [expandedInner],
+                            generic_target: "GENERIC"
+                        }]
+                    }
+                }
+            }
+        }
+        // Not an alias or cannot expand further
+        return type
+    }
+    // If already a GenericType object: expand all generic_mapper[].types recursively
+    if (typeof type === "object" && type !== null) {
+        const result: any = {}
+        for (const key of Object.keys(type)) {
+            if (key === "generic_mapper" && Array.isArray(type[key])) {
+                result[key] = type[key].map((gm: any) => ({
+                    ...gm,
+                    types: Array.isArray(gm.types)
+                        ? gm.types.map((t: any) => resolveType(t, service))
+                        : resolveType(gm.types, service),
+                    generic_target: gm.generic_target // Normalize all generic_target to "GENERIC"
+                }))
+            } else if (key === "type") {
+                // Always expand nested type to primitive string (no nested objects)
+                if (typeof type[key] === "object") {
+                    result[key] = (type[key] as any).type || type[key]
+                } else {
+                    result[key] = type[key]
+                }
+            } else {
+                // Recursively handle all other fields
+                //@ts-ignore
+                result[key] = resolveType(type[key], service)
+            }
+        }
+        return result
+    }
+    // Primitive (number/boolean): just return as-is
+    return type
 }

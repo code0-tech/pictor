@@ -1,5 +1,7 @@
 import {
     DataTypeObject,
+    DataTypeRuleObject,
+    EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -7,7 +9,10 @@ import {
     Value
 } from "../components/d-flow/data-type/DFlowDataType.view";
 import {FunctionDefinition} from "../components/d-flow/function/DFlowFunction.view";
-import {DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {
+    DFlowDataTypeItemOfCollectionRuleConfig
+} from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -416,4 +421,258 @@ export const resolveGenericKeys = (
     }
 
     return genericMap
+}
+
+/**
+ * Checks if a source DataTypeObject matches a target DataTypeObject with the following semantics:
+ * - Only the fields 'type' and 'rules' are considered.
+ * - All rules in the target must be matched by at least one rule in the source.
+ * - Target rules may be more generic (contain "GENERIC" as type/key), whereas source rules can be more specific.
+ * - For rules with a 'type' or 'key', a GENERIC in target matches any value in source.
+ * - Source must have at least as many or more specific rules than the target.
+ * - This function supports all rule types defined in the EDataTypeRuleType enum.
+ *
+ * @param source Source DataTypeObject (potentially more specific)
+ * @param target Target DataTypeObject (potentially generic, e.g., contains "GENERIC" in rules)
+ * @returns True if source matches all relevant constraints in target, otherwise false
+ */
+export function isMatchingDataTypeObject(
+    source: DataTypeObject,
+    target: DataTypeObject
+): boolean {
+    if (source.type !== target.type) return false;
+    if (!Array.isArray(target.rules) || target.rules.length === 0) return true;
+
+    for (const targetRule of target.rules) {
+        const found = source.rules?.some(sourceRule =>
+            ruleMatches(sourceRule, targetRule)
+        );
+        if (!found) return false;
+    }
+    return true;
+
+    // Rule comparison logic supporting all relevant EDataTypeRuleType configs
+    function ruleMatches(sourceRule: DataTypeRuleObject, targetRule: DataTypeRuleObject): boolean {
+        if (sourceRule.type !== targetRule.type) return false;
+        switch (targetRule.type) {
+            case EDataTypeRuleType.CONTAINS_TYPE:
+            case EDataTypeRuleType.RETURNS_TYPE:
+            case EDataTypeRuleType.PARENT:
+                if ("type" in targetRule.config && targetRule.config.type === "GENERIC") return true;
+                if ("type" in sourceRule.config && "type" in targetRule.config)
+                    return sourceRule.config.type === targetRule.config.type;
+                return false;
+            case EDataTypeRuleType.CONTAINS_KEY:
+                if ("key" in sourceRule.config && "key" in targetRule.config) {
+                    if (sourceRule.config.key !== targetRule.config.key) return false;
+                    if ("type" in targetRule.config && targetRule.config.type === "GENERIC") return true;
+                    if ("type" in sourceRule.config && "type" in targetRule.config)
+                        return sourceRule.config.type === targetRule.config.type;
+                }
+                return false;
+            case EDataTypeRuleType.REGEX:
+                if ("pattern" in sourceRule.config && "pattern" in targetRule.config)
+                    return sourceRule.config.pattern === targetRule.config.pattern;
+                return false;
+            case EDataTypeRuleType.NUMBER_RANGE:
+                if ("from" in sourceRule.config && "from" in targetRule.config &&
+                    "to" in sourceRule.config && "to" in targetRule.config) {
+                    return (
+                        sourceRule.config.from === targetRule.config.from &&
+                        sourceRule.config.to === targetRule.config.to &&
+                        ("step" in sourceRule.config ? sourceRule.config.step : undefined) ===
+                        ("step" in targetRule.config ? targetRule.config.step : undefined)
+                    );
+                }
+                return false;
+            case EDataTypeRuleType.ITEM_OF_COLLECTION:
+                if ("items" in sourceRule.config && "items" in targetRule.config) {
+                    return Array.isArray(sourceRule.config.items)
+                        && Array.isArray(targetRule.config.items)
+                        && sourceRule.config.items.length === targetRule.config.items.length
+                        && sourceRule.config.items.every((v: any, i: number) => v === (targetRule.config as DFlowDataTypeItemOfCollectionRuleConfig).items[i]);
+                }
+                return false;
+            default:
+                // Fallback: exact deep equality for other configs
+                return JSON.stringify(sourceRule.config) === JSON.stringify(targetRule.config);
+        }
+    }
+}
+
+/**
+ * Checks if a source Type matches a target Type with the following semantics:
+ * - Only the structure (type and generic_mapper, etc.) is considered, not DataTypeObject metadata.
+ * - All values in the target must be matched by at least one corresponding value in the source.
+ * - "GENERIC" in the target matches anything in the source at the same location.
+ * - Recursively checks all nested types (e.g. in generic_mapper[].types).
+ * - Source can be more specific, target can be more generic (with "GENERIC").
+ * - Arrays must match in order and length unless the target is "GENERIC".
+ *
+ * @param source Source Type (potentially more specific)
+ * @param target Target Type (potentially generic, e.g., contains "GENERIC" somewhere)
+ * @returns True if source matches all relevant constraints in target, otherwise false
+ */
+export function isMatchingType(
+    source: Type,
+    target: Type
+): boolean {
+    // Helper: Recursively deep compare with GENERIC wildcard logic
+    function deepMatch(s: any, t: any): boolean {
+        // GENERIC wildcard: target accepts anything at this position
+        if (s === "GENERIC") return true;
+
+        // Null/undefined check
+        if (s == null || t == null) return s === t;
+
+        // If both are arrays, match by length and recurse
+        if (Array.isArray(t)) {
+            if (!Array.isArray(s) || s.length !== t.length) return false;
+            return s.every((sElem, idx) => deepMatch(sElem, t[idx]));
+        }
+
+        // If both are objects (but not arrays), compare all keys in target
+        if (typeof t === "object" && typeof s === "object") {
+            const tKeys = Object.keys(t);
+            for (const key of tKeys) {
+                // Only compare keys present in target (ignore extra keys in source)
+                if (!deepMatch(s[key], t[key])) return false;
+            }
+            return true;
+        }
+
+        // Primitive comparison
+        return s === t;
+    }
+
+    return deepMatch(source, target);
+}
+
+/**
+ * Recursively expands all type aliases (e.g. "NUMBER_ARRAY" → ARRAY<NUMBER>).
+ * Ensures every alias in the tree is fully expanded.
+ *
+ * @param type     The Type or type alias to expand
+ * @param service  Data type service (for lookup)
+ * @returns        Deeply expanded Type object (with aliases replaced)
+ */
+export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): Type => {
+    // Alias (string): try to expand via CONTAINS_TYPE recursively
+    if (typeof type === "string") {
+        const dt = service.getDataType(type)
+        if (
+            dt &&
+            dt.rules &&
+            dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+        ) {
+            // Find most generic DataType with matching type and generics
+            const genericDT = service.values().find(
+                dt2 => dt2.type === dt.type && dt2.genericKeys && dt2.genericKeys.length > 0
+            )
+            if (genericDT && genericDT.genericKeys!!.length) {
+                const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+                if (rule) {
+                    // Recursively expand inner type
+                    //@ts-ignore
+                    const expandedInner = resolveType(rule.config.type, service)
+                    return {
+                        type: genericDT.id,
+                        generic_mapper: [{
+                            types: [expandedInner],
+                            generic_target: "GENERIC"
+                        }]
+                    }
+                }
+            }
+        }
+        // Not an alias or cannot expand further
+        return type
+    }
+    // If already a GenericType object: expand all generic_mapper[].types recursively
+    if (typeof type === "object" && type !== null) {
+        const result: any = {}
+        for (const key of Object.keys(type)) {
+            if (key === "generic_mapper" && Array.isArray(type[key])) {
+                result[key] = type[key].map((gm: any) => ({
+                    ...gm,
+                    types: Array.isArray(gm.types)
+                        ? gm.types.map((t: any) => resolveType(t, service))
+                        : resolveType(gm.types, service),
+                    generic_target: gm.generic_target // Normalize all generic_target to "GENERIC"
+                }))
+            } else if (key === "type") {
+                // Always expand nested type to primitive string (no nested objects)
+                if (typeof type[key] === "object") {
+                    result[key] = (type[key] as any).type || type[key]
+                } else {
+                    result[key] = type[key]
+                }
+            } else {
+                // Recursively handle all other fields
+                //@ts-ignore
+                result[key] = resolveType(type[key], service)
+            }
+        }
+        return result
+    }
+    // Primitive (number/boolean): just return as-is
+    return type
+}
+
+export const replaceGenericsAndSortType = (
+    type: Type,
+    genericKeys?: string[]
+): Type => {
+    function deepReplaceAndSort(node: any): any {
+        // 1. Replace generic keys if string (überall, nicht nur in generic_target)
+        if (
+            typeof node === "string" &&
+            Array.isArray(genericKeys) &&
+            genericKeys.includes(node)
+        ) {
+            return "GENERIC";
+        }
+
+        // 2. Array: Rekursiv, ggf. sortieren (für deterministische Ausgabe)
+        if (Array.isArray(node)) {
+            const mapped = node.map(deepReplaceAndSort);
+
+            // Spezieller Fall: Array von Objekten mit generic_target → sortieren
+            if (mapped.length > 0 && typeof mapped[0] === "object" && mapped[0] !== null && "generic_target" in mapped[0]) {
+                // Sortierung: zuerst generic_target, dann types
+                return mapped.sort((a, b) => {
+                    // generic_target ist jetzt immer "GENERIC" – also ggf. noch types vergleichen
+                    const aTypes = JSON.stringify(a.types);
+                    const bTypes = JSON.stringify(b.types);
+                    if (aTypes < bTypes) return -1;
+                    if (aTypes > bTypes) return 1;
+                    return 0;
+                });
+            }
+            // Auch primitive Arrays sortieren (z. B. ["FOOBAR", "MY_KEY"])
+            if (typeof mapped[0] === "string" || typeof mapped[0] === "number") {
+                return [...mapped].sort();
+            }
+            return mapped;
+        }
+
+        // 3. Object: keys sortieren, rekursiv ersetzen
+        if (typeof node === "object" && node !== null) {
+            const sortedKeys = Object.keys(node).sort();
+            const result: any = {};
+            for (const key of sortedKeys) {
+                // generic_target IMMER zu "GENERIC"
+                if (key === "generic_target") {
+                    result[key] = "GENERIC";
+                } else {
+                    result[key] = deepReplaceAndSort(node[key]);
+                }
+            }
+            return result;
+        }
+        // 4. Primitives
+        return node;
+    }
+
+    return deepReplaceAndSort(type);
 }

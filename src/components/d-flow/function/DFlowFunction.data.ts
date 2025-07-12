@@ -15,7 +15,7 @@ export const functionData: FunctionDefinitionObject[] = [{
     }]
 }, {
     function_id: "std::array::add",
-    runtime_function_id: "std::math::add",
+    runtime_function_id: "std::array::add",
     return_type: {
         type: "ARRAY",
         generic_mapper: [{

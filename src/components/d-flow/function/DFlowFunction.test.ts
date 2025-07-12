@@ -13,7 +13,7 @@ import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
 import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
 import {useReturnType} from "./DFlowFunction.return.hook";
 
-class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
+export class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
 
     constructor(store: NonReactiveArrayStore<FunctionDefinition>) {
         super(store);

@@ -40,14 +40,14 @@ export interface RefPath {
  * {@link RefObject#secondaryLevel} links to the node inside the flow
  * starting at 0.
  *
- * {@link RefObject#secondaryLevel} links to an {@link DataTypeObject#inputTypes} of the node
+ * {@link RefObject#tertiaryLevel} links to an {@link DataTypeObject#rule#inputtype} of the node
  * starting at 0.
  */
 export interface RefObject {
     type: Type
     primaryLevel: number
     secondaryLevel: number
-    tertiaryLevel?: number
+    tertiaryLevel?: string
     path?: RefPath[]
 }
 
@@ -105,7 +105,8 @@ export const enum EDataTypeRuleType {
     CONTAINS_KEY,
     LOCK_KEY,
     RETURNS_TYPE,
-    INPUT_TYPES
+    INPUT_TYPE,
+    PARENT
     //etc
 }
 
@@ -175,10 +176,10 @@ export class DataType {
             a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
 
 
-        if (this.allRules && !dataType.allRules) return false
-        if (!this.allRules && dataType.allRules) return false
+        if (this._rules && !dataType._rules) return false
+        if (!this._rules && dataType._rules) return false
 
-        return arraysEqual(this.allRules as [], dataType.allRules as [])
+        return arraysEqual(this.rules as [], dataType.rules as [])
     }
 
     public validateValue(value: Value, generics?: GenericMapper[]): boolean {
@@ -193,18 +194,14 @@ export class DataType {
 
         const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
 
-        return this.allRules.every(rule => {
+        return this.rules.every(rule => {
             return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)
         })
     }
 
 
-    get rules(): DataTypeRuleObject[] | undefined {
-        return this._rules
-    }
-
-    get allRules(): DataTypeRuleObject[] {
-        return [...(this._rules || []), ...((this._parent ? this._service.getDataType(this._parent)?.allRules : []) || [])]
+    get rules(): DataTypeRuleObject[] {
+        return this._rules || []
     }
 
     get id(): string {

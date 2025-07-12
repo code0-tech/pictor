@@ -91,7 +91,7 @@ export const dataTypes: DataTypeObject[] = [{
     type: EDataType.NODE,
     genericKeys: ["V", "S"],
     rules: [{
-        type: EDataTypeRuleType.INPUT_TYPES,
+        type: EDataTypeRuleType.INPUT_TYPE,
         config: {type: "V"}
     }, {
         type: EDataTypeRuleType.RETURNS_TYPE,

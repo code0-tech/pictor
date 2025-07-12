@@ -19,38 +19,21 @@ export const flow: FlowObject = {
     }],
     starting_node: {
         function: {
-            function_id: "123456789",
-            runtime_function_id: "standard::for",
+            function_id: "std::math::add",
+            runtime_function_id: "std::math::add"
         },
         parameters: [{
             definition: {
-                parameter_id: "123456789_1",
-                runtime_parameter_id: "standard::for::array",
+                parameter_id: "std::math::add__firstValue",
+                runtime_parameter_id: "std::math::add__firstValue"
             },
-            value: [1,2,3,4]
+            value: 5
         }, {
             definition: {
-                parameter_id: "123456789_2",
-                runtime_parameter_id: "standard::map::function",
+                parameter_id: "standard::math::add__secondValue",
+                runtime_parameter_id: "standard::math::add__secondValue"
             },
-            value: {
-                function: {
-                    function_id: "123456789_2",
-                    runtime_function_id: "standard::math:add"
-                },
-                parameters: [{
-
-                }],
-                next_node: {
-                    function: {
-                        function_id: "123456789_2",
-                        runtime_function_id: "standard::math:add"
-                    },
-                    parameters: [{
-
-                    }],
-                }
-            }
+            value: 10
         }]
     }
 }

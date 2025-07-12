@@ -1,7 +1,13 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 
-export class DFlowReactiveSuggestionService extends ReactiveArrayService<DFlowSuggestion> {
+export interface DFlowSuggestionService {
+    getSuggestionsByHash(hash: string): DFlowSuggestion[]
+
+    addSuggestion(suggestion: DFlowSuggestion): void
+}
+
+export class DFlowReactiveSuggestionService extends ReactiveArrayService<DFlowSuggestion> implements DFlowSuggestionService {
 
     constructor(store: ReactiveArrayStore<DFlowSuggestion>) {
         super(store);

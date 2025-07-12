@@ -520,7 +520,7 @@ export function isMatchingType(
     // Helper: Recursively deep compare with GENERIC wildcard logic
     function deepMatch(s: any, t: any): boolean {
         // GENERIC wildcard: target accepts anything at this position
-        if (t === "GENERIC") return true;
+        if (s === "GENERIC") return true;
 
         // Null/undefined check
         if (s == null || t == null) return s === t;
@@ -617,4 +617,62 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
     }
     // Primitive (number/boolean): just return as-is
     return type
+}
+
+export const replaceGenericsAndSortType = (
+    type: Type,
+    genericKeys?: string[]
+): Type => {
+    function deepReplaceAndSort(node: any): any {
+        // 1. Replace generic keys if string (überall, nicht nur in generic_target)
+        if (
+            typeof node === "string" &&
+            Array.isArray(genericKeys) &&
+            genericKeys.includes(node)
+        ) {
+            return "GENERIC";
+        }
+
+        // 2. Array: Rekursiv, ggf. sortieren (für deterministische Ausgabe)
+        if (Array.isArray(node)) {
+            const mapped = node.map(deepReplaceAndSort);
+
+            // Spezieller Fall: Array von Objekten mit generic_target → sortieren
+            if (mapped.length > 0 && typeof mapped[0] === "object" && mapped[0] !== null && "generic_target" in mapped[0]) {
+                // Sortierung: zuerst generic_target, dann types
+                return mapped.sort((a, b) => {
+                    // generic_target ist jetzt immer "GENERIC" – also ggf. noch types vergleichen
+                    const aTypes = JSON.stringify(a.types);
+                    const bTypes = JSON.stringify(b.types);
+                    if (aTypes < bTypes) return -1;
+                    if (aTypes > bTypes) return 1;
+                    return 0;
+                });
+            }
+            // Auch primitive Arrays sortieren (z. B. ["FOOBAR", "MY_KEY"])
+            if (typeof mapped[0] === "string" || typeof mapped[0] === "number") {
+                return [...mapped].sort();
+            }
+            return mapped;
+        }
+
+        // 3. Object: keys sortieren, rekursiv ersetzen
+        if (typeof node === "object" && node !== null) {
+            const sortedKeys = Object.keys(node).sort();
+            const result: any = {};
+            for (const key of sortedKeys) {
+                // generic_target IMMER zu "GENERIC"
+                if (key === "generic_target") {
+                    result[key] = "GENERIC";
+                } else {
+                    result[key] = deepReplaceAndSort(node[key]);
+                }
+            }
+            return result;
+        }
+        // 4. Primitives
+        return node;
+    }
+
+    return deepReplaceAndSort(type);
 }

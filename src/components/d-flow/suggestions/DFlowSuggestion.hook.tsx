@@ -1,24 +1,13 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowReactiveSuggestionService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {
-    EDataType,
-    EDataTypeRuleType,
-    GenericMapper,
-    GenericType,
-    RefObject,
-    Type
-} from "../data-type/DFlowDataType.view";
+import {EDataType, EDataTypeRuleType, RefObject, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
-import {
-    isMatchingDataTypeObject, isMatchingType,
-    replaceGenericKeysInDataTypeObject,
-    replaceGenericKeysInType, resolveType
-} from "../../../utils/generics";
+import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
 import {NodeFunction, NodeFunctionObject} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
@@ -28,7 +17,7 @@ import {useInputType} from "../function/DFlowFunction.input.hook";
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 
-export const useSuggestions = (type: Type, flowId: string, contextLevel: number): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -39,7 +28,7 @@ export const useSuggestions = (type: Type, flowId: string, contextLevel: number)
     if (!dataType || !suggestionService || !dataTypeService) return []
 
     const hashedType = useTypeHash(type)
-    const resolvedType = resolveType(type, dataTypeService)
+    const resolvedType = replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys)
     const cached = suggestionService.getSuggestionsByHash(hashedType || "")
     const state: DFlowSuggestion[] = []
     if (!hashedType) return []
@@ -68,10 +57,9 @@ export const useSuggestions = (type: Type, flowId: string, contextLevel: number)
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!funcDefinition.return_type) return false
-            const resolvedReturnType = resolveType(funcDefinition.return_type, dataTypeService)
-            if (!resolvedReturnType) return false
+            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
 
-            console.log(funcDefinition.function_id, JSON.stringify(resolvedType), JSON.stringify(resolvedReturnType))
+            console.log(funcDefinition.function_id, JSON.stringify(resolvedType), JSON.stringify(resolvedReturnType), isMatchingType(resolvedType, resolvedReturnType))
             //TODO: use is matching type with replaced generics use expandTypeAliases to generify both the target and the source
             return isMatchingType(resolvedType, resolvedReturnType)
 
@@ -124,69 +112,11 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     if (!type || !dataTypeService) return undefined
 
-    function replaceGenericsAndSortTypeObject(
-        type: Type,
-        genericKeys?: string[]
-    ): Type {
-        function deepReplaceAndSort(node: any): any {
-            // 1. Replace generic keys if string (überall, nicht nur in generic_target)
-            if (
-                typeof node === "string" &&
-                Array.isArray(genericKeys) &&
-                genericKeys.includes(node)
-            ) {
-                return "GENERIC";
-            }
-
-            // 2. Array: Rekursiv, ggf. sortieren (für deterministische Ausgabe)
-            if (Array.isArray(node)) {
-                const mapped = node.map(deepReplaceAndSort);
-
-                // Spezieller Fall: Array von Objekten mit generic_target → sortieren
-                if (mapped.length > 0 && typeof mapped[0] === "object" && mapped[0] !== null && "generic_target" in mapped[0]) {
-                    // Sortierung: zuerst generic_target, dann types
-                    return mapped.sort((a, b) => {
-                        // generic_target ist jetzt immer "GENERIC" – also ggf. noch types vergleichen
-                        const aTypes = JSON.stringify(a.types);
-                        const bTypes = JSON.stringify(b.types);
-                        if (aTypes < bTypes) return -1;
-                        if (aTypes > bTypes) return 1;
-                        return 0;
-                    });
-                }
-                // Auch primitive Arrays sortieren (z. B. ["FOOBAR", "MY_KEY"])
-                if (typeof mapped[0] === "string" || typeof mapped[0] === "number") {
-                    return [...mapped].sort();
-                }
-                return mapped;
-            }
-
-            // 3. Object: keys sortieren, rekursiv ersetzen
-            if (typeof node === "object" && node !== null) {
-                const sortedKeys = Object.keys(node).sort();
-                const result: any = {};
-                for (const key of sortedKeys) {
-                    // generic_target IMMER zu "GENERIC"
-                    if (key === "generic_target") {
-                        result[key] = "GENERIC";
-                    } else {
-                        result[key] = deepReplaceAndSort(node[key]);
-                    }
-                }
-                return result;
-            }
-            // 4. Primitives
-            return node;
-        }
-
-        return deepReplaceAndSort(type);
-    }
-
 
     // 1. Expand all aliases and deeply unify generics
     const expandedType = resolveType(type, dataTypeService)
     // 2. Replace generics and sort keys for canonicalization
-    const canonical = replaceGenericsAndSortTypeObject(expandedType, generic_keys)
+    const canonical = replaceGenericsAndSortType(expandedType, generic_keys)
     // 3. Stable stringification for MD5
     const stableString = JSON.stringify(canonical)
 

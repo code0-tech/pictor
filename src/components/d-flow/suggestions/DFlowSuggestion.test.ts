@@ -272,7 +272,7 @@ describe("useSuggestions", () => {
     test("returns FUNCTION suggestion for NUMBER_ARRAY", () => {
         const result = useSuggestions({
             type: "ARRAY", generic_mapper: [{
-                types: ["NUMBER"],
+                types: ["D"],
                 generic_target: "T"
             }]
         } as GenericType, "some_database_id", 0);

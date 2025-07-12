@@ -7,7 +7,7 @@ export interface DFlowSuggestionService {
     addSuggestion(suggestion: DFlowSuggestion): void
 }
 
-export class DFlowReactiveSuggestionService extends ReactiveArrayService<DFlowSuggestion> implements DFlowSuggestionService {
+export class DFlowSuggestionService extends ReactiveArrayService<DFlowSuggestion> implements DFlowSuggestionService {
 
     constructor(store: ReactiveArrayStore<DFlowSuggestion>) {
         super(store);

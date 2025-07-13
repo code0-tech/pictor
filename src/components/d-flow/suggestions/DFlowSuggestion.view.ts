@@ -13,9 +13,13 @@ export class DFlowSuggestion {
         private readonly _hash: string,
         private readonly _path: number[],
         private readonly _value: Value,
-        private readonly _type: DFlowSuggestionType
+        private readonly _type: DFlowSuggestionType,
+        private readonly _displayText: string[]
     ){}
 
+    get displayText(): string[] {
+        return this._displayText;
+    }
 
     get hash(): string {
         return this._hash;

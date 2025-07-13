@@ -32,14 +32,13 @@ export const Example = () => {
 
     return <ContextStoreProvider
         services={[[dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-        <SuggestionMenu/>
+        {React.useMemo(() => <SuggestionMenu/>, [])}
     </ContextStoreProvider>
 }
 
 const SuggestionMenu = () => {
 
     const result = useSuggestions("NUMBER", [], "some_database_id", 0)
-    console.log("sd")
 
     return <DFlowSuggestionMenu suggestions={result}/>
 }

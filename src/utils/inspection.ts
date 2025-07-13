@@ -1,6 +1,6 @@
 import {Translation} from "./translation";
 
-export const enum InspectionSeverity {
+export enum InspectionSeverity {
     TYPO,
     GRAMMAR,
     WEAK,

@@ -1,7 +1,7 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, EDataTypeRuleType, RefObject, Type} from "../data-type/DFlowDataType.view";
+import {EDataType, RefObject, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
@@ -13,6 +13,7 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
 import {useInputType} from "../function/DFlowFunction.input.hook";
+import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search

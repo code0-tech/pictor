@@ -86,7 +86,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
     })
 
 
-    return state
+    return [...state, ...cached]
 
 }
 

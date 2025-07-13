@@ -17,6 +17,7 @@ import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
+//TODO: calculate FUNCTION_COMBINATION deepness max 2
 
 export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
 
@@ -40,13 +41,13 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
         dataType.rules?.forEach(rule => {
             if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
                 (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
-                    const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE);
+                    const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE, [value.toString()])
                     suggestionService.addSuggestion(suggestion)
                     state.push(suggestion)
                 })
             } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
                 const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
-                const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE)
+                const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE, [config.from.toString()])
                 suggestionService.addSuggestion(suggestion)
                 state.push(suggestion)
             }
@@ -67,13 +68,10 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
                     function_id: funcDefinition.function_id,
                     runtime_function_id: funcDefinition.runtime_function_id
                 },
-            } as NodeFunctionObject, DFlowSuggestionType.FUNCTION)
+            } as NodeFunctionObject, DFlowSuggestionType.FUNCTION, [funcDefinition.function_id])
             suggestionService.addSuggestion(suggestion)
             state.push(suggestion)
         })
-
-
-        //calculate FUNCTION_COMBINATION deepness max 2
 
     }
 
@@ -82,7 +80,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
     const refObjects = useRefObjects(flowId)
     refObjects.forEach(value => {
         if (value.primaryLevel > contextLevel && value.secondaryLevel > nodeLevel) return
-        const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
+        const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.primaryLevel}-${value.secondaryLevel}-${value.tertiaryLevel || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)
     })
 

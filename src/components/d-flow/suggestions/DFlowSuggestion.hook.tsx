@@ -30,9 +30,9 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
 
     const hashedType = useTypeHash(type)
     const resolvedType = replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys)
-    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
     const state: DFlowSuggestion[] = []
     if (!hashedType) return []
+    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
 
     if (cached.length <= 0) {
 
@@ -77,6 +77,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
 
     }
 
+
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
     const refObjects = useRefObjects(flowId)
     refObjects.forEach(value => {
@@ -86,7 +87,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
     })
 
 
-    return [...state, ...cached]
+    return [...state, ...suggestionService.getSuggestionsByHash(hashedType)]
 
 }
 

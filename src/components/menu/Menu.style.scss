@@ -19,7 +19,9 @@
   &__label {
     text-transform: uppercase;
     font-size: variables.$xs;
-    display: block;
+    display: flex;
+    gap: variables.$xxs;
+    align-items: center;
     padding: variables.$xxs variables.$xs;
     color: helpers.color();
 

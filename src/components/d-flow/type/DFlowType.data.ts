@@ -1,5 +1,6 @@
 import {FlowType} from "./DFlowType.view";
-import {EDataType, EDataTypeRuleType} from "../data-type/DFlowDataType.view";
+import {EDataType} from "../data-type/DFlowDataType.view";
+import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 
 export const REST_FLOW_TYPE: FlowType = {
     flow_type_id: "REST",

@@ -1,4 +1,5 @@
-import {DataTypeObject, EDataType, EDataTypeRuleType} from "./DFlowDataType.view";
+import {DataTypeObject, EDataType} from "./DFlowDataType.view";
+import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 
 export const dataTypes: DataTypeObject[] = [{
     data_type_id: "NUMBER",

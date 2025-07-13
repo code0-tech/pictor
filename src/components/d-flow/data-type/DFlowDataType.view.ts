@@ -1,6 +1,6 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
-import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
+import {CombinesRuleConfig, EDataTypeRuleType, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
 export enum GenericCombinationStrategy {
@@ -87,7 +87,7 @@ export const isValue = (v: any): boolean =>
     isObject(v) ||
     isNodeFunctionObject(v)
 
-export const enum EDataType {
+export enum EDataType {
     PRIMITIVE,
     TYPE,
     OBJECT,
@@ -95,19 +95,6 @@ export const enum EDataType {
     ARRAY,
     NODE,
     ERROR
-}
-
-export const enum EDataTypeRuleType {
-    REGEX,
-    NUMBER_RANGE,
-    ITEM_OF_COLLECTION,
-    CONTAINS_TYPE,
-    CONTAINS_KEY,
-    LOCK_KEY,
-    RETURNS_TYPE,
-    INPUT_TYPE,
-    PARENT
-    //etc
 }
 
 export interface DataTypeRuleObject {

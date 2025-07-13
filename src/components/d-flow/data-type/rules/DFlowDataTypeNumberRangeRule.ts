@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {EDataType, Value} from "../DFlowDataType.view";
+import {Value} from "../DFlowDataType.view";
 
 export interface DFlowDataTypeNumberRangeRuleConfig {
     from: number
@@ -7,7 +7,7 @@ export interface DFlowDataTypeNumberRangeRuleConfig {
     step?: number //TODO
 }
 
-@staticImplements<DFlowDataTypeRule>(EDataType.PRIMITIVE, EDataType.TYPE)
+@staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRangeRule {
     public static validate(value: Value, config: DFlowDataTypeNumberRangeRuleConfig): boolean {
         if (!(typeof value === "number")) return false

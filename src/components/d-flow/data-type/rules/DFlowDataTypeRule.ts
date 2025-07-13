@@ -5,7 +5,7 @@ export interface DFlowDataTypeRule {
     validate(value: Value, config: object, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean
 }
 
-export const staticImplements = <T>(...types: EDataType[]) => {
+export const staticImplements = <T>() => {
     return <U extends T>(constructor: U) => constructor
 }
 

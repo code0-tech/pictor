@@ -38,10 +38,7 @@ export const Example = () => {
 
 const SuggestionMenu = () => {
 
-    const result = useSuggestions({
-        type: "ARRAY",
-        generic_mapper: [{generic_target: "T", types: ["NUMBER"]}]
-    } as GenericType, [], "some_database_id", 0, 0)
+    const result = useSuggestions("NUMBER", [], "some_database_id", 0, 0)
 
     return <div>
         <NumberInput title={"number"}

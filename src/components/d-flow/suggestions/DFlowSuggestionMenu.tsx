@@ -40,12 +40,12 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
         }, []);
 
         // @ts-ignore
-        return <MenuContent ref={localRef} loop onInteractOutside={(event) => {
+        return <MenuContent ref={localRef} onInteractOutside={(event) => {
             if (event.target instanceof HTMLInputElement) event.preventDefault()
         }} onCloseAutoFocus={(event) => {
             event.preventDefault()
-        }} sticky={"always"} align={"start"} pos={"relative"} sideOffset={8} {...rest} >
-            <ScrollArea mah={"calc(var(--radix-popper-available-height) - 100px)"}>
+        }} align={"start"} sideOffset={8} {...rest} >
+            <ScrollArea h={`${(suggestions?.length ?? 1) * 16}px`} mah={"calc(var(--radix-popper-available-height) - 175px)"}>
                 <ScrollAreaViewport>
                     {suggestions?.map((suggestion, i) => {
                         switch (suggestion.type) {

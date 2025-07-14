@@ -44,6 +44,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
     ref = ref || React.useRef(null)
     const menuRef = React.useRef<DFlowSuggestionMenuRef | null>(null)
     const [open, setOpen] = React.useState(false);
+    const shouldPreventCloseRef = React.useRef(true);
 
     const {
         wrapperComponent = {},
@@ -72,6 +73,56 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
         ref.current.addEventListener("change", ev => formValidation.setValue(rest.type != "checkbox" ? ev.target.value : ev.target.checked))
     }, [ref])
 
+    props.suggestions && useEffect(() => {
+        const handler = (e: PointerEvent) => {
+            shouldPreventCloseRef.current = !!ref.current?.contains(e.target as Node);
+        };
+        document.addEventListener("pointerdown", handler, true);
+        return () => document.removeEventListener("pointerdown", handler, true);
+    }, [ref]);
+
+
+    const suggestionMenu = React.useMemo(() => {
+        return <Menu open={open} onOpenChange={(next) => {
+            if (!next && shouldPreventCloseRef.current) {
+                shouldPreventCloseRef.current = false;
+                return;
+            }
+
+            setOpen(next);
+
+            if (next) {
+                setTimeout(() => {
+                    ref?.current?.focus();
+                }, 0);
+            }
+        }} modal={false}>
+            <MenuTrigger asChild>
+                <input ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}
+                       onMouseDown={() => {
+                           shouldPreventCloseRef.current = true;
+                       }}
+                       onFocus={(e) => {
+                           if (!open) setOpen(true)
+                       }}
+                       onKeyDown={(e) => {
+                           if (e.key === "ArrowDown") {
+                               e.preventDefault()
+                               menuRef.current?.focusFirstItem()
+                           } else if (e.key === "ArrowUp") {
+                               e.preventDefault()
+                               menuRef.current?.focusLastItem()
+                           }
+                       }}
+                />
+            </MenuTrigger>
+            <MenuPortal>
+                {/* @ts-ignore */}
+                <DFlowSuggestionMenu ref={menuRef} suggestions={props.suggestions}/>
+            </MenuPortal>
+        </Menu>
+
+    }, [open, props.suggestions])
 
     // @ts-ignore
     return <>
@@ -85,48 +136,10 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
                 {left}
             </div> : null}
 
-            {props.suggestions ? (
-                <Menu open={open} onOpenChange={(next) => {
-                    setOpen(next)
-                    if (next) {
-                        setTimeout(() => {
-                            ref?.current?.focus()
-                        }, 0)
-                    }
-                }} modal={false}>
-                    <MenuTrigger asChild>
-                        <input tabIndex={2}
-                               ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}
-                               onMouseDown={(e) => {
-                                   if (!open) {
-                                       setOpen(true)
-                                   }
-                               }}
-                               onFocus={(e) => {
-                                   // optional: für Tastaturnavigation
-                                   if (!open) {
-                                       setOpen(true)
-                                   }
-                               }}
-                               onKeyDown={(e) => {
-                                   if (e.key === "ArrowDown") {
-                                       e.preventDefault()
-                                       menuRef.current?.focusFirstItem()
-                                   } else if (e.key === "ArrowUp") {
-                                       e.preventDefault()
-                                       menuRef.current?.focusLastItem()
-                                   }
-                               }}
-                        />
-                    </MenuTrigger>
-                    <MenuPortal>
-                        {/* @ts-ignore */}
-                        <DFlowSuggestionMenu ref={menuRef} suggestions={props.suggestions}/>
-                    </MenuPortal>
-                </Menu>
-            ) : (
+            {props.suggestions ? suggestionMenu : (
                 <input tabIndex={2}
-                       ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
+                       ref={ref as LegacyRef<HTMLInputElement> | undefined}
+                       {...mergeCode0Props("input__control", rest)}/>
             )}
 
             {!!right ? <div className={`input__right input__right--${rightType}`}>

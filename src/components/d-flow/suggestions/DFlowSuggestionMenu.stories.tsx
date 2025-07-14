@@ -1,7 +1,6 @@
 import {Meta} from "@storybook/react";
-import {DFlowSuggestionMenu} from "./DFlowSuggestionMenu";
 import React from "react";
-import {DataType} from "../data-type/DFlowDataType.view";
+import {DataType, GenericType} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {functionData} from "../function/DFlowFunction.data";
 import {FunctionDefinition} from "../function/DFlowFunction.view";
@@ -15,6 +14,7 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {useSuggestions} from "./DFlowSuggestion.hook";
+import NumberInput from "../../form/NumberInput";
 
 export default {
     title: "DFlowSuggestionMenu",
@@ -38,7 +38,15 @@ export const Example = () => {
 
 const SuggestionMenu = () => {
 
-    const result = useSuggestions("NUMBER", [], "some_database_id", 0)
+    const result = useSuggestions({
+        type: "ARRAY",
+        generic_mapper: [{generic_target: "T", types: ["NUMBER"]}]
+    } as GenericType, [], "some_database_id", 0, 0)
 
-    return <DFlowSuggestionMenu suggestions={result}/>
+    return <div>
+        <NumberInput title={"number"}
+                     suggestions={result}
+                     description={"Increase and decrease your number"}
+                     placeholder={"code0.tech"}/>
+    </div>
 }

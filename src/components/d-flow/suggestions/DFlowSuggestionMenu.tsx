@@ -45,7 +45,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
         }} onCloseAutoFocus={(event) => {
             event.preventDefault()
         }} align={"start"} sideOffset={8} {...rest} >
-            <ScrollArea h={`${(suggestions?.length ?? 1) * 16}px`} mah={"calc(var(--radix-popper-available-height) - 175px)"}>
+            <ScrollArea h={`${(suggestions?.length ?? 1) * 28}px`} mah={"calc(var(--radix-popper-available-height) - 3rem)"}>
                 <ScrollAreaViewport>
                     {suggestions?.map((suggestion, i) => {
                         switch (suggestion.type) {

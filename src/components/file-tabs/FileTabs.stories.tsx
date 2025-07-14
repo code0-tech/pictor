@@ -8,7 +8,7 @@ import {FileTabsView} from "./FileTabs.view";
 import {FileTabsService} from "./FileTabs.service";
 import Button from "../button/Button";
 import Text from "../text/Text";
-import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../menu /Menu";
+import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
 
 export default {
     title: "File Tabs",

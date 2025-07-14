@@ -6,11 +6,15 @@ import "./Input.style.scss"
 import InputLabel from "./InputLabel";
 import InputDescription from "./InputDescription";
 import InputMessage from "./InputMessage";
+import {DFlowSuggestion} from "../d-flow/suggestions/DFlowSuggestion.view";
+import {DFlowSuggestionMenu, DFlowSuggestionMenuRef} from "../d-flow/suggestions/DFlowSuggestionMenu";
+import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
 
 type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">, "title">
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
+    suggestions?: DFlowSuggestion[]
     wrapperComponent?: Code0Component<HTMLDivElement>
     right?: React.ReactNode | React.ReactElement | React.ReactElement[]
     left?: React.ReactNode | React.ReactElement | React.ReactElement[]
@@ -31,13 +35,15 @@ export const setElementKey = (element: HTMLElement, key: string, value: any, eve
         valueSetter?.call(element, value);
     }
 
-    element.dispatchEvent(new Event(event, { bubbles: true }));
+    element.dispatchEvent(new Event(event, {bubbles: true}));
 }
 
 
 const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef((props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
+    const menuRef = React.useRef<DFlowSuggestionMenuRef | null>(null)
+    const [open, setOpen] = React.useState(false);
 
     const {
         wrapperComponent = {},
@@ -67,6 +73,7 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
     }, [ref])
 
 
+    // @ts-ignore
     return <>
 
         {!!title ? <InputLabel children={title}/> : null}
@@ -78,11 +85,54 @@ const Input: React.ForwardRefExoticComponent<InputProps<any>> = React.forwardRef
                 {left}
             </div> : null}
 
-            <input ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
+            {props.suggestions ? (
+                <Menu open={open} onOpenChange={(next) => {
+                    setOpen(next)
+                    if (next) {
+                        setTimeout(() => {
+                            ref?.current?.focus()
+                        }, 0)
+                    }
+                }} modal={false}>
+                    <MenuTrigger asChild>
+                        <input tabIndex={2}
+                               ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}
+                               onMouseDown={(e) => {
+                                   if (!open) {
+                                       setOpen(true)
+                                   }
+                               }}
+                               onFocus={(e) => {
+                                   // optional: für Tastaturnavigation
+                                   if (!open) {
+                                       setOpen(true)
+                                   }
+                               }}
+                               onKeyDown={(e) => {
+                                   if (e.key === "ArrowDown") {
+                                       e.preventDefault()
+                                       menuRef.current?.focusFirstItem()
+                                   } else if (e.key === "ArrowUp") {
+                                       e.preventDefault()
+                                       menuRef.current?.focusLastItem()
+                                   }
+                               }}
+                        />
+                    </MenuTrigger>
+                    <MenuPortal>
+                        {/* @ts-ignore */}
+                        <DFlowSuggestionMenu ref={menuRef} suggestions={props.suggestions}/>
+                    </MenuPortal>
+                </Menu>
+            ) : (
+                <input tabIndex={2}
+                       ref={ref as LegacyRef<HTMLInputElement> | undefined} {...mergeCode0Props("input__control", rest)}/>
+            )}
 
             {!!right ? <div className={`input__right input__right--${rightType}`}>
                 {right}
             </div> : null}
+
 
         </div>
 

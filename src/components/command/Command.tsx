@@ -1,8 +1,8 @@
 import React from "react"
 import {Command as CommandPrimitive} from "cmdk"
 import {mergeCode0Props} from "../../utils/utils"
-import {Code0ComponentProps} from "../../utils/types"
-import Dialog from "../dialog/Dialog"
+import {Code0Component, Code0ComponentProps} from "../../utils/types"
+import {Dialog} from "../dialog/Dialog"
 
 export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>
 export type CommandDialogProps = Code0ComponentProps & React.ComponentProps<typeof Dialog>
@@ -12,7 +12,9 @@ export type CommandEmptyProps = Code0ComponentProps & React.ComponentProps<typeo
 export type CommandGroupProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Group>
 export type CommandItemProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Item>
 export type CommandSeparatorProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Separator>
-export type CommandShortcutProps = Code0ComponentProps & React.ComponentProps<"span">
+export type CommandShortcutProps = Code0Component<HTMLDivElement> & {
+    shortcut: string
+}
 
 export const Command: React.FC<CommandProps> = (props) => {
     return <CommandPrimitive {...mergeCode0Props("command", props) as CommandProps}/>
@@ -50,5 +52,7 @@ export const CommandSeparator: React.FC<CommandSeparatorProps> = (props) => {
     return <CommandPrimitive.Separator {...mergeCode0Props("command__separator", props) as CommandSeparatorProps}/>
 }
 
-//export const CommandShortcut: React.FC<CommandShortcutProps> = (props) => {}
+export const CommandShortcut: React.FC<CommandShortcutProps> = (props) => {
+    return <div {...mergeCode0Props("command__shortcut", props) as CommandShortcutProps}>{props.shortcut}</div>
+}
 

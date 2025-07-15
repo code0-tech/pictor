@@ -17,31 +17,31 @@ export type DialogContentProps = Code0ComponentProps & React.ComponentProps<type
     showCloseButton?: boolean
 }
 
-export interface DialogStickyContentProps extends Code0Component<HTMLDivElement> {
+export type DialogStickyContentProps = Code0Component<HTMLDivElement> & {
     children: React.ReactNode | React.ReactNode[]
 }
 
-const Dialog: React.FC<DialogProps> = (props) => {
+export const Dialog: React.FC<DialogProps> = (props) => {
     return <DialogPrimitive.Root {...mergeCode0Props("dialog", props) as DialogProps}/>
 }
 
-const DialogTrigger: React.FC<DialogTriggerProps> = (props) => {
+export const DialogTrigger: React.FC<DialogTriggerProps> = (props) => {
     return <DialogPrimitive.Trigger {...mergeCode0Props("dialog__trigger", props) as DialogTriggerProps}/>
 }
 
-const DialogPortal: React.FC<DialogPortalProps> = (props) => {
+export const DialogPortal: React.FC<DialogPortalProps> = (props) => {
     return <DialogPrimitive.Portal {...mergeCode0Props("dialog__portal", props) as DialogPortalProps}/>
 }
 
-const DialogClose: React.FC<DialogCloseProps> = (props) => {
+export const DialogClose: React.FC<DialogCloseProps> = (props) => {
     return <DialogPrimitive.Close {...mergeCode0Props("dialog__close", props) as DialogCloseProps}/>
 }
 
-const DialogOverlay: React.FC<DialogOverlayProps> = (props) => {
+export const DialogOverlay: React.FC<DialogOverlayProps> = (props) => {
     return <DialogPrimitive.Overlay {...mergeCode0Props("dialog__overlay", props) as DialogOverlayProps}/>
 }
 
-const DialogContent: React.FC<DialogContentProps> = (props) => {
+export const DialogContent: React.FC<DialogContentProps> = (props) => {
     return (
         <DialogPrimitive.Portal>
             <DialogOverlay/>
@@ -57,15 +57,15 @@ const DialogContent: React.FC<DialogContentProps> = (props) => {
     )
 }
 
-const DialogTitle: React.FC<DialogTitleProps> = (props) => {
+export const DialogTitle: React.FC<DialogTitleProps> = (props) => {
     return <DialogPrimitive.Title {...mergeCode0Props("dialog__title", props) as DialogTitleProps}/>
 }
 
-const DialogDescription: React.FC<DialogDescriptionProps> = (props) => {
+export const DialogDescription: React.FC<DialogDescriptionProps> = (props) => {
     return <DialogPrimitive.Description {...mergeCode0Props("dialog__description", props) as DialogDescriptionProps}/>
 }
 
-const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogStickyContentProps> => (props) => {
+export const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogStickyContentProps> => (props) => {
 
     const stickyRef = React.useRef<HTMLDivElement>(null)
     const stickyPseudoRef = React.useRef<HTMLDivElement>(null)
@@ -113,14 +113,5 @@ const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogS
 
 }
 
-export default Object.assign(Dialog, {
-    Trigger: DialogTrigger,
-    Portal: DialogPortal,
-    Close: DialogClose,
-    Overlay: DialogOverlay,
-    Content: DialogContent,
-    Title: DialogTitle,
-    Description: DialogDescription,
-    Header: DialogStickyContent("header"),
-    Footer: DialogStickyContent("footer")
-})
+export const DialogHeader = DialogStickyContent("header")
+export const DialogFooter = DialogStickyContent("footer")

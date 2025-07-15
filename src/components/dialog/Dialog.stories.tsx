@@ -1,5 +1,5 @@
 import {Meta} from "@storybook/react";
-import Dialog from "./Dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger} from "./Dialog";
 import React, {useState} from "react";
 import Flex from "../flex/Flex";
 import Text from "../text/Text";
@@ -24,10 +24,10 @@ export const ExampleDialog = () => {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <Dialog.Trigger asChild>
+            <DialogTrigger asChild>
                 <Button type="primary">Open</Button>
-            </Dialog.Trigger>
-            <Dialog.Content>
+            </DialogTrigger>
+            <DialogContent>
 
                 <Flex justify={"space-between"} mb={1} c={"rgba(255,255,255, 0.75)"} style={{gap: "1rem"}} align={"center"}>
                     <Flex style={{gap: "1rem"}} align={"center"}>
@@ -58,7 +58,7 @@ export const ExampleDialog = () => {
                     <Button w={"100%"} color={"secondary"} variant={"none"} onClick={() => setOpen(false)}>Cancel</Button>
                     <Button w={"100%"} color={"error"} variant={"none"} onClick={() => setOpen(false)}>Remove</Button>
                 </Flex>
-            </Dialog.Content>
+            </DialogContent>
         </Dialog>
     )
 }
@@ -69,20 +69,20 @@ export const NestedDialog = () => {
 
     return (
         <Dialog open={firstOpen} onOpenChange={setFirstOpen}>
-            <Dialog.Trigger asChild>
+            <DialogTrigger asChild>
                 <Button onClick={() => setFirstOpen(true)}>Open</Button>
-            </Dialog.Trigger>
-            <Dialog.Content>
+            </DialogTrigger>
+            <DialogContent>
                 <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
                 <Text size={"md"} display={"block"} mb={1}>
                     Your payment has been successfully processed. We have emailed your receipt.
                 </Text>
                 <Flex justify={"space-between"} style={{gap: ".5rem"}}>
                     <Dialog>
-                        <Dialog.Trigger asChild>
+                        <DialogTrigger asChild>
                             <Button>Remove</Button>
-                        </Dialog.Trigger>
-                        <Dialog.Content>
+                        </DialogTrigger>
+                        <DialogContent>
                             <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Are you sure?</Text>
                             <Text size={"md"} display={"block"} mb={1}>
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
@@ -106,13 +106,13 @@ export const NestedDialog = () => {
                                     Close
                                 </Button>
                             </Flex>
-                        </Dialog.Content>
+                        </DialogContent>
                     </Dialog>
                     <Button w={"100%"} onClick={() => setFirstOpen(false)} variant={"outlined"} color={"secondary"}>
                         Close
                     </Button>
                 </Flex>
-            </Dialog.Content>
+            </DialogContent>
         </Dialog>
     )
 }
@@ -120,16 +120,16 @@ export const NestedDialog = () => {
 export const LongDialog = () => {
     return (
         <Dialog defaultOpen>
-            <Dialog.Trigger asChild>
+            <DialogTrigger asChild>
                 <Button>Open</Button>
-            </Dialog.Trigger>
-            <Dialog.Content>
-                <Dialog.Header>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
                     <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
                     <Text size={"md"} display={"block"}>
                         Your payment has been successfully processed. We have emailed your receipt.
                     </Text>
-                </Dialog.Header>
+                </DialogHeader>
                 <p>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
                     vehicula nisl leo, eget posuere turpis suscipit id. Sed auctor purus
@@ -224,13 +224,13 @@ export const LongDialog = () => {
                     id bibendum ullamcorper. Duis ac mi vitae nisi finibus semper non vel
                     quam.
                 </p>
-                <Dialog.Footer>
+                <DialogFooter>
                     <Text size={"lg"} hierarchy={"primary"} display={"block"} mb={1}>Success</Text>
                     <Text size={"md"} display={"block"}>
                         Your payment has been successfully processed. We have emailed your receipt.
                     </Text>
-                </Dialog.Footer>
-            </Dialog.Content>
+                </DialogFooter>
+            </DialogContent>
         </Dialog>
     )
 }

@@ -5,11 +5,10 @@ import {MenuContent, MenuContentProps, MenuItem, MenuLabel} from "../../menu/Men
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {
     IconArrowsShuffle,
-    IconAtom,
     IconBulb,
     IconCirclesRelation,
     IconCornerDownLeft,
-    IconFileFunctionFilled
+    IconFileFunctionFilled, IconCircleDot
 } from "@tabler/icons-react";
 import Text from "../../text/Text";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../../scroll-area/ScrollArea";
@@ -77,7 +76,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                             case DFlowSuggestionType.VALUE:
                                 // @ts-ignore
                                 return <MenuItem ref={el => itemRefs.current[i] = el}>
-                                    <IconAtom color={"#D90429"} size={16}/>
+                                    <IconCircleDot color={"#D90429"} size={16}/>
                                     <div>
                                         <Text display={"flex"}
                                               style={{gap: ".5rem"}}>{suggestion.displayText.map(text =>
@@ -116,7 +115,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                                         <Text hierarchy={"tertiary"} size={"xs"}>VARIABLE</Text>
                                     </Flex>
                                     <Flex align={"center"} style={{gap: ".35rem"}}>
-                                        <IconAtom color={"#D90429"} size={16}/>
+                                        <IconCircleDot color={"#D90429"} size={16}/>
                                         <Text hierarchy={"tertiary"} size={"xs"}>VALUE</Text>
                                     </Flex>
                                 </Flex>

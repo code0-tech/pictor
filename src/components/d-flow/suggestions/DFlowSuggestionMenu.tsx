@@ -17,6 +17,7 @@ import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../../tool
 
 export interface DFlowSuggestionMenuProps extends MenuContentProps {
     suggestions?: DFlowSuggestion[]
+    onSuggestionSelect?: (suggestion: DFlowSuggestion) => void
 }
 
 export interface DFlowSuggestionMenuRef {
@@ -25,7 +26,7 @@ export interface DFlowSuggestionMenuRef {
 }
 
 export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.forwardRef<DFlowSuggestionMenuRef, DFlowSuggestionMenuProps>(
-    ({suggestions, ...rest}, ref) => {
+    ({suggestions, onSuggestionSelect = () => {}, ...rest}, ref) => {
 
         const itemRefs = React.useRef<(HTMLDivElement | null)[]>([])
         const localRef = React.useRef<HTMLDivElement>(null);
@@ -50,7 +51,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                         switch (suggestion.type) {
                             case DFlowSuggestionType.FUNCTION:
                                 // @ts-ignore
-                                return <MenuItem ref={el => itemRefs.current[i] = el}>
+                                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)} ref={el => itemRefs.current[i] = el}>
                                     <IconFileFunctionFilled color={"#70ffb2"} size={16}/>
                                     <div>
                                         <Text display={"flex"}
@@ -60,12 +61,12 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                                 </MenuItem>
                             case DFlowSuggestionType.FUNCTION_COMBINATION:
                                 // @ts-ignore
-                                return <MenuItem ref={el => itemRefs.current[i] = el}>
+                                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)} ref={el => itemRefs.current[i] = el}>
                                     {JSON.stringify(suggestion.value)}
                                 </MenuItem>
                             case DFlowSuggestionType.REF_OBJECT:
                                 // @ts-ignore
-                                return <MenuItem ref={el => itemRefs.current[i] = el}>
+                                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)} ref={el => itemRefs.current[i] = el}>
                                     <IconCirclesRelation color={"#FFBE0B"} size={16}/>
                                     <div>
                                         <Text display={"flex"}
@@ -75,7 +76,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                                 </MenuItem>
                             case DFlowSuggestionType.VALUE:
                                 // @ts-ignore
-                                return <MenuItem ref={el => itemRefs.current[i] = el}>
+                                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)} ref={el => itemRefs.current[i] = el}>
                                     <IconCircleDot color={"#D90429"} size={16}/>
                                     <div>
                                         <Text display={"flex"}
@@ -84,7 +85,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
                                     </div>
                                 </MenuItem>
                             default:
-                                return <MenuItem>{JSON.stringify(suggestion.value)}</MenuItem>
+                                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)}>{JSON.stringify(suggestion.value)}</MenuItem>
                         }
                     })}
                 </ScrollAreaViewport>

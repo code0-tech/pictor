@@ -1,53 +1,69 @@
-import {
-    DialogProviderProps as AKDialogProviderProps,
-    DialogDisclosureProps as AKDialogDisclosureProps,
-    DialogProps as AKDialogProps,
-    DialogDismissProps as AKDialogDismissProps,
-    DialogProvider as AKDialogProvider,
-    Dialog as AKDialog,
-    DialogDisclosure as AKDialogDisclosure,
-    DialogDismiss as AKDialogDismiss
-} from "@ariakit/react"
+import  * as DialogPrimitive from "@radix-ui/react-dialog"
 import {Code0Component, Code0ComponentProps} from "../../utils/types";
 import React, {useEffect} from "react";
 import {mergeCode0Props} from "../../utils/utils";
-import Button, {ButtonProps} from "../button/Button";
+import {IconX} from "@tabler/icons-react"
 import "./Dialog.style.scss"
 
-export type DialogProps = AKDialogProviderProps
-export type DialogDisclosureProps = ButtonProps & AKDialogDisclosureProps
-export type DialogModalProps = Code0ComponentProps & AKDialogProps
-export type DialogDismissProps = ButtonProps & AKDialogDismissProps
+export type DialogProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Root>
+export type DialogTriggerProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Trigger>
+export type DialogPortalProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Portal>
+export type DialogCloseProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Close>
+export type DialogOverlayProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Overlay>
+export type DialogTitleProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Title>
+export type DialogDescriptionProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Description>
+
+export type DialogContentProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Content> & {
+    showCloseButton?: boolean
+}
 
 export interface DialogStickyContentProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
-const Dialog: React.FC<DialogProps> = (props) => <AKDialogProvider {...props}/>
-const DialogModal: React.FC<DialogModalProps> = (props) => <AKDialog {...mergeCode0Props("dialog", {
-    ...props,
-    ...(!props.render ? {
-        render: (props: React.HTMLAttributes<HTMLDivElement>) => {
-            return <div className={"dialog__wrapper"} hidden={props.hidden}>
-                <div {...props}/>
-            </div>
-        }
-    } : {render: props.render})
-})}/>
-const DialogDisclosure: React.FC<DialogDisclosureProps> = (props) =>
-    <AKDialogDisclosure {...mergeCode0Props("", {
-        ...props,
-        ...(!props.render ? {
-            render: (props: React.JSX.IntrinsicAttributes & ButtonProps) => <Button {...props}/>
-        } : {render: props.render})
-    })}/>
-const DialogDismiss: React.FC<DialogDismissProps> = (props) =>
-    <AKDialogDismiss {...mergeCode0Props("", {
-        ...props,
-        ...(!props.render ? {
-            render: (props: React.JSX.IntrinsicAttributes & ButtonProps) => <Button {...props}/>
-        } : {render: props.render})
-    })}/>
+const Dialog: React.FC<DialogProps> = (props) => {
+    return <DialogPrimitive.Root {...mergeCode0Props("dialog", props) as DialogProps}/>
+}
+
+const DialogTrigger: React.FC<DialogTriggerProps> = (props) => {
+    return <DialogPrimitive.Trigger {...mergeCode0Props("dialog__trigger", props) as DialogTriggerProps}/>
+}
+
+const DialogPortal: React.FC<DialogPortalProps> = (props) => {
+    return <DialogPrimitive.Portal {...mergeCode0Props("dialog__portal", props) as DialogPortalProps}/>
+}
+
+const DialogClose: React.FC<DialogCloseProps> = (props) => {
+    return <DialogPrimitive.Close {...mergeCode0Props("dialog__close", props) as DialogCloseProps}/>
+}
+
+const DialogOverlay: React.FC<DialogOverlayProps> = (props) => {
+    return <DialogPrimitive.Overlay {...mergeCode0Props("dialog__overlay", props) as DialogOverlayProps}/>
+}
+
+const DialogContent: React.FC<DialogContentProps> = (props) => {
+    return (
+        <DialogPrimitive.Portal>
+            <DialogOverlay/>
+            <DialogPrimitive.Content {...mergeCode0Props("dialog__content", props) as DialogContentProps}>
+                {props.children}
+                {props.showCloseButton && (
+                    <DialogPrimitive.Close>
+                        <IconX size={16}/>
+                    </DialogPrimitive.Close>
+                )}
+            </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+    )
+}
+
+const DialogTitle: React.FC<DialogTitleProps> = (props) => {
+    return <DialogPrimitive.Title {...mergeCode0Props("dialog__title", props) as DialogTitleProps}/>
+}
+
+const DialogDescription: React.FC<DialogDescriptionProps> = (props) => {
+    return <DialogPrimitive.Description {...mergeCode0Props("dialog__description", props) as DialogDescriptionProps}/>
+}
 
 const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogStickyContentProps> => (props) => {
 
@@ -98,9 +114,13 @@ const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogS
 }
 
 export default Object.assign(Dialog, {
-    Modal: DialogModal,
-    Disclosure: DialogDisclosure,
-    Dismiss: DialogDismiss,
+    Trigger: DialogTrigger,
+    Portal: DialogPortal,
+    Close: DialogClose,
+    Overlay: DialogOverlay,
+    Content: DialogContent,
+    Title: DialogTitle,
+    Description: DialogDescription,
     Header: DialogStickyContent("header"),
     Footer: DialogStickyContent("footer")
 })

@@ -18,7 +18,13 @@ export const Command: React.FC<CommandProps> = (props) => {
     return <CommandPrimitive {...mergeCode0Props("command", props) as CommandProps}/>
 }
 
-//export const CommandDialog: React.FC<CommandProps> = (props) => {}
+export const CommandDialog: React.FC<CommandProps> = (props) => {
+    return (
+        <Dialog>
+
+        </Dialog>
+    )
+}
 
 export const CommandList: React.FC<CommandListProps> = (props) => {
     return <CommandPrimitive.List {...mergeCode0Props("command__list", props) as CommandListProps}/>

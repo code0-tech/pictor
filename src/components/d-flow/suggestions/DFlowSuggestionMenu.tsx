@@ -39,7 +39,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = React.for
         }, []);
 
         // @ts-ignore
-        return <MenuContent ref={localRef} onInteractOutside={(event) => {
+        return <MenuContent onOpenAutoFocus={(event) => event.preventDefault()} ref={localRef} onInteractOutside={(event) => {
             if (event.target instanceof HTMLInputElement) event.preventDefault()
         }} onCloseAutoFocus={(event) => {
             event.preventDefault()

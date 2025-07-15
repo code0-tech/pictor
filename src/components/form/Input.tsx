@@ -141,7 +141,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                     </MenuTrigger>
                     <MenuPortal>
                         {/* @ts-ignore */}
-                        <DFlowSuggestionMenu ref={menuRef} suggestions={suggestions} />
+                        <DFlowSuggestionMenu onSuggestionSelect={(suggestion) => setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change")} ref={menuRef} suggestions={suggestions} />
                     </MenuPortal>
                 </Menu>
             );

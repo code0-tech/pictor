@@ -3,7 +3,7 @@
 @use "../../styles/variables";
 
 .menu {
-  z-index: 100;
+  z-index: 999;
 
   &__content, &__sub-content {
     padding: variables.$xxs;

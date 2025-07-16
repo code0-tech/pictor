@@ -1,173 +1,203 @@
-import React, {
-    LegacyRef,
-    RefObject,
-    useEffect,
-    useMemo,
-    useRef,
-    ForwardRefExoticComponent,
-} from "react";
-import { Code0Component } from "../../utils/types";
-import { ValidationProps } from "./useForm";
-import { mergeCode0Props } from "../../utils/utils";
+/**
+ * Input.tsx
+ *
+ * A highly customizable and accessible input component with extended features,
+ * including dynamic suggestion rendering, validation handling, and structural
+ * decoration options. Designed to integrate seamlessly with complex forms,
+ * this component provides robust interaction patterns and user guidance.
+ */
+
+import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react";
+
+import {Code0Component} from "../../utils/types";
+import {ValidationProps} from "./useForm";
+import {mergeCode0Props} from "../../utils/utils";
+
 import "./Input.style.scss";
 
 import InputLabel from "./InputLabel";
 import InputDescription from "./InputDescription";
 import InputMessage from "./InputMessage";
 
+import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {
-    Menu,
-    MenuPortal,
-    MenuTrigger
-} from "../menu/Menu";
+    InputSuggestion,
+    InputSuggestionMenuContent,
+    InputSuggestionMenuContentItems,
+    InputSuggestionMenuContentItemsHandle
+} from "./InputSuggestion";
 
-import {
-    DFlowSuggestionMenu,
-    DFlowSuggestionMenuRef
-} from "../d-flow/suggestions/DFlowSuggestionMenu";
-import {DFlowSuggestion} from "../d-flow/suggestions/DFlowSuggestion.view";
-
-// Hilfsfunktion zur programmgesteuerten Value-Setzung
-export const setElementKey = (element: HTMLElement, key: string, value: any, event: string) => {
-    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set;
+// Programmatically set a property (like 'value') and dispatch an event (like 'change')
+export const setElementKey = (
+    element: HTMLElement,
+    key: string,
+    value: any,
+    event: string
+) => {
+    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set; // Try direct setter
     const prototype = Object.getPrototypeOf(element);
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set;
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set; // Fallback to prototype
 
     if (valueSetter && valueSetter !== prototypeValueSetter) {
-        prototypeValueSetter?.call(element, value);
+        prototypeValueSetter?.call(element, value); // Use prototype's setter if overridden
     } else {
-        valueSetter?.call(element, value);
+        valueSetter?.call(element, value); // Use direct setter
     }
 
-    element.dispatchEvent(new Event(event, { bubbles: true }));
+    element.dispatchEvent(new Event(event, {bubbles: true})); // Fire change/input event
 };
 
-type Code0Input = Omit<Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">, "title">;
+// Base input props without layout-specific keys
+export type Code0Input = Omit<
+    Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">,
+    "title"
+>;
 
+// Input component props definition
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
-    suggestions?: DFlowSuggestion[];
-    wrapperComponent?: Code0Component<HTMLDivElement>;
-    right?: React.ReactNode;
-    left?: React.ReactNode;
-    leftType?: "action" | "placeholder" | "icon";
-    rightType?: "action" | "placeholder" | "icon";
-    title?: React.ReactNode;
-    description?: React.ReactNode;
+    suggestions?: InputSuggestion[]; // Optional suggestions shown in dropdown
+    suggestionsHeader?: React.ReactNode; // Custom header above suggestions
+    suggestionsFooter?: React.ReactNode; // Custom footer below suggestions
+    wrapperComponent?: Code0Component<HTMLDivElement>; // Props for the wrapping div
+    right?: React.ReactNode; // Right-side icon or element
+    left?: React.ReactNode; // Left-side icon or element
+    leftType?: "action" | "placeholder" | "icon"; // Visual type for left slot
+    rightType?: "action" | "placeholder" | "icon"; // Visual type for right slot
+    title?: React.ReactNode; // Input label
+    description?: React.ReactNode; // Label description below title
 }
 
 const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
-        const inputRef = ref || useRef<HTMLInputElement>(null);
-        const menuRef = useRef<DFlowSuggestionMenuRef | null>(null);
-        const [open, setOpen] = React.useState(false);
-        const shouldPreventCloseRef = useRef(true);
+        const inputRef = ref || useRef<HTMLInputElement>(null); // External ref or fallback internal ref
+        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
+        const [open, setOpen] = useState(false); // Dropdown open state
+        const shouldPreventCloseRef = useRef(true); // Controls if dropdown should stay open on click
 
         const {
-            wrapperComponent = {},
-            title,
-            description,
-            disabled = false,
-            left,
-            right,
-            leftType = "icon",
-            rightType = "action",
-            formValidation = { valid: true, notValidMessage: null, setValue: null },
-            suggestions,
-            ...rest
+            wrapperComponent = {}, // Default empty wrapper props
+            title, // Optional input label
+            description, // Optional description below label
+            disabled = false, // Input disabled state
+            left, // Left element (icon/button)
+            right, // Right element (icon/button)
+            leftType = "icon", // Visual hint for left
+            rightType = "action", // Visual hint for right
+            formValidation = {valid: true, notValidMessage: null, setValue: null}, // Validation config
+            suggestions, // Optional suggestions array
+            suggestionsHeader, // Optional header above suggestion list
+            suggestionsFooter, // Optional footer below suggestion list
+            ...rest // Remaining native input props
         } = props;
 
-        // Input-Change auf Form setzen
+        // Sync input value changes to external validation state
         useEffect(() => {
             const el = inputRef.current;
             if (!el || !formValidation?.setValue) return;
 
-            const handler = (ev: any) => {
-                const value = rest.type !== "checkbox" ? ev.target.value : ev.target.checked;
-                formValidation.setValue?.(value);
+            const handleChange = (event: any) => {
+                const value = rest.type !== "checkbox" ? event.target.value : event.target.checked; // Support checkbox
+                formValidation.setValue?.(value); // Push value to form context
             };
 
-            el.addEventListener("change", handler);
-            return () => el.removeEventListener("change", handler);
-        }, [inputRef, formValidation?.setValue]);
+            el.addEventListener("change", handleChange); // Native listener
+            return () => el.removeEventListener("change", handleChange); // Cleanup
+        }, [formValidation?.setValue]);
 
-        // PointerDown für ClickOutside-Steuerung
+        // Manage click-outside logic for dropdown
         useEffect(() => {
             if (!suggestions) return;
 
-            const handler = (e: PointerEvent) => {
-                shouldPreventCloseRef.current = !!inputRef.current?.contains(e.target as Node);
+            const handlePointerDown = (event: PointerEvent) => {
+                shouldPreventCloseRef.current = !!inputRef.current?.contains(event.target as Node); // Stay open if click is inside
             };
 
-            document.addEventListener("pointerdown", handler, true);
-            return () => document.removeEventListener("pointerdown", handler, true);
-        }, [inputRef, suggestions]);
+            document.addEventListener("pointerdown", handlePointerDown, true);
+            return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+        }, [suggestions]);
 
-        const suggestionMenu = useMemo(() => {
-            return (
-                <Menu
-                    open={open}
-                    modal={false}
-                    onOpenChange={(next) => {
-                        if (!next && shouldPreventCloseRef.current) {
-                            shouldPreventCloseRef.current = false;
-                            return;
-                        }
+        // Render suggestion menu dropdown
+        const suggestionMenu = useMemo(() => (
+            <Menu
+                open={open} // Controlled open state
+                modal={false}
+                onOpenChange={(nextOpen) => {
+                    if (!nextOpen && shouldPreventCloseRef.current) { // Prevent close if internal click
+                        shouldPreventCloseRef.current = false;
+                        return;
+                    }
 
-                        setOpen(next);
+                    setOpen(nextOpen);
 
-                        if (next) {
-                            setTimeout(() => {
-                                inputRef.current?.focus();
-                            }, 0);
-                        }
-                    }}
-                >
-                    <MenuTrigger asChild>
-                        <input
-                            ref={inputRef as LegacyRef<HTMLInputElement>}
-                            {...mergeCode0Props("input__control", rest)}
-                            onMouseDown={() => (shouldPreventCloseRef.current = true)}
-                            onFocus={() => !open && setOpen(true)}
-                            onKeyDown={(e) => {
-                                if (e.key === "ArrowDown") {
-                                    e.preventDefault();
-                                    menuRef.current?.focusFirstItem();
-                                } else if (e.key === "ArrowUp") {
-                                    e.preventDefault();
-                                    menuRef.current?.focusLastItem();
-                                }
+                    if (nextOpen) {
+                        setTimeout(() => inputRef.current?.focus(), 0); // Refocus input on open
+                    }
+                }}
+            >
+                <MenuTrigger asChild>
+                    <input
+                        ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
+                        {...mergeCode0Props("input__control", rest)} // Merge styling and native props
+                        onMouseDown={() => (shouldPreventCloseRef.current = true)} // Mark as internal click
+                        onFocus={() => !open && setOpen(true)} // Open on focus
+                        onKeyDown={(e) => {
+                            if (e.key === "ArrowDown") {
+                                e.preventDefault();
+                                menuRef.current?.focusFirstItem(); // Navigate down
+                            } else if (e.key === "ArrowUp") {
+                                e.preventDefault();
+                                menuRef.current?.focusLastItem(); // Navigate up
+                            }
+                        }}
+                    />
+                </MenuTrigger>
+                <MenuPortal>
+                    <InputSuggestionMenuContent>
+                        {suggestionsHeader} {/* Custom content above suggestions */}
+                        <InputSuggestionMenuContentItems
+                            /* @ts-ignore */
+                            ref={menuRef} // Handle keyboard focus control
+                            suggestions={suggestions}
+                            onSuggestionSelect={(suggestion) => {
+                                // Update value and dispatch event
+                                setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change");
                             }}
                         />
-                    </MenuTrigger>
-                    <MenuPortal>
-                        {/* @ts-ignore */}
-                        <DFlowSuggestionMenu onSuggestionSelect={(suggestion) => setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change")} ref={menuRef} suggestions={suggestions} />
-                    </MenuPortal>
-                </Menu>
-            );
-        }, [open, suggestions]);
+                        {suggestionsFooter} {/* Custom content below suggestions */}
+                    </InputSuggestionMenuContent>
+                </MenuPortal>
+            </Menu>
+        ), [open, suggestions, suggestionsHeader, suggestionsFooter]);
 
         return (
             <>
-                {title && <InputLabel>{title}</InputLabel>}
-                {description && <InputDescription>{description}</InputDescription>}
+                {title && <InputLabel>{title}</InputLabel>} {/* Optional label */}
+                {description && <InputDescription>{description}</InputDescription>} {/* Optional description */}
 
-                <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}>
-                    {left && <div className={`input__left input__left--${leftType}`}>{left}</div>}
+                <div
+                    {...mergeCode0Props(
+                        `input ${!formValidation?.valid ? "input--not-valid" : ""}`, // Add error class if invalid
+                        wrapperComponent
+                    )}
+                >
+                    {left && <div className={`input__left input__left--${leftType}`}>{left}</div>} {/* Left element */}
 
-                    {suggestions ? suggestionMenu : (
+                    {suggestions ? (
+                        suggestionMenu // If suggestions exist, render dropdown version
+                    ) : (
                         <input
-                            tabIndex={2}
+                            tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
-                            {...mergeCode0Props("input__control", rest)}
+                            {...mergeCode0Props("input__control", rest)} // Basic input styling and props
                         />
                     )}
 
-                    {right && <div className={`input__right input__right--${rightType}`}>{right}</div>}
+                    {right &&
+                        <div className={`input__right input__right--${rightType}`}>{right}</div>} {/* Right element */}
                 </div>
 
                 {!formValidation?.valid && formValidation?.notValidMessage && (
-                    <InputMessage>{formValidation.notValidMessage}</InputMessage>
+                    <InputMessage>{formValidation.notValidMessage}</InputMessage> // Show validation error
                 )}
             </>
         );

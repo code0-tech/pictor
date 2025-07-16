@@ -15,6 +15,7 @@ import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {useSuggestions} from "./DFlowSuggestion.hook";
 import TextInput from "../../form/TextInput";
+import {DFlowSuggestionMenuFooter, toInputSuggestions} from "./DFlowSuggestionMenu";
 
 export default {
     title: "DFlowSuggestionMenu",
@@ -43,7 +44,8 @@ const SuggestionMenu = () => {
     return <div>
         <TextInput title={"Text"}
                    clearable
-                   suggestions={result}
+                   suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                   suggestions={toInputSuggestions(result)}
                    description={"Type what ever text you like"}
                    placeholder={"code0.tech"}/>
     </div>

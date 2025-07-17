@@ -23,6 +23,18 @@
     @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
   }
 
+  &__syntax {
+    position: absolute;
+    z-index: -1;
+    overflow: hidden;
+    font-size: variables.$sm;
+    color: rgba(variables.$white, .5);
+    white-space: nowrap;
+    padding: $padding $padding;
+    box-sizing: border-box;
+
+  }
+
   &__left, &__right {
     display: flex;
     align-items: stretch;
@@ -73,10 +85,15 @@
     width: 100%;
     box-shadow: none;
     font-size: variables.$sm;
+    box-sizing: border-box;
     color: rgba(variables.$white, .5);
 
     & {
       @include helpers.fontStyle();
+    }
+
+    &--syntax {
+      color: transparent;
     }
   }
 

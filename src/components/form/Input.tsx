@@ -138,7 +138,6 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
                         {...mergeCode0Props("input__control", rest)} // Merge styling and native props
-                        onMouseDown={() => (shouldPreventCloseRef.current = true)} // Mark as internal click
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {
@@ -161,6 +160,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                             onSuggestionSelect={(suggestion) => {
                                 // Update value and dispatch event
                                 setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change");
+                                setOpen(false)
                             }}
                         />
                         {suggestionsFooter} {/* Custom content below suggestions */}

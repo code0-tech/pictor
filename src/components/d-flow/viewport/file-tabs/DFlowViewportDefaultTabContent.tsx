@@ -12,6 +12,7 @@ import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {ParameterDefinition} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
+import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
@@ -24,6 +25,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
 
     const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.id)
 
@@ -71,6 +73,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
 
 
             return <div>
+                {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value))}
                 <TextInput title={title}
                            description={description}
                            clearable

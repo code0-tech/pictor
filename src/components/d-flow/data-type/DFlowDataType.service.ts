@@ -12,6 +12,7 @@ import {
 import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
 import {NodeFunctionObject} from "../DFlow.view";
 import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
+import {resolveType} from "../../../utils/generics";
 
 export interface DFlowDataTypeService {
     getDataType(type: Type): DataType | undefined
@@ -40,6 +41,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
         if (typeof value === "number") return this.getDataType("NUMBER")
         if (typeof value === "boolean") return this.getDataType("BOOLEAN")
 
+        //TODO: we can't just search trough all data types we need to build the type either on our primitives a type, an array or object. Otherwise we will have a lot of problems
         const matchingDataTypes = this.values().filter(type => {
             return type.validateValue(value)
         }).sort((a, b) => {
@@ -55,7 +57,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
         if (isRefObject(value)) return value.type
 
         const dataType = this.getDataTypeFromValue(value)
-        if (!dataType?.genericKeys) return dataType?.id ?? ""
+        if (!dataType?.genericKeys) return resolveType(dataType?.id ?? "", this)
 
         const genericMapper: GenericMapper[] = dataType.genericKeys.map(genericKey => {
 
@@ -92,10 +94,10 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
             return null
         }).filter(mapper => !!mapper)
 
-        return {
+        return resolveType({
             type: dataType?.id ?? "",
             generic_mapper: genericMapper
-        }
+        }, this)
 
     }
 

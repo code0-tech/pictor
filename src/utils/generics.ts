@@ -579,7 +579,7 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
                         type: genericDT.id,
                         generic_mapper: [{
                             types: [expandedInner],
-                            generic_target: "GENERIC"
+                            generic_target: genericDT.genericKeys[0]
                         }]
                     }
                 }

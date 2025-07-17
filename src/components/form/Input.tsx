@@ -55,16 +55,20 @@ export type Code0Input = Omit<
 
 // Input component props definition
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
-    suggestions?: InputSuggestion[]; // Optional suggestions shown in dropdown
-    suggestionsHeader?: React.ReactNode; // Custom header above suggestions
-    suggestionsFooter?: React.ReactNode; // Custom footer below suggestions
-    wrapperComponent?: Code0Component<HTMLDivElement>; // Props for the wrapping div
-    right?: React.ReactNode; // Right-side icon or element
-    left?: React.ReactNode; // Left-side icon or element
-    leftType?: "action" | "placeholder" | "icon"; // Visual type for left slot
-    rightType?: "action" | "placeholder" | "icon"; // Visual type for right slot
-    title?: React.ReactNode; // Input label
-    description?: React.ReactNode; // Label description below title
+
+    suggestions?: InputSuggestion[] // Optional suggestions shown in dropdown
+    suggestionsHeader?: React.ReactNode // Custom header above suggestions
+    suggestionsFooter?: React.ReactNode // Custom footer below suggestions
+    transformValue?: (value: T) => React.ReactNode | T // Optional value transformation function
+
+    wrapperComponent?: Code0Component<HTMLDivElement> // Props for the wrapping div
+    right?: React.ReactNode // Right-side icon or element
+    left?: React.ReactNode // Left-side icon or element
+    leftType?: "action" | "placeholder" | "icon" // Visual type for left slot
+    rightType?: "action" | "placeholder" | "icon" // Visual type for right slot
+    title?: React.ReactNode // Input label
+    description?: React.ReactNode // Label description below title
+
 }
 
 const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
@@ -137,7 +141,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                 <MenuTrigger asChild>
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
-                        {...mergeCode0Props("input__control", rest)} // Merge styling and native props
+                        {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)}
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {
@@ -188,9 +192,20 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                         <input
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
-                            {...mergeCode0Props("input__control", rest)} // Basic input styling and props
+                            {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />
                     )}
+
+                    {props.transformValue ? (
+                        <div className={"input__syntax"} style={{
+                            width: inputRef?.current?.clientWidth ?? 0,
+                            height: inputRef?.current?.clientHeight ?? 0,
+                            top: inputRef?.current?.offsetTop ?? 0,
+                            left: inputRef?.current?.offsetLeft ?? 0,
+                        }}>
+                            {props.transformValue(inputRef?.current?.value ?? inputRef?.current?.placeholder ?? "sd" )} {/* Render transformed value */}
+                        </div>
+                    ) : null}
 
                     {right &&
                         <div className={`input__right input__right--${rightType}`}>{right}</div>} {/* Right element */}

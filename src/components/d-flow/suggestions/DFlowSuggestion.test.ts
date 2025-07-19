@@ -6,12 +6,12 @@ import {
     NonReactiveArrayService,
     NonReactiveArrayStore
 } from "../../../utils/nonReactiveArrayService"
-import {DataType, GenericType, Type} from "../data-type/DFlowDataType.view"
+import {DataType, Type} from "../data-type/DFlowDataType.view"
 import {dataTypes} from "../data-type/DFlowDataType.data"
 import {functionData} from "../function/DFlowFunction.data"
 import {flow} from "../DFlow.data"
 import {useService} from "../../../utils/contextStore"
-import {DFlowSuggestionService} from "./DFlowReactiveSuggestionService";
+import {DFlowSuggestionService} from "./DFlowSuggestion.service";
 import {FunctionDefinition} from "../function/DFlowFunction.view";
 import {Flow} from "../DFlow.view";
 import {DFlowFunctionNonReactiveService} from "../function/DFlowFunction.test";

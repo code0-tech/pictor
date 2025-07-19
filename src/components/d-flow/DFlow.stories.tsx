@@ -3,12 +3,18 @@ import {Background, BackgroundVariant} from "@xyflow/react";
 import React from "react";
 import {DFlowFunctionCard} from "./function/cards/DFlowFunctionCard";
 import {DFlow} from "./DFlow";
+import {ContextStoreProvider} from "../../utils/contextStore";
+import {createReactiveArrayService} from "../../utils/reactiveArrayService";
+import {Flow} from "./DFlow.view";
+import {DFlowReactiveService} from "./DFlow.service";
 
 export default {
     title: "DFlow",
 } as Meta
 
 export const ExampleFlow = () => {
+
+    const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService);
 
     const initialNodes = [
         {id: 'n1', draggable: false, position: {x: 0, y: 0}, type: "default", data: {label: 'Node 1'}},
@@ -21,14 +27,17 @@ export const ExampleFlow = () => {
     };
 
     return (
-        <DFlow
-            nodes={initialNodes}
-            edges={initialEdges}
-            nodeTypes={nodeTypes}
-            fitView
-        >
-            <Background variant={BackgroundVariant.Dots} color="#bbb"/>
-        </DFlow>
+        <ContextStoreProvider services={[[flowStore, flowService]]}>
+
+            <DFlow
+                nodes={initialNodes}
+                edges={initialEdges}
+                nodeTypes={nodeTypes}
+                fitView
+            >
+                <Background variant={BackgroundVariant.Dots} color="#bbb"/>
+            </DFlow>
+        </ContextStoreProvider>
     );
 
 }

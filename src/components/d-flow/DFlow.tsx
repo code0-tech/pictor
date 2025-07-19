@@ -48,6 +48,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 
         setNodes([...layouted.nodes]);
         setEdges([...layouted.edges]);
+        instance.fitView()
     }, [nodes, edges])
 
     return <ReactFlow onInit={onInit}

@@ -19,6 +19,7 @@
   "author": "Code0",
   "devDependencies": {
     "@ariakit/react": "^0.4.17",
+    "@dagrejs/dagre": "^1.1.5",
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@mdx-js/react": "^3.1.0",
@@ -51,6 +52,7 @@
     "@tabler/icons-react": "3.34.1",
     "@types/react": "^19.1.8",
     "@vitejs/plugin-react": "^4.6.0",
+    "@xyflow/react": "^12.8.2",
     "axe-playwright": "^2.1.0",
     "babel-loader": "^9.2.1",
     "babel-plugin-react-compiler": "^19.1.0-rc.2",
@@ -92,6 +94,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@tabler/icons-react": "^3.5.0",
+    "@xyflow/react": "^12.8.2",
     "js-md5": "^0.8.3",
     "merge-props": "^6.0.0",
     "overlap-area": "^1.1.0",

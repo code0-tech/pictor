@@ -132,6 +132,8 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
                       panOnDrag={true}
                       zoomOnScroll
                       onNodesChange={onNodesChange}
-                      onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)} nodes={nodes} edges={edges}/>
+                      onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}
+                      nodes={nodes}
+                      edges={edges}/>
 
 }

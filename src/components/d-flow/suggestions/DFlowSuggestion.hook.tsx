@@ -25,6 +25,7 @@ import {
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
+//TODO: No type => just all function suggestion and also maybe combinations
 
 export const useSuggestions = (
     type: DataTypeIdentifier | undefined,

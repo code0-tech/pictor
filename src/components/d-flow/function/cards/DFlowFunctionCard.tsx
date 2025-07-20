@@ -22,6 +22,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
             <Handle isConnectable={false}
                     draggable={false}
                     type="target"
+                    className={"function-card__handle function-card__handle--target"}
                     position={Position.Top}/>
 
             My favorite UX feedback from customers is:
@@ -37,12 +38,14 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                     id={`param-${param.definition.parameter_id}`}
                     style={{top: 50 + index * 30}}
                     isConnectable={false}
+                    className={"function-card__handle function-card__handle--target"}
                 />
             ))}
 
             {/* Ausgang */}
             <Handle isConnectable={false}
                     type="source"
+                    className={"function-card__handle function-card__handle--source"}
                     position={functionData.isParameter ? Position.Left : Position.Bottom}/>
         </Card>
     )

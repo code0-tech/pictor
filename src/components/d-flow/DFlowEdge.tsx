@@ -34,7 +34,7 @@ const calcEdgePositions = (
 
 export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
 
-    const {sourceX, sourceY, targetX, targetY, id} = props
+    const {sourceX, sourceY, targetX, targetY, id, ...rest} = props
 
     const {sourcePosition, targetPosition} = calcEdgePositions(
         sourceX, sourceY, targetX, targetY
@@ -49,6 +49,6 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
         targetPosition,
     })
 
-    return <BaseEdge id={id} path={edgePath}/>
+    return <BaseEdge id={id} path={edgePath} {...rest}/>
 
 }

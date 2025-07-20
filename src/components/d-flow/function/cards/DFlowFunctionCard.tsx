@@ -7,16 +7,21 @@ import Card from "../../../card/Card";
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
 // @ts-ignore
-export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {}
+export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {
+}
 
 export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
+
     const {data} = props;
-    const functionData = data as NodeFunctionObject & {isParameter: boolean};
+    const functionData = data as NodeFunctionObject & { isParameter: boolean };
 
     return (
-        <Card w={300} color={"secondary"} style={{ position: "relative" }}>
+        <Card w={300} color={"secondary"} style={{position: "relative"}}>
             {/* Oben globaler Eingang */}
-            <Handle isConnectable={false} draggable={false} type="target" position={Position.Top} />
+            <Handle isConnectable={false}
+                    draggable={false}
+                    type="target"
+                    position={Position.Top}/>
 
             My favorite UX feedback from customers is:
             "How is the app so fast?" Because we’ve built on Next.js and Vercel since day one,
@@ -29,13 +34,15 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                     type="target"
                     position={Position.Right}
                     id={`param-${param.definition.parameter_id}`}
-                    style={{ top: 50 + index * 30 }}
+                    style={{top: 50 + index * 30}}
                     isConnectable={false}
                 />
             ))}
 
             {/* Ausgang */}
-            <Handle isConnectable={false} type="source" position={functionData.isParameter ? Position.Left : Position.Bottom} />
+            <Handle isConnectable={false}
+                    type="source"
+                    position={functionData.isParameter ? Position.Left : Position.Bottom}/>
         </Card>
-    );
-});
+    )
+})

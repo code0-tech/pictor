@@ -10,6 +10,7 @@ import {DFlowReactiveService} from "./DFlow.service";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {flow} from "./DFlow.data";
 import {useFlowEdges} from "./DFlow.edges.hook";
+import {DFlowEdge} from "./DFlowEdge";
 
 export default {
     title: "DFlow",
@@ -39,10 +40,15 @@ const Test = () => {
         default: DFlowFunctionCard,
     }
 
+    const edgeTypes = {
+        default: DFlowEdge
+    }
+
     return <DFlow
         nodes={initialNodes}
         edges={initialEdges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="#bbb"/>

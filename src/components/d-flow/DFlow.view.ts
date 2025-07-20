@@ -187,6 +187,23 @@ export class NodeFunctionView {
     json(): NodeFunction | undefined {
         return undefined
     }
+
+    get json(): NodeFunctionObject {
+        return {
+            function: {
+                function_id: this._id,
+                runtime_function_id: this._runtime_id
+            },
+            parameters: this._parameters?.map(param => ({
+                definition: {
+                    parameter_id: param.id,
+                    runtime_parameter_id: param.runtime_id
+                },
+                value: param.value
+            })),
+            next_node: this._nextNode ? this._nextNode.json : undefined
+        }
+    }
 }
 
 export class NodeParameterView {

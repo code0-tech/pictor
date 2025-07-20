@@ -3,6 +3,7 @@ import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
+import "./DFlowFunctionCard.style.scss"
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 

@@ -1,9 +1,8 @@
 import {useService} from "../../utils/contextStore";
 import {DFlowReactiveService} from "./DFlow.service";
 import React from "react";
-import {Edge} from "@xyflow/react";
-import {Flow, NodeFunction, NodeFunctionParameter} from "./DFlow.view";
-import {isNodeFunctionObject, NodeFunctionObject} from "./DFlow.view";
+import {Edge, MarkerType} from "@xyflow/react";
+import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeFunctionParameter} from "./DFlow.view";
 
 export const useFlowEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
@@ -39,7 +38,10 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                         id: `${subId}-${currentId}-param-${param.id}`,
                         source: subId,
                         target: currentId,
-                        targetHandle: `param-${param.id}`, // ← Handle am Parent
+                        targetHandle: `param-${param.id}`, // ← Handle am Parent,
+                        animated: true,
+                        deletable: false,
+                        selectable: false
                     });
                 }
             });

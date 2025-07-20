@@ -7,6 +7,9 @@ import {ContextStoreProvider} from "../../utils/contextStore";
 import {createReactiveArrayService} from "../../utils/reactiveArrayService";
 import {Flow} from "./DFlow.view";
 import {DFlowReactiveService} from "./DFlow.service";
+import {useFlowNodes} from "./DFlow.nodes.hook";
+import {flow} from "./DFlow.data";
+import {useFlowEdges} from "./DFlow.edges.hook";
 
 export default {
     title: "DFlow",
@@ -14,31 +17,35 @@ export default {
 
 export const ExampleFlow = () => {
 
-    const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService);
+    const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow)]);
 
-    const initialNodes = [
-        {id: 'n1', draggable: false, position: {x: 0, y: 0}, type: "default", data: {label: 'Node 1'}},
-        {id: 'n2', draggable: false, position: {x: 0, y: 0}, type: "default", data: {label: 'Node 2'}},
-    ];
-    const initialEdges = [{id: 'n1-n2', source: 'n1', target: 'n2'}];
-
-    const nodeTypes = {
-        default: DFlowFunctionCard,
-    };
 
     return (
         <ContextStoreProvider services={[[flowStore, flowService]]}>
-
-            <DFlow
-                nodes={initialNodes}
-                edges={initialEdges}
-                nodeTypes={nodeTypes}
-                fitView
-            >
-                <Background variant={BackgroundVariant.Dots} color="#bbb"/>
-            </DFlow>
+            <Test/>
         </ContextStoreProvider>
     );
 
+}
+
+const Test = () => {
+
+    const initialNodes = useFlowNodes("some_database_id")
+    const initialEdges = useFlowEdges("some_database_id")
+
+    console.log(initialNodes, initialEdges)
+
+    const nodeTypes = {
+        default: DFlowFunctionCard,
+    }
+
+    return <DFlow
+        nodes={initialNodes}
+        edges={initialEdges}
+        nodeTypes={nodeTypes}
+        fitView
+    >
+        <Background variant={BackgroundVariant.Dots} color="#bbb"/>
+    </DFlow>
 }
 

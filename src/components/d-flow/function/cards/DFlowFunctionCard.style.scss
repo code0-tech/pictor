@@ -1,0 +1,12 @@
+@use "../../../../styles/variables";
+@use "../../../../styles/box";
+
+.function-card {
+  &__handle {
+    border: none !important;
+    padding: 4px;
+    & {
+      @include box.box(variables.$secondary, variables.$secondary, variables.$secondary);
+    }
+  }
+}

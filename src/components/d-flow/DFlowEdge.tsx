@@ -4,6 +4,7 @@ import React from "react";
 
 export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
+    color?: string
 }
 
 // @ts-ignore
@@ -34,7 +35,7 @@ const calcEdgePositions = (
 
 export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
 
-    const {sourceX, sourceY, targetX, targetY, id, ...rest} = props
+    const {sourceX, sourceY, targetX, targetY, id, data, ...rest} = props
 
     const {sourcePosition, targetPosition} = calcEdgePositions(
         sourceX, sourceY, targetX, targetY
@@ -49,6 +50,6 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
         targetPosition,
     })
 
-    return <BaseEdge id={id} path={edgePath} {...rest}/>
+    return <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color}}/>
 
 }

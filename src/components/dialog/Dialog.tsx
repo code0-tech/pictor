@@ -12,7 +12,8 @@ export type DialogCloseProps = Code0ComponentProps & React.ComponentProps<typeof
 export type DialogOverlayProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Overlay>
 export type DialogTitleProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Title>
 export type DialogDescriptionProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Description>
-
+export type DialogHeaderProps = Code0ComponentProps & React.ComponentProps<"div">
+export type DialogFooterProps = Code0ComponentProps & React.ComponentProps<"div">
 export type DialogContentProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean
 }
@@ -46,12 +47,12 @@ export const DialogContent: React.FC<DialogContentProps> = (props) => {
         <DialogPrimitive.Portal>
             <DialogOverlay/>
             <DialogPrimitive.Content {...mergeCode0Props("dialog__content", props) as DialogContentProps}>
-                {props.children}
                 {props.showCloseButton && (
-                    <DialogPrimitive.Close>
+                    <DialogClose>
                         <IconX size={16}/>
-                    </DialogPrimitive.Close>
+                    </DialogClose>
                 )}
+                {props.children}
             </DialogPrimitive.Content>
         </DialogPrimitive.Portal>
     )
@@ -65,53 +66,10 @@ export const DialogDescription: React.FC<DialogDescriptionProps> = (props) => {
     return <DialogPrimitive.Description {...mergeCode0Props("dialog__description", props) as DialogDescriptionProps}/>
 }
 
-export const DialogStickyContent = (contentType: 'header' | 'footer'): React.FC<DialogStickyContentProps> => (props) => {
-
-    const stickyRef = React.useRef<HTMLDivElement>(null)
-    const stickyPseudoRef = React.useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        if (!stickyRef.current || !stickyPseudoRef.current) return
-
-        const wrapper = document.querySelector(".dialog__wrapper")
-        const yPos = contentType == 'header' ? stickyRef.current.getBoundingClientRect().top : stickyRef.current.getBoundingClientRect().bottom
-        const height = stickyRef.current.getBoundingClientRect().bottom - stickyRef.current.getBoundingClientRect().top
-        const scroll = () => {
-            if (!stickyRef.current || !stickyPseudoRef.current) return
-
-            if (contentType == 'header' ? (wrapper?.scrollTop ?? 0) > yPos : ((wrapper?.scrollTop ?? 0) + window.innerHeight) < yPos) {
-                stickyRef.current.style.position = "fixed"
-                stickyRef.current.style[contentType == 'header' ? 'top' : 'bottom'] = '.5rem'
-                stickyPseudoRef.current.style.display = "block"
-            } else {
-                stickyRef.current.style.position = "relative"
-                stickyRef.current.style[contentType == 'header' ? 'top' : 'bottom'] = '0'
-                stickyPseudoRef.current.style.display = "none"
-            }
-        }
-        const resize = () => {
-            if (!stickyRef.current || !stickyPseudoRef.current) return
-            stickyRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-            stickyPseudoRef.current.style.height = `${height}px`
-        }
-
-        stickyRef.current.style.width = `${(wrapper?.querySelector(".dialog")?.clientWidth ?? 0) - 16}px`
-        stickyPseudoRef.current.style.height = `${height}px`
-        resize()
-        scroll()
-
-        wrapper?.addEventListener("scroll", scroll)
-        window.addEventListener("resize", resize)
-    }, [stickyRef, stickyPseudoRef]);
-
-    return <>
-        <div style={{display: "none"}} ref={stickyPseudoRef}/>
-        <div ref={stickyRef} className={`dialog__${contentType}`}>
-            {props.children}
-        </div>
-    </>
-
+export const DialogHeader: React.FC<DialogHeaderProps> = (props) => {
+    return <div {...mergeCode0Props("dialog__header", props) as DialogHeaderProps}/>
 }
 
-export const DialogHeader = DialogStickyContent("header")
-export const DialogFooter = DialogStickyContent("footer")
+export const DialogFooter: React.FC<DialogFooterProps> = (props) => {
+    return <div {...mergeCode0Props("dialog__footer", props) as DialogFooterProps}/>
+}

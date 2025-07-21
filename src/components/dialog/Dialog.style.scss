@@ -19,31 +19,6 @@
   height: fit-content;
   max-height: none;
 
-  &__header {
-    position: relative;
-    margin: -0.5rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid helpers.borderColor();
-    background: helpers.backgroundColor(variables.$secondary);
-  }
-
-  &__footer {
-    position: relative;
-    margin: -0.5rem;
-    padding: 0.5rem;
-    border-top: 1px solid helpers.borderColor();
-    background: helpers.backgroundColor(variables.$secondary);
-  }
-
-  &__wrapper {
-    scroll-padding-top: 4rem;
-    position: fixed;
-    z-index: 100;
-    overflow: auto;
-    padding: 4rem 1rem;
-    inset: 0;
-  }
-
   &__overlay {
     position: fixed;
     top: 0;
@@ -66,6 +41,8 @@
     transform: translate(-50%, -50%);
     border: 1px solid helpers.borderColor();
     padding: 1rem;
+    background: variables.$primary;
+    color: variables.$secondary;
 
     @include helpers.borderRadius();
 
@@ -78,10 +55,70 @@
     @include helpers.fontStyle();
     font-weight: 600;
     font-size: variables.$lg;
+    color: variables.$secondary;
+    margin: 0;
   }
 
   &__description {
     @include helpers.fontStyle();
     font-size: variables.$sm;
+    color: variables.$secondary;
+    margin: 0;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+
+    @media (min-width: 640px) {
+      text-align: left;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+  }
+
+  &__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border-radius: 0.125rem;
+    border: none;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    background: none;
+    color: variables.$secondary;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:disabled {
+      pointer-events: none;
+    }
+
+    svg {
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+
+    svg:not([class*="size-"]) {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 }

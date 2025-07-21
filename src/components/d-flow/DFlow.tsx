@@ -122,12 +122,16 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
     const onInit = React.useCallback((instance: ReactFlowInstance) => {
         const layouted = getLayoutedElements(instance.getNodes(), instance.getEdges())
 
-        setNodes([...layouted.nodes]);
-        setEdges([...layouted.edges]);
-        instance.fitView()
+            setNodes([...layouted.nodes]);
+            setEdges([...layouted.edges]);
+            //instance.fitView()
+
     }, [nodes, edges])
 
     return <ReactFlow onInit={onInit}
+                      onMove={(event, viewport) => {
+                          console.log("sd", viewport)
+                      }}
                       connectionLineType={ConnectionLineType.Straight}
                       panOnDrag={true}
                       zoomOnScroll

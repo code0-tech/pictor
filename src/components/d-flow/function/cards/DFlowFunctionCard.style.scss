@@ -4,9 +4,8 @@
 .function-card {
   &__handle {
     border: none !important;
-    padding: 4px;
-    & {
-      @include box.box(variables.$secondary, variables.$secondary, variables.$secondary);
-    }
+    padding: 1px;
+    z-index: -1;
+    background: variables.$info !important;
   }
 }

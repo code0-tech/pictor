@@ -130,7 +130,6 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
             } as Node
         })
 
-        console.log(localNodes)
         if (!calculated.current) {
             const layouted = getLayoutedElements(localNodes, props.edges!!)
             setNodes([...layouted.nodes])
@@ -144,8 +143,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
         setEdges([...props.edges!!])
     }, [props.nodes, props.edges])
 
-    return <ReactFlow connectionLineType={ConnectionLineType.Straight}
-                      panOnDrag={true}
+    return <ReactFlow panOnDrag={true}
                       zoomOnScroll
                       onNodesChange={nodeChangeEvent}
                       onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}

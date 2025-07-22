@@ -58,7 +58,7 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                     animated: true,
                     deletable: false,
                     selectable: false,
-                    data: {color: FLOW_EDGE_RAINBOW[(paramLevel + 1) % FLOW_EDGE_RAINBOW.length]},
+                    data: {color: FLOW_EDGE_RAINBOW[(paramLevel + 1) % FLOW_EDGE_RAINBOW.length], isParameter: true},
                 });
             }
         });

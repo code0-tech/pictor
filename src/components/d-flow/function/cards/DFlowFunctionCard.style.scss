@@ -6,6 +6,6 @@
     border: none !important;
     padding: 1px;
     z-index: -1;
-    background: helpers.borderColor(variables.$secondary) !important;
+    background: helpers.backgroundColor(variables.$secondary) !important;
   }
 }

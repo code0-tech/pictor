@@ -21,10 +21,6 @@ export const ExampleFlow = () => {
 
     const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow)]);
 
-    React.useEffect(() => {
-        console.log("Flow Store Initialized", flowStore)
-    }, [flowStore])
-
     return (
         <ContextStoreProvider services={[[flowStore, flowService]]}>
             <Button onClick={() => {
@@ -52,7 +48,7 @@ export const ExampleFlow = () => {
                 flow.startingNode.nextNode!!.nextNode!!.nextNode = newNode
                 flowService.update()
             }}>Add Node</Button>
-            {React.useMemo(() => <Test key={JSON.stringify(flowStore)}/>, [flowStore])}
+            <Test/>
         </ContextStoreProvider>
     );
 
@@ -62,8 +58,6 @@ const Test = () => {
 
     const initialNodes = useFlowNodes("some_database_id")
     const initialEdges = useFlowEdges("some_database_id")
-
-    console.log(initialNodes)
 
     const nodeTypes = {
         default: DFlowFunctionCard,

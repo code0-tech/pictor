@@ -1,10 +1,9 @@
 import {Code0ComponentProps} from "../../utils/types";
-import {ConnectionLineType, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
+import {ConnectionLineType, Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import type {ReactFlowInstance} from "@xyflow/react/dist/esm/types";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -116,26 +115,39 @@ export type DFlowProps = Code0ComponentProps & ReactFlowProps
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
 
+    const calculated = React.useRef<boolean>(false)
     const [nodes, setNodes, onNodesChange] = useNodesState(props.nodes!!)
     const [edges, setEdges, onEdgesChange] = useEdgesState(props.edges!!)
 
-    const onInit = React.useCallback((instance: ReactFlowInstance) => {
-        const layouted = getLayoutedElements(instance.getNodes(), instance.getEdges())
+    const nodeChangeEvent = React.useCallback((changes: any) => {
+        const localNodes = nodes.map(value => {
+            return {
+                ...value,
+                measured: {
+                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? 0,
+                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? 0,
+                }
+            } as Node
+        })
 
-            setNodes([...layouted.nodes]);
-            setEdges([...layouted.edges]);
-            //instance.fitView()
+        console.log(localNodes)
+        if (!calculated.current) {
+            const layouted = getLayoutedElements(localNodes, props.edges!!)
+            setNodes([...layouted.nodes])
+            calculated.current = true
+        }
+    }, [calculated, nodes, edges])
 
-    }, [nodes, edges])
+    React.useEffect(() => {
+        calculated.current = false
+        setNodes([...props.nodes!!])
+        setEdges([...props.edges!!])
+    }, [props.nodes, props.edges])
 
-    return <ReactFlow onInit={onInit}
-                      onMove={(event, viewport) => {
-                          console.log("sd", viewport)
-                      }}
-                      connectionLineType={ConnectionLineType.Straight}
+    return <ReactFlow connectionLineType={ConnectionLineType.Straight}
                       panOnDrag={true}
                       zoomOnScroll
-                      onNodesChange={onNodesChange}
+                      onNodesChange={nodeChangeEvent}
                       onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}
                       nodes={nodes}
                       edges={edges}/>

@@ -4,6 +4,11 @@ import {NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowFunctionCard.style.scss";
+import CardSection from "../../../card/CardSection";
+import Flex from "../../../flex/Flex";
+import Button from "../../../button/Button";
+import {IconFileLambdaFilled} from "@tabler/icons-react";
+import Text from "../../../text/Text";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
@@ -31,7 +36,6 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
 
     return (
         <Card w={300} color={"secondary"} onClick={() => {
-            console.log("sdsdsdsdd")
             flowInstance.setViewport({
                 x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
                 y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,
@@ -40,7 +44,14 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 duration: 250,
             })
         }} style={{position: "relative"}}>
-            {/* Oben globaler Eingang */}
+
+            <CardSection border>
+                <Flex align={"center"} style={{gap: "0.7rem"}}>
+                    <IconFileLambdaFilled size={16}/>
+                    <Text size={"md"}>{functionData.function.function_id}</Text>
+                </Flex>
+            </CardSection>
+
             <Handle
                 isConnectable={false}
                 draggable={false}
@@ -49,22 +60,21 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 position={Position.Top}
             />
 
-            My favorite UX feedback from customers is:
-            "How is the app so fast?" Because we’ve built on Next.js and Vercel since day one,
-            our pages load in an instant, which is important when it comes to mission-critical software.
-
             {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
             {functionData.parameters?.map((param: NodeParameterObject, index: number) => (
-                <Handle
-                    key={param.definition.parameter_id}
-                    type="target"
-                    position={Position.Right}
-                    id={`param-${param.definition.parameter_id}`}
-                    style={{top: 50 + index * 30}}
-                    isConnectable={false}
-                    hidden={!isParamConnected(param.definition.parameter_id)}
-                    className={"function-card__handle function-card__handle--target"}
-                />
+                <div>
+                    {param.definition.parameter_id}
+                    <Handle
+                        key={param.definition.parameter_id}
+                        type="target"
+                        position={Position.Right}
+                        style={{position: "absolute", transform: "translateX(50%)", top: "auto", right: 0}}
+                        id={`param-${param.definition.parameter_id}`}
+                        isConnectable={false}
+                        hidden={!isParamConnected(param.definition.parameter_id)}
+                        className={"function-card__handle function-card__handle--target"}
+                    />
+                </div>
             ))}
 
             {/* Ausgang */}

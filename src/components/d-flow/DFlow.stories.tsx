@@ -74,7 +74,7 @@ const Test = () => {
         edgeTypes={edgeTypes}
         fitView
     >
-        <Background variant={BackgroundVariant.Dots} color="#bbb"/>
+        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
     </DFlow>
 }
 

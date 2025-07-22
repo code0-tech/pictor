@@ -57,30 +57,32 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 draggable={false}
                 type="target"
                 className={"function-card__handle function-card__handle--target"}
-                position={Position.Top}
+                style={{...(functionData.isParameter ? {right: "1rem"} : {top: "1rem"})}}
+                position={functionData.isParameter ? Position.Right : Position.Top}
             />
 
             {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
             {functionData.parameters?.map((param: NodeParameterObject, index: number) => (
-                <div>
+                <Flex pos={"relative"}>
                     {param.definition.parameter_id}
                     <Handle
                         key={param.definition.parameter_id}
                         type="target"
                         position={Position.Right}
-                        style={{position: "absolute", transform: "translateX(50%)", top: "auto", right: 0}}
+                        style={{position: "absolute", transform: "translate(50%, -50%)", top: "50%", right: "0"}}
                         id={`param-${param.definition.parameter_id}`}
                         isConnectable={false}
                         hidden={!isParamConnected(param.definition.parameter_id)}
                         className={"function-card__handle function-card__handle--target"}
                     />
-                </div>
+                </Flex>
             ))}
 
             {/* Ausgang */}
             <Handle
                 isConnectable={false}
                 type="source"
+                style={{...(functionData.isParameter ? {left: "1rem"} : {bottom: "1rem"})}}
                 className={"function-card__handle function-card__handle--source"}
                 position={functionData.isParameter ? Position.Left : Position.Bottom}
             />

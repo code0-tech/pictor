@@ -1,11 +1,11 @@
 @use "../../../../styles/variables";
-@use "../../../../styles/box";
+@use "../../../../styles/helpers";
 
 .function-card {
   &__handle {
     border: none !important;
     padding: 1px;
     z-index: -1;
-    background: variables.$info !important;
+    background: helpers.borderColor(variables.$secondary) !important;
   }
 }

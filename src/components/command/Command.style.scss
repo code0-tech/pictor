@@ -10,6 +10,7 @@
   display: flex;
   height: 100%;
   width: 100%;
+  min-width: 32rem;
   flex-direction: column;
   overflow: hidden;
   background: variables.$primary;
@@ -61,7 +62,9 @@
     background-color: transparent;
     font-size: 0.875rem;
     margin: 0.5rem;
+    padding: 0 0.5rem;
     outline: none;
+    color: variables.$secondary;
 
     &::placeholder {
     }
@@ -81,11 +84,9 @@
 
   &__group {
     overflow: hidden;
-    padding: 0.25rem;
-    color: variables.$secondary;
-    opacity: 0.5;
+    color: helpers.color(variables.$secondary, 0.5);
     font-size: variables.$xs;
-    margin-left: 0.5rem;
+    margin: 0.75rem;
   }
 
   &__item {
@@ -95,11 +96,16 @@
     gap: 0.5rem;
     user-select: none;
     align-items: center;
-    border-radius: variables.$borderRadius;
+    border-radius: 0.5rem;
     padding: 0.375rem 0.5rem;
     font-size: 0.875rem;
     outline: none;
-    color: variables.$secondary;
+    color: helpers.color(variables.$secondary, 0.75);
+
+    &:hover {
+      background: helpers.backgroundColor(variables.$white);
+      color: variables.$secondary;
+    }
 
     &[data-disabled='true'] {
       pointer-events: none;
@@ -107,6 +113,8 @@
     }
 
     &[data-selected='true'] {
+      background: helpers.backgroundColor(variables.$white);
+      color: variables.$secondary;
     }
 
     svg {
@@ -126,7 +134,10 @@
 
   &__shortcut {
     margin-left: auto;
-    font-size: 0.75rem;
+    font-size: 0.625rem;
     letter-spacing: 0.1em;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    background: helpers.backgroundColor(variables.$white);
   }
 }

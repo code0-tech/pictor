@@ -6,14 +6,25 @@ import Card from "../../../card/Card";
 import "./DFlowFunctionCard.style.scss";
 import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
-import Button from "../../../button/Button";
-import {IconFileLambdaFilled} from "@tabler/icons-react";
+import {
+    IconAlertTriangle,
+    IconCopy,
+    IconDots,
+    IconExclamationCircle,
+    IconFileLambdaFilled,
+    IconGripVertical, IconMessageExclamation,
+    IconTrash
+} from "@tabler/icons-react";
 import Text from "../../../text/Text";
+import Button from "../../../button/Button";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
+import Badge from "../../../badge/Badge";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
 // @ts-ignore
-export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {}
+export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {
+}
 
 export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
     const {data, id} = props;
@@ -46,9 +57,30 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
         }} style={{position: "relative"}}>
 
             <CardSection border>
-                <Flex align={"center"} style={{gap: "0.7rem"}}>
-                    <IconFileLambdaFilled size={16}/>
-                    <Text size={"md"}>{functionData.function.function_id}</Text>
+                <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
+                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                        <IconFileLambdaFilled size={16}/>
+                        <Text size={"md"}>{functionData.function.function_id}</Text>
+                    </Flex>
+                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                        <Menu modal={true}>
+                            <MenuTrigger asChild>
+                                <Button variant={"none"}>
+                                    <IconDots size={16}/>
+                                </Button>
+                            </MenuTrigger>
+                            <MenuPortal>
+                                <MenuContent>
+                                    <MenuLabel>Actions</MenuLabel>
+                                    <MenuItem><IconTrash size={16}/> Delete node</MenuItem>
+                                    <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
+                                </MenuContent>
+                            </MenuPortal>
+                        </Menu>
+                        <Button disabled>
+                            <IconGripVertical size={16}/>
+                        </Button>
+                    </Flex>
                 </Flex>
             </CardSection>
 
@@ -60,6 +92,29 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 style={{...(functionData.isParameter ? {right: "1rem"} : {top: "1rem"})}}
                 position={functionData.isParameter ? Position.Right : Position.Top}
             />
+
+            <div className={"function-card__inspection"}>
+                <Flex style={{gap: "0.35rem"}}>
+                    <Badge color={"error"}>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <IconExclamationCircle size={12}/>
+                            12
+                        </Flex>
+                    </Badge>
+                    <Badge color={"warning"}>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <IconAlertTriangle size={12}/>
+                            12
+                        </Flex>
+                    </Badge>
+                    <Badge>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <IconMessageExclamation size={12}/>
+                            12
+                        </Flex>
+                    </Badge>
+                </Flex>
+            </div>
 
             {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
             {functionData.parameters?.map((param: NodeParameterObject, index: number) => (

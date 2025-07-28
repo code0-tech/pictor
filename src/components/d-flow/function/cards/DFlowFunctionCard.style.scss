@@ -1,5 +1,6 @@
 @use "../../../../styles/variables";
 @use "../../../../styles/helpers";
+@use "../../../../styles/box";
 
 .function-card {
   &__handle {
@@ -7,5 +8,17 @@
     padding: 1px;
     z-index: -1;
     background: helpers.backgroundColor(variables.$secondary) !important;
+  }
+
+  &__inspection {
+    top: 0;
+    transform: translateY(-50%);
+    padding: variables.$xxs;
+
+    & {
+      @include box.box(variables.$primary);
+      @include helpers.borderRadius();
+      position: absolute;
+    }
   }
 }

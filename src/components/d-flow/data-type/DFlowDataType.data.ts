@@ -5,8 +5,8 @@ export const dataTypes: DataTypeObject[] = [{
     data_type_id: "NUMBER",
     type: EDataType.PRIMITIVE,
     rules: [{
-        type: EDataTypeRuleType.ITEM_OF_COLLECTION,
-        config: {items: [1, 2, 3, 4, 5, 6, 7]}
+        type: EDataTypeRuleType.REGEX,
+        config: {pattern: "^-?\\d+(?:[.,]\\d+)?$"}
     }]
 }, {
     data_type_id: "HTTP_METHOD",

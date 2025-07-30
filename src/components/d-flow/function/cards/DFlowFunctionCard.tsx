@@ -19,6 +19,11 @@ import Text from "../../../text/Text";
 import Button from "../../../button/Button";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
 import Badge from "../../../badge/Badge";
+import {useService} from "../../../../utils/contextStore";
+import {DFlowFunctionReactiveService} from "../DFlowFunction.service";
+import {useFunctionValidation} from "../DFlowFunction.vaildation.hook";
+import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
+import {InspectionSeverity} from "../../../../utils/inspection";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
@@ -33,7 +38,11 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
-
+    const functionService = useService(DFlowFunctionReactiveService)
+    const definition = functionService.getFunctionDefinition(data.function.function_id)
+    const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
+    console.log(validation)
+    validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
     // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 
@@ -95,24 +104,32 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
 
             <div className={"function-card__inspection"}>
                 <Flex style={{gap: "0.35rem"}}>
-                    <Badge color={"error"}>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconExclamationCircle size={12}/>
-                            12
-                        </Flex>
-                    </Badge>
-                    <Badge color={"warning"}>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconAlertTriangle size={12}/>
-                            12
-                        </Flex>
-                    </Badge>
-                    <Badge>
-                        <Flex align={"center"} style={{gap: "0.35rem"}}>
-                            <IconMessageExclamation size={12}/>
-                            12
-                        </Flex>
-                    </Badge>
+                    {(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? (
+                        <Badge color={"error"}>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconExclamationCircle size={12}/>
+                                {validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length}
+                            </Flex>
+                        </Badge>
+                    ) : null}
+
+                    {(validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length ?? 0) > 0 ? (
+                        <Badge color={"warning"}>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconAlertTriangle size={12}/>
+                                {validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length}
+                            </Flex>
+                        </Badge>
+                    ) : null}
+
+                    {(validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length ?? 0) > 0 ? (
+                        <Badge>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconMessageExclamation size={12}/>
+                                {validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length}
+                            </Flex>
+                        </Badge>
+                    ) : null}
                 </Flex>
             </div>
 

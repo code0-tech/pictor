@@ -12,7 +12,8 @@ import {
     IconDots,
     IconExclamationCircle,
     IconFileLambdaFilled,
-    IconGripVertical, IconMessageExclamation,
+    IconGripVertical,
+    IconMessageExclamation,
     IconTrash
 } from "@tabler/icons-react";
 import Text from "../../../text/Text";
@@ -102,36 +103,39 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 position={functionData.isParameter ? Position.Right : Position.Top}
             />
 
-            <div className={"function-card__inspection"}>
-                <Flex style={{gap: "0.35rem"}}>
-                    {(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? (
-                        <Badge color={"error"}>
-                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconExclamationCircle size={12}/>
-                                {validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length}
-                            </Flex>
-                        </Badge>
-                    ) : null}
+            {(validation?.length ?? 0) > 0 ? (
+                <div className={"function-card__inspection"}>
+                    <Flex style={{gap: "0.35rem"}}>
+                        {(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? (
+                            <Badge color={"error"}>
+                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                    <IconExclamationCircle size={12}/>
+                                    {validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length}
+                                </Flex>
+                            </Badge>
+                        ) : null}
 
-                    {(validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length ?? 0) > 0 ? (
-                        <Badge color={"warning"}>
-                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconAlertTriangle size={12}/>
-                                {validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length}
-                            </Flex>
-                        </Badge>
-                    ) : null}
+                        {(validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length ?? 0) > 0 ? (
+                            <Badge color={"warning"}>
+                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                    <IconAlertTriangle size={12}/>
+                                    {validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length}
+                                </Flex>
+                            </Badge>
+                        ) : null}
 
-                    {(validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length ?? 0) > 0 ? (
-                        <Badge>
-                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconMessageExclamation size={12}/>
-                                {validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length}
-                            </Flex>
-                        </Badge>
-                    ) : null}
-                </Flex>
-            </div>
+                        {(validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length ?? 0) > 0 ? (
+                            <Badge>
+                                <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                    <IconMessageExclamation size={12}/>
+                                    {validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length}
+                                </Flex>
+                            </Badge>
+                        ) : null}
+                    </Flex>
+                </div>
+            ) : null}
+
 
             {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
             {functionData.parameters?.map((param: NodeParameterObject, index: number) => (

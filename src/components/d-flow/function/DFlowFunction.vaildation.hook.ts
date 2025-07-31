@@ -12,7 +12,6 @@ import {useReturnType} from "./DFlowFunction.return.hook";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 
-//TODO need to test alo functions not only values and ref objects
 
 /**
  * Validates function parameter values against a function definition, resolving all generics.

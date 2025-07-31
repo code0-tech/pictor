@@ -44,7 +44,7 @@ const SuggestionMenu = () => {
     return <div>
         <TextInput title={"Text"}
                    clearable
-                   transformValue={(value) => <span color={"red"}>{value}</span>}
+                   transformValue={(value) => <span style={{color: "red"}}>{value}</span>}
                    suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                    suggestions={toInputSuggestions(result)}
                    description={"Type what ever text you like"}

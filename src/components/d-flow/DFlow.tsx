@@ -52,8 +52,23 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
         pos.set(node.id, {x: cx, y: cy});
 
         // Find direct children for this node.
-        const allChildren = (children.get(node.id) ?? [])
-            .sort((a, b) => (a.data?.paramIndex ?? 0) - (b.data?.paramIndex ?? 0));
+        if (node.type === 'group') {
+            const groupRoots = nodes.filter(
+                n => n.parentNode === node.id && !n.data?.parentId
+            );
+            let innerY = cy - h / 2;
+            groupRoots.forEach(root => {
+                const rh = root.measured?.height ?? 80;
+                const rcy = innerY + rh / 2;
+                layout(root, cx, rcy);
+                innerY = rcy + rh / 2 + V_SPACING;
+            });
+            return cy + h / 2;
+        }
+
+        const allChildren = (children.get(node.id) ?? []).sort(
+            (a, b) => (a.data?.paramIndex ?? 0) - (b.data?.paramIndex ?? 0)
+        );
         const sideParams = allChildren.filter((c: any) => c.type !== 'group');
         const downGroups = allChildren.filter((c: any) => c.type === 'group');
 
@@ -108,12 +123,23 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
         const {x, y} = pos.get(node.id) ?? {x: 0, y: 0};
         const w = node.measured?.width ?? 200;
         const h = node.measured?.height ?? 80;
+        let px = x - w / 2;
+        let py = y - h / 2;
+
+        if (node.parentNode) {
+            const parent = nodes.find(n => n.id === node.parentNode);
+            if (parent) {
+                const {x: pxp, y: pyp} = pos.get(parent.id) ?? {x: 0, y: 0};
+                const pw = parent.measured?.width ?? 200;
+                const ph = parent.measured?.height ?? 80;
+                px -= pxp - pw / 2;
+                py -= pyp - ph / 2;
+            }
+        }
+
         return {
             ...node,
-            position: {
-                x: x - w / 2,
-                y: y - h / 2,
-            },
+            position: {x: px, y: py},
         };
     });
 

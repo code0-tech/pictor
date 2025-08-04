@@ -2,6 +2,7 @@ import {Meta} from "@storybook/react";
 import {Background, BackgroundVariant} from "@xyflow/react";
 import React, {useEffect} from "react";
 import {DFlowFunctionCard} from "./function/cards/DFlowFunctionCard";
+import {DFlowFunctionGroupCard} from "./function/cards/DFlowFunctionGroupCard";
 import {DFlow} from "./DFlow";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {createReactiveArrayService} from "../../utils/reactiveArrayService";
@@ -79,6 +80,7 @@ const Test = () => {
 
     const nodeTypes = {
         default: DFlowFunctionCard,
+        group: DFlowFunctionGroupCard,
     }
 
     const edgeTypes = {

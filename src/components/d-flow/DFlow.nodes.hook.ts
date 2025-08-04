@@ -54,7 +54,7 @@ export const useFlowNodes = (flowId: string): Node[] => {
                         type: "group",
                         position: {x: 0, y: 0},
                         draggable: false,
-                        parentNode: parentGroup,
+                        parentId: parentGroup,
                         data: {
                             isParameter: true,
                             parentId: id,

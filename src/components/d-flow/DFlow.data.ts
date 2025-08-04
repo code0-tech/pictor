@@ -76,8 +76,7 @@ export const flow: FlowObject = {
                             definition: {
                                 parameter_id: "standard::math::add__secondValue",
                                 runtime_parameter_id: "standard::math::add__secondValue"
-                            },
-                            value: 10
+                            }
                         }]
                     }
                 }]

@@ -184,21 +184,33 @@ export const flow1: FlowObject = {
     }],
     starting_node: {
         function: {
-            function_id: "std::math::add",
-            runtime_function_id: "std::math::add"
+            function_id: "std::math::multiply",
+            runtime_function_id: "std::math::multiply"
         },
         parameters: [{
             definition: {
-                parameter_id: "std::math::add__firstValue",
-                runtime_parameter_id: "std::math::add__firstValue"
+                parameter_id: "std::math::multiply__firstValue",
+                runtime_parameter_id: "std::math::multiply__firstValue"
             },
-            value: 5
-        }, {
-            definition: {
-                parameter_id: "standard::math::add__secondValue",
-                runtime_parameter_id: "standard::math::add__secondValue"
-            },
-            value: 10
+            value: {
+                function: {
+                    function_id: "std::math::add",
+                    runtime_function_id: "std::math::add"
+                },
+                parameters: [{
+                    definition: {
+                        parameter_id: "std::math::add__firstValue",
+                        runtime_parameter_id: "std::math::add__firstValue"
+                    },
+                    value: 5
+                }, {
+                    definition: {
+                        parameter_id: "standard::math::add__secondValue",
+                        runtime_parameter_id: "standard::math::add__secondValue"
+                    },
+                    value: 10
+                }]
+            }
         }]
     }
 }

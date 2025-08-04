@@ -39,4 +39,13 @@ export const functionData: FunctionDefinitionObject[] = [{
         type: "D"
     }],
     generic_keys: ["D"],
+}, {
+    function_id: "std::math::multiply",
+    runtime_function_id: "std::math::multiply",
+    return_type: "NUMBER",
+    parameters: [{
+        parameter_id: "std::math::multiply__firstValue",
+        runtime_parameter_id: "std::math::multiply__firstValue",
+        type: "NUMBER_NODE"
+    }]
 }]

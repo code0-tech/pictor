@@ -11,7 +11,15 @@ export default defineConfig({
     plugins: [
         react(),
         libInjectCss(),
-        dts({ include: ['src'], exclude: ['src/**/*.stories.tsx'] })
+        dts({
+            include: ['src'],
+            exclude: ['src/**/*.stories.tsx'],
+            afterDiagnostic: (diagnostics) => {
+                if (diagnostics.length > 0) {
+                    throw new Error("dts failed");
+                }
+            },
+        })
     ],
     build: {
         lib: {

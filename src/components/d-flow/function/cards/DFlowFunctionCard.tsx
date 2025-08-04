@@ -42,7 +42,6 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const functionService = useService(DFlowFunctionReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
-    // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 
     // Helper, ob zu diesem Parameter eine Edge existiert:

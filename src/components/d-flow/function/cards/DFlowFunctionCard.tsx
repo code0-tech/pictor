@@ -42,8 +42,6 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const functionService = useService(DFlowFunctionReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
-    console.log(validation)
-    validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
     // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 
@@ -56,7 +54,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     }
 
     return (
-        <Card w={300} color={"secondary"} onClick={() => {
+        <Card borderColor={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : undefined} w={300} color={"secondary"} onClick={() => {
             flowInstance.setViewport({
                 x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
                 y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,

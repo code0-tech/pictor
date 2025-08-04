@@ -22,8 +22,10 @@
 }
 
 @function borderColor($color: variables.$secondary) {
-  $mixedBorderWhite: color.mix($color, variables.$white, 25%);
-  @return rgba($mixedBorderWhite, .1);
+  @if($color == variables.$secondary) {
+    @return rgba($color, .1);
+  }
+  @return rgba($color, .25);
 }
 
 @function color($color: variables.$white, $hierarchy: variables.$hierarchyTertiary) {

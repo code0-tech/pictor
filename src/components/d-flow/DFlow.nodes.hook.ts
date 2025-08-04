@@ -2,9 +2,14 @@ import {useService} from "../../utils/contextStore";
 import {DFlowReactiveService} from "./DFlow.service";
 import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "./DFlow.view";
 import {Node} from "@xyflow/react";
+import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
+import {EDataType} from "./data-type/DFlowDataType.view";
 
 export const useFlowNodes = (flowId: string): Node[] => {
     const flowService = useService(DFlowReactiveService);
+    const functionService = useService(DFlowFunctionReactiveService);
+    const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flow = flowService.getById(flowId);
 
     if (!flow) return [];
@@ -12,7 +17,13 @@ export const useFlowNodes = (flowId: string): Node[] => {
     const nodes: Node[] = [];
     let idCounter = 0;
 
-    const traverse = (fn: NodeFunction, isParameter = false, parentId?: string) => {
+    const traverse = (
+        fn: NodeFunction,
+        isParameter = false,
+        parentId?: string,
+        depth: number = 0,
+        parentGroup?: string
+    ) => {
         const id = `${fn.runtime_id}-${idCounter++}`;
 
         nodes.push({
@@ -20,24 +31,51 @@ export const useFlowNodes = (flowId: string): Node[] => {
             type: "default",
             position: {x: 0, y: 0},
             draggable: false,
+            parentNode: parentGroup,
             data: {
                 ...fn.json,
                 isParameter,
-                parentId: isParameter ? parentId : undefined, // Nur für Parameter!
+                parentId: isParameter ? parentId : undefined,
+                depth
             },
         });
 
+        const definition = functionService.getFunctionDefinition(fn.id);
+
         fn.parameters?.forEach((param, i) => {
-            if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
+            const paramType = definition?.parameters!!.find(p => p.parameter_id == param.id)?.type;
+            const paramDataType = paramType ? dataTypeService.getDataType(paramType) : undefined;
+
+            if (paramDataType?.type === EDataType.NODE) {
+                if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
+                    const groupId = `${id}-group-${idCounter++}`;
+                    nodes.push({
+                        id: groupId,
+                        type: "group",
+                        position: {x: 0, y: 0},
+                        draggable: false,
+                        parentNode: parentGroup,
+                        data: {
+                            isParameter: true,
+                            parentId: id,
+                            depth: depth + 1,
+                        },
+                    });
+
+                    const subNode = new NodeFunction(param.value as NodeFunctionObject);
+                    traverse(subNode, false, undefined, depth + 1, groupId);
+                }
+            } else if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
                 const subNode = new NodeFunction(param.value as NodeFunctionObject);
-                traverse(subNode, true, id); // Parameter: isParameter=true, parentId gesetzt
+                traverse(subNode, true, id, depth, parentGroup);
             }
         });
 
         if (fn.nextNode) {
-            traverse(fn.nextNode, false); // nextNode: isParameter=false, parentId NICHT setzen
+            traverse(fn.nextNode, false, undefined, depth, parentGroup);
         }
     };
+
     traverse(flow.startingNode);
     return nodes;
 };

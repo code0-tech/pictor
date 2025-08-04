@@ -29,9 +29,9 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
         }
     }
 
-    // 2. Identify root/main nodes (nodes that are not parameters or have no parent).
+    // 2. Identify root/main nodes (nodes that are not parameters or have no parent and are not inside a group).
     const roots = nodes.filter(
-        n => !n.data?.isParameter || !n.data?.parentId
+        n => (!n.data?.isParameter || !n.data?.parentId) && !n.parentNode
     );
 
     // 3. Store calculated center positions for each node by id.
@@ -51,38 +51,62 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
         // Store center position for this node.
         pos.set(node.id, {x: cx, y: cy});
 
-        // Find and sort direct parameter nodes for this node.
-        const params = (children.get(node.id) ?? [])
-            .sort((a, b) => (a.data?.paramIndex ?? 0) - (b.data?.paramIndex ?? 0));
+        // Find direct children for this node.
+        if (node.type === 'group') {
+            const groupRoots = nodes.filter(
+                n => n.parentNode === node.id && !n.data?.parentId
+            );
+            let innerY = cy - h / 2;
+            groupRoots.forEach(root => {
+                const rh = root.measured?.height ?? 80;
+                const rcy = innerY + rh / 2;
+                layout(root, cx, rcy);
+                innerY = rcy + rh / 2 + V_SPACING;
+            });
+            return cy + h / 2;
+        }
 
-        // Compute the total vertical height of all parameter nodes including spacing.
-        const paramHeights = params.map(p => p.measured?.height ?? 80);
+        const allChildren = (children.get(node.id) ?? []).sort(
+            (a, b) => (a.data?.paramIndex ?? 0) - (b.data?.paramIndex ?? 0)
+        );
+        const sideParams = allChildren.filter((c: any) => c.type !== 'group');
+        const downGroups = allChildren.filter((c: any) => c.type === 'group');
+
+        // Compute the total vertical height of parameter nodes on the side including spacing.
+        const paramHeights = sideParams.map(p => p.measured?.height ?? 80);
         const paramBlockHeight = paramHeights.length
             ? paramHeights.reduce((sum, h, i) => sum + h + (i ? V_SPACING : 0), 0)
             : 0;
 
-        // The "block" height for the main node is the max of its own height or its parameter block.
-        const blockHeight = Math.max(h, paramBlockHeight);
-
-        // Center parameters vertically relative to parent node.
+        // Center side parameters vertically relative to parent node.
         let paramY = cy - paramBlockHeight / 2;
-        params.forEach((param, i) => {
+        sideParams.forEach((param: any, i: number) => {
             const pw = param.measured?.width ?? 200;
             const ph = paramHeights[i];
-            // Place parameter node to the right of the parent.
             const px = cx + w / 2 + H_SPACING + pw / 2;
             const py = paramY + ph / 2;
 
             pos.set(param.id, {x: px, y: py});
 
-            // Recursively layout any sub-parameters of this parameter node.
             layout(param, px, py);
 
             paramY += ph + V_SPACING;
         });
 
-        // Return the bottom y-coordinate of this main node's "block".
-        return cy + blockHeight / 2;
+        // Place group parameters below the node.
+        let blockBottom = cy + h / 2;
+        downGroups.forEach((group: any) => {
+            const gh = group.measured?.height ?? 80;
+            const gx = cx;
+            const gy = blockBottom + V_SPACING + gh / 2;
+            pos.set(group.id, {x: gx, y: gy});
+            layout(group, gx, gy);
+            blockBottom = gy + gh / 2;
+        });
+
+        // The block height is the max of node height, side params and groups below.
+        const maxBottom = Math.max(blockBottom, cy + Math.max(h, paramBlockHeight) / 2);
+        return maxBottom;
     }
 
     // 4. Layout all root/main nodes vertically, keeping at least V_SPACING between each.
@@ -96,15 +120,26 @@ const getLayoutedElements = (nodes: any[], edges: any[]) => {
 
     // 5. Generate new positioned nodes by shifting from center to top-left.
     const positionedNodes = nodes.map(node => {
-        const {x, y} = pos.get(node.id)!;
+        const {x, y} = pos.get(node.id) ?? {x: 0, y: 0};
         const w = node.measured?.width ?? 200;
         const h = node.measured?.height ?? 80;
+        let px = x - w / 2;
+        let py = y - h / 2;
+
+        if (node.parentNode) {
+            const parent = nodes.find(n => n.id === node.parentNode);
+            if (parent) {
+                const {x: pxp, y: pyp} = pos.get(parent.id) ?? {x: 0, y: 0};
+                const pw = parent.measured?.width ?? 200;
+                const ph = parent.measured?.height ?? 80;
+                px -= pxp - pw / 2;
+                py -= pyp - ph / 2;
+            }
+        }
+
         return {
             ...node,
-            position: {
-                x: x - w / 2,
-                y: y - h / 2,
-            },
+            position: {x: px, y: py},
         };
     });
 

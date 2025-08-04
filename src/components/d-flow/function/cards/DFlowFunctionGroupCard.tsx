@@ -1,19 +1,30 @@
 import React from "react";
-import {NodeProps, Node} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {FLOW_EDGE_RAINBOW} from "../../DFlow.edges.hook";
 import "./DFlowFunctionGroupCard.style.scss";
 import Card from "../../../card/Card";
-import {Code0Component} from "../../../../utils/types";
-import {NodeFunctionObject} from "../../DFlow.view";
 
-type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
+export interface DFlowFunctionGroupCardProps extends NodeProps<Node> {}
 
-// @ts-ignore
-export interface DFlowFunctionGroupCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {
-}
-
-export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = (props) => {
-    const depth = (props.data as any)?.depth ?? 0;
+export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = (
+    {data, className, style, children, ...rest}
+) => {
+    const depth = (data as any)?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
-    return <Card {...props} className="function-group" style={{border: `2px solid ${color}`, background: "transparent"}} />;
+    return (
+        <Card
+            {...rest}
+            variant={"outlined"}
+            className={`function-group ${className ?? ""}`}
+            style={{...(style || {}), border: `2px solid ${color}`, background: "transparent"}}
+        >
+            <Handle
+                type="source"
+                position={Position.Top}
+                className="function-group__handle"
+                isConnectable={false}
+            />
+            {children}
+        </Card>
+    );
 };

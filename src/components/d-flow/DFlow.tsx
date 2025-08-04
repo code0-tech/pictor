@@ -144,6 +144,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
     }, [props.nodes, props.edges])
 
     return <ReactFlow panOnDrag={true}
+                      onInit={(reactFlowInstance) =>  reactFlowInstance.fitView()}
                       zoomOnScroll
                       onNodesChange={nodeChangeEvent}
                       onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}

@@ -32,10 +32,11 @@ export const useFlowNodes = (flowId: string): Node[] => {
             position: {x: 0, y: 0},
             draggable: false,
             parentId: parentGroup,
+            extent: parentGroup ? "parent" : undefined,   //  <-- NEU
             data: {
                 ...fn.json,
                 isParameter,
-                parentId: isParameter ? parentId : undefined,
+                linkingId: isParameter ? parentId : undefined,
                 depth
             },
         });
@@ -55,9 +56,10 @@ export const useFlowNodes = (flowId: string): Node[] => {
                         position: {x: 0, y: 0},
                         draggable: false,
                         parentId: parentGroup,
+                        extent: parentGroup ? "parent" : undefined,   //  <-- NEU
                         data: {
                             isParameter: true,
-                            parentId: id,
+                            linkingId: id,
                             depth: depth + 1,
                         },
                     });

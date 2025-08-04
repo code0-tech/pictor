@@ -2,6 +2,9 @@ import {useService} from "../../utils/contextStore";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
 import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeFunctionParameter} from "./DFlow.view";
+import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
+import {EDataType} from "./data-type/DFlowDataType.view";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -17,6 +20,8 @@ export const FLOW_EDGE_RAINBOW: string[] = [
 
 export const useFlowEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
+    const functionService = useService(DFlowFunctionReactiveService);
+    const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flow = flowService.getById(flowId);
 
     if (!flow) return [];
@@ -44,12 +49,32 @@ export const useFlowEdges = (flowId: string): Edge[] => {
         }
 
         // --- Parameter-Verbindungen (horizontal)
-        fn.parameters?.forEach((param: NodeFunctionParameter, paramIdx: number) => {
+        fn.parameters?.forEach((param: NodeFunctionParameter) => {
             const val = param.value;
-            if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
-                const subFn = new NodeFunction(val as NodeFunctionObject);
-                const subId = traverse(subFn, undefined, paramLevel + 1); // Param-Sublevel erhöhen
+            const definition = functionService
+                .getFunctionDefinition(fn.id)?.parameters?.find(p => p.parameter_id === param.id);
+            const paramType = definition?.type;
+            const paramDataType = paramType ? dataTypeService.getDataType(paramType) : undefined;
 
+            if (paramDataType?.type === EDataType.NODE) {
+                const groupId = `${currentId}-group-${idCounter++}`;
+                edges.push({
+                    id: `${groupId}-${currentId}-param-${param.id}`,
+                    source: groupId,
+                    target: currentId,
+                    targetHandle: `param-${param.id}`,
+                    animated: true,
+                    deletable: false,
+                    selectable: false,
+                    data: {color: FLOW_EDGE_RAINBOW[(paramLevel + 1) % FLOW_EDGE_RAINBOW.length], isParameter: true},
+                });
+                if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
+                    const subFn = new NodeFunction(val as NodeFunctionObject);
+                    traverse(subFn, groupId, paramLevel + 1);
+                }
+            } else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
+                const subFn = new NodeFunction(val as NodeFunctionObject);
+                const subId = traverse(subFn, undefined, paramLevel + 1);
                 edges.push({
                     id: `${subId}-${currentId}-param-${param.id}`,
                     source: subId,

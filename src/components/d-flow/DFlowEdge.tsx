@@ -1,6 +1,7 @@
 import {Code0Component} from "../../utils/types";
-import {BaseEdge, Edge, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
+import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 import React from "react";
+import Badge from "../badge/Badge";
 
 export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
@@ -15,7 +16,7 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
 
     const {sourceX, sourceY, targetX, targetY, id, data, ...rest} = props
 
-    const [edgePath] = getSmoothStepPath({
+    const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
         sourcePosition: data?.isParameter ? Position.Left : Position.Top,
@@ -24,6 +25,22 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
         targetPosition: data?.isParameter ? Position.Right : Position.Bottom,
     })
 
-    return <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color}}/>
+    return <>
+        <BaseEdge id={id} path={edgePath} style={{ stroke: data?.color}}/>
+        {props.label ? (
+            <EdgeLabelRenderer>
+                <div style={{
+                    position: 'absolute',
+                    transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+                    pointerEvents: 'all',
+                }}>
+                    <Badge>
+                        {props.label}
+                    </Badge>
+                </div>
+            </EdgeLabelRenderer>
+        ) : null}
+
+    </>
 
 }

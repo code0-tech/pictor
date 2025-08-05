@@ -1,5 +1,5 @@
 import {Code0ComponentProps} from "../../utils/types";
-import {ConnectionLineType, Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
+import {Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
@@ -17,12 +17,12 @@ import "./DFlow.style.scss"
  */
 const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     /* Grund-Konstanten -------------------------------------------------- */
-    const V   = 100;      // vertikal Main ↕ Main
-    const H   = 100;      // Parent → erste Param-Spalte
+    const V = 100;      // vertikal Main ↕ Main
+    const H = 100;      // Parent → erste Param-Spalte
     const PAD = 11.2;     // Innen-Padding Group-Box
 
     /* Helper-Maps ------------------------------------------------------- */
-    const byId   = new Map(nodes.map(n => [n.id, n]));
+    const byId = new Map(nodes.map(n => [n.id, n]));
 
     // React-Flow-Kinder (auf `parentId` basierend)
     const rfKids = new Map<string, Node[]>();
@@ -46,8 +46,8 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     const cache = new Map<string, Size>();
 
     const measured = (n: Node): Size => ({
-        w: n.measured?.width  || 200,
-        h: n.measured?.height || 80,
+        w: n.measured?.width && n.measured.width > 0 ? n.measured.width : 200,
+        h: n.measured?.height && n.measured.height > 0 ? n.measured.height : 80,
     });
 
     const size = (n: Node): Size => {
@@ -61,7 +61,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
         const kids = rfKids.get(n.id) ?? [];
         if (!kids.length) {
-            const s = { w: 150, h: 100 };
+            const s = {w: 0, h: 0};
             cache.set(n.id, s);
             return s;
         }
@@ -84,8 +84,8 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     const rel = new Map<string, Pos>();
 
     const layout = (n: Node, cx: number, cy: number): number => {
-        rel.set(n.id, { x: cx, y: cy });
-        const { w, h } = size(n);
+        rel.set(n.id, {x: cx, y: cy});
+        const {w, h} = size(n);
 
         /* 1️⃣  rechte Parameter-Karten (type ≠ 'group') */
         const right = (params.get(n.id) ?? [])
@@ -107,25 +107,57 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             py += ps.h + V;
         });
 
-        /* 2️⃣  Gruppen-Parameter unterhalb des Parents */
+        /* 2️⃣  Gruppen-Parameter UNTERHALB des Parents – JETZT WAAGRECHT ---------------- */
         let bottom = cy + h / 2;
         const pGroups = (params.get(n.id) ?? []).filter(p => p.type === 'group');
-        pGroups.forEach(g => {
-            const gs = size(g);
-            const gy = bottom + V + gs.h / 2;
-            layout(g, cx, gy);
-            bottom = gy + gs.h / 2;
-        });
 
-        /* 3️⃣  RF-Kinder innerhalb einer Group-Box */
-        if (n.type === 'group') {
-            let iy = cy - h / 2 + PAD;
-            (rfKids.get(n.id) ?? []).forEach(k => {
-                const ks = size(k);
-                layout(k, cx, iy + ks.h / 2);
-                iy += ks.h + V;
+        if (pGroups.length) {
+            /* ► Größen aller Gruppen vorab bestimmen */
+            const gSizes = pGroups.map(size);
+
+            /* ► Gesamtbreite der „Row“ = Summe Breiten + H-Abstände */
+            const rowW   = gSizes.reduce((s, g) => s + g.w, 0) + H * (pGroups.length - 1);
+
+            /* ► x-Cursor linksbündig starten (zentriert unter dem Parent) */
+            let gx = cx - rowW / 2;
+            const gy = bottom + V;                // gemeinsame y-Koordinate aller Groups
+            let maxGH = 0;                        // höchste Group – für bottom-Update
+
+            pGroups.forEach((g, i) => {
+                const gs = gSizes[i];
+                /* Center-Koordinate der jeweiligen Group */
+                layout(g, gx + gs.w / 2, gy + gs.h / 2);
+
+                gx     += gs.w + H;                 // x-Cursor zum nächsten Slot
+                maxGH   = Math.max(maxGH, gs.h);
             });
-            bottom = Math.max(bottom, cy + h / 2); // Box selbst
+
+            /* ► Bottom so anheben, dass die gesamte Row Platz hat */
+            bottom = gy + maxGH / 2;
+        }
+
+        /* 3️⃣  RF-Kinder innerhalb einer Group-Box --------------------------- */
+        if (n.type === 'group') {
+            const kids = (rfKids.get(n.id) ?? []).sort(
+                (a, b) => nodes.indexOf(a) - nodes.indexOf(b)
+            );
+
+            // oberer Innen­rand der Box
+            let innerY = cy - h / 2 + PAD;
+
+            kids.forEach(child => {
+                const cs = size(child);
+
+                console.log(child, cs)
+
+                // Cursor auf die Mittel­höhe des Childs schieben
+                innerY += cs.h / 2;
+                layout(child, cx, innerY);            // Child zentriert platzieren
+                // Cursor eine Zeile tiefer (zweite Hälfte + Spacing)
+                innerY += cs.h / 2 + V;
+            });
+
+            bottom = Math.max(bottom, cy + h / 2);  // Box-Rahmen als Unterkante
         } else {
             bottom = Math.max(bottom, cy + Math.max(h, rightBlockH) / 2);
         }
@@ -134,7 +166,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     };
 
     /* Root-Nodes (ohne linkingId) vertikal stapeln ---------------------- */
-    const roots = nodes.filter(n => !(n.data as any)?.linkingId);
+    const roots = nodes.filter(n => !(n.data as any)?.linkingId && !n.parentId);
     let currY = 0;
     roots.forEach(r => {
         const bottom = layout(r, 0, currY + size(r).h / 2);
@@ -147,9 +179,12 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         if (abs.has(n.id)) return abs.get(n.id)!;
         const p = rel.get(n.id)!;
         if (!n.parentId) abs.set(n.id, p);
-        else {
+        else if (n.extent === 'parent') {
+            // bereits Group-relativ – kein weiterer Shift
+            abs.set(n.id, p);
+        } else {
             const pp = toAbs(byId.get(n.parentId)!);
-            abs.set(n.id, { x: pp.x + p.x, y: pp.y + p.y });
+            abs.set(n.id, {x: pp.x + p.x, y: pp.y + p.y});
         }
         return abs.get(n.id)!;
     };
@@ -157,14 +192,14 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
     /* finale Nodes (Top-Left-Shift, Style) ------------------------------ */
     const positioned = nodes.map(n => {
-        const { w, h } = size(n);
-        const { x, y } = abs.get(n.id)!;
+        const {w, h} = size(n);
+        const {x, y} = abs.get(n.id)!;
 
         let px = x - w / 2,
             py = y - h / 2;
 
         if (n.parentId) {                       // shift innerhalb Group
-            const ps  = size(byId.get(n.parentId)!);
+            const ps = size(byId.get(n.parentId)!);
             const pTL = {
                 x: abs.get(n.parentId)!.x - ps.w / 2,
                 y: abs.get(n.parentId)!.y - ps.h / 2,
@@ -175,15 +210,17 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
         return {
             ...n,
-            position: { x: px, y: py },
+            position: {x: px, y: py},
             style: n.type === 'group'
-                ? { ...(n.style ?? {}), width: w, height: h,
-                    pointerEvents: 'none', zIndex: -1 }
+                ? {
+                    ...(n.style ?? {}), width: w, height: h,
+                    pointerEvents: 'none', zIndex: -1
+                }
                 : n.style,
         };
     });
 
-    return { nodes: positioned, edges };
+    return {nodes: positioned, edges};
 };
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps
@@ -207,7 +244,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 
         if (!calculated.current) {
             const layouted = getLayoutedElements(localNodes, props.edges!!)
-            setNodes([...layouted.nodes])
+            setNodes(layouted.nodes as Node[])
             calculated.current = true
         }
     }, [calculated, nodes, edges])

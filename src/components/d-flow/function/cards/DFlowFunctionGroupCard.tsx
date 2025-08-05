@@ -8,7 +8,7 @@ export interface DFlowFunctionGroupCardProps extends NodeProps<Node> {}
 export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = (
     {data, ...rest}
 ) => {
-    console.log(data, rest)
+    //console.log(data, rest)
     const depth = (data as any)?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
     return (

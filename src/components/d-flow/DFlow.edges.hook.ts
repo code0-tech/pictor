@@ -63,14 +63,14 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                     source: groupId,
                     target: currentId,
                     targetHandle: `param-${param.id}`,
-                    animated: true,
+                    label: "sd",
                     deletable: false,
                     selectable: false,
-                    data: {color: FLOW_EDGE_RAINBOW[(paramLevel + 1) % FLOW_EDGE_RAINBOW.length], isParameter: true},
+                    data: {color: FLOW_EDGE_RAINBOW[paramLevel % FLOW_EDGE_RAINBOW.length], isParameter: false},
                 });
                 if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
                     const subFn = new NodeFunction(val as NodeFunctionObject);
-                    traverse(subFn, groupId, paramLevel + 1);
+                    traverse(subFn, undefined, paramLevel + 1);
                 }
             } else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
                 const subFn = new NodeFunction(val as NodeFunctionObject);

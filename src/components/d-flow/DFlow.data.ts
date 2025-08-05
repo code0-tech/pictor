@@ -211,6 +211,30 @@ export const flow1: FlowObject = {
                     value: 10
                 }]
             }
+        }, {
+            definition: {
+                parameter_id: "std::math::multiply__secondValue",
+                runtime_parameter_id: "std::math::multiply__secondValue"
+            },
+            value: {
+                function: {
+                    function_id: "std::math::add",
+                    runtime_function_id: "std::math::add"
+                },
+                parameters: [{
+                    definition: {
+                        parameter_id: "std::math::add__firstValue",
+                        runtime_parameter_id: "std::math::add__firstValue"
+                    },
+                    value: 5
+                }, {
+                    definition: {
+                        parameter_id: "standard::math::add__secondValue",
+                        runtime_parameter_id: "standard::math::add__secondValue"
+                    },
+                    value: 10
+                }]
+            }
         }]
     }
 }

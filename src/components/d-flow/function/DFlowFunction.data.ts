@@ -47,5 +47,9 @@ export const functionData: FunctionDefinitionObject[] = [{
         parameter_id: "std::math::multiply__firstValue",
         runtime_parameter_id: "std::math::multiply__firstValue",
         type: "NUMBER_NODE"
+    }, {
+        parameter_id: "std::math::multiply__secondValue",
+        runtime_parameter_id: "std::math::multiply__secondValue",
+        type: "NUMBER_NODE"
     }]
 }]

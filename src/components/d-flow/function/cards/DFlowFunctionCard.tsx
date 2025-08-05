@@ -35,15 +35,13 @@ export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponent
 export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
     const {data, id} = props;
     const functionData = data as NodeFunctionObject & { isParameter: boolean };
-
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
     const functionService = useService(DFlowFunctionReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
-    console.log(validation)
-    validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
+    //validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
     // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 

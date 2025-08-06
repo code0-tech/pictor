@@ -16,211 +16,213 @@ import "./DFlow.style.scss"
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
 const getLayoutedElements = (nodes: Node[], edges: any[]) => {
-    /* Grund-Konstanten -------------------------------------------------- */
-    const V = 100;      // vertikal Main ↕ Main
-    const H = 100;      // Parent → erste Param-Spalte
-    const PAD = 11.2;     // Innen-Padding Group-Box
+    /* Konstanten */
+    const V   = 100;          // vertical gap Node ↕ Node
+    const H   = 100;          // horizontal gap Parent → Param
+    const PAD = 11.2;         // inner padding of a group
 
-    /* Helper-Maps ------------------------------------------------------- */
-    const byId = new Map(nodes.map(n => [n.id, n]));
-
-    // React-Flow-Kinder (auf `parentId` basierend)
+    /* Helper-Maps */
+    const byId   = new Map(nodes.map(n => [n.id, n]));
     const rfKids = new Map<string, Node[]>();
-    // fachliche Parameter (rechte Spalte / Gruppen-Parameter)
     const params = new Map<string, Node[]>();
 
     nodes.forEach(n => {
-        if (n.parentId) {
-            (rfKids.get(n.parentId) ??
-                (rfKids.set(n.parentId, []), rfKids.get(n.parentId)!)).push(n);
-        }
         const link = (n.data as any)?.linkingId;
-        if (link) {
-            (params.get(link) ??
-                (params.set(link, []), params.get(link)!)).push(n);
-        }
+        if (link)
+            (params.get(link) ?? (params.set(link, []), params.get(link)!)).push(n);
+        if (n.parentId && !link)
+            (rfKids.get(n.parentId) ?? (rfKids.set(n.parentId, []), rfKids.get(n.parentId)!)).push(n);
     });
 
-    /* Größe jeder Node (inkl. Group-Boxes) ------------------------------ */
+    /* ---------- Größen ---------- */
     type Size = { w: number; h: number };
     const cache = new Map<string, Size>();
 
     const measured = (n: Node): Size => ({
-        w: n.measured?.width && n.measured.width > 0 ? n.measured.width : 200,
-        h: n.measured?.height && n.measured.height > 0 ? n.measured.height : 80,
+        w: n.measured?.width  && n.measured.width  > 0 ? n.measured.width  : 200,
+        h: n.measured?.height && n.measured.height > 0 ? n.measured.height :  80,
     });
 
     const size = (n: Node): Size => {
         if (cache.has(n.id)) return cache.get(n.id)!;
+        if (n.type !== 'group') { const s = measured(n); cache.set(n.id, s); return s; }
 
-        if (n.type !== 'group') {
-            const s = measured(n);
-            cache.set(n.id, s);
-            return s;
-        }
+        const kids   = rfKids.get(n.id) ?? [];
+        const kSizes = kids.map(size);
+        const stackH = kSizes.reduce((s,k)=>s+k.h,0) + V*Math.max(0,kids.length-1);
 
-        const kids = rfKids.get(n.id) ?? [];
-        if (!kids.length) {
-            const s = {w: 0, h: 0};
-            cache.set(n.id, s);
-            return s;
-        }
-
-        const kSz = kids.map(size);
-        const stackedH = kSz.reduce((sum, k) => sum + k.h, 0) +
-            V * (kids.length - 1);
-
-        const s = {
-            w: Math.max(...kSz.map(k => k.w)) + 2 * PAD,
-            h: stackedH + 2 * PAD,
-        };
-        cache.set(n.id, s);
-        return s;
+        const g = { w: Math.max(...kSizes.map(k=>k.w),0) + 2*PAD,
+            h: stackH + 2*PAD };
+        cache.set(n.id, g); return g;
     };
     nodes.forEach(size);
 
-    /* Relatives Layout (Center-Koordinaten) ----------------------------- */
-    type Pos = { x: number; y: number };
+    /* ---------- relatives Layout ---------- */
+    type Pos = { x:number; y:number };
     const rel = new Map<string, Pos>();
 
-    const layout = (n: Node, cx: number, cy: number): number => {
-        rel.set(n.id, {x: cx, y: cy});
-        const {w, h} = size(n);
+    const layout = (n:Node, cx:number, cy:number): number => {
+        rel.set(n.id,{x:cx,y:cy});
+        const { w,h } = size(n);
 
-        /* 1️⃣  rechte Parameter-Karten (type ≠ 'group') */
+        /* 1️⃣  »einfache« Parameter rechts */
         const right = (params.get(n.id) ?? [])
-            .filter(p => p.type !== 'group')
-            .sort((a, b) =>
-                Number((a.data as any)?.paramIndex ?? 0) -
-                Number((b.data as any)?.paramIndex ?? 0)
-            );
+            .filter(p=>p.type!=='group')
+            .sort((a,b)=>(+(a.data as any)?.paramIndex)-(+(b.data as any)?.paramIndex));
 
-        const rightBlockH =
-            right.map(size).reduce((s, z) => s + z.h, 0) +
-            Math.max(0, right.length - 1) * V;
-
-        let py = cy - rightBlockH / 2;
-        right.forEach(p => {
+        const rightH = right.reduce((s,p)=>s+size(p).h,0)+V*Math.max(0,right.length-1);
+        let py = cy - rightH/2;
+        right.forEach(p=>{
             const ps = size(p);
-            const px = cx + w / 2 + H + ps.w / 2;
-            layout(p, px, py + ps.h / 2);
+            layout(p, cx + w/2 + H + ps.w/2, py + ps.h/2);
             py += ps.h + V;
         });
 
-        /* 2️⃣  Gruppen-Parameter UNTERHALB des Parents – JETZT WAAGRECHT ---------------- */
-        let bottom = cy + h / 2;
-        const pGroups = (params.get(n.id) ?? []).filter(p => p.type === 'group');
+        /* 2️⃣  Gruppen-Parameter (eine Row) */
+        let bottom = cy + h/2;
+        const gParams = (params.get(n.id) ?? []).filter(p=>p.type==='group');
+        if (gParams.length){
+            const gSizes = gParams.map(size);
+            const rowW   = gSizes.reduce((s,g)=>s+g.w,0)+H*(gParams.length-1);
 
-        if (pGroups.length) {
-            /* ► Größen aller Gruppen vorab bestimmen */
-            const gSizes = pGroups.map(size);
-
-            /* ► Gesamtbreite der „Row“ = Summe Breiten + H-Abstände */
-            const rowW   = gSizes.reduce((s, g) => s + g.w, 0) + H * (pGroups.length - 1);
-
-            /* ► x-Cursor linksbündig starten (zentriert unter dem Parent) */
-            let gx = cx - rowW / 2;
-            const gy = bottom + V;                // gemeinsame y-Koordinate aller Groups
-            let maxGH = 0;                        // höchste Group – für bottom-Update
-
-            pGroups.forEach((g, i) => {
+            let gx = cx - rowW/2, gy = bottom + V, maxH = 0;
+            gParams.forEach((g,i)=>{
                 const gs = gSizes[i];
-                /* Center-Koordinate der jeweiligen Group */
-                layout(g, gx + gs.w / 2, gy + gs.h / 2);
-
-                gx     += gs.w + H;                 // x-Cursor zum nächsten Slot
-                maxGH   = Math.max(maxGH, gs.h);
+                layout(g, gx + gs.w/2, gy + gs.h/2);
+                gx += gs.w + H; maxH = Math.max(maxH, gs.h);
             });
-
-            /* ► Bottom so anheben, dass die gesamte Row Platz hat */
-            bottom = gy + maxGH / 2;
+            bottom = gy + maxH/2;
         }
 
-        /* 3️⃣  RF-Kinder innerhalb einer Group-Box --------------------------- */
-        if (n.type === 'group') {
-            const kids = (rfKids.get(n.id) ?? []).sort(
-                (a, b) => nodes.indexOf(a) - nodes.indexOf(b)
-            );
-
-            // oberer Innen­rand der Box
-            let innerY = cy - h / 2 + PAD;
-
-            kids.forEach(child => {
-                const cs = size(child);
-
-                console.log(child, cs)
-
-                // Cursor auf die Mittel­höhe des Childs schieben
-                innerY += cs.h / 2;
-                layout(child, cx, innerY);            // Child zentriert platzieren
-                // Cursor eine Zeile tiefer (zweite Hälfte + Spacing)
-                innerY += cs.h / 2 + V;
+        /* 3️⃣  React-Flow-Kinder in Group-Box */
+        if (n.type==='group'){
+            const kids = (rfKids.get(n.id) ?? []).filter(k=>!(k.data as any)?.linkingId);
+            let curY = cy - h/2 + PAD;
+            kids.forEach(k=>{
+                curY = layout(k, cx, curY + size(k).h/2) + V;
             });
-
-            bottom = Math.max(bottom, cy + h / 2);  // Box-Rahmen als Unterkante
+            bottom = Math.max(bottom, curY - V + PAD);
         } else {
-            bottom = Math.max(bottom, cy + Math.max(h, rightBlockH) / 2);
+            bottom = Math.max(bottom, cy + Math.max(h,rightH)/2);
         }
-
         return bottom;
     };
 
-    /* Root-Nodes (ohne linkingId) vertikal stapeln ---------------------- */
-    const roots = nodes.filter(n => !(n.data as any)?.linkingId && !n.parentId);
-    let currY = 0;
-    roots.forEach(r => {
-        const bottom = layout(r, 0, currY + size(r).h / 2);
-        currY = bottom + V;
-    });
+    /* Root-Nodes untereinander stapeln */
+    let yCursor = 0;
+    nodes
+        .filter(n=>!(n.data as any)?.linkingId && !n.parentId)
+        .forEach(r=> yCursor = layout(r, 0, yCursor + size(r).h/2) + V);
 
-    /* Rel → absolute Canvas-Koordinaten -------------------------------- */
+    /* ---------- rel → abs ---------- */
     const abs = new Map<string, Pos>();
-    const toAbs = (n: Node): Pos => {
+    const toAbs = (n:Node):Pos=>{
         if (abs.has(n.id)) return abs.get(n.id)!;
         const p = rel.get(n.id)!;
-        if (!n.parentId) abs.set(n.id, p);
-        else if (n.extent === 'parent') {
-            // bereits Group-relativ – kein weiterer Shift
-            abs.set(n.id, p);
-        } else {
-            const pp = toAbs(byId.get(n.parentId)!);
-            abs.set(n.id, {x: pp.x + p.x, y: pp.y + p.y});
-        }
-        return abs.get(n.id)!;
+        if (!n.parentId || n.extent==='parent'){ abs.set(n.id,p); return p; }
+        const pp = toAbs(byId.get(n.parentId)!);
+        const a  = { x: pp.x + p.x, y: pp.y + p.y };
+        abs.set(n.id,a); return a;
     };
     nodes.forEach(toAbs);
 
-    /* finale Nodes (Top-Left-Shift, Style) ------------------------------ */
-    const positioned = nodes.map(n => {
-        const {w, h} = size(n);
-        const {x, y} = abs.get(n.id)!;
+    const positioned = nodes.map(n=>{
+        const { w,h } = size(n);
+        const { x,y } = abs.get(n.id)!;
 
-        let px = x - w / 2,
-            py = y - h / 2;
-
-        if (n.parentId) {                       // shift innerhalb Group
-            const ps = size(byId.get(n.parentId)!);
-            const pTL = {
-                x: abs.get(n.parentId)!.x - ps.w / 2,
-                y: abs.get(n.parentId)!.y - ps.h / 2,
-            };
-            px -= pTL.x;
-            py -= pTL.y;
+        let px = x-w/2, py = y-h/2;
+        if (n.parentId){
+            const ps  = size(byId.get(n.parentId)!);
+            const pTL = { x: abs.get(n.parentId)!.x - ps.w/2,
+                y: abs.get(n.parentId)!.y - ps.h/2 };
+            px -= pTL.x; py -= pTL.y;
         }
-
+        const baseStyle = n.style ?? {};
         return {
             ...n,
-            position: {x: px, y: py},
-            style: n.type === 'group'
-                ? {
-                    ...(n.style ?? {}), width: w, height: h,
-                    pointerEvents: 'none', zIndex: -1
-                }
-                : n.style,
-        };
+            position:{x:px,y:py},
+            style: n.type==='group'
+                ? { ...baseStyle, pointerEvents:'none', zIndex:-1 }
+                : baseStyle,
+        } as Node;
     });
 
-    return {nodes: positioned, edges};
+    const posById = new Map(positioned.map(n=>[n.id,n]));
+
+    /* ---------- Bounding-Korrektur jeder Group ---------- */
+    const depth = (g:Node)=>{
+        let d = 0, p = g;
+        while (p.parentId){ d++; p = posById.get(p.parentId)!; }
+        return d;
+    };
+
+    positioned
+        .filter(n=>n.type==='group')
+        .sort((a,b)=>depth(b)-depth(a))          // innerste zuerst
+        .forEach(g=>{
+            /* alle Nachkommen dieser Group */
+            const kids = positioned.filter(k=>{
+                for (let p=k; p.parentId; ){ p = posById.get(p.parentId)!;
+                    if (p.id===g.id) return true;
+                }
+                return false;
+            });
+            if (!kids.length) return;
+
+            let minX=Number.POSITIVE_INFINITY,
+                minY=Number.POSITIVE_INFINITY,
+                maxX=0,maxY=0;
+
+            kids.forEach(k=>{
+                const kw = typeof k.style?.width  === 'number' ? k.style.width  : size(k).w;
+                const kh = typeof k.style?.height === 'number' ? k.style.height : size(k).h;
+                minX = Math.min(minX, k.position.x);
+                minY = Math.min(minY, k.position.y);
+                maxX = Math.max(maxX, k.position.x + kw);
+                maxY = Math.max(maxY, k.position.y + kh);
+            });
+
+            const dx = minX - PAD;
+            const dy = minY - PAD;
+
+            if (dx || dy){
+                kids.forEach(k=>{
+                    k.position.x -= dx;
+                    k.position.y -= dy;
+                });
+            }
+
+            g.style = {
+                ...(g.style as React.CSSProperties),
+                width : (maxX - dx) + PAD,
+                height: (maxY - dy) + PAD,
+            };
+        });
+
+    /* ---------- Row-Nachkorrektur ---------- */
+    positioned.forEach(parent=>{
+        const pGroups = (params.get(parent.id) ?? []).filter(p=>p.type==='group');
+        if (!pGroups.length) return;
+
+        const ordered = pGroups.slice().sort((a,b)=>
+            (+(a.data as any)?.paramIndex||0)-(+(b.data as any)?.paramIndex||0));
+
+        const widths = ordered.map(g=>{
+            const gn = posById.get(g.id)!;
+            return typeof gn.style?.width === 'number' ? gn.style.width : size(gn).w;
+        });
+        const rowW = widths.reduce((s,w)=>s+w,0) + H*(ordered.length-1);
+
+        const parentCenter = abs.get(parent.id)!.x + size(parent).w/2;
+        let gx = parentCenter - rowW/2;
+
+        ordered.forEach((g,i)=>{
+            posById.get(g.id)!.position.x = gx;
+            gx += widths[i] + H;
+        });
+    });
+
+    return { nodes: positioned, edges };
 };
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps

@@ -21,7 +21,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     const H   = 100;          // horizontal gap Parent → Param
     const PAD = 11.2;         // inner padding of a group
 
-    /* Helper-Maps */
+    /* Helper-Maps ---------------------------------------------------------- */
     const byId   = new Map(nodes.map(n => [n.id, n]));
     const rfKids = new Map<string, Node[]>();
     const params = new Map<string, Node[]>();
@@ -34,7 +34,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             (rfKids.get(n.parentId) ?? (rfKids.set(n.parentId, []), rfKids.get(n.parentId)!)).push(n);
     });
 
-    /* ---------- Größen ---------- */
+    /* ---------- Größen ---------------------------------------------------- */
     type Size = { w: number; h: number };
     const cache = new Map<string, Size>();
 
@@ -57,7 +57,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     };
     nodes.forEach(size);
 
-    /* ---------- relatives Layout ---------- */
+    /* ---------- relatives Layout ------------------------------------------ */
     type Pos = { x:number; y:number };
     const rel = new Map<string, Pos>();
 
@@ -114,7 +114,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         .filter(n=>!(n.data as any)?.linkingId && !n.parentId)
         .forEach(r=> yCursor = layout(r, 0, yCursor + size(r).h/2) + V);
 
-    /* ---------- rel → abs ---------- */
+    /* ---------- rel → abs -------------------------------------------------- */
     const abs = new Map<string, Pos>();
     const toAbs = (n:Node):Pos=>{
         if (abs.has(n.id)) return abs.get(n.id)!;
@@ -149,7 +149,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
     const posById = new Map(positioned.map(n=>[n.id,n]));
 
-    /* ---------- Bounding-Korrektur jeder Group ---------- */
+    /* ---------- Bounding-Korrektur jeder Group ---------------------------- */
     const depth = (g:Node)=>{
         let d = 0, p = g;
         while (p.parentId){ d++; p = posById.get(p.parentId)!; }
@@ -199,13 +199,14 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             };
         });
 
-    /* ---------- Row-Nachkorrektur ---------- */
+    /* ---------- Row-Nachkorrektur (Param-Groups) -------------------------- */
     positioned.forEach(parent=>{
         const pGroups = (params.get(parent.id) ?? []).filter(p=>p.type==='group');
         if (!pGroups.length) return;
 
         const ordered = pGroups.slice().sort((a,b)=>
-            (+(a.data as any)?.paramIndex||0)-(+(b.data as any)?.paramIndex||0));
+            (+((a.data as any)?.paramIndex) || 0) -
+            (+((b.data as any)?.paramIndex) || 0));
 
         const widths = ordered.map(g=>{
             const gn = posById.get(g.id)!;
@@ -213,9 +214,14 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         });
         const rowW = widths.reduce((s,w)=>s+w,0) + H*(ordered.length-1);
 
-        const parentCenter = abs.get(parent.id)!.x + size(parent).w/2;
-        let gx = parentCenter - rowW/2;
+        /* ------------------------------------------------------------------
+           **Fix**: abs.get(parent.id) enthält bereits die X-Koordinate
+           des Parent-Mittelpunkts – das zusätzliche + size(parent).w/2
+           hatte die Row um eine halbe Parent-Breite verschoben.
+        ------------------------------------------------------------------ */
+        const parentCenter = abs.get(parent.id)!.x;   // ← Korrektur
 
+        let gx = parentCenter - rowW/2;
         ordered.forEach((g,i)=>{
             posById.get(g.id)!.position.x = gx;
             gx += widths[i] + H;

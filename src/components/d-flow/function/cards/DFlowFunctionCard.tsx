@@ -25,6 +25,7 @@ import {DFlowFunctionReactiveService} from "../DFlowFunction.service";
 import {useFunctionValidation} from "../DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {InspectionSeverity} from "../../../../utils/inspection";
+import {EDataType} from "../../data-type/DFlowDataType.view";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
@@ -40,6 +41,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
     const functionService = useService(DFlowFunctionReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
     const edges = useStore(s => s.edges);
@@ -135,21 +137,27 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
 
 
             {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-            {functionData.parameters?.map((param: NodeParameterObject, index: number) => (
-                <Flex pos={"relative"}>
+            {functionData.parameters?.map((param: NodeParameterObject, index: number) => {
+
+
+                const parameter = definition?.parameters!!.find(p => p.parameter_id == param.definition.parameter_id)
+                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+
+
+                return <Flex pos={"relative"}>
                     {param.definition.parameter_id}
                     <Handle
                         key={param.definition.parameter_id}
                         type="target"
                         position={Position.Right}
-                        style={{position: "absolute", transform: "translate(50%, -50%)", top: "50%", right: "0"}}
+                        style={{position: "absolute", transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)", top: "50%", right: isNodeDataType ? "50%" : "0"}}
                         id={`param-${param.definition.parameter_id}`}
                         isConnectable={false}
                         hidden={!isParamConnected(param.definition.parameter_id)}
                         className={"function-card__handle function-card__handle--target"}
                     />
                 </Flex>
-            ))}
+            })}
 
             {/* Ausgang */}
             <Handle

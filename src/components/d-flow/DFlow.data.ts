@@ -40,8 +40,8 @@ export const flow: FlowObject = {
                     value: 5
                 }, {
                     definition: {
-                        parameter_id: "standard::math::add__secondValue",
-                        runtime_parameter_id: "standard::math::add__secondValue"
+                        parameter_id: "std::math::add__secondValue",
+                        runtime_parameter_id: "std::math::add__secondValue"
                     },
                     value: {
                         function: {
@@ -66,16 +66,16 @@ export const flow: FlowObject = {
                                     value: 5
                                 }, {
                                     definition: {
-                                        parameter_id: "standard::math::add__secondValue",
-                                        runtime_parameter_id: "standard::math::add__secondValue"
+                                        parameter_id: "std::math::add__secondValue",
+                                        runtime_parameter_id: "std::math::add__secondValue"
                                     },
                                     value: 10
                                 }]
                             }
                         }, {
                             definition: {
-                                parameter_id: "standard::math::add__secondValue",
-                                runtime_parameter_id: "standard::math::add__secondValue"
+                                parameter_id: "std::math::add__secondValue",
+                                runtime_parameter_id: "std::math::add__secondValue"
                             },
                             value: 10
                         }]
@@ -84,8 +84,8 @@ export const flow: FlowObject = {
             }
         }, {
             definition: {
-                parameter_id: "standard::math::add__secondValue",
-                runtime_parameter_id: "standard::math::add__secondValue"
+                parameter_id: "std::math::add__secondValue",
+                runtime_parameter_id: "std::math::add__secondValue"
             },
             value: {
                 function: {
@@ -100,8 +100,8 @@ export const flow: FlowObject = {
                     value: 5
                 }, {
                     definition: {
-                        parameter_id: "standard::math::add__secondValue",
-                        runtime_parameter_id: "standard::math::add__secondValue"
+                        parameter_id: "std::math::add__secondValue",
+                        runtime_parameter_id: "std::math::add__secondValue"
                     },
                     value: 10
                 }]
@@ -130,16 +130,16 @@ export const flow: FlowObject = {
                         value: 5
                     }, {
                         definition: {
-                            parameter_id: "standard::math::add__secondValue",
-                            runtime_parameter_id: "standard::math::add__secondValue"
+                            parameter_id: "std::math::add__secondValue",
+                            runtime_parameter_id: "std::math::add__secondValue"
                         },
                         value: 10
                     }]
                 }
             }, {
                 definition: {
-                    parameter_id: "standard::math::add__secondValue",
-                    runtime_parameter_id: "standard::math::add__secondValue"
+                    parameter_id: "std::math::add__secondValue",
+                    runtime_parameter_id: "std::math::add__secondValue"
                 },
                 value: 10
             }],
@@ -156,8 +156,8 @@ export const flow: FlowObject = {
                     value: 5
                 }, {
                     definition: {
-                        parameter_id: "standard::math::add__secondValue",
-                        runtime_parameter_id: "standard::math::add__secondValue"
+                        parameter_id: "std::math::add__secondValue",
+                        runtime_parameter_id: "std::math::add__secondValue"
                     },
                     value: 10
                 }]
@@ -203,14 +203,142 @@ export const flow1: FlowObject = {
                         parameter_id: "std::math::add__firstValue",
                         runtime_parameter_id: "std::math::add__firstValue"
                     },
-                    value: 5
+                    value: {
+                        function: {
+                            function_id: "std::math::add",
+                            runtime_function_id: "std::math::add"
+                        },
+                        parameters: [{
+                            definition: {
+                                parameter_id: "std::math::add__firstValue",
+                                runtime_parameter_id: "std::math::add__firstValue"
+                            },
+                            value: 5
+                        }, {
+                            definition: {
+                                parameter_id: "std::math::add__secondValue",
+                                runtime_parameter_id: "std::math::add__secondValue"
+                            },
+                            value: {
+                                function: {
+                                    function_id: "std::math::add",
+                                    runtime_function_id: "std::math::add"
+                                },
+                                parameters: [{
+                                    definition: {
+                                        parameter_id: "std::math::add__firstValue",
+                                        runtime_parameter_id: "std::math::add__firstValue"
+                                    },
+                                    value: {
+                                        function: {
+                                            function_id: "std::math::add",
+                                            runtime_function_id: "std::math::add"
+                                        },
+                                        parameters: [{
+                                            definition: {
+                                                parameter_id: "std::math::add__firstValue",
+                                                runtime_parameter_id: "std::math::add__firstValue"
+                                            },
+                                            value: 5
+                                        }, {
+                                            definition: {
+                                                parameter_id: "std::math::add__secondValue",
+                                                runtime_parameter_id: "std::math::add__secondValue"
+                                            },
+                                            value: 10
+                                        }]
+                                    }
+                                }, {
+                                    definition: {
+                                        parameter_id: "std::math::add__secondValue",
+                                        runtime_parameter_id: "std::math::add__secondValue"
+                                    },
+                                    value: 10
+                                }]
+                            }
+                        }]
+                    }
                 }, {
                     definition: {
-                        parameter_id: "standard::math::add__secondValue",
-                        runtime_parameter_id: "standard::math::add__secondValue"
+                        parameter_id: "std::math::add__secondValue",
+                        runtime_parameter_id: "std::math::add__secondValue"
                     },
-                    value: 10
-                }]
+                    value: {
+                        function: {
+                            function_id: "std::math::add",
+                            runtime_function_id: "std::math::add"
+                        },
+                        parameters: [{
+                            definition: {
+                                parameter_id: "std::math::add__firstValue",
+                                runtime_parameter_id: "std::math::add__firstValue"
+                            },
+                            value: 5
+                        }, {
+                            definition: {
+                                parameter_id: "std::math::add__secondValue",
+                                runtime_parameter_id: "std::math::add__secondValue"
+                            },
+                            value: 10
+                        }]
+                    }
+                }],
+                next_node: {
+                    function: {
+                        function_id: "std::math::add",
+                        runtime_function_id: "std::math::add"
+                    },
+                    parameters: [{
+                        definition: {
+                            parameter_id: "std::math::add__firstValue",
+                            runtime_parameter_id: "std::math::add__firstValue"
+                        },
+                        value: {
+                            function: {
+                                function_id: "std::math::add",
+                                runtime_function_id: "std::math::add"
+                            },
+                            parameters: [{
+                                definition: {
+                                    parameter_id: "std::math::add__firstValue",
+                                    runtime_parameter_id: "std::math::add__firstValue"
+                                },
+                                value: 5
+                            }, {
+                                definition: {
+                                    parameter_id: "std::math::add__secondValue",
+                                    runtime_parameter_id: "std::math::add__secondValue"
+                                },
+                                value: 10
+                            }]
+                        }
+                    }, {
+                        definition: {
+                            parameter_id: "std::math::add__secondValue",
+                            runtime_parameter_id: "std::math::add__secondValue"
+                        },
+                        value: 10
+                    }],
+                    next_node: {
+                        function: {
+                            function_id: "std::math::add",
+                            runtime_function_id: "std::math::add"
+                        },
+                        parameters: [{
+                            definition: {
+                                parameter_id: "std::math::add__firstValue",
+                                runtime_parameter_id: "std::math::add__firstValue"
+                            },
+                            value: 5
+                        }, {
+                            definition: {
+                                parameter_id: "std::math::add__secondValue",
+                                runtime_parameter_id: "std::math::add__secondValue"
+                            },
+                            value: 10
+                        }]
+                    }
+                }
             }
         }, {
             definition: {
@@ -230,12 +358,50 @@ export const flow1: FlowObject = {
                     value: 5
                 }, {
                     definition: {
-                        parameter_id: "standard::math::add__secondValue",
-                        runtime_parameter_id: "standard::math::add__secondValue"
+                        parameter_id: "std::math::add__secondValue",
+                        runtime_parameter_id: "std::math::add__secondValue"
                     },
                     value: 10
-                }]
+                }],
+                next_node: {
+                    function: {
+                        function_id: "std::math::add",
+                        runtime_function_id: "std::math::add"
+                    },
+                    parameters: [{
+                        definition: {
+                            parameter_id: "std::math::add__firstValue",
+                            runtime_parameter_id: "std::math::add__firstValue"
+                        },
+                        value: 5
+                    }, {
+                        definition: {
+                            parameter_id: "std::math::add__secondValue",
+                            runtime_parameter_id: "std::math::add__secondValue"
+                        },
+                        value: 10
+                    }]
+                }
             }
-        }]
+        }],
+        next_node: {
+            function: {
+                function_id: "std::math::add",
+                runtime_function_id: "std::math::add"
+            },
+            parameters: [{
+                definition: {
+                    parameter_id: "std::math::add__firstValue",
+                    runtime_parameter_id: "std::math::add__firstValue"
+                },
+                value: 5
+            }, {
+                definition: {
+                    parameter_id: "std::math::add__secondValue",
+                    runtime_parameter_id: "std::math::add__secondValue"
+                },
+                value: 10
+            }]
+        }
     }
 }

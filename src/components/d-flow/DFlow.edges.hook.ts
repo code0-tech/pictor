@@ -63,7 +63,6 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                     source: groupId,
                     target: currentId,
                     targetHandle: `param-${param.id}`,
-                    label: "sd",
                     deletable: false,
                     selectable: false,
                     data: {color: FLOW_EDGE_RAINBOW[paramLevel % FLOW_EDGE_RAINBOW.length], isParameter: false},

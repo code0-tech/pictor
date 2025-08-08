@@ -1,7 +1,7 @@
 import {useService} from "../../utils/contextStore";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
-import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeFunctionParameter} from "./DFlow.view";
+import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "./DFlow.view";
 import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import {EDataType} from "./data-type/DFlowDataType.view";
@@ -22,80 +22,133 @@ export const useFlowEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);
-    const flow = flowService.getById(flowId);
 
+    const flow = flowService.getById(flowId);
     if (!flow) return [];
 
+    /* ------------------------------------------------------------------ */
     const edges: Edge[] = [];
-    let idCounter = 0;
 
-    /**
-     * Traverses the NodeFunction tree recursively,
-     * assigns color by current parameter depth (level)
-     * and adds edges for both vertical (nextNode) and horizontal (parameter) connections.
-     */
-    const traverse = (fn: NodeFunction, parentId?: string, paramLevel: number = 0): string => {
-        const currentId = `${fn.runtime_id}-${idCounter++}`;
+    /** merkt sich für jede Function-Card die Gruppen-IDs,
+     *  **für die wirklich ein Funktions-Wert existiert**      */
+    const groupsWithValue = new Map<string, string[]>();
 
-        // --- Vertikale Verbindung (z.B. nextNode)
-        if (parentId) {
-            edges.push({
-                id: `${parentId}-${currentId}`,
-                source: parentId,
-                target: currentId,
-                // Vertical edges always use the rainbow index for "main" level
-                data: {color: FLOW_EDGE_RAINBOW[paramLevel % FLOW_EDGE_RAINBOW.length]},
-            });
-        }
+    let idCounter = 0;              // globale, fortlaufende Id-Vergabe
 
-        // --- Parameter-Verbindungen (horizontal)
-        fn.parameters?.forEach((param: NodeFunctionParameter) => {
-            const val = param.value;
-            const definition = functionService
-                .getFunctionDefinition(fn.id)?.parameters?.find(p => p.parameter_id === param.id);
-            const paramType = definition?.type;
-            const paramDataType = paramType ? dataTypeService.getDataType(paramType) : undefined;
+    /* ------------------------------------------------------------------ */
+    const traverse = (
+        fn: NodeFunction,
+        parentFnId?: string,        // Id der *Function-Card* des Aufrufers
+        level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array
+    ): string => {
 
-            if (paramDataType?.type === EDataType.NODE) {
-                const groupId = `${currentId}-group-${idCounter++}`;
-                edges.push({
-                    id: `${groupId}-${currentId}-param-${param.id}`,
-                    source: groupId,
-                    target: currentId,
-                    targetHandle: `param-${param.id}`,
+        /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
+        const fnId = `${fn.runtime_id}-${idCounter++}`;
+
+        /* ------- vertikale Kante (nextNode) -------------------------- */
+        if (parentFnId) {
+            const startGroups = groupsWithValue.get(parentFnId) ?? [];
+
+            if (startGroups.length) {
+                startGroups.forEach((gId, idx) => edges.push({
+                    id: `${gId}-${fnId}-next-${idx}`,
+                    source: gId,           // Handle-Bottom der Group-Card
+                    target: fnId,          // Handle-Top der Function-Card
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        isParameter: false
+                    },
                     deletable: false,
                     selectable: false,
-                    data: {color: FLOW_EDGE_RAINBOW[paramLevel % FLOW_EDGE_RAINBOW.length], isParameter: false},
-                });
-                if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
-                    const subFn = new NodeFunction(val as NodeFunctionObject);
-                    traverse(subFn, undefined, paramLevel + 1);
-                }
-            } else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
-                const subFn = new NodeFunction(val as NodeFunctionObject);
-                const subId = traverse(subFn, undefined, paramLevel + 1);
+                }));
+            } else {
                 edges.push({
-                    id: `${subId}-${currentId}-param-${param.id}`,
-                    source: subId,
-                    target: currentId,
+                    id: `${parentFnId}-${fnId}-next`,
+                    source: parentFnId,    // Handle-Bottom der Function-Card
+                    target: fnId,          // Handle-Top der Function-Card
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        isParameter: false
+                    },
+                    deletable: false,
+                    selectable: false,
+                });
+            }
+        }
+
+        /* ------- horizontale Kanten für Parameter -------------------- */
+        fn.parameters?.forEach((param) => {
+            const val = param.value;
+            const def = functionService
+                .getFunctionDefinition(fn.id)
+                ?.parameters?.find(p => p.parameter_id === param.id);
+            const paramType = def?.type;
+            const paramDT = paramType ? dataTypeService.getDataType(paramType) : undefined;
+
+            /* --- NODE-Parameter → Group-Card ------------------------- */
+            if (paramDT?.type === EDataType.NODE) {
+                const groupId = `${fnId}-group-${idCounter++}`;
+
+                /* Verbindung Gruppe  → Function-Card (horizontal)       */
+                edges.push({
+                    id:         `${fnId}-${groupId}-param-${param.id}`,
+                    source:     fnId,        // FunctionCard (Quelle)
+                    target:     groupId,     // GroupCard (Ziel – hat Top: target)
+                    deletable:  false,
+                    selectable: false,
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        isParameter: false,
+                    },
+                });
+
+                /* existiert ein Funktions-Wert für dieses Param-Feld?   */
+                if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
+                    /* merken: diese Group-Card besitzt Content – das ist
+                       später Startpunkt der next-Kante                   */
+                    (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
+                        groupsWithValue.get(fnId)!))
+                        .push(groupId);
+
+                    /* rekursiv Funktions-Ast innerhalb der Gruppe       */
+                    traverse(new NodeFunction(val as NodeFunctionObject),
+                        undefined,
+                        level + 1);
+                }
+            }
+
+            /* --- anderer Parameter, der selbst eine Function hält ---- */
+            else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
+                const subFnId = traverse(
+                    new NodeFunction(val as NodeFunctionObject),
+                    undefined,
+                    level + 1);
+
+                edges.push({
+                    id: `${subFnId}-${fnId}-param-${param.id}`,
+                    source: subFnId,
+                    target: fnId,
                     targetHandle: `param-${param.id}`,
                     animated: true,
                     deletable: false,
                     selectable: false,
-                    data: {color: FLOW_EDGE_RAINBOW[(paramLevel + 1) % FLOW_EDGE_RAINBOW.length], isParameter: true},
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[(level + 1) % FLOW_EDGE_RAINBOW.length],
+                        isParameter: true
+                    },
                 });
             }
         });
 
-        // --- Nächster Funktions-Node (vertikal)
+        /* ------- Rekursion auf nextNode ------------------------------ */
         if (fn.nextNode) {
-            traverse(fn.nextNode, currentId, paramLevel); // Vertikal: gleiche Ebene behalten
+            traverse(fn.nextNode, fnId, level);   // gleiche Ebenentiefe
         }
 
-        return currentId;
+        return fnId;
     };
 
+    /* ------------------------------------------------------------------ */
     traverse(flow.startingNode);
-
     return edges;
 };

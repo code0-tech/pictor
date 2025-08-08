@@ -17,12 +17,12 @@ import "./DFlow.style.scss"
  */
 const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     /* Konstanten */
-    const V   = 100;          // vertical gap Node ↕ Node
-    const H   = 100;          // horizontal gap Parent → Param
+    const V = 100;          // vertical gap Node ↕ Node
+    const H = 100;          // horizontal gap Parent → Param
     const PAD = 11.2;         // inner padding of a group
 
     /* Helper-Maps ---------------------------------------------------------- */
-    const byId   = new Map(nodes.map(n => [n.id, n]));
+    const byId = new Map(nodes.map(n => [n.id, n]));
     const rfKids = new Map<string, Node[]>();
     const params = new Map<string, Node[]>();
 
@@ -39,71 +39,79 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     const cache = new Map<string, Size>();
 
     const measured = (n: Node): Size => ({
-        w: n.measured?.width  && n.measured.width  > 0 ? n.measured.width  : 200,
-        h: n.measured?.height && n.measured.height > 0 ? n.measured.height :  80,
+        w: n.measured?.width && n.measured.width > 0 ? n.measured.width : 200,
+        h: n.measured?.height && n.measured.height > 0 ? n.measured.height : 80,
     });
 
     const size = (n: Node): Size => {
         if (cache.has(n.id)) return cache.get(n.id)!;
-        if (n.type !== 'group') { const s = measured(n); cache.set(n.id, s); return s; }
+        if (n.type !== 'group') {
+            const s = measured(n);
+            cache.set(n.id, s);
+            return s;
+        }
 
-        const kids   = rfKids.get(n.id) ?? [];
+        const kids = rfKids.get(n.id) ?? [];
         const kSizes = kids.map(size);
-        const stackH = kSizes.reduce((s,k)=>s+k.h,0) + V*Math.max(0,kids.length-1);
+        const stackH = kSizes.reduce((s, k) => s + k.h, 0) + V * Math.max(0, kids.length - 1);
 
-        const g = { w: Math.max(...kSizes.map(k=>k.w),0) + 2*PAD,
-            h: stackH + 2*PAD };
-        cache.set(n.id, g); return g;
+        const g = {
+            w: Math.max(...kSizes.map(k => k.w), 0) + 2 * PAD,
+            h: stackH + 2 * PAD
+        };
+        cache.set(n.id, g);
+        return g;
     };
     nodes.forEach(size);
 
     /* ---------- relatives Layout ------------------------------------------ */
-    type Pos = { x:number; y:number };
+    type Pos = { x: number; y: number };
     const rel = new Map<string, Pos>();
 
-    const layout = (n:Node, cx:number, cy:number): number => {
-        rel.set(n.id,{x:cx,y:cy});
-        const { w,h } = size(n);
+    const layout = (n: Node, cx: number, cy: number): number => {
+        rel.set(n.id, {x: cx, y: cy});
+        const {w, h} = size(n);
 
         /* 1️⃣  »einfache« Parameter rechts */
         const right = (params.get(n.id) ?? [])
-            .filter(p=>p.type!=='group')
-            .sort((a,b)=>(+(a.data as any)?.paramIndex)-(+(b.data as any)?.paramIndex));
+            .filter(p => p.type !== 'group')
+            .sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
 
-        const rightH = right.reduce((s,p)=>s+size(p).h,0)+V*Math.max(0,right.length-1);
-        let py = cy - rightH/2;
-        right.forEach(p=>{
+        const rightH = right.reduce((s, p) => s + size(p).h, 0) + V * Math.max(0, right.length - 1);
+        let py = cy - rightH / 2;
+        right.forEach(p => {
             const ps = size(p);
-            layout(p, cx + w/2 + H + ps.w/2, py + ps.h/2);
+            layout(p, cx + w / 2 + H + ps.w / 2, py + ps.h / 2);
             py += ps.h + V;
         });
 
         /* 2️⃣  Gruppen-Parameter (eine Row) */
-        let bottom = cy + h/2;
-        const gParams = (params.get(n.id) ?? []).filter(p=>p.type==='group');
-        if (gParams.length){
+        let bottom = cy + h / 2;
+        const gParams = (params.get(n.id) ?? []).filter(p => p.type === 'group');
+        if (gParams.length) {
             const gSizes = gParams.map(size);
-            const rowW   = gSizes.reduce((s,g)=>s+g.w,0)+H*(gParams.length-1);
+            const rowW = gSizes.reduce((s, g) => s + g.w, 0) + H * (gParams.length - 1);
 
-            let gx = cx - rowW/2, gy = bottom + V, maxH = 0;
-            gParams.forEach((g,i)=>{
+            let gx = cx - rowW / 2, gy = bottom + V, maxH = 0;
+            gParams.forEach((g, i) => {
                 const gs = gSizes[i];
-                layout(g, gx + gs.w/2, gy + gs.h/2);
-                gx += gs.w + H; maxH = Math.max(maxH, gs.h);
+                layout(g, gx + gs.w / 2, gy + gs.h / 2);
+                gx += gs.w + H;
+                maxH = Math.max(maxH, gs.h);
             });
-            bottom = gy + maxH/2;
+            bottom = gy + maxH / 2;
         }
 
         /* 3️⃣  React-Flow-Kinder in Group-Box */
-        if (n.type==='group'){
-            const kids = (rfKids.get(n.id) ?? []).filter(k=>!(k.data as any)?.linkingId);
-            let curY = cy - h/2 + PAD;
-            kids.forEach(k=>{
-                curY = layout(k, cx, curY + size(k).h/2) + V;
+        if (n.type === 'group') {
+            const kids = (rfKids.get(n.id) ?? []).filter(k => !(k.data as any)?.linkingId);
+            let curY = cy - h / 2 + PAD;
+            kids.forEach(k => {
+                curY = layout(k, cx, curY + size(k).h / 2) + V;
             });
             bottom = Math.max(bottom, curY - V + PAD);
         } else {
-            bottom = Math.max(bottom, cy + Math.max(h,rightH)/2);
+            bottom = Math.max(bottom, cy + Math.max(h, rightH) / 2);
         }
         return bottom;
     };
@@ -111,70 +119,77 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     /* Root-Nodes untereinander stapeln */
     let yCursor = 0;
     nodes
-        .filter(n=>!(n.data as any)?.linkingId && !n.parentId)
-        .forEach(r=> yCursor = layout(r, 0, yCursor + size(r).h/2) + V);
+        .filter(n => !(n.data as any)?.linkingId && !n.parentId)
+        .forEach(r => yCursor = layout(r, 0, yCursor + size(r).h / 2) + V);
 
     /* ---------- rel → abs -------------------------------------------------- */
     const abs = new Map<string, Pos>();
-    const toAbs = (n:Node):Pos=>{
+    const toAbs = (n: Node): Pos => {
         if (abs.has(n.id)) return abs.get(n.id)!;
         const p = rel.get(n.id)!;
-        if (!n.parentId || n.extent==='parent'){ abs.set(n.id,p); return p; }
+        if (!n.parentId || n.extent === 'parent') {
+            abs.set(n.id, p);
+            return p;
+        }
         const pp = toAbs(byId.get(n.parentId)!);
-        const a  = { x: pp.x + p.x, y: pp.y + p.y };
-        abs.set(n.id,a); return a;
+        const a = {x: pp.x + p.x, y: pp.y + p.y};
+        abs.set(n.id, a);
+        return a;
     };
     nodes.forEach(toAbs);
 
-    const positioned = nodes.map(n=>{
-        const { w,h } = size(n);
-        const { x,y } = abs.get(n.id)!;
+    const positioned = nodes.map(n => {
+        const {w, h} = size(n);
+        const {x, y} = abs.get(n.id)!;
 
-        let px = x-w/2, py = y-h/2;
-        if (n.parentId){
-            const ps  = size(byId.get(n.parentId)!);
-            const pTL = { x: abs.get(n.parentId)!.x - ps.w/2,
-                y: abs.get(n.parentId)!.y - ps.h/2 };
-            px -= pTL.x; py -= pTL.y;
+        let px = x - w / 2, py = y - h / 2;
+        if (n.parentId) {
+            const ps = size(byId.get(n.parentId)!);
+            const pTL = {
+                x: abs.get(n.parentId)!.x - ps.w / 2,
+                y: abs.get(n.parentId)!.y - ps.h / 2
+            };
+            px -= pTL.x;
+            py -= pTL.y;
         }
-        const baseStyle = n.style ?? {};
         return {
             ...n,
-            position:{x:px,y:py},
-            style: n.type==='group'
-                ? { ...baseStyle, pointerEvents:'none', zIndex:-1 }
-                : baseStyle,
+            position: {x: px, y: py}
         } as Node;
     });
 
-    const posById = new Map(positioned.map(n=>[n.id,n]));
+    const posById = new Map(positioned.map(n => [n.id, n]));
 
     /* ---------- Bounding-Korrektur jeder Group ---------------------------- */
-    const depth = (g:Node)=>{
+    const depth = (g: Node) => {
         let d = 0, p = g;
-        while (p.parentId){ d++; p = posById.get(p.parentId)!; }
+        while (p.parentId) {
+            d++;
+            p = posById.get(p.parentId)!;
+        }
         return d;
     };
 
     positioned
-        .filter(n=>n.type==='group')
-        .sort((a,b)=>depth(b)-depth(a))          // innerste zuerst
-        .forEach(g=>{
+        .filter(n => n.type === 'group')
+        .sort((a, b) => depth(b) - depth(a))          // innerste zuerst
+        .forEach(g => {
             /* alle Nachkommen dieser Group */
-            const kids = positioned.filter(k=>{
-                for (let p=k; p.parentId; ){ p = posById.get(p.parentId)!;
-                    if (p.id===g.id) return true;
+            const kids = positioned.filter(k => {
+                for (let p = k; p.parentId;) {
+                    p = posById.get(p.parentId)!;
+                    if (p.id === g.id) return true;
                 }
                 return false;
             });
             if (!kids.length) return;
 
-            let minX=Number.POSITIVE_INFINITY,
-                minY=Number.POSITIVE_INFINITY,
-                maxX=0,maxY=0;
+            let minX = Number.POSITIVE_INFINITY,
+                minY = Number.POSITIVE_INFINITY,
+                maxX = 0, maxY = 0;
 
-            kids.forEach(k=>{
-                const kw = typeof k.style?.width  === 'number' ? k.style.width  : size(k).w;
+            kids.forEach(k => {
+                const kw = typeof k.style?.width === 'number' ? k.style.width : size(k).w;
                 const kh = typeof k.style?.height === 'number' ? k.style.height : size(k).h;
                 minX = Math.min(minX, k.position.x);
                 minY = Math.min(minY, k.position.y);
@@ -185,8 +200,8 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             const dx = minX - PAD;
             const dy = minY - PAD;
 
-            if (dx || dy){
-                kids.forEach(k=>{
+            if (dx || dy) {
+                kids.forEach(k => {
                     k.position.x -= dx;
                     k.position.y -= dy;
                 });
@@ -194,25 +209,25 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
             g.style = {
                 ...(g.style as React.CSSProperties),
-                width : (maxX - dx) + PAD,
+                width: (maxX - dx) + PAD,
                 height: (maxY - dy) + PAD,
             };
         });
 
     /* ---------- Row-Nachkorrektur (Param-Groups) -------------------------- */
-    positioned.forEach(parent=>{
-        const pGroups = (params.get(parent.id) ?? []).filter(p=>p.type==='group');
+    positioned.forEach(parent => {
+        const pGroups = (params.get(parent.id) ?? []).filter(p => p.type === 'group');
         if (!pGroups.length) return;
 
-        const ordered = pGroups.slice().sort((a,b)=>
+        const ordered = pGroups.slice().sort((a, b) =>
             (+((a.data as any)?.paramIndex) || 0) -
             (+((b.data as any)?.paramIndex) || 0));
 
-        const widths = ordered.map(g=>{
+        const widths = ordered.map(g => {
             const gn = posById.get(g.id)!;
             return typeof gn.style?.width === 'number' ? gn.style.width : size(gn).w;
         });
-        const rowW = widths.reduce((s,w)=>s+w,0) + H*(ordered.length-1);
+        const rowW = widths.reduce((s, w) => s + w, 0) + H * (ordered.length - 1);
 
         /* ------------------------------------------------------------------
            **Fix**: abs.get(parent.id) enthält bereits die X-Koordinate
@@ -221,14 +236,14 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         ------------------------------------------------------------------ */
         const parentCenter = abs.get(parent.id)!.x;   // ← Korrektur
 
-        let gx = parentCenter - rowW/2;
-        ordered.forEach((g,i)=>{
+        let gx = parentCenter - rowW / 2;
+        ordered.forEach((g, i) => {
             posById.get(g.id)!.position.x = gx;
             gx += widths[i] + H;
         });
     });
 
-    return { nodes: positioned, edges };
+    return {nodes: positioned, edges};
 };
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps

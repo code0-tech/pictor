@@ -99,7 +99,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 gx += gs.w + H;
                 maxH = Math.max(maxH, gs.h);
             });
-            bottom = gy + maxH / 2;
+            bottom = gy + maxH + h + V;
         }
 
         /* 3️⃣  React-Flow-Kinder in Group-Box */

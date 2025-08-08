@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import {NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
+import {isNodeFunctionObject, NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowFunctionCard.style.scss";
@@ -36,7 +36,6 @@ export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponent
 export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
     const {data, id} = props;
     const functionData = data as NodeFunctionObject & { isParameter: boolean };
-
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
@@ -44,6 +43,8 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
+    //validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
+    // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
@@ -55,7 +56,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     }
 
     return (
-        <Card borderColor={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : undefined} w={300} color={"secondary"} onClick={() => {
+        <Card borderColor={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : undefined} color={"secondary"} onClick={() => {
             flowInstance.setViewport({
                 x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
                 y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,

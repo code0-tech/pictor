@@ -98,7 +98,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 draggable={false}
                 type="target"
                 className={"function-card__handle function-card__handle--target"}
-                style={{...(functionData.isParameter ? {right: "1rem"} : {top: "1rem"})}}
+                style={{...(functionData.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={functionData.isParameter ? Position.Right : Position.Top}
             />
 
@@ -163,7 +163,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
             <Handle
                 isConnectable={false}
                 type="source"
-                style={{...(functionData.isParameter ? {left: "1rem"} : {bottom: "1rem"})}}
+                style={{...(functionData.isParameter ? {left: "2px"} : {bottom: "2px"})}}
                 className={"function-card__handle function-card__handle--source"}
                 position={functionData.isParameter ? Position.Left : Position.Bottom}
             />

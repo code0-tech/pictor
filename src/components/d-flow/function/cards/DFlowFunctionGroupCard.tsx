@@ -13,7 +13,7 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = (
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
     return (
         <Card w={"100%"} h={"100%"}
-              style={{background: withAlpha(color, 0.1), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.5)}}>
+              style={{background: withAlpha(color, 0.05), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.25)}}>
             <Handle
                 type="target"
                 position={Position.Top}

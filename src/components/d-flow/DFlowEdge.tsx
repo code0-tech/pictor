@@ -19,10 +19,12 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
-        sourcePosition: data?.isParameter ? Position.Left : Position.Top,
+        sourcePosition: data?.isParameter ? Position.Left : Position.Bottom,
         targetX,
         targetY,
-        targetPosition: data?.isParameter ? Position.Right : Position.Bottom,
+        targetPosition: data?.isParameter ? Position.Right : Position.Top,
+        borderRadius: 32,
+        centerY: targetY - 50
     })
 
     return <>

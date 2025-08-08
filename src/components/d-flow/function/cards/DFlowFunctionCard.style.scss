@@ -7,7 +7,7 @@
     border: none !important;
     padding: 1px;
     z-index: -1;
-    background: helpers.backgroundColor(variables.$secondary) !important;
+    opacity: 0;
   }
 
   &__inspection {

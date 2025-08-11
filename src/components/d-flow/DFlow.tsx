@@ -27,7 +27,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
     let changed = false;
 
     // Aktueller Arbeitsstand der Nodes (Styles werden in den Pässen fortgeschrieben)
-    let work = nodes.map(n => ({ ...n }));
+    let work = nodes.map(n => ({...n}));
 
     do {
         changed = false;
@@ -76,7 +76,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
             const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
             if (styleW !== undefined && styleH !== undefined) {
-                const s = { w: styleW, h: styleH };
+                const s = {w: styleW, h: styleH};
                 cache.set(n.id, s);
                 return s;
             }
@@ -104,8 +104,8 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         const rel = new Map<string, Pos>();
 
         const layout = (n: Node, cx: number, cy: number): number => {
-            rel.set(n.id, { x: cx, y: cy });
-            const { w, h } = size(n);
+            rel.set(n.id, {x: cx, y: cy});
+            const {w, h} = size(n);
 
             /* 1) einfache Parameter rechts (keine Groups) */
             const right = (params.get(n.id) ?? [])
@@ -182,9 +182,9 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
 
         const absTL_initial = new Map<string, Pos>();
         work.forEach(n => {
-            const { w, h } = size(n);
-            const { x, y } = absCenter.get(n.id)!;
-            absTL_initial.set(n.id, { x: x - w / 2, y: y - h / 2 });
+            const {w, h} = size(n);
+            const {x, y} = absCenter.get(n.id)!;
+            absTL_initial.set(n.id, {x: x - w / 2, y: y - h / 2});
         });
 
         /* ---------- positions in RF-Koordinaten (Top-Left), ggf. relativ zu Parent */
@@ -200,7 +200,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 py -= pTL.y;
             }
 
-            return { ...n, position: { x: px, y: py } } as Node;
+            return {...n, position: {x: px, y: py}} as Node;
         });
 
         const posById = new Map(positioned.map(n => [n.id, n]));
@@ -226,7 +226,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 // leere Group: min. 2*PAD
                 const gw = typeof g.style?.width === 'number' ? g.style.width : 2 * PAD;
                 const gh = typeof g.style?.height === 'number' ? g.style.height : 2 * PAD;
-                g.style = { ...(g.style as React.CSSProperties), width: gw, height: gh };
+                g.style = {...(g.style as React.CSSProperties), width: gw, height: gh};
                 return;
             }
 
@@ -236,7 +236,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 const sh = typeof n.style?.height === 'number' ? n.style.height : undefined;
                 // ACHTUNG: size() kann gecached sein – Style bevorzugen
                 const s = measured(n);
-                return { w: sw ?? s.w, h: sh ?? s.h };
+                return {w: sw ?? s.w, h: sh ?? s.h};
             };
 
             // Bounds relativ zur Group-Top-Left (direkte Kinder!)
@@ -265,7 +265,10 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 });
                 changed = true;
 
-                minX -= dx; minY -= dy; maxX -= dx; maxY -= dy;
+                minX -= dx;
+                minY -= dy;
+                maxX -= dx;
+                maxY -= dy;
             }
 
             const newW = (maxX - minX) + 2 * PAD;
@@ -297,7 +300,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
             const s = size(n);
             const c = rel.get(n.id)!; // globales Center aus dem Layout-Durchlauf
             absCenterAfter.set(n.id, c);
-            absTL.set(n.id, { x: c.x - s.w / 2, y: c.y - s.h / 2 });
+            absTL.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2});
         });
 
         positioned.forEach(parent => {
@@ -326,7 +329,7 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 const gn = posById.get(g.id)!;
 
                 // *** NEU: in Parent-Row gegen das tatsächliche Container-TL (gn.parentId) umrechnen ***
-                const containerTL = gn.parentId ? absTL.get(gn.parentId)! : { x: 0, y: 0 };
+                const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0};
 
                 // setze linke Kante relativ zum Container
                 gn.position.x = gx - containerTL.x;
@@ -337,11 +340,11 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
         });
 
         // Arbeitsstand für evtl. nächste Runde übernehmen
-        work = positioned.map(n => ({ ...n }));
+        work = positioned.map(n => ({...n}));
 
     } while (changed && pass < 5);
 
-    return { nodes: work, edges };
+    return {nodes: work, edges};
 };
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps
@@ -377,7 +380,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
     }, [props.nodes, props.edges])
 
     return <ReactFlow panOnDrag={true}
-                      onInit={(reactFlowInstance) =>  reactFlowInstance.fitView()}
+                      onInit={(reactFlowInstance) => reactFlowInstance.fitView()}
                       zoomOnScroll
                       onNodesChange={nodeChangeEvent}
                       onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}

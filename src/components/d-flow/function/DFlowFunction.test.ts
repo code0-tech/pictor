@@ -53,7 +53,7 @@ describe('function', () => {
     })
 
     test('', () => {
-        expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[[1], 2, 3], {type: "NUMBER", primaryLevel: 0, secondaryLevel: 1}], dataTypeService)).toMatchObject([{"message": [{"code": "de_DE", "text": "Not working"}], "type": 4}])
+        expect(useFunctionValidation(functionService.getFunctionDefinition('std::array::add')!!, [[[1], 2, 3], {type: "NUMBER", primaryLevel: 0, secondaryLevel: 1}], dataTypeService)).toMatchObject([{"message": [{"code": "de_DE", "text": "Parameter #1: Ungültiger Wert. Erwartet: {\"type\":\"ARRAY\",\"generic_mapper\":[{\"types\":[\"D\"],\"generic_target\":\"T\"}]}, Erhalten: [[1],2,3]. [Generic Value: Invalid value]"}], "type": 4}])
     })
 })
 

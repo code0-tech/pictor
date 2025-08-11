@@ -1,5 +1,5 @@
 import {Meta} from "@storybook/react";
-import {Background, BackgroundVariant} from "@xyflow/react";
+import {Background, BackgroundVariant, Panel} from "@xyflow/react";
 import React, {useEffect} from "react";
 import {DFlowFunctionCard} from "./function/cards/DFlowFunctionCard";
 import {DFlowFunctionGroupCard} from "./function/cards/DFlowFunctionGroupCard";
@@ -20,6 +20,7 @@ import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowSuggestion} from "./suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "./suggestions/DFlowSuggestion.service";
+import {DFlowControls} from "./DFlowControls";
 
 export default {
     title: "DFlow",
@@ -69,6 +70,7 @@ const Test = () => {
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
+        <DFlowControls/>
     </DFlow>
 }
 

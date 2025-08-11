@@ -23,7 +23,6 @@ export default {
 
 export const Example = () => {
 
-    const dataTypesData: DataType[] = dataTypes.map((dt) => new DataType(dt, null as any))
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
     const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService);

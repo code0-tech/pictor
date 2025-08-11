@@ -12,7 +12,7 @@ import {
     IconDots,
     IconExclamationCircle,
     IconFileLambdaFilled,
-    IconGripVertical,
+    IconLayoutNavbarCollapseFilled,
     IconMessageExclamation,
     IconTrash
 } from "@tabler/icons-react";
@@ -54,15 +54,17 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     }
 
     return (
-        <Card color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"} onClick={() => {
-            flowInstance.setViewport({
-                x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
-                y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,
-                zoom: 1
-            }, {
-                duration: 250,
-            })
-        }} style={{position: "relative"}}>
+        <Card
+            color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
+            onClick={() => {
+                flowInstance.setViewport({
+                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
+                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,
+                    zoom: 1
+                }, {
+                    duration: 250,
+                })
+            }} style={{position: "relative"}}>
 
             <CardSection border>
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
@@ -80,13 +82,14 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                             <MenuPortal>
                                 <MenuContent>
                                     <MenuLabel>Actions</MenuLabel>
-                                    <MenuItem><IconTrash size={16}/> Delete node</MenuItem>
+                                    <MenuItem onClick={() => {
+                                    }}><IconTrash size={16}/> Delete node</MenuItem>
                                     <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
                         <Button disabled>
-                            <IconGripVertical size={16}/>
+                            <IconLayoutNavbarCollapseFilled size={16}/>
                         </Button>
                     </Flex>
                 </Flex>
@@ -144,19 +147,25 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
 
 
-                        return isNodeFunctionObject(param.value as NodeFunctionObject) ? <Flex key={index} pos={"relative"}>
-                            {param.definition.parameter_id}
-                            <Handle
-                                key={param.definition.parameter_id}
-                                type="target"
-                                position={Position.Right}
-                                style={{position: "absolute", transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)", top: "50%", right: isNodeDataType ? "50%" : "0"}}
-                                id={`param-${param.definition.parameter_id}`}
-                                isConnectable={false}
-                                hidden={!isParamConnected(param.definition.parameter_id)}
-                                className={"function-card__handle function-card__handle--target"}
-                            />
-                        </Flex> : null
+                        return isNodeFunctionObject(param.value as NodeFunctionObject) ?
+                            <Flex key={index} pos={"relative"}>
+                                {param.definition.parameter_id}
+                                <Handle
+                                    key={param.definition.parameter_id}
+                                    type="target"
+                                    position={Position.Right}
+                                    style={{
+                                        position: "absolute",
+                                        transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)",
+                                        top: "50%",
+                                        right: isNodeDataType ? "50%" : "0"
+                                    }}
+                                    id={`param-${param.definition.parameter_id}`}
+                                    isConnectable={false}
+                                    hidden={!isParamConnected(param.definition.parameter_id)}
+                                    className={"function-card__handle function-card__handle--target"}
+                                />
+                            </Flex> : null
                     })}
                 </CardSection>
             ) : null}

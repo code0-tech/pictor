@@ -54,7 +54,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     }
 
     return (
-        <Card borderColor={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : undefined} color={"secondary"} onClick={() => {
+        <Card color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"} onClick={() => {
             flowInstance.setViewport({
                 x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
                 y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,

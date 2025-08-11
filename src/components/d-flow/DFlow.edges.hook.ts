@@ -44,7 +44,6 @@ export const useFlowEdges = (flowId: string): Edge[] => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
         const fnId = `${fn.runtime_id}-${idCounter++}`;
-        console.log(fnId)
 
         /* ------- vertikale Kante (nextNode) -------------------------- */
         if (parentFnId) {
@@ -99,6 +98,7 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                     target:     groupId,     // GroupCard (Ziel – hat Top: target)
                     deletable:  false,
                     selectable: false,
+                    label: param.id,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                         isParameter: false,

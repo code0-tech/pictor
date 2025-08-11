@@ -92,7 +92,7 @@ export const Dashboard = () => {
             <ScrollArea>
                 <ScrollAreaViewport>
                     {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
-                        return <DFolder name={"Google Cloud Flows"} defaultOpen>
+                        return <DFolder key={index} name={"Google Cloud Flows"} defaultOpen>
                             <DFolder name={"Google Cloud Flows"}>
                                 <DFolder.Item icon={<IconFileFilled size={12}/>}
                                               name={"Google Cloud Flows"}/>

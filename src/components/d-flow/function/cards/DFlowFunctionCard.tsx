@@ -144,7 +144,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
 
 
-                        return isNodeFunctionObject(param.value as NodeFunctionObject) ? <Flex pos={"relative"}>
+                        return isNodeFunctionObject(param.value as NodeFunctionObject) ? <Flex key={index} pos={"relative"}>
                             {param.definition.parameter_id}
                             <Handle
                                 key={param.definition.parameter_id}

@@ -44,12 +44,13 @@ export const useFlowEdges = (flowId: string): Edge[] => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
         const fnId = `${fn.runtime_id}-${idCounter++}`;
+        console.log(fnId)
 
         /* ------- vertikale Kante (nextNode) -------------------------- */
         if (parentFnId) {
             const startGroups = groupsWithValue.get(parentFnId) ?? [];
 
-            if (startGroups.length) {
+            if (startGroups.length > 0) {
                 startGroups.forEach((gId, idx) => edges.push({
                     id: `${gId}-${fnId}-next-${idx}`,
                     source: gId,           // Handle-Bottom der Group-Card
@@ -84,6 +85,8 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                 ?.parameters?.find(p => p.parameter_id === param.id);
             const paramType = def?.type;
             const paramDT = paramType ? dataTypeService.getDataType(paramType) : undefined;
+
+            if (!val) return
 
             /* --- NODE-Parameter → Group-Card ------------------------- */
             if (paramDT?.type === EDataType.NODE) {

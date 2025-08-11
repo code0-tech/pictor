@@ -114,7 +114,7 @@ describe('data type validation against data type', () => {
         type: EDataType.PRIMITIVE,
         rules: [{
             type: EDataTypeRuleType.REGEX,
-            config: {pattern: "^(?:-(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))|(?:0|(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))))(?:.\d+|)$"}
+            config: {pattern: "^-?\\d+(?:[.,]\\d+)?$"}
         }]
     }].forEach((dataType) => {
         service.add(new DataType(dataType, service))

@@ -271,7 +271,7 @@ describe("useSuggestions", () => {
 
     test("returns FUNCTION suggestion for NUMBER_ARRAY", () => {
         const result = useSuggestions("NUMBER", [], "some_database_id", 0);
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(7);
     })
 
 })

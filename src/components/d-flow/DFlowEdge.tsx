@@ -35,6 +35,7 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
                     position: 'absolute',
                     transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
                     pointerEvents: 'all',
+                    zIndex: 1,
                 }}>
                     <Badge>
                         {props.label}

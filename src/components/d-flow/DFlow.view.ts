@@ -133,6 +133,10 @@ export class NodeFunction {
         this._nextNode = value;
     }
 
+    public deleteNextNode(): void {
+        this.nextNode = this.nextNode?.nextNode
+    }
+
     get parameters(): NodeFunctionParameter[] | undefined {
         return this._parameters;
     }
@@ -169,7 +173,13 @@ export class NodeFunctionParameter {
     constructor(nodeParameter: NodeParameterObject) {
         this._id = nodeParameter.definition.parameter_id
         this._runtime_id = nodeParameter.definition.runtime_parameter_id
-        this._value = nodeParameter.value
+        if (isNodeFunctionObject(nodeParameter.value as NodeFunctionObject)) {
+            this._subNode = new NodeFunction(nodeParameter.value as NodeFunctionObject);
+            this._value = this._subNode.json
+        } else {
+            this._value = nodeParameter.value
+        }
+
     }
 
 
@@ -186,7 +196,12 @@ export class NodeFunctionParameter {
     }
 
     set value(value: Value) {
-        this._value = value;
+        if (isNodeFunctionObject(value as NodeFunctionObject)) {
+            this._subNode = new NodeFunction(value as NodeFunctionObject);
+            this._value = this._subNode.json
+        } else {
+            this._value = value
+        }
     }
 
     get subNode(): NodeFunction | undefined {
@@ -195,5 +210,6 @@ export class NodeFunctionParameter {
 
     set subNode(value: NodeFunction | undefined) {
         this._subNode = value;
+        this._value = value?.json
     }
 }

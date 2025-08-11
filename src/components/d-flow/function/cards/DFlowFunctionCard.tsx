@@ -43,8 +43,6 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
-    //validation && console.log(definition, data.parameters!!.map(p => p.value!!), validation)
-    // Greife auf alle aktuellen Edges im Flow zu:
     const edges = useStore(s => s.edges);
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
@@ -136,29 +134,33 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                 </div>
             ) : null}
 
-
-            {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-            {functionData.parameters?.map((param: NodeParameterObject, index: number) => {
-
-
-                const parameter = definition?.parameters!!.find(p => p.parameter_id == param.definition.parameter_id)
-                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+            {functionData.parameters?.some(param => isNodeFunctionObject(param.value as NodeFunctionObject)) ? (
+                <CardSection>
+                    {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
+                    {functionData.parameters?.map((param: NodeParameterObject, index: number) => {
 
 
-                return <Flex pos={"relative"}>
-                    {param.definition.parameter_id}
-                    <Handle
-                        key={param.definition.parameter_id}
-                        type="target"
-                        position={Position.Right}
-                        style={{position: "absolute", transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)", top: "50%", right: isNodeDataType ? "50%" : "0"}}
-                        id={`param-${param.definition.parameter_id}`}
-                        isConnectable={false}
-                        hidden={!isParamConnected(param.definition.parameter_id)}
-                        className={"function-card__handle function-card__handle--target"}
-                    />
-                </Flex>
-            })}
+                        const parameter = definition?.parameters!!.find(p => p.parameter_id == param.definition.parameter_id)
+                        const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+
+
+                        return isNodeFunctionObject(param.value as NodeFunctionObject) ? <Flex pos={"relative"}>
+                            {param.definition.parameter_id}
+                            <Handle
+                                key={param.definition.parameter_id}
+                                type="target"
+                                position={Position.Right}
+                                style={{position: "absolute", transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)", top: "50%", right: isNodeDataType ? "50%" : "0"}}
+                                id={`param-${param.definition.parameter_id}`}
+                                isConnectable={false}
+                                hidden={!isParamConnected(param.definition.parameter_id)}
+                                className={"function-card__handle function-card__handle--target"}
+                            />
+                        </Flex> : null
+                    })}
+                </CardSection>
+            ) : null}
+
 
             {/* Ausgang */}
             <Handle

@@ -6,13 +6,12 @@ import {DFlowFunctionGroupCard} from "./function/cards/DFlowFunctionGroupCard";
 import {DFlow} from "./DFlow";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {createReactiveArrayService} from "../../utils/reactiveArrayService";
-import {Flow, NodeFunction} from "./DFlow.view";
+import {Flow} from "./DFlow.view";
 import {DFlowReactiveService} from "./DFlow.service";
 import {useFlowNodes} from "./DFlow.nodes.hook";
-import {flow, flow1} from "./DFlow.data";
+import {flow1} from "./DFlow.data";
 import {useFlowEdges} from "./DFlow.edges.hook";
 import {DFlowEdge} from "./DFlowEdge";
-import Button from "../button/Button";
 import {DataType} from "./data-type/DFlowDataType.view";
 import {FunctionDefinition} from "./function/DFlowFunction.view";
 import {dataTypes} from "./data-type/DFlowDataType.data";
@@ -42,31 +41,6 @@ export const ExampleFlow = () => {
     return (
         <ContextStoreProvider
             services={[[dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-            <Button onClick={() => {
-                const flow = flowService.getById("some_database_id")
-                if (!flow) return
-                const newNode = new NodeFunction({
-                    function: {
-                        function_id: "std::math::add",
-                        runtime_function_id: "std::math::add_2"
-                    },
-                    parameters: [{
-                        definition: {
-                            parameter_id: "std::math::add__firstValue",
-                            runtime_parameter_id: "std::math::add__firstValue"
-                        },
-                        value: 50
-                    }, {
-                        definition: {
-                            parameter_id: "standard::math::add__secondValue",
-                            runtime_parameter_id: "standard::math::add__secondValue"
-                        },
-                        value: 100
-                    }]
-                })
-                flow.startingNode.nextNode!!.nextNode!!.nextNode = newNode
-                flowService.update()
-            }}>Add Node</Button>
             <Test/>
         </ContextStoreProvider>
     );

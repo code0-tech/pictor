@@ -22,8 +22,10 @@ export const useFlowEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);
-
     const flow = flowService.getById(flowId);
+
+    console.log(flow)
+
     if (!flow) return [];
 
     /* ------------------------------------------------------------------ */
@@ -93,10 +95,10 @@ export const useFlowEdges = (flowId: string): Edge[] => {
 
                 /* Verbindung Gruppe  → Function-Card (horizontal)       */
                 edges.push({
-                    id:         `${fnId}-${groupId}-param-${param.id}`,
-                    source:     fnId,        // FunctionCard (Quelle)
-                    target:     groupId,     // GroupCard (Ziel – hat Top: target)
-                    deletable:  false,
+                    id: `${fnId}-${groupId}-param-${param.id}`,
+                    source: fnId,        // FunctionCard (Quelle)
+                    target: groupId,     // GroupCard (Ziel – hat Top: target)
+                    deletable: false,
                     selectable: false,
                     label: param.id,
                     data: {
@@ -114,7 +116,7 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                         .push(groupId);
 
                     /* rekursiv Funktions-Ast innerhalb der Gruppe       */
-                    traverse(new NodeFunction(val as NodeFunctionObject),
+                    traverse(param.subNode!!,
                         undefined,
                         level + 1);
                 }
@@ -122,8 +124,7 @@ export const useFlowEdges = (flowId: string): Edge[] => {
 
             /* --- anderer Parameter, der selbst eine Function hält ---- */
             else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
-                const subFnId = traverse(
-                    new NodeFunction(val as NodeFunctionObject),
+                const subFnId = traverse(param.subNode!!,
                     undefined,
                     level + 1);
 

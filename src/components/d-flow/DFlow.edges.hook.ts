@@ -24,8 +24,6 @@ export const useFlowEdges = (flowId: string): Edge[] => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flow = flowService.getById(flowId);
 
-    console.log(flow)
-
     if (!flow) return [];
 
     /* ------------------------------------------------------------------ */

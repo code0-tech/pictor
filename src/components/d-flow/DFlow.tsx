@@ -368,8 +368,8 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
             return {
                 ...value,
                 measured: {
-                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? value.measured?.width ?? node[0].getBoundingClientRect().width ?? 0,
-                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? value.measured?.height ?? node[0].getBoundingClientRect().height ?? 0,
+                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? value.measured?.width ?? node[0].clientWidth ?? 0,
+                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? value.measured?.height ?? node[0].clientHeight ?? 0,
                 }
             } as Node
         })

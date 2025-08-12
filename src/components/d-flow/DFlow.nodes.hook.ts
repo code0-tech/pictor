@@ -35,6 +35,7 @@ export const useFlowNodes = (flowId: string): Node[] => {
             extent: parentGroup ? "parent" : undefined,   //  <-- NEU
             data: {
                 ...fn.json,
+                instance: fn,
                 isParameter,
                 linkingId: isParameter ? parentId : undefined,
                 depth
@@ -63,13 +64,10 @@ export const useFlowNodes = (flowId: string): Node[] => {
                             depth: depth + 1,
                         },
                     });
-
-                    const subNode = new NodeFunction(param.value as NodeFunctionObject);
-                    traverse(subNode, false, undefined, depth + 1, groupId);
+                    traverse(param.subNode!!, false, undefined, depth + 1, groupId);
                 }
             } else if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
-                const subNode = new NodeFunction(param.value as NodeFunctionObject);
-                traverse(subNode, true, id, depth, parentGroup);
+                traverse(param.subNode!!, true, id, depth, parentGroup);
             }
         });
 

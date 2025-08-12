@@ -1,5 +1,5 @@
 import {Code0ComponentProps} from "../../utils/types";
-import {Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
+import {Edge, Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
@@ -15,7 +15,7 @@ import "./DFlow.style.scss"
  * @param edges Array of edge objects, unchanged by this function (used only for return type symmetry).
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
-const getLayoutedElements = (nodes: Node[], edges: any[]) => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
     /* Konstanten */
     const V = 100;          // vertical gap Node ↕ Node
     const H = 100;          // horizontal gap Parent → Param
@@ -281,6 +281,10 @@ const getLayoutedElements = (nodes: Node[], edges: any[]) => {
                 changed = true;
             }
 
+            g.measured = {
+                width: newW,
+                height: newH,
+            }
             g.style = {
                 ...(g.style as React.CSSProperties),
                 width: newW,
@@ -356,34 +360,36 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(props.edges!!)
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
+        if (calculated.current) return
+        calculated.current = true
+
         const localNodes = nodes.map(value => {
+            const node = document.querySelectorAll("[data-id='" + value.id + "']")
             return {
                 ...value,
                 measured: {
-                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? 0,
-                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? 0,
+                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? value.measured?.width ?? node[0].getBoundingClientRect().width ?? 0,
+                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? value.measured?.height ?? node[0].getBoundingClientRect().height ?? 0,
                 }
             } as Node
         })
 
-        if (!calculated.current) {
-            const layouted = getLayoutedElements(localNodes, props.edges!!)
-            setNodes(layouted.nodes as Node[])
-            calculated.current = true
-        }
-    }, [calculated, nodes, edges])
+        const layouted = getLayoutedElements(localNodes, edges)
+        setNodes(layouted.nodes as Node[])
+        setEdges(layouted.edges as Edge[])
+    }, [calculated, nodes, edges, props.nodes, props.edges])
 
     React.useEffect(() => {
         calculated.current = false
-        setNodes([...props.nodes!!])
-        setEdges([...props.edges!!])
+        setNodes(props.nodes as Node[])
+        setEdges(props.edges as Edge[])
     }, [props.nodes, props.edges])
 
     return <ReactFlow panOnDrag={true}
                       onInit={(reactFlowInstance) => reactFlowInstance.fitView()}
                       zoomOnScroll
                       onNodesChange={nodeChangeEvent}
-                      onEdgesChange={onEdgesChange} {...mergeCode0Props("flow", props)}
+                      {...mergeCode0Props("flow", props)}
                       nodes={nodes}
                       edges={edges}/>
 

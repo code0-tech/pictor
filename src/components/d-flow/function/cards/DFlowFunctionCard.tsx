@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import {isNodeFunctionObject, NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
+import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowFunctionCard.style.scss";
@@ -26,12 +26,17 @@ import {useFunctionValidation} from "../DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {InspectionSeverity} from "../../../../utils/inspection";
 import {EDataType} from "../../data-type/DFlowDataType.view";
+import {DFlowReactiveService} from "../../DFlow.service";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
-// @ts-ignore
-export interface DFlowFunctionCardProps extends NodeProps<Node<CodeZeroComponentProps & NodeFunctionObject>> {
+export interface DFlowFunctionCardDataProps extends Code0Component<HTMLDivElement> {
+    instance: NodeFunction
+    isParameter: boolean
 }
+
+// @ts-ignore
+export type DFlowFunctionCardProps = NodeProps<Node<DFlowFunctionCardDataProps & NodeFunctionObject>>
 
 export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
     const {data, id} = props;
@@ -39,6 +44,7 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
+    const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
@@ -83,6 +89,8 @@ export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) 
                                 <MenuContent>
                                     <MenuLabel>Actions</MenuLabel>
                                     <MenuItem onClick={() => {
+                                        data.instance.deleteNextNode()
+                                        flowService.update()
                                     }}><IconTrash size={16}/> Delete node</MenuItem>
                                     <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
                                 </MenuContent>

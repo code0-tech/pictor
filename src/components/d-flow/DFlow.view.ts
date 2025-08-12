@@ -182,7 +182,6 @@ export class NodeFunctionParameter {
 
     }
 
-
     get id(): string {
         return this._id;
     }

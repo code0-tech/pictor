@@ -13,12 +13,13 @@ import {
     IconExclamationCircle,
     IconFileLambdaFilled,
     IconLayoutNavbarCollapseFilled,
-    IconMessageExclamation, IconPlus,
+    IconMessageExclamation,
+    IconPlus,
     IconTrash
 } from "@tabler/icons-react";
 import Text from "../../../text/Text";
 import Button from "../../../button/Button";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger} from "../../../menu/Menu";
 import Badge from "../../../badge/Badge";
 import {useService} from "../../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service";
@@ -83,16 +84,14 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                                     <IconDots size={16}/>
                                 </Button>
                             </MenuTrigger>
-                            <MenuPortal>
-                                <MenuContent>
-                                    <MenuLabel>Actions</MenuLabel>
-                                    <MenuItem onClick={() => {
-                                        data.instance.deleteNextNode()
-                                        flowService.update()
-                                    }}><IconTrash size={16}/> Delete node</MenuItem>
-                                    <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
-                                </MenuContent>
-                            </MenuPortal>
+                            <MenuContent>
+                                <MenuLabel>Actions</MenuLabel>
+                                <MenuItem onClick={() => {
+                                    data.instance.deleteNextNode()
+                                    flowService.update()
+                                }}><IconTrash size={16}/> Delete node</MenuItem>
+                                <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
+                            </MenuContent>
                         </Menu>
                         <Button disabled>
                             <IconLayoutNavbarCollapseFilled size={16}/>

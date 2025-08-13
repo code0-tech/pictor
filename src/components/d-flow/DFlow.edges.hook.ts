@@ -106,7 +106,7 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                 });
 
                 /* existiert ein Funktions-Wert für dieses Param-Feld?   */
-                if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
+                if (val && val instanceof NodeFunction) {
                     /* merken: diese Group-Card besitzt Content – das ist
                        später Startpunkt der next-Kante                   */
                     (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
@@ -114,15 +114,15 @@ export const useFlowEdges = (flowId: string): Edge[] => {
                         .push(groupId);
 
                     /* rekursiv Funktions-Ast innerhalb der Gruppe       */
-                    traverse(param.subNode!!,
+                    traverse(param.value as NodeFunction,
                         undefined,
                         level + 1);
                 }
             }
 
             /* --- anderer Parameter, der selbst eine Function hält ---- */
-            else if (val && isNodeFunctionObject(val as NodeFunctionObject)) {
-                const subFnId = traverse(param.subNode!!,
+            else if (val && val instanceof NodeFunction) {
+                const subFnId = traverse(param.value as NodeFunction,
                     undefined,
                     level + 1);
 

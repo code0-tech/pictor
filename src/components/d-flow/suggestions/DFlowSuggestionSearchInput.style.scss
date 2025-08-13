@@ -1,0 +1,14 @@
+@use "../../../styles/variables";
+@use "../../../styles/helpers";
+
+.d-flow-suggestion-search-input {
+  box-shadow: none !important;
+  background: none !important;
+  margin-left: -1 * variables.$xxs;
+  margin-right: -1 * variables.$xxs;
+  padding-left: variables.$xxs;
+  padding-right: variables.$xxs;
+  margin-bottom: variables.$xxs;
+  border-radius: 0 !important;
+  border-bottom: 1px solid helpers.borderColor();
+}

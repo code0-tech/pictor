@@ -1,17 +1,17 @@
 import {Meta} from "@storybook/react";
 import {Background, BackgroundVariant, Panel} from "@xyflow/react";
 import React, {useEffect} from "react";
-import {DFlowFunctionCard} from "./function/cards/DFlowFunctionCard";
-import {DFlowFunctionGroupCard} from "./function/cards/DFlowFunctionGroupCard";
+import {DFlowViewportDefaultCard} from "./viewport/cards/DFlowViewportDefaultCard";
+import {DFlowViewportGroupCard} from "./viewport/cards/DFlowViewportGroupCard";
 import {DFlow} from "./DFlow";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {createReactiveArrayService} from "../../utils/reactiveArrayService";
 import {Flow} from "./DFlow.view";
 import {DFlowReactiveService} from "./DFlow.service";
-import {useFlowNodes} from "./DFlow.nodes.hook";
+import {useFlowViewportNodes} from "./viewport/DFlowViewport.nodes.hook";
 import {flow1} from "./DFlow.data";
-import {useFlowEdges} from "./DFlow.edges.hook";
-import {DFlowEdge} from "./DFlowEdge";
+import {useFlowViewportEdges} from "./viewport/DFlowViewport.edges.hook";
+import {DFlowViewportEdge} from "./viewport/DFlowViewportEdge";
 import {DataType} from "./data-type/DFlowDataType.view";
 import {FunctionDefinition} from "./function/DFlowFunction.view";
 import {dataTypes} from "./data-type/DFlowDataType.data";
@@ -20,7 +20,7 @@ import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowSuggestion} from "./suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "./suggestions/DFlowSuggestion.service";
-import {DFlowControls} from "./DFlowControls";
+import {DFlowViewportControls} from "./viewport/DFlowViewportControls";
 
 export default {
     title: "DFlow",
@@ -50,16 +50,16 @@ export const ExampleFlow = () => {
 
 const Test = () => {
 
-    const initialNodes = useFlowNodes("some_database_id")
-    const initialEdges = useFlowEdges("some_database_id")
+    const initialNodes = useFlowViewportNodes("some_database_id")
+    const initialEdges = useFlowViewportEdges("some_database_id")
 
     const nodeTypes = {
-        default: DFlowFunctionCard,
-        group: DFlowFunctionGroupCard,
+        default: DFlowViewportDefaultCard,
+        group: DFlowViewportGroupCard,
     }
 
     const edgeTypes = {
-        default: DFlowEdge
+        default: DFlowViewportEdge
     }
 
     return <DFlow
@@ -70,7 +70,7 @@ const Test = () => {
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
-        <DFlowControls/>
+        <DFlowViewportControls/>
     </DFlow>
 }
 

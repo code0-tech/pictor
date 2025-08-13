@@ -3,7 +3,7 @@ import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow
 import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
-import "./DFlowFunctionCard.style.scss";
+import "./DFlowViewportDefaultCard.style.scss";
 import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
 import {
@@ -21,8 +21,8 @@ import Button from "../../../button/Button";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
 import Badge from "../../../badge/Badge";
 import {useService} from "../../../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "../DFlowFunction.service";
-import {useFunctionValidation} from "../DFlowFunction.vaildation.hook";
+import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service";
+import {useFunctionValidation} from "../../function/DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {InspectionSeverity} from "../../../../utils/inspection";
 import {EDataType} from "../../data-type/DFlowDataType.view";
@@ -30,15 +30,15 @@ import {DFlowReactiveService} from "../../DFlow.service";
 
 type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
 
-export interface DFlowFunctionCardDataProps extends Code0Component<HTMLDivElement> {
+export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
     instance: NodeFunction
     isParameter: boolean
 }
 
 // @ts-ignore
-export type DFlowFunctionCardProps = NodeProps<Node<DFlowFunctionCardDataProps & NodeFunctionObject>>
+export type DFlowViewportDefaultCardProps = NodeProps<Node<DFlowViewportDefaultCardDataProps & NodeFunctionObject>>
 
-export const DFlowFunctionCard: React.FC<DFlowFunctionCardProps> = memo((props) => {
+export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> = memo((props) => {
     const {data, id} = props;
     const functionData = data as NodeFunctionObject & { isParameter: boolean };
     const viewportWidth = useStore(s => s.width);

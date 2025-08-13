@@ -1,12 +1,12 @@
-import {useService} from "../../utils/contextStore";
-import {DFlowReactiveService} from "./DFlow.service";
-import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "./DFlow.view";
+import {useService} from "../../../utils/contextStore";
+import {DFlowReactiveService} from "../DFlow.service";
+import {NodeFunction} from "../DFlow.view";
 import {Node} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
-import {EDataType} from "./data-type/DFlowDataType.view";
+import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {EDataType} from "../data-type/DFlowDataType.view";
 
-export const useFlowNodes = (flowId: string): Node[] => {
+export const useFlowViewportNodes = (flowId: string): Node[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);

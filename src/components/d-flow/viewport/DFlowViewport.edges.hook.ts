@@ -1,10 +1,10 @@
-import {useService} from "../../utils/contextStore";
-import {DFlowReactiveService} from "./DFlow.service";
+import {useService} from "../../../utils/contextStore";
+import {DFlowReactiveService} from "../DFlow.service";
 import {Edge} from "@xyflow/react";
-import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "./DFlow.view";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
-import {EDataType} from "./data-type/DFlowDataType.view";
+import {NodeFunction} from "../DFlow.view";
+import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {EDataType} from "../data-type/DFlowDataType.view";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -18,7 +18,7 @@ export const FLOW_EDGE_RAINBOW: string[] = [
     '#fff170', // 7 – Gelb
 ];
 
-export const useFlowEdges = (flowId: string): Edge[] => {
+export const useFlowViewportEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);

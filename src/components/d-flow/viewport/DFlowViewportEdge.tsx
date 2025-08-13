@@ -1,18 +1,18 @@
-import {Code0Component} from "../../utils/types";
+import {Code0Component} from "../../../utils/types";
 import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 import React from "react";
-import Badge from "../badge/Badge";
+import Badge from "../../badge/Badge";
 
-export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
+export interface DFlowViewportEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
     color?: string
     isParameter?: boolean
 }
 
 // @ts-ignore
-export type DFlowEdgeProps = EdgeProps<Edge<DFlowEdgeDataProps>>
+export type DFlowViewportEdgeProps = EdgeProps<Edge<DFlowViewportEdgeDataProps>>
 
-export const DFlowEdge: React.FC<DFlowEdgeProps> = (props) => {
+export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = (props) => {
 
     const {sourceX, sourceY, targetX, targetY, id, data, ...rest} = props
 

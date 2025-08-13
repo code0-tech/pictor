@@ -21,6 +21,7 @@ import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowSuggestion} from "./suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "./suggestions/DFlowSuggestion.service";
 import {DFlowViewportControls} from "./viewport/DFlowViewportControls";
+import {DFlowViewportSuggestionCard} from "./viewport/cards/DFlowViewportSuggestionCard";
 
 export default {
     title: "DFlow",
@@ -56,6 +57,7 @@ const Test = () => {
     const nodeTypes = {
         default: DFlowViewportDefaultCard,
         group: DFlowViewportGroupCard,
+        suggestion: DFlowViewportSuggestionCard
     }
 
     const edgeTypes = {

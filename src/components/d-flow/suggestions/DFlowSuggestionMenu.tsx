@@ -1,82 +1,71 @@
-"use client";
-
+import {Menu, MenuPortal, MenuTrigger} from "../../menu/Menu";
 import React from "react";
-import {MenuLabel} from "../../menu/Menu";
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
+import {DFlowSuggestion} from "./DFlowSuggestion.view";
+import {DFlowSuggestionMenuFooter} from "./DFlowSuggestionMenuFooter";
 import {
-    IconArrowsShuffle,
-    IconBulb,
-    IconCircleDot,
-    IconCirclesRelation,
-    IconCornerDownLeft,
-    IconFileFunctionFilled
-} from "@tabler/icons-react";
-import Text from "../../text/Text";
-import Flex from "../../flex/Flex";
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../../tooltip/Tooltip";
-import {InputSuggestion} from "../../form/InputSuggestion";
+    InputSuggestionMenuContent,
+    InputSuggestionMenuContentItems,
+    InputSuggestionMenuContentItemsHandle
+} from "../../form/InputSuggestion";
+import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
+import {DFlowSuggestionSearchInput} from "./DFlowSuggestionSearchInput";
 
-export const DFlowSuggestionMenuFooter: React.FC = () => {
-    return <MenuLabel>
-        <Flex align={"center"} style={{gap: ".35rem"}}>Press <IconCornerDownLeft size={12}/> to insert</Flex>
-        <Flex ml={1} align={"center"} justify={"center"}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <IconBulb size={12}/>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent align={"center"} side={"right"} sideOffset={8}>
-                        <Flex pt={0.35} pb={0.35} style={{flexDirection: "column", gap: ".35rem"}}>
-                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                <IconFileFunctionFilled color={"#70ffb2"} size={16}/>
-                                <Text hierarchy={"tertiary"} size={"xs"}>FUNCTION</Text>
-                            </Flex>
-                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                <IconArrowsShuffle color={"#29BF12"} size={16}/>
-                                <Text hierarchy={"tertiary"} size={"xs"}>FUNCTION COMBINATION</Text>
-                            </Flex>
-                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                <IconCirclesRelation color={"#FFBE0B"} size={16}/>
-                                <Text hierarchy={"tertiary"} size={"xs"}>VARIABLE</Text>
-                            </Flex>
-                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                <IconCircleDot color={"#D90429"} size={16}/>
-                                <Text hierarchy={"tertiary"} size={"xs"}>VALUE</Text>
-                            </Flex>
-                        </Flex>
-
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>
-        </Flex></MenuLabel>
+export interface DFlowSuggestionMenuProps {
+    triggerContent: React.ReactNode
+    suggestions?: DFlowSuggestion[]
+    onSuggestionSelect?: (suggestion: DFlowSuggestion) => void
 }
 
-export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggestion[] => {
+export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) => {
 
-    return suggestions.map(suggestion => {
-
-        const iconMap: Record<DFlowSuggestionType, React.ReactNode> = {
-            [DFlowSuggestionType.FUNCTION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
-            [DFlowSuggestionType.FUNCTION_COMBINATION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
-            [DFlowSuggestionType.REF_OBJECT]: <IconCirclesRelation color="#FFBE0B" size={16}/>,
-            [DFlowSuggestionType.VALUE]: <IconCircleDot color="#D90429" size={16}/>,
+    const {
+        suggestions = [], triggerContent, onSuggestionSelect = () => {
         }
+    } = props
 
-        const children: React.ReactNode = <>
-            {iconMap[suggestion.type]}
-            <div>
-                <Text display="flex" style={{gap: ".5rem"}}>
-                    {suggestion.displayText.map((text, idx) => (
-                        <span key={idx}>{text}</span>
-                    ))}
-                </Text>
-            </div>
-        </>
+    const menuRef = React.useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
+    const [stateSuggestions, setStateSuggestions] = React.useState(suggestions)
 
-        return {
-            children,
-            ref: suggestion,
-            value: suggestion.value
-        };
-    })
+    return <Menu>
+        <MenuTrigger asChild>
+            {triggerContent}
+        </MenuTrigger>
+        <MenuPortal>
+            <InputSuggestionMenuContent>
+                <DFlowSuggestionMenuSearchBar onType={event => {
+
+                    if (event.key === "ArrowDown") {
+                        event.preventDefault();
+                        menuRef.current?.focusFirstItem(); // Navigate down
+                    } else if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        menuRef.current?.focusLastItem(); // Navigate up
+                    }
+
+                    const searchTerm = event.target.value
+                    setStateSuggestions(suggestions.filter(suggestion => {
+                        return suggestion.displayText.some(text => {
+                            return text.includes(searchTerm)
+                        })
+                    }))
+                    event.preventDefault()
+                }}/>
+                <InputSuggestionMenuContentItems
+                    /* @ts-ignore */
+                    ref={menuRef}
+                    suggestions={toInputSuggestions(stateSuggestions)}
+                    onSuggestionSelect={(suggestion) => {
+                        onSuggestionSelect(suggestion.ref as DFlowSuggestion)
+                    }}
+                />
+                <DFlowSuggestionMenuFooter/>
+            </InputSuggestionMenuContent>
+        </MenuPortal>
+    </Menu>
+
+}
+
+export const DFlowSuggestionMenuSearchBar: React.FC = (props) => {
+    return <DFlowSuggestionSearchInput onKeyUp={(event) => props.onType(event)} clearable
+                                       style={{background: "none", boxShadow: "none"}} autoFocus/>
 }

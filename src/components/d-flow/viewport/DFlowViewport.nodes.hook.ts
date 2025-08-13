@@ -42,6 +42,21 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             },
         });
 
+        if (!fn.nextNode && !isParameter) {
+            nodes.push({
+                id: `${id}-suggestion`,
+                type: "suggestion",
+                position: {x: 0, y: 0},
+                draggable: false,
+                extent: parentGroup ? "parent" : undefined,   //  <-- NEU
+                parentId: parentGroup,
+                data: {
+                    flowId: flowId,
+                    parentFunction: fn
+                }
+            })
+        }
+
         const definition = functionService.getFunctionDefinition(fn.id);
 
         fn.parameters?.forEach((param, i) => {

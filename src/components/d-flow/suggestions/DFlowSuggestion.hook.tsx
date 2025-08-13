@@ -20,43 +20,46 @@ import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
 //TODO: No type => just all function suggestion and also maybe combinations
 
-export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type | undefined, genericKeys: string[] | undefined, flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
 
-    const dataType = dataTypeService?.getDataType(type)
+    const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
-    if (!dataType || !suggestionService || !dataTypeService) return []
+    if (!suggestionService || !dataTypeService) return []
 
-    const hashedType = useTypeHash(type)
-    const resolvedType = replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys)
+    const hashedType = type ? useTypeHash(type) : undefined
+    const resolvedType = type ? replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys) : undefined
     const state: DFlowSuggestion[] = []
-    if (!hashedType) return []
     const cached = suggestionService.getSuggestionsByHash(hashedType || "")
 
     if (cached.length <= 0) {
 
-        //calculate VALUE
-        dataType.rules?.forEach(rule => {
-            if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
-                (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
-                    const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE, [value.toString()])
+        if (hashedType && dataType) {
+            //calculate VALUE
+            dataType.rules?.forEach(rule => {
+                if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
+                    (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
+                        const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE, [value.toString()])
+                        suggestionService.addSuggestion(suggestion)
+                        state.push(suggestion)
+                    })
+                } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
+                    const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
+                    const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE, [config.from.toString()])
                     suggestionService.addSuggestion(suggestion)
                     state.push(suggestion)
-                })
-            } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
-                const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
-                const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE, [config.from.toString()])
-                suggestionService.addSuggestion(suggestion)
-                state.push(suggestion)
-            }
-        })
+                }
+            })
+        }
+
 
         //calculate FUNCTION
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
+            if (!type || !resolvedType || !hashedType) return true
             if (!funcDefinition.return_type) return false
             const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
@@ -64,7 +67,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
         })
 
         matchingFunctions.forEach(funcDefinition => {
-            const suggestion = new DFlowSuggestion(hashedType, [], {
+            const suggestion = new DFlowSuggestion(hashedType || "", [], {
                 function: {
                     function_id: funcDefinition.function_id,
                     runtime_function_id: funcDefinition.runtime_function_id
@@ -78,15 +81,15 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
 
 
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
-    const refObjects = useRefObjects(flowId)
+    const refObjects = type ? useRefObjects(flowId) : []
     refObjects.forEach(value => {
         if (value.primaryLevel > contextLevel && value.secondaryLevel > nodeLevel) return
-        const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.primaryLevel}-${value.secondaryLevel}-${value.tertiaryLevel || ''}`, JSON.stringify(value.type)])
+        const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.primaryLevel}-${value.secondaryLevel}-${value.tertiaryLevel || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)
     })
 
 
-    return [...state, ...suggestionService.getSuggestionsByHash(hashedType)]
+    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")]
 
 }
 

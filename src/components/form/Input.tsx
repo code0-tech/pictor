@@ -59,6 +59,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestions?: InputSuggestion[] // Optional suggestions shown in dropdown
     suggestionsHeader?: React.ReactNode // Custom header above suggestions
     suggestionsFooter?: React.ReactNode // Custom footer below suggestions
+    onSuggestionSelect?: (suggestion: InputSuggestion) => void // Callback when a suggestion is selected
     transformValue?: (value: T) => React.ReactNode | T // Optional value transformation function
 
     wrapperComponent?: Code0Component<HTMLDivElement> // Props for the wrapping div
@@ -91,6 +92,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
             suggestions, // Optional suggestions array
             suggestionsHeader, // Optional header above suggestion list
             suggestionsFooter, // Optional footer below suggestion list
+            onSuggestionSelect = () => {}, // Callback for suggestion selection
             ...rest // Remaining native input props
         } = props;
 
@@ -164,6 +166,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                             onSuggestionSelect={(suggestion) => {
                                 // Update value and dispatch event
                                 setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change");
+                                onSuggestionSelect(suggestion)
                                 setOpen(false)
                             }}
                         />

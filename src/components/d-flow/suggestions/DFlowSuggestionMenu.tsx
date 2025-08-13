@@ -49,6 +49,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                         })
                     }))
                     event.preventDefault()
+                    return false
                 }}/>
                 <InputSuggestionMenuContentItems
                     /* @ts-ignore */

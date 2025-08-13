@@ -15,10 +15,11 @@ import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {useSuggestions} from "./DFlowSuggestion.hook";
 import TextInput from "../../form/TextInput";
-import {DFlowSuggestionMenuFooter, toInputSuggestions} from "./DFlowSuggestionMenu";
+import {DFlowSuggestionMenuFooter} from "./DFlowSuggestionMenuFooter";
+import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
 
 export default {
-    title: "DFlowSuggestionMenu",
+    title: "DFlowSuggestionMenuWithInput",
 } as Meta
 
 export const Example = () => {

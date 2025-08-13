@@ -13,7 +13,7 @@ import {
     IconExclamationCircle,
     IconFileLambdaFilled,
     IconLayoutNavbarCollapseFilled,
-    IconMessageExclamation,
+    IconMessageExclamation, IconPlus,
     IconTrash
 } from "@tabler/icons-react";
 import Text from "../../../text/Text";
@@ -143,7 +143,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </div>
             ) : null}
 
-            {functionData.parameters?.some(param => isNodeFunctionObject(param.value as NodeFunctionObject)) ? (
+            {functionData.parameters?.some(param => isNodeFunctionObject(param.value as NodeFunctionObject) || !param.value) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
                     {functionData.parameters?.map((param: NodeParameterObject, index: number) => {
@@ -153,9 +153,12 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
 
 
-                        return isNodeFunctionObject(param.value as NodeFunctionObject) ?
-                            <Flex key={index} pos={"relative"}>
+                        return (isNodeFunctionObject(param.value as NodeFunctionObject) && !isNodeDataType) || (!param.value) ?
+                            <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
                                 {param.definition.parameter_id}
+                                {!param.value ? (
+                                    <Button><IconPlus size={16}/></Button>
+                                ) : null}
                                 <Handle
                                     key={param.definition.parameter_id}
                                     type="target"

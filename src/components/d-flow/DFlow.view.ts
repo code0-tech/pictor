@@ -156,7 +156,7 @@ export class NodeFunction {
                     parameter_id: param.id,
                     runtime_parameter_id: param.runtime_id
                 },
-                value: param.value
+                value: param.value instanceof NodeFunction ? param.value.json : param.value
             })),
             next_node: this._nextNode ? this._nextNode.json : undefined
         }
@@ -167,15 +167,13 @@ export class NodeFunctionParameter {
 
     private readonly _id: string
     private readonly _runtime_id: string
-    private _value: Value | undefined
-    private _subNode: NodeFunction | undefined
+    private _value: Value | NodeFunction | undefined
 
     constructor(nodeParameter: NodeParameterObject) {
         this._id = nodeParameter.definition.parameter_id
         this._runtime_id = nodeParameter.definition.runtime_parameter_id
         if (isNodeFunctionObject(nodeParameter.value as NodeFunctionObject)) {
-            this._subNode = new NodeFunction(nodeParameter.value as NodeFunctionObject);
-            this._value = this._subNode.json
+            this._value = new NodeFunction(nodeParameter.value as NodeFunctionObject);
         } else {
             this._value = nodeParameter.value
         }
@@ -190,25 +188,11 @@ export class NodeFunctionParameter {
         return this._runtime_id;
     }
 
-    get value(): Value | undefined {
+    get value(): Value | NodeFunction | undefined {
         return this._value;
     }
 
-    set value(value: Value) {
-        if (isNodeFunctionObject(value as NodeFunctionObject)) {
-            this._subNode = new NodeFunction(value as NodeFunctionObject);
-            this._value = this._subNode.json
-        } else {
-            this._value = value
-        }
-    }
-
-    get subNode(): NodeFunction | undefined {
-        return this._subNode;
-    }
-
-    set subNode(value: NodeFunction | undefined) {
-        this._subNode = value;
-        this._value = value?.json
+    set value(value: Value | NodeFunction) {
+        this._value = value;
     }
 }

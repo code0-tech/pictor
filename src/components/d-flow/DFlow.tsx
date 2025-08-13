@@ -356,8 +356,8 @@ export type DFlowProps = Code0ComponentProps & ReactFlowProps
 export const DFlow: React.FC<DFlowProps> = (props) => {
 
     const calculated = React.useRef<boolean>(false)
-    const [nodes, setNodes, onNodesChange] = useNodesState(props.nodes!!)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(props.edges!!)
+    const [nodes, setNodes] = useNodesState(props.nodes!!)
+    const [edges, setEdges] = useEdgesState(props.edges!!)
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
         if (calculated.current) return

@@ -28,8 +28,6 @@ import {InspectionSeverity} from "../../../../utils/inspection";
 import {EDataType} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
 
-type CodeZeroComponentProps = Code0Component<HTMLDivElement>;
-
 export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
     instance: NodeFunction
     isParameter: boolean

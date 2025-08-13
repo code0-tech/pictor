@@ -1,4 +1,4 @@
-import {Menu, MenuPortal, MenuTrigger} from "../../menu/Menu";
+import {Menu, MenuTrigger} from "../../menu/Menu";
 import React from "react";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {DFlowSuggestionMenuFooter} from "./DFlowSuggestionMenuFooter";
@@ -9,6 +9,7 @@ import {
 } from "../../form/InputSuggestion";
 import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
 import {DFlowSuggestionSearchInput} from "./DFlowSuggestionSearchInput";
+import {IconSearch} from "@tabler/icons-react";
 
 export interface DFlowSuggestionMenuProps {
     triggerContent: React.ReactNode
@@ -30,43 +31,46 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
         <MenuTrigger asChild>
             {triggerContent}
         </MenuTrigger>
-        <MenuPortal>
-            <InputSuggestionMenuContent>
-                <DFlowSuggestionMenuSearchBar onType={event => {
+        <InputSuggestionMenuContent>
+            <DFlowSuggestionMenuSearchBar onType={event => {
 
-                    if (event.key === "ArrowDown") {
-                        event.preventDefault();
-                        menuRef.current?.focusFirstItem(); // Navigate down
-                    } else if (event.key === "ArrowUp") {
-                        event.preventDefault();
-                        menuRef.current?.focusLastItem(); // Navigate up
-                    }
+                if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    menuRef.current?.focusFirstItem(); // Navigate down
+                } else if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    menuRef.current?.focusLastItem(); // Navigate up
+                }
 
-                    const searchTerm = event.target.value
-                    setStateSuggestions(suggestions.filter(suggestion => {
-                        return suggestion.displayText.some(text => {
-                            return text.includes(searchTerm)
-                        })
-                    }))
-                    event.preventDefault()
-                    return false
-                }}/>
-                <InputSuggestionMenuContentItems
-                    /* @ts-ignore */
-                    ref={menuRef}
-                    suggestions={toInputSuggestions(stateSuggestions)}
-                    onSuggestionSelect={(suggestion) => {
-                        onSuggestionSelect(suggestion.ref as DFlowSuggestion)
-                    }}
-                />
-                <DFlowSuggestionMenuFooter/>
-            </InputSuggestionMenuContent>
-        </MenuPortal>
+                const searchTerm = event.target.value
+                setStateSuggestions(suggestions.filter(suggestion => {
+                    return suggestion.displayText.some(text => {
+                        return text.includes(searchTerm)
+                    })
+                }))
+                event.preventDefault()
+                return false
+            }}/>
+            <InputSuggestionMenuContentItems
+                /* @ts-ignore */
+                ref={menuRef}
+                suggestions={toInputSuggestions(stateSuggestions)}
+                onSuggestionSelect={(suggestion) => {
+                    onSuggestionSelect(suggestion.ref as DFlowSuggestion)
+                }}
+            />
+            <DFlowSuggestionMenuFooter/>
+        </InputSuggestionMenuContent>
     </Menu>
 
 }
 
 export const DFlowSuggestionMenuSearchBar: React.FC = (props) => {
-    return <DFlowSuggestionSearchInput onKeyUp={(event) => props.onType(event)} clearable
-                                       style={{background: "none", boxShadow: "none"}} autoFocus/>
+    return <DFlowSuggestionSearchInput placeholder={"Search..."}
+                                       onKeyUp={(event) => props.onType(event)}
+                                       clearable
+                                       style={{background: "none", boxShadow: "none"}}
+                                       autoFocus
+                                       left={<IconSearch size={12}/>}
+    />
 }

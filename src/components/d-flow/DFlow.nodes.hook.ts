@@ -49,7 +49,7 @@ export const useFlowNodes = (flowId: string): Node[] => {
             const paramDataType = paramType ? dataTypeService.getDataType(paramType) : undefined;
 
             if (paramDataType?.type === EDataType.NODE) {
-                if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
+                if (param.value && param.value instanceof NodeFunction) {
                     const groupId = `${id}-group-${idCounter++}`;
                     nodes.push({
                         id: groupId,
@@ -64,10 +64,10 @@ export const useFlowNodes = (flowId: string): Node[] => {
                             depth: depth + 1,
                         },
                     });
-                    traverse(param.subNode!!, false, undefined, depth + 1, groupId);
+                    traverse(param.value as NodeFunction, false, undefined, depth + 1, groupId);
                 }
-            } else if (param.value && isNodeFunctionObject(param.value as NodeFunctionObject)) {
-                traverse(param.subNode!!, true, id, depth, parentGroup);
+            } else if (param.value && param.value instanceof NodeFunction) {
+                traverse(param.value as NodeFunction, true, id, depth, parentGroup);
             }
         });
 

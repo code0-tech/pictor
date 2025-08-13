@@ -8,7 +8,7 @@ import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowD
 import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
-import {NodeFunction, NodeFunctionObject} from "../DFlow.view";
+import {NodeFunction, NodeFunctionObject, NodeParameterObject} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
@@ -72,6 +72,14 @@ export const useSuggestions = (type: Type | undefined, genericKeys: string[] | u
                     function_id: funcDefinition.function_id,
                     runtime_function_id: funcDefinition.runtime_function_id
                 },
+                parameters: funcDefinition.parameters?.map(paramDefinition => {
+                    return {
+                        definition: {
+                            parameter_id: paramDefinition.parameter_id,
+                            runtime_parameter_id: paramDefinition.runtime_function_id
+                        }
+                    } as NodeParameterObject
+                })
             } as NodeFunctionObject, DFlowSuggestionType.FUNCTION, [funcDefinition.function_id])
             suggestionService.addSuggestion(suggestion)
             state.push(suggestion)

@@ -165,9 +165,9 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                     if (paramType && paramType.type === EDataType.NODE) {
                         // Finde passendes Parameter-Objekt
                         const paramInstance = currentNode.parameters.find(p => p.id === paramDef.parameter_id);
-                        if (paramInstance?.subNode) {
+                        if (paramInstance?.value) {
                             contextCounter++; // neuer Kontext
-                            traverseBlock(paramInstance.subNode, contextCounter);
+                            traverseBlock(paramInstance.value as NodeFunction, contextCounter);
                         }
                     }
                 }
@@ -188,7 +188,7 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                         const resolvedInputType = useInputType(
                             config.type,
                             functionDefinition,
-                            paramValue !== undefined ? [paramValue] : [],
+                            paramValue !== undefined ? paramValue instanceof NodeFunction ? [paramValue.json] : [paramValue] : [],
                             dataTypeService
                         );
                         if (resolvedInputType) {
@@ -205,7 +205,7 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
 
             // Handle return type (main output of this node)
             const paramValues = currentNode.parameters?.map(p => p.value).filter(v => v !== undefined) || [];
-            const resolvedReturnType = useReturnType(functionDefinition, paramValues, dataTypeService);
+            const resolvedReturnType = useReturnType(functionDefinition, paramValues.map(paramValue => paramValue instanceof NodeFunction ? paramValue.json : paramValue), dataTypeService);
             if (resolvedReturnType) {
                 refObjects.push({
                     type: resolvedReturnType,

@@ -7,7 +7,7 @@ import "./DFlowViewportDefaultCard.style.scss";
 import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
 import {
-    IconAlertTriangle,
+    IconAlertTriangle, IconArrowRightCircle,
     IconCopy,
     IconDots,
     IconExclamationCircle,
@@ -63,9 +63,9 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
             onClick={() => {
                 flowInstance.setViewport({
-                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - 150,
-                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - 50,
-                    zoom: 1
+                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1),
+                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1),
+                    zoom: 1.5
                 }, {
                     duration: 250,
                 })
@@ -156,7 +156,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
                                 {param.definition.parameter_id}
                                 {!param.value ? (
-                                    <Button><IconPlus size={16}/></Button>
+                                    <Button variant={"outlined"}><IconArrowRightCircle size={12}/></Button>
                                 ) : null}
                                 <Handle
                                     key={param.definition.parameter_id}

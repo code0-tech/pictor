@@ -1,5 +1,5 @@
 import {Meta} from "@storybook/react";
-import {Background, BackgroundVariant, Panel} from "@xyflow/react";
+import {Background, BackgroundVariant, MiniMap, Panel} from "@xyflow/react";
 import React, {useEffect} from "react";
 import {DFlowViewportDefaultCard} from "./viewport/cards/DFlowViewportDefaultCard";
 import {DFlowViewportGroupCard} from "./viewport/cards/DFlowViewportGroupCard";
@@ -73,6 +73,7 @@ const Test = () => {
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
         <DFlowViewportControls/>
+        <MiniMap/>
     </DFlow>
 }
 

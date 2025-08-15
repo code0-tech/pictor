@@ -1,5 +1,5 @@
 import {Code0Component} from "../../../../utils/types";
-import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
 import {
     isNodeFunctionObject,
     NodeFunction,
@@ -25,7 +25,7 @@ import {
 } from "@tabler/icons-react";
 import Text from "../../../text/Text";
 import Button from "../../../button/Button";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger} from "../../../menu/Menu";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
 import Badge from "../../../badge/Badge";
 import {useService} from "../../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service";
@@ -51,12 +51,15 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
+    const flowStoreApi = useStoreApi()
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.function.function_id)
     const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
     const edges = useStore(s => s.edges);
+    const width = props.width ?? 0
+    const height = props.height ?? 0
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
     function isParamConnected(paramId: string): boolean {
@@ -69,16 +72,15 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     return (
         <Card
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
-            /*
             onClick={() => {
                 flowInstance.setViewport({
-                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1),
-                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1),
-                    zoom: 1.5
+                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
+                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
+                    zoom: 1
                 }, {
                     duration: 250,
                 })
-            }}*/ style={{position: "relative"}}>
+            }} style={{position: "relative"}}>
 
             <CardSection border>
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
@@ -87,20 +89,30 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                         <Text size={"md"}>{functionData.function.function_id}</Text>
                     </Flex>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
-                        <Menu modal={true}>
+                        <Menu onOpenChange={event => {
+                            setTimeout(() => {
+                                flowStoreApi.setState({
+                                    nodesDraggable: !event,
+                                    nodesConnectable: !event,
+                                    elementsSelectable: !event,
+                                });
+                            }, 250) // Timeout to ensure the menu is fully opened before changing the state
+                        }}>
                             <MenuTrigger asChild>
                                 <Button variant={"none"}>
                                     <IconDots size={16}/>
                                 </Button>
                             </MenuTrigger>
-                            <MenuContent>
-                                <MenuLabel>Actions</MenuLabel>
-                                <MenuItem onClick={() => {
-                                    data.instance.deleteNextNode()
-                                    flowService.update()
-                                }}><IconTrash size={16}/> Delete node</MenuItem>
-                                <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
-                            </MenuContent>
+                            <MenuPortal>
+                                <MenuContent>
+                                    <MenuLabel>Actions</MenuLabel>
+                                    <MenuItem onClick={() => {
+                                        data.instance.deleteNextNode()
+                                        flowService.update()
+                                    }}><IconTrash size={16}/> Delete node</MenuItem>
+                                    <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
+                                </MenuContent>
+                            </MenuPortal>
                         </Menu>
                         <Button disabled>
                             <IconLayoutNavbarCollapseFilled size={16}/>

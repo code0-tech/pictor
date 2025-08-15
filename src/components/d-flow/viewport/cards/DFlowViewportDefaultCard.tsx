@@ -1,11 +1,9 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
 import {
-    isNodeFunctionObject,
     NodeFunction,
     NodeFunctionObject,
-    NodeFunctionParameter,
-    NodeParameterObject
+    NodeFunctionParameter
 } from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
@@ -20,7 +18,6 @@ import {
     IconFileLambdaFilled,
     IconLayoutNavbarCollapseFilled,
     IconMessageExclamation,
-    IconPlus,
     IconTrash
 } from "@tabler/icons-react";
 import Text from "../../../text/Text";
@@ -36,6 +33,8 @@ import {EDataType} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
+import {FileTabsService} from "../../../file-tabs/FileTabs.service";
+import {DFlowViewportFileTabsContent} from "../file-tabs/DFlowViewportFileTabsContent";
 
 export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
     instance: NodeFunction
@@ -52,6 +51,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
     const flowStoreApi = useStoreApi()
+    const fileTabsService = useService(FileTabsService)
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -71,6 +71,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
     return (
         <Card
+            borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
             onClick={() => {
                 flowInstance.setViewport({
@@ -80,6 +81,14 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 }, {
                     duration: 250,
                 })
+                fileTabsService.add({
+                    id: id,
+                    active: true,
+                    closeable: true,
+                    children: <Text size={"md"}>{functionData.function.function_id}</Text>,
+                    content: <DFlowViewportFileTabsContent functionInstance={data.instance}/>
+                })
+                fileTabsService.update()
             }} style={{position: "relative"}}>
 
             <CardSection border>
@@ -120,6 +129,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     </Flex>
                 </Flex>
             </CardSection>
+
 
             <Handle
                 isConnectable={false}

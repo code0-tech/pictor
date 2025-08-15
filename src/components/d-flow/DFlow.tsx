@@ -100,8 +100,14 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
         work.forEach(size);
 
         /* ---------- relatives Layout (Zentren in globalen Koordinaten) -------- */
+
         type Pos = { x: number; y: number };
         const rel = new Map<string, Pos>();
+
+        // Merker: Unterkante je rechter Spalten-"Band", damit Parameter unterschiedlicher Parents
+        // in derselben Spalte nicht kollidieren.
+        const columnBottom = new Map<number, number>();
+        const colKey = (x: number) => Math.round(x / 10); // 10px-Buckets gegen Floating-Drift
 
         const layout = (n: Node, cx: number, cy: number): number => {
             rel.set(n.id, {x: cx, y: cy});
@@ -114,16 +120,46 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 
             const rightH = right.reduce((s, p) => s + size(p).h, 0) + V * Math.max(0, right.length - 1);
             let py = cy - rightH / 2;
+
+            // tatsächliche Unterkante der rechten Spalte dieses Parents
+            let rightBottom = cy + h / 2;
+
             right.forEach(p => {
                 const ps = size(p);
                 const px = cx + w / 2 + H + ps.w / 2;
-                layout(p, px, py + ps.h / 2);
-                py += ps.h + V;
+
+                // Start-Center-Y des Params (ohne Kollision)
+                let pcy = py + ps.h / 2;
+
+                // **NEU**: Kollisionen mit bereits platzierten Parametern in derselben rechten Spalte vermeiden
+                const key = colKey(px);
+                const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
+                const minTop = occ + V; // mind. V Abstand über zuletzt belegter Unterkante
+                const desiredTop = pcy - ps.h / 2;
+
+                if (desiredTop < minTop) {
+                    pcy = minTop + ps.h / 2;   // schiebe diesen Param nach unten
+                    py  = pcy - ps.h / 2;      // und korrigiere lokalen Stack-Start
+                }
+
+                // Layout des Params (liefert tatsächliche Unterkante inkl. Subtree)
+                const subBottom = layout(p, px, pcy);
+
+                // Spalten-Unterkante aktualisieren
+                columnBottom.set(key, Math.max(columnBottom.get(key) ?? Number.NEGATIVE_INFINITY, subBottom));
+
+                // Unterkante der gesamten rechten Seite dieses Parents fortschreiben
+                rightBottom = Math.max(rightBottom, subBottom);
+
+                // nächster Param: mind. V unter tatsächlicher Unterkante dieses Params bzw. unter dem
+                // zuvor berechneten lokalen Stack-Increment (falls Subtree kleiner ist).
+                py = Math.max(py + ps.h + V, subBottom + V);
             });
 
+            // Unterkante dieses Nodes/Subtrees
             let bottom = Math.max(
-                cy + h / 2,          // Unterkante des Nodes selbst
-                cy + rightH / 2      // Unterkante des rechten Param-Stacks
+                cy + h / 2,  // Unterkante des Nodes selbst
+                rightBottom  // Unterkante des rechten Param-Stacks (inkl. Subtrees & Kollisions-Shift)
             );
 
             /* 2) Gruppen-Parameter (in einer Zeile unter dem Node) */
@@ -234,7 +270,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
             const childSize = (n: Node): Size => {
                 const sw = typeof n.style?.width === 'number' ? n.style.width : undefined;
                 const sh = typeof n.style?.height === 'number' ? n.style.height : undefined;
-                // ACHTUNG: size() kann gecached sein – Style bevorzugen
                 const s = measured(n);
                 return {w: sw ?? s.w, h: sh ?? s.h};
             };
@@ -264,11 +299,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
                     k.position.y -= dy;
                 });
                 changed = true;
-
-                minX -= dx;
-                minY -= dy;
-                maxX -= dx;
-                maxY -= dy;
             }
 
             const newW = (maxX - minX) + 2 * PAD;
@@ -281,15 +311,8 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
                 changed = true;
             }
 
-            g.measured = {
-                width: newW,
-                height: newH,
-            }
-            g.style = {
-                ...(g.style as React.CSSProperties),
-                width: newW,
-                height: newH,
-            };
+            g.measured = { width: newW, height: newH };
+            g.style = { ...(g.style as React.CSSProperties), width: newW, height: newH };
         });
 
         /* ---------- Param-Group-Row nach Bounding sauber zentrieren ----------- */
@@ -332,7 +355,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
             ordered.forEach((g, i) => {
                 const gn = posById.get(g.id)!;
 
-                // *** NEU: in Parent-Row gegen das tatsächliche Container-TL (gn.parentId) umrechnen ***
+                // gegen das tatsächliche Container-TL (gn.parentId) umrechnen
                 const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0};
 
                 // setze linke Kante relativ zum Container

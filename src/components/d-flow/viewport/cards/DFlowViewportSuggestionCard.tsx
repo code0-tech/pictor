@@ -25,6 +25,6 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
         props.data.parentFunction.nextNode = new NodeFunction(suggestion.value as NodeFunctionObject)
         flowService.update()
-    }} suggestions={result} triggerContent={<Button variant={"none"} color={"info"}><IconPlus size={16}/> Add new node</Button>}/>
+    }} suggestions={result} triggerContent={<Button top={-50} variant={"normal"} color={"secondary"}><IconPlus size={16}/> Add new node</Button>}/>
 
 }

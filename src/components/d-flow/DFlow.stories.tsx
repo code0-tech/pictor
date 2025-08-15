@@ -1,5 +1,5 @@
 import {Meta} from "@storybook/react";
-import {Background, BackgroundVariant, MiniMap, Panel} from "@xyflow/react";
+import {Background, BackgroundVariant, MiniMap} from "@xyflow/react";
 import React, {useEffect} from "react";
 import {DFlowViewportDefaultCard} from "./viewport/cards/DFlowViewportDefaultCard";
 import {DFlowViewportGroupCard} from "./viewport/cards/DFlowViewportGroupCard";
@@ -22,6 +22,8 @@ import {DFlowSuggestion} from "./suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "./suggestions/DFlowSuggestion.service";
 import {DFlowViewportControls} from "./viewport/DFlowViewportControls";
 import {DFlowViewportSuggestionCard} from "./viewport/cards/DFlowViewportSuggestionCard";
+import {FileTabsView} from "../file-tabs/FileTabs.view";
+import {FileTabsService} from "../file-tabs/FileTabs.service";
 
 export default {
     title: "DFlow",
@@ -31,6 +33,7 @@ export const ExampleFlow = () => {
 
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
+    const [fileTabsStore, fileTabsService] = createReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
     const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService);
     const [functionStore, functionService] = createReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, undefined, functionsData);
     const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow1)]);
@@ -42,7 +45,7 @@ export const ExampleFlow = () => {
 
     return (
         <ContextStoreProvider
-            services={[[dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+            services={[[fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
             <Test/>
         </ContextStoreProvider>
     );

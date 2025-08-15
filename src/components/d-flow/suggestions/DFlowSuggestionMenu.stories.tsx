@@ -46,7 +46,7 @@ export const Example = () => {
 
 const SuggestionMenu = () => {
 
-    const result = useSuggestions(undefined, [], "some_database_id", 0, 0)
+    const result = useSuggestions("NUMBER", [], "some_database_id", 0, 0)
 
     return <div>
         <TextInput title={"Text"}

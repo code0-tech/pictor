@@ -48,6 +48,13 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
     }
 
     public add(value: FileTabsView) {
+        //if tab with id already exists, do not add it again and just activate the existing one
+
+        if (this.values().some(value1 => value1.id == value.id)) {
+            this.activateTab(value.id!!)
+            return
+        }
+
         if (value.active) {
             this.values().forEach((item: FileTabsView) => {
                 item.active = false

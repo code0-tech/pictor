@@ -49,7 +49,7 @@ export const setElementKey = (
 
 // Base input props without layout-specific keys
 export type Code0Input = Omit<
-    Omit<Omit<Omit<Code0Component<HTMLInputElement>, "defaultValue">, "left">, "right">,
+    Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
     "title"
 >;
 

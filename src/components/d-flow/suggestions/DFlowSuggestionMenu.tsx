@@ -1,4 +1,4 @@
-import {Menu, MenuTrigger} from "../../menu/Menu";
+import {Menu, MenuSeparator, MenuTrigger} from "../../menu/Menu";
 import React from "react";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {DFlowSuggestionMenuFooter} from "./DFlowSuggestionMenuFooter";
@@ -8,8 +8,7 @@ import {
     InputSuggestionMenuContentItemsHandle
 } from "../../form/InputSuggestion";
 import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
-import {DFlowSuggestionSearchInput} from "./DFlowSuggestionSearchInput";
-import {IconSearch} from "@tabler/icons-react";
+import {DFlowSuggestionMenuSearchBar} from "./DFlowSuggestionMenuSearchBar";
 
 export interface DFlowSuggestionMenuProps {
     triggerContent: React.ReactNode
@@ -42,6 +41,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                     menuRef.current?.focusLastItem(); // Navigate up
                 }
 
+                // @ts-ignore
                 const searchTerm = event.target.value
                 setStateSuggestions(suggestions.filter(suggestion => {
                     return suggestion.displayText.some(text => {
@@ -51,6 +51,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                 event.preventDefault()
                 return false
             }}/>
+            <MenuSeparator/>
             <InputSuggestionMenuContentItems
                 /* @ts-ignore */
                 ref={menuRef}
@@ -59,18 +60,9 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                     onSuggestionSelect(suggestion.ref as DFlowSuggestion)
                 }}
             />
+            <MenuSeparator/>
             <DFlowSuggestionMenuFooter/>
         </InputSuggestionMenuContent>
     </Menu>
 
-}
-
-export const DFlowSuggestionMenuSearchBar: React.FC = (props) => {
-    return <DFlowSuggestionSearchInput placeholder={"Search..."}
-                                       onKeyUp={(event) => props.onType(event)}
-                                       clearable
-                                       style={{background: "none", boxShadow: "none"}}
-                                       autoFocus
-                                       left={<IconSearch size={12}/>}
-    />
 }

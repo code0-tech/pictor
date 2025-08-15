@@ -1,6 +1,12 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import {isNodeFunctionObject, NodeFunction, NodeFunctionObject, NodeParameterObject} from "../../DFlow.view";
+import {
+    isNodeFunctionObject,
+    NodeFunction,
+    NodeFunctionObject,
+    NodeFunctionParameter,
+    NodeParameterObject
+} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowViewportDefaultCard.style.scss";
@@ -28,6 +34,8 @@ import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.servic
 import {InspectionSeverity} from "../../../../utils/inspection";
 import {EDataType} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
+import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
+import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 
 export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
     instance: NodeFunction
@@ -39,7 +47,7 @@ export type DFlowViewportDefaultCardProps = NodeProps<Node<DFlowViewportDefaultC
 
 export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> = memo((props) => {
     const {data, id} = props;
-    const functionData = data as NodeFunctionObject & { isParameter: boolean };
+    const functionData = data as DFlowViewportDefaultCardDataProps & NodeFunctionObject;
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
@@ -61,6 +69,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     return (
         <Card
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
+            /*
             onClick={() => {
                 flowInstance.setViewport({
                     x: (viewportWidth / 2) + (props.positionAbsoluteX * -1),
@@ -69,7 +78,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 }, {
                     duration: 250,
                 })
-            }} style={{position: "relative"}}>
+            }}*/ style={{position: "relative"}}>
 
             <CardSection border>
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
@@ -142,24 +151,27 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </div>
             ) : null}
 
-            {functionData.parameters?.some(param => isNodeFunctionObject(param.value as NodeFunctionObject) || !param.value) ? (
+            {functionData.instance.parameters?.some(param => param.value instanceof NodeFunction || !param.value) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-                    {functionData.parameters?.map((param: NodeParameterObject, index: number) => {
+                    {functionData.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {
 
 
-                        const parameter = definition?.parameters!!.find(p => p.parameter_id == param.definition.parameter_id)
+                        const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+                        const result = useSuggestions(undefined, [], "some_database_id", 0, 0)
 
-
-                        return (isNodeFunctionObject(param.value as NodeFunctionObject) && !isNodeDataType) || (!param.value) ?
+                        return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
-                                {param.definition.parameter_id}
+                                {param.id}
                                 {!param.value ? (
-                                    <Button variant={"outlined"}><IconArrowRightCircle size={12}/></Button>
+                                        <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
+                                            param.value = new NodeFunction(suggestion.value as NodeFunctionObject)
+                                            flowService.update()
+                                        }} suggestions={result} triggerContent={<Button variant={"outlined"}><IconArrowRightCircle size={12}/></Button>}/>
                                 ) : null}
                                 <Handle
-                                    key={param.definition.parameter_id}
+                                    key={param.id}
                                     type="target"
                                     position={Position.Right}
                                     style={{
@@ -168,9 +180,9 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                                         top: "50%",
                                         right: isNodeDataType ? "50%" : "0"
                                     }}
-                                    id={`param-${param.definition.parameter_id}`}
+                                    id={`param-${param.id}`}
                                     isConnectable={false}
-                                    hidden={!isParamConnected(param.definition.parameter_id)}
+                                    hidden={!isParamConnected(param.id)}
                                     className={"function-card__handle function-card__handle--target"}
                                 />
                             </Flex> : null

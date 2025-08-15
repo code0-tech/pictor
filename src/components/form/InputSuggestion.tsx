@@ -27,6 +27,7 @@ export const InputSuggestionMenuContent: React.FC<InputSuggestionMenuContentProp
 
     // @ts-ignore
     return <MenuContent ref={localRef}
+                        onContextMenuCapture={(e) => e.stopPropagation()}
                         onInteractOutside={(event) => event.target instanceof HTMLInputElement && event.preventDefault()}
                         onCloseAutoFocus={(event) => event.preventDefault()}
                         align={"start"}
@@ -54,7 +55,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         <ScrollAreaViewport>
             {suggestions?.map((suggestion, i) => {
                 // @ts-ignore
-                return <MenuItem onSelect={() => onSuggestionSelect(suggestion)} ref={el => itemRefs.current[i] = el}>
+                return <MenuItem onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)} ref={el => itemRefs.current[i] = el}>
                     {suggestion.children}
                 </MenuItem>
             })}

@@ -35,7 +35,7 @@ export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = (props) => {
                     position: 'absolute',
                     transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
                     pointerEvents: 'all',
-                    zIndex: 1,
+                    zIndex: 100,
                 }}>
                     <Badge>
                         {props.label}

@@ -34,6 +34,7 @@ import {dataTypes} from "../d-flow/data-type/DFlowDataType.data";
 import {Flow} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {DFlowViewportFileTabs} from "../d-flow/viewport/file-tabs/DFlowViewportFileTabs";
+import {DFlowViewportMiniMap} from "../d-flow/viewport/DFlowViewportMiniMap";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -189,6 +190,6 @@ const FlowExample = () => {
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
         <DFlowViewportControls/>
-        <MiniMap/>
+        <DFlowViewportMiniMap/>
     </DFlow>
 }

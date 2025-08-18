@@ -92,9 +92,7 @@ export const useSuggestions = (type: Type | undefined, genericKeys: string[] | u
     const refObjects = type ? useRefObjects(flowId) : []
     refObjects.forEach(value => {
         if (value.primaryLevel > contextLevel) return
-        if (value.secondaryLevel > nodeLevel) return
-        console.log(value.primaryLevel, contextLevel, value.primaryLevel <= contextLevel)
-        console.log(value.secondaryLevel, nodeLevel, value.secondaryLevel <= nodeLevel)
+        if (value.secondaryLevel + 1 > nodeLevel) return
         const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.primaryLevel}-${value.secondaryLevel}-${value.tertiaryLevel || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)
     })

@@ -378,13 +378,10 @@ export type DFlowProps = Code0ComponentProps & ReactFlowProps
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
 
-    const calculated = React.useRef<boolean>(false)
     const [nodes, setNodes] = useNodesState(props.nodes!!)
     const [edges, setEdges] = useEdgesState(props.edges!!)
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
-        if (calculated.current) return
-        calculated.current = true
 
         const localNodes = nodes.map(value => {
             const node = document.querySelectorAll("[data-id='" + value.id + "']")
@@ -400,12 +397,25 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
         const layouted = getLayoutedElements(localNodes, edges)
         setNodes(layouted.nodes as Node[])
         setEdges(layouted.edges as Edge[])
-    }, [calculated, nodes, edges, props.nodes, props.edges])
+    }, [nodes, edges, props.nodes, props.edges])
 
     React.useEffect(() => {
-        calculated.current = false
-        setNodes(props.nodes as Node[])
-        setEdges(props.edges as Edge[])
+
+        const localNodes = props.nodes!!.map(value => {
+            const node = document.querySelectorAll("[data-id='" + value.id + "']")
+            return {
+                ...value,
+                measured: {
+                    width: value.measured?.width ?? node[0]?.clientWidth ?? 0,
+                    height: value.measured?.height ?? node[0]?.clientHeight ?? 0,
+                }
+            } as Node
+        })
+
+        const layouted = getLayoutedElements(localNodes, props.edges!!)
+
+        setNodes(layouted.nodes as Node[])
+        setEdges(layouted.edges as Edge[])
     }, [props.nodes, props.edges])
 
     return <ReactFlow onInit={(reactFlowInstance) => reactFlowInstance.fitView()}

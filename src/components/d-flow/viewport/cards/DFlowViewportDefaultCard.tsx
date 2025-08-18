@@ -39,6 +39,8 @@ import {DFlowViewportFileTabsContent} from "../file-tabs/DFlowViewportFileTabsCo
 export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
     instance: NodeFunction
     isParameter: boolean
+    depth: number
+    index: number
 }
 
 // @ts-ignore
@@ -86,7 +88,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     active: true,
                     closeable: true,
                     children: <Text size={"md"}>{functionData.function.function_id}</Text>,
-                    content: <DFlowViewportFileTabsContent functionInstance={data.instance}/>
+                    content: <DFlowViewportFileTabsContent contextLevel={data.depth} nodeLevel={data.index} functionInstance={data.instance}/>
                 })
                 fileTabsService.update()
             }} style={{position: "relative"}}>
@@ -129,7 +131,6 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     </Flex>
                 </Flex>
             </CardSection>
-
 
             <Handle
                 isConnectable={false}
@@ -181,7 +182,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
                         const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
-                        const result = useSuggestions(undefined, [], "some_database_id", 0, 0)
+                        const result = useSuggestions(undefined, [], "some_database_id", data.depth, data.index)
 
                         return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>

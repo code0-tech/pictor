@@ -6,7 +6,13 @@ import {Dialog, DialogContent} from "../dialog/Dialog"
 import "./Command.style.scss"
 
 export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>
-export type CommandDialogProps = Code0ComponentProps & React.ComponentProps<typeof Dialog>
+export type CommandDialogProps = {
+    dialogProps?: Code0ComponentProps & React.ComponentProps<typeof Dialog>
+    contentProps?: Code0ComponentProps & React.ComponentProps<typeof DialogContent>
+    open?: boolean
+    onOpenChange?: () => void
+    children: React.ReactNode
+}
 export type CommandListProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.List>
 export type CommandInputProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Input>
 export type CommandEmptyProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Empty>
@@ -19,11 +25,11 @@ export const Command: React.FC<CommandProps> = (props) => {
     return <CommandPrimitive {...mergeCode0Props("command", props) as CommandProps}/>
 }
 
-export const CommandDialog: React.FC<CommandProps> = (props) => {
+export const CommandDialog: React.FC<CommandDialogProps> = (props) => {
     return (
-        <Dialog>
-            <DialogContent>
-                <Command>
+        <Dialog {...props.dialogProps} open={props.open} onOpenChange={props.onOpenChange}>
+            <DialogContent {...mergeCode0Props("command__dialog", props.contentProps ?? {}) as Code0ComponentProps & React.ComponentProps<typeof DialogContent>}>
+                <Command {...props}>
                     {props.children}
                 </Command>
             </DialogContent>

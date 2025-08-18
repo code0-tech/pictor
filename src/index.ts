@@ -9,7 +9,6 @@ export {default as DFolder} from "./components/d-folder/DFolder"
 export {default as DFullScreen} from "./components/d-fullscreen/DFullScreen"
 export {default as DZoomPanPinch} from "./components/d-zoom-pan-pinch/DZoomPanPinch"
 
-export { default as Dialog} from "./components/dialog/Dialog"
 export { default as Flex} from "./components/flex/Flex"
 export { default as Quote} from "./components/quote/Quote"
 export { default as Row} from "./components/row/Row"

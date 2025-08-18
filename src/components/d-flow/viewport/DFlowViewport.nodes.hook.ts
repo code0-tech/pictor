@@ -35,15 +35,16 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         isParameter = false,
         parentId?: string,
         depth: number = 0,
+        scope: number = 0,
         parentGroup?: string
     ) => {
         const id = `${fn.runtime_id}-${idCounter++}`;
-        const index = nextIndexForDepth(depth);
+        const index = nextIndexForDepth(scope);
 
         nodes.push({
             id,
             type: "default",
-            position: { x: 0, y: 0 },
+            position: {x: 0, y: 0},
             draggable: false,
             parentId: parentGroup,
             extent: parentGroup ? "parent" : undefined,
@@ -52,6 +53,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                 instance: fn,
                 isParameter,
                 linkingId: isParameter ? parentId : undefined,
+                scope,
                 depth,
                 index,
             },
@@ -61,7 +63,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             nodes.push({
                 id: `${id}-suggestion`,
                 type: "suggestion",
-                position: { x: 0, y: 0 },
+                position: {x: 0, y: 0},
                 draggable: false,
                 extent: parentGroup ? "parent" : undefined,
                 parentId: parentGroup,
@@ -88,7 +90,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                     nodes.push({
                         id: groupId,
                         type: "group",
-                        position: { x: 0, y: 0 },
+                        position: {x: 0, y: 0},
                         draggable: false,
                         parentId: parentGroup,
                         extent: parentGroup ? "parent" : undefined,
@@ -96,25 +98,26 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                             isParameter: true,
                             linkingId: id,
                             depth: depth + 1,
+                            scope: groupDepth
                         },
                     });
 
                     // Child function inside the group uses the group's depth (its lane).
-                    traverse(param.value as NodeFunction, false, undefined, groupDepth, groupId);
+                    traverse(param.value as NodeFunction, false, undefined, depth + 1, groupDepth, groupId);
                 }
             } else if (param.value && param.value instanceof NodeFunction) {
                 // Functions passed as non-NODE parameters live in the same depth/lane.
-                traverse(param.value as NodeFunction, true, id, depth, parentGroup);
+                traverse(param.value as NodeFunction, true, id, depth, scope, parentGroup);
             }
         });
 
         if (fn.nextNode) {
             // Linear chain continues in the same depth/lane.
-            traverse(fn.nextNode, false, undefined, depth, parentGroup);
+            traverse(fn.nextNode, false, undefined, depth, scope, parentGroup);
         }
     };
 
     // Root lane is depth 0.
-    traverse(flow.startingNode, false, undefined, 0, undefined);
+    traverse(flow.startingNode, false, undefined, 0, 0, undefined);
     return nodes;
 };

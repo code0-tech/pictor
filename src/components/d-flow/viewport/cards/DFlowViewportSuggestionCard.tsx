@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../../utils/types";
 import {Node, NodeProps} from "@xyflow/react";
-import React from "react";
+import React, {memo} from "react";
 import Button from "../../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
@@ -17,7 +17,7 @@ export interface DFlowViewportSuggestionCardDataProps extends Code0Component<HTM
 // @ts-ignore
 export type DFlowViewportSuggestionCardProps = NodeProps<Node<DFlowViewportSuggestionCardDataProps>>
 
-export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardProps> = (props) => {
+export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardProps> = memo((props) => {
 
     const result = useSuggestions(undefined, [], props.data.flowId, 0, 0)
     const flowService = useService(DFlowReactiveService)
@@ -27,4 +27,4 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
         flowService.update()
     }} suggestions={result} triggerContent={<Button top={-50} variant={"normal"} color={"secondary"}><IconPlus size={16}/> Add new node</Button>}/>
 
-}
+})

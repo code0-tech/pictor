@@ -36,10 +36,11 @@ import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {FileTabsService} from "../../../file-tabs/FileTabs.service";
 import {DFlowViewportFileTabsContent} from "../file-tabs/DFlowViewportFileTabsContent";
 
-export interface DFlowViewportDefaultCardDataProps extends Code0Component<HTMLDivElement> {
+export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunction
     isParameter: boolean
     depth: number
+    scope: number
     index: number
 }
 
@@ -131,6 +132,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     </Flex>
                 </Flex>
             </CardSection>
+
+            <Badge>{data.depth} - {data.scope}-{data.index}</Badge>
 
             <Handle
                 isConnectable={false}

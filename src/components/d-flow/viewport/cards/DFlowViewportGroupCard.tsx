@@ -1,4 +1,4 @@
-import React from "react";
+import React, {memo} from "react";
 import {Handle, NodeProps, Position} from "@xyflow/react";
 import {FLOW_EDGE_RAINBOW} from "../DFlowViewport.edges.hook";
 import Card from "../../../card/Card";
@@ -6,7 +6,7 @@ import Card from "../../../card/Card";
 export interface DFlowViewportGroupCardProps extends NodeProps {
 }
 
-export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = (
+export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = memo((
     {data, ...rest}
 ) => {
     const depth = (data as any)?.depth ?? 0;
@@ -32,7 +32,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = (
             />
         </Card>
     );
-};
+});
 
 const withAlpha = (hex: string, alpha: number) => {
     const h = hex.replace('#', '');

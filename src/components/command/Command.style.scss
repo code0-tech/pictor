@@ -27,44 +27,51 @@
     overflow-x: hidden;
   }
 
-  &__input {
+  &__input.input,
+  .input.input:hover,
+  .input.input:active,
+  .input.input:focus,
+  .input.input:focus-within,
+  .input.input:not(:focus),
+  {
     @include helpers.noFocusStyle();
 
+    all: unset !important;
     display: flex;
     height: 2rem;
-    border-bottom: 1px solid;
-    border-right: none;
-    border-left: none;
+    border-bottom: 1px solid helpers.backgroundColor(variables.$white) !important;
     border-top: none;
-    border-color: helpers.backgroundColor(variables.$white);
-    background-color: transparent;
+    border-left: none;
+    border-right: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
-    font-size: 0.875rem;
-    margin: 0.25rem 0;
-    padding-inline: 1rem;
+    background: transparent !important;
+    font-size: variables.$sm;
+    margin: 0 variables.$xs !important;
     outline: none;
 
+    .input__control {
+      padding: variables.$sm 0 !important;
+    }
 
     &::placeholder {
       color: helpers.color(variables.$white, 25%);
     }
 
     &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
+      @include helpers.disabled()
     }
   }
 
   &__empty {
-    padding: 1rem 0 1.5rem 0;
+    padding: variables.$md 0 variables.$xl 0;
     text-align: center;
-    font-size: 0.875rem;
+    font-size: variables.$sm;
     color: helpers.color(variables.$white, variables.$hierarchyTertiary);
   }
 
   &__group {
     overflow: hidden;
-    padding: 0.5rem;
+    padding: variables.$xs;
     color: helpers.color(variables.$white, variables.$hierarchyTertiary);
     font-size: variables.$xs;
   }
@@ -73,12 +80,12 @@
     position: relative;
     display: flex;
     cursor: default;
-    gap: 0.5rem;
+    gap: variables.$xs;
     user-select: none;
     align-items: center;
     border-radius: variables.$borderRadius - 0.375rem;
-    padding: 0.375rem 0.5rem;
-    font-size: 0.875rem;
+    padding: variables.$xxs variables.$xxs;
+    font-size: variables.$sm;
     outline: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
 
@@ -88,7 +95,6 @@
     }
 
     &[data-selected='true'] {
-      color: helpers.color(variables.$white, variables.$hierarchyPrimary);
       background: helpers.backgroundColor();
     }
 
@@ -101,17 +107,17 @@
   }
 
   &__separator {
-    margin-inline: -0.25rem;
     height: 1px;
+    margin: 0 variables.$xs;
     background: helpers.backgroundColor(variables.$white);
   }
 
   &__shortcut {
     margin-left: auto;
-    font-size: 0.75rem;
+    font-size: variables.$xs;
     letter-spacing: 0.1rem;
-    padding: 0 0.25rem;
-    border-radius: 0.375rem;
+    padding: 0 variables.$xxs;
+    border-radius: 0.375rem !important;
     color: helpers.color(variables.$white, variables.$hierarchyTertiary);
     background: helpers.backgroundColor(variables.$primary);
   }

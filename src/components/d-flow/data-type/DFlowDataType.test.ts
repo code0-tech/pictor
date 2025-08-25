@@ -201,8 +201,8 @@ describe('value validation against data type', () => {
                     },
                     value: {
                         type: "NUMBER",
-                        primaryLevel: 0,
-                        secondaryLevel: 1
+                        depth: 0,
+                        nodeLevel: 1
                     }
                 }]
             }

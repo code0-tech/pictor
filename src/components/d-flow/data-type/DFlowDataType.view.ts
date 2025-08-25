@@ -34,10 +34,10 @@ export interface RefPath {
  *
  * Every possible reference can be tracked down via it's depth inside the flow.
  *
- * {@link RefObject#primaryLevel} links to the context of the node inside the flow
+ * {@link RefObject#depth} links to the context of the node inside the flow
  * starting at 0.
  *
- * {@link RefObject#secondaryLevel} links to the node inside the flow
+ * {@link RefObject#nodeLevel} links to the node inside the flow
  * starting at 0.
  *
  * {@link RefObject#tertiaryLevel} links to an {@link DataTypeObject#rule#inputtype} of the node
@@ -45,8 +45,9 @@ export interface RefPath {
  */
 export interface RefObject {
     type: Type
-    primaryLevel: number
-    secondaryLevel: number
+    depth: number
+    scope: number
+    nodeLevel: number
     tertiaryLevel?: string
     path?: RefPath[]
 }
@@ -54,10 +55,11 @@ export interface RefObject {
 export const isRefObject = (v: any): v is RefObject =>
     v && typeof v === 'object' &&
     typeof v.type === 'string' &&
-    typeof v.primaryLevel === 'number' &&
-    typeof v.secondaryLevel === 'number' &&
+    typeof v.depth === 'number' &&
+    typeof v.scope === 'number' &&
+    typeof v.nodeLevel === 'number' &&
     (v.tertiaryLevel === undefined || typeof v.tertiaryLevel === 'number') &&
-    Object.keys(v).every(k => ['type', 'primaryLevel', 'secondaryLevel', 'tertiaryLevel'].includes(k))
+    Object.keys(v).every(k => ['type', 'depth', 'scope', 'nodeLevel', 'tertiaryLevel'].includes(k))
 
 /**
  * This type represents a raw object including the rule

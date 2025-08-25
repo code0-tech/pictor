@@ -10,20 +10,21 @@ import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
-    contextLevel?: number
+    depthLevel?: number
+    scopeLevel?: number
     nodeLevel?: number
 }
 
 export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
 
-    const {functionInstance, contextLevel, nodeLevel} = props
+    const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.id)
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {functionInstance.parameters!!.map(parameter => {
 
             const parameterDefinition = definition?.parameters!!.find(parameterDefinition => parameterDefinition.parameter_id === parameter.id)
-            const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", contextLevel, nodeLevel)
+            const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
             return <div>
                 <TextInput title={parameterDefinition!!.parameter_id}
                            description={JSON.stringify(parameterDefinition!!.type)}

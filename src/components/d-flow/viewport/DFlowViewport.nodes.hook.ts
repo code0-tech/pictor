@@ -22,14 +22,6 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     let globalDepthCounter = 0;
     const nextGlobalDepth = () => ++globalDepthCounter;
 
-    // Per-depth running index for nodes. Resets automatically when we first visit a new depth.
-    const depthIndex: Record<number, number> = {};
-    const nextIndexForDepth = (d: number): number => {
-        const i = depthIndex[d] ?? 1;
-        depthIndex[d] = i + 1;
-        return i;
-    };
-
     const traverse = (
         fn: NodeFunction,
         isParameter = false,
@@ -39,7 +31,6 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         parentGroup?: string
     ) => {
         const id = `${fn.runtime_id}-${idCounter++}`;
-        const index = nextIndexForDepth(scope);
 
         nodes.push({
             id,
@@ -55,7 +46,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                 linkingId: isParameter ? parentId : undefined,
                 scope,
                 depth,
-                index,
+                index: idCounter,
             },
         });
 

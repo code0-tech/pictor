@@ -89,7 +89,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     active: true,
                     closeable: true,
                     children: <Text size={"md"}>{functionData.function.function_id}</Text>,
-                    content: <DFlowViewportFileTabsContent contextLevel={data.depth} nodeLevel={data.index} functionInstance={data.instance}/>
+                    content: <DFlowViewportFileTabsContent depthLevel={data.depth} scopeLevel={data.scope} nodeLevel={data.index} functionInstance={data.instance}/>
                 })
                 fileTabsService.update()
             }} style={{position: "relative"}}>

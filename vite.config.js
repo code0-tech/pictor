@@ -9,7 +9,15 @@ import pkg from './package.json'
 
 export default defineConfig({
     plugins: [
-        react(),
+        react({
+            babel: {
+                plugins: [
+                    'babel-plugin-react-compiler',
+                    ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],
+                    '@babel/plugin-transform-class-properties'
+                ],
+            },
+        }),
         libInjectCss(),
         dts({
             include: ['src'],

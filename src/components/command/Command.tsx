@@ -1,11 +1,11 @@
 import React from "react"
 import {Command as CommandPrimitive} from "cmdk"
 import {mergeCode0Props} from "../../utils/utils"
-import {Code0Component, Code0ComponentProps} from "../../utils/types"
+import {Code0ComponentProps} from "../../utils/types"
 import {Dialog, DialogContent} from "../dialog/Dialog"
 import "./Command.style.scss"
 import Badge from "../badge/Badge"
-import Input from "../form/Input"
+import TextInput, {TextInputProps} from "../form/TextInput"
 
 export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>
 export type CommandDialogProps = {
@@ -16,7 +16,7 @@ export type CommandDialogProps = {
     children: React.ReactNode
 }
 export type CommandListProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.List>
-export type CommandInputProps = Code0ComponentProps & React.ComponentProps<typeof Input>
+export type CommandInputProps = Code0ComponentProps & TextInputProps
 export type CommandEmptyProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Empty>
 export type CommandGroupProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Group>
 export type CommandItemProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Item>
@@ -58,7 +58,7 @@ export const CommandInput: React.FC<CommandInputProps> = (props) => {
             }}
             asChild
         >
-            <Input {...mergeCode0Props("command__input", props)} />
+            <TextInput {...mergeCode0Props("command__input", props)} />
         </CommandPrimitive.Input>
     )
 }

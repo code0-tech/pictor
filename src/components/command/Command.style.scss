@@ -3,16 +3,20 @@
 @use "../../styles/variables";
 
 .command {
-  @include box.box(variables.$primary, variables.$primary, variables.$secondary);
-  @include helpers.borderRadius();
-  @include helpers.fontStyle();
 
+  z-index: 100;
   display: flex;
   height: 100%;
   width: 100%;
   flex-direction: column;
   overflow: hidden;
   background: variables.$primary;
+  padding: variables.$xxs;
+
+  & {
+    @include box.box(variables.$primary, variables.$primary, variables.$primary);
+    @include helpers.borderRadius();
+  }
 
   &__dialog {
     padding: 0;
@@ -36,18 +40,16 @@
   {
     @include helpers.noFocusStyle();
 
-    all: unset !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent;
+    box-shadow: none !important;
     display: flex;
     height: 2rem;
-    border-bottom: 1px solid helpers.backgroundColor(variables.$white) !important;
-    border-top: none;
-    border-left: none;
-    border-right: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
-    background: transparent !important;
+    padding-top: variables.$xxs !important;
     font-size: variables.$sm;
     margin: 0 variables.$xs !important;
-    outline: none;
 
     .input__control {
       padding: variables.$sm 0 !important;
@@ -69,25 +71,37 @@
     color: helpers.color(variables.$white, variables.$hierarchyTertiary);
   }
 
+  [cmdk-group] > [cmdk-group-heading] {
+    padding: 0 variables.$xs;
+  }
+
   &__group {
     overflow: hidden;
-    padding: variables.$xs;
-    color: helpers.color(variables.$white, variables.$hierarchyTertiary);
+    text-transform: uppercase;
+    display: block;
     font-size: variables.$xs;
+    padding: variables.$xxs 0 0 0;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+
   }
 
   &__item {
     position: relative;
     display: flex;
-    cursor: default;
-    gap: variables.$xs;
+    cursor: pointer;
     user-select: none;
     align-items: center;
-    border-radius: variables.$borderRadius - 0.375rem;
-    padding: variables.$xxs variables.$xxs;
     font-size: variables.$sm;
     outline: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    border-radius: variables.$borderRadius - variables.$xxs;
+    padding: variables.$xxs variables.$xs;
+    gap: variables.$xs;
+    text-transform: none;
 
     &[data-disabled='true'] {
       pointer-events: none;
@@ -95,7 +109,9 @@
     }
 
     &[data-selected='true'] {
-      background: helpers.backgroundColor();
+      @include box.box(variables.$white, variables.$white, variables.$white);
+      box-shadow: none;
+      width: 100%;
     }
 
     svg {

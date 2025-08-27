@@ -43,7 +43,6 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             parentId: parentGroup,
             extent: parentGroup ? "parent" : undefined,
             data: {
-                ...fn.json,
                 instance: fn,
                 isParameter,
                 linkingId: isParameter ? parentId : undefined,

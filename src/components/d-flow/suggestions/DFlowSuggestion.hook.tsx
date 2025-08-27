@@ -20,7 +20,13 @@ import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
 //TODO: No type => just all function suggestion and also maybe combinations
 
-export const useSuggestions = (type: Type | undefined, genericKeys: string[] | undefined, flowId: string, depthLevel: number = 0, scopeLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
+export const useSuggestions = (
+    type: Type | undefined,
+    genericKeys: string[] | undefined,
+    flowId: string,
+    depth: number = 0,
+    scope: number[] = [0],
+    node: number = 1): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -90,36 +96,13 @@ export const useSuggestions = (type: Type | undefined, genericKeys: string[] | u
 
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
     const refObjects = type ? useRefObjects(flowId) : []
-    // Build scope intervals from the collected refObjects
-    const scopeStart: Record<number, number> = {};
-    const scopeEnd:   Record<number, number> = {};
-    for (const v of refObjects) {
-        if (scopeStart[v.scope] === undefined || v.nodeLevel < scopeStart[v.scope]) {
-            scopeStart[v.scope] = v.nodeLevel;
-        }
-        if (scopeEnd[v.scope] === undefined || v.nodeLevel > scopeEnd[v.scope]) {
-            scopeEnd[v.scope] = v.nodeLevel;
-        }
-    }
+
     refObjects.forEach(value => {
-        if (value.nodeLevel >= nodeLevel) {
-            // liegt nicht "über" der Ziel-Node  -> verwerfen
-            return;
-        }
+        if (value.node >= node) return
+        if (value.depth > depth) return
+        if (value.scope.some(r => !scope.includes(r))) return;
 
-        if (value.depth > depthLevel) {
-            // kommt aus tieferem (Kind-)Block    -> verwerfen
-            return;
-        }
-
-        const sameScope     = value.scope === scopeLevel;
-        const ancestorScope = scopeStart[value.scope] <= nodeLevel && nodeLevel <= scopeEnd[value.scope];
-
-        if (!sameScope && !ancestorScope) {
-            // anderer, nicht-vorfahrlicher Block -> verwerfen
-            return;
-        }
-        const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.nodeLevel || ''}`, JSON.stringify(value.type)])
+        const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)
     })
 
@@ -160,16 +143,17 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
 
 /**
  * Walks the flow starting at its startingNode (depth-first, left-to-right) and collects
- * all in-scope RefObjects (variables/outputs) with contextual metadata:
- *  - depth: structural nesting (root 0; +1 per NODE-parameter group)
- *  - scope: unique scope ID per group/lane (root 0; every group gets a new global ID)
- *  - nodeLevel: GLOBAL visit index across the entire flow (1-based, strictly increasing)
+ * all RefObjects (variables/outputs) with contextual metadata:
+ *  - depth: nesting level (root 0; +1 per NODE-parameter sub-block)
+ *  - scope: PATH of scope ids as number[], e.g. [0], [0,1], [0,2], [0,2,3] ...
+ *           (root is [0]; each NODE-parameter group appends a new unique id)
+ *  - node:  GLOBAL visit index across the entire flow (1-based, strictly increasing)
  *
  * Notes:
- *  - A NODE-typed parameter opens a new group/lane: depth+1 and a new unique scope ID.
- *  - Functions passed as non-NODE parameters are traversed in the SAME depth/scope.
- *  - The nodeLevel is incremented globally for every visited node and is shared by all
- *    RefObjects (input variables from rules and the return value) produced by that node.
+ *  - A NODE-typed parameter opens a new group/lane: depth+1 and scopePath+[newId].
+ *  - Functions passed as non-NODE parameters are traversed in the SAME depth/scopePath.
+ *  - The `node` id is incremented globally for every visited node and shared by all
+ *    RefObjects (inputs from rules and the return value) produced by that node.
  */
 export const useRefObjects = (flowId: string): Array<RefObject> => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
@@ -182,18 +166,24 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
     const flow = flowService.values().find((f) => f.id === flowId);
     if (!flow?.startingNode) return refObjects;
 
-    // Global, strictly increasing scope ID for groups (root = 0; every new group: ++).
-    let globalScopeCounter = 0;
-    const nextGlobalScope = () => ++globalScopeCounter;
+    // Global, strictly increasing group id used to extend the scope PATH.
+    // Root scope path is [0]; first created group gets id 1, then 2, ...
+    let globalGroupId = 0;
+    const nextGroupId = () => ++globalGroupId;
 
-    // Global, strictly increasing node-level counter across the ENTIRE flow (1-based).
-    let globalNodeLevel = 0;
-    const nextGlobalNodeLevel = () => ++globalNodeLevel + globalScopeCounter;
+    // Global, strictly increasing node id across the ENTIRE flow (1-based).
+    let globalNodeId = 0;
+    const nextNodeId = () => ++globalNodeId;
 
     /**
      * DFS across a lane: visit node, recurse into NODE-parameter groups, then follow nextNode.
+     * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
      */
-    const traverse = (fn: NodeFunction | undefined, depth: number, scope: number) => {
+    const traverse = (
+        fn: NodeFunction | undefined,
+        depth: number,
+        scopePath: number[]
+    ) => {
         if (!fn) return;
 
         let current: NodeFunction | undefined = fn;
@@ -202,8 +192,8 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
             const def = functionService.getFunctionDefinition(current.id);
             if (!def) break;
 
-            // Assign a single GLOBAL nodeLevel for this node (shared by all outputs/inputs it yields).
-            const nodeLevel = nextGlobalNodeLevel();
+            // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
+            const node = nextNodeId();
 
             // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
             if (current.parameters && def.parameters) {
@@ -231,9 +221,8 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                                 refObjects.push({
                                     type: resolved,
                                     depth,
-                                    scope,
-                                    nodeLevel,
-                                    tertiaryLevel: cfg.key,
+                                    scope: scopePath,
+                                    node,
                                 });
                             }
                         }
@@ -254,13 +243,13 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                     refObjects.push({
                         type: resolvedReturnType,
                         depth,
-                        scope,
-                        nodeLevel,
+                        scope: scopePath,
+                        node,
                     });
                 }
             }
 
-            // 3) For each NODE-typed parameter: create a NEW group/lane (depth+1, new scope)
+            // 3) For each NODE-typed parameter: create a NEW group/lane
             if (current.parameters && def.parameters) {
                 for (const pDef of def.parameters) {
                     const pType = dataTypeService.getDataType(pDef.type);
@@ -269,15 +258,15 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunction) {
                             const childFn = paramInstance.value as NodeFunction;
 
-                            // New group/lane -> unique scope ID; child lives at depth+1 in that scope.
-                            const childScope = nextGlobalScope();
-                            traverse(childFn, depth + 1, childScope);
+                            // New group: extend the scope path with a fresh id; increase depth by 1.
+                            const childScopePath = [...scopePath, nextGroupId()];
+                            traverse(childFn, depth + 1, childScopePath);
                         }
                     } else {
-                        // Functions passed as NON-NODE parameters remain in the SAME depth/scope.
+                        // Functions passed as NON-NODE parameters: same depth and same scope path.
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunction) {
-                            traverse(paramInstance.value as NodeFunction, depth, scope);
+                            traverse(paramInstance.value as NodeFunction, depth, scopePath);
                         }
                     }
                 }
@@ -288,8 +277,8 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
         }
     };
 
-    // Root lane: depth 0, scope 0; nodeLevel starts at 1 on the first visited node.
-    traverse(flow.startingNode, 0, 0);
+    // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
+    traverse(flow.startingNode, 0, [0]);
 
     return refObjects;
-}
+};

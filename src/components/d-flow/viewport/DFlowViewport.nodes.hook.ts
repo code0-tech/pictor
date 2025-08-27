@@ -17,25 +17,28 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     const nodes: Node[] = [];
     let idCounter = 0;
 
-    // GLOBAL, strictly increasing depth across the whole flow (no duplicates).
-    // Depth 0 is reserved for the root lane. Every *group* created gets the next global depth.
-    let globalDepthCounter = 0;
-    const nextGlobalDepth = () => ++globalDepthCounter;
+    // Global, strictly increasing group-id used to build the scope PATH ([0], [0,1], [0,2], [0,2,3], ...)
+    let globalScopeId = 0;
+    const nextScopeId = () => ++globalScopeId;
+
+    // Global, strictly increasing node index across the entire flow (only real nodes)
+    let globalNodeIndex = 0;
 
     const traverse = (
         fn: NodeFunction,
         isParameter = false,
         parentId?: string,
         depth: number = 0,
-        scope: number = 0,
+        scopePath: number[] = [0],
         parentGroup?: string
     ) => {
         const id = `${fn.runtime_id}-${idCounter++}`;
+        const index = ++globalNodeIndex; // global node level
 
         nodes.push({
             id,
             type: "default",
-            position: {x: 0, y: 0},
+            position: { x: 0, y: 0 },
             draggable: false,
             parentId: parentGroup,
             extent: parentGroup ? "parent" : undefined,
@@ -44,9 +47,9 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                 instance: fn,
                 isParameter,
                 linkingId: isParameter ? parentId : undefined,
-                scope,
-                depth,
-                index: idCounter,
+                scope: scopePath,   // scope is now a PATH (number[])
+                depth,              // structural depth (0 at root, +1 per group)
+                index,              // global node level
             },
         });
 
@@ -54,20 +57,20 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             nodes.push({
                 id: `${id}-suggestion`,
                 type: "suggestion",
-                position: {x: 0, y: 0},
+                position: { x: 0, y: 0 },
                 draggable: false,
                 extent: parentGroup ? "parent" : undefined,
                 parentId: parentGroup,
                 data: {
                     flowId: flowId,
-                    parentFunction: fn
-                }
+                    parentFunction: fn,
+                },
             });
         }
 
         const definition = functionService.getFunctionDefinition(fn.id);
 
-        fn.parameters?.forEach((param, i) => {
+        fn.parameters?.forEach((param) => {
             const paramType = definition?.parameters!!.find(p => p.parameter_id == param.id)?.type;
             const paramDataType = paramType ? dataTypeService.getDataType(paramType) : undefined;
 
@@ -75,13 +78,13 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                 if (param.value && param.value instanceof NodeFunction) {
                     const groupId = `${id}-group-${idCounter++}`;
 
-                    // Each GROUP receives a new unique global depth (no duplicates anywhere).
-                    const groupDepth = nextGlobalDepth();
+                    // New group: extend scope PATH with a fresh segment and increase depth.
+                    const childScopePath = [...scopePath, nextScopeId()];
 
                     nodes.push({
                         id: groupId,
                         type: "group",
-                        position: {x: 0, y: 0},
+                        position: { x: 0, y: 0 },
                         draggable: false,
                         parentId: parentGroup,
                         extent: parentGroup ? "parent" : undefined,
@@ -89,26 +92,26 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                             isParameter: true,
                             linkingId: id,
                             depth: depth + 1,
-                            scope: groupDepth
+                            scope: childScopePath,
                         },
                     });
 
-                    // Child function inside the group uses the group's depth (its lane).
-                    traverse(param.value as NodeFunction, false, undefined, depth + 1, groupDepth, groupId);
+                    // Child function inside the group uses the group's depth and scope PATH.
+                    traverse(param.value as NodeFunction, false, undefined, depth + 1, childScopePath, groupId);
                 }
             } else if (param.value && param.value instanceof NodeFunction) {
-                // Functions passed as non-NODE parameters live in the same depth/lane.
-                traverse(param.value as NodeFunction, true, id, depth, scope, parentGroup);
+                // Functions passed as non-NODE parameters live in the same depth/scope PATH.
+                traverse(param.value as NodeFunction, true, id, depth, scopePath, parentGroup);
             }
         });
 
         if (fn.nextNode) {
-            // Linear chain continues in the same depth/lane.
-            traverse(fn.nextNode, false, undefined, depth, scope, parentGroup);
+            // Linear chain continues in the same depth/scope PATH.
+            traverse(fn.nextNode, false, undefined, depth, scopePath, parentGroup);
         }
     };
 
-    // Root lane is depth 0.
-    traverse(flow.startingNode, false, undefined, 0, 0, undefined);
+    // Root lane: depth 0, scope path [0]
+    traverse(flow.startingNode, false, undefined, 0, [0], undefined);
     return nodes;
 };

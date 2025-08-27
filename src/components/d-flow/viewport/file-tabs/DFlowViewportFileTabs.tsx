@@ -5,12 +5,17 @@ import React from "react";
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../../menu/Menu";
 import Button from "../../../button/Button";
 import {IconChevronDown, IconDotsVertical} from "@tabler/icons-react";
+import {FileTabsView} from "../../../file-tabs/FileTabs.view";
 
 export const DFlowViewportFileTabs = () => {
 
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
     const id = React.useId()
+
+    const activeTabId = React.useMemo(() => {
+        return fileTabsStore.find((t: any) => (t as any).active)?.id ?? fileTabsService.getActiveTab()?.id;
+    }, [fileTabsStore, fileTabsService]);
 
     React.useEffect(() => {
         const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
@@ -27,67 +32,77 @@ export const DFlowViewportFileTabs = () => {
             });
         }
 
-    }, [fileTabsService.getActiveTab()])
+    }, [activeTabId, id])
 
-    const fileTabsList = React.useMemo(() => {
-        return fileTabsService.values().map((value, index) => {
-            return <FileTabsTrigger closable={value.closeable} onClose={() => {
-                fileTabsService.delete(index)
-            }} value={value.id!!}>{value.children}</FileTabsTrigger>
-        })
-    }, [fileTabsStore])
+    return (
+        <FileTabs
+            data-id={id}
+            value={activeTabId}
+            onValueChange={(value) => {
+                fileTabsService.activateTab(value); // mutieren reicht; kein .update() nötig, wenn setState benutzt wird
+            }}
+        >
+            <FileTabsList
+                controls={
+                    <>
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant="none" color="primary" style={{aspectRatio: "1/1"}}>
+                                    <IconChevronDown size={12}/>
+                                </Button>
+                            </MenuTrigger>
+                            <MenuPortal>
+                                <MenuContent align="end" sideOffset={8}>
+                                    {fileTabsStore.map((tab: FileTabsView) => (
+                                        <MenuItem key={`menu-${tab.id}`}
+                                                  onClick={() => fileTabsService.activateTab(tab.id!)}>
+                                            {tab.children}
+                                        </MenuItem>
+                                    ))}
+                                </MenuContent>
+                            </MenuPortal>
+                        </Menu>
 
-    const fileTabsContent = React.useMemo(() => {
-        return fileTabsService.values().map((value, index) => {
-            return <FileTabsContent value={value.id!!}>
-                {value.content}
-            </FileTabsContent>
-        })
-    }, [fileTabsStore])
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant="none" color="primary" style={{aspectRatio: "1/1"}}>
+                                    <IconDotsVertical size={12}/>
+                                </Button>
+                            </MenuTrigger>
+                            <MenuPortal>
+                                <MenuContent align="end" sideOffset={8}>
+                                    <MenuItem onClick={() => fileTabsService.clear()}>Close all tabs</MenuItem>
+                                    <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
+                                        tabs</MenuItem>
+                                    <MenuSeparator/>
+                                    <MenuItem onClick={() => fileTabsService.clearLeft()}>Close all tabs to
+                                        left</MenuItem>
+                                    <MenuItem onClick={() => fileTabsService.clearRight()}>Close all tabs to
+                                        right</MenuItem>
+                                </MenuContent>
+                            </MenuPortal>
+                        </Menu>
+                    </>
+                }
+            >
+                {fileTabsStore.map((tab: FileTabsView, index: number) => (
+                    <FileTabsTrigger
+                        key={`trigger-${tab.id}`}
+                        closable={tab.closeable}
+                        value={tab.id!}
+                        onClose={() => fileTabsService.delete(index)}
+                    >
+                        {tab.children}
+                    </FileTabsTrigger>
+                ))}
+            </FileTabsList>
 
-    return <FileTabs data-id={id} value={fileTabsService.getActiveTab()?.id} onValueChange={(value) => {
-        fileTabsService.activateTab(value)
-        fileTabsService.update()
-    }}>
-        <FileTabsList controls={<>
-            <Menu>
-                <MenuTrigger asChild>
-                    <Button variant={"none"} color={"primary"} style={{aspectRatio: "1/1"}}>
-                        <IconChevronDown size={12}/>
-                    </Button>
-                </MenuTrigger>
-                <MenuPortal>
-                    <MenuContent align={"end"} sideOffset={8}>
-                        {fileTabsService.values().map((value) => {
-                            return <MenuItem onClick={() => {
-                                fileTabsService.activateTab(value.id!!)
-                                fileTabsService.update()
-                            }}>{value.children}</MenuItem>
-                        })}
-                    </MenuContent>
-                </MenuPortal>
-            </Menu>
-            <Menu>
-                <MenuTrigger asChild>
-                    <Button variant={"none"} color={"primary"} style={{aspectRatio: "1/1"}}>
-                        <IconDotsVertical size={12}/>
-                    </Button>
-                </MenuTrigger>
-                <MenuPortal>
-                    <MenuContent align={"end"} sideOffset={8}>
-                        <MenuItem onClick={() => fileTabsService.clear()}> Close all tabs</MenuItem>
-                        <MenuItem onClick={() => fileTabsService.clearWithoutActive()}> Close other tabs</MenuItem>
-                        <MenuSeparator/>
-                        <MenuItem onClick={() => fileTabsService.clearLeft()}> Close all tabs to left </MenuItem>
-                        <MenuItem onClick={() => fileTabsService.clearRight()}> Close all tabs to right </MenuItem>
-                    </MenuContent>
-                </MenuPortal>
-            </Menu>
-        </>}>
-            {fileTabsList}
-        </FileTabsList>
-        {fileTabsContent}
-
-    </FileTabs>
+            {fileTabsStore.map((tab: FileTabsView) => (
+                <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
+                    {tab.content}
+                </FileTabsContent>
+            ))}
+        </FileTabs>
+    );
 
 }

@@ -1,17 +1,14 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
-import {
-    NodeFunction,
-    NodeFunctionObject,
-    NodeFunctionParameter
-} from "../../DFlow.view";
+import {NodeFunction, NodeFunctionParameter} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowViewportDefaultCard.style.scss";
 import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
 import {
-    IconAlertTriangle, IconArrowRightCircle,
+    IconAlertTriangle,
+    IconArrowRightCircle,
     IconCopy,
     IconDots,
     IconExclamationCircle,
@@ -45,11 +42,10 @@ export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<H
 }
 
 // @ts-ignore
-export type DFlowViewportDefaultCardProps = NodeProps<Node<DFlowViewportDefaultCardDataProps & NodeFunctionObject>>
+export type DFlowViewportDefaultCardProps = NodeProps<Node<DFlowViewportDefaultCardDataProps>>
 
 export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> = memo((props) => {
     const {data, id} = props;
-    const functionData = data as DFlowViewportDefaultCardDataProps & NodeFunctionObject;
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
@@ -58,8 +54,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const definition = functionService.getFunctionDefinition(data.function.function_id)
-    const validation = useFunctionValidation(definition!!, data.parameters!!.map(p => p.value!!), useService(DFlowDataTypeReactiveService)!!)
+    const definition = functionService.getFunctionDefinition(data.instance.id)
+    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunction ? p.value.json : p.value!!), useService(DFlowDataTypeReactiveService)!!)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0
@@ -82,14 +78,15 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
                     zoom: 1
                 }, {
-                    duration: 250,
+                    duration: 0,
                 })
                 fileTabsService.add({
                     id: id,
                     active: true,
                     closeable: true,
-                    children: <Text size={"md"}>{functionData.function.function_id}</Text>,
-                    content: <DFlowViewportFileTabsContent depthLevel={data.depth} scopeLevel={data.scope} nodeLevel={data.index} functionInstance={data.instance}/>
+                    children: <Text size={"md"}>{data.instance.id}</Text>,
+                    content: <DFlowViewportFileTabsContent depthLevel={data.depth} scopeLevel={data.scope}
+                                                           nodeLevel={data.index} functionInstance={data.instance}/>
                 })
                 fileTabsService.update()
             }} style={{position: "relative"}}>
@@ -98,7 +95,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <IconFileLambdaFilled size={16}/>
-                        <Text size={"md"}>{functionData.function.function_id}</Text>
+                        <Text size={"md"}>{data.instance.id}</Text>
                     </Flex>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <Menu onOpenChange={event => {
@@ -138,8 +135,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 draggable={false}
                 type="target"
                 className={"function-card__handle function-card__handle--target"}
-                style={{...(functionData.isParameter ? {right: "2px"} : {top: "2px"})}}
-                position={functionData.isParameter ? Position.Right : Position.Top}
+                style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
+                position={data.isParameter ? Position.Right : Position.Top}
             />
 
             {(validation?.length ?? 0) > 0 ? (
@@ -175,14 +172,14 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </div>
             ) : null}
 
-            {functionData.instance.parameters?.some(param => {
+            {data.instance.parameters?.some(param => {
                 const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
                 const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
                 return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value)
             }) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-                    {functionData.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {
+                    {data.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {
 
 
                         const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
@@ -193,10 +190,11 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
                                 {param.id}
                                 {!param.value ? (
-                                        <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-                                            param.value = new NodeFunction(suggestion.value as NodeFunctionObject)
-                                            flowService.update()
-                                        }} suggestions={result} triggerContent={<Button variant={"outlined"}><IconArrowRightCircle size={12}/></Button>}/>
+                                    <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
+                                        param.value = suggestion.value
+                                        flowService.update()
+                                    }} suggestions={result} triggerContent={<Button
+                                        variant={"outlined"}><IconArrowRightCircle size={12}/></Button>}/>
                                 ) : null}
                                 <Handle
                                     key={param.id}
@@ -223,9 +221,9 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             <Handle
                 isConnectable={false}
                 type="source"
-                style={{...(functionData.isParameter ? {left: "2px"} : {bottom: "2px"})}}
+                style={{...(data.isParameter ? {left: "2px"} : {bottom: "2px"})}}
                 className={"function-card__handle function-card__handle--source"}
-                position={functionData.isParameter ? Position.Left : Position.Bottom}
+                position={data.isParameter ? Position.Left : Position.Bottom}
             />
         </Card>
     );

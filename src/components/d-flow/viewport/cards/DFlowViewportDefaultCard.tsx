@@ -40,7 +40,7 @@ export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<H
     instance: NodeFunction
     isParameter: boolean
     depth: number
-    scope: number
+    scope: number[]
     index: number
 }
 
@@ -133,8 +133,6 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </Flex>
             </CardSection>
 
-            <Badge>{data.depth} - {data.scope}-{data.index}</Badge>
-
             <Handle
                 isConnectable={false}
                 draggable={false}
@@ -185,7 +183,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
                         const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
-                        const result = useSuggestions(undefined, [], "some_database_id", data.depth, data.index)
+                        const result = useSuggestions(undefined, [], "some_database_id", data.depth, data.scope, data.index)
 
                         return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>

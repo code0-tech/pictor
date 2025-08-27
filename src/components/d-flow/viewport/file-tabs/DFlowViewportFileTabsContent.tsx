@@ -11,7 +11,7 @@ import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
     depthLevel?: number
-    scopeLevel?: number
+    scopeLevel?: number[]
     nodeLevel?: number
 }
 

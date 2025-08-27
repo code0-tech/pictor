@@ -9,9 +9,25 @@ import pkg from './package.json'
 
 export default defineConfig({
     plugins: [
-        react(),
+        react({
+            babel: {
+                plugins: [
+                    'babel-plugin-react-compiler',
+                    ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true }],
+                    '@babel/plugin-transform-class-properties'
+                ],
+            },
+        }),
         libInjectCss(),
-        dts({ include: ['src'], exclude: ['src/**/*.stories.tsx'] })
+        dts({
+            include: ['src'],
+            exclude: ['src/**/*.stories.tsx'],
+            afterDiagnostic: (diagnostics) => {
+                if (diagnostics.length > 0) {
+                    throw new Error("dts failed");
+                }
+            },
+        })
     ],
     build: {
         lib: {

@@ -9,7 +9,7 @@ import {
 } from "../../form/InputSuggestion";
 import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
 import {DFlowSuggestionMenuSearchBar} from "./DFlowSuggestionMenuSearchBar";
-import {useReactFlow, useStoreApi} from "@xyflow/react";
+import {useStoreApi} from "@xyflow/react";
 
 export interface DFlowSuggestionMenuProps {
     triggerContent: React.ReactNode

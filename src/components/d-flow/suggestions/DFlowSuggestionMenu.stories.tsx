@@ -26,16 +26,18 @@ export const Example = () => {
 
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
-    const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService);
+    const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (store) => {
+
+        const service = new DFlowDataTypeReactiveService(store)
+        dataTypes.map((dt) => {
+            service.add(new DataType(dt, dataTypeService))
+        })
+        return service
+
+    })
     const [functionStore, functionService] = createReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, undefined, functionsData);
     const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow)]);
     const [suggestionStore, suggestionService] = createReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-
-    React.useEffect(() => {
-        dataTypes.map((dt) => {
-            dataTypeService.add(new DataType(dt, dataTypeService))
-        })
-    }, [])
 
 
     return <ContextStoreProvider

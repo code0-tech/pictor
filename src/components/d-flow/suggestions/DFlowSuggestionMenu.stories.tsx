@@ -7,7 +7,7 @@ import {FunctionDefinition} from "../function/DFlowFunction.view";
 import {Flow} from "../DFlow.view";
 import {flow} from "../DFlow.data";
 import {ContextStoreProvider} from "../../../utils/contextStore";
-import {createReactiveArrayService} from "../../../utils/reactiveArrayService";
+import {useReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowReactiveService} from "../DFlow.service";
@@ -26,19 +26,14 @@ export const Example = () => {
 
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
-    const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (store) => {
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
+    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow)]);
+    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
 
-        const service = new DFlowDataTypeReactiveService(store)
-        dataTypes.map((dt) => {
-            service.add(new DataType(dt, dataTypeService))
-        })
-        return service
-
-    })
-    const [functionStore, functionService] = createReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, undefined, functionsData);
-    const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow)]);
-    const [suggestionStore, suggestionService] = createReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-
+    React.useEffect(() => {
+        dataTypes.forEach(dt => dataTypeService.add(new DataType(dt, dataTypeService)));
+    }, [dataTypeService])
 
     return <ContextStoreProvider
         services={[[dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>

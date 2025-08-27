@@ -1,7 +1,6 @@
 import {Meta} from "@storybook/react"
 import React from "react"
 import {
-    Command,
     CommandItem,
     CommandInput,
     CommandList,

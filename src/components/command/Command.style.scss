@@ -40,6 +40,7 @@
   {
     @include helpers.noFocusStyle();
 
+    width: 100%;
     border: none !important;
     outline: none !important;
     background: transparent;
@@ -47,13 +48,8 @@
     display: flex;
     height: 2rem;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
-    padding-top: variables.$xxs !important;
-    font-size: variables.$sm;
-    margin: 0 variables.$xs !important;
-
-    .input__control {
-      padding: variables.$sm 0 !important;
-    }
+    font-size: variables.$sm;;
+    border-radius: variables.$borderRadius - variables.$xxs;
 
     &::placeholder {
       color: helpers.color(variables.$white, 25%);
@@ -62,6 +58,10 @@
     &:disabled {
       @include helpers.disabled()
     }
+
+    .input__right {
+      padding-right: 0;
+    }
   }
 
   &__empty {
@@ -69,16 +69,19 @@
     text-align: center;
     font-size: variables.$sm;
     color: helpers.color(variables.$white, variables.$hierarchyTertiary);
+
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
-  [cmdk-group] > [cmdk-group-heading] {
-    padding: 0 variables.$xs;
+  [cmdk-group-heading] {
+    padding: variables.$xxs variables.$xs;
   }
 
   &__group {
     overflow: hidden;
     text-transform: uppercase;
-    display: block;
     font-size: variables.$xs;
     padding: variables.$xxs 0 0 0;
     color: helpers.color();
@@ -99,7 +102,7 @@
     outline: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
     border-radius: variables.$borderRadius - variables.$xxs;
-    padding: variables.$xxs variables.$xs;
+    padding: variables.$xxs variables.$xxs variables.$xxs variables.$lg;
     gap: variables.$xs;
     text-transform: none;
 
@@ -124,7 +127,7 @@
 
   &__separator {
     height: 1px;
-    margin: 0 variables.$xs;
+    margin: variables.$xs;
     background: helpers.backgroundColor(variables.$white);
   }
 

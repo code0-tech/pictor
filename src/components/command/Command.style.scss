@@ -11,7 +11,7 @@
   flex-direction: column;
   overflow: hidden;
   background: variables.$primary;
-  padding: variables.$xxs;
+  padding: variables.$xs;
 
   & {
     @include box.box(variables.$primary, variables.$primary, variables.$primary);
@@ -102,7 +102,7 @@
     outline: none;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
     border-radius: variables.$borderRadius - variables.$xxs;
-    padding: variables.$xxs variables.$xxs variables.$xxs variables.$lg;
+    padding: variables.$xxs variables.$xxs variables.$xxs variables.$sm;
     gap: variables.$xs;
     text-transform: none;
 
@@ -127,7 +127,7 @@
 
   &__separator {
     height: 1px;
-    margin: variables.$xs;
+    margin: variables.$xxs 0;
     background: helpers.backgroundColor(variables.$white);
   }
 

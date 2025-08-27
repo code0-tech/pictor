@@ -21,6 +21,7 @@ export const ExampleCommand = () => {
     return (
         <CommandDialog open={true}>
             <CommandInput placeholder="Type a command or search..." clearable />
+            <CommandSeparator />
             <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup heading="Suggestions">

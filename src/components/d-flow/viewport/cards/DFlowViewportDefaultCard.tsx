@@ -175,7 +175,11 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </div>
             ) : null}
 
-            {functionData.instance.parameters?.some(param => param.value instanceof NodeFunction || !param.value) ? (
+            {functionData.instance.parameters?.some(param => {
+                const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
+                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+                return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value)
+            }) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
                     {functionData.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {

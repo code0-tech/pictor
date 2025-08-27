@@ -192,7 +192,11 @@ export class NodeFunctionParameter {
         return this._value;
     }
 
-    set value(value: Value | NodeFunction) {
-        this._value = value;
+    set value(value: Value) {
+        if (isNodeFunctionObject(value as NodeFunctionObject)) {
+            this._value = new NodeFunction(value as NodeFunctionObject);
+        } else {
+            this._value = value
+        }
     }
 }

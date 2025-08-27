@@ -15,7 +15,7 @@ import "./DFlow.style.scss"
  * @param edges Array of edge objects, unchanged by this function (used only for return type symmetry).
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+const getLayoutedElements = (nodes: Node[]) => {
     /* Konstanten */
     const V = 100;          // vertical gap Node ↕ Node
     const H = 100;          // horizontal gap Parent → Param
@@ -371,7 +371,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 
     } while (changed && pass < 5);
 
-    return {nodes: work, edges};
+    return {nodes: work};
 };
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps
@@ -379,12 +379,12 @@ export type DFlowProps = Code0ComponentProps & ReactFlowProps
 export const DFlow: React.FC<DFlowProps> = (props) => {
 
     const [nodes, setNodes] = useNodesState(props.nodes!!)
-    const [edges, setEdges] = useEdgesState(props.edges!!)
+    const [edges, setEdges, edgeChangeEvent] = useEdgesState(props.edges!!)
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
 
         const localNodes = nodes.map(value => {
-            const node = document.querySelectorAll("[data-id='" + value.id + "']")
+            const node = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : []
             return {
                 ...value,
                 measured: {
@@ -394,15 +394,15 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
             } as Node
         })
 
-        const layouted = getLayoutedElements(localNodes, edges)
+        const layouted = getLayoutedElements(localNodes)
         setNodes(layouted.nodes as Node[])
-        setEdges(layouted.edges as Edge[])
-    }, [nodes, edges, props.nodes, props.edges])
+        setEdges(edges as Edge[])
+    }, [nodes, edges])
 
     React.useEffect(() => {
 
         const localNodes = props.nodes!!.map(value => {
-            const node = document.querySelectorAll("[data-id='" + value.id + "']")
+            const node = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : []
             return {
                 ...value,
                 measured: {
@@ -412,14 +412,15 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
             } as Node
         })
 
-        const layouted = getLayoutedElements(localNodes, props.edges!!)
+        const layouted = getLayoutedElements(localNodes)
 
         setNodes(layouted.nodes as Node[])
-        setEdges(layouted.edges as Edge[])
+        setEdges(props.edges as Edge[])
     }, [props.nodes, props.edges])
 
     return <ReactFlow onInit={(reactFlowInstance) => reactFlowInstance.fitView()}
                       onNodesChange={nodeChangeEvent}
+                      onEdgesChange={edgeChangeEvent}
                       {...mergeCode0Props("flow", props)}
                       nodes={nodes}
                       edges={edges}/>

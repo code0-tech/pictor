@@ -46,9 +46,8 @@ export interface RefPath {
 export interface RefObject {
     type: Type
     depth: number
-    scope: number
-    nodeLevel: number
-    tertiaryLevel?: string
+    scope: number[]
+    node: number
     path?: RefPath[]
 }
 
@@ -56,10 +55,9 @@ export const isRefObject = (v: any): v is RefObject =>
     v && typeof v === 'object' &&
     typeof v.type === 'string' &&
     typeof v.depth === 'number' &&
-    typeof v.scope === 'number' &&
-    typeof v.nodeLevel === 'number' &&
-    (v.tertiaryLevel === undefined || typeof v.tertiaryLevel === 'number') &&
-    Object.keys(v).every(k => ['type', 'depth', 'scope', 'nodeLevel', 'tertiaryLevel'].includes(k))
+    typeof v.scope === 'object' &&
+    typeof v.node === 'number' &&
+    Object.keys(v).every(k => ['type', 'depth', 'scope', 'node'].includes(k))
 
 /**
  * This type represents a raw object including the rule

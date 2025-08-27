@@ -1,12 +1,11 @@
 import {Meta} from "@storybook/react";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
-import React, {useEffect} from "react";
+import React from "react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
 import DFolder from "../d-folder/DFolder";
 import Button from "../button/Button";
 import {IconDatabase, IconFileFilled, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import Flex from "../flex/Flex";
-import {ExampleFileTabs} from "../file-tabs/FileTabs.stories";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {useFlowViewportNodes} from "../d-flow/viewport/DFlowViewport.nodes.hook";
@@ -16,11 +15,11 @@ import {DFlowViewportGroupCard} from "../d-flow/viewport/cards/DFlowViewportGrou
 import {DFlowViewportSuggestionCard} from "../d-flow/viewport/cards/DFlowViewportSuggestionCard";
 import {DFlowViewportEdge} from "../d-flow/viewport/DFlowViewportEdge";
 import {DFlow} from "../d-flow/DFlow";
-import {Background, BackgroundVariant, MiniMap} from "@xyflow/react";
+import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
 import {FunctionDefinition} from "../d-flow/function/DFlowFunction.view";
 import {functionData} from "../d-flow/function/DFlowFunction.data";
-import {createReactiveArrayService} from "../../utils/reactiveArrayService";
+import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
 import {DataType} from "../d-flow/data-type/DFlowDataType.view";
@@ -53,15 +52,15 @@ export const Dashboard = () => {
 
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
-    const [fileTabsStore, fileTabsService] = createReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
-    const [dataTypeStore, dataTypeService] = createReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService);
-    const [functionStore, functionService] = createReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, undefined, functionsData);
-    const [flowStore, flowService] = createReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, undefined, [new Flow(flow1)]);
-    const [suggestionStore, suggestionService] = createReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
+    const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
+    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow1)]);
+    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
 
-    useEffect(() => {
-        dataTypes.map((dt) => dataTypeService.add(new DataType(dt, dataTypeService)))
-    }, []);
+    React.useEffect(() => {
+        dataTypes.forEach(dt => dataTypeService.add(new DataType(dt, dataTypeService)));
+    }, [dataTypeService]); // Effekt feuert, Store rendert neu
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>

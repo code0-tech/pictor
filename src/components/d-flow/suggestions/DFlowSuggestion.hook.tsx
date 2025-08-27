@@ -20,7 +20,7 @@ import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
 //TODO: No type => just all function suggestion and also maybe combinations
 
-export const useSuggestions = (type: Type | undefined, genericKeys: string[] | undefined, flowId: string, depthLevel: number = 0, scopeLevel: number = 1, nodeLevel: number = 1): DFlowSuggestion[] => {
+export const useSuggestions = (type: Type | undefined, genericKeys: string[] | undefined, flowId: string, depthLevel: number = 0, scopeLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -90,11 +90,35 @@ export const useSuggestions = (type: Type | undefined, genericKeys: string[] | u
 
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
     const refObjects = type ? useRefObjects(flowId) : []
+    // Build scope intervals from the collected refObjects
+    const scopeStart: Record<number, number> = {};
+    const scopeEnd:   Record<number, number> = {};
+    for (const v of refObjects) {
+        if (scopeStart[v.scope] === undefined || v.nodeLevel < scopeStart[v.scope]) {
+            scopeStart[v.scope] = v.nodeLevel;
+        }
+        if (scopeEnd[v.scope] === undefined || v.nodeLevel > scopeEnd[v.scope]) {
+            scopeEnd[v.scope] = v.nodeLevel;
+        }
+    }
     refObjects.forEach(value => {
-        if (value.depth > depthLevel) return
-        if (value.scope > scopeLevel) return
-        if (value.nodeLevel >= nodeLevel) return
-        if (value.depth == depthLevel && value.scope != scopeLevel) return
+        if (value.nodeLevel >= nodeLevel) {
+            // liegt nicht "über" der Ziel-Node  -> verwerfen
+            return;
+        }
+
+        if (value.depth > depthLevel) {
+            // kommt aus tieferem (Kind-)Block    -> verwerfen
+            return;
+        }
+
+        const sameScope     = value.scope === scopeLevel;
+        const ancestorScope = scopeStart[value.scope] <= nodeLevel && nodeLevel <= scopeEnd[value.scope];
+
+        if (!sameScope && !ancestorScope) {
+            // anderer, nicht-vorfahrlicher Block -> verwerfen
+            return;
+        }
         const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.nodeLevel || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)
     })

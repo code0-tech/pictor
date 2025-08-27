@@ -21,7 +21,7 @@
 
     & {
       @include box.box();
-      @include helpers.borderRadius();
+      border-radius: variables.$borderRadius - variables.$xxs;
       @include helpers.fontStyle();
       font-size: variables.$sm;
       box-shadow: none;

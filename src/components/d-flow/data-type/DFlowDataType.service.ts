@@ -3,7 +3,6 @@ import {
     DataType,
     DataTypeRuleObject,
     EDataType,
-    EDataTypeRuleType,
     GenericMapper,
     isRefObject,
     Object,
@@ -12,6 +11,7 @@ import {
 } from "./DFlowDataType.view";
 import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
 import {NodeFunctionObject} from "../DFlow.view";
+import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 
 export interface DFlowDataTypeService {
     getDataType(type: Type): DataType | undefined

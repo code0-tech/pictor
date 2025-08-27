@@ -1,11 +1,12 @@
-import {DataTypeObject, EDataType, EDataTypeRuleType} from "./DFlowDataType.view";
+import {DataTypeObject, EDataType} from "./DFlowDataType.view";
+import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 
 export const dataTypes: DataTypeObject[] = [{
     data_type_id: "NUMBER",
     type: EDataType.PRIMITIVE,
     rules: [{
         type: EDataTypeRuleType.REGEX,
-        config: {pattern: "^(?:-(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))|(?:0|(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))))(?:.\d+|)$"}
+        config: {pattern: "^-?\\d+(?:[.,]\\d+)?$"}
     }]
 }, {
     data_type_id: "HTTP_METHOD",

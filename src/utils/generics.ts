@@ -1,7 +1,6 @@
 import {
     DataTypeObject,
     DataTypeRuleObject,
-    EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -13,6 +12,7 @@ import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/
 import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
+import {EDataTypeRuleType} from "../components/d-flow/data-type/rules/DFlowDataTypeRules";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.

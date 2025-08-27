@@ -3,7 +3,6 @@ import {
     DataType,
     DataTypeRuleObject,
     EDataType,
-    EDataTypeRuleType,
     GenericCombinationStrategy,
     GenericMapper,
     isRefObject,
@@ -20,6 +19,7 @@ import {
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
 import {NodeFunctionObject} from "../DFlow.view";
+import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 
 export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService {
 
@@ -114,7 +114,7 @@ describe('data type validation against data type', () => {
         type: EDataType.PRIMITIVE,
         rules: [{
             type: EDataTypeRuleType.REGEX,
-            config: {pattern: "^(?:-(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))|(?:0|(?:[1-9](?:\d{0,2}(?:,\d{3})+|\d*))))(?:.\d+|)$"}
+            config: {pattern: "^-?\\d+(?:[.,]\\d+)?$"}
         }]
     }].forEach((dataType) => {
         service.add(new DataType(dataType, service))
@@ -201,8 +201,8 @@ describe('value validation against data type', () => {
                     },
                     value: {
                         type: "NUMBER",
-                        primaryLevel: 0,
-                        secondaryLevel: 1
+                        depth: 0,
+                        nodeLevel: 1
                     }
                 }]
             }

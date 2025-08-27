@@ -1,4 +1,3 @@
-import {EDataTypeRuleType} from "../DFlowDataType.view";
 import {DFlowDataTypeRegexRule, DFlowDataTypeRegexRuleConfig} from "./DFlowDataTypeRegexRule";
 import {DFlowDataTypeNumberRangeRuleConfig, DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
 import {
@@ -10,6 +9,19 @@ import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "
 import {DFlowDataTypeRule} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReturnTypeRule, DFlowDataTypeReturnTypeRuleConfig} from "./DFlowDataTypeReturnTypeRule";
 import {DFlowDataTypeParentRule, DFlowDataTypeParentRuleConfig} from "./DFlowDataTypeParentRule";
+
+export enum EDataTypeRuleType {
+    REGEX,
+    NUMBER_RANGE,
+    ITEM_OF_COLLECTION,
+    CONTAINS_TYPE,
+    CONTAINS_KEY,
+    LOCK_KEY,
+    RETURNS_TYPE,
+    INPUT_TYPE,
+    PARENT
+    //etc
+}
 
 export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
     [EDataTypeRuleType.REGEX, DFlowDataTypeRegexRule],

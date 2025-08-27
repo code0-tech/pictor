@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
-import {EDataType, GenericCombinationStrategy, GenericMapper, GenericType, Type, Value} from "../DFlowDataType.view";
+import {GenericCombinationStrategy, GenericMapper, GenericType, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 
@@ -7,7 +7,7 @@ export interface DFlowDataTypeContainsTypeRuleConfig {
     type: Type
 }
 
-@staticImplements<DFlowDataTypeRule>(EDataType.ARRAY)
+@staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsTypeRule {
     public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 

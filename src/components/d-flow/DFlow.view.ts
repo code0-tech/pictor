@@ -133,6 +133,10 @@ export class NodeFunction {
         this._nextNode = value;
     }
 
+    public deleteNextNode(): void {
+        this.nextNode = this.nextNode?.nextNode
+    }
+
     get parameters(): NodeFunctionParameter[] | undefined {
         return this._parameters;
     }
@@ -140,21 +144,41 @@ export class NodeFunction {
     set parameters(value: NodeFunctionParameter[] | undefined) {
         this._parameters = value;
     }
+
+    get json(): NodeFunctionObject {
+        return {
+            function: {
+                function_id: this._id,
+                runtime_function_id: this._runtime_id
+            },
+            parameters: this._parameters?.map(param => ({
+                definition: {
+                    parameter_id: param.id,
+                    runtime_parameter_id: param.runtime_id
+                },
+                value: param.value instanceof NodeFunction ? param.value.json : param.value
+            })),
+            next_node: this._nextNode ? this._nextNode.json : undefined
+        }
+    }
 }
 
 export class NodeFunctionParameter {
 
     private readonly _id: string
     private readonly _runtime_id: string
-    private _value: Value | undefined
-    private _subNode: NodeFunction | undefined
+    private _value: Value | NodeFunction | undefined
 
     constructor(nodeParameter: NodeParameterObject) {
         this._id = nodeParameter.definition.parameter_id
         this._runtime_id = nodeParameter.definition.runtime_parameter_id
-        this._value = nodeParameter.value
-    }
+        if (isNodeFunctionObject(nodeParameter.value as NodeFunctionObject)) {
+            this._value = new NodeFunction(nodeParameter.value as NodeFunctionObject);
+        } else {
+            this._value = nodeParameter.value
+        }
 
+    }
 
     get id(): string {
         return this._id;
@@ -164,19 +188,11 @@ export class NodeFunctionParameter {
         return this._runtime_id;
     }
 
-    get value(): Value | undefined {
+    get value(): Value | NodeFunction | undefined {
         return this._value;
     }
 
-    set value(value: Value) {
+    set value(value: Value | NodeFunction) {
         this._value = value;
-    }
-
-    get subNode(): NodeFunction | undefined {
-        return this._subNode;
-    }
-
-    set subNode(value: NodeFunction | undefined) {
-        this._subNode = value;
     }
 }

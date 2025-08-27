@@ -1,5 +1,4 @@
 import {
-    EDataType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -17,7 +16,7 @@ export interface DFlowDataTypeReturnTypeRuleConfig {
 }
 
 
-@staticImplements<DFlowDataTypeRule>(EDataType.NODE)
+@staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeReturnTypeRule {
     public static validate(
         value: Value,

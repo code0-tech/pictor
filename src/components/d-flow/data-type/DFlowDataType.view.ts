@@ -1,6 +1,6 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
-import {CombinesRuleConfig, RuleMap} from "./rules/DFlowDataTypeRules";
+import {CombinesRuleConfig, EDataTypeRuleType, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 
 export enum GenericCombinationStrategy {
@@ -34,10 +34,10 @@ export interface RefPath {
  *
  * Every possible reference can be tracked down via it's depth inside the flow.
  *
- * {@link RefObject#primaryLevel} links to the context of the node inside the flow
+ * {@link RefObject#depth} links to the context of the node inside the flow
  * starting at 0.
  *
- * {@link RefObject#secondaryLevel} links to the node inside the flow
+ * {@link RefObject#nodeLevel} links to the node inside the flow
  * starting at 0.
  *
  * {@link RefObject#tertiaryLevel} links to an {@link DataTypeObject#rule#inputtype} of the node
@@ -45,19 +45,19 @@ export interface RefPath {
  */
 export interface RefObject {
     type: Type
-    primaryLevel: number
-    secondaryLevel: number
-    tertiaryLevel?: string
+    depth: number
+    scope: number[]
+    node: number
     path?: RefPath[]
 }
 
 export const isRefObject = (v: any): v is RefObject =>
     v && typeof v === 'object' &&
     typeof v.type === 'string' &&
-    typeof v.primaryLevel === 'number' &&
-    typeof v.secondaryLevel === 'number' &&
-    (v.tertiaryLevel === undefined || typeof v.tertiaryLevel === 'number') &&
-    Object.keys(v).every(k => ['type', 'primaryLevel', 'secondaryLevel', 'tertiaryLevel'].includes(k))
+    typeof v.depth === 'number' &&
+    typeof v.scope === 'object' &&
+    typeof v.node === 'number' &&
+    Object.keys(v).every(k => ['type', 'depth', 'scope', 'node'].includes(k))
 
 /**
  * This type represents a raw object including the rule
@@ -87,7 +87,7 @@ export const isValue = (v: any): boolean =>
     isObject(v) ||
     isNodeFunctionObject(v)
 
-export const enum EDataType {
+export enum EDataType {
     PRIMITIVE,
     TYPE,
     OBJECT,
@@ -95,19 +95,6 @@ export const enum EDataType {
     ARRAY,
     NODE,
     ERROR
-}
-
-export const enum EDataTypeRuleType {
-    REGEX,
-    NUMBER_RANGE,
-    ITEM_OF_COLLECTION,
-    CONTAINS_TYPE,
-    CONTAINS_KEY,
-    LOCK_KEY,
-    RETURNS_TYPE,
-    INPUT_TYPE,
-    PARENT
-    //etc
 }
 
 export interface DataTypeRuleObject {

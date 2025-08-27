@@ -49,35 +49,93 @@ export const Login = () => {
             dolore magna aliquyam erat, sed diam voluptua.
         </Text>
         <br/>
-        <form>
-            <EmailInput
-                placeholder={"Email"}
-                title={"Email"}
-                description={"Your Email address for login"}
-                left={<IconMail size={13}/>}
-                {...inputs.getInputProps("email")}
-            />
-            <br/>
-            <PasswordInput
-                placeholder={"Password"}
-                title={"Password"}
-                description={"Your password for login"}
-                left={<IconKey size={13}/>}
-                {...inputs.getInputProps("password")}
-            />
-            <br/>
-            <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: ".75rem",
+        <EmailInput
+            placeholder={"Email"}
+            title={"Email"}
+            description={"Your Email address for login"}
+            left={<IconMail size={13}/>}
+            {...inputs.getInputProps("email")}
+        />
+        <br/>
+        <PasswordInput
+            placeholder={"Password"}
+            title={"Password"}
+            description={"Your password for login"}
+            left={<IconKey size={13}/>}
+            {...inputs.getInputProps("password")}
+        />
+        <br/>
+        <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: ".75rem",
+        }}>
+            <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
+                Login
+            </Button>
+
+            <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={() => {
+                const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
+                    challenge: crypto.getRandomValues(new Uint8Array(32)),
+                    rp: { name: "Code0 Dev", id: "localhost" },
+                    user: {
+                        id: Uint8Array.from("nico", c => c.charCodeAt(0)),
+                        name: "nico@localhost",
+                        displayName: "Nico Sammito",
+                    },
+                    pubKeyCredParams: [
+                        { type: "public-key", alg: -7 },
+                        { type: "public-key", alg: -257 }
+                    ] as const,
+                    authenticatorSelection: {
+                        userVerification: "preferred" as UserVerificationRequirement,
+                        // authenticatorAttachment: "platform" as AuthenticatorAttachment,
+                    },
+                    timeout: 60000,
+                }
+
+                navigator.credentials.create({
+                    publicKey: publicKeyCredentialCreationOptions,
+                }).then(cred => {
+                    console.log("Passkey registriert:", cred);
+                });
             }}>
-                <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
-                    Login
-                </Button>
+                Login with Passkeys
+            </Button>
 
-            </div>
+            <Button
+                w={"100%"}
+                color={"primary"}
+                variant={"contained"}
+                onClick={async () => {
+                    const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
+                        challenge: crypto.getRandomValues(new Uint8Array(32)), // Demo: sollte vom Server kommen!
+                        rpId: "localhost",
+                        userVerification: "preferred" as UserVerificationRequirement,
+                        timeout: 60000,
+                        // allowCredentials: [
+                        //   {
+                        //     id: new Uint8Array([/* credentialId als Uint8Array vom Server */]).buffer,
+                        //     type: "public-key" as PublicKeyCredentialType,
+                        //   }
+                        // ],
+                    };
 
-        </form>
+                    try {
+                        await navigator.credentials.get({
+                            publicKey: publicKeyCredentialRequestOptions,
+                        }).then(value => {
+                            console.log("Passkey Login erfolgreich:", value);
+                        });
+                    } catch (err) {
+                        console.error("Login fehlgeschlagen:", err);
+                    }
+                }}
+            >
+                Login with Passkeys
+            </Button>
+
+        </div>
     </Card>
 
 }
@@ -128,34 +186,34 @@ export const RadioExample = () => {
 
 
     return <Card maw={300}>
-            <RadioGroup title={"Runtime"}
-                        description={"Change runtime mode production version"}
-                        {...inputs.getInputProps("radio")}>
-                <RadioInput
-                    value={"dynamic"}
-                    label={"Dynamic"}
-                />
-                <RadioInput
-                    value={"hybrid"}
-                    label={"Hybrid"}
-                />
-                <RadioInput
-                    value={"static"}
-                    label={"Static"}
-                />
-            </RadioGroup>
-            <br/>
-            <div style={{
-                display: "flex",
-                justifyContent: "end"
-            }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
-                    Login
-                </Button>
+        <RadioGroup title={"Runtime"}
+                    description={"Change runtime mode production version"}
+                    {...inputs.getInputProps("radio")}>
+            <RadioInput
+                value={"dynamic"}
+                label={"Dynamic"}
+            />
+            <RadioInput
+                value={"hybrid"}
+                label={"Hybrid"}
+            />
+            <RadioInput
+                value={"static"}
+                label={"Static"}
+            />
+        </RadioGroup>
+        <br/>
+        <div style={{
+            display: "flex",
+            justifyContent: "end"
+        }}>
+            <Button color={"info"} onClick={validate}>
+                <IconLogin size={13}/>
+                Login
+            </Button>
 
-            </div>
-        </Card>
+        </div>
+    </Card>
 
 }
 
@@ -223,23 +281,23 @@ export const Switch = () => {
 
 
     return <Card maw={300}>
-            <SwitchInput
-                title={"Runtime"}
-                description={"Change runtime mode production version"}
-                {...inputs.getInputProps("switch")}
-            />
-            <br/>
-            <div style={{
-                display: "flex",
-                justifyContent: "end"
-            }}>
-                <Button color={"info"} onClick={validate}>
-                    <IconLogin size={13}/>
-                    Login
-                </Button>
+        <SwitchInput
+            title={"Runtime"}
+            description={"Change runtime mode production version"}
+            {...inputs.getInputProps("switch")}
+        />
+        <br/>
+        <div style={{
+            display: "flex",
+            justifyContent: "end"
+        }}>
+            <Button color={"info"} onClick={validate}>
+                <IconLogin size={13}/>
+                Login
+            </Button>
 
-            </div>
-        </Card>
+        </div>
+    </Card>
 
 }
 

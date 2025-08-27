@@ -25,6 +25,7 @@
       @include box.boxActive($color, variables.$white, variables.$white);
 
     &.button--outlined {
+      background: transparent;
       //@include helpers.glassBox($color, variables.$white, $color);
     }
 

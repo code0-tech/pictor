@@ -1,7 +1,7 @@
 import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {CombinesRuleConfig, EDataTypeRuleType, RuleMap} from "./rules/DFlowDataTypeRules";
-import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
+import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "../DFlow.view";
 
 export enum GenericCombinationStrategy {
     AND,

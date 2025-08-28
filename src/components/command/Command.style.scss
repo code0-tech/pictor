@@ -1,0 +1,143 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.command {
+
+  z-index: 100;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  background: variables.$primary;
+  padding: variables.$xs;
+
+  & {
+    @include box.box(variables.$primary, variables.$primary, variables.$primary);
+    @include helpers.borderRadius();
+  }
+
+  &__dialog {
+    padding: 0;
+    border: none;
+  }
+
+  &__list {
+    @include helpers.noFocusStyle();
+
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  &__input.input,
+  .input.input:hover,
+  .input.input:active,
+  .input.input:focus,
+  .input.input:focus-within,
+  .input.input:not(:focus),
+  {
+    @include helpers.noFocusStyle();
+
+    width: 100%;
+    border: none !important;
+    outline: none !important;
+    background: transparent;
+    box-shadow: none !important;
+    display: flex;
+    height: 2rem;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    font-size: variables.$sm;;
+    border-radius: variables.$borderRadius - variables.$xxs;
+
+    &::placeholder {
+      color: helpers.color(variables.$white, 25%);
+    }
+
+    &:disabled {
+      @include helpers.disabled()
+    }
+
+    .input__right {
+      padding-right: 0;
+    }
+  }
+
+  &__empty {
+    padding: variables.$md 0 variables.$xl 0;
+    text-align: center;
+    font-size: variables.$sm;
+    color: helpers.color(variables.$white, variables.$hierarchyTertiary);
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  [cmdk-group-heading] {
+    padding: variables.$xxs variables.$xs;
+  }
+
+  &__group {
+    overflow: hidden;
+    text-transform: uppercase;
+    font-size: variables.$xs;
+    padding: variables.$xxs 0 0 0;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+
+  }
+
+  &__item {
+    position: relative;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    font-size: variables.$sm;
+    outline: none;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    border-radius: variables.$borderRadius - variables.$xxs;
+    padding: variables.$xxs variables.$xxs variables.$xxs variables.$sm;
+    gap: variables.$xs;
+    text-transform: none;
+
+    &[data-disabled='true'] {
+      pointer-events: none;
+      color: helpers.color(variables.$white, 25%);
+    }
+
+    &[data-selected='true'] {
+      @include box.box(variables.$white, variables.$white, variables.$white);
+      box-shadow: none;
+      width: 100%;
+    }
+
+    svg {
+      pointer-events: none;
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+  }
+
+  &__separator {
+    height: 1px;
+    margin: variables.$xxs 0;
+    background: helpers.backgroundColor(variables.$white);
+  }
+
+  &__shortcut {
+    margin-left: auto;
+    font-size: variables.$xs;
+    letter-spacing: 0.1rem;
+    padding: 0 variables.$xxs;
+    border-radius: 0.375rem !important;
+    color: helpers.color(variables.$white, variables.$hierarchyTertiary);
+    background: helpers.backgroundColor(variables.$primary);
+  }
+}

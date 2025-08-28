@@ -185,6 +185,6 @@ const FlowExample = () => {
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
         <DFlowViewportControls/>
-        <DFlowViewportMiniMap/>
+        {/*<DFlowViewportMiniMap/>*/}
     </DFlow>
 }

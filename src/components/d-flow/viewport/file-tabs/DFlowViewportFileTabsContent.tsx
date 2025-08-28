@@ -9,6 +9,7 @@ import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFo
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 import {Value} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
+import InputMessage from "../../../form/InputMessage";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
@@ -38,7 +39,7 @@ export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContent
                 <TextInput title={parameterDefinition!!.parameter_id}
                            description={JSON.stringify(parameterDefinition!!.type)}
                            clearable
-                           defaultValue={JSON.stringify(parameter.value)}
+                           defaultValue={parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : JSON.stringify(parameter.value)}
                            onSuggestionSelect={(suggestion) => {
                                enterValue(suggestion.value)
                            }}

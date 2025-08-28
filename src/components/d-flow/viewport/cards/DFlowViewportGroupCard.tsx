@@ -6,9 +6,8 @@ import Card from "../../../card/Card";
 export interface DFlowViewportGroupCardProps extends NodeProps {
 }
 
-export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = memo((
-    {data, ...rest}
-) => {
+export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = memo((props) => {
+    const {data} = props
     const depth = (data as any)?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
     return (

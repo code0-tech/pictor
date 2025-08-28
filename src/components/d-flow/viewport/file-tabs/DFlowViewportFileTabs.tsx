@@ -22,7 +22,6 @@ export const DFlowViewportFileTabs = () => {
         const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
         const trigger = tabList.querySelector("[data-value=" + '"' + fileTabsService.getActiveTab()?.id + '"' + "]") as HTMLDivElement
 
-
         if (tabList && trigger) {
             const offset = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
             tabList.scrollLeft = 0 //reset to 0
@@ -55,7 +54,9 @@ export const DFlowViewportFileTabs = () => {
                                 <MenuContent align="end" sideOffset={8}>
                                     {fileTabsStore.map((tab: FileTabsView) => (
                                         <MenuItem key={`menu-${tab.id}`}
-                                                  onClick={() => fileTabsService.activateTab(tab.id!)}>
+                                                  onClick={() => {
+                                                      fileTabsService.activateTab(tab.id!)
+                                                  }}>
                                             {tab.children}
                                         </MenuItem>
                                     ))}

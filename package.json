@@ -53,7 +53,7 @@
     "@types/react": "^19.1.8",
     "@vitejs/plugin-react": "^4.6.0",
     "axe-playwright": "^2.1.0",
-    "babel-loader": "^9.2.1",
+    "babel-loader": "^10.0.0",
     "cmdk": "^1.1.1",
     "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "concurrently": "^9.1.2",

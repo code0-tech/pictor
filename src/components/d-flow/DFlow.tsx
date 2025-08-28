@@ -1,5 +1,13 @@
 import {Code0ComponentProps} from "../../utils/types";
-import {Edge, Node, ReactFlow, ReactFlowProps, useEdgesState, useNodesState} from "@xyflow/react";
+import {
+    Edge,
+    Node,
+    ReactFlow,
+    ReactFlowProps, ReactFlowProvider,
+    useEdgesState,
+    useNodesState,
+    useUpdateNodeInternals
+} from "@xyflow/react";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
@@ -139,7 +147,7 @@ const getLayoutedElements = (nodes: Node[]) => {
 
                 if (desiredTop < minTop) {
                     pcy = minTop + ps.h / 2;   // schiebe diesen Param nach unten
-                    py  = pcy - ps.h / 2;      // und korrigiere lokalen Stack-Start
+                    py = pcy - ps.h / 2;      // und korrigiere lokalen Stack-Start
                 }
 
                 // Layout des Params (liefert tatsächliche Unterkante inkl. Subtree)
@@ -311,8 +319,8 @@ const getLayoutedElements = (nodes: Node[]) => {
                 changed = true;
             }
 
-            g.measured = { width: newW, height: newH };
-            g.style = { ...(g.style as React.CSSProperties), width: newW, height: newH };
+            g.measured = {width: newW, height: newH};
+            g.style = {...(g.style as React.CSSProperties), width: newW, height: newH};
         });
 
         /* ---------- Param-Group-Row nach Bounding sauber zentrieren ----------- */
@@ -372,57 +380,74 @@ const getLayoutedElements = (nodes: Node[]) => {
     } while (changed && pass < 5);
 
     return {nodes: work};
-};
+}
 
 export type DFlowProps = Code0ComponentProps & ReactFlowProps
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
+    return <ReactFlowProvider>
+        <InternalDFlow {...props}/>
+    </ReactFlowProvider>
+}
 
+const InternalDFlow: React.FC<DFlowProps> = (props) => {
     const [nodes, setNodes] = useNodesState(props.nodes!!)
     const [edges, setEdges, edgeChangeEvent] = useEdgesState(props.edges!!)
+    const updateNodeInternals = useUpdateNodeInternals()
+
+    const revalidateHandles = React.useCallback((ids: string[]) => {
+        requestAnimationFrame(() => {
+            ids.forEach(id => updateNodeInternals(id));
+        });
+    }, [updateNodeInternals]);
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
-
         const localNodes = nodes.map(value => {
-            const node = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : []
+            const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
                 ...value,
                 measured: {
-                    width: changes.find((change: any) => change.id === value.id)?.dimensions?.width ?? value.measured?.width ?? node[0].clientWidth ?? 0,
-                    height: changes.find((change: any) => change.id === value.id)?.dimensions?.height ?? value.measured?.height ?? node[0].clientHeight ?? 0,
+                    width: changes.find((c: any) => c.id === value.id)?.dimensions?.width ?? value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
+                    height: changes.find((c: any) => c.id === value.id)?.dimensions?.height ?? value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
                 }
-            } as Node
-        })
+            } as Node;
+        });
 
-        const layouted = getLayoutedElements(localNodes)
-        setNodes(layouted.nodes as Node[])
-        setEdges(edges as Edge[])
-    }, [nodes, edges])
+        const layouted = getLayoutedElements(localNodes);
+        setNodes(layouted.nodes as Node[]);
+        setEdges(edges as Edge[]);
+
+        revalidateHandles((layouted.nodes as Node[]).map(n => n.id));
+    }, [nodes, edges, revalidateHandles]);
 
     React.useEffect(() => {
-
         const localNodes = props.nodes!!.map(value => {
-            const node = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : []
+            const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
                 ...value,
                 measured: {
-                    width: value.measured?.width ?? node[0]?.clientWidth ?? 0,
-                    height: value.measured?.height ?? node[0]?.clientHeight ?? 0,
+                    width: value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
+                    height: value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
                 }
-            } as Node
-        })
+            } as Node;
+        });
 
         const layouted = getLayoutedElements(localNodes)
-
         setNodes(layouted.nodes as Node[])
         setEdges(props.edges as Edge[])
-    }, [props.nodes, props.edges])
 
-    return <ReactFlow onInit={(reactFlowInstance) => reactFlowInstance.fitView()}
-                      onNodesChange={nodeChangeEvent}
-                      onEdgesChange={edgeChangeEvent}
-                      {...mergeCode0Props("flow", props)}
-                      nodes={nodes}
-                      edges={edges}/>
+        revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
+    }, [props.nodes, props.edges, revalidateHandles])
+
+    return (
+        <ReactFlow
+            onInit={(rf) => rf.fitView()}
+            onNodesChange={nodeChangeEvent}
+            onEdgesChange={edgeChangeEvent}
+            {...mergeCode0Props("flow", props)}
+            nodes={nodes}
+            edges={edges}
+        />
+    )
 }

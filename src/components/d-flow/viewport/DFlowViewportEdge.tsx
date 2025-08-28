@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../utils/types";
 import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
-import React from "react";
+import React, {memo} from "react";
 import Badge from "../../badge/Badge";
 
 export interface DFlowViewportEdgeDataProps extends Code0Component<HTMLDivElement> {
@@ -12,7 +12,7 @@ export interface DFlowViewportEdgeDataProps extends Code0Component<HTMLDivElemen
 // @ts-ignore
 export type DFlowViewportEdgeProps = EdgeProps<Edge<DFlowViewportEdgeDataProps>>
 
-export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = (props) => {
+export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = memo((props) => {
 
     const {sourceX, sourceY, targetX, targetY, id, data, ...rest} = props
 
@@ -46,4 +46,4 @@ export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = (props) => {
 
     </>
 
-}
+})

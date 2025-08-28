@@ -33,6 +33,7 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
         const tab = this.values().find((item: FileTabsView) => item.id === id);
         if (tab) tab.active = true
+        this.update()
     }
 
     public delete(index: number) {

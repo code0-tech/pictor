@@ -18,19 +18,20 @@ export const DFlowViewportFileTabs = () => {
     }, [fileTabsStore, fileTabsService]);
 
     React.useEffect(() => {
-        const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
-        const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
-        const trigger = tabList.querySelector("[data-value=" + '"' + fileTabsService.getActiveTab()?.id + '"' + "]") as HTMLDivElement
+        setTimeout(() => {
+            const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
+            const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
+            const trigger = tabList.querySelector("[data-value=" + '"' + fileTabsService.getActiveTab()?.id + '"' + "]") as HTMLDivElement
 
-        if (tabList && trigger) {
-            const offset = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
-            tabList.scrollLeft = 0 //reset to 0
-            tabList.scrollBy({
-                left: offset,
-                behavior: 'smooth'
-            });
-        }
-
+            if (tabList && trigger) {
+                const offset = (trigger.offsetLeft + (trigger.offsetWidth / 2)) - (tabList.offsetWidth / 2)
+                tabList.scrollLeft = 0 //reset to 0
+                tabList.scrollBy({
+                    left: offset,
+                    behavior: 'smooth'
+                });
+            }
+        }, 0)
     }, [activeTabId, id])
 
     return (

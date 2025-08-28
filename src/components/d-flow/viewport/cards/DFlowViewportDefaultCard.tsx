@@ -227,4 +227,4 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             />
         </Card>
     );
-});
+})

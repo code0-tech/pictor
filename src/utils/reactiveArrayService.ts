@@ -31,7 +31,8 @@ export class ReactiveArrayService<T> implements ArrayService<T> {
     }
 
     has(index: number) {
-        return !!this.access.getState()[index];
+        const arr = this.access.getState();
+        return index >= 0 && index < arr.length;
     }
 
     get(index: number) {
@@ -51,15 +52,39 @@ export class ReactiveArrayService<T> implements ArrayService<T> {
     }
 }
 
+// Hilfstyp für den Konstruktor des Service
+type ArrayServiceCtor<K, S extends ArrayService<K>> =
+    new (access: ReactiveArrayStore<K>) => S;
+
+// initial kann Array oder Callback sein
+type InitialArg<K, S extends ArrayService<K>> = K[] | ((svc: S) => K[]);
+
 export function useReactiveArrayService<K, S extends ArrayService<K>>(
-    // @ts-ignore
-    Ctor: typeof S,
-    initial: K[] = []
+    Ctor: ArrayServiceCtor<K, S>,
+    initial: InitialArg<K, S> = []
 ): [K[], S] {
-    const [state, setState] = React.useState<K[]>(initial);
+    // 1) State + Ref
+    const [state, setState] = React.useState<K[]>(
+        Array.isArray(initial) ? initial : [] // Platzhalter; Callback folgt in Effect
+    );
     const ref = React.useRef(state);
     React.useEffect(() => { ref.current = state; }, [state]);
+
+    // 2) stabiler Getter
     const getState = React.useCallback(() => ref.current, []);
+
+    // 3) Service erstellen (stabil über getState/setState)
     const service = React.useMemo(() => new Ctor({ getState, setState }), [Ctor, getState, setState]);
+
+    // 4) Falls initial ein Callback ist, einmalig ausführen, sobald Service existiert
+    React.useEffect(() => {
+        if (typeof initial === "function") {
+            // Nur einmal setzen (überschreibt ggf. den Platzhalter)
+            setState((initial as (svc: S) => K[])(service));
+        }
+        // absichtlich keine Abhängigkeit auf `state` – nur einmal ausführen
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [service]);
+
     return [state, service];
 }

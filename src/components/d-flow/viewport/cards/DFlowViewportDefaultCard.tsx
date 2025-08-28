@@ -8,10 +8,10 @@ import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
 import {
     IconAlertTriangle,
-    IconArrowRightCircle,
+    IconArrowRightCircle, IconCircleCheckFilled,
     IconCopy,
     IconDots,
-    IconExclamationCircle,
+    IconExclamationCircle, IconFileCheckFilled,
     IconFileLambdaFilled,
     IconLayoutNavbarCollapseFilled,
     IconMessageExclamation,
@@ -216,6 +216,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 </CardSection>
             ) : null}
 
+            {fileTabsService.getActiveTab()?.id == id ? <Badge pos={"absolute"} style={{bottom: 0, transform: "translateY(50%)"}} color={"info"}><IconCircleCheckFilled size={16}/></Badge> : null}
 
             {/* Ausgang */}
             <Handle

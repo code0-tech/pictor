@@ -50,17 +50,13 @@ export default meta
 
 export const Dashboard = () => {
 
-    const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
-
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
-    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
-    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (service) => {
+        return dataTypes.map(dataType => (new DataType(dataType, service)))
+    })
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinition(fd)));
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow1)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-
-    React.useEffect(() => {
-        dataTypes.forEach(dt => dataTypeService.add(new DataType(dt, dataTypeService)));
-    }, [dataTypeService]); // Effekt feuert, Store rendert neu
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
@@ -149,7 +145,7 @@ export const Dashboard = () => {
                     <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
                         <ContextStoreProvider
                             services={[[fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-                            <DResizablePanel collapsible collapsedSize={0} minSize={10}>
+                            <DResizablePanel>
                                 <FlowExample/>
                             </DResizablePanel>
                             <DResizableHandle/>

@@ -30,7 +30,7 @@ import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {FileTabsService} from "../../../file-tabs/FileTabs.service";
-import {DFlowViewportFileTabsContent} from "../file-tabs/DFlowViewportFileTabsContent";
+import {DFlowViewportDefaultTabContent} from "../file-tabs/DFlowViewportDefaultTabContent";
 
 export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunction
@@ -85,8 +85,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     active: true,
                     closeable: true,
                     children: <Text size={"md"}>{data.instance.id}</Text>,
-                    content: <DFlowViewportFileTabsContent depthLevel={data.depth} scopeLevel={data.scope}
-                                                           nodeLevel={data.index} functionInstance={data.instance}/>
+                    content: <DFlowViewportDefaultTabContent depthLevel={data.depth} scopeLevel={data.scope}
+                                                             nodeLevel={data.index} functionInstance={data.instance}/>
                 })
                 fileTabsService.update()
             }} style={{position: "relative"}}>

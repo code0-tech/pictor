@@ -16,6 +16,7 @@ export interface DFlowDataTypeReturnTypeRuleConfig {
 }
 
 
+//TODO: simple use useReturnType function
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeReturnTypeRule {
     public static validate(

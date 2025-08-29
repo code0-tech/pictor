@@ -18,7 +18,7 @@ export interface DFlowViewportFileTabsContentProps {
     nodeLevel?: number
 }
 
-export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
+export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
 
     const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)

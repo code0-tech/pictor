@@ -89,6 +89,21 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
             });
         }
 
+        if (idCounter == 1) {
+            // erste Function-Card → Verbindung Trigger → Function
+            edges.push({
+                id: `trigger-${fnId}-next`,
+                source: flow.id,    // Handle-Bottom des Trigger-Nodes
+                target: fnId,       // Handle-Top der Function-Card
+                data: {
+                    color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                    isParameter: false
+                },
+                deletable: false,
+                selectable: false,
+            });
+        }
+
         /* ------- vertikale Kante (nextNode) -------------------------- */
         if (parentFnId) {
             const startGroups = groupsWithValue.get(parentFnId) ?? [];

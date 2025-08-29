@@ -32,8 +32,9 @@ import {DFlowReactiveSuggestionService} from "../d-flow/suggestions/DFlowSuggest
 import {dataTypes} from "../d-flow/data-type/DFlowDataType.data";
 import {Flow} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
-import {DFlowViewportFileTabs} from "../d-flow/viewport/file-tabs/DFlowViewportFileTabs";
+import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
 import {DFlowViewportMiniMap} from "../d-flow/viewport/DFlowViewportMiniMap";
+import {DFlowViewportTriggerCard} from "../d-flow/viewport/cards/DFlowViewportTriggerCard";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -150,7 +151,7 @@ export const Dashboard = () => {
                             </DResizablePanel>
                             <DResizableHandle/>
                             <DResizablePanel>
-                                <DFlowViewportFileTabs/>
+                                <DFlowViewportTabs/>
                             </DResizablePanel>
                         </ContextStoreProvider>
                     </DResizablePanelGroup>
@@ -169,7 +170,8 @@ const FlowExample = () => {
     const nodeTypes = {
         default: DFlowViewportDefaultCard,
         group: DFlowViewportGroupCard,
-        suggestion: DFlowViewportSuggestionCard
+        suggestion: DFlowViewportSuggestionCard,
+        trigger: DFlowViewportTriggerCard
     }
 
     const edgeTypes = {

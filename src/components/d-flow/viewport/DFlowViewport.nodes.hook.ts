@@ -24,6 +24,17 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     // Global, strictly increasing node index across the entire flow (only real nodes)
     let globalNodeIndex = 0;
 
+    //trigger node
+    nodes.push({
+        id: `${flow.id}`,
+        type: "trigger",
+        position: { x: 0, y: 0 },
+        draggable: false,
+        data: {
+            instance: flow
+        }
+    })
+
     const traverse = (
         fn: NodeFunction,
         isParameter = false,

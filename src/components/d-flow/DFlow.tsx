@@ -402,6 +402,12 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
     }, [updateNodeInternals]);
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
+        const changedIds: string[] = Array.from(new Set(
+            changes
+                .filter((c: any) => c.type === 'dimensions' || c.type === 'position')
+                .map((c: any) => c.id)
+        ));
+
         const localNodes = nodes.map(value => {
             const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
@@ -416,7 +422,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         const layouted = getLayoutedElements(localNodes);
         setNodes(layouted.nodes as Node[]);
 
-        revalidateHandles((layouted.nodes as Node[]).map(n => n.id));
+        revalidateHandles(changedIds);
     }, [nodes, edges, revalidateHandles]);
 
     React.useEffect(() => {

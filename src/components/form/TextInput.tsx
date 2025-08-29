@@ -7,6 +7,7 @@ import Button from "../button/Button";
 export interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
+    onClear?: (event: Event) => void
 }
 
 const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
@@ -19,8 +20,9 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
         ...rest
     } = props
 
-    const toClearable = () => {
+    const toClearable = (event: Event) => {
         if (ref.current) setElementKey(ref.current, "value", "", "change")
+        if (props.onClear) props.onClear(event)
     }
 
     const rightAction = [right]

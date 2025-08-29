@@ -11,7 +11,7 @@ import {
     IconArrowRightCircle, IconCircleCheckFilled,
     IconCopy,
     IconDots,
-    IconExclamationCircle, IconFileCheckFilled,
+    IconExclamationCircle,
     IconFileLambdaFilled,
     IconLayoutNavbarCollapseFilled,
     IconMessageExclamation,
@@ -71,6 +71,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     return (
         <Card
             borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
+            className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
             onClick={() => {
                 flowInstance.setViewport({
@@ -134,13 +135,13 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 isConnectable={false}
                 draggable={false}
                 type="target"
-                className={"function-card__handle function-card__handle--target"}
+                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                 style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={data.isParameter ? Position.Right : Position.Top}
             />
 
             {(validation?.length ?? 0) > 0 ? (
-                <div className={"function-card__inspection"}>
+                <div className={"d-flow-viewport-default-card__inspection"}>
                     <Flex style={{gap: "0.35rem"}}>
                         {(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? (
                             <Badge color={"error"}>
@@ -209,21 +210,19 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                                     id={`param-${param.id}`}
                                     isConnectable={false}
                                     hidden={!isParamConnected(param.id)}
-                                    className={"function-card__handle function-card__handle--target"}
+                                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                                 />
                             </Flex> : null
                     })}
                 </CardSection>
             ) : null}
 
-            {fileTabsService.getActiveTab()?.id == id ? <Badge pos={"absolute"} style={{bottom: 0, transform: "translateY(50%)"}} color={"info"}><IconCircleCheckFilled size={16}/></Badge> : null}
-
             {/* Ausgang */}
             <Handle
                 isConnectable={false}
                 type="source"
                 style={{...(data.isParameter ? {left: "2px"} : {bottom: "2px"})}}
-                className={"function-card__handle function-card__handle--source"}
+                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
         </Card>

@@ -9,6 +9,8 @@ import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFo
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 import {isRefObject, RefObject, Value} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
+import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
+import {ParameterDefinition} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
 
 export interface DFlowViewportFileTabsContentProps {
@@ -24,8 +26,27 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.id)
+
+    const paramDefinitions = React.useMemo(() => {
+        const map: Record<string, ParameterDefinition> = {}
+        definition?.parameters?.forEach(pd => {
+            map[pd.parameter_id] = pd
+        })
+        return map
+    }, [definition?.parameters])
+
+    const sortedParameters = React.useMemo(() => {
+        return [...(functionInstance.parameters || [])].sort((a, b) => a.id.localeCompare(b.id))
+    }, [functionInstance.parameters])
+
+    const suggestionsById: Record<string, DFlowSuggestion[]> = {}
+    sortedParameters.forEach(parameter => {
+        const parameterDefinition = paramDefinitions[parameter.id]
+        suggestionsById[parameter.id] = useSuggestions(parameterDefinition?.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
+    })
+
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {functionInstance.parameters!!.map(parameter => {
+        {sortedParameters.map(parameter => {
 
             const submitValue = (value: Value) => {
                 parameter.value = value
@@ -42,8 +63,8 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 }
             }
 
-            const parameterDefinition = definition?.parameters!!.find(parameterDefinition => parameterDefinition.parameter_id === parameter.id)
-            const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
+            const parameterDefinition = paramDefinitions[parameter.id]
+            const result = suggestionsById[parameter.id]
             const title = parameterDefinition?.name ? parameterDefinition?.name[0]?.text : parameterDefinition!!.parameter_id
             const description = parameterDefinition?.description ? parameterDefinition?.description[0]?.text : JSON.stringify(parameterDefinition!!.type)
             const defaultValue = parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value

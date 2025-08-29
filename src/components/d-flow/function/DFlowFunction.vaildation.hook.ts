@@ -1,5 +1,5 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {DataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
+import {DataType, EDataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 import {
@@ -120,8 +120,9 @@ export const useFunctionValidation = (
                 }
                 return;
             }
+
             if (valueDataType) {
-                if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
+                if ((isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) && parameterDataType.type !== EDataType.NODE) {
                     isValid = parameterDataType.validateDataType(valueDataType);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Ref Type mismatch"));

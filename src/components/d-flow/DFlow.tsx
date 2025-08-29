@@ -453,6 +453,8 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     return (
         <ReactFlow
+            onlyRenderVisibleElements
+            panOnScroll={false}
             onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}

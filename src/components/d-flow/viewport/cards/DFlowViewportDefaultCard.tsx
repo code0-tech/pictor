@@ -8,8 +8,7 @@ import CardSection from "../../../card/CardSection";
 import Flex from "../../../flex/Flex";
 import {
     IconAlertTriangle,
-    IconArrowRightCircle, IconCircleCheckFilled,
-    IconCopy,
+    IconArrowRightCircle, IconCopy,
     IconDots,
     IconExclamationCircle,
     IconFileLambdaFilled,

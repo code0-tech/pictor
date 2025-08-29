@@ -1,5 +1,5 @@
 import React from "react";
-import {NodeFunction} from "../../DFlow.view";
+import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "../../DFlow.view";
 import TextInput from "../../../form/TextInput";
 import Flex from "../../../flex/Flex";
 import {useService} from "../../../../utils/contextStore";
@@ -7,9 +7,9 @@ import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
-import {Value} from "../../data-type/DFlowDataType.view";
+import {isRefObject, RefObject, Value} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
-import InputMessage from "../../../form/InputMessage";
+import Badge from "../../../badge/Badge";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
@@ -30,21 +30,47 @@ export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContent
             const parameterDefinition = definition?.parameters!!.find(parameterDefinition => parameterDefinition.parameter_id === parameter.id)
             const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
 
-            const enterValue = (value: Value) => {
+            const submitValue = (value: Value) => {
                 parameter.value = value
                 flowService.update()
             }
 
+            const title = parameterDefinition?.name ? parameterDefinition?.name[0]?.text : parameterDefinition!!.parameter_id
+            const description = parameterDefinition?.description ? parameterDefinition?.description[0]?.text : JSON.stringify(parameterDefinition!!.type)
+            const defaultValue = parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
             return <div>
-                <TextInput title={parameterDefinition!!.parameter_id}
-                           description={JSON.stringify(parameterDefinition!!.type)}
+                <TextInput title={title}
+                           description={description}
                            clearable
-                           defaultValue={parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : JSON.stringify(parameter.value)}
+                           key={JSON.stringify(parameter.value)}
+                           transformValue={value => {
+                               try {
+                                   if (!value) return value
+                                   if (isNodeFunctionObject(JSON.parse(value) as NodeFunctionObject)) {
+                                       return <Badge
+                                           color={"info"}>{(JSON.parse(value) as NodeFunctionObject).function.function_id}</Badge>
+                                   }
+                                   if (isRefObject(JSON.parse(value))) {
+                                       const refObject = JSON.parse(value) as RefObject
+                                       return <Badge
+                                           color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.type)}</Badge>
+                                   }
+                               } catch (e) {
+                               }
+                               return value
+                           }}
+                           defaultValue={defaultValue}
                            onSuggestionSelect={(suggestion) => {
-                               enterValue(suggestion.value)
+                               submitValue(suggestion.value)
                            }}
                            onBlur={event => {
-                               enterValue(JSON.parse(event.target.value))
+                               try {
+                                   const value = JSON.parse(event.target.value)
+                                   submitValue(value)
+                               } catch (e) {
+                                   // @ts-ignore
+                                   submitValue(event.target.value == "" ? undefined : event.target.value)
+                               }
                            }}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                            suggestions={toInputSuggestions(result)}

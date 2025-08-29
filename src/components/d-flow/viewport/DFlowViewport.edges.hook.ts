@@ -4,7 +4,7 @@ import {Edge} from "@xyflow/react";
 import {NodeFunction} from "../DFlow.view";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType} from "../data-type/DFlowDataType.view";
+import {EDataType, Type} from "../data-type/DFlowDataType.view";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -35,11 +35,36 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
 
     let idCounter = 0;              // globale, fortlaufende Id-Vergabe
 
+    const functionCache = new Map<string, ReturnType<typeof functionService.getFunctionDefinition>>();
+    const dataTypeCache = new Map<Type, ReturnType<typeof dataTypeService.getDataType>>();
+
+    const getFunctionDefinitionCached = (
+        id: string,
+        cache = functionCache,
+    ) => {
+        if (!cache.has(id)) {
+            cache.set(id, functionService.getFunctionDefinition(id));
+        }
+        return cache.get(id);
+    };
+
+    const getDataTypeCached = (
+        type: Type,
+        cache = dataTypeCache,
+    ) => {
+        if (!cache.has(type)) {
+            cache.set(type, dataTypeService.getDataType(type));
+        }
+        return cache.get(type);
+    };
+
     /* ------------------------------------------------------------------ */
     const traverse = (
         fn: NodeFunction,
         parentFnId?: string,        // Id der *Function-Card* des Aufrufers
-        level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array
+        level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array,
+        fnCache = functionCache,
+        dtCache = dataTypeCache,
     ): string => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
@@ -94,11 +119,10 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         /* ------- horizontale Kanten für Parameter -------------------- */
         fn.parameters?.forEach((param) => {
             const val = param.value;
-            const def = functionService
-                .getFunctionDefinition(fn.id)
+            const def = getFunctionDefinitionCached(fn.id, fnCache)
                 ?.parameters?.find(p => p.parameter_id === param.id);
             const paramType = def?.type;
-            const paramDT = paramType ? dataTypeService.getDataType(paramType) : undefined;
+            const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (!val) return
 
@@ -131,7 +155,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
                     /* rekursiv Funktions-Ast innerhalb der Gruppe       */
                     traverse(param.value as NodeFunction,
                         undefined,
-                        level + 1);
+                        level + 1,
+                        fnCache,
+                        dtCache);
                 }
             }
 
@@ -139,7 +165,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
             else if (val && val instanceof NodeFunction) {
                 const subFnId = traverse(param.value as NodeFunction,
                     undefined,
-                    level + 1);
+                    level + 1,
+                    fnCache,
+                    dtCache);
 
                 edges.push({
                     id: `${subFnId}-${fnId}-param-${param.id}`,
@@ -159,13 +187,13 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
 
         /* ------- Rekursion auf nextNode ------------------------------ */
         if (fn.nextNode) {
-            traverse(fn.nextNode, fnId, level);   // gleiche Ebenentiefe
+            traverse(fn.nextNode, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
         }
 
         return fnId;
     };
 
     /* ------------------------------------------------------------------ */
-    traverse(flow.startingNode);
+    traverse(flow.startingNode, undefined, 0, functionCache, dataTypeCache);
     return edges;
 };

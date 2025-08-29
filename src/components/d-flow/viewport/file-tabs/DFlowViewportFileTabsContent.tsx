@@ -27,17 +27,28 @@ export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContent
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {functionInstance.parameters!!.map(parameter => {
 
-            const parameterDefinition = definition?.parameters!!.find(parameterDefinition => parameterDefinition.parameter_id === parameter.id)
-            const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
-
             const submitValue = (value: Value) => {
                 parameter.value = value
                 flowService.update()
             }
 
+            const submitValueEvent = (event: any) => {
+                try {
+                    const value = JSON.parse(event.target.value)
+                    submitValue(value)
+                } catch (e) {
+                    // @ts-ignore
+                    submitValue(event.target.value == "" ? undefined : event.target.value)
+                }
+            }
+
+            const parameterDefinition = definition?.parameters!!.find(parameterDefinition => parameterDefinition.parameter_id === parameter.id)
+            const result = useSuggestions(parameterDefinition!!.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
             const title = parameterDefinition?.name ? parameterDefinition?.name[0]?.text : parameterDefinition!!.parameter_id
             const description = parameterDefinition?.description ? parameterDefinition?.description[0]?.text : JSON.stringify(parameterDefinition!!.type)
             const defaultValue = parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
+
+
             return <div>
                 <TextInput title={title}
                            description={description}
@@ -63,15 +74,8 @@ export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContent
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)
                            }}
-                           onBlur={event => {
-                               try {
-                                   const value = JSON.parse(event.target.value)
-                                   submitValue(value)
-                               } catch (e) {
-                                   // @ts-ignore
-                                   submitValue(event.target.value == "" ? undefined : event.target.value)
-                               }
-                           }}
+                           onBlur={submitValueEvent}
+                           onClear={submitValueEvent}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                            suggestions={toInputSuggestions(result)}
 

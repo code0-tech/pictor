@@ -78,6 +78,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
         const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
         const [open, setOpen] = useState(false); // Dropdown open state
         const shouldPreventCloseRef = useRef(true); // Controls if dropdown should stay open on click
+        const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
 
         const {
             wrapperComponent = {}, // Default empty wrapper props
@@ -92,7 +93,8 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
             suggestions, // Optional suggestions array
             suggestionsHeader, // Optional header above suggestion list
             suggestionsFooter, // Optional footer below suggestion list
-            onSuggestionSelect = () => {}, // Callback for suggestion selection
+            onSuggestionSelect = () => {
+            }, // Callback for suggestion selection
             ...rest // Remaining native input props
         } = props;
 
@@ -121,6 +123,20 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
             document.addEventListener("pointerdown", handlePointerDown, true);
             return () => document.removeEventListener("pointerdown", handlePointerDown, true);
         }, [suggestions]);
+
+        useEffect(() => {
+            if (!inputRef.current) return
+            inputRef.current.addEventListener("change", (e: any) => setValue(e.target.value))
+            inputRef.current.addEventListener("input", (e: any) => setValue(e.target.value))
+        }, [inputRef]);
+
+        const syntax = React.useMemo(() => {
+            return props.transformValue ? (
+                <div className={"input__syntax"}>
+                    {props.transformValue(value)} {/* Render transformed value */}
+                </div>
+            ) : null
+        }, [props.transformValue, value])
 
         // Render suggestion menu dropdown
         const suggestionMenu = useMemo(() => (
@@ -199,16 +215,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                         />
                     )}
 
-                    {props.transformValue ? (
-                        <div className={"input__syntax"} style={{
-                            width: inputRef?.current?.clientWidth ?? 0,
-                            height: inputRef?.current?.clientHeight ?? 0,
-                            top: inputRef?.current?.offsetTop ?? 0,
-                            left: inputRef?.current?.offsetLeft ?? 0,
-                        }}>
-                            {props.transformValue(inputRef?.current?.value ?? inputRef?.current?.placeholder ?? "sd" )} {/* Render transformed value */}
-                        </div>
-                    ) : null}
+                    {syntax}
 
                     {right &&
                         <div className={`input__right input__right--${rightType}`}>{right}</div>} {/* Right element */}

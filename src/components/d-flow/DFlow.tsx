@@ -415,7 +415,6 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
         const layouted = getLayoutedElements(localNodes);
         setNodes(layouted.nodes as Node[]);
-        setEdges(edges as Edge[]);
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id));
     }, [nodes, edges, revalidateHandles]);

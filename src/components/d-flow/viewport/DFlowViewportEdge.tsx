@@ -24,7 +24,7 @@ export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = memo((props) 
         targetY,
         targetPosition: data?.isParameter ? Position.Right : Position.Top,
         borderRadius: 32,
-        centerY: targetY - 50
+        centerY: targetY - 37.5
     })
 
     return <>

@@ -61,6 +61,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestionsFooter?: React.ReactNode // Custom footer below suggestions
     onSuggestionSelect?: (suggestion: InputSuggestion) => void // Callback when a suggestion is selected
     transformValue?: (value: T) => React.ReactNode | T // Optional value transformation function
+    disableOnValue?: (value: T) => boolean
 
     wrapperComponent?: Code0Component<HTMLDivElement> // Props for the wrapping div
     right?: React.ReactNode // Right-side icon or element
@@ -94,7 +95,8 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
             suggestionsHeader, // Optional header above suggestion list
             suggestionsFooter, // Optional footer below suggestion list
             onSuggestionSelect = () => {
-            }, // Callback for suggestion selection
+            }, // Callback for suggestion selection,
+            disableOnValue = () => false,
             ...rest // Remaining native input props
         } = props;
 
@@ -124,11 +126,20 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
             return () => document.removeEventListener("pointerdown", handlePointerDown, true);
         }, [suggestions]);
 
+        const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
+
         useEffect(() => {
             if (!inputRef.current) return
-            inputRef.current.addEventListener("change", (e: any) => setValue(e.target.value))
-            inputRef.current.addEventListener("input", (e: any) => setValue(e.target.value))
-        }, [inputRef]);
+            inputRef.current.addEventListener("change", (e: any) => {
+                if (disabledOnValue) return
+                setValue(e.target.value)
+            })
+            inputRef.current.addEventListener("input", (e: any) => {
+                if (disabledOnValue) return
+                setValue(e.target.value)
+            })
+        }, [inputRef, disabledOnValue])
+
 
         const syntax = React.useMemo(() => {
             return props.transformValue ? (
@@ -170,6 +181,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                                 menuRef.current?.focusLastItem(); // Navigate up
                             }
                         }}
+                        disabled={disabled || disabledOnValue}
                     />
                 </MenuTrigger>
                 <MenuPortal>

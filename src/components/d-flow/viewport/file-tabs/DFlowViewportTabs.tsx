@@ -7,7 +7,7 @@ import Button from "../../../button/Button";
 import {IconChevronDown, IconDotsVertical} from "@tabler/icons-react";
 import {FileTabsView} from "../../../file-tabs/FileTabs.view";
 
-export const DFlowViewportFileTabs = () => {
+export const DFlowViewportTabs = () => {
 
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)

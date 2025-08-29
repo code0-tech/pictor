@@ -67,6 +67,8 @@ export class DFlowDataTypeReturnTypeRule {
                 return !!service?.getDataType(config.type)?.validateDataType(service?.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!)
             }
 
+        } else if (isNodeFunctionObject(foundReturnFunction.parameters!![0].value!! as NodeFunctionObject)) {
+            //TODO : allow function as return value
         } else {
 
             //use generic given type for checking against value

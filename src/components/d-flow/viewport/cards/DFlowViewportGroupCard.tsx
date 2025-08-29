@@ -16,7 +16,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
             <Handle
                 type="target"
                 position={Position.Top}
-                className={"function-card__handle function-card__handle--target"}
+                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                 isConnectable={false}
                 draggable={false}
                 style={{top: "2px"}}
@@ -24,7 +24,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
             <Handle
                 type="source"
                 position={Position.Bottom}
-                className={"function-card__handle function-card__handle--source"}
+                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 isConnectable={false}
                 draggable={false}
                 style={{bottom: "2px"}}

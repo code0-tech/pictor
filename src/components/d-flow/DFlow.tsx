@@ -408,13 +408,19 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                 .map((c: any) => c.id)
         ));
 
-        const localNodes = nodes.map(value => {
-            const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
+        const dimensionMap = new Map<string, { width?: number; height?: number }>();
+        changes
+            .filter((c: any) => c.type === 'dimensions')
+            .forEach((c: any) => dimensionMap.set(c.id, c.dimensions));
+
+        const localNodes = nodes.map(node => {
+            if (!dimensionMap.has(node.id)) return node;
+            const dims = dimensionMap.get(node.id) || {};
             return {
-                ...value,
+                ...node,
                 measured: {
-                    width: changes.find((c: any) => c.id === value.id)?.dimensions?.width ?? value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
-                    height: changes.find((c: any) => c.id === value.id)?.dimensions?.height ?? value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
+                    width: dims.width ?? node.measured?.width ?? 0,
+                    height: dims.height ?? node.measured?.height ?? 0,
                 }
             } as Node;
         });
@@ -423,7 +429,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         setNodes(layouted.nodes as Node[]);
 
         revalidateHandles(changedIds);
-    }, [nodes, edges, revalidateHandles]);
+    }, [nodes, revalidateHandles]);
 
     React.useEffect(() => {
         const localNodes = props.nodes!!.map(value => {

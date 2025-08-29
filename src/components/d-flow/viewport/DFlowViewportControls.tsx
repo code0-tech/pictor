@@ -5,6 +5,7 @@ import Button from "../../button/Button";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
 import Badge from "../../badge/Badge";
 import Flex from "../../flex/Flex";
+import {DFlowViewportMiniMap} from "./DFlowViewportMiniMap";
 
 export const DFlowViewportControls: React.FC = () => {
 
@@ -28,13 +29,16 @@ export const DFlowViewportControls: React.FC = () => {
     }
 
     return <Panel position="bottom-left">
-        <Flex align="stretch" style={{gap: ".35rem"}}>
-            <ButtonGroup>
-                <Button color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
-                <Button color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
-                <Button color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
-            </ButtonGroup>
-            <Badge color={"secondary"}>{getCurrentZoomInPercent()}%</Badge>
+        <Flex style={{flexDirection: "column", gap: "1rem"}}>
+            <DFlowViewportMiniMap/>
+            <Flex align="stretch" style={{gap: ".35rem"}}>
+                <ButtonGroup>
+                    <Button color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
+                    <Button color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
+                    <Button color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
+                </ButtonGroup>
+                <Badge color={"secondary"}>{getCurrentZoomInPercent()}%</Badge>
+            </Flex>
         </Flex>
     </Panel>
 

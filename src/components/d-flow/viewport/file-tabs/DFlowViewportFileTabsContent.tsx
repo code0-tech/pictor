@@ -70,6 +70,14 @@ export const DFlowViewportFileTabsContent: React.FC<DFlowViewportFileTabsContent
                                }
                                return value
                            }}
+                           disableOnValue={value => {
+                               if (!value) return false
+                               try {
+                                   return isNodeFunctionObject(JSON.parse(value) as NodeFunctionObject) || isRefObject(JSON.parse(value))
+                               } catch (e) {
+                               }
+                               return false
+                           }}
                            defaultValue={defaultValue}
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)

@@ -37,24 +37,52 @@ const getLayoutedElements = (nodes: Node[]) => {
     // Aktueller Arbeitsstand der Nodes (Styles werden in den Pässen fortgeschrieben)
     let work = nodes.map(n => ({...n}));
 
+    // Relationen einmalig ermitteln (IDs behalten) --------------------------------
+    const rfKidIds = new Map<string, string[]>();
+    const paramIds = new Map<string, string[]>();
+    for (const n of work) {
+        const link = (n.data as any)?.linkingId;
+        if (link) {
+            let arr = paramIds.get(link);
+            if (!arr) {
+                arr = [];
+                paramIds.set(link, arr);
+            }
+            arr.push(n.id);
+        }
+        if (n.parentId && !link) {
+            let arr = rfKidIds.get(n.parentId);
+            if (!arr) {
+                arr = [];
+                rfKidIds.set(n.parentId, arr);
+            }
+            arr.push(n.id);
+        }
+    }
+
+    const rfKids = new Map<string, Node[]>();
+    const params = new Map<string, Node[]>();
+    for (const [k, ids] of rfKidIds) rfKids.set(k, new Array(ids.length));
+    for (const [k, ids] of paramIds) params.set(k, new Array(ids.length));
+
+    const updateRefs = (byId: Map<string, Node>) => {
+        for (const [k, ids] of rfKidIds) {
+            const arr = rfKids.get(k)!;
+            for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
+        }
+        for (const [k, ids] of paramIds) {
+            const arr = params.get(k)!;
+            for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
+        }
+    };
+
     do {
         changed = false;
         pass++;
 
         /* Helper-Maps ---------------------------------------------------------- */
         const byId = new Map(work.map(n => [n.id, n]));
-        const rfKids = new Map<string, Node[]>();   // echte RF-Kinder (parentId gesetzt, aber kein linkingId)
-        const params = new Map<string, Node[]>();   // Parameter je Parent (linkingId === parent.id)
-
-        work.forEach(n => {
-            const link = (n.data as any)?.linkingId;
-            if (link) {
-                (params.get(link) ?? (params.set(link, []), params.get(link)!)).push(n);
-            }
-            if (n.parentId && !link) {
-                (rfKids.get(n.parentId) ?? (rfKids.set(n.parentId, []), rfKids.get(n.parentId)!)).push(n);
-            }
-        });
+        updateRefs(byId);
 
         /* ---------- Größen ---------------------------------------------------- */
         type Size = { w: number; h: number };
@@ -89,23 +117,29 @@ const getLayoutedElements = (nodes: Node[]) => {
                 return s;
             }
 
-            // ansonsten aus RF-Kindern abschätzen (inkl. V-Stack + Innen-Padding)
-            const kids = rfKids.get(n.id) ?? [];
-            const kSizes = kids.map(size);
+              // ansonsten aus RF-Kindern abschätzen (inkl. V-Stack + Innen-Padding)
+              const kids = rfKids.get(n.id) ?? [];
+              let stackH = 0;
+              let wMax = 0;
+              let count = 0;
+              for (const k of kids) {
+                  const ks = size(k);
+                  stackH += ks.h;
+                  if (ks.w > wMax) wMax = ks.w;
+                  count++;
+              }
+              stackH += V * Math.max(0, count - 1);
 
-            const stackH = kSizes.reduce((s, k) => s + k.h, 0) + V * Math.max(0, kSizes.length - 1);
-            const wMax = Math.max(0, ...kSizes.map(k => k.w));
-
-            const g = {
-                w: wMax + 2 * PAD,
-                h: (kids.length ? stackH : 0) + 2 * PAD,
-            };
-            cache.set(n.id, g);
-            return g;
+              const g = {
+                  w: wMax + 2 * PAD,
+                  h: (count ? stackH : 0) + 2 * PAD,
+              };
+              cache.set(n.id, g);
+              return g;
         };
 
         // Pre-Warm Größen
-        work.forEach(size);
+        for (const n of work) size(n);
 
         /* ---------- relatives Layout (Zentren in globalen Koordinaten) -------- */
 
@@ -117,137 +151,230 @@ const getLayoutedElements = (nodes: Node[]) => {
         const columnBottom = new Map<number, number>();
         const colKey = (x: number) => Math.round(x / 10); // 10px-Buckets gegen Floating-Drift
 
-        const layout = (n: Node, cx: number, cy: number): number => {
-            rel.set(n.id, {x: cx, y: cy});
-            const {w, h} = size(n);
+        const layoutIter = (root: Node, cx: number, cy: number): number => {
+            type Frame = {
+                node: Node;
+                cx: number;
+                cy: number;
+                phase: number;
+                w?: number;
+                h?: number;
+                right?: Node[];
+                rightIndex?: number;
+                py?: number;
+                rightBottom?: number;
+                childKey?: number;
+                childPs?: Size;
+                lastChildBottom?: number;
+                gParams?: Node[];
+                gSizes?: Size[];
+                gIndex?: number;
+                gx?: number;
+                gy?: number;
+                rowBottom?: number;
+                kids?: Node[];
+                kidIndex?: number;
+                curY?: number;
+                bottom?: number;
+            };
+            const stack: Frame[] = [{node: root, cx, cy, phase: 0}];
+            let returnBottom = 0;
 
-            /* 1) einfache Parameter rechts (keine Groups) */
-            const right = (params.get(n.id) ?? [])
-                .filter(p => p.type !== 'group')
-                .sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+            while (stack.length) {
+                const f = stack[stack.length - 1];
+                switch (f.phase) {
+                    case 0: {
+                        rel.set(f.node.id, {x: f.cx, y: f.cy});
+                        const {w, h} = size(f.node);
+                        f.w = w;
+                        f.h = h;
 
-            const rightH = right.reduce((s, p) => s + size(p).h, 0) + V * Math.max(0, right.length - 1);
-            let py = cy - rightH / 2;
+                        const paramsOf = params.get(f.node.id) ?? [];
+                        const right: Node[] = [];
+                        const gParams: Node[] = [];
+                        for (const p of paramsOf) {
+                            if (p.type === 'group') gParams.push(p); else right.push(p);
+                        }
+                        right.sort((a,b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+                        gParams.sort((a,b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+                        f.right = right;
+                        f.gParams = gParams;
 
-            // tatsächliche Unterkante der rechten Spalte dieses Parents
-            let rightBottom = cy + h / 2;
-
-            right.forEach(p => {
-                const ps = size(p);
-                const px = cx + w / 2 + H + ps.w / 2;
-
-                // Start-Center-Y des Params (ohne Kollision)
-                let pcy = py + ps.h / 2;
-
-                // **NEU**: Kollisionen mit bereits platzierten Parametern in derselben rechten Spalte vermeiden
-                const key = colKey(px);
-                const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
-                const minTop = occ + V; // mind. V Abstand über zuletzt belegter Unterkante
-                const desiredTop = pcy - ps.h / 2;
-
-                if (desiredTop < minTop) {
-                    pcy = minTop + ps.h / 2;   // schiebe diesen Param nach unten
-                    py = pcy - ps.h / 2;      // und korrigiere lokalen Stack-Start
+                        let total = 0;
+                        for (const p of right) total += size(p).h;
+                        total += V * Math.max(0, right.length - 1);
+                        f.py = f.cy - total / 2;
+                        f.rightBottom = f.cy + h / 2;
+                        f.rightIndex = 0;
+                        f.phase = 1;
+                        break;
+                    }
+                    case 1: {
+                        if (f.rightIndex! < f.right!.length) {
+                            const p = f.right![f.rightIndex!];
+                            const ps = size(p);
+                            const px = f.cx + f.w!/2 + H + ps.w/2;
+                            let pcy = f.py! + ps.h/2;
+                            const key = colKey(px);
+                            const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
+                            const minTop = occ + V;
+                            const desiredTop = pcy - ps.h/2;
+                            if (desiredTop < minTop) {
+                                pcy = minTop + ps.h/2;
+                                f.py = pcy - ps.h/2;
+                            }
+                            f.childKey = key;
+                            f.childPs = ps;
+                            stack.push({node: p, cx: px, cy: pcy, phase: 0});
+                            f.phase = 10;
+                        } else {
+                            f.bottom = Math.max(f.cy + f.h!/2, f.rightBottom!);
+                            f.phase = 2;
+                        }
+                        break;
+                    }
+                    case 10: {
+                        const subBottom = f.lastChildBottom!;
+                        columnBottom.set(f.childKey!, Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom));
+                        f.rightBottom = Math.max(f.rightBottom!, subBottom);
+                        f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V);
+                        f.rightIndex!++;
+                        f.phase = 1;
+                        break;
+                    }
+                    case 2: {
+                        if (f.gParams && f.gParams.length) {
+                            const gSizes: Size[] = [];
+                            let rowW = 0;
+                            for (const g of f.gParams) {
+                                const gs = size(g);
+                                gSizes.push(gs);
+                                rowW += gs.w;
+                            }
+                            rowW += H * (f.gParams.length - 1);
+                            f.gSizes = gSizes;
+                            f.gx = f.cx - rowW / 2;
+                            f.gy = f.bottom! + V;
+                            f.rowBottom = f.bottom;
+                            f.gIndex = 0;
+                            f.phase = 3;
+                        } else {
+                            f.phase = 4;
+                        }
+                        break;
+                    }
+                    case 3: {
+                        if (f.gIndex! < f.gParams!.length) {
+                            const g = f.gParams![f.gIndex!];
+                            const gs = f.gSizes![f.gIndex!];
+                            const gcx = f.gx! + gs.w/2;
+                            const gcy = f.gy! + gs.h/2;
+                            f.gx! += gs.w + H;
+                            stack.push({node: g, cx: gcx, cy: gcy, phase: 0});
+                            f.childPs = gs;
+                            f.phase = 30;
+                        } else {
+                            f.bottom = f.rowBottom;
+                            f.phase = 4;
+                        }
+                        break;
+                    }
+                    case 30: {
+                        const subBottom = f.lastChildBottom!;
+                        f.rowBottom = Math.max(f.rowBottom!, subBottom);
+                        f.gIndex!++;
+                        f.phase = 3;
+                        break;
+                    }
+                    case 4: {
+                        if (f.node.type === 'group') {
+                            const kidsAll = rfKids.get(f.node.id) ?? [];
+                            const kids: Node[] = [];
+                            for (const k of kidsAll) {
+                                if (!(k.data as any)?.linkingId) kids.push(k);
+                            }
+                            f.kids = kids;
+                            f.kidIndex = 0;
+                            f.curY = f.cy - f.h!/2 + PAD;
+                            f.phase = 5;
+                        } else {
+                            f.phase = 6;
+                        }
+                        break;
+                    }
+                    case 5: {
+                        if (f.kidIndex! < f.kids!.length) {
+                            const k = f.kids![f.kidIndex!];
+                            const ks = size(k);
+                            const ky = f.curY! + ks.h/2;
+                            stack.push({node: k, cx: f.cx, cy: ky, phase: 0});
+                            f.childPs = ks;
+                            f.phase = 50;
+                        } else {
+                            const contentBottom = f.curY! - V;
+                            f.bottom = Math.max(f.bottom!, contentBottom + PAD);
+                            f.phase = 6;
+                        }
+                        break;
+                    }
+                    case 50: {
+                        const subBottom = f.lastChildBottom!;
+                        f.curY = subBottom + V;
+                        f.kidIndex!++;
+                        f.phase = 5;
+                        break;
+                    }
+                    case 6: {
+                        const finished = stack.pop()!;
+                        if (stack.length) {
+                            stack[stack.length - 1].lastChildBottom = finished.bottom;
+                        } else {
+                            returnBottom = finished.bottom!;
+                        }
+                        break;
+                    }
                 }
-
-                // Layout des Params (liefert tatsächliche Unterkante inkl. Subtree)
-                const subBottom = layout(p, px, pcy);
-
-                // Spalten-Unterkante aktualisieren
-                columnBottom.set(key, Math.max(columnBottom.get(key) ?? Number.NEGATIVE_INFINITY, subBottom));
-
-                // Unterkante der gesamten rechten Seite dieses Parents fortschreiben
-                rightBottom = Math.max(rightBottom, subBottom);
-
-                // nächster Param: mind. V unter tatsächlicher Unterkante dieses Params bzw. unter dem
-                // zuvor berechneten lokalen Stack-Increment (falls Subtree kleiner ist).
-                py = Math.max(py + ps.h + V, subBottom + V);
-            });
-
-            // Unterkante dieses Nodes/Subtrees
-            let bottom = Math.max(
-                cy + h / 2,  // Unterkante des Nodes selbst
-                rightBottom  // Unterkante des rechten Param-Stacks (inkl. Subtrees & Kollisions-Shift)
-            );
-
-            /* 2) Gruppen-Parameter (in einer Zeile unter dem Node) */
-            const gParams = (params.get(n.id) ?? [])
-                .filter(p => p.type === 'group')
-                .sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
-
-            if (gParams.length) {
-                const gSizes = gParams.map(size);
-                const rowW = gSizes.reduce((s, g) => s + g.w, 0) + H * (gParams.length - 1);
-
-                let gx = cx - rowW / 2;
-                const gy = bottom + V;  // Start der Param-Group-Row
-
-                let rowBottom = bottom;
-                gParams.forEach((g, i) => {
-                    const gs = gSizes[i];
-                    const subBottom = layout(g, gx + gs.w / 2, gy + gs.h / 2);
-                    rowBottom = Math.max(rowBottom, subBottom);
-                    gx += gs.w + H;
-                });
-
-                bottom = rowBottom;
             }
 
-            /* 3) RF-Kinder in Group-Box (vertikal) */
-            if (n.type === 'group') {
-                const kids = (rfKids.get(n.id) ?? []).filter(k => !(k.data as any)?.linkingId);
-                let curY = cy - h / 2 + PAD;
-
-                kids.forEach(k => {
-                    const ks = size(k);
-                    const subBottom = layout(k, cx, curY + ks.h / 2);
-                    curY = subBottom + V; // nutze tatsächliche Unterkante (verschachtelte Höhe!)
-                });
-
-                const contentBottom = curY - V; // Unterkante des letzten Kindes
-                bottom = Math.max(bottom, contentBottom + PAD);
-            }
-
-            return bottom;
+            return returnBottom;
         };
 
         /* Root-Nodes untereinander stapeln (nur echte Roots, keine Param-Nodes) */
         let yCursor = 0;
-        work
-            .filter(n => !(n.data as any)?.linkingId && !n.parentId)
-            .forEach(r => {
-                const b = layout(r, 0, yCursor + size(r).h / 2);
+        for (const r of work) {
+            if (!(r.data as any)?.linkingId && !r.parentId) {
+                const b = layoutIter(r, 0, yCursor + size(r).h / 2);
                 yCursor = b + V;
-            });
+            }
+        }
 
         /* ---------- rel (Center) → abs (Top-Left) ----------------------------- */
         const absCenter = new Map<string, Pos>();
-        work.forEach(n => absCenter.set(n.id, rel.get(n.id)!));
+        for (const n of work) absCenter.set(n.id, rel.get(n.id)!);
 
         const absTL_initial = new Map<string, Pos>();
-        work.forEach(n => {
+        for (const n of work) {
             const {w, h} = size(n);
             const {x, y} = absCenter.get(n.id)!;
             absTL_initial.set(n.id, {x: x - w / 2, y: y - h / 2});
-        });
+        }
 
         /* ---------- positions in RF-Koordinaten (Top-Left), ggf. relativ zu Parent */
-        let positioned = work.map(n => {
+        const positioned: Node[] = [];
+        for (const n of work) {
             const tl = absTL_initial.get(n.id)!;
-
             let px = tl.x;
             let py = tl.y;
-
             if (n.parentId) {
                 const pTL = absTL_initial.get(n.parentId)!;
                 px -= pTL.x;
                 py -= pTL.y;
             }
+            positioned.push({...n, position: {x: px, y: py}} as Node);
+        }
 
-            return {...n, position: {x: px, y: py}} as Node;
-        });
-
-        const posById = new Map(positioned.map(n => [n.id, n]));
+        const posById = new Map<string, Node>();
+        for (const n of positioned) posById.set(n.id, n);
 
         /* ---------- Bounding-Korrektur jeder Group ----------------------------- */
         const depth = (g: Node) => {
@@ -255,26 +382,30 @@ const getLayoutedElements = (nodes: Node[]) => {
             while (p?.parentId) {
                 d++;
                 p = posById.get(p.parentId);
+                if (!p) break;
             }
             return d;
         };
 
-        // innerste zuerst
-        const groups = positioned.filter(n => n.type === 'group').sort((a, b) => depth(b) - depth(a));
+        const groups: Node[] = [];
+        for (const n of positioned) {
+            if (n.type === 'group') groups.push(n);
+        }
+        groups.sort((a, b) => depth(b) - depth(a));
 
-        groups.forEach(g => {
-            // *** Nur direkte Kinder dieser Group berücksichtigen ***
-            const direct = positioned.filter(k => k.parentId === g.id);
+        for (const g of groups) {
+            const direct: Node[] = [];
+            for (const k of positioned) {
+                if (k.parentId === g.id) direct.push(k);
+            }
 
             if (!direct.length) {
-                // leere Group: min. 2*PAD
                 const gw = typeof g.style?.width === 'number' ? g.style.width : 2 * PAD;
                 const gh = typeof g.style?.height === 'number' ? g.style.height : 2 * PAD;
                 g.style = {...(g.style as React.CSSProperties), width: gw, height: gh};
-                return;
+                continue;
             }
 
-            // Hilfsfunktion: aktuelle Größe eines Childs (Style bevorzugt)
             const childSize = (n: Node): Size => {
                 const sw = typeof n.style?.width === 'number' ? n.style.width : undefined;
                 const sh = typeof n.style?.height === 'number' ? n.style.height : undefined;
@@ -282,30 +413,27 @@ const getLayoutedElements = (nodes: Node[]) => {
                 return {w: sw ?? s.w, h: sh ?? s.h};
             };
 
-            // Bounds relativ zur Group-Top-Left (direkte Kinder!)
             let minX = Number.POSITIVE_INFINITY,
                 minY = Number.POSITIVE_INFINITY,
                 maxX = Number.NEGATIVE_INFINITY,
                 maxY = Number.NEGATIVE_INFINITY;
 
-            direct.forEach(k => {
+            for (const k of direct) {
                 const ks = childSize(k);
-                minX = Math.min(minX, k.position.x);
-                minY = Math.min(minY, k.position.y);
-                maxX = Math.max(maxX, k.position.x + ks.w);
-                maxY = Math.max(maxY, k.position.y + ks.h);
-            });
+                if (k.position.x < minX) minX = k.position.x;
+                if (k.position.y < minY) minY = k.position.y;
+                if (k.position.x + ks.w > maxX) maxX = k.position.x + ks.w;
+                if (k.position.y + ks.h > maxY) maxY = k.position.y + ks.h;
+            }
 
-            // Innen-Offset, so dass Inhalt bei PAD beginnt
             const dx = minX - PAD;
             const dy = minY - PAD;
 
             if (Math.abs(dx) > EPS || Math.abs(dy) > EPS) {
-                // *** nur direkte Kinder verschieben ***
-                direct.forEach(k => {
+                for (const k of direct) {
                     k.position.x -= dx;
                     k.position.y -= dy;
-                });
+                }
                 changed = true;
             }
 
@@ -321,58 +449,56 @@ const getLayoutedElements = (nodes: Node[]) => {
 
             g.measured = {width: newW, height: newH};
             g.style = {...(g.style as React.CSSProperties), width: newW, height: newH};
-        });
+        }
 
         /* ---------- Param-Group-Row nach Bounding sauber zentrieren ----------- */
         // WICHTIG: Größen-Cache invalidieren, da Group-Styles sich geändert haben
         cache.clear();
-        positioned.forEach(size);
+        for (const n of positioned) size(n);
 
         // Globale Center bleiben in rel; aber Top-Left muss mit NEUEN Größen berechnet werden
         const absTL = new Map<string, Pos>();
         const absCenterAfter = new Map<string, Pos>();
-        positioned.forEach(n => {
+        for (const n of positioned) {
             const s = size(n);
             const c = rel.get(n.id)!; // globales Center aus dem Layout-Durchlauf
             absCenterAfter.set(n.id, c);
             absTL.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2});
-        });
+        }
 
-        positioned.forEach(parent => {
-            const pGroups = (params.get(parent.id) ?? []).filter(p => p.type === 'group');
-            if (!pGroups.length) return;
+        for (const parent of positioned) {
+            const pGroups: Node[] = [];
+            const paramList = params.get(parent.id) ?? [];
+            for (const p of paramList) {
+                if (p.type === 'group') pGroups.push(p);
+            }
+            if (!pGroups.length) continue;
 
             const ordered = pGroups.slice().sort((a, b) =>
-                (+((a.data as any)?.paramIndex) || 0) -
-                (+((b.data as any)?.paramIndex) || 0)
+                (+((a.data as any)?.paramIndex) || 0) - (+((b.data as any)?.paramIndex) || 0)
             );
 
-            const widths = ordered.map(g => {
+            const widths: number[] = [];
+            for (const g of ordered) {
                 const gn = posById.get(g.id)!;
                 const sw = typeof gn.style?.width === 'number' ? gn.style.width : undefined;
-                return sw ?? size(gn).w;
-            });
-            const rowW = widths.reduce((s, w) => s + w, 0) + H * (ordered.length - 1);
+                widths.push(sw ?? size(gn).w);
+            }
+            let rowW = 0;
+            for (const w of widths) rowW += w;
+            rowW += H * (ordered.length - 1);
 
-            // Parent-Center (global, nach Bounding-Größen)
             const pCenterX = absCenterAfter.get(parent.id)!.x;
-
-            // Start-X in globalen Koordinaten
             let gx = pCenterX - rowW / 2;
 
-            ordered.forEach((g, i) => {
+            for (let i = 0; i < ordered.length; i++) {
+                const g = ordered[i];
                 const gn = posById.get(g.id)!;
-
-                // gegen das tatsächliche Container-TL (gn.parentId) umrechnen
                 const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0};
-
-                // setze linke Kante relativ zum Container
                 gn.position.x = gx - containerTL.x;
-
-                // nächstes Element mit konstantem H
                 gx += widths[i] + H;
-            });
-        });
+            }
+        }
 
         // Arbeitsstand für evtl. nächste Runde übernehmen
         work = positioned.map(n => ({...n}));

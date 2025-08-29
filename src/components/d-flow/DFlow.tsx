@@ -25,9 +25,9 @@ import "./DFlow.style.scss"
  */
 const getLayoutedElements = (nodes: Node[]) => {
     /* Konstanten */
-    const V = 100;          // vertical gap Node ↕ Node
-    const H = 100;          // horizontal gap Parent → Param
-    const PAD = 12;         // inner padding einer Group (links+rechts / oben+unten)
+    const V = 75;          // vertical gap Node ↕ Node
+    const H = 75;          // horizontal gap Parent → Param
+    const PAD = 16;         // inner padding einer Group (links+rechts / oben+unten)
     const EPS = 0.25;       // Toleranz gegen Rundungsdrift
 
     // Wir iterieren, bis Group-Maße stabil sind

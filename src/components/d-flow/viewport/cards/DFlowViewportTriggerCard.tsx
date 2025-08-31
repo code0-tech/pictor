@@ -11,6 +11,7 @@ import Flex from "../../../flex/Flex";
 import {IconBolt, IconLayoutNavbarCollapseFilled} from "@tabler/icons-react";
 import Button from "../../../button/Button";
 import Badge from "../../../badge/Badge";
+import {DFlowViewportTriggerTabContent} from "../file-tabs/DFlowViewportTriggerTabContent";
 
 export interface DFlowViewportTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: Flow
@@ -29,7 +30,26 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
     const viewportWidth = useStore(s => s.width)
     const viewportHeight = useStore(s => s.height)
 
-    return <Card variant={"filled"} color={"info"} style={{padding: "0.35rem"}}>
+    return <Card variant={"filled"} color={"info"} style={{padding: "0.35rem"}}
+                 borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
+                 className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
+                 onClick={() => {
+                     flowInstance.setViewport({
+                         x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
+                         y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
+                         zoom: 1
+                     }, {
+                         duration: 0,
+                     })
+                     fileTabsService.add({
+                         id: id,
+                         active: true,
+                         closeable: true,
+                         children: <Text size={"md"}>{data.instance.id}</Text>,
+                         content: <DFlowViewportTriggerTabContent instance={data.instance}/>
+                     })
+                     fileTabsService.update()
+                 }}>
         <Flex mb={"0.35"} style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
             <Badge color={"info"}>
                 <Flex style={{gap: "0.35rem"}} align={"center"}>
@@ -43,28 +63,8 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
         </Flex>
 
         <Card
-            borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
-            className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
             color={"secondary"}
-            style={{borderRadius: "calc(1rem - 0.35rem)"}}
-            onClick={() => {
-                flowInstance.setViewport({
-                    x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
-                    y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
-                    zoom: 1
-                }, {
-                    duration: 0,
-                })
-                /*fileTabsService.add({
-                    id: id,
-                    active: true,
-                    closeable: true,
-                    children: <Text size={"md"}>{data.instance.id}</Text>,
-                    content: <DFlowViewportFileTabsContent depthLevel={0} scopeLevel={[0]}
-                                                           nodeLevel={0} functionInstance={data.instance}/>
-                })
-                fileTabsService.update()*/
-            }}>
+            style={{borderRadius: "calc(1rem - 0.35rem)"}}>
             <CardSection border maw={"300px"}>
                 <Text mb={0.35} display={"block"} size={"md"}>{data.instance.id}</Text>
                 <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy.</Text>

@@ -1,7 +1,7 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, RefObject, Type} from "../data-type/DFlowDataType.view";
+import {EDataType, GenericType, RefObject, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
@@ -98,7 +98,11 @@ export const useSuggestions = (
     refObjects.forEach(value => {
         if (value.node >= node) return
         if (value.depth > depth) return
-        if (value.scope.some(r => !scope.includes(r))) return;
+        if (value.scope.some(r => !scope.includes(r))) return
+        if (!resolvedType) return
+
+        const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.type, dataTypeService), [])
+        if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
         const suggestion = new DFlowSuggestion(hashedType || "", [], value as RefObject, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.type)])
         state.push(suggestion)

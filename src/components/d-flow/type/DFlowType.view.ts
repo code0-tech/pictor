@@ -1,5 +1,5 @@
 import {Translation} from "../../../utils/translation";
-import {DataTypeObject} from "../data-type/DFlowDataType.view";
+import {DataTypeObject, Type} from "../data-type/DFlowDataType.view";
 
 export interface FlowType {
     flow_type_id: string
@@ -17,6 +17,6 @@ export interface FlowTypeSetting {
     name: Translation[]
     unique: boolean
     description: Translation[]
-    type: string // data type id
+    type: Type // data type id
     default_value?: object
 }

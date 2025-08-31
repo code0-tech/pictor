@@ -55,7 +55,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         <ScrollAreaViewport>
             {suggestions?.map((suggestion, i) => {
                 // @ts-ignore
-                return <MenuItem onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)} ref={el => itemRefs.current[i] = el}>
+                return <MenuItem textValue={""} onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)} ref={el => itemRefs.current[i] = el}>
                     {suggestion.children}
                 </MenuItem>
             })}

@@ -193,7 +193,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
                                 // Update value and dispatch event
-                                setElementKey(ref.current, "value", JSON.stringify(suggestion.value), "change");
+                                setElementKey(ref.current, "value", typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value, "change");
                                 onSuggestionSelect(suggestion)
                                 setOpen(false)
                             }}

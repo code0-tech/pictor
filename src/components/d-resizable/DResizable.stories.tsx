@@ -33,8 +33,10 @@ import {dataTypes} from "../d-flow/data-type/DFlowDataType.data";
 import {Flow} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
-import {DFlowViewportMiniMap} from "../d-flow/viewport/DFlowViewportMiniMap";
 import {DFlowViewportTriggerCard} from "../d-flow/viewport/cards/DFlowViewportTriggerCard";
+import {FlowType} from "../d-flow/type/DFlowType.view";
+import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
+import {REST_FLOW_TYPE} from "../d-flow/type/DFlowType.data";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -58,6 +60,7 @@ export const Dashboard = () => {
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinition(fd)));
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow1)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
+    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowType, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
@@ -145,7 +148,7 @@ export const Dashboard = () => {
                 <div style={{position: "relative", overflow: "auto", flex: "1 1 auto", boxSizing: "border-box"}}>
                     <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
                         <ContextStoreProvider
-                            services={[[fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+                            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
                             <DResizablePanel>
                                 <FlowExample/>
                             </DResizablePanel>

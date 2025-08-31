@@ -50,8 +50,8 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
     }), [])
 
     // @ts-ignore
-    return <ScrollArea h={`${(suggestions?.length ?? 1) * 28}px`}
-                       mah={"calc(var(--radix-popper-available-height) - 3rem)"}>
+    return <ScrollArea h={`${(suggestions?.length ?? 1) * 27}px`}
+                       mah={"calc(var(--radix-popper-available-height) - 3rem - 69px)"}>
         <ScrollAreaViewport>
             {suggestions?.map((suggestion, i) => {
                 // @ts-ignore

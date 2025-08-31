@@ -48,7 +48,6 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
                          children: <Text size={"md"}>{data.instance.id}</Text>,
                          content: <DFlowViewportTriggerTabContent instance={data.instance}/>
                      })
-                     fileTabsService.update()
                  }}>
         <Flex mb={"0.35"} style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>
             <Badge color={"info"}>

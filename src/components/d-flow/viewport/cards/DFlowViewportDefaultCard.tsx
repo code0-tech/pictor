@@ -88,7 +88,6 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     content: <DFlowViewportDefaultTabContent depthLevel={data.depth} scopeLevel={data.scope}
                                                              nodeLevel={data.index} functionInstance={data.instance}/>
                 })
-                fileTabsService.update()
             }} style={{position: "relative"}}>
 
             <CardSection border>

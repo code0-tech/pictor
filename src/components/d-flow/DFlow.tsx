@@ -528,23 +528,25 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             .filter((c: any) => c.type === 'dimensions')
             .forEach((c: any) => dimensionMap.set(c.id, c.dimensions));
 
-        const localNodes = nodes.map(node => {
-            if (!dimensionMap.has(node.id)) return node;
-            const dims = dimensionMap.get(node.id) || {};
-            return {
-                ...node,
-                measured: {
-                    width: dims.width ?? node.measured?.width ?? 0,
-                    height: dims.height ?? node.measured?.height ?? 0,
-                }
-            } as Node;
+        setNodes(prevNodes => {
+            const localNodes = prevNodes.map(node => {
+                if (!dimensionMap.has(node.id)) return node;
+                const dims = dimensionMap.get(node.id) || {};
+                return {
+                    ...node,
+                    measured: {
+                        width: dims.width ?? node.measured?.width ?? 0,
+                        height: dims.height ?? node.measured?.height ?? 0,
+                    }
+                } as Node;
+            });
+
+            const layouted = getLayoutedElements(localNodes, new Set(changedIds));
+            return layouted.nodes as Node[];
         });
 
-        const layouted = getLayoutedElements(localNodes, new Set(changedIds));
-        setNodes(layouted.nodes as Node[]);
-
         revalidateHandles(changedIds);
-    }, [nodes, revalidateHandles]);
+    }, [revalidateHandles]);
 
     React.useEffect(() => {
         const localNodes = props.nodes!!.map(value => {

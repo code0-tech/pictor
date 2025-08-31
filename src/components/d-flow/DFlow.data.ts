@@ -3,7 +3,7 @@ import {FlowObject} from "./DFlow.view";
 export const flow: FlowObject = {
     flow_id: "some_database_id",
     name: "test/test/Flow",
-    type: "some_database_id",
+    type: "REST",
     settings: [{
         definition: {
             setting_id: "rest_setting_2",
@@ -169,7 +169,7 @@ export const flow: FlowObject = {
 export const flow1: FlowObject = {
     flow_id: "some_database_id",
     name: "test/test/Flow",
-    type: "some_database_id",
+    type: "REST",
     settings: [{
         definition: {
             setting_id: "rest_setting_2",

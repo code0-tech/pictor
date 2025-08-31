@@ -25,7 +25,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
     const menuRef = React.useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
     const [stateSuggestions, setStateSuggestions] = React.useState(suggestions)
 
-    return <Menu onOpenChange={event => {
+    return <Menu modal={false} onOpenChange={event => {
         setTimeout(() => {
             flowStoreApi.setState({
                 nodesDraggable: !event,

@@ -31,7 +31,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
 
     return (
         <Card w={"100%"} h={"100%"}
-              style={{background: withAlpha(color, 0.05), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.25)}}>
+              style={{background: withAlpha(color, 0.05), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.125)}}>
             <Handle
                 type="target"
                 position={Position.Top}

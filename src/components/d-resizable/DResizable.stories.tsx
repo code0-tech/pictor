@@ -188,7 +188,7 @@ const FlowExample = () => {
         edgeTypes={edgeTypes}
         fitView
     >
-        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .1)" gap={8} size={2}/>
+        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
         <DFlowViewportControls/>
         {/*<DFlowViewportMiniMap/>*/}
     </DFlow>

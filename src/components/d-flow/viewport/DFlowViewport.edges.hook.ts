@@ -192,6 +192,36 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         /* ------- Rekursion auf nextNode ------------------------------ */
         if (fn.nextNode) {
             traverse(fn.nextNode, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
+        } else {
+            // letzte Function-Card im Ast → Add-new-node wie *normale* nextNode behandeln
+            const suggestionNodeId = `${fnId}-suggestion`;
+            const startGroups = groupsWithValue.get(fnId) ?? [];
+
+            if (startGroups.length > 0) {
+                startGroups.forEach((gId, idx) => edges.push({
+                    id: `${gId}-${suggestionNodeId}-next-${idx}`,
+                    source: gId,                  // wie bei echter nextNode von Group-Card starten
+                    target: suggestionNodeId,     // Ziel ist die Suggestion-Card
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        isSuggestion: true,
+                    },
+                    deletable: false,
+                    selectable: false,
+                }));
+            } else {
+                edges.push({
+                    id: `${fnId}-${suggestionNodeId}-next`,
+                    source: fnId,                 // Handle-Bottom der Function-Card
+                    target: suggestionNodeId,     // Handle-Top der Suggestion-Card
+                    data: {
+                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        isSuggestion: true,
+                    },
+                    deletable: false,
+                    selectable: false,
+                });
+            }
         }
 
         return fnId;

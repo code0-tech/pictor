@@ -23,7 +23,6 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
             }
         });
         if (start) {
-            console.log(start)
             const width = start.measured.width ?? 0;
             return start.position.x + width / 2;
         }

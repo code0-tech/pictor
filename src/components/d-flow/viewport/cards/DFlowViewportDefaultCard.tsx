@@ -67,6 +67,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
         );
     }
 
+    console.log(props.id, props.parentId)
+
     return (
         <Card
             borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}

@@ -7,6 +7,7 @@ export interface DFlowViewportEdgeDataProps extends Code0Component<HTMLDivElemen
     //some data we will use
     color?: string
     isParameter?: boolean
+    isSuggestion?: boolean
 }
 
 // @ts-ignore
@@ -23,8 +24,8 @@ export const DFlowViewportEdge: React.FC<DFlowViewportEdgeProps> = memo((props) 
         targetX,
         targetY,
         targetPosition: data?.isParameter ? Position.Right : Position.Top,
-        borderRadius: 32,
-        centerY: targetY - 37.5
+        borderRadius: 64,
+        centerY: data?.isSuggestion ? targetY - 37.5 : targetY - 37.5
     })
 
     return <>

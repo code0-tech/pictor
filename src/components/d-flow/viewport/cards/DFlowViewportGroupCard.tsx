@@ -27,7 +27,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
             return start.position.x + width / 2;
         }
         return undefined;
-    });
+    })
 
     return (
         <Card w={"100%"} h={"100%"}

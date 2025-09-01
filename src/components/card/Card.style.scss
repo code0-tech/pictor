@@ -3,7 +3,7 @@
 @use "../../styles/variables";
 @use "sass:math";
 
-$padding: variables.$md;
+$padding: variables.$xs;
 
 .card {
 
@@ -100,8 +100,8 @@ $padding: variables.$md;
   }
 
   .card--outline-#{$name} {
-    outline-offset: $padding;
-    margin: $padding;
+    outline-offset: $padding/2;
+    margin: $padding/2;
     outline: helpers.borderColor($color) solid 1px;
   }
 

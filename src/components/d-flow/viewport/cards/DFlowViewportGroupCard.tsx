@@ -1,5 +1,5 @@
 import React, {memo} from "react";
-import {Handle, NodeProps, Position} from "@xyflow/react";
+import {Handle, NodeProps, Position, useStore} from "@xyflow/react";
 import {FLOW_EDGE_RAINBOW} from "../DFlowViewport.edges.hook";
 import Card from "../../../card/Card";
 
@@ -7,9 +7,29 @@ export interface DFlowViewportGroupCardProps extends NodeProps {
 }
 
 export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = memo((props) => {
-    const {data} = props
+    const {data, id} = props
     const depth = (data as any)?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
+
+    // Align handles with the first node inside this group
+    const handleLeft = useStore((s) => {
+        const children = s.nodes.filter((n) => n.parentId === id);
+        let start: any | undefined = undefined;
+        children.forEach((n) => {
+            const idx = (n.data as any)?.index ?? Infinity;
+            const startIdx = (start?.data as any)?.index ?? Infinity;
+            if (!start || idx < startIdx) {
+                start = n;
+            }
+        });
+        if (start) {
+            console.log(start)
+            const width = start.measured.width ?? 0;
+            return start.position.x + width / 2;
+        }
+        return undefined;
+    });
+
     return (
         <Card w={"100%"} h={"100%"}
               style={{background: withAlpha(color, 0.05), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.25)}}>
@@ -19,7 +39,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                 isConnectable={false}
                 draggable={false}
-                style={{top: "2px"}}
+                style={{top: "2px", left: handleLeft}}
             />
             <Handle
                 type="source"
@@ -27,7 +47,7 @@ export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = mem
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 isConnectable={false}
                 draggable={false}
-                style={{bottom: "2px"}}
+                style={{bottom: "2px", left: handleLeft}}
             />
         </Card>
     );

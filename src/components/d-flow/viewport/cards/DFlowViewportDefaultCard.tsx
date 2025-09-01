@@ -67,10 +67,22 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
         );
     }
 
-    console.log(props.id, props.parentId)
+    const firstItem = useStore((s) => {
+        const children = s.nodes.filter((n) => n.parentId === props.parentId);
+        let start: any | undefined = undefined;
+        children.forEach((n) => {
+            const idx = (n.data as any)?.index ?? Infinity;
+            const startIdx = (start?.data as any)?.index ?? Infinity;
+            if (!start || idx < startIdx) {
+                start = n;
+            }
+        });
+        return start;
+    })
 
     return (
         <Card
+            outline={firstItem.id === id}
             borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
             className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}

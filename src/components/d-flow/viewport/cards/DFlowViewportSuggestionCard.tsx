@@ -1,5 +1,5 @@
 import {Code0Component} from "../../../../utils/types";
-import {Node, NodeProps} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import Button from "../../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
@@ -25,7 +25,19 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
         props.data.parentFunction.nextNode = new NodeFunction(suggestion.value as NodeFunctionObject)
         flowService.update()
-    }} suggestions={result} triggerContent={<Button top={-37.5} variant={"normal"} color={"secondary"}><IconPlus
-        size={16}/> Add new node</Button>}/>
+    }} suggestions={result} triggerContent={
+        <Button top={-37.5} variant={"normal"} color={"secondary"}>
+            <Handle
+                isConnectable={false}
+                draggable={false}
+                type="target"
+                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                style={{top: "2px"}}
+                position={Position.Top}
+            />
+            <IconPlus size={16}/>
+            Add new node
+        </Button>
+    }/>
 
 })

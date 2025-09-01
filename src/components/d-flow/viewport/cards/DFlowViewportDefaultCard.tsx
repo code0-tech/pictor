@@ -193,7 +193,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                                         param.value = suggestion.value
                                         flowService.update()
                                     }} suggestions={result} triggerContent={<Button
-                                        variant={"outlined"}><IconArrowRightCircle size={12}/></Button>}/>
+                                        variant={"none"}><IconArrowRightCircle size={12}/></Button>}/>
                                 ) : null}
                                 <Handle
                                     key={param.id}

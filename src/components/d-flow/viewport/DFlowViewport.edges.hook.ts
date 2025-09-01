@@ -1,10 +1,11 @@
-import {useService} from "../../../utils/contextStore";
+import {useService, useStore} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {Edge} from "@xyflow/react";
 import {NodeFunction} from "../DFlow.view";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {EDataType, Type} from "../data-type/DFlowDataType.view";
+import React, {memo} from "react";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -23,6 +24,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flow = flowService.getById(flowId);
+    const flowStore = useStore(DFlowReactiveService)
+    const functionStore = useStore(DFlowFunctionReactiveService)
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
     if (!flow) return [];
 
@@ -195,5 +199,6 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
 
     /* ------------------------------------------------------------------ */
     traverse(flow.startingNode, undefined, 0, functionCache, dataTypeCache);
-    return edges;
+
+    return React.useMemo(() => edges, [flowStore, functionStore, dataTypeStore, edges]);
 };

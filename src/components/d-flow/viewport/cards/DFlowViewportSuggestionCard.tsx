@@ -36,7 +36,7 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
                 position={Position.Top}
             />
             <IconPlus size={16}/>
-            Add new node
+            Add next
         </Button>
     }/>
 

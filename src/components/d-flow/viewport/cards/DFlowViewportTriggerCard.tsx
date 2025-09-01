@@ -39,7 +39,7 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
                          y: (viewportHeight / 2) + (props.positionAbsoluteY * -1) - (height / 2),
                          zoom: 1
                      }, {
-                         duration: 0,
+                         duration: 250,
                      })
                      fileTabsService.add({
                          id: id,

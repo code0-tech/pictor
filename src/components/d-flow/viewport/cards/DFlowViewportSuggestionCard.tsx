@@ -26,7 +26,7 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
         props.data.parentFunction.nextNode = new NodeFunction(suggestion.value as NodeFunctionObject)
         flowService.update()
     }} suggestions={result} triggerContent={
-        <Button top={-37.5} variant={"normal"} color={"secondary"}>
+        <Button top={0} variant={"normal"} color={"secondary"}>
             <Handle
                 isConnectable={false}
                 draggable={false}

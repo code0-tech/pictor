@@ -30,7 +30,6 @@ export const DFlowViewportControls: React.FC = () => {
 
     return <Panel position="bottom-left">
         <Flex style={{flexDirection: "column", gap: "1rem"}}>
-            <DFlowViewportMiniMap/>
             <Flex align="stretch" style={{gap: ".35rem"}}>
                 <ButtonGroup>
                     <Button color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>

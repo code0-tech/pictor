@@ -3,7 +3,8 @@ import {
     Edge,
     Node,
     ReactFlow,
-    ReactFlowProps, ReactFlowProvider,
+    ReactFlowProps,
+    ReactFlowProvider,
     useEdgesState,
     useNodesState,
     useUpdateNodeInternals
@@ -12,6 +13,11 @@ import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
+import {DFlowViewportDefaultCard} from "./viewport/cards/DFlowViewportDefaultCard";
+import {DFlowViewportGroupCard} from "./viewport/cards/DFlowViewportGroupCard";
+import {DFlowViewportSuggestionCard} from "./viewport/cards/DFlowViewportSuggestionCard";
+import {DFlowViewportTriggerCard} from "./viewport/cards/DFlowViewportTriggerCard";
+import {DFlowViewportEdge} from "./viewport/DFlowViewportEdge";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -86,7 +92,7 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
         const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined;
         const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined;
-        baseSizes.set(n.id, { w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80 });
+        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80});
     }
 
     const sizeCache = new Map<string, Size>();
@@ -102,7 +108,7 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
         const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
         if (styleW !== undefined && styleH !== undefined) {
-            const s = { w: styleW, h: styleH };
+            const s = {w: styleW, h: styleH};
             sizeCache.set(n.id, s);
             return s;
         }
@@ -187,8 +193,8 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         for (const p of paramsOf) {
                             if (p.type === 'group') gParams.push(p); else right.push(p);
                         }
-                        right.sort((a,b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
-                        gParams.sort((a,b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+                        right.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+                        gParams.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
                         f.right = right;
                         f.gParams = gParams;
 
@@ -205,22 +211,22 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.rightIndex! < f.right!.length) {
                             const p = f.right![f.rightIndex!];
                             const ps = size(p);
-                            const px = f.cx + f.w!/2 + H + ps.w/2;
-                            let pcy = f.py! + ps.h/2;
+                            const px = f.cx + f.w! / 2 + H + ps.w / 2;
+                            let pcy = f.py! + ps.h / 2;
                             const key = colKey(px);
                             const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
                             const minTop = occ + V;
-                            const desiredTop = pcy - ps.h/2;
+                            const desiredTop = pcy - ps.h / 2;
                             if (desiredTop < minTop) {
-                                pcy = minTop + ps.h/2;
-                                f.py = pcy - ps.h/2;
+                                pcy = minTop + ps.h / 2;
+                                f.py = pcy - ps.h / 2;
                             }
                             f.childKey = key;
                             f.childPs = ps;
                             stack.push({node: p, cx: px, cy: pcy, phase: 0});
                             f.phase = 10;
                         } else {
-                            f.bottom = Math.max(f.cy + f.h!/2, f.rightBottom!);
+                            f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!);
                             f.phase = 2;
                         }
                         break;
@@ -259,8 +265,8 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.gIndex! < f.gParams!.length) {
                             const g = f.gParams![f.gIndex!];
                             const gs = f.gSizes![f.gIndex!];
-                            const gcx = f.gx! + gs.w/2;
-                            const gcy = f.gy! + gs.h/2;
+                            const gcx = f.gx! + gs.w / 2;
+                            const gcy = f.gy! + gs.h / 2;
                             f.gx! += gs.w + H;
                             stack.push({node: g, cx: gcx, cy: gcy, phase: 0});
                             f.childPs = gs;
@@ -287,7 +293,7 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             }
                             f.kids = kids;
                             f.kidIndex = 0;
-                            f.curY = f.cy - f.h!/2 + PAD;
+                            f.curY = f.cy - f.h! / 2 + PAD;
                             f.phase = 5;
                         } else {
                             f.phase = 6;
@@ -298,7 +304,7 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.kidIndex! < f.kids!.length) {
                             const k = f.kids![f.kidIndex!];
                             const ks = size(k);
-                            const ky = f.curY! + ks.h/2;
+                            const ky = f.curY! + ks.h / 2;
                             stack.push({node: k, cx: f.cx, cy: ky, phase: 0});
                             f.childPs = ks;
                             f.phase = 50;
@@ -514,7 +520,20 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         requestAnimationFrame(() => {
             ids.forEach(id => updateNodeInternals(id));
         });
-    }, [updateNodeInternals]);
+    }, [updateNodeInternals])
+
+    const nodeTypes = {
+        default: DFlowViewportDefaultCard,
+        group: DFlowViewportGroupCard,
+        suggestion: DFlowViewportSuggestionCard,
+        trigger: DFlowViewportTriggerCard,
+        ...props.nodeTypes
+    }
+
+    const edgeTypes = {
+        default: DFlowViewportEdge,
+        ...props.edgeTypes
+    }
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
         const changedIds: string[] = Array.from(new Set(
@@ -572,6 +591,8 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         <ReactFlow
             onlyRenderVisibleElements
             panOnScroll={false}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}

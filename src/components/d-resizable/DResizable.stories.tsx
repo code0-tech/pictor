@@ -170,22 +170,9 @@ const FlowExample = () => {
     const initialNodes = useFlowViewportNodes("some_database_id")
     const initialEdges = useFlowViewportEdges("some_database_id")
 
-    const nodeTypes = {
-        default: DFlowViewportDefaultCard,
-        group: DFlowViewportGroupCard,
-        suggestion: DFlowViewportSuggestionCard,
-        trigger: DFlowViewportTriggerCard
-    }
-
-    const edgeTypes = {
-        default: DFlowViewportEdge
-    }
-
     return <DFlow
         nodes={initialNodes}
         edges={initialEdges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>

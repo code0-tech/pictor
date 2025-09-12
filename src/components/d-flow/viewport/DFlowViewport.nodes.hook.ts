@@ -6,6 +6,90 @@ import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {EDataType, Type} from "../data-type/DFlowDataType.view";
 
+const packageNodes = new Map<string, string>([
+    ['std', 'default'],
+]);
+
+/**
+ * Returns the value of the best-matching key from a Map<string, string>.
+ *
+ * Matching priority:
+ *   1) Exact match
+ *   2) Longest prefix match (with bonus if the prefix ends at a token boundary)
+ *   3) Largest common prefix length (with small boundary bonus)
+ *
+ * Token boundaries are characters in /[:._\-\/\s]+/ (e.g., "::", ".", "_", "-", "/", whitespace).
+ *
+ * Performance:
+ *   - O(N * M), where N = number of keys, M = average key length (string comparisons only).
+ *
+ */
+const bestMatchValue = (map: Map<string, string>, input: string): string => {
+    if (!input || map.size === 0) return ""
+
+    const SEP = /[:._\-\/\s]+/;
+    const normInput = input.trim().toLowerCase();
+
+    let bestKey: string | null = null;
+    let bestScore = -Infinity;
+
+    for (const [key, value] of map.entries()) {
+        const normKey = key.trim().toLowerCase();
+
+        // (1) Exact match → immediately return (strongest possible score)
+        if (normInput === normKey) {
+            return value;
+        }
+
+        let score = 0;
+
+        // (2) Prefix match
+        if (normInput.startsWith(normKey)) {
+            score = 2000 + normKey.length * 2;
+
+            // Bonus if the prefix ends at a clean token boundary (or equals the whole input)
+            const boundaryChar = normInput.charAt(normKey.length); // '' if out of range
+            if (boundaryChar === "" || SEP.test(boundaryChar)) {
+                score += 200;
+            }
+        } else {
+            // (3) Largest common prefix (LCP)
+            const max = Math.min(normInput.length, normKey.length);
+            let lcp = 0;
+            while (lcp < max && normInput.charCodeAt(lcp) === normKey.charCodeAt(lcp)) {
+                lcp++;
+            }
+            if (lcp > 0) {
+                score = 1000 + lcp;
+
+                // Small bonus if LCP ends at a boundary on either side
+                const inBoundaryChar = normInput.charAt(lcp);
+                const keyBoundaryChar = normKey.charAt(lcp);
+                if (
+                    inBoundaryChar === "" ||
+                    SEP.test(inBoundaryChar) ||
+                    keyBoundaryChar === "" ||
+                    SEP.test(keyBoundaryChar)
+                ) {
+                    score += 50;
+                }
+            }
+        }
+
+        // Best candidate so far? Tie-breaker favors longer key (more specific)
+        if (score > bestScore) {
+            bestScore = score;
+            bestKey = key;
+        } else if (score === bestScore && bestKey !== null && key.length > bestKey.length) {
+            bestKey = key;
+        } else if (score === bestScore && bestKey === null) {
+            bestKey = key;
+        }
+    }
+
+    return bestKey !== null ? map.get(bestKey)! : "";
+};
+
 export const useFlowViewportNodes = (flowId: string): Node[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
@@ -73,7 +157,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
 
         nodes.push({
             id,
-            type: "default",
+            type: bestMatchValue(packageNodes, fn.runtime_id),
             position: { x: 0, y: 0 },
             draggable: false,
             parentId: parentGroup,

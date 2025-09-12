@@ -66,6 +66,7 @@ export const useSuggestions = (
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!type || !resolvedType || !hashedType) return true
             if (!funcDefinition.return_type) return false
+            if (funcDefinition.runtime_function_id == "RETURN" && type) return
             const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
         })

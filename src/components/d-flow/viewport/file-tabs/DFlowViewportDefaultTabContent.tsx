@@ -73,7 +73,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
 
 
             return <div>
-                {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value))}
+                {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value as Value))}
                 <TextInput title={title}
                            description={description}
                            clearable

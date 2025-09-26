@@ -1,6 +1,6 @@
 import {
     DataTypeObject,
-    DataTypeRuleObject,
+    DataTypeRuleObject, EDataType,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -549,73 +549,80 @@ export function isMatchingType(
 }
 
 /**
- * Recursively expands all type aliases (e.g. "NUMBER_ARRAY" → ARRAY<NUMBER>).
- * Ensures every alias in the tree is fully expanded.
+ * Recursively expands all type aliases
+ * - ARRAY aliases expand their inner type recursively (e.g. NUMBER_ARRAY → ARRAY<NUMBER>).
+ * - OBJECT aliases expand to OBJECT<ALIAS> (e.g. TEST_OBJECT → OBJECT<TEST_OBJECT>).
  *
  * @param type     The Type or type alias to expand
  * @param service  Data type service (for lookup)
  * @returns        Deeply expanded Type object (with aliases replaced)
  */
 export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): Type => {
-    // Alias (string): try to expand via CONTAINS_TYPE recursively
+    // --- Case 1: Alias string ---
     if (typeof type === "string") {
         const dt = service.getDataType(type)
-        if (
-            dt &&
-            dt.rules &&
-            dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
-        ) {
-            // Find most generic DataType with matching type and generics
-            const genericDT = service.values().find(
-                dt2 => dt2.type === dt.type && dt2.genericKeys && dt2.genericKeys.length > 0
-            )
-            if (genericDT && genericDT.genericKeys!!.length) {
-                const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
-                if (rule) {
-                    // Recursively expand inner type
-                    //@ts-ignore
-                    const expandedInner = resolveType(rule.config.type, service)
+
+        if (dt && dt.rules) {
+            // --- ARRAY alias (e.g. NUMBER_ARRAY) ---
+            if (
+                dt.type === EDataType.ARRAY &&
+                dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+            ) {
+                const genericDT = service.values().find(
+                    dt2 => dt2.type === EDataType.ARRAY && dt2.genericKeys && dt2.genericKeys.length > 0
+                )
+                if (genericDT) {
+                    const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
+                    if (rule) {
+                        //@ts-ignore
+                        const expandedInner = resolveType(rule.config.type, service)
+                        return {
+                            type: genericDT.id,
+                            generic_mapper: [{
+                                types: [expandedInner],
+                                generic_target: genericDT.genericKeys[0]
+                            }]
+                        }
+                    }
+                }
+            }
+
+            // --- OBJECT alias (e.g. TEST_OBJECT) ---
+            if (dt.type === EDataType.OBJECT) {
+                const genericDT = service.values().find(
+                    dt2 => dt2.type === EDataType.OBJECT && dt2.genericKeys && dt2.genericKeys.length > 0
+                )
+                if (genericDT) {
                     return {
                         type: genericDT.id,
                         generic_mapper: [{
-                            types: [expandedInner],
+                            types: [type], // keep alias itself as Type ("TEST_OBJECT")
                             generic_target: genericDT.genericKeys[0]
                         }]
                     }
                 }
             }
         }
-        // Not an alias or cannot expand further
+
+        // Fallback: primitive or unknown alias → keep as string
         return type
     }
-    // If already a GenericType object: expand all generic_mapper[].types recursively
+
+    // --- Case 2: Already a GenericType ---
     if (typeof type === "object" && type !== null) {
-        const result: any = {}
-        for (const key of Object.keys(type)) {
-            if (key === "generic_mapper" && Array.isArray(type[key])) {
-                result[key] = type[key].map((gm: any) => ({
-                    ...gm,
-                    types: Array.isArray(gm.types)
-                        ? gm.types.map((t: any) => resolveType(t, service))
-                        : resolveType(gm.types, service),
-                    generic_target: gm.generic_target // Normalize all generic_target to "GENERIC"
-                }))
-            } else if (key === "type") {
-                // Always expand nested type to primitive string (no nested objects)
-                if (typeof type[key] === "object") {
-                    result[key] = (type[key] as any).type || type[key]
-                } else {
-                    result[key] = type[key]
-                }
-            } else {
-                // Recursively handle all other fields
-                //@ts-ignore
-                result[key] = resolveType(type[key], service)
-            }
+        const result: GenericType = { type: type.type }
+
+        if (Array.isArray(type.generic_mapper)) {
+            result.generic_mapper = type.generic_mapper.map(gm => ({
+                ...gm,
+                types: gm.types.map(t => resolveType(t, service))
+            }))
         }
+
         return result
     }
-    // Primitive (number/boolean): just return as-is
+
+    // --- Case 3: Primitive (shouldn't happen often) ---
     return type
 }
 

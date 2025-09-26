@@ -14,6 +14,7 @@ import {ParameterDefinition} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {useReturnType} from "../../function/DFlowFunction.return.hook";
+import {resolveGenericKeys} from "../../../../utils/generics";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
@@ -48,7 +49,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     })
 
     const returnType = useReturnType(definition!!, sortedParameters.map(p => p.value as Value), dataTypeService)
-
+    const genericTypeMap = resolveGenericKeys(definition!!, sortedParameters.map(p => p.value as Value), dataTypeService)
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
@@ -117,6 +118,9 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             </div>
         })}
         {JSON.stringify(returnType)}
+        <br/>
+        <br/>
+        {genericTypeMap}
     </Flex>
 
 }

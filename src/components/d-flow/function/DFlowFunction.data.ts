@@ -1,4 +1,5 @@
 import {FunctionDefinitionObject} from "./DFlowFunction.view";
+import {GenericCombinationStrategy} from "../data-type/DFlowDataType.view";
 
 export const functionData: FunctionDefinitionObject[] = [{
     function_id: "std::math::add",
@@ -61,4 +62,37 @@ export const functionData: FunctionDefinitionObject[] = [{
         runtime_parameter_id: "RETURN__firstValue",
         type: "NUMBER"
     }]
+}, {
+    function_id: "std::object::combine",
+    runtime_function_id: "std::object::combine",
+    return_type: {
+        type: "OBJECT",
+        generic_mapper: [{
+            types: ["A", "B"],
+            generic_combination: [GenericCombinationStrategy.AND],
+            generic_target: "O"
+        }]
+    },
+    parameters: [{
+        parameter_id: "std::object::combine__first",
+        runtime_parameter_id: "std::object::combine__first",
+        type: {
+            type: "OBJECT",
+            generic_mapper: [{
+                types: ["A"],
+                generic_target: "O"
+            }]
+        }
+    }, {
+        parameter_id: "std::object::combine__second",
+        runtime_parameter_id: "std::object::combine__second",
+        type: {
+            type: "OBJECT",
+            generic_mapper: [{
+                types: ["B"],
+                generic_target: "O"
+            }]
+        }
+    }],
+    generic_keys: ["A", "B"]
 }]

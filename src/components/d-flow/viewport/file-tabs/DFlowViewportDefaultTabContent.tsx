@@ -13,6 +13,7 @@ import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {ParameterDefinition} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
+import {useReturnType} from "../../function/DFlowFunction.return.hook";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunction
@@ -28,7 +29,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.id)
-
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinition> = {}
         definition?.parameters?.forEach(pd => {
@@ -46,6 +46,8 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
         const parameterDefinition = paramDefinitions[parameter.id]
         suggestionsById[parameter.id] = useSuggestions(parameterDefinition?.type, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
     })
+
+    const returnType = useReturnType(definition!!, sortedParameters.map(p => p.value as Value), dataTypeService)
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
@@ -114,6 +116,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 />
             </div>
         })}
+        {JSON.stringify(returnType)}
     </Flex>
 
 }

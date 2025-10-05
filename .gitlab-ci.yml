@@ -38,10 +38,9 @@ test:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 .storybook:test:base:
-  image: ghcr.io/code0-tech/build-images/node-playwright:196.1-node-24.8
+  image: ghcr.io/code0-tech/build-images/node-playwright:203.1-node-24.8
   stage: test
   before_script:
-    - source ~/.asdf/asdf.sh
     - npm ci
     - npm run storybook:dev &
     - curl --fail -sv --retry 30 --retry-delay 3 --head --retry-all-errors http://127.0.0.1:6006

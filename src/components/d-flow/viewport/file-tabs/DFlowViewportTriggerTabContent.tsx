@@ -1,5 +1,5 @@
 import React from "react";
-import {Flow, NodeFunction} from "../../DFlow.view";
+import {FlowView, NodeFunctionView} from "../../DFlow.view";
 import {useService} from "../../../../utils/contextStore";
 import {DFlowReactiveService} from "../../DFlow.service";
 import TextInput from "../../../form/TextInput";
@@ -12,7 +12,7 @@ import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFo
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 
 export interface DFlowViewportTriggerTabContentProps {
-    instance: Flow
+    instance: FlowView
 }
 
 export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabContentProps> = (props) => {
@@ -43,7 +43,7 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
             const title = settingsDefinition?.name ? settingsDefinition.name[0]?.text : setting.definition.setting_id
             const description = settingsDefinition?.description ? settingsDefinition?.description[0]?.text : JSON.stringify(settingsDefinition!!.type)
             const result = suggestionsById[setting.definition.setting_id]
-            const defaultValue = setting.value instanceof NodeFunction ? JSON.stringify(setting.value.json) : typeof setting.value == "object" || typeof setting.value == "boolean" ? JSON.stringify(setting.value) : setting.value
+            const defaultValue = setting.value instanceof NodeFunctionView ? JSON.stringify(setting.value.json) : typeof setting.value == "object" || typeof setting.value == "boolean" ? JSON.stringify(setting.value) : setting.value
 
             return <div>
                 <TextInput title={title}

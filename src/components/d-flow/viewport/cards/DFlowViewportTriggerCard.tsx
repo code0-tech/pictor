@@ -1,6 +1,6 @@
 import React, {memo} from "react";
 import {Code0Component} from "../../../../utils/types";
-import {Flow} from "../../DFlow.view";
+import {FlowView} from "../../DFlow.view";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import Text from "../../../text/Text";
 import {useService} from "../../../../utils/contextStore";
@@ -14,7 +14,7 @@ import Badge from "../../../badge/Badge";
 import {DFlowViewportTriggerTabContent} from "../file-tabs/DFlowViewportTriggerTabContent";
 
 export interface DFlowViewportTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    instance: Flow
+    instance: FlowView
 }
 
 // @ts-ignore

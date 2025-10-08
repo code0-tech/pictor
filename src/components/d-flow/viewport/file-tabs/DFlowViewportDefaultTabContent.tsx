@@ -1,5 +1,5 @@
 import React from "react";
-import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "../../DFlow.view";
+import {isNodeFunctionObject, NodeFunctionView, NodeFunctionObject} from "../../DFlow.view";
 import TextInput from "../../../form/TextInput";
 import Flex from "../../../flex/Flex";
 import {useService} from "../../../../utils/contextStore";
@@ -17,7 +17,7 @@ import {useReturnType} from "../../function/DFlowFunction.return.hook";
 import {resolveGenericKeys} from "../../../../utils/generics";
 
 export interface DFlowViewportFileTabsContentProps {
-    functionInstance: NodeFunction
+    functionInstance: NodeFunctionView
     depthLevel?: number
     scopeLevel?: number[]
     nodeLevel?: number
@@ -72,7 +72,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             const result = suggestionsById[parameter.id]
             const title = parameterDefinition?.name ? parameterDefinition?.name[0]?.text : parameterDefinition!!.parameter_id
             const description = parameterDefinition?.description ? parameterDefinition?.description[0]?.text : JSON.stringify(parameterDefinition!!.type)
-            const defaultValue = parameter.value instanceof NodeFunction ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
+            const defaultValue = parameter.value instanceof NodeFunctionView ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
 
 
             return <div>

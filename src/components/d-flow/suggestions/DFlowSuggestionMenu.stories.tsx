@@ -4,7 +4,7 @@ import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {functionData} from "../function/DFlowFunction.data";
 import {FunctionDefinition} from "../function/DFlowFunction.view";
-import {Flow} from "../DFlow.view";
+import {FlowView} from "../DFlow.view";
 import {flow} from "../DFlow.data";
 import {ContextStoreProvider} from "../../../utils/contextStore";
 import {useReactiveArrayService} from "../../../utils/reactiveArrayService";
@@ -28,7 +28,7 @@ export const Example = () => {
 
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
-    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow)]);
+    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
 
     React.useEffect(() => {

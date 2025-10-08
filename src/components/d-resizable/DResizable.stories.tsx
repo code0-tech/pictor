@@ -22,7 +22,7 @@ import {functionData} from "../d-flow/function/DFlowFunction.data";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DataType} from "../d-flow/data-type/DFlowDataType.view";
+import {DataTypeView} from "../d-flow/data-type/DFlowDataType.view";
 import {DFlowDataTypeReactiveService} from "../d-flow/data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "../d-flow/function/DFlowFunction.service";
 import {DFlowReactiveService} from "../d-flow/DFlow.service";
@@ -54,8 +54,8 @@ export default meta
 export const Dashboard = () => {
 
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
-    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (service) => {
-        return dataTypes.map(dataType => (new DataType(dataType, service)))
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (service) => {
+        return dataTypes.map(dataType => (new DataTypeView(dataType, service)))
     })
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinition(fd)));
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow1)]);

@@ -8,26 +8,29 @@ import {
     Value
 } from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
+import {ContainsKeyConfig, DataTypeIdentifier, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeContainsKeyRuleConfig {
     key: string
     type: Type
 }
 
+
+
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsKeyRule {
-    public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
+    public static validate(value: Value, config: ContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
-        const genericMapper = generics?.get(config.type as string)
-        const genericTypes = generics?.get(config.type as string)?.types
-        const genericCombination = generics?.get(config.type as string)?.generic_combination
+        const typeId = config.dataTypeIdentifier.dataType?.identifier || config.dataTypeIdentifier.genericType?.dataType.identifier
+        const genericMapper = generics?.get(config.dataTypeIdentifier.genericKey!!)
+        const genericTypes = generics?.get(config.dataTypeIdentifier.genericKey!!)?.types
+        const genericCombination = generics?.get(config.dataTypeIdentifier.genericKey!!)?.generic_combination
 
         if (!(isObject(value))) return false
 
-        //TODO: only if its really a generic key
-        if (config.key in value && typeof config.type === "string" && !genericMapper && !service?.getDataType(config.type)) return true
+        if (config.key in value && config.dataTypeIdentifier.genericKey && !genericMapper && !service?.getDataType(typeId)) return true
 
-        if (!(service?.getDataType(config.type) || genericMapper)) return false
+        if (!(service?.getDataType(typeId) || genericMapper)) return false
 
         //use of generic key but datatypes does not exist
         if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
@@ -53,8 +56,8 @@ export class DFlowDataTypeContainsKeyRule {
         }
 
         //normal datatype link
-        if (typeof config.type === "string") {
-            return (config.key in value) && (!!service?.getDataType(config.type)?.validateValue(value[config.key]))
+        if (config.dataTypeIdentifier.dataType?.identifier) {
+            return (config.key in value) && (!!service?.getDataType(config.dataTypeIdentifier.dataType?.identifier)?.validateValue(value[config.key]))
         }
 
         return (config.key in value) && (!!service?.getDataType(config.type)?.validateValue(value[config.key], genericMapping(config.type.generic_mapper, generics)))

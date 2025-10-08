@@ -120,7 +120,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
         {JSON.stringify(returnType)}
         <br/>
         <br/>
-        {genericTypeMap}
+        {JSON.stringify(genericTypeMap)}
     </Flex>
 
 }

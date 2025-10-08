@@ -1,5 +1,5 @@
 import {FunctionDefinition} from "./DFlowFunction.view";
-import {DataType, EDataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
+import {DataTypeView, EDataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 import {
@@ -48,11 +48,11 @@ export const useFunctionValidation = (
         if (isParameterGeneric) {
             if (typeof valueType === "object" && valueType && "type" in valueType && parameterDataType) {
                 if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
-                    const resolvedParameterDT = new DataType(
+                    const resolvedParameterDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
                         dataTypeService
                     );
-                    const resolvedValueDT = new DataType(
+                    const resolvedValueDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
                         dataTypeService
                     );
@@ -81,7 +81,7 @@ export const useFunctionValidation = (
             }
             if (valueDataType && parameterDataType && parameterDataType.genericKeys && valueDataType.json && parameterDataType.json) {
                 if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
-                    const resolvedParameterDT = new DataType(
+                    const resolvedParameterDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
                         dataTypeService
                     );
@@ -104,7 +104,7 @@ export const useFunctionValidation = (
         if (parameterDataType) {
             if (typeof valueType === "object" && valueType && "type" in valueType && parameterDataType) {
                 if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
-                    const resolvedValueDT = new DataType(
+                    const resolvedValueDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
                         dataTypeService
                     );

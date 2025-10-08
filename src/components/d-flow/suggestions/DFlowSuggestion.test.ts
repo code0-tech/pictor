@@ -13,7 +13,7 @@ import {flow} from "../DFlow.data"
 import {useService} from "../../../utils/contextStore"
 import {DFlowSuggestionService} from "./DFlowSuggestion.service";
 import {FunctionDefinition} from "../function/DFlowFunction.view";
-import {Flow} from "../DFlow.view";
+import {FlowView} from "../DFlow.view";
 import {DFlowFunctionNonReactiveService} from "../function/DFlowFunction.test";
 import {DFlowNonReactiveService} from "../DFlow.test";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
@@ -51,7 +51,7 @@ const [____, suggestionService] = createNonReactiveArrayService<any, DFlowNonRea
 
 dataTypes.forEach((dt) => dataTypeService.add(new DataTypeView(dt, dataTypeService)))
 functionData.forEach((dt) => functionService.add(new FunctionDefinition(dt)))
-flowService.add(new Flow(flow))
+flowService.add(new FlowView(flow))
 
 beforeEach(() => {
     (useService as jest.Mock).mockImplementation((serviceType?: any) => {

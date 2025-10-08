@@ -10,6 +10,7 @@ import {
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
+import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeReturnTypeRuleConfig {
     type: Type // can be a key, a type or a generic type
@@ -52,7 +53,7 @@ export class DFlowDataTypeReturnTypeRule {
             if (typeof config.type === "string" && genericMapper && genericTypes) {
 
                 const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                    return !!service?.getDataType(genericType)?.validateDataType(service?.getDataType((foundReturnFunction.parameters!![0].value as RefObject).type)!!)
+                    return !!service?.getDataType(genericType)?.validateDataType(service?.getDataType((foundReturnFunction.parameters!![0].value as ReferenceValue).dataTypeIdentifier)!!)
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {

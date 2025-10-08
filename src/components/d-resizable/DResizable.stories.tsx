@@ -30,7 +30,7 @@ import {flow1} from "../d-flow/DFlow.data";
 import {DFlowSuggestion} from "../d-flow/suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "../d-flow/suggestions/DFlowSuggestion.service";
 import {dataTypes} from "../d-flow/data-type/DFlowDataType.data";
-import {Flow} from "../d-flow/DFlow.view";
+import {FlowView} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
 import {DFlowViewportTriggerCard} from "../d-flow/viewport/cards/DFlowViewportTriggerCard";
@@ -58,7 +58,7 @@ export const Dashboard = () => {
         return dataTypes.map(dataType => (new DataTypeView(dataType, service)))
     })
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinition(fd)));
-    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow1)]);
+    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow1)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowType, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);
 

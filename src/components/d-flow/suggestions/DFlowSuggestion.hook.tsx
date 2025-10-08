@@ -8,7 +8,7 @@ import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowD
 import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
-import {NodeFunction, NodeFunctionObject, NodeParameterObject} from "../DFlow.view";
+import {NodeFunctionView, NodeFunctionObject, NodeParameterObject} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
@@ -184,13 +184,13 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
      * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
      */
     const traverse = (
-        fn: NodeFunction | undefined,
+        fn: NodeFunctionView | undefined,
         depth: number,
         scopePath: number[]
     ) => {
         if (!fn) return;
 
-        let current: NodeFunction | undefined = fn;
+        let current: NodeFunctionView | undefined = fn;
 
         while (current) {
             const def = functionService.getFunctionDefinition(current.id);
@@ -213,7 +213,7 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                         const rawValue = paramInstance?.value;
                         const valuesArray =
                             rawValue !== undefined
-                                ? rawValue instanceof NodeFunction
+                                ? rawValue instanceof NodeFunctionView
                                     ? [rawValue.json]
                                     : [rawValue]
                                 : [];
@@ -240,7 +240,7 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                     current.parameters?.map((p) => p.value).filter((v) => v !== undefined) ?? [];
                 const resolvedReturnType = useReturnType(
                     def,
-                    paramValues.map((v) => (v instanceof NodeFunction ? v.json : v)),
+                    paramValues.map((v) => (v instanceof NodeFunctionView ? v.json : v)),
                     dataTypeService
                 );
                 if (resolvedReturnType) {
@@ -259,8 +259,8 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                     const pType = dataTypeService.getDataType(pDef.type);
                     if (pType?.type === EDataType.NODE) {
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
-                        if (paramInstance?.value && paramInstance.value instanceof NodeFunction) {
-                            const childFn = paramInstance.value as NodeFunction;
+                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
+                            const childFn = paramInstance.value as NodeFunctionView;
 
                             // New group: extend the scope path with a fresh id; increase depth by 1.
                             const childScopePath = [...scopePath, nextGroupId()];
@@ -269,8 +269,8 @@ export const useRefObjects = (flowId: string): Array<RefObject> => {
                     } else {
                         // Functions passed as NON-NODE parameters: same depth and same scope path.
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
-                        if (paramInstance?.value && paramInstance.value instanceof NodeFunction) {
-                            traverse(paramInstance.value as NodeFunction, depth, scopePath);
+                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
+                            traverse(paramInstance.value as NodeFunctionView, depth, scopePath);
                         }
                     }
                 }

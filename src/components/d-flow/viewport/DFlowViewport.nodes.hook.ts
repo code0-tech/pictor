@@ -1,6 +1,6 @@
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
-import {NodeFunction} from "../DFlow.view";
+import {NodeFunctionView} from "../DFlow.view";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
@@ -143,7 +143,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     })
 
     const traverse = (
-        fn: NodeFunction,
+        fn: NodeFunctionView,
         isParameter = false,
         parentId?: string,
         depth: number = 0,
@@ -194,7 +194,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (paramDataType?.type === EDataType.NODE) {
-                if (param.value && param.value instanceof NodeFunction) {
+                if (param.value && param.value instanceof NodeFunctionView) {
                     const groupId = `${id}-group-${idCounter++}`;
 
                     // New group: extend scope PATH with a fresh segment and increase depth.
@@ -216,11 +216,11 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                     });
 
                     // Child function inside the group uses the group's depth and scope PATH.
-                    traverse(param.value as NodeFunction, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
+                    traverse(param.value as NodeFunctionView, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
                 }
-            } else if (param.value && param.value instanceof NodeFunction) {
+            } else if (param.value && param.value instanceof NodeFunctionView) {
                 // Functions passed as non-NODE parameters live in the same depth/scope PATH.
-                traverse(param.value as NodeFunction, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
+                traverse(param.value as NodeFunctionView, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
             }
         });
 

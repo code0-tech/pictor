@@ -1,7 +1,7 @@
 import {useService, useStore} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {Edge} from "@xyflow/react";
-import {NodeFunction} from "../DFlow.view";
+import {NodeFunctionView} from "../DFlow.view";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {EDataType, Type} from "../data-type/DFlowDataType.view";
@@ -64,7 +64,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
 
     /* ------------------------------------------------------------------ */
     const traverse = (
-        fn: NodeFunction,
+        fn: NodeFunctionView,
         parentFnId?: string,        // Id der *Function-Card* des Aufrufers
         level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array,
         fnCache = functionCache,
@@ -149,7 +149,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
                 });
 
                 /* existiert ein Funktions-Wert für dieses Param-Feld?   */
-                if (val && val instanceof NodeFunction) {
+                if (val && val instanceof NodeFunctionView) {
                     /* merken: diese Group-Card besitzt Content – das ist
                        später Startpunkt der next-Kante                   */
                     (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
@@ -157,7 +157,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
                         .push(groupId);
 
                     /* rekursiv Funktions-Ast innerhalb der Gruppe       */
-                    traverse(param.value as NodeFunction,
+                    traverse(param.value as NodeFunctionView,
                         undefined,
                         level + 1,
                         fnCache,
@@ -166,8 +166,8 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
             }
 
             /* --- anderer Parameter, der selbst eine Function hält ---- */
-            else if (val && val instanceof NodeFunction) {
-                const subFnId = traverse(param.value as NodeFunction,
+            else if (val && val instanceof NodeFunctionView) {
+                const subFnId = traverse(param.value as NodeFunctionView,
                     undefined,
                     level + 1,
                     fnCache,

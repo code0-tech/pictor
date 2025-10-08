@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
-import {NodeFunction, NodeFunctionParameter} from "../../DFlow.view";
+import {NodeFunctionView, NodeFunctionParameter} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowViewportDefaultCard.style.scss";
@@ -33,7 +33,7 @@ import {FileTabsService} from "../../../file-tabs/FileTabs.service";
 import {DFlowViewportDefaultTabContent} from "../file-tabs/DFlowViewportDefaultTabContent";
 
 export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    instance: NodeFunction
+    instance: NodeFunctionView
     isParameter: boolean
     depth: number
     scope: number[]
@@ -54,7 +54,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.instance.id)
-    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunction ? p.value.json : p.value!!), useService(DFlowDataTypeReactiveService)!!)
+    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json : p.value!!), useService(DFlowDataTypeReactiveService)!!)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0
@@ -188,7 +188,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             {data.instance.parameters?.some(param => {
                 const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
                 const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
-                return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value)
+                return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
             }) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
@@ -199,7 +199,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                         const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
                         const result = useSuggestions(parameter?.type ?? undefined, [], "some_database_id", data.depth, data.scope, data.index)
 
-                        return (param.value instanceof NodeFunction && !isNodeDataType) || (!param.value) ?
+                        return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
                                 {param.id}
                                 {!param.value ? (

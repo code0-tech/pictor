@@ -8,7 +8,7 @@ import {FunctionDefinition} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
-import {DataType} from "../data-type/DFlowDataType.view";
+import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {useReturnType} from "./DFlowFunction.return.hook";
 
@@ -67,10 +67,10 @@ describe('return type', () => {
         functionService.add(new FunctionDefinition(functionData));
     })
 
-    const [_, dataTypeService] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, dataTypeService] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     dataTypes.forEach((dataType) => {
-        dataTypeService.add(new DataType(dataType, dataTypeService))
+        dataTypeService.add(new DataTypeView(dataType, dataTypeService))
     })
 
     test('', () => {

@@ -2,6 +2,12 @@ import {Translation} from "../../../utils/translation";
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {CombinesRuleConfig, EDataTypeRuleType, RuleMap} from "./rules/DFlowDataTypeRules";
 import {isNodeFunctionObject, NodeFunction, NodeFunctionObject} from "../DFlow.view";
+import {
+    DataType,
+    DataTypeIdentifier, DataTypeRuleConnection,
+    DataTypeVariant, Maybe,
+    TranslationConnection
+} from "@code0-tech/sagittarius-graphql-types";
 
 export enum GenericCombinationStrategy {
     AND,
@@ -29,7 +35,7 @@ export interface RefPath {
 /**
  * This interface represents a reference value coming from either
  * the return or from the input of a node.
- * Because references, don't hold the actual value we perform just a {@link DataType#validateDataType}
+ * Because references, don't hold the actual value we perform just a {@link DataTypeView#validateDataType}
  * check against the {@link RefObject#type}.
  *
  * Every possible reference can be tracked down via it's depth inside the flow.
@@ -114,19 +120,19 @@ export interface DataTypeObject {
 /*
     @todo is DataType castable to another DataType
  */
-export class DataType {
+export class DataTypeView {
 
     private readonly _service: DFlowDataTypeService
     private readonly _id: string
-    private readonly _type: EDataType
-    private readonly _name?: Translation[]
-    private readonly _rules?: DataTypeRuleObject[]
-    private readonly _parent?: Type
-    private readonly _generic_keys?: string[]
+    private readonly _type: DataTypeVariant
+    private readonly _name?: TranslationConnection
+    private readonly _rules?: DataTypeRuleConnection
+    private readonly _parent?: Maybe<DataTypeIdentifier>
+    private readonly _generic_keys?: Maybe<string[]>
 
-    constructor(dataType: DataTypeObject, service: DFlowDataTypeService) {
-        this._id = dataType.data_type_id
-        this._type = dataType.type
+    constructor(dataType: DataType, service: DFlowDataTypeService) {
+        this._id = dataType.identifier
+        this._type = dataType.variant
         this._name = dataType.name
         this._rules = dataType.rules
         this._parent = dataType.parent
@@ -134,7 +140,7 @@ export class DataType {
         this._generic_keys = dataType.genericKeys
     }
 
-    public validateDataType(dataType: DataType): boolean {
+    public validateDataType(dataType: DataTypeView): boolean {
 
         if (this._type != dataType.type) return false
 
@@ -166,29 +172,30 @@ export class DataType {
         if (this._rules && !dataType._rules) return false
         if (!this._rules && dataType._rules) return false
 
-        return arraysEqual(this.rules as [], dataType.rules as [])
+        return arraysEqual(this.rules?.nodes as [], this.rules?.nodes as [])
     }
 
     public validateValue(value: Value, generics?: GenericMapper[]): boolean {
 
-        if (this._type === EDataType.OBJECT && !isObject(value)) {
+        if (this._type === DataTypeVariant.Object && !isObject(value)) {
             return false
         }
 
-        if (this._type === EDataType.NODE && !isNodeFunctionObject(value as NodeFunctionObject)) {
+        if (this._type === DataTypeVariant.Node && !isNodeFunctionObject(value as NodeFunctionObject)) {
             return false
         }
 
         const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
 
-        return this.rules.every(rule => {
-            return RuleMap.get(rule.type)?.validate(value, rule.config, map, this._service)
-        })
+        return this.rules?.nodes?.every(rule => {
+            if (!rule) return false
+            return RuleMap.get(rule.variant)?.validate(value, rule.config, map, this._service)
+        }) ?? false
     }
 
 
-    get rules(): DataTypeRuleObject[] {
-        return this._rules || []
+    get rules(): DataTypeRuleConnection | undefined {
+        return this._rules
     }
 
     get id(): string {
@@ -199,26 +206,19 @@ export class DataType {
         return this._service
     }
 
-    get genericKeys(): string[] | undefined {
+    get genericKeys(): Maybe<string[]> | undefined {
         return this._generic_keys
     }
 
-    get type(): EDataType {
+    get type(): DataTypeVariant {
         return this._type;
     }
 
     get depth(): number {
-        return this._parent ? 1 + (this._service.getDataType(this._parent as string)?.depth ?? 0) : 0
+        return this._parent ? 1 + (this._service.getDataType(this._parent)?.depth ?? 0) : 0
     }
 
-    get json(): DataTypeObject {
-        return {
-            type: this._type,
-            data_type_id: this._id,
-            name: this._name,
-            rules: this._rules,
-            parent: this._parent,
-            genericKeys: this._generic_keys
-        }
+    get json(): DataType {
+        return null
     }
 }

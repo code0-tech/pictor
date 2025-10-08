@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals'
 import {
-    DataType,
+    DataTypeView,
     DataTypeRuleObject,
     EDataType,
     GenericCombinationStrategy,
@@ -21,17 +21,17 @@ import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsK
 import {NodeFunctionObject} from "../DFlow.view";
 import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 
-export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType> implements DFlowDataTypeService {
+export class NonReactiveDataTypeService extends NonReactiveArrayService<DataTypeView> implements DFlowDataTypeService {
 
-    constructor(store: NonReactiveArrayStore<DataType>) {
+    constructor(store: NonReactiveArrayStore<DataTypeView>) {
         super(store);
     }
 
-    public getDataType = (type: Type): DataType | undefined => {
+    public getDataType = (type: Type): DataTypeView | undefined => {
         return this.values().find(value => value.id === (typeof type === "string" ? type : (type?.type ?? "")));
     }
 
-    public getDataTypeFromValue = (value: Value): DataType | undefined => {
+    public getDataTypeFromValue = (value: Value): DataTypeView | undefined => {
 
         //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
         if (typeof value === "string") return this.getDataType("TEXT")
@@ -107,7 +107,7 @@ export class NonReactiveDataTypeService extends NonReactiveArrayService<DataType
 }
 
 describe('data type validation against data type', () => {
-    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, service] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     [...dataTypes, {
         data_type_id: "NUMBER_2",
@@ -117,32 +117,32 @@ describe('data type validation against data type', () => {
             config: {pattern: "^-?\\d+(?:[.,]\\d+)?$"}
         }]
     }].forEach((dataType) => {
-        service.add(new DataType(dataType, service))
+        service.add(new DataTypeView(dataType, service))
     })
 
     test('NUMBER match', () => {
-        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("NUMBER") as DataType)).toBe(true)
+        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("NUMBER") as DataTypeView)).toBe(true)
     })
 
     test('HTTP_METHOD match', () => {
-        expect(service.getDataType("HTTP_METHOD")?.validateDataType(service.getDataType("HTTP_METHOD") as DataType)).toBe(true)
+        expect(service.getDataType("HTTP_METHOD")?.validateDataType(service.getDataType("HTTP_METHOD") as DataTypeView)).toBe(true)
     })
 
     test('different data type id match', () => {
-        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("NUMBER_2") as DataType)).toBe(true)
+        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("NUMBER_2") as DataTypeView)).toBe(true)
     })
 
     test('NUMBER with TEXT not match', () => {
-        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("TEXT") as DataType)).toBe(false)
+        expect(service.getDataType("NUMBER")?.validateDataType(service.getDataType("TEXT") as DataTypeView)).toBe(false)
     })
 })
 
 describe('value validation against data type', () => {
 
-    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, service] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     dataTypes.forEach((dataType) => {
-        service.add(new DataType(dataType, service))
+        service.add(new DataTypeView(dataType, service))
     })
 
     test('1 is of type NUMBER', () => {
@@ -213,10 +213,10 @@ describe('value validation against data type', () => {
 
 describe('generics', () => {
 
-    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, service] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     dataTypes.forEach((dataType) => {
-        service.add(new DataType(dataType, service))
+        service.add(new DataTypeView(dataType, service))
     })
 
     test('Array of array numbers against two dimensional number array', () => {
@@ -267,10 +267,10 @@ describe('generics', () => {
 })
 
 describe('test1', () => {
-    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, service] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     dataTypes.forEach((dataType) => {
-        service.add(new DataType(dataType, service))
+        service.add(new DataTypeView(dataType, service))
     })
 
     test('test', () => {
@@ -300,10 +300,10 @@ describe('test1', () => {
 })
 
 describe('test2', () => {
-    const [_, service] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+    const [_, service] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 
     dataTypes.forEach((dataType) => {
-        service.add(new DataType(dataType, service))
+        service.add(new DataTypeView(dataType, service))
     })
 
     test('test', () => {

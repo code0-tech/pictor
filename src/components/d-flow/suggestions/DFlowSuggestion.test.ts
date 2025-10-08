@@ -6,7 +6,7 @@ import {
     NonReactiveArrayService,
     NonReactiveArrayStore
 } from "../../../utils/nonReactiveArrayService"
-import {DataType, Type} from "../data-type/DFlowDataType.view"
+import {DataTypeView, Type} from "../data-type/DFlowDataType.view"
 import {dataTypes} from "../data-type/DFlowDataType.data"
 import {functionData} from "../function/DFlowFunction.data"
 import {flow} from "../DFlow.data"
@@ -44,12 +44,12 @@ jest.mock("../../../utils/contextStore", () => ({
 }))
 
 // ---- Service Instanzen vorbereiten ----
-const [_, dataTypeService] = createNonReactiveArrayService<DataType, NonReactiveDataTypeService>(NonReactiveDataTypeService);
+const [_, dataTypeService] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);
 const [__, functionService] = createNonReactiveArrayService<any, DFlowFunctionNonReactiveService>(DFlowFunctionNonReactiveService);
 const [___, flowService] = createNonReactiveArrayService<any, DFlowNonReactiveService>(DFlowNonReactiveService);
 const [____, suggestionService] = createNonReactiveArrayService<any, DFlowNonReactiveSuggestionService>(DFlowNonReactiveSuggestionService);
 
-dataTypes.forEach((dt) => dataTypeService.add(new DataType(dt, dataTypeService)))
+dataTypes.forEach((dt) => dataTypeService.add(new DataTypeView(dt, dataTypeService)))
 functionData.forEach((dt) => functionService.add(new FunctionDefinition(dt)))
 flowService.add(new Flow(flow))
 

@@ -1,6 +1,6 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 import {
-    DataType,
+    DataTypeView,
     DataTypeRuleObject,
     EDataType,
     GenericMapper,
@@ -12,28 +12,32 @@ import {
 import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
 import {NodeFunctionObject} from "../DFlow.view";
 import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
+import {resolveType} from "../../../utils/generics";
+import {DataTypeIdentifier} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeService {
-    getDataType(type: Type): DataType | undefined
+    getDataType(type: DataTypeIdentifier | string): DataTypeView | undefined
 
-    hasDataTypes(types: Type[]): boolean
+    hasDataTypes(types: DataTypeIdentifier[]): boolean
 
-    getDataTypeFromValue(value: Value): DataType | undefined
+    getDataTypeFromValue(value: Value): DataTypeView | undefined
 
-    getTypeFromValue(value: Value): Type
+    getTypeFromValue(value: Value): DataTypeIdentifier
 }
 
-export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType> implements DFlowDataTypeService {
+export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> implements DFlowDataTypeService {
 
-    constructor(store: ReactiveArrayStore<DataType>) {
+    constructor(store: ReactiveArrayStore<DataTypeView>) {
         super(store);
     }
 
-    public getDataType = (type: Type): DataType | undefined => {
-        return this.values().find(value => value.id === (typeof type === "string" ? type : (type?.type ?? "")));
+    public getDataType = (type: DataTypeIdentifier | string): DataTypeView | undefined => {
+        if (!!(type as DataTypeIdentifier).genericKey) return undefined
+        const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType.identifier ?? (type as string)
+        return this.values().find(value => value.id === id);
     }
 
-    public getDataTypeFromValue = (value: Value): DataType | undefined => {
+    public getDataTypeFromValue = (value: Value): DataTypeView | undefined => {
 
         //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
         if (typeof value === "string") return this.getDataType("TEXT")
@@ -97,10 +101,10 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataType>
             return null
         }).filter(mapper => !!mapper)
 
-        return {
+        return resolveType({
             type: dataType?.id ?? "",
             generic_mapper: genericMapper
-        }
+        }, this)
 
     }
 

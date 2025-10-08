@@ -571,16 +571,18 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
                 const genericDT = service.values().find(
                     dt2 => dt2.type === EDataType.ARRAY && dt2.genericKeys && dt2.genericKeys.length > 0
                 )
-                if (genericDT) {
+                if (genericDT?.genericKeys && genericDT.genericKeys.length > 0) {
                     const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
                     if (rule) {
                         //@ts-ignore
                         const expandedInner = resolveType(rule.config.type, service)
+                        const [genericKey] = genericDT.genericKeys
+                        if (!genericKey) return type
                         return {
                             type: genericDT.id,
                             generic_mapper: [{
                                 types: [expandedInner],
-                                generic_target: genericDT.genericKeys[0]
+                                generic_target: genericKey
                             }]
                         }
                     }
@@ -592,12 +594,14 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
                 const genericDT = service.values().find(
                     dt2 => dt2.type === EDataType.OBJECT && dt2.genericKeys && dt2.genericKeys.length > 0
                 )
-                if (genericDT) {
+                if (genericDT?.genericKeys && genericDT.genericKeys.length > 0) {
+                    const [genericKey] = genericDT.genericKeys
+                    if (!genericKey) return type
                     return {
                         type: genericDT.id,
                         generic_mapper: [{
                             types: [type], // keep alias itself as Type ("TEST_OBJECT")
-                            generic_target: genericDT.genericKeys[0]
+                            generic_target: genericKey
                         }]
                     }
                 }
@@ -617,6 +621,30 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
                 ...gm,
                 types: gm.types.map(t => resolveType(t, service))
             }))
+        }
+
+        const dataType = service.getDataType(type.type)
+        if (dataType?.genericKeys && dataType.genericKeys.length > 0) {
+            const baseTypeId = EDataType[dataType.type]
+            if (typeof baseTypeId === "string") {
+                const baseType = service.getDataType(baseTypeId)
+                const baseGenericKeys = baseType?.genericKeys
+
+                if (
+                    baseType &&
+                    baseGenericKeys &&
+                    baseGenericKeys.length > 0 &&
+                    baseType.id !== dataType.id
+                ) {
+                    return {
+                        type: baseType.id,
+                        generic_mapper: [{
+                            types: [result],
+                            generic_target: baseGenericKeys[0]
+                        }]
+                    }
+                }
+            }
         }
 
         return result

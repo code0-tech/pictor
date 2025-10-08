@@ -1,6 +1,6 @@
 import {Meta} from "@storybook/react";
 import React from "react";
-import {DataType} from "../data-type/DFlowDataType.view";
+import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {functionData} from "../function/DFlowFunction.data";
 import {FunctionDefinition} from "../function/DFlowFunction.view";
@@ -26,13 +26,13 @@ export const Example = () => {
 
     const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
 
-    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataType, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveService, [new Flow(flow)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
 
     React.useEffect(() => {
-        dataTypes.forEach(dt => dataTypeService.add(new DataType(dt, dataTypeService)));
+        dataTypes.forEach(dt => dataTypeService.add(new DataTypeView(dt, dataTypeService)));
     }, [dataTypeService])
 
     return <ContextStoreProvider

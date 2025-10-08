@@ -1,202 +1,135 @@
-import {DataTypeObject, isValue, Value} from "./data-type/DFlowDataType.view";
+import {
+    DataType,
+    Flow,
+    FlowType, LiteralValue,
+    Maybe,
+    NodeFunction,
+    NodeParameter, NodeParameterValue, ReferenceValue,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 
-export interface FlowObject {
-    flow_id: string
-    name: string
-    type: string //in the actual implementation we will just link the database id
-    settings?: FlowSettingObject[]
-    input_type?: DataTypeObject
-    return_type?: DataTypeObject
-    starting_node: NodeFunctionObject
-}
+export class FlowView {
 
-export interface FlowSettingObject {
-    definition: FlowSettingDefinition
-    value: Value
-}
+    private readonly _id: Scalars['FlowID']['output']
+    private readonly _createdAt:  Scalars['Time']['output']
+    private readonly _updatedAt:  Scalars['Time']['output']
+    private _inputType: Maybe<DataType> | undefined
+    private _returnType: Maybe<DataType> | undefined
+    //TODO: settings
+    private _startingNode: NodeFunctionView
+    private readonly _type: FlowType
 
-export interface FlowSettingDefinition {
-    setting_id: string
-    key: string
-}
+    constructor(flow: Flow) {
 
-export interface NodeFunctionDefinitionObject {
-    function_id: string //function::math::add
-    runtime_function_id: string //standard::math::add
-}
-
-export interface NodeFunctionObject {
-    function: NodeFunctionDefinitionObject
-    parameters?: NodeParameterObject[]
-    next_node?: NodeFunctionObject
-}
-
-export interface NodeParameterDefinitionObject {
-    parameter_id: string
-    runtime_parameter_id: string
-}
-
-export interface NodeParameterObject {
-    definition: NodeParameterDefinitionObject
-    value?: Value
-}
-
-export const isNodeFunctionObject = (
-    v: NodeFunctionObject
-): v is NodeFunctionObject => {
-    if (
-        !v || typeof v !== 'object' ||
-        typeof v.function?.function_id !== 'string' ||
-        typeof v.function?.runtime_function_id !== 'string'
-    ) return false
-
-    if (v.parameters && (!Array.isArray(v.parameters) || !v.parameters.every(p => isNodeParameterObject(p))))
-        return false
-
-    return !(v.next_node && !isNodeFunctionObject(v.next_node));
-
-}
-
-const isNodeParameterObject = (v: NodeParameterObject): boolean =>
-    v && typeof v === 'object' &&
-    typeof v.definition?.parameter_id === 'string' &&
-    typeof v.definition?.runtime_parameter_id === 'string' &&
-    (
-        v.value === undefined ||
-        isValue(v.value)
-    )
-
-
-export class Flow {
-
-    private readonly _id: string
-    private readonly _type: string
-    private _settings: FlowSettingObject[] | undefined
-    private _startingNode: NodeFunction
-
-    constructor(flow: FlowObject) {
-        this._id = flow.flow_id
+        this._id = flow.id
+        this._createdAt = flow.createdAt
+        this._updatedAt = flow.updatedAt
+        this._inputType = flow.inputType ?? undefined
+        this._returnType = flow.returnType ?? undefined
         this._type = flow.type
-        this._settings = flow.settings
-        this._startingNode = new NodeFunction(flow.starting_node)
+        this._startingNode = new NodeFunctionView(flow.startingNode)
+
     }
 
-    get id(): string {
+
+    get id(): Scalars["FlowID"]["output"] {
         return this._id;
     }
 
-    get type(): string {
-        return this._type;
+    get createdAt(): Scalars["Time"]["output"] {
+        return this._createdAt;
     }
 
-    get settings(): FlowSettingObject[] | undefined {
-        return this._settings;
+    get updatedAt(): Scalars["Time"]["output"] {
+        return this._updatedAt;
     }
 
-    get startingNode(): NodeFunction {
+    get inputType(): Maybe<DataType> | undefined {
+        return this._inputType;
+    }
+
+    get returnType(): Maybe<DataType> | undefined {
+        return this._returnType;
+    }
+
+    get startingNode(): NodeFunctionView {
         return this._startingNode;
     }
 
-    set startingNode(value: NodeFunction) {
-        this._startingNode = value;
+    get type(): FlowType {
+        return this._type;
     }
 }
 
-export class NodeFunction {
+export class NodeFunctionView {
 
-    private readonly _id: string
-    private readonly _runtime_id: string
-    private _nextNode: NodeFunction | undefined
+
+    private readonly _id: Scalars['NodeFunctionID']['output']
+    private readonly _runtimeId: Scalars['RuntimeParameterDefinitionID']['output']
+    private readonly _createdAt:  Scalars['Time']['output']
+    private readonly _updatedAt:  Scalars['Time']['output']
+    private _nextNode: NodeFunctionView | undefined
     private _parameters: NodeFunctionParameter[] | undefined
 
-    constructor(nodeFunction: NodeFunctionObject) {
-        this._id = nodeFunction.function.function_id
-        this._runtime_id = nodeFunction.function.runtime_function_id
-        this._nextNode = nodeFunction.next_node ? new NodeFunction(nodeFunction.next_node) : undefined
-        this._parameters = nodeFunction.parameters?.map(parameter => new NodeFunctionParameter(parameter))
+
+    constructor(nodeFunction: NodeFunction) {
+        this._id = nodeFunction.id
+        this._runtimeId = nodeFunction.runtimeFunction.id
+        this._createdAt = nodeFunction.createdAt
+        this._updatedAt = nodeFunction.updatedAt
+        this._nextNode = nodeFunction.nextNode ? new NodeFunctionView(nodeFunction.nextNode) : undefined
+        this._parameters = nodeFunction.parameters ? nodeFunction.parameters.nodes?.map(param => new NodeFunctionParameter(param)) : undefined
     }
 
 
-    get id(): string {
-        return this._id;
-    }
-
-    get runtime_id(): string {
-        return this._runtime_id;
-    }
-
-    get nextNode(): NodeFunction | undefined {
-        return this._nextNode;
-    }
-
-    set nextNode(value: NodeFunction | undefined) {
-        this._nextNode = value;
-    }
-
-    public deleteNextNode(): void {
-        this.nextNode = this.nextNode?.nextNode
-    }
-
-    get parameters(): NodeFunctionParameter[] | undefined {
-        return this._parameters;
-    }
-
-    set parameters(value: NodeFunctionParameter[] | undefined) {
-        this._parameters = value;
-    }
-
-    get json(): NodeFunctionObject {
-        return {
-            function: {
-                function_id: this._id,
-                runtime_function_id: this._runtime_id
-            },
-            parameters: this._parameters?.map(param => ({
-                definition: {
-                    parameter_id: param.id,
-                    runtime_parameter_id: param.runtime_id
-                },
-                value: param.value instanceof NodeFunction ? param.value.json : param.value
-            })),
-            next_node: this._nextNode ? this._nextNode.json : undefined
-        }
-    }
 }
 
 export class NodeFunctionParameter {
 
-    private readonly _id: string
-    private readonly _runtime_id: string
-    private _value: Value | NodeFunction | undefined
+    private readonly _id: Scalars['NodeParameterID']['output']
+    private readonly _runtimeId: Scalars['RuntimeParameterDefinitionID']['output']
+    private readonly _createdAt:  Scalars['Time']['output']
+    private readonly _updatedAt:  Scalars['Time']['output']
+    private _value: LiteralValue | NodeFunctionView | ReferenceValue | undefined
 
-    constructor(nodeParameter: NodeParameterObject) {
-        this._id = nodeParameter.definition.parameter_id
-        this._runtime_id = nodeParameter.definition.runtime_parameter_id
-        if (isNodeFunctionObject(nodeParameter.value as NodeFunctionObject)) {
-            this._value = new NodeFunction(nodeParameter.value as NodeFunctionObject);
+    constructor(nodeParameter: NodeParameter) {
+        this._id = nodeParameter.id
+        this._runtimeId = nodeParameter.runtimeParameter.id
+        this._createdAt = nodeParameter.createdAt
+        this._updatedAt = nodeParameter.updatedAt
+        if (nodeParameter.value?.__typename === "NodeFunction") {
+            this._value = new NodeFunctionView(nodeParameter.value as NodeFunction);
         } else {
-            this._value = nodeParameter.value
+            this._value = nodeParameter.value as LiteralValue | ReferenceValue;
         }
 
     }
 
-    get id(): string {
+    get id(): Scalars["NodeParameterID"]["output"] {
         return this._id;
     }
 
-    get runtime_id(): string {
-        return this._runtime_id;
+    get runtimeId(): Scalars["RuntimeParameterDefinitionID"]["output"] {
+        return this._runtimeId;
     }
 
-    get value(): Value | NodeFunction | undefined {
+    get createdAt(): Scalars["Time"]["output"] {
+        return this._createdAt;
+    }
+
+    get updatedAt(): Scalars["Time"]["output"] {
+        return this._updatedAt;
+    }
+
+    get value(): LiteralValue | NodeFunctionView | ReferenceValue | undefined {
         return this._value;
     }
 
-    set value(value: Value) {
-        if (isNodeFunctionObject(value as NodeFunctionObject)) {
-            this._value = new NodeFunction(value as NodeFunctionObject);
+    set value(value: NodeParameterValue) {
+        if (value.__typename === "NodeFunction") {
+            this._value = new NodeFunctionView(value as NodeFunction);
         } else {
-            this._value = value
+            this._value = value as LiteralValue | ReferenceValue;
         }
     }
 }

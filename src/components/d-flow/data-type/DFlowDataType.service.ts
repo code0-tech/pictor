@@ -1,7 +1,5 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 import {DataTypeView} from "./DFlowDataType.view";
-import {DFlowDataTypeContainsKeyRuleConfig} from "./rules/DFlowDataTypeContainsKeyRule";
-import {EDataTypeRuleType} from "./rules/DFlowDataTypeRules";
 import {resolveType} from "../../../utils/generics";
 import {
     DataTypeIdentifier,

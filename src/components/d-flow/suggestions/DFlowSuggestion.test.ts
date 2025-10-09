@@ -12,7 +12,7 @@ import {functionData} from "../function/DFlowFunction.data"
 import {flow} from "../DFlow.data"
 import {useService} from "../../../utils/contextStore"
 import {DFlowSuggestionService} from "./DFlowSuggestion.service";
-import {FunctionDefinition} from "../function/DFlowFunction.view";
+import {FunctionDefinitionView} from "../function/DFlowFunction.view";
 import {FlowView} from "../DFlow.view";
 import {DFlowFunctionNonReactiveService} from "../function/DFlowFunction.test";
 import {DFlowNonReactiveService} from "../DFlow.test";
@@ -50,7 +50,7 @@ const [___, flowService] = createNonReactiveArrayService<any, DFlowNonReactiveSe
 const [____, suggestionService] = createNonReactiveArrayService<any, DFlowNonReactiveSuggestionService>(DFlowNonReactiveSuggestionService);
 
 dataTypes.forEach((dt) => dataTypeService.add(new DataTypeView(dt, dataTypeService)))
-functionData.forEach((dt) => functionService.add(new FunctionDefinition(dt)))
+functionData.forEach((dt) => functionService.add(new FunctionDefinitionView(dt)))
 flowService.add(new FlowView(flow))
 
 beforeEach(() => {

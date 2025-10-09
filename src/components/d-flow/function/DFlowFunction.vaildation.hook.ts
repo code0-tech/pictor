@@ -1,4 +1,4 @@
-import {FunctionDefinition} from "./DFlowFunction.view";
+import {FunctionDefinitionView} from "./DFlowFunction.view";
 import {DataTypeView, EDataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
@@ -19,7 +19,7 @@ import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
  * Returns an array of ValidationResults (errors for each parameter, null entry for valid).
  */
 export const useFunctionValidation = (
-    func: FunctionDefinition,
+    func: FunctionDefinitionView,
     values: Value[],
     dataTypeService: DFlowDataTypeService
 ): ValidationResult[] | null => {

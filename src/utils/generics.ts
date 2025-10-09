@@ -1,12 +1,3 @@
-import {
-    DataTypeObject,
-    DataTypeRuleObject,
-    GenericCombinationStrategy,
-    GenericMapper,
-    GenericType,
-    Type,
-    Value
-} from "../components/d-flow/data-type/DFlowDataType.view";
 import {FunctionDefinitionView} from "../components/d-flow/function/DFlowFunction.view";
 import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
 import {

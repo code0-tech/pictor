@@ -4,7 +4,7 @@ import {
     NonReactiveArrayService,
     NonReactiveArrayStore
 } from "../../../utils/nonReactiveArrayService";
-import {FunctionDefinition} from "./DFlowFunction.view";
+import {FunctionDefinitionView} from "./DFlowFunction.view";
 import {DFlowFunctionService} from "./DFlowFunction.service";
 import {functionData} from "./DFlowFunction.data";
 import {NonReactiveDataTypeService} from "../data-type/DFlowDataType.test";
@@ -12,13 +12,13 @@ import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {useReturnType} from "./DFlowFunction.return.hook";
 
-export class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinition> implements DFlowFunctionService {
+export class DFlowFunctionNonReactiveService extends NonReactiveArrayService<FunctionDefinitionView> implements DFlowFunctionService {
 
-    constructor(store: NonReactiveArrayStore<FunctionDefinition>) {
+    constructor(store: NonReactiveArrayStore<FunctionDefinitionView>) {
         super(store);
     }
 
-    public getFunctionDefinition(id: string): FunctionDefinition | undefined {
+    public getFunctionDefinition(id: string): FunctionDefinitionView | undefined {
         return this.values().find(functionDefinition => functionDefinition.function_id === id)
     }
 
@@ -61,10 +61,10 @@ describe('function', () => {
 
 describe('return type', () => {
 
-    const [__, functionService] = createNonReactiveArrayService<FunctionDefinition, DFlowFunctionNonReactiveService>(DFlowFunctionNonReactiveService);
+    const [__, functionService] = createNonReactiveArrayService<FunctionDefinitionView, DFlowFunctionNonReactiveService>(DFlowFunctionNonReactiveService);
 
     functionData.forEach((functionData) => {
-        functionService.add(new FunctionDefinition(functionData));
+        functionService.add(new FunctionDefinitionView(functionData));
     })
 
     const [_, dataTypeService] = createNonReactiveArrayService<DataTypeView, NonReactiveDataTypeService>(NonReactiveDataTypeService);

@@ -1,11 +1,10 @@
 
 import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {RuleMap} from "./rules/DFlowDataTypeRules";
-import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 import {
     DataType,
     DataTypeIdentifier, DataTypeRuleConnection,
-    DataTypeVariant, Maybe,
+    DataTypeVariant, GenericMapper, Maybe, NodeParameterValue,
     TranslationConnection
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -67,8 +66,10 @@ export class DataTypeView {
         return arraysEqual(this.rules?.nodes as [], this.rules?.nodes as [])
     }
 
-    public validateValue(value: Value, generics?: GenericMapper[]): boolean {
+    public validateValue(value: NodeParameterValue, generics?: GenericMapper[]): boolean {
 
+        //TODO: needs to be replaced with general validation for all types
+        /*
         if (this._type === DataTypeVariant.Object && !isObject(value)) {
             return false
         }
@@ -76,6 +77,7 @@ export class DataTypeView {
         if (this._type === DataTypeVariant.Node && !isNodeFunctionObject(value as NodeFunctionObject)) {
             return false
         }
+        */
 
         const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
 

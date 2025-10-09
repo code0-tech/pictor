@@ -3,7 +3,7 @@ import React from "react";
 import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {dataTypes} from "../data-type/DFlowDataType.data";
 import {functionData} from "../function/DFlowFunction.data";
-import {FunctionDefinition} from "../function/DFlowFunction.view";
+import {FunctionDefinitionView} from "../function/DFlowFunction.view";
 import {FlowView} from "../DFlow.view";
 import {flow} from "../DFlow.data";
 import {ContextStoreProvider} from "../../../utils/contextStore";
@@ -24,10 +24,10 @@ export default {
 
 export const Example = () => {
 
-    const functionsData: FunctionDefinition[] = functionData.map((fd) => new FunctionDefinition(fd))
+    const functionsData: FunctionDefinitionView[] = functionData.map((fd) => new FunctionDefinitionView(fd))
 
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
-    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionsData);
     const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
 

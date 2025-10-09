@@ -1,18 +1,18 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
-import {FlowType} from "./DFlowType.view";
+import {FlowTypeView} from "./DFlowType.view";
 
 export interface DFlowTypeService {
-    getById(id: string): FlowType | undefined
+    getById(id: string): FlowTypeView | undefined
 }
 
-export class DFlowTypeReactiveService extends ReactiveArrayService<FlowType> implements DFlowTypeService {
+export class DFlowTypeReactiveService extends ReactiveArrayService<FlowTypeView> implements DFlowTypeService {
 
-    constructor(store: ReactiveArrayStore<FlowType>) {
+    constructor(store: ReactiveArrayStore<FlowTypeView>) {
         super(store);
     }
 
-    getById(id: string): FlowType | undefined {
-        return this.values().find(value => value.flow_type_id === id);
+    getById(id: string): FlowTypeView | undefined {
+        return this.values().find(value => value.id === id);
     }
 
 }

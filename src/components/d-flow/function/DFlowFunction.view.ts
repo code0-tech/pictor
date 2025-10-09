@@ -1,48 +1,13 @@
 import {Translation} from "../../../utils/translation";
-import {GenericMapper, Type, Value} from "../data-type/DFlowDataType.view";
+import {FunctionDefinition, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
-export interface FunctionGenericMapper extends GenericMapper {
-    parameter_id?: string
-}
+export class FunctionDefinitionView {
 
-export interface FunctionDefinitionObject {
-    function_id: string
-    runtime_function_id: string //runtime function id
-    return_type?: Type // data type id
-    parameters?: ParameterDefinitionObject[]
-    throwing?: string[] // data type id
-    deprecatedMessage?: Translation[]
-    name?: Translation[]
-    description?: Translation[]
-    documentation?: Translation[] //as markdown
-    generic_keys?: string[]
-    generic_mapper?: FunctionGenericMapper[] //TODO: remove
-}
+    private readonly _id: Scalars['FunctionDefinitionID']['output'];
+    private readonly _createdAt:  Scalars['Time']['output']
+    private readonly _updatedAt:  Scalars['Time']['output']
 
-export interface ParameterDefinitionObject {
-    parameter_id: string
-    runtime_parameter_id: string
-    type: Type
-    name?: Translation[] // overrides the runtime parameter name and ref to language entry
-    description?: Translation[]
-    default_value?: Value
-}
-
-export class FunctionDefinition {
-
-    private readonly _function_id: string
-    private readonly _runtime_function_id: string
-    private readonly _return_type?: Type
-    private readonly _parameters?: ParameterDefinition[]
-    private readonly _throwing?: string[]
-    private readonly _deprecatedMessage?: Translation[]
-    private readonly _name?: Translation[]
-    private readonly _description?: Translation[]
-    private readonly _documentation?: Translation[]
-    private readonly _genericKeys?: string[]
-    private readonly _genericMapper?: FunctionGenericMapper[]
-
-    constructor(object: FunctionDefinitionObject) {
+    constructor(object: FunctionDefinition) {
         this._function_id = object.function_id
         this._runtime_function_id = object.runtime_function_id
         this._return_type = object.return_type

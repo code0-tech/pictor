@@ -17,7 +17,7 @@ import {DFlowViewportEdge} from "../d-flow/viewport/DFlowViewportEdge";
 import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
-import {FunctionDefinition} from "../d-flow/function/DFlowFunction.view";
+import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
 import {functionData} from "../d-flow/function/DFlowFunction.data";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -57,7 +57,7 @@ export const Dashboard = () => {
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (service) => {
         return dataTypes.map(dataType => (new DataTypeView(dataType, service)))
     })
-    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinition, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinition(fd)));
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinitionView(fd)));
     const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow1)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowType, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);

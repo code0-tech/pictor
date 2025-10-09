@@ -1,6 +1,6 @@
 import {
     DataTypeObject,
-    DataTypeRuleObject, EDataType,
+    DataTypeRuleObject,
     GenericCombinationStrategy,
     GenericMapper,
     GenericType,
@@ -13,6 +13,7 @@ import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {EDataTypeRuleType} from "../components/d-flow/data-type/rules/DFlowDataTypeRules";
+import {DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -565,11 +566,11 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
         if (dt && dt.rules) {
             // --- ARRAY alias (e.g. NUMBER_ARRAY) ---
             if (
-                dt.type === EDataType.ARRAY &&
+                dt.type === DataTypeVariant.Array &&
                 dt.rules.some(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
             ) {
                 const genericDT = service.values().find(
-                    dt2 => dt2.type === EDataType.ARRAY && dt2.genericKeys && dt2.genericKeys.length > 0
+                    dt2 => dt2.type === DataTypeVariant.Array && dt2.genericKeys && dt2.genericKeys.length > 0
                 )
                 if (genericDT?.genericKeys && genericDT.genericKeys.length > 0) {
                     const rule = dt.rules.find(r => r.type === EDataTypeRuleType.CONTAINS_TYPE && "type" in r.config)
@@ -590,9 +591,9 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
             }
 
             // --- OBJECT alias (e.g. TEST_OBJECT) ---
-            if (dt.type === EDataType.OBJECT) {
+            if (dt.type === DataTypeVariant.Object) {
                 const genericDT = service.values().find(
-                    dt2 => dt2.type === EDataType.OBJECT && dt2.genericKeys && dt2.genericKeys.length > 0
+                    dt2 => dt2.type === DataTypeVariant.Object && dt2.genericKeys && dt2.genericKeys.length > 0
                 )
                 if (genericDT?.genericKeys && genericDT.genericKeys.length > 0) {
                     const [genericKey] = genericDT.genericKeys
@@ -625,7 +626,7 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
 
         const dataType = service.getDataType(type.type)
         if (dataType?.genericKeys && dataType.genericKeys.length > 0) {
-            const baseTypeId = EDataType[dataType.type]
+            const baseTypeId = DataTypeVariant[dataType.type]
             if (typeof baseTypeId === "string") {
                 const baseType = service.getDataType(baseTypeId)
                 const baseGenericKeys = baseType?.genericKeys

@@ -1,14 +1,14 @@
 import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {Type, Value} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {replaceGenericKeysInType, resolveGenericKeys} from "../../../utils/generics";
+import {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export const useInputType = (
-    type: Type,
+    type: DataTypeIdentifier,
     func: FunctionDefinitionView,
-    values: Value[],
+    values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeService
-): Type | null => {
+): DataTypeIdentifier | null => {
 
     if (!func.return_type) return null
 

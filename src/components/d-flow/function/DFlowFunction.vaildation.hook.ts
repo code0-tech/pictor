@@ -1,5 +1,5 @@
 import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {DataTypeView, EDataType, GenericType, isRefObject, Value} from "../data-type/DFlowDataType.view";
+import {DataTypeView} from "../data-type/DFlowDataType.view";
 import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 import {
@@ -7,10 +7,10 @@ import {
     replaceGenericKeysInType,
     resolveGenericKeys
 } from "../../../utils/generics";
-import {isNodeFunctionObject, NodeFunctionObject} from "../DFlow.view";
 import {useReturnType} from "./DFlowFunction.return.hook";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
+import {DataTypeVariant, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 
 /**
@@ -20,7 +20,7 @@ import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
  */
 export const useFunctionValidation = (
     func: FunctionDefinitionView,
-    values: Value[],
+    values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeService
 ): ValidationResult[] | null => {
     const functionService = useService(DFlowFunctionReactiveService)
@@ -30,24 +30,24 @@ export const useFunctionValidation = (
     const errors: ValidationResult[] = [];
 
     parameters.forEach((parameter, index) => {
-        const value = values[index];
-        const parameterType = parameter.type;
-        const valueType = isNodeFunctionObject(value as NodeFunctionObject) ? useReturnType(functionService.getFunctionDefinition((value as NodeFunctionObject).function.function_id)!!, (value as NodeFunctionObject).parameters!!.map(p => p.value!!))!! : dataTypeService.getTypeFromValue(value);
-        const parameterDataType = dataTypeService.getDataType(parameterType);
-        const valueDataType = dataTypeService.getDataType(valueType);
+        const value = values[index]
+        const parameterType = parameter.type
+        const valueType = value.__typename === "NodeFunction" ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).id)!!, (value as NodeFunction).parameters.nodes!!.map(p => p!!.value))!! : dataTypeService.getTypeFromValue(value);
+        const parameterDataType = dataTypeService.getDataType(parameterType)
+        const valueDataType = dataTypeService.getDataType(valueType)
 
-        const paramLabel: string = `Parameter #${index + 1}`;
+        const paramLabel: string = `Parameter #${index + 1}`
 
         // Check if the parameter is generic (by key or by structure)
         const isParameterGeneric =
             (typeof parameterType === "string" && genericKeys.includes(parameterType)) ||
-            (typeof parameterType === "object" && parameterDataType);
+            (typeof parameterType === "object" && parameterDataType)
 
-        let isValid = true;
+        let isValid = true
 
         if (isParameterGeneric) {
             if (typeof valueType === "object" && valueType && "type" in valueType && parameterDataType) {
-                if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
+                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedParameterDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
                         dataTypeService
@@ -61,7 +61,7 @@ export const useFunctionValidation = (
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Ref: Type mismatch"));
                     }
                 } else {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap) as GenericType;
+                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
                     isValid = parameterDataType.validateValue(value, replacedGenericType.generic_mapper);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Value: Invalid value"));
@@ -70,8 +70,8 @@ export const useFunctionValidation = (
                 return;
             }
             if (typeof parameterType === "string" && genericKeys.includes(parameterType)) {
-                if (!isRefObject(value)) {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap) as GenericType;
+                if (value.__typename != "ReferenceValue") {
+                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
                     isValid = !!dataTypeService.getDataType(replacedGenericType)?.validateValue(value, replacedGenericType.generic_mapper);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Key: Invalid value"));
@@ -80,7 +80,7 @@ export const useFunctionValidation = (
                 return;
             }
             if (valueDataType && parameterDataType && parameterDataType.genericKeys && valueDataType.json && parameterDataType.json) {
-                if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
+                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedParameterDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
                         dataTypeService
@@ -90,7 +90,7 @@ export const useFunctionValidation = (
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Param/Value: Type mismatch"));
                     }
                 } else {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap) as GenericType;
+                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap);
                     isValid = !!dataTypeService.getDataType(replacedGenericType)?.validateValue(value, replacedGenericType.generic_mapper);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Param/Value: Invalid value"));
@@ -103,7 +103,7 @@ export const useFunctionValidation = (
         // Non-generic parameter validation
         if (parameterDataType) {
             if (typeof valueType === "object" && valueType && "type" in valueType && parameterDataType) {
-                if (isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) {
+                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedValueDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
                         dataTypeService
@@ -122,7 +122,7 @@ export const useFunctionValidation = (
             }
 
             if (valueDataType) {
-                if ((isRefObject(value) || isNodeFunctionObject(value as NodeFunctionObject)) && parameterDataType.type !== EDataType.NODE) {
+                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.type !== DataTypeVariant.Node) {
                     isValid = parameterDataType.validateDataType(valueDataType);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Ref Type mismatch"));

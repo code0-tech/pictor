@@ -4,7 +4,7 @@ import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {EDataTypeRuleType} from "../components/d-flow/data-type/rules/DFlowDataTypeRules";
-import {DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeIdentifier, DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -26,11 +26,11 @@ import {DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
  *
  */
 export const resolveGenericKeyMappings = (
-    parameterType: Type,
-    valueType: Type,
+    parameterType: DataTypeIdentifier,
+    valueType: DataTypeIdentifier,
     genericKeys: string[]
-): Record<string, Type> => {
-    const result: Record<string, Type> = {}
+): Record<string, DataTypeIdentifier> => {
+    const result: Record<string, DataTypeIdentifier> = {}
 
     /**
      * Recursively matches parameter type and value type, mapping generics to their concrete types
@@ -38,7 +38,7 @@ export const resolveGenericKeyMappings = (
      * @param param  Current node in the parameter type (string or type object)
      * @param value  Current node in the value type (string or type object)
      */
-    function recurse(param: Type, value: Type) {
+    function recurse(param: DataTypeIdentifier, value: DataTypeIdentifier) {
         // If param is a string and a generic key, map it directly to value
         if (typeof param === "string") {
             if (genericKeys.includes(param)) {
@@ -106,9 +106,9 @@ export const resolveGenericKeyMappings = (
  * @returns          The type tree with all generic keys replaced by their resolved form
  */
 export const replaceGenericKeysInType = (
-    type: Type,
-    genericMap: Map<string, Type | GenericMapper>
-): Type => {
+    type: DataTypeIdentifier,
+    genericMap: Map<string, DataTypeIdentifier | GenericMapper>
+): DataTypeIdentifier => {
     // If this node is a generic key and there's a replacement in the map...
     if (typeof type === "string" && genericMap.has(type)) {
         const replacement = genericMap.get(type)
@@ -131,7 +131,7 @@ export const replaceGenericKeysInType = (
 
     // If this node is a type object, process all its generic_mapper entries recursively
     const newGenericMapper = (type.generic_mapper ?? []).map(gm => {
-        let resultTypes: Type[] = []
+        let resultTypes: DataTypeIdentifier[] = []
         for (const t of gm.types) {
             // Check if 't' is a generic key with a mapping
             if (typeof t === "string" && genericMap.has(t)) {
@@ -149,7 +149,7 @@ export const replaceGenericKeysInType = (
                     (typeof replacement === "object" && replacement !== null && "type" in replacement)
                 ) {
                     // If replacement is a valid Type: insert it
-                    resultTypes.push(replacement as Type)
+                    resultTypes.push(replacement as DataTypeIdentifier)
                 } else {
                     // Defensive fallback: insert the original key
                     resultTypes.push(t)
@@ -195,8 +195,8 @@ export const resolveAllGenericKeysInDataTypeObject = (
     genericObj: DataTypeObject,
     concreteObj: DataTypeObject,
     genericKeys: string[]
-): Record<string, Type | GenericMapper | undefined> => {
-    const result: Record<string, Type | GenericMapper | undefined> = {}
+): Record<string, DataTypeIdentifier | GenericMapper | undefined> => {
+    const result: Record<string, DataTypeIdentifier | GenericMapper | undefined> = {}
 
     // Track which keys are still missing for early return optimization
     const unresolved = new Set(genericKeys)
@@ -285,7 +285,7 @@ export const resolveAllGenericKeysInDataTypeObject = (
  */
 export const replaceGenericKeysInDataTypeObject = (
     dataType: DataTypeObject,
-    genericMap: Map<string, Type | GenericMapper>
+    genericMap: Map<string, DataTypeIdentifier | GenericMapper>
 ): DataTypeObject => {
     // Helper to handle the parent, which may be a generic key or a full Type
     const resolvedParent =
@@ -341,8 +341,8 @@ export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: Value[],
     dataTypeService: DFlowDataTypeService
-): Map<string, Type | GenericMapper> => {
-    const genericMap = new Map<string, Type | GenericMapper>()
+): Map<string, DataTypeIdentifier | GenericMapper> => {
+    const genericMap = new Map<string, DataTypeIdentifier | GenericMapper>()
     const genericKeys = func.genericKeys ?? []
 
     if (!func.parameters) return genericMap
@@ -506,8 +506,8 @@ export function isMatchingDataTypeObject(
  * @returns True if source matches all relevant constraints in target, otherwise false
  */
 export function isMatchingType(
-    source: Type,
-    target: Type
+    source: DataTypeIdentifier,
+    target: DataTypeIdentifier
 ): boolean {
     // Helper: Recursively deep compare with GENERIC wildcard logic
     function deepMatch(s: any, t: any): boolean {
@@ -549,7 +549,7 @@ export function isMatchingType(
  * @param service  Data type service (for lookup)
  * @returns        Deeply expanded Type object (with aliases replaced)
  */
-export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): Type => {
+export const resolveType = (type: DataTypeIdentifier, service: DFlowDataTypeReactiveService): DataTypeIdentifier => {
     // --- Case 1: Alias string ---
     if (typeof type === "string") {
         const dt = service.getDataType(type)
@@ -647,9 +647,9 @@ export const resolveType = (type: Type, service: DFlowDataTypeReactiveService): 
 }
 
 export const replaceGenericsAndSortType = (
-    type: Type,
+    type: DataTypeIdentifier,
     genericKeys?: string[]
-): Type => {
+): DataTypeIdentifier => {
     function deepReplaceAndSort(node: any): any {
         // 1. Replace generic keys if string (überall, nicht nur in generic_target)
         if (

@@ -540,9 +540,9 @@ export const resolveType = (
                 const [genericKey] = genericKeys;
                 if (!genericKey) return type;
                 return {
-                    dataType: dataType as unknown as DataType,
+                    dataType: dataType.json as DataType,
                     genericType: {
-                        dataType: dataType as unknown as DataType,
+                        dataType: dataType.json as DataType,
                         genericMappers: [
                             {
                                 target: genericKey,
@@ -550,7 +550,7 @@ export const resolveType = (
                             }
                         ]
                     }
-                } as unknown as DataTypeIdentifier;
+                } as DataTypeIdentifier;
             }
         }
 

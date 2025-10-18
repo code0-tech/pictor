@@ -78,7 +78,7 @@ export class NodeFunctionView {
         this._createdAt = nodeFunction.createdAt
         this._updatedAt = nodeFunction.updatedAt
         this._nextNode = nodeFunction.nextNode ? new NodeFunctionView(nodeFunction.nextNode) : undefined
-        this._parameters = nodeFunction.parameters ? nodeFunction.parameters.nodes?.map(param => new NodeFunctionParameter(param)) : undefined
+        this._parameters = nodeFunction.parameters ? nodeFunction.parameters.nodes?.map(param => new NodeFunctionParameter(param!!)) : undefined
     }
 
 

@@ -23,6 +23,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         super(store);
     }
 
+    //TODO: remove string because of sagittarius types update
     public getDataType = (type: DataTypeIdentifier | string): DataTypeView | undefined => {
         if ((type as DataTypeIdentifier).genericKey) return undefined
         const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType.identifier ?? (type as string)

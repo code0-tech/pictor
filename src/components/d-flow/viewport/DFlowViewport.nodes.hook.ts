@@ -4,7 +4,7 @@ import {NodeFunctionView} from "../DFlow.view";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, Type} from "../data-type/DFlowDataType.view";
+import {DataTypeIdentifier} from "@code0-tech/sagittarius-graphql-types";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -102,7 +102,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     let idCounter = 0;
 
     const functionCache = new Map<string, ReturnType<typeof functionService.getFunctionDefinition>>();
-    const dataTypeCache = new Map<Type, ReturnType<typeof dataTypeService.getDataType>>();
+    const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
     const getFunctionDefinitionCached = (
         id: string,
@@ -115,7 +115,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     };
 
     const getDataTypeCached = (
-        type: Type,
+        type: DataTypeIdentifier,
         cache = dataTypeCache,
     ) => {
         if (!cache.has(type)) {

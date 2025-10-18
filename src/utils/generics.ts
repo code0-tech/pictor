@@ -650,7 +650,7 @@ export const replaceGenericsAndSortType = (
     type: DataTypeIdentifier,
     genericKeys?: string[]
 ): DataTypeIdentifier => {
-    function deepReplaceAndSort(node: any): any {
+    function deepReplaceAndSort(node: DataTypeIdentifier): DataTypeIdentifier {
         // 1. Replace generic keys if string (überall, nicht nur in generic_target)
         if (
             typeof node === "string" &&

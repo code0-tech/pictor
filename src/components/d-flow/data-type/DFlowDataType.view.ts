@@ -79,7 +79,7 @@ export class DataTypeView {
         }
         */
 
-        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.generic_target, generic]))
+        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.target, generic]))
 
         return this.rules?.nodes?.every(rule => {
             if (!rule) return false
@@ -112,7 +112,7 @@ export class DataTypeView {
         return this._parent ? 1 + (this._service.getDataType(this._parent)?.depth ?? 0) : 0
     }
 
-    get json(): DataType {
-        return null
+    get json(): DataType | undefined {
+        return undefined
     }
 }

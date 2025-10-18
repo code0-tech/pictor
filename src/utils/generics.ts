@@ -651,13 +651,17 @@ export const replaceGenericsAndSortType = (
     genericKeys?: string[]
 ): DataTypeIdentifier => {
     function deepReplaceAndSort(node: DataTypeIdentifier): DataTypeIdentifier {
-        // 1. Replace generic keys if string (überall, nicht nur in generic_target)
+
+        // 2. if it is a generic key than simple replace with "GENERIC"
         if (
-            typeof node === "string" &&
+            node.genericKey &&
             Array.isArray(genericKeys) &&
-            genericKeys.includes(node)
+            genericKeys.includes(node.genericKey)
         ) {
-            return "GENERIC";
+            return {
+                ...node,
+                genericKey: "GENERIC"
+            }
         }
 
         // 2. Array: Rekursiv, ggf. sortieren (für deterministische Ausgabe)

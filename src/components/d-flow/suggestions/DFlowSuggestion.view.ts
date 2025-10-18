@@ -1,4 +1,4 @@
-import {Value} from "../data-type/DFlowDataType.view";
+import {NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export enum DFlowSuggestionType {
     REF_OBJECT,
@@ -12,7 +12,7 @@ export class DFlowSuggestion {
     public constructor(
         private readonly _hash: string,
         private readonly _path: number[],
-        private readonly _value: Value,
+        private readonly _value: NodeParameterValue,
         private readonly _type: DFlowSuggestionType,
         private readonly _displayText: string[]
     ){}
@@ -29,7 +29,7 @@ export class DFlowSuggestion {
         return this._path;
     }
 
-    get value(): Value {
+    get value(): NodeParameterValue {
         return this._value;
     }
 

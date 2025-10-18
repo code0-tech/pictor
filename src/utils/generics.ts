@@ -4,7 +4,7 @@ import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {EDataTypeRuleType} from "../components/d-flow/data-type/rules/DFlowDataTypeRules";
-import {DataTypeIdentifier, DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeIdentifier, DataTypeVariant, GenericMapper, GenericType} from "@code0-tech/sagittarius-graphql-types";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -646,64 +646,79 @@ export const resolveType = (type: DataTypeIdentifier, service: DFlowDataTypeReac
     return type
 }
 
-export const replaceGenericsAndSortType = (
-    type: DataTypeIdentifier,
-    genericKeys?: string[]
-): DataTypeIdentifier => {
-    function deepReplaceAndSort(node: DataTypeIdentifier): DataTypeIdentifier {
+const GENERIC_PLACEHOLDER = "GENERIC";
 
-        // 2. if it is a generic key than simple replace with "GENERIC"
-        if (
-            node.genericKey &&
-            Array.isArray(genericKeys) &&
-            genericKeys.includes(node.genericKey)
-        ) {
-            return {
-                ...node,
-                genericKey: "GENERIC"
-            }
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+};
+
+const sortValue = (value: unknown): unknown => {
+    if (Array.isArray(value)) {
+        const mapped = value.map(sortValue);
+        if (mapped.length <= 1) return mapped;
+
+        const allPlainObjects = mapped.every(isPlainObject);
+        if (allPlainObjects) {
+            return [...mapped].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
         }
 
-        // 2. Array: Rekursiv, ggf. sortieren (für deterministische Ausgabe)
-        if (Array.isArray(node)) {
-            const mapped = node.map(deepReplaceAndSort);
-
-            // Spezieller Fall: Array von Objekten mit generic_target → sortieren
-            if (mapped.length > 0 && typeof mapped[0] === "object" && mapped[0] !== null && "generic_target" in mapped[0]) {
-                // Sortierung: zuerst generic_target, dann types
-                return mapped.sort((a, b) => {
-                    // generic_target ist jetzt immer "GENERIC" – also ggf. noch types vergleichen
-                    const aTypes = JSON.stringify(a.types);
-                    const bTypes = JSON.stringify(b.types);
-                    if (aTypes < bTypes) return -1;
-                    if (aTypes > bTypes) return 1;
-                    return 0;
-                });
-            }
-            // Auch primitive Arrays sortieren (z. B. ["FOOBAR", "MY_KEY"])
-            if (typeof mapped[0] === "string" || typeof mapped[0] === "number") {
-                return [...mapped].sort();
-            }
-            return mapped;
+        const allPrimitive = mapped.every(item => !Array.isArray(item) && !isPlainObject(item));
+        if (allPrimitive) {
+            return [...mapped].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
         }
 
-        // 3. Object: keys sortieren, rekursiv ersetzen
-        if (typeof node === "object" && node !== null) {
-            const sortedKeys = Object.keys(node).sort();
-            const result: any = {};
-            for (const key of sortedKeys) {
-                // generic_target IMMER zu "GENERIC"
-                if (key === "generic_target") {
-                    result[key] = "GENERIC";
-                } else {
-                    result[key] = deepReplaceAndSort(node[key]);
-                }
-            }
-            return result;
-        }
-        // 4. Primitives
-        return node;
+        return mapped;
     }
 
-    return deepReplaceAndSort(type);
+    if (isPlainObject(value)) {
+        const recordValue = value as Record<string, unknown>;
+        return Object.keys(recordValue)
+            .sort()
+            .reduce<Record<string, unknown>>((acc, key) => {
+                acc[key] = sortValue(recordValue[key]);
+                return acc;
+            }, {});
+    }
+
+    return value;
+};
+
+export const replaceGenericsAndSortType = (
+    type: DataTypeIdentifier,
+    genericKeys: string[] = []
+): DataTypeIdentifier => {
+    const genericKeySet = new Set(genericKeys);
+
+    const replaceIdentifier = (identifier: DataTypeIdentifier): DataTypeIdentifier => {
+        const genericKey =
+            typeof identifier.genericKey === "string" && genericKeySet.has(identifier.genericKey)
+                ? GENERIC_PLACEHOLDER
+                : identifier.genericKey;
+
+        const genericType = identifier.genericType;
+        const replacedGenericType = genericType
+            ? (sortValue({
+                  ...genericType,
+                  genericMappers: (genericType.genericMappers ?? []).map(mapper => {
+                      const replacedMapper = {
+                          ...mapper,
+                          target: genericKeySet.has(mapper.target)
+                              ? GENERIC_PLACEHOLDER
+                              : mapper.target,
+                          sources: mapper.sources.map(source => replaceIdentifier(source))
+                      };
+
+                      return sortValue(replacedMapper) as GenericMapper;
+                  })
+              }) as GenericType)
+            : genericType;
+
+        return sortValue({
+            ...identifier,
+            genericKey,
+            genericType: replacedGenericType
+        }) as DataTypeIdentifier;
+    };
+
+    return replaceIdentifier(type);
 }

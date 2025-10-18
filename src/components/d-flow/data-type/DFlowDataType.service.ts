@@ -3,9 +3,8 @@ import {DataTypeView} from "./DFlowDataType.view";
 import {resolveType} from "../../../utils/generics";
 import {
     DataTypeIdentifier,
-    DataTypeRule, DataTypeRulesVariant, DataTypeVariant,
-    GenericMapper,
-    NodeParameterValue
+    DataTypeRule, DataTypeRulesVariant, DataTypeVariant, Maybe,
+    NodeParameterValue, Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeService {
@@ -62,7 +61,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         //TODO: missing generic combinations
         const genericMapper: any[] = dataType.genericKeys.map(genericKey => {
 
-            const ruleThatIncludesGenericKey: DataTypeRule = dataType.rules?.nodes?.find((rule: DataTypeRule) => {
+            const ruleThatIncludesGenericKey: Maybe<DataTypeRule> | undefined = dataType.rules?.nodes?.find((rule: DataTypeRule) => {
                 return "dataTypeIdentifier" in rule.config && rule.config.dataTypeIdentifier.genericKey
             })
 
@@ -110,7 +109,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         }).filter(mapper => !!mapper)
 
         return resolveType({
-            type: dataType?.id ?? "",
+            id: (dataType?.id ?? "") as Scalars['DataTypeIdentifierID']['output'],
             generic_mapper: genericMapper
         }, this)
 

@@ -1,14 +1,12 @@
-import {DFlowDataTypeRegexRule, DFlowDataTypeRegexRuleConfig} from "./DFlowDataTypeRegexRule";
-import {DFlowDataTypeNumberRangeRuleConfig, DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
+import {DFlowDataTypeRegexRule} from "./DFlowDataTypeRegexRule";
+import {DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
 import {
-    DFlowDataTypeItemOfCollectionRule,
-    DFlowDataTypeItemOfCollectionRuleConfig
+    DFlowDataTypeItemOfCollectionRule
 } from "./DFlowDataTypeItemOfCollectionRule";
-import {DFlowDataTypeContainsTypeRule, DFlowDataTypeContainsTypeRuleConfig} from "./DFlowDataTypeContainsTypeRule";
-import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
+import {DFlowDataTypeContainsTypeRule} from "./DFlowDataTypeContainsTypeRule";
+import {DFlowDataTypeContainsKeyRule} from "./DFlowDataTypeContainsKeyRule";
 import {DFlowDataTypeRule} from "./DFlowDataTypeRule";
-import {DFlowDataTypeReturnTypeRule, DFlowDataTypeReturnTypeRuleConfig} from "./DFlowDataTypeReturnTypeRule";
-import {DFlowDataTypeParentRule, DFlowDataTypeParentRuleConfig} from "./DFlowDataTypeParentRule";
+import {DFlowDataTypeReturnTypeRule} from "./DFlowDataTypeReturnTypeRule";
 import {DataTypeRulesVariant} from "@code0-tech/sagittarius-graphql-types";
 
 export enum EDataTypeRuleType {
@@ -33,12 +31,3 @@ export const RuleMap = new Map<DataTypeRulesVariant, DFlowDataTypeRule>([
     [DataTypeRulesVariant.ReturnType, DFlowDataTypeReturnTypeRule]
 
 ])
-
-//TODO: add input type rule
-export type CombinesRuleConfig = DFlowDataTypeRegexRuleConfig
-    | DFlowDataTypeNumberRangeRuleConfig
-    | DFlowDataTypeItemOfCollectionRuleConfig
-    | DFlowDataTypeContainsTypeRuleConfig
-    | DFlowDataTypeContainsKeyRuleConfig
-    | DFlowDataTypeReturnTypeRuleConfig
-    | DFlowDataTypeParentRuleConfig

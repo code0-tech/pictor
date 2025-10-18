@@ -4,7 +4,12 @@ import {
     DFlowDataTypeItemOfCollectionRuleConfig
 } from "../components/d-flow/data-type/rules/DFlowDataTypeItemOfCollectionRule";
 import {EDataTypeRuleType} from "../components/d-flow/data-type/rules/DFlowDataTypeRules";
-import {DataTypeIdentifier, DataTypeVariant, GenericMapper, GenericType} from "@code0-tech/sagittarius-graphql-types";
+import {
+    DataType,
+    DataTypeIdentifier, DataTypeRule, DataTypeVariant,
+    GenericMapper,
+    GenericType, NodeParameterValue
+} from "@code0-tech/sagittarius-graphql-types";
 
 /**
  * Resolves concrete type mappings for generic keys in a generic type system.
@@ -117,7 +122,7 @@ export const replaceGenericKeysInType = (
             typeof replacement === "string" ||
             (typeof replacement === "object" && replacement !== null && "type" in replacement)
         ) {
-            return replacement as Type
+            return replacement as DataTypeIdentifier
         }
         // If the replacement is a GenericMapper, we DO NOT return it directly
         // (It will be inlined in the parent generic_mapper context—handled below)
@@ -192,8 +197,8 @@ export const replaceGenericKeysInType = (
  * @returns            Record mapping each generic key to its resolved Type or GenericMapper (or undefined if not found)
  */
 export const resolveAllGenericKeysInDataTypeObject = (
-    genericObj: DataTypeObject,
-    concreteObj: DataTypeObject,
+    genericObj: DataType,
+    concreteObj: DataType,
     genericKeys: string[]
 ): Record<string, DataTypeIdentifier | GenericMapper | undefined> => {
     const result: Record<string, DataTypeIdentifier | GenericMapper | undefined> = {}
@@ -284,9 +289,9 @@ export const resolveAllGenericKeysInDataTypeObject = (
  * @returns          A new DataTypeObject with all generics replaced by their resolved form
  */
 export const replaceGenericKeysInDataTypeObject = (
-    dataType: DataTypeObject,
+    dataType: DataType,
     genericMap: Map<string, DataTypeIdentifier | GenericMapper>
-): DataTypeObject => {
+): DataType => {
     // Helper to handle the parent, which may be a generic key or a full Type
     const resolvedParent =
         dataType.parent !== undefined
@@ -339,7 +344,7 @@ export const replaceGenericKeysInDataTypeObject = (
  */
 export const resolveGenericKeys = (
     func: FunctionDefinitionView,
-    values: Value[],
+    values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeService
 ): Map<string, DataTypeIdentifier | GenericMapper> => {
     const genericMap = new Map<string, DataTypeIdentifier | GenericMapper>()
@@ -429,8 +434,8 @@ export const resolveGenericKeys = (
  * @returns True if source matches all relevant constraints in target, otherwise false
  */
 export function isMatchingDataTypeObject(
-    source: DataTypeObject,
-    target: DataTypeObject
+    source: DataType,
+    target: DataType
 ): boolean {
     if (source.type !== target.type) return false;
     if (!Array.isArray(target.rules) || target.rules.length === 0) return true;
@@ -444,9 +449,9 @@ export function isMatchingDataTypeObject(
     return true;
 
     // Rule comparison logic supporting all relevant EDataTypeRuleType configs
-    function ruleMatches(sourceRule: DataTypeRuleObject, targetRule: DataTypeRuleObject): boolean {
-        if (sourceRule.type !== targetRule.type) return false;
-        switch (targetRule.type) {
+    function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolean {
+        if (sourceRule.variant !== targetRule.variant) return false;
+        switch (targetRule.variant) {
             case EDataTypeRuleType.CONTAINS_TYPE:
             case EDataTypeRuleType.RETURNS_TYPE:
             case EDataTypeRuleType.PARENT:

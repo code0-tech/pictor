@@ -123,7 +123,8 @@
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-resizable-panels": "^3.0.3",
-    "react-zoom-pan-pinch": "^3.6.1"
+    "react-zoom-pan-pinch": "^3.6.1",
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-4b2e73eae302fe499001bf42fdb3a6bcc5be78aa"
   },
   "publishConfig": {
     "access": "public"

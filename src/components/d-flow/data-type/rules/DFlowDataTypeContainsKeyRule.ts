@@ -3,7 +3,7 @@ import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {
     DataTypeRulesContainsKeyConfig,
     GenericCombinationStrategyType,
-    GenericMapper, GenericType, LiteralValue,
+    GenericMapper, LiteralValue,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
 

@@ -3,17 +3,14 @@ import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
 import {NodeFunctionView} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
-import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
 import {useInputType} from "../function/DFlowFunction.input.hook";
-import {EDataTypeRuleType} from "../data-type/rules/DFlowDataTypeRules";
 import {
-    DataTypeIdentifier,
+    DataTypeIdentifier, DataTypeRulesInputTypeConfig,
     DataTypeRulesItemOfCollectionConfig, DataTypeRulesNumberRangeConfig,
     DataTypeRulesVariant, DataTypeVariant, NodeFunction, NodeParameter, ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
@@ -59,12 +56,12 @@ export const useSuggestions = (
                         state.push(suggestion)
                     })
                 } else if (rule?.variant === DataTypeRulesVariant.NumberRange) {
-                    const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DataTypeRulesNumberRangeConfig
+                    const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
                     const suggestion = new DFlowSuggestion(hashedType, [], {
                         createdAt: "",
                         id: undefined,
                         updatedAt: "",
-                        value: config.from}, DFlowSuggestionType.VALUE, [config.from.toString()])
+                        value: config.from}, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                     suggestionService.addSuggestion(suggestion)
                     state.push(suggestion)
                 }
@@ -109,15 +106,15 @@ export const useSuggestions = (
     const refObjects = type ? useRefObjects(flowId) : []
 
     refObjects.forEach(value => {
-        if (value.node >= node) return
-        if (value.depth > depth) return
-        if (value.scope.some(r => !scope.includes(r))) return
+        if (value?.node ?? 0 >= node) return
+        if (value?.depth ?? 0 > depth) return
+        if ((value?.scope ?? []).some(r => !scope.includes(r))) return
         if (!resolvedType) return
 
-        const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier, dataTypeService), [])
+        const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
         if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
-        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.type)])
+        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.dataTypeIdentifier)])
         state.push(suggestion)
     })
 
@@ -214,10 +211,10 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             if (current.parameters && def.parameters) {
                 for (const pDef of def.parameters) {
                     const pType = dataTypeService.getDataType(pDef.type);
-                    if (!pType || pType.type === EDataType.NODE) continue;
+                    if (!pType || pType.type === DataTypeVariant.Node) continue;
 
                     const inputTypeRules =
-                        pType.rules?.filter((r) => r.type === EDataTypeRuleType.INPUT_TYPE) ?? [];
+                        pType.rules?.nodes?.filter((r) => r?.variant === DataTypeRulesVariant.InputType) ?? [];
 
                     if (inputTypeRules.length) {
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
@@ -230,11 +227,11 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                                 : [];
 
                         for (const rule of inputTypeRules) {
-                            const cfg = rule.config as DFlowDataTypeInputTypeRuleConfig;
-                            const resolved = useInputType(cfg.type, def, valuesArray, dataTypeService);
+                            const cfg = rule?.config as DataTypeRulesInputTypeConfig;
+                            const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
                             if (resolved) {
                                 refObjects.push({
-                                    type: resolved,
+                                    dataTypeIdentifier: resolved,
                                     depth,
                                     scope: scopePath,
                                     node,
@@ -256,7 +253,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                 );
                 if (resolvedReturnType) {
                     refObjects.push({
-                        type: resolvedReturnType,
+                        dataTypeIdentifier: resolvedReturnType,
                         depth,
                         scope: scopePath,
                         node,
@@ -268,7 +265,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             if (current.parameters && def.parameters) {
                 for (const pDef of def.parameters) {
                     const pType = dataTypeService.getDataType(pDef.type);
-                    if (pType?.type === EDataType.NODE) {
+                    if (pType?.type === DataTypeVariant.Node) {
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
                             const childFn = paramInstance.value as NodeFunctionView;

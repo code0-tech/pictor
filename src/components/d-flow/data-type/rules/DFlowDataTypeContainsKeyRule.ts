@@ -12,16 +12,16 @@ import {
 export class DFlowDataTypeContainsKeyRule {
     public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
-        const typeId = config.dataTypeIdentifier.dataType?.identifier || config.dataTypeIdentifier.genericType?.dataType.identifier
-        const genericMapper = generics?.get(config.dataTypeIdentifier.genericKey!!)
-        const genericTypes = generics?.get(config.dataTypeIdentifier.genericKey!!)?.sources
-        const genericCombination = generics?.get(config.dataTypeIdentifier.genericKey!!)?.genericCombinationStrategies
+        const typeId = config.dataTypeIdentifier?.dataType?.identifier || config?.dataTypeIdentifier?.genericType?.dataType?.identifier
+        const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
+        const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sources
+        const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
         //TODO: seperate general validation
         //if (!(isObject(value))) return false
-        if (config.key in value && config.dataTypeIdentifier.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
+        if ((config?.key ?? "") in value && config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
-        if (!(service?.getDataType(config.dataTypeIdentifier) || genericMapper)) return false
+        if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
 
         //use of generic key but datatypes does not exist
         if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
@@ -30,9 +30,9 @@ export class DFlowDataTypeContainsKeyRule {
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
 
         //use generic given type for checking against value
-        if (config.dataTypeIdentifier.genericKey && genericMapper && genericTypes) {
+        if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return !!service?.getDataType(genericType)?.validateValue((value as LiteralValue).value[config.key], ((genericType.genericType)!!.genericMappers as GenericMapper[]))
+                return !!service?.getDataType(genericType)?.validateValue((value as LiteralValue).value[(config?.key ?? "")], ((genericType.genericType)!!.genericMappers as GenericMapper[]))
             })
 
             const combination = checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -43,14 +43,14 @@ export class DFlowDataTypeContainsKeyRule {
                 return previousValue && currentValue
             }) : checkAllTypes[0]
 
-            return (config.key in value) && combination
+            return ((config?.key ?? "") in value) && combination
         }
 
         //normal datatype link
-        if (config.dataTypeIdentifier.dataType?.identifier) {
-            return (config.key in value) && (!!service?.getDataType(config.dataTypeIdentifier)?.validateValue((value as LiteralValue).value[config.key]))
+        if (config?.dataTypeIdentifier?.dataType) {
+            return ((config?.key ?? "") in value) && (!!service?.getDataType(config.dataTypeIdentifier)?.validateValue((value as LiteralValue).value[(config?.key ?? "")]))
         }
 
-        return (config.key in value) && (!!service?.getDataType(config.dataTypeIdentifier)?.validateValue((value as LiteralValue).value[config.key], genericMapping(config.dataTypeIdentifier.genericType?.genericMappers, generics)))
+        return ((config?.key ?? "") in value) && (!!service?.getDataType(config.dataTypeIdentifier!!)?.validateValue((value as LiteralValue).value[(config?.key ?? "")], genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics)))
     }
 }

@@ -8,13 +8,13 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeService {
-    getDataType(type: DataTypeIdentifier | string): DataTypeView | undefined
+    getDataType(type: DataTypeIdentifier): DataTypeView | undefined
 
     hasDataTypes(types: DataTypeIdentifier[]): boolean
 
     getDataTypeFromValue(value: NodeParameterValue): DataTypeView | undefined
 
-    getTypeFromValue(value: NodeParameterValue): DataTypeIdentifier | string
+    getTypeFromValue(value: NodeParameterValue): DataTypeIdentifier
 }
 
 export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> implements DFlowDataTypeService {
@@ -24,7 +24,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
     }
 
     //TODO: remove string because of sagittarius types update
-    public getDataType = (type: DataTypeIdentifier | string): DataTypeView | undefined => {
+    public getDataType = (type: DataTypeIdentifier): DataTypeView | undefined => {
         if ((type as DataTypeIdentifier).genericKey) return undefined
         const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType.identifier ?? (type as string)
         return this.values().find(value => value.id === id);
@@ -52,7 +52,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     }
 
-    public getTypeFromValue = (value: NodeParameterValue): DataTypeIdentifier | string => {
+    public getTypeFromValue = (value: NodeParameterValue): DataTypeIdentifier => {
 
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 

@@ -1,14 +1,10 @@
-import {Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-
-export interface DFlowDataTypeRegexRuleConfig {
-    pattern: string
-}
+import {DataTypeRulesRegexConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRegexRule {
-    public static validate(value: Value, config: DFlowDataTypeRegexRuleConfig): boolean {
-        if (!(typeof value === "string" || typeof value === "number" || typeof value === "boolean")) return false
+    public static validate(value: NodeParameterValue, config: DataTypeRulesRegexConfig): boolean {
+        if (value.__typename != 'LiteralValue') return false
         return new RegExp(config.pattern).test(String(value))
     }
 }

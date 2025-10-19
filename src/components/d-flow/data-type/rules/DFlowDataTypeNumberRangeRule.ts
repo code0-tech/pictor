@@ -1,16 +1,11 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {Value} from "../DFlowDataType.view";
-
-export interface DFlowDataTypeNumberRangeRuleConfig {
-    from: number
-    to: number
-    step?: number //TODO
-}
+import {DataTypeRulesNumberRangeConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRangeRule {
-    public static validate(value: Value, config: DFlowDataTypeNumberRangeRuleConfig): boolean {
-        if (!(typeof value === "number")) return false
-        return value >= config.from && value <= config.to
+    public static validate(value: NodeParameterValue, config: DataTypeRulesNumberRangeConfig): boolean {
+        if (value.__typename !== 'LiteralValue') return false
+        if (!(typeof value.value === "number")) return false
+        return value.value >= config.from && value.value <= config.to
     }
 }

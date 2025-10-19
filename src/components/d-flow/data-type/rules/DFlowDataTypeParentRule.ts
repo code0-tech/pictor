@@ -1,16 +1,15 @@
-import {GenericMapper, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
-import {DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
 import {replaceGenericKeysInType} from "../../../../utils/generics";
+import {DataTypeIdentifier, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeParentRuleConfig {
-    type: Type
+    type: DataTypeIdentifier
 }
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeParentRule {
-    public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
+    public static validate(value: NodeParameterValue, config: DFlowDataTypeParentRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
         const replacedType = generics ? replaceGenericKeysInType(config.type, generics) : config.type
 

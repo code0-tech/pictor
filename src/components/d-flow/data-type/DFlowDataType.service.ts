@@ -73,7 +73,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
             if (ruleThatIncludesGenericKey
                 && ruleThatIncludesGenericKey.variant === DataTypeRulesVariant.ContainsType
-                && dataType.type === DataTypeVariant.Array) {
+                && dataType.variant === DataTypeVariant.Array) {
                 return {
                     types: [this.getTypeFromValue((value as Array<any>)[0])],
                     generic_target: genericKey

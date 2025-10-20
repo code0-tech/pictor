@@ -80,7 +80,7 @@ export class DFlowDataTypeReturnTypeRule {
             }
 
             if (typeof config.type === "string") {
-                return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+                return <boolean>service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(foundReturnFunction.parameters!![0].value!!)
             }
 
             return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!, genericMapping(config.type.generic_mapper, generics))

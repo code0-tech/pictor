@@ -193,7 +193,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             const paramType = definition?.parameters!!.find(p => p.parameter_id == param.id)?.type;
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
-            if (paramDataType?.type === EDataType.NODE) {
+            if (paramDataType?.variant === EDataType.NODE) {
                 if (param.value && param.value instanceof NodeFunctionView) {
                     const groupId = `${id}-group-${idCounter++}`;
 

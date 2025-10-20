@@ -10,7 +10,7 @@ export const useInputType = (
     dataTypeService: DFlowDataTypeService
 ): DataTypeIdentifier | null => {
 
-    if (!func.return_type) return null
+    if (!func.returnType) return null
 
     const genericTypeMap = resolveGenericKeys(func, values, dataTypeService)
     return replaceGenericKeysInType(type, genericTypeMap)

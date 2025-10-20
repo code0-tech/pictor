@@ -10,9 +10,16 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {useInputType} from "../function/DFlowFunction.input.hook";
 import {
-    DataTypeIdentifier, DataTypeRulesInputTypeConfig,
-    DataTypeRulesItemOfCollectionConfig, DataTypeRulesNumberRangeConfig,
-    DataTypeRulesVariant, DataTypeVariant, NodeFunction, NodeParameter, ReferenceValue
+    DataTypeIdentifier,
+    DataTypeRulesInputTypeConfig,
+    DataTypeRulesItemOfCollectionConfig,
+    DataTypeRulesNumberRangeConfig,
+    DataTypeRulesVariant,
+    DataTypeVariant,
+    Maybe,
+    NodeFunction,
+    NodeParameter,
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
 //TODO: instead of GENERIC use some uuid or hash for replacement
@@ -51,7 +58,8 @@ export const useSuggestions = (
                             createdAt: "",
                             id: undefined,
                             updatedAt: "",
-                            value: value}, DFlowSuggestionType.VALUE, [value.toString()])
+                            value: value
+                        }, DFlowSuggestionType.VALUE, [value.toString()])
                         suggestionService.addSuggestion(suggestion)
                         state.push(suggestion)
                     })
@@ -61,7 +69,8 @@ export const useSuggestions = (
                         createdAt: "",
                         id: undefined,
                         updatedAt: "",
-                        value: config.from}, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
+                        value: config.from
+                    }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                     suggestionService.addSuggestion(suggestion)
                     state.push(suggestion)
                 }
@@ -73,28 +82,32 @@ export const useSuggestions = (
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!type || !resolvedType || !hashedType) return true
-            if (funcDefinition.runtime_function_id == "RETURN" && type) return false
+            if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
             if (dataType?.variant === DataTypeVariant.Node) return true
-            if (!funcDefinition.return_type) return false
-            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
+            if (!funcDefinition.returnType) return false
+            if (!funcDefinition.genericKeys) return false
+            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
         })
 
         matchingFunctions.forEach(funcDefinition => {
-            const suggestion = new DFlowSuggestion(hashedType || "", [], {
-                function: {
-                    function_id: funcDefinition.function_id,
-                    runtime_function_id: funcDefinition.runtime_function_id
+            const nodeFunctionSuggestion: NodeFunction = {
+                id: funcDefinition.id,
+                runtimeFunction: {
+                  identifier: ""
                 },
-                parameters: funcDefinition.parameters?.map(paramDefinition => {
-                    return {
-                        definition: {
-                            parameter_id: paramDefinition.parameter_id,
-                            runtime_parameter_id: paramDefinition.runtime_function_id
+                parameters: {
+                    nodes: (funcDefinition.parameterDefinitions?.map(definition => {
+                        return {
+                            id: definition.id,
+                            runtimeParameter: {
+                                id: definition.id
+                            }
                         }
-                    } as unknown as NodeParameter;
-                })
-            } as unknown as NodeFunction, DFlowSuggestionType.FUNCTION, [funcDefinition.function_id])
+                    }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
+                }
+            }
+            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.id as string])
             suggestionService.addSuggestion(suggestion)
             state.push(suggestion)
         })

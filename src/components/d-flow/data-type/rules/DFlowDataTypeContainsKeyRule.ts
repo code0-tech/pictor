@@ -12,7 +12,6 @@ import {
 export class DFlowDataTypeContainsKeyRule {
     public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
-        const typeId = config.dataTypeIdentifier?.dataType?.identifier || config?.dataTypeIdentifier?.genericType?.dataType?.identifier
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
         const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sources
         const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies

@@ -1,42 +1,32 @@
-import {
-    GenericCombinationStrategy,
-    GenericMapper,
-    GenericType,
-    isRefObject,
-    RefObject,
-    Type,
-    Value
-} from "../DFlowDataType.view";
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
-import {isNodeFunctionObject, NodeFunctionObject} from "../../DFlow.view";
-import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
-
-export interface DFlowDataTypeReturnTypeRuleConfig {
-    type: Type // can be a key, a type or a generic type
-}
-
+import {
+    DataTypeRulesReturnTypeConfig,
+    GenericMapper, NodeFunction,
+    NodeParameterValue,
+    ReferenceValue
+} from "@code0-tech/sagittarius-graphql-types";
 
 //TODO: simple use useReturnType function
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeReturnTypeRule {
     public static validate(
-        value: Value,
-        config: DFlowDataTypeReturnTypeRuleConfig,
+        value: NodeParameterValue,
+        config: DataTypeRulesReturnTypeConfig,
         generics?: Map<string, GenericMapper>,
         service?: DFlowDataTypeService
     ): boolean {
 
-        const genericMapper = generics?.get(config.type as string)
-        const genericTypes = generics?.get(config.type as string)?.types
-        const genericCombination = generics?.get(config.type as string)?.generic_combination
+        const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
+        const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sources
+        const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
-        if (!(isNodeFunctionObject(value as NodeFunctionObject))) return false
+        if (value.__typename != "NodeFunction") return false
 
         //TODO: only if its really a generic key
-        if (typeof config.type === "string" && !genericMapper && !service?.getDataType(config.type)) return true
+        if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
-        if (!(service?.getDataType(config.type) || genericMapper)) return false
+        if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
 
         //use of generic key but datatypes does not exist
         if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
@@ -102,10 +92,10 @@ export class DFlowDataTypeReturnTypeRule {
     }
 }
 
-const findReturnNode = (n: NodeFunctionObject): NodeFunctionObject | undefined => {
-    if (n.function.runtime_function_id === 'RETURN') return n
+const findReturnNode = (n: NodeFunction): NodeFunction | undefined => {
+    if (n.runtimeFunction?.identifier === 'RETURN') return n
 
-    if (n.next_node) {
+    if (n.ne) {
         const found = findReturnNode(n.next_node)
         if (found) return found
     }

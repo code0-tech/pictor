@@ -122,7 +122,7 @@ export const useFunctionValidation = (
             }
 
             if (valueDataType) {
-                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.type !== DataTypeVariant.Node) {
+                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.variant !== DataTypeVariant.Node) {
                     isValid = parameterDataType.validateDataType(valueDataType);
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Ref Type mismatch"));

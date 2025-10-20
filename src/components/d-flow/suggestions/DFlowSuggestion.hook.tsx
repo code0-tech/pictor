@@ -74,7 +74,7 @@ export const useSuggestions = (
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!type || !resolvedType || !hashedType) return true
             if (funcDefinition.runtime_function_id == "RETURN" && type) return false
-            if (dataType?.type === DataTypeVariant.Node) return true
+            if (dataType?.variant === DataTypeVariant.Node) return true
             if (!funcDefinition.return_type) return false
             const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
@@ -211,7 +211,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             if (current.parameters && def.parameters) {
                 for (const pDef of def.parameters) {
                     const pType = dataTypeService.getDataType(pDef.type);
-                    if (!pType || pType.type === DataTypeVariant.Node) continue;
+                    if (!pType || pType.variant === DataTypeVariant.Node) continue;
 
                     const inputTypeRules =
                         pType.rules?.nodes?.filter((r) => r?.variant === DataTypeRulesVariant.InputType) ?? [];
@@ -265,7 +265,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             if (current.parameters && def.parameters) {
                 for (const pDef of def.parameters) {
                     const pType = dataTypeService.getDataType(pDef.type);
-                    if (pType?.type === DataTypeVariant.Node) {
+                    if (pType?.variant === DataTypeVariant.Node) {
                         const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
                             const childFn = paramInstance.value as NodeFunctionView;

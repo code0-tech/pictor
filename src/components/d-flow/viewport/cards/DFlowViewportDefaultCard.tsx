@@ -187,7 +187,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
             {data.instance.parameters?.some(param => {
                 const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
-                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.variant === EDataType.NODE;
                 return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
             }) ? (
                 <CardSection>
@@ -196,7 +196,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
 
                         const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
-                        const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.type === EDataType.NODE;
+                        const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.variant === EDataType.NODE;
                         const result = useSuggestions(parameter?.type ?? undefined, [], "some_database_id", data.depth, data.scope, data.index)
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?

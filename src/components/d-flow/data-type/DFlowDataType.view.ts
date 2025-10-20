@@ -3,8 +3,8 @@ import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {RuleMap} from "./rules/DFlowDataTypeRules";
 import {
     DataType,
-    DataTypeIdentifier, DataTypeRuleConnection,
-    DataTypeVariant, GenericMapper, Maybe, NodeParameterValue,
+    DataTypeRuleConnection,
+    DataTypeVariant, GenericMapper, Maybe, Namespace, NodeParameterValue, Scalars,
     TranslationConnection
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -13,27 +13,43 @@ import {
  */
 export class DataTypeView {
 
+    /** Time when this DataType was created */
+    private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** Generic keys of the datatype */
+    private readonly _genericKeys?: Maybe<Array<Scalars['String']['output']>>;
+    /** Global ID of this DataType */
+    private readonly _id?: Maybe<Scalars['DataTypeID']['output']>;
+    /** The identifier scoped to the namespace */
+    private readonly _identifier?: Maybe<Scalars['String']['output']>;
+    /** Names of the flow type setting */
+    private readonly _name?: Maybe<TranslationConnection>;
+    /** The namespace where this datatype belongs to */
+    private readonly _namespace?: Maybe<Namespace>;
+    /** Rules of the datatype */
+    private readonly _rules?: Maybe<DataTypeRuleConnection>;
+    /** Time when this DataType was last updated */
+    private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
+    /** The type of the datatype */
+    private readonly _variant?: Maybe<DataTypeVariant>;
     private readonly _service: DFlowDataTypeService
-    private readonly _id: string
-    private readonly _type: DataTypeVariant
-    private readonly _name?: TranslationConnection
-    private readonly _rules?: DataTypeRuleConnection
-    private readonly _parent?: Maybe<DataTypeIdentifier>
-    private readonly _generic_keys?: Maybe<string[]>
 
     constructor(dataType: DataType, service: DFlowDataTypeService) {
-        this._id = dataType.identifier
-        this._type = dataType.variant
-        this._name = dataType.name
-        this._rules = dataType.rules
-        this._parent = dataType.parent
+        this._id = dataType.id
+        this._createdAt = dataType.createdAt
+        this._updatedAt = dataType.updatedAt
+        this._identifier = dataType.identifier
+        this._name = dataType.name ?? undefined
+        this._namespace = dataType.namespace ?? undefined
+        this._variant = dataType.variant
+        this._genericKeys = dataType.genericKeys ?? undefined
+        this._rules = dataType.rules ?? undefined
         this._service = service
-        this._generic_keys = dataType.genericKeys
+
     }
 
     public validateDataType(dataType: DataTypeView): boolean {
 
-        if (this._type != dataType.type) return false
+        if (this._variant != dataType.variant) return false
 
         const isObject = (object: object) => {
             return object != null && typeof object === "object";
@@ -79,37 +95,53 @@ export class DataTypeView {
         }
         */
 
-        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.target, generic]))
+        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.target!!, generic]))
 
         return this.rules?.nodes?.every(rule => {
-            if (!rule) return false
+            if (!rule || !rule.variant || !rule.config) return false
             return RuleMap.get(rule.variant)?.validate(value, rule.config, map, this._service)
         }) ?? false
     }
 
 
-    get rules(): DataTypeRuleConnection | undefined {
-        return this._rules
+    get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._createdAt;
     }
 
-    get id(): string {
-        return this._id
+    get genericKeys(): Maybe<Array<Scalars["String"]["output"]>> | undefined {
+        return this._genericKeys;
+    }
+
+    get id(): Maybe<Scalars["DataTypeID"]["output"]> | undefined {
+        return this._id;
+    }
+
+    get identifier(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._identifier;
+    }
+
+    get name(): Maybe<TranslationConnection> | undefined {
+        return this._name;
+    }
+
+    get namespace(): Maybe<Namespace> | undefined {
+        return this._namespace;
+    }
+
+    get rules(): Maybe<DataTypeRuleConnection> | undefined {
+        return this._rules;
+    }
+
+    get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._updatedAt;
+    }
+
+    get variant(): Maybe<DataTypeVariant> | undefined {
+        return this._variant;
     }
 
     get service(): DFlowDataTypeService {
-        return this._service
-    }
-
-    get genericKeys(): Maybe<string[]> | undefined {
-        return this._generic_keys
-    }
-
-    get type(): DataTypeVariant {
-        return this._type;
-    }
-
-    get depth(): number {
-        return this._parent ? 1 + (this._service.getDataType(this._parent)?.depth ?? 0) : 0
+        return this._service;
     }
 
     get json(): DataType | undefined {

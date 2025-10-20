@@ -46,11 +46,13 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
         //TODO: performance here is bad
         const matchingDataTypes = this.values().filter(type => {
-            if (type.id === "OBJECT") return false
+            if (type.identifier === "OBJECT") return false
             return type.validateValue(value)
-        }).sort((a, b) => {
-            return a.depth - b.depth
         })
+
+        // .sort((a, b) => {
+        //     return a.depth - b.depth
+        // })
 
         return matchingDataTypes[matchingDataTypes.length - 1]
 
@@ -61,7 +63,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
         const dataType = this.getDataTypeFromValue(value)
-        if (!dataType?.genericKeys) return {dataType: {id: dataType?.id ?? ""}}
+        if (!dataType?.genericKeys) return {dataType: {id: dataType?.id}}
 
         //TODO: missing generic combinations
         const genericMapper: any[] = dataType.genericKeys.map(genericKey => {

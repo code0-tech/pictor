@@ -1,26 +1,27 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
-import {GenericCombinationStrategy, GenericMapper, GenericType, Type, Value} from "../DFlowDataType.view";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
-import {DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
-
-export interface DFlowDataTypeContainsTypeRuleConfig {
-    type: Type
-}
+import {
+    DataTypeRulesContainsKeyConfig, GenericCombinationStrategyType,
+    GenericMapper, GenericType,
+    LiteralValue,
+    NodeParameterValue
+} from "@code0-tech/sagittarius-graphql-types";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsTypeRule {
-    public static validate(value: Value, config: DFlowDataTypeContainsKeyRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
+    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
-        const genericMapper = generics?.get(config.type as string)
-        const genericTypes = generics?.get(config.type as string)?.types
-        const genericCombination = generics?.get(config.type as string)?.generic_combination
+        const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
+        const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sources
+        const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
-        if (!(Array.isArray(value))) return false
+        //TODO: seperate general validation
+        //if (!(Array.isArray(value))) return false
 
         //TODO: only if its really a generic key
-        if (typeof config.type === "string" && !genericMapper && !service?.getDataType(config.type)) return true
+        if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
-        if (!(service?.getDataType(config.type) || genericMapper)) return false
+        if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
 
         //use of generic key but datatype does not exist
         if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
@@ -29,15 +30,15 @@ export class DFlowDataTypeContainsTypeRule {
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
 
         //use generic given type for checking against value
-        if (typeof config.type === "string" && genericMapper && genericTypes) {
+        if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return value.every(value1 => {
-                    return service?.getDataType(genericType)?.validateValue(value1, ((genericType as GenericType)!!.generic_mapper as GenericMapper[]))
+                return (value as LiteralValue).value.every((value1: any) => {
+                    return service?.getDataType(genericType)?.validateValue(value1, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                 })
             })
 
             return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
-                if (genericCombination && genericCombination[currentIndex - 1] == GenericCombinationStrategy.OR) {
+                if (genericCombination && genericCombination[currentIndex - 1].type == GenericCombinationStrategyType.Or) {
                     return previousValue || currentValue
                 }
 
@@ -46,11 +47,11 @@ export class DFlowDataTypeContainsTypeRule {
         }
 
         //normal datatype link
-        if (typeof config.type === "string") {
-            return value.every(value1 => service?.getDataType(config.type)?.validateValue(value1))
+        if (config?.dataTypeIdentifier?.dataType) {
+            return (value as LiteralValue).value.every((value1: any) => service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(value1))
         }
 
-        return value.every(value1 => service?.getDataType(config.type)?.validateValue(value1, genericMapping((config.type as GenericType).generic_mapper, generics)))
+        return (value as LiteralValue).value.every((value1: any) => service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(value1, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
 
     }
 }

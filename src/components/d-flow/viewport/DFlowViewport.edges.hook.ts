@@ -131,7 +131,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
             if (!val) return
 
             /* --- NODE-Parameter → Group-Card ------------------------- */
-            if (paramDT?.type === EDataType.NODE) {
+            if (paramDT?.variant === EDataType.NODE) {
                 const groupId = `${fnId}-group-${idCounter++}`;
 
                 /* Verbindung Gruppe  → Function-Card (horizontal)       */

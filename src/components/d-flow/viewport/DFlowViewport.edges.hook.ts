@@ -4,8 +4,8 @@ import {Edge} from "@xyflow/react";
 import {NodeFunctionView} from "../DFlow.view";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, Type} from "../data-type/DFlowDataType.view";
-import React, {memo} from "react";
+import React from "react";
+import {DataTypeIdentifier, DataTypeVariant, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -40,10 +40,10 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     let idCounter = 0;              // globale, fortlaufende Id-Vergabe
 
     const functionCache = new Map<string, ReturnType<typeof functionService.getFunctionDefinition>>();
-    const dataTypeCache = new Map<Type, ReturnType<typeof dataTypeService.getDataType>>();
+    const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
     const getFunctionDefinitionCached = (
-        id: string,
+        id: Scalars['FunctionDefinitionID']['output'],
         cache = functionCache,
     ) => {
         if (!cache.has(id)) {
@@ -53,7 +53,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     };
 
     const getDataTypeCached = (
-        type: Type,
+        type: DataTypeIdentifier,
         cache = dataTypeCache,
     ) => {
         if (!cache.has(type)) {
@@ -131,7 +131,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
             if (!val) return
 
             /* --- NODE-Parameter → Group-Card ------------------------- */
-            if (paramDT?.variant === EDataType.NODE) {
+            if (paramDT?.variant === DataTypeVariant.Node) {
                 const groupId = `${fnId}-group-${idCounter++}`;
 
                 /* Verbindung Gruppe  → Function-Card (horizontal)       */

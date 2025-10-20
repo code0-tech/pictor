@@ -1,11 +1,8 @@
 import {Meta} from "@storybook/react";
 import React from "react";
 import {DataTypeView} from "../data-type/DFlowDataType.view";
-import {dataTypes} from "../data-type/DFlowDataType.data";
-import {functionData} from "../function/DFlowFunction.data";
 import {FunctionDefinitionView} from "../function/DFlowFunction.view";
 import {FlowView} from "../DFlow.view";
-import {flow} from "../DFlow.data";
 import {ContextStoreProvider} from "../../../utils/contextStore";
 import {useReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
@@ -43,7 +40,7 @@ export const Example = () => {
 
 const SuggestionMenu = () => {
 
-    const result = useSuggestions("NUMBER", [], "some_database_id", 0, 0)
+    const result = useSuggestions({dataType: {identifier: "NUMBER"}}, [], "some_database_id", 0, [0])
 
     return <div>
         <TextInput title={"Text"}

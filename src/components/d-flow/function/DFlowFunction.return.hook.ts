@@ -12,9 +12,9 @@ export const useReturnType = (
 
     dataTypeService = dataTypeService ?? useService(DFlowDataTypeReactiveService)
 
-    if (!func.return_type) return null
+    if (!func.returnType) return null
 
     const genericTypeMap = resolveGenericKeys(func, values, dataTypeService)
-    return replaceGenericKeysInType(func.return_type, genericTypeMap)
+    return replaceGenericKeysInType(func.returnType, genericTypeMap)
 
 }

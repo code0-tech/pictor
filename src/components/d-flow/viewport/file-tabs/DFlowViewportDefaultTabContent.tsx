@@ -10,7 +10,7 @@ import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 import {isRefObject, RefObject, Value} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
-import {ParameterDefinition} from "../../function/DFlowFunction.view";
+import {ParameterDefinitionView} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {useReturnType} from "../../function/DFlowFunction.return.hook";
@@ -31,7 +31,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.id)
     const paramDefinitions = React.useMemo(() => {
-        const map: Record<string, ParameterDefinition> = {}
+        const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameters?.forEach(pd => {
             map[pd.parameter_id] = pd
         })

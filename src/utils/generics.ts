@@ -533,7 +533,7 @@ export const resolveType = (
         if (!dataType) return type;
         const genericKeys = dataType.genericKeys ?? [];
 
-        if (dataType.type === DataTypeVariant.Array && genericKeys.length > 0) {
+        if (dataType.variant === DataTypeVariant.Array && genericKeys.length > 0) {
             const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === DataTypeRulesVariant.ContainsType);
             const innerIdentifier = (innerTypeRule?.config as { dataTypeIdentifier?: DataTypeIdentifier })?.dataTypeIdentifier;
             if (innerIdentifier) {

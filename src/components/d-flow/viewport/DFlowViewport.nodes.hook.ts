@@ -4,7 +4,7 @@ import {NodeFunctionView} from "../DFlow.view";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {DataTypeIdentifier} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeIdentifier, DataTypeVariant, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -105,7 +105,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
     const getFunctionDefinitionCached = (
-        id: string,
+        id: Scalars['FunctionDefinitionID']['output'],
         cache = functionCache,
     ) => {
         if (!cache.has(id)) {
@@ -193,7 +193,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             const paramType = definition?.parameters!!.find(p => p.parameter_id == param.id)?.type;
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
-            if (paramDataType?.variant === EDataType.NODE) {
+            if (paramDataType?.variant === DataTypeVariant.Node) {
                 if (param.value && param.value instanceof NodeFunctionView) {
                     const groupId = `${id}-group-${idCounter++}`;
 

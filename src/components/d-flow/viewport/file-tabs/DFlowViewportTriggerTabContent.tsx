@@ -5,7 +5,6 @@ import {DFlowReactiveService} from "../../DFlow.service";
 import TextInput from "../../../form/TextInput";
 import Flex from "../../../flex/Flex";
 import {DFlowTypeReactiveService} from "../../type/DFlowType.service";
-import {FlowTypeSetting} from "../../type/DFlowType.view";
 import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
@@ -20,7 +19,7 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
     const {instance} = props
     const flowService = useService(DFlowReactiveService)
     const flowTypeService = useService(DFlowTypeReactiveService)
-    const definition = flowTypeService.getById(instance.type)
+    const definition = flowTypeService.getById(instance.type.identifier as string)
 
     const flowTypeSettingsDefinition = React.useMemo(() => {
         const map: Record<string, FlowTypeSetting> = {}

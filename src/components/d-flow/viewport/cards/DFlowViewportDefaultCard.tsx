@@ -25,12 +25,12 @@ import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service
 import {useFunctionValidation} from "../../function/DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {InspectionSeverity} from "../../../../utils/inspection";
-import {EDataType} from "../../data-type/DFlowDataType.view";
 import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {FileTabsService} from "../../../file-tabs/FileTabs.service";
 import {DFlowViewportDefaultTabContent} from "../file-tabs/DFlowViewportDefaultTabContent";
+import {DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunctionView
@@ -186,8 +186,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             ) : null}
 
             {data.instance.parameters?.some(param => {
-                const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
-                const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.variant === EDataType.NODE;
+                const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
+                const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === DataTypeVariant.Node;
                 return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
             }) ? (
                 <CardSection>
@@ -195,9 +195,9 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     {data.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {
 
 
-                        const parameter = definition?.parameters!!.find(p => p.parameter_id == param.id)
-                        const isNodeDataType = dataTypeService.getDataType(parameter!!.type)?.variant === EDataType.NODE;
-                        const result = useSuggestions(parameter?.type ?? undefined, [], "some_database_id", data.depth, data.scope, data.index)
+                        const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
+                        const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === DataTypeVariant.Node;
+                        const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], "some_database_id", data.depth, data.scope, data.index)
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>

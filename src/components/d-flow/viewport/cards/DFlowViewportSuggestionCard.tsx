@@ -4,10 +4,11 @@ import React, {memo} from "react";
 import Button from "../../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {NodeFunctionView, NodeFunctionObject} from "../../DFlow.view";
+import {NodeFunctionView} from "../../DFlow.view";
 import {useService} from "../../../../utils/contextStore";
 import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
+import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
     flowId: string
@@ -23,7 +24,7 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
     const flowService = useService(DFlowReactiveService)
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-        props.data.parentFunction.nextNode = new NodeFunctionView(suggestion.value as NodeFunctionObject)
+        props.data.parentFunction.nextNode = new NodeFunctionView(suggestion.value as NodeFunction)
         flowService.update()
     }} suggestions={result} triggerContent={
         <Button top={0} variant={"normal"} color={"secondary"}>

@@ -152,12 +152,12 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         fnCache = functionCache,
         dtCache = dataTypeCache,
     ) => {
-        const id = `${fn.runtime_id}-${idCounter++}`;
+        const id = `${fn.runtimeFunction?.identifier}-${idCounter++}`;
         const index = ++globalNodeIndex; // global node level
 
         nodes.push({
             id,
-            type: bestMatchValue(packageNodes, fn.runtime_id),
+            type: bestMatchValue(packageNodes, fn.runtimeFunction?.identifier!!),
             position: { x: 0, y: 0 },
             draggable: false,
             parentId: parentGroup,
@@ -172,7 +172,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             },
         });
 
-        if (!fn.nextNode && !isParameter) {
+        if (!fn.nextNodeId && !isParameter) {
             nodes.push({
                 id: `${id}-suggestion`,
                 type: "suggestion",
@@ -187,10 +187,10 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             });
         }
 
-        const definition = getFunctionDefinitionCached(fn.id, fnCache);
+        const definition = getFunctionDefinitionCached(fn.runtimeFunction?.id, fnCache);
 
         fn.parameters?.forEach((param) => {
-            const paramType = definition?.parameters!!.find(p => p.parameter_id == param.id)?.type;
+            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.id)?.dataTypeIdentifier;
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (paramDataType?.variant === DataTypeVariant.Node) {
@@ -224,13 +224,13 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             }
         });
 
-        if (fn.nextNode) {
+        if (fn.nextNodeId) {
             // Linear chain continues in the same depth/scope PATH.
-            traverse(fn.nextNode, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
+            traverse(flow.getNodeById(fn.nextNodeId!!)!!, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
         }
     };
 
     // Root lane: depth 0, scope path [0]
-    traverse(flow.startingNode, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+    traverse(flow.getNodeById(flow.startingNodeId!!)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
     return nodes;
 };

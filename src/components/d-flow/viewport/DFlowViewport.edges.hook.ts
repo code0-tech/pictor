@@ -72,13 +72,13 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     ): string => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
-        const fnId = `${fn.runtime_id}-${idCounter++}`;
+        const fnId = `${fn.runtimeFunction?.identifier}-${idCounter++}`;
 
         if (idCounter == 1) {
             // erste Function-Card → Verbindung Trigger → Function
             edges.push({
                 id: `trigger-${fnId}-next`,
-                source: flow.id,    // Handle-Bottom des Trigger-Nodes
+                source: flow.id as string,    // Handle-Bottom des Trigger-Nodes
                 target: fnId,       // Handle-Top der Function-Card
                 data: {
                     color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
@@ -123,9 +123,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         /* ------- horizontale Kanten für Parameter -------------------- */
         fn.parameters?.forEach((param) => {
             const val = param.value;
-            const def = getFunctionDefinitionCached(fn.id, fnCache)
-                ?.parameters?.find(p => p.parameter_id === param.id);
-            const paramType = def?.type;
+            const def = getFunctionDefinitionCached(fn.runtimeFunction?.id, fnCache)
+                ?.parameterDefinitions?.find(p => p.id === param.id);
+            const paramType = def?.dataTypeIdentifier;
             const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (!val) return
@@ -190,8 +190,8 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         });
 
         /* ------- Rekursion auf nextNode ------------------------------ */
-        if (fn.nextNode) {
-            traverse(fn.nextNode, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
+        if (fn.nextNodeId) {
+            traverse(flow.getNodeById(fn.nextNodeId!!)!!, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
         } else {
             // letzte Function-Card im Ast → Add-new-node wie *normale* nextNode behandeln
             const suggestionNodeId = `${fnId}-suggestion`;
@@ -228,7 +228,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     };
 
     /* ------------------------------------------------------------------ */
-    traverse(flow.startingNode, undefined, 0, functionCache, dataTypeCache);
+    traverse(flow.getNodeById(flow.startingNodeId!!)!!, undefined, 0, functionCache, dataTypeCache);
 
     return React.useMemo(() => edges, [flowStore, functionStore, dataTypeStore, edges]);
 };

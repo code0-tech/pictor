@@ -3,7 +3,8 @@ import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/
 import {
     DataType,
     DataTypeIdentifier,
-    DataTypeRule, DataTypeRuleConnection,
+    DataTypeRule,
+    DataTypeRuleConnection,
     DataTypeRulesConfig,
     DataTypeRulesVariant,
     DataTypeVariant,
@@ -52,9 +53,9 @@ const extractIdentifierId = (identifier: IdentifierLike): string | undefined => 
     if (!identifier) return undefined;
     if (typeof identifier === "string") return identifier;
     return (
-        identifier.dataType?.identifier ??
-        identifier.genericType?.dataType.identifier
-    );
+        identifier?.dataType?.identifier ??
+        identifier?.genericType?.dataType?.identifier
+    ) ?? undefined;
 };
 
 const extractIdentifierGenericKey = (
@@ -86,7 +87,7 @@ const cloneMapperWithSources = (
 
 const toCombinationTypes = (mapper: GenericMapper): Set<GenericCombinationStrategyType> => {
     const strategies = mapper.genericCombinationStrategies ?? [];
-    return new Set(strategies.map(strategy => strategy.type));
+    return new Set(strategies.map(strategy => strategy.type!!));
 };
 
 const normalizeObjectForComparison = (value: unknown): unknown => {
@@ -143,8 +144,8 @@ const replaceIdentifiersInConfig = (
             const typedConfig = config;
             const inputTypes = typedConfig.inputTypes?.map(inputType => ({
                 ...inputType,
-                dataTypeIdentifier: replaceGenericKeysInType(inputType.dataTypeIdentifier, genericMap),
-                inputType: replaceGenericKeysInDataTypeObject(inputType.inputType, genericMap)
+                dataTypeIdentifier: replaceGenericKeysInType(inputType.dataTypeIdentifier!!, genericMap),
+                inputType: replaceGenericKeysInDataTypeObject(inputType.inputType!!, genericMap)
             }));
             return {
                 ...typedConfig,
@@ -239,7 +240,7 @@ export const replaceGenericKeysInType = (
             if (sourceKey && genericMap.has(sourceKey)) {
                 const replacement = genericMap.get(sourceKey);
                 if (replacement && isGenericMapper(replacement as GenericMapper)) {
-                    resolvedSources.push(...(replacement as GenericMapper).sources);
+                    resolvedSources.push(...(replacement as GenericMapper).sources!!);
                 } else if (replacement && isDataTypeIdentifier(replacement)) {
                     resolvedSources.push(replacement);
                 } else {
@@ -295,9 +296,9 @@ export const resolveAllGenericKeysInDataTypeObject = (
         }
 
         if (isGenericMapper(genericNode as GenericMapper) && isGenericMapper(concreteNode as GenericMapper)) {
-            const length = Math.min((genericNode as GenericMapper).sources.length, (concreteNode as GenericMapper).sources.length);
+            const length = Math.min((genericNode as GenericMapper).sources?.length!!, (concreteNode as GenericMapper).sources?.length!!);
             for (let index = 0; index < length; index++) {
-                visit((genericNode as GenericMapper).sources[index], (concreteNode as GenericMapper).sources[index], concreteNode as GenericMapper);
+                visit((genericNode as GenericMapper).sources!![index], (concreteNode as GenericMapper).sources!![index], concreteNode as GenericMapper);
                 if (unresolved.size === 0) return;
             }
             return;
@@ -366,7 +367,7 @@ export const replaceGenericKeysInDataTypeObject = (
                 if (!rule) return rule;
                 return {
                     ...rule,
-                    config: replaceIdentifiersInConfig(rule.config, genericMap)
+                    config: replaceIdentifiersInConfig(rule.config!!, genericMap)
                 } as DataTypeRule;
             })
         }
@@ -387,12 +388,12 @@ export const resolveGenericKeys = (
     const genericMap: GenericMap = new Map();
     const genericKeys = func.genericKeys ?? [];
 
-    if (!func.parameters || genericKeys.length === 0) return genericMap;
+    if (!func.parameterDefinitions || genericKeys.length === 0) return genericMap;
 
     const genericKeySet = new Set(genericKeys);
 
-    func.parameters.forEach((parameter, index) => {
-        const parameterType = parameter.type as IdentifierLike;
+    func.parameterDefinitions.forEach((parameter, index) => {
+        const parameterType = parameter.dataTypeIdentifier as IdentifierLike;
         const value = values[index];
         const valueType = dataTypeService.getTypeFromValue(value) as IdentifierLike;
 
@@ -528,8 +529,7 @@ export const resolveType = (
     service: DFlowDataTypeReactiveService
 ): DataTypeIdentifier => {
     if (typeof (type as unknown) === "string") {
-        const identifier = type as unknown as string;
-        const dataType = service.getDataType(identifier);
+        const dataType = service.getDataType(type);
         if (!dataType) return type;
         const genericKeys = dataType.genericKeys ?? [];
 
@@ -563,7 +563,7 @@ export const resolveType = (
 
     const resolvedMappers = type.genericType.genericMappers?.map(mapper => ({
         ...mapper,
-        sources: mapper.sources.map(source => resolveType(source, service))
+        sources: mapper?.sources?.map(source => resolveType(source, service))
     })) ?? [];
 
     return {
@@ -625,10 +625,10 @@ export const replaceGenericsAndSortType = (
                   genericMappers: (genericType.genericMappers ?? []).map(mapper => {
                       const replacedMapper = {
                           ...mapper,
-                          target: genericKeySet.has(mapper.target)
+                          target: genericKeySet.has(mapper.target!!)
                               ? GENERIC_PLACEHOLDER
                               : mapper.target,
-                          sources: mapper.sources.map(source => replaceIdentifier(source))
+                          sources: mapper.sources?.map(source => replaceIdentifier(source))
                       };
 
                       return sortValue(replacedMapper) as GenericMapper;

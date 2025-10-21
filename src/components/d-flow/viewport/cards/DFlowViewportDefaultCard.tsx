@@ -1,6 +1,6 @@
 import {Code0Component} from "../../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
-import {NodeFunctionView, NodeFunctionParameter} from "../../DFlow.view";
+import {NodeFunctionView, NodeParameterView} from "../../DFlow.view";
 import React, {memo} from "react";
 import Card from "../../../card/Card";
 import "./DFlowViewportDefaultCard.style.scss";
@@ -192,7 +192,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
             }) ? (
                 <CardSection>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-                    {data.instance.parameters?.map((param: NodeFunctionParameter, index: number) => {
+                    {data.instance.parameters?.map((param: NodeParameterView, index: number) => {
 
 
                         const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)

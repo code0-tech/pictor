@@ -112,6 +112,13 @@ export class FlowView {
         }
         this._nodes = this._nodes.filter(node => node.id !== nodeId);
     }
+
+    getNodeById(nodeId: Scalars['NodeFunctionID']['output']): NodeFunctionView | undefined {
+        if (!this._nodes) {
+            return undefined;
+        }
+        return this._nodes.find(node => node.id === nodeId);
+    }
 }
 
 export class NodeFunctionView {
@@ -177,7 +184,7 @@ export class NodeParameterView {
     /** Time when this NodeParameter was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The value of the parameter */
-    private _value?: Maybe<NodeParameterValue>;
+    private _value?: LiteralValue | ReferenceValue | NodeFunctionView;
 
     constructor(nodeParameter: NodeParameter) {
         this._createdAt = nodeParameter.createdAt
@@ -208,7 +215,7 @@ export class NodeParameterView {
         return this._updatedAt;
     }
 
-    get value(): Maybe<NodeParameterValue> | undefined {
+    get value(): LiteralValue | ReferenceValue | NodeFunctionView | undefined {
         return this._value;
     }
 

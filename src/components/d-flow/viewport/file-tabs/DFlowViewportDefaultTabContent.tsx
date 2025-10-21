@@ -39,13 +39,13 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     }, [definition?.parameterDefinitions])
 
     const sortedParameters = React.useMemo(() => {
-        return [...(functionInstance.parameters || [])].sort((a, b) => a.id.localeCompare(b.id))
+        return [...(functionInstance.parameters || [])].sort((a, b) => a.id!!.localeCompare(b.id!!))
     }, [functionInstance.parameters])
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     sortedParameters.forEach(parameter => {
-        const parameterDefinition = paramDefinitions[parameter.id]
-        suggestionsById[parameter.id] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
+        const parameterDefinition = paramDefinitions[parameter.id!!]
+        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
     })
 
     const returnType = useReturnType(definition!!, sortedParameters.map(p => p.value as NodeParameterValue), dataTypeService)
@@ -68,11 +68,11 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 }
             }
 
-            const parameterDefinition = paramDefinitions[parameter.id]
-            const result = suggestionsById[parameter.id]
+            const parameterDefinition = paramDefinitions[parameter.id!!]
+            const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue = parameter.value instanceof NodeFunctionView ? JSON.stringify(parameter.value.json) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
+            const defaultValue = parameter.value instanceof NodeFunctionView ? JSON.stringify(parameter.value) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
 
 
             return <div>

@@ -189,7 +189,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
     if (!dataTypeService || !flowService || !functionService) return refObjects;
 
     const flow = flowService.values().find((f) => f.id === flowId);
-    if (!flow?.startingNode) return refObjects;
+    if (!flow?.startingNodeId) return refObjects;
 
     // Global, strictly increasing group id used to extend the scope PATH.
     // Root scope path is [0]; first created group gets id 1, then 2, ...
@@ -221,16 +221,16 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             const node = nextNodeId();
 
             // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
-            if (current.parameters && def.parameters) {
-                for (const pDef of def.parameters) {
-                    const pType = dataTypeService.getDataType(pDef.type);
+            if (current.parameters && def.parameterDefinitions) {
+                for (const pDef of def.parameterDefinitions) {
+                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
                     if (!pType || pType.variant === DataTypeVariant.Node) continue;
 
                     const inputTypeRules =
                         pType.rules?.nodes?.filter((r) => r?.variant === DataTypeRulesVariant.InputType) ?? [];
 
                     if (inputTypeRules.length) {
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
                         const rawValue = paramInstance?.value;
                         const valuesArray =
                             rawValue !== undefined
@@ -275,11 +275,11 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             }
 
             // 3) For each NODE-typed parameter: create a NEW group/lane
-            if (current.parameters && def.parameters) {
-                for (const pDef of def.parameters) {
-                    const pType = dataTypeService.getDataType(pDef.type);
+            if (current.parameters && def.parameterDefinitions) {
+                for (const pDef of def.parameterDefinitions) {
+                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
                     if (pType?.variant === DataTypeVariant.Node) {
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
                             const childFn = paramInstance.value as NodeFunctionView;
 
@@ -289,7 +289,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                         }
                     } else {
                         // Functions passed as NON-NODE parameters: same depth and same scope path.
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.parameter_id);
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
                         if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
                             traverse(paramInstance.value as NodeFunctionView, depth, scopePath);
                         }
@@ -298,12 +298,12 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
             }
 
             // 4) Continue the linear chain in the same lane/scope.
-            current = current.nextNode;
+            current = flow.getNodeById(current.nextNodeId!!);
         }
     };
 
     // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
-    traverse(flow.startingNode, 0, [0]);
+    traverse(flow.getNodeById(flow.startingNodeId), 0, [0]);
 
     return refObjects;
 };

@@ -1,8 +1,8 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {
-    DataTypeRulesReturnTypeConfig,
-    GenericMapper, NodeFunction,
+    DataTypeRulesReturnTypeConfig, GenericCombinationStrategyType,
+    GenericMapper, GenericType, NodeFunction,
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
@@ -34,20 +34,20 @@ export class DFlowDataTypeReturnTypeRule {
         //check if all generic combinations are set
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
 
-        const foundReturnFunction = findReturnNode(value as NodeFunctionObject)
+        const foundReturnFunction = findReturnNode(value)
         if (!foundReturnFunction) return false
 
-        if (isRefObject(foundReturnFunction.parameters!![0].value!!)) {
+        if (foundReturnFunction?.parameters?.nodes!![0]?.value!!.__typename === "ReferenceValue") {
 
             //use generic given type for checking against value
-            if (typeof config.type === "string" && genericMapper && genericTypes) {
+            if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
 
                 const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                    return !!service?.getDataType(genericType)?.validateDataType(service?.getDataType((foundReturnFunction.parameters!![0].value as ReferenceValue).dataTypeIdentifier)!!)
+                    return !!service?.getDataType(genericType)?.validateDataType(service?.getDataType((foundReturnFunction?.parameters?.nodes!![0]?.value!! as ReferenceValue).dataTypeIdentifier!!)!!)
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
-                    if (genericCombination && genericCombination[currentIndex - 1] == GenericCombinationStrategy.OR) {
+                    if (genericCombination && genericCombination[currentIndex - 1].type == GenericCombinationStrategyType.Or) {
                         return previousValue || currentValue
                     }
 
@@ -55,23 +55,23 @@ export class DFlowDataTypeReturnTypeRule {
                 }) : checkAllTypes[0]
             }
 
-            if (typeof config.type === "string") {
-                return !!service?.getDataType(config.type)?.validateDataType(service?.getDataType(foundReturnFunction.parameters!![0].value!!.type)!!)
+            if (config?.dataTypeIdentifier?.dataType) {
+                return !!service?.getDataType(config.dataTypeIdentifier!!)?.validateDataType(service?.getDataType(foundReturnFunction?.parameters?.nodes!![0]?.value?.dataTypeIdentifier!!)!!)
             }
 
-        } else if (isNodeFunctionObject(foundReturnFunction.parameters!![0].value!! as NodeFunctionObject)) {
+        } else if (foundReturnFunction?.parameters?.nodes!![0]?.value?.__typename == "NodeFunction") {
             //TODO : allow function as return value
         } else {
 
             //use generic given type for checking against value
-            if (typeof config.type === "string" && genericMapper && genericTypes) {
+            if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
 
                 const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                    return !!service?.getDataType(genericType)?.validateValue(foundReturnFunction.parameters!![0].value!!, ((genericType as GenericType)!!.generic_mapper as GenericMapper[]))
+                    return !!service?.getDataType(genericType)?.validateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
-                    if (genericCombination && genericCombination[currentIndex - 1] == GenericCombinationStrategy.OR) {
+                    if (genericCombination && genericCombination[currentIndex - 1].type == GenericCombinationStrategyType.Or) {
                         return previousValue || currentValue
                     }
 
@@ -79,11 +79,11 @@ export class DFlowDataTypeReturnTypeRule {
                 }) : checkAllTypes[0]
             }
 
-            if (typeof config.type === "string") {
-                return <boolean>service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(foundReturnFunction.parameters!![0].value!!)
+            if (config?.dataTypeIdentifier?.dataType) {
+                return <boolean>service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!)
             }
 
-            return <boolean>service?.getDataType(config.type)?.validateValue(foundReturnFunction.parameters!![0].value!!, genericMapping(config.type.generic_mapper, generics))
+            return <boolean>service?.getDataType(config.dataTypeIdentifier!!)?.validateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, genericMapping(config.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
 
         }
 

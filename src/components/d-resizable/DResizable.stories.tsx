@@ -10,15 +10,10 @@ import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} fr
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {useFlowViewportNodes} from "../d-flow/viewport/DFlowViewport.nodes.hook";
 import {useFlowViewportEdges} from "../d-flow/viewport/DFlowViewport.edges.hook";
-import {DFlowViewportDefaultCard} from "../d-flow/viewport/cards/DFlowViewportDefaultCard";
-import {DFlowViewportGroupCard} from "../d-flow/viewport/cards/DFlowViewportGroupCard";
-import {DFlowViewportSuggestionCard} from "../d-flow/viewport/cards/DFlowViewportSuggestionCard";
-import {DFlowViewportEdge} from "../d-flow/viewport/DFlowViewportEdge";
 import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
 import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
-import {functionData} from "../d-flow/function/DFlowFunction.data";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
@@ -26,17 +21,13 @@ import {DataTypeView} from "../d-flow/data-type/DFlowDataType.view";
 import {DFlowDataTypeReactiveService} from "../d-flow/data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "../d-flow/function/DFlowFunction.service";
 import {DFlowReactiveService} from "../d-flow/DFlow.service";
-import {flow1} from "../d-flow/DFlow.data";
 import {DFlowSuggestion} from "../d-flow/suggestions/DFlowSuggestion.view";
 import {DFlowReactiveSuggestionService} from "../d-flow/suggestions/DFlowSuggestion.service";
-import {dataTypes} from "../d-flow/data-type/DFlowDataType.data";
 import {FlowView} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
 import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
-import {DFlowViewportTriggerCard} from "../d-flow/viewport/cards/DFlowViewportTriggerCard";
-import {FlowType} from "../d-flow/type/DFlowType.view";
 import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
-import {REST_FLOW_TYPE} from "../d-flow/type/DFlowType.data";
+import {FlowTypeView} from "../d-flow/type/DFlowType.view";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -60,7 +51,7 @@ export const Dashboard = () => {
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinitionView(fd)));
     const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow1)]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowType, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);
+    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>

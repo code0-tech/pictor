@@ -29,7 +29,7 @@ export class FlowView {
     /** The return data type of the flow */
     private readonly _returnType?: Maybe<DataType>;
     /** The settings of the flow */
-    private readonly _settings?: Maybe<Array<FlowSetting>>;
+    private readonly _settings?: FlowSettingView[];
     /** The ID of the starting node of the flow */
     private readonly _startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The flow type of the flow */
@@ -44,7 +44,7 @@ export class FlowView {
         this._inputType = flow.inputType
         this._nodes = flow.nodes?.nodes?.map(node => new NodeFunctionView(node!!))
         this._returnType = flow.returnType
-        this._settings = flow.settings
+        this._settings = flow.settings?.map(setting => new FlowSettingView(setting))
         this._startingNodeId = flow.startingNodeId
         this._type = flow.type
         this._updatedAt = flow.updatedAt
@@ -71,7 +71,7 @@ export class FlowView {
         return this._returnType;
     }
 
-    get settings(): Maybe<Array<FlowSetting>> | undefined {
+    get settings(): FlowSettingView[] | undefined {
         return this._settings;
     }
 
@@ -225,5 +225,50 @@ export class NodeParameterView {
         } else {
             this._value = value as LiteralValue | ReferenceValue;
         }
+    }
+}
+
+export class FlowSettingView {
+
+    private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** The identifier of the flow setting */
+    private readonly _flowSettingId?: Maybe<Scalars['String']['output']>;
+    /** Global ID of this FlowSetting */
+    private readonly _id?: Maybe<Scalars['FlowSettingID']['output']>;
+    /** Time when this FlowSetting was last updated */
+    private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
+    /** The value of the flow setting */
+    private _value?: Maybe<Scalars['JSON']['output']>;
+
+    constructor(flowSetting: FlowSetting) {
+        this._createdAt = flowSetting.createdAt
+        this._flowSettingId = flowSetting.flowSettingId
+        this._id = flowSetting.id
+        this._value = flowSetting.value
+        this._updatedAt = flowSetting.updatedAt
+    }
+
+    get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._createdAt;
+    }
+
+    get flowSettingId(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._flowSettingId;
+    }
+
+    get id(): Maybe<Scalars["FlowSettingID"]["output"]> | undefined {
+        return this._id;
+    }
+
+    get value(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._value;
+    }
+
+    get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._updatedAt;
+    }
+
+    set value(value: Maybe<Scalars["JSON"]["output"]>) {
+        this._value = value;
     }
 }

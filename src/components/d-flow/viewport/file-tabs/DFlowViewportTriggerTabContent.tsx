@@ -9,6 +9,7 @@ import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
+import {FlowTypeSetting} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportTriggerTabContentProps {
     instance: FlowView
@@ -19,30 +20,30 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
     const {instance} = props
     const flowService = useService(DFlowReactiveService)
     const flowTypeService = useService(DFlowTypeReactiveService)
-    const definition = flowTypeService.getById(instance.type.identifier as string)
+    const definition = flowTypeService.getById(instance.type?.id!!)
 
     const flowTypeSettingsDefinition = React.useMemo(() => {
         const map: Record<string, FlowTypeSetting> = {}
-        definition?.settings.forEach(def => {
-            map[def.flow_definition_settings_id] = def
+        definition?.flowTypeSettings?.forEach(def => {
+            map[def.identifier!!] = def
         })
         return map
-    }, [definition?.settings])
+    }, [definition?.flowTypeSettings])
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     instance?.settings?.forEach(setting => {
-        const settingDefinition = flowTypeSettingsDefinition[setting.definition.setting_id]
-        suggestionsById[setting.definition.setting_id] = useSuggestions(settingDefinition.type, [], "some_database_id", 0, [0], 0)
+        const settingDefinition = flowTypeSettingsDefinition[setting.flowSettingId!!]
+        suggestionsById[setting.flowSettingId!!] = useSuggestions({dataType: settingDefinition.dataType}, [], "some_database_id", 0, [0], 0)
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {instance.settings?.map(setting => {
 
-            const settingsDefinition = flowTypeSettingsDefinition[setting.definition.setting_id]
-            const title = settingsDefinition?.name ? settingsDefinition.name[0]?.text : setting.definition.setting_id
-            const description = settingsDefinition?.description ? settingsDefinition?.description[0]?.text : JSON.stringify(settingsDefinition!!.type)
-            const result = suggestionsById[setting.definition.setting_id]
-            const defaultValue = setting.value instanceof NodeFunctionView ? JSON.stringify(setting.value.json) : typeof setting.value == "object" || typeof setting.value == "boolean" ? JSON.stringify(setting.value) : setting.value
+            const settingsDefinition = flowTypeSettingsDefinition[setting.flowSettingId!!]
+            const title = settingsDefinition?.names ? settingsDefinition.names?.nodes!![0]?.content : setting.flowSettingId
+            const description = settingsDefinition?.descriptions ? settingsDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(settingsDefinition!!.dataType)
+            const result = suggestionsById[setting.flowSettingId!!]
+            const defaultValue = typeof setting.value == "object" ? JSON.stringify(setting.value) : setting.value
 
             return <div>
                 <TextInput title={title}

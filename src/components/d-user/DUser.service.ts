@@ -13,35 +13,34 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view";
 
-export interface DUserService {
-    userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
+export abstract class DUserService extends ReactiveArrayService<DUserView> {
 
-    userLogin(payload: UsersLoginInput): User | undefined
+    constructor(store: ReactiveArrayStore<DUserView>) { super(store); }
 
-    userLogout(payload: UsersLogoutInput): void
+    abstract userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
 
-    userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
+    abstract userLogin(payload: UsersLoginInput): User | undefined
 
-    userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
+    abstract userLogout(payload: UsersLogoutInput): void
 
-    userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
+    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
 
-    userRegister(payload: UsersRegisterInput): User | undefined
+    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
 
-    userUpdate(payload: UsersUpdateInput): User | undefined
+    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
 
-    createUserSession(payload: UserSession): void
+    abstract userRegister(payload: UsersRegisterInput): User | undefined
 
-    getUserSession(): UserSession | undefined
+    abstract userUpdate(payload: UsersUpdateInput): User | undefined
+
+    abstract createUserSession(payload: UserSession): void
+
+    abstract getUserSession(): UserSession | undefined
 }
 
-export abstract class DUserReactiveService extends ReactiveArrayService<DUserView> implements DUserService {
+export abstract class DUserReactiveService extends DUserService {
 
-    constructor(store: ReactiveArrayStore<DUserView>) {
-        super(store);
-    }
-
-    userLogin(payload: UsersLoginInput): User | undefined {
+    override userLogin(payload: UsersLoginInput): User | undefined {
         //check if a session already exists
         if (this.getUserSession()) {
             return this.values().find(user => user.id === this.getUserSession()?.user?.id);
@@ -50,7 +49,7 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
         return undefined;
     }
 
-    userLogout(payload: UsersLogoutInput): void {
+    override userLogout(payload: UsersLogoutInput): void {
         if (!this.getUserSession()) return
 
         const user = this.values().find(user => user.id === this.getUserSession()?.user?.id);
@@ -61,20 +60,20 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
 
     }
 
-    createUserSession(payload: UserSession): void {
+    override createUserSession(payload: UserSession): void {
         window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
     }
 
-    getUserSession(): UserSession | undefined {
+    override getUserSession(): UserSession | undefined {
         return window.localStorage.getItem("ide_code-zero_session") as UserSession
     }
 
-    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
-    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
-    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
-    abstract userRegister(payload: UsersRegisterInput): User | undefined
-    abstract userUpdate(payload: UsersUpdateInput): User | undefined
-    abstract userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
+    abstract override userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
+    abstract override userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
+    abstract override userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
+    abstract override userRegister(payload: UsersRegisterInput): User | undefined
+    abstract override userUpdate(payload: UsersUpdateInput): User | undefined
+    abstract override userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
 
 
 }

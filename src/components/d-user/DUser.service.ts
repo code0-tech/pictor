@@ -35,15 +35,10 @@ export interface DUserService {
     getUserSession(): UserSession | undefined
 }
 
-export class DUserReactiveService extends ReactiveArrayService<DUserView> implements DUserService {
+export abstract class DUserReactiveService extends ReactiveArrayService<DUserView> implements DUserService {
 
     constructor(store: ReactiveArrayStore<DUserView>) {
         super(store);
-    }
-
-    userEmailVerification(payload: UsersEmailVerificationInput): User | undefined {
-        //
-        return undefined;
     }
 
     userLogin(payload: UsersLoginInput): User | undefined {
@@ -66,23 +61,6 @@ export class DUserReactiveService extends ReactiveArrayService<DUserView> implem
 
     }
 
-    userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void {
-    }
-
-    userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void {
-    }
-
-    userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void {
-    }
-
-    userRegister(payload: UsersRegisterInput): User | undefined {
-        return undefined;
-    }
-
-    userUpdate(payload: UsersUpdateInput): User | undefined {
-        return undefined;
-    }
-
     createUserSession(payload: UserSession): void {
         window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
     }
@@ -90,6 +68,13 @@ export class DUserReactiveService extends ReactiveArrayService<DUserView> implem
     getUserSession(): UserSession | undefined {
         return window.localStorage.getItem("ide_code-zero_session") as UserSession
     }
+
+    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
+    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
+    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
+    abstract userRegister(payload: UsersRegisterInput): User | undefined
+    abstract userUpdate(payload: UsersUpdateInput): User | undefined
+    abstract userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
 
 
 }

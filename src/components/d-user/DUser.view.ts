@@ -1,5 +1,11 @@
 import {Maybe, Namespace, NamespaceMemberConnection, Scalars, User} from "@code0-tech/sagittarius-graphql-types";
 
+export const DUserViewQuery = `
+
+
+
+`
+
 export class DUserView {
 
     /** Global admin status of the user */

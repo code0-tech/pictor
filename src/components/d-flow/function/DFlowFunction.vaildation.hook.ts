@@ -11,6 +11,8 @@ import {useReturnType} from "./DFlowFunction.return.hook";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 import {DataTypeVariant, NodeFunction, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import {useValidateDataType} from "../data-type/DFlowDataType.validation.type";
+import {useValidateValue} from "../data-type/DFlowDataType.validation.value";
 
 
 /**
@@ -54,13 +56,13 @@ export const useFunctionValidation = (
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
                         dataTypeService
                     );
-                    isValid = resolvedParameterDT.validateDataType(resolvedValueDT);
+                    isValid = useValidateDataType(resolvedParameterDT, resolvedValueDT)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Ref: Type mismatch"));
                     }
                 } else {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
-                    isValid = parameterDataType.validateValue(value, replacedGenericType?.genericType?.genericMappers!!);
+                    isValid = useValidateValue(value, parameterDataType, replacedGenericType?.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Value: Invalid value"));
                     }
@@ -70,7 +72,7 @@ export const useFunctionValidation = (
             if (parameterType?.genericKey && genericKeys.includes(parameterType?.genericKey)) {
                 if (value.__typename != "ReferenceValue") {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
-                    isValid = !!dataTypeService.getDataType(replacedGenericType)?.validateValue(value, replacedGenericType.genericType?.genericMappers!!);
+                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, replacedGenericType.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Key: Invalid value"));
                     }
@@ -83,13 +85,13 @@ export const useFunctionValidation = (
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
                         dataTypeService
                     );
-                    isValid = resolvedParameterDT.validateDataType(valueDataType);
+                    isValid = useValidateDataType(resolvedParameterDT, valueDataType)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Param/Value: Type mismatch"));
                     }
                 } else {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap);
-                    isValid = !!dataTypeService.getDataType(replacedGenericType)?.validateValue(value, replacedGenericType.genericType?.genericMappers!!);
+                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, replacedGenericType.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Param/Value: Invalid value"));
                     }
@@ -106,12 +108,12 @@ export const useFunctionValidation = (
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
                         dataTypeService
                     );
-                    isValid = parameterDataType.validateDataType(resolvedValueDT);
+                    isValid = useValidateDataType(parameterDataType, resolvedValueDT)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Ref Type mismatch"));
                     }
                 } else {
-                    isValid = parameterDataType.validateValue(value);
+                    isValid = useValidateValue(value, parameterDataType)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Invalid value"));
                     }
@@ -121,12 +123,12 @@ export const useFunctionValidation = (
 
             if (valueDataType) {
                 if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.variant !== DataTypeVariant.Node) {
-                    isValid = parameterDataType.validateDataType(valueDataType);
+                    isValid = useValidateDataType(parameterDataType, valueDataType)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Ref Type mismatch"));
                     }
                 } else {
-                    isValid = parameterDataType.validateValue(value);
+                    isValid = useValidateValue(value, parameterDataType)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Non-generic: Invalid value"));
                     }

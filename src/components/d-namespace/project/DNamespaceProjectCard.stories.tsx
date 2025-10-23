@@ -4,6 +4,11 @@ import DNamespaceProjectCard, {DNamespaceProjectReactiveServiceExtended} from ".
 import {ContextStoreProvider} from "../../../utils/contextStore"
 import {useReactiveArrayService} from "../../../utils/reactiveArrayService"
 import {DNamespaceProjectView} from "./DNamespaceProject.view"
+import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
+import {
+    NamespacesProjectsAssignRuntimesInput,
+    NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput
+} from "@code0-tech/sagittarius-graphql-types"
 
 const meta: Meta = {
     title: "DProjectCard",

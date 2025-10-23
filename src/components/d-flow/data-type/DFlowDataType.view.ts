@@ -4,7 +4,7 @@ import {RuleMap} from "./rules/DFlowDataTypeRules";
 import {
     DataType,
     DataTypeRuleConnection,
-    DataTypeVariant, GenericMapper, Maybe, Namespace, NodeParameterValue, Scalars,
+    DataTypeVariant, GenericMapper, Maybe, NodeParameterValue, Runtime, Scalars,
     TranslationConnection
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -24,7 +24,7 @@ export class DataTypeView {
     /** Names of the flow type setting */
     private readonly _name?: Maybe<TranslationConnection>;
     /** The namespace where this datatype belongs to */
-    private readonly _namespace?: Maybe<Namespace>;
+    private readonly _runtime?: Maybe<Runtime>;
     /** Rules of the datatype */
     private readonly _rules?: Maybe<DataTypeRuleConnection>;
     /** Time when this DataType was last updated */
@@ -39,7 +39,7 @@ export class DataTypeView {
         this._updatedAt = dataType.updatedAt
         this._identifier = dataType.identifier
         this._name = dataType.name ?? undefined
-        this._namespace = dataType.namespace ?? undefined
+        this._runtime = dataType.runtime ?? undefined
         this._variant = dataType.variant
         this._genericKeys = dataType.genericKeys ?? undefined
         this._rules = dataType.rules ?? undefined
@@ -124,8 +124,8 @@ export class DataTypeView {
         return this._name;
     }
 
-    get namespace(): Maybe<Namespace> | undefined {
-        return this._namespace;
+    get runtime(): Maybe<Runtime> | undefined {
+        return this._runtime;
     }
 
     get rules(): Maybe<DataTypeRuleConnection> | undefined {

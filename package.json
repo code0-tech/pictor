@@ -116,6 +116,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@code0-tech/definition-reader": "^0.0.15"
+    "@code0-tech/definition-reader": "^0.0.16"
   }
 }

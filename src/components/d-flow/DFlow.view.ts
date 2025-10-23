@@ -129,7 +129,7 @@ export class NodeFunctionView {
     /** Global ID of this NodeFunction */
     private readonly _id?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The ID of the next Node Function in the flow */
-    private readonly _nextNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
+    private _nextNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The parameters of the Node Function */
     private readonly _parameters?: NodeParameterView[];
     /** The definition of the Node Function */
@@ -170,6 +170,10 @@ export class NodeFunctionView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    set nextNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {
+        this._nextNodeId = value;
     }
 }
 

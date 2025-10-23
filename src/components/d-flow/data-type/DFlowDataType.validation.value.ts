@@ -10,7 +10,7 @@ export const useValidateValue = (
     dataType: DataTypeView,
     generics?: GenericMapper[],
     flowId?: Scalars["NodeFunctionID"]["output"]
-) => {
+): boolean => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)

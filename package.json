@@ -55,7 +55,7 @@
     "@types/react": "^19.1.8",
     "@vitejs/plugin-react": "^5.0.4",
     "@xyflow/react": "^12.9.0",
-    "axe-playwright": "^2.1.0",
+    "axe-playwright": "^2.2.2",
     "babel-loader": "^9.2.1",
     "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "cmdk": "^1.1.1",

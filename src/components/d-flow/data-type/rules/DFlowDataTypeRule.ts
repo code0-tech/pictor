@@ -16,7 +16,7 @@ export const genericMapping = (to?: GenericMapper[], from?: Map<string, GenericM
     return to.map(generic => ({
         ...generic,
         target: generic.target,
-        sources: generic?.sources?.map(type => from?.get(type.genericKey!!)?.sources!!).flat(),
-        genericCombinationStrategies: generic?.sources?.map(type => from?.get(type.genericKey!!)?.genericCombinationStrategies!!).flat()
+        sources: generic?.sourceDataTypeIdentifiers?.map(type => from?.get(type.genericKey!!)?.sourceDataTypeIdentifiers!!).flat(),
+        genericCombinationStrategies: generic?.sourceDataTypeIdentifiers?.map(type => from?.get(type.genericKey!!)?.genericCombinationStrategies!!).flat()
     }))
 }

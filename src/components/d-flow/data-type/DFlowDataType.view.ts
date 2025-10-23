@@ -1,10 +1,9 @@
 
 import {DFlowDataTypeService} from "./DFlowDataType.service";
-import {RuleMap} from "./rules/DFlowDataTypeRules";
 import {
     DataType,
     DataTypeRuleConnection,
-    DataTypeVariant, GenericMapper, Maybe, NodeParameterValue, Runtime, Scalars,
+    DataTypeVariant, Maybe, Runtime, Scalars,
     TranslationConnection
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -46,63 +45,6 @@ export class DataTypeView {
         this._service = service
 
     }
-
-    public validateDataType(dataType: DataTypeView): boolean {
-
-        if (this._variant != dataType.variant) return false
-
-        const isObject = (object: object) => {
-            return object != null && typeof object === "object";
-        }
-
-        //all rules need to match
-        const isDeepEqual = (object1: { [index: string]: any }, object2: { [index: string]: any }) => {
-            const objKeys1 = Object.keys(object1)
-            const objKeys2 = Object.keys(object2)
-
-            if (objKeys1.length !== objKeys2.length) return false
-
-            for (const key of objKeys1) {
-                const value1 = object1[key]
-                const value2 = object2[key]
-                const isObjects = isObject(value1) && isObject(value2)
-
-                if ((isObjects && !isDeepEqual(value1, value2)) || (!isObjects && value1 !== value2)) return false
-            }
-            return true
-        }
-
-        const arraysEqual = (a1: [], a2: []): boolean =>
-            a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
-
-
-        if (this._rules && !dataType._rules) return false
-        if (!this._rules && dataType._rules) return false
-
-        return arraysEqual(this.rules?.nodes as [], this.rules?.nodes as [])
-    }
-
-    public validateValue(value: NodeParameterValue, generics?: GenericMapper[]): boolean {
-
-        //TODO: needs to be replaced with general validation for all types
-        /*
-        if (this._type === DataTypeVariant.Object && !isObject(value)) {
-            return false
-        }
-
-        if (this._type === DataTypeVariant.Node && !isNodeFunctionObject(value as NodeFunctionObject)) {
-            return false
-        }
-        */
-
-        const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.target!!, generic]))
-
-        return this.rules?.nodes?.every(rule => {
-            if (!rule || !rule.variant || !rule.config) return false
-            return RuleMap.get(rule.variant)?.validate(value, rule.config, map, this._service)
-        }) ?? false
-    }
-
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;

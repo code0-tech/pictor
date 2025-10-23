@@ -72,7 +72,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     ): string => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
-        const fnId = `${fn.runtimeFunction?.identifier}-${idCounter++}`;
+        const fnId = `${fn.functionDefinition?.identifier}-${idCounter++}`;
 
         if (idCounter == 1) {
             // erste Function-Card → Verbindung Trigger → Function
@@ -123,7 +123,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         /* ------- horizontale Kanten für Parameter -------------------- */
         fn.parameters?.forEach((param) => {
             const val = param.value;
-            const def = getFunctionDefinitionCached(fn.runtimeFunction?.id, fnCache)
+            const def = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache)
                 ?.parameterDefinitions?.find(p => p.id === param.id);
             const paramType = def?.dataTypeIdentifier;
             const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;

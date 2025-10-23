@@ -38,7 +38,7 @@ const isDataTypeIdentifier = (value: unknown): value is DataTypeIdentifier => {
 };
 
 const isGenericMapper = (value: GenericMapper): value is GenericMapper => {
-    return isPlainObject(value) && "target" in value && Array.isArray((value as GenericMapper).sources);
+    return isPlainObject(value) && "target" in value && Array.isArray((value as GenericMapper).sourceDataTypeIdentifiers);
 };
 
 const isDataType = (value: unknown): value is DataType => {
@@ -81,7 +81,7 @@ const cloneMapperWithSources = (
 ): GenericMapper => {
     return {
         ...mapper,
-        sources
+        sourceDataTypeIdentifiers: sources
     };
 };
 
@@ -185,25 +185,25 @@ export const resolveGenericKeyMappings = (
             const matchingValueMapper = valueMappers.find(mapper => mapper.target === paramMapper.target);
             if (!matchingValueMapper) continue;
 
-            const keysInSources = (paramMapper.sources ?? [])
+            const keysInSources = (paramMapper.sourceDataTypeIdentifiers ?? [])
                 .map(source => extractIdentifierGenericKey(source, genericKeySet))
                 .filter((key): key is string => !!key && genericKeySet.has(key));
 
             const combination = toCombinationTypes(paramMapper);
-            const valueSources = matchingValueMapper.sources ?? [];
+            const valueSources = matchingValueMapper.sourceDataTypeIdentifiers ?? [];
 
             if (
                 (combination.has(GenericCombinationStrategyType.And) || combination.has(GenericCombinationStrategyType.Or)) &&
                 valueSources.length === 1 &&
-                keysInSources.length === (paramMapper.sources?.length ?? 0)
+                keysInSources.length === (paramMapper.sourceDataTypeIdentifiers?.length ?? 0)
             ) {
                 for (const key of keysInSources) {
                     result[key] = valueSources[0];
                 }
             } else {
-                const length = Math.min(paramMapper.sources?.length ?? 0, valueSources.length);
+                const length = Math.min(paramMapper.sourceDataTypeIdentifiers?.length ?? 0, valueSources.length);
                 for (let index = 0; index < length; index++) {
-                    recurse(paramMapper.sources?.[index], valueSources[index]);
+                    recurse(paramMapper.sourceDataTypeIdentifiers?.[index], valueSources[index]);
                 }
             }
         }
@@ -234,13 +234,13 @@ export const replaceGenericKeysInType = (
     const resolvedMappers = (genericType.genericMappers ?? []).map(mapper => {
         const resolvedSources: DataTypeIdentifier[] = [];
 
-        for (const source of mapper.sources ?? []) {
+        for (const source of mapper.sourceDataTypeIdentifiers ?? []) {
             if (!source) continue;
             const sourceKey = source.genericKey;
             if (sourceKey && genericMap.has(sourceKey)) {
                 const replacement = genericMap.get(sourceKey);
                 if (replacement && isGenericMapper(replacement as GenericMapper)) {
-                    resolvedSources.push(...(replacement as GenericMapper).sources!!);
+                    resolvedSources.push(...(replacement as GenericMapper).sourceDataTypeIdentifiers!!);
                 } else if (replacement && isDataTypeIdentifier(replacement)) {
                     resolvedSources.push(replacement);
                 } else {
@@ -296,20 +296,15 @@ export const resolveAllGenericKeysInDataTypeObject = (
         }
 
         if (isGenericMapper(genericNode as GenericMapper) && isGenericMapper(concreteNode as GenericMapper)) {
-            const length = Math.min((genericNode as GenericMapper).sources?.length!!, (concreteNode as GenericMapper).sources?.length!!);
+            const length = Math.min((genericNode as GenericMapper).sourceDataTypeIdentifiers?.length!!, (concreteNode as GenericMapper).sourceDataTypeIdentifiers?.length!!);
             for (let index = 0; index < length; index++) {
-                visit((genericNode as GenericMapper).sources!![index], (concreteNode as GenericMapper).sources!![index], concreteNode as GenericMapper);
+                visit((genericNode as GenericMapper).sourceDataTypeIdentifiers!![index], (concreteNode as GenericMapper).sourceDataTypeIdentifiers!![index], concreteNode as GenericMapper);
                 if (unresolved.size === 0) return;
             }
             return;
         }
 
         if (isDataType(genericNode) && isDataType(concreteNode)) {
-            if (genericNode.parent && concreteNode.parent) {
-                visit(genericNode.parent, concreteNode.parent);
-                if (unresolved.size === 0) return;
-            }
-
             const genericRules = genericNode.rules?.nodes ?? [];
             const concreteRules = concreteNode.rules?.nodes ?? [];
             const length = Math.min(genericRules.length, concreteRules.length);
@@ -356,9 +351,6 @@ export const replaceGenericKeysInDataTypeObject = (
     dataType: DataType,
     genericMap: GenericMap
 ): DataType => {
-    const resolvedParent = dataType.parent
-        ? replaceGenericKeysInType(dataType.parent, genericMap)
-        : undefined;
 
     const resolvedRules = dataType.rules
         ? {
@@ -375,7 +367,6 @@ export const replaceGenericKeysInDataTypeObject = (
 
     return {
         ...dataType,
-        parent: resolvedParent,
         rules: resolvedRules as DataTypeRuleConnection
     };
 };
@@ -546,7 +537,7 @@ export const resolveType = (
                         genericMappers: [
                             {
                                 target: genericKey,
-                                sources: [resolveType(innerIdentifier, service)]
+                                sourceDataTypeIdentifiers: [resolveType(innerIdentifier, service)]
                             }
                         ]
                     }
@@ -563,7 +554,7 @@ export const resolveType = (
 
     const resolvedMappers = type.genericType.genericMappers?.map(mapper => ({
         ...mapper,
-        sources: mapper?.sources?.map(source => resolveType(source, service))
+        sources: mapper?.sourceDataTypeIdentifiers?.map(source => resolveType(source, service))
     })) ?? [];
 
     return {
@@ -628,7 +619,7 @@ export const replaceGenericsAndSortType = (
                           target: genericKeySet.has(mapper.target!!)
                               ? GENERIC_PLACEHOLDER
                               : mapper.target,
-                          sources: mapper.sources?.map(source => replaceIdentifier(source))
+                          sources: mapper.sourceDataTypeIdentifiers?.map(source => replaceIdentifier(source))
                       };
 
                       return sortValue(replacedMapper) as GenericMapper;

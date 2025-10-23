@@ -4,7 +4,7 @@ import {IconX} from "@tabler/icons-react";
 import Button from "../button/Button";
 
 
-interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
+export interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
     onClear?: (event: Event) => void

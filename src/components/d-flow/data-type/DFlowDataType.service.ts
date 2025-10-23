@@ -10,6 +10,7 @@ import {
     NodeParameterValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {useValidateValue} from "./DFlowDataType.validation.value";
 
 export interface DFlowDataTypeService {
     getDataType(type: DataTypeIdentifier): DataTypeView | undefined
@@ -47,7 +48,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         //TODO: performance here is bad
         const matchingDataTypes = this.values().filter(type => {
             if (type.identifier === "OBJECT") return false
-            return type.validateValue(value)
+            return useValidateValue(value, type)
         })
 
         // .sort((a, b) => {

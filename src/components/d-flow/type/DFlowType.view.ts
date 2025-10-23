@@ -85,4 +85,8 @@ export class FlowTypeView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): FlowType | undefined {
+        return undefined
+    }
 }

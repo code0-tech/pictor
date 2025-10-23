@@ -97,6 +97,10 @@ export class FunctionDefinitionView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): FunctionDefinition | undefined {
+        return undefined
+    }
 }
 
 export class ParameterDefinitionView {
@@ -118,7 +122,7 @@ export class ParameterDefinitionView {
 
     constructor(object: ParameterDefinition) {
         this._createdAt = object.createdAt;
-        this._dataTypeIdentifier = object.dataType;
+        this._dataTypeIdentifier = object.dataTypeIdentifier;
         this._descriptions = object.descriptions;
         this._documentations = object.documentations;
         this._id = object.id;
@@ -153,6 +157,10 @@ export class ParameterDefinitionView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    json(): ParameterDefinition | undefined {
+        return undefined
     }
 }
 

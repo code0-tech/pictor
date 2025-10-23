@@ -138,7 +138,8 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         position: { x: 0, y: 0 },
         draggable: false,
         data: {
-            instance: flow
+            instance: flow,
+            flowId,
         }
     })
 
@@ -152,12 +153,12 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         fnCache = functionCache,
         dtCache = dataTypeCache,
     ) => {
-        const id = `${fn.runtimeFunction?.identifier}-${idCounter++}`;
+        const id = `${fn.functionDefinition?.identifier}-${idCounter++}`;
         const index = ++globalNodeIndex; // global node level
 
         nodes.push({
             id,
-            type: bestMatchValue(packageNodes, fn.runtimeFunction?.identifier!!),
+            type: bestMatchValue(packageNodes, fn.functionDefinition?.identifier!!),
             position: { x: 0, y: 0 },
             draggable: false,
             parentId: parentGroup,
@@ -165,6 +166,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             data: {
                 instance: fn,
                 isParameter,
+                flowId,
                 linkingId: isParameter ? parentId : undefined,
                 scope: scopePath,   // scope is now a PATH (number[])
                 depth,              // structural depth (0 at root, +1 per group)
@@ -187,7 +189,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
             });
         }
 
-        const definition = getFunctionDefinitionCached(fn.runtimeFunction?.id, fnCache);
+        const definition = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache);
 
         fn.parameters?.forEach((param) => {
             const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.id)?.dataTypeIdentifier;
@@ -210,6 +212,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
                         data: {
                             isParameter: true,
                             linkingId: id,
+                            flowId,
                             depth: depth + 1,
                             scope: childScopePath,
                         },

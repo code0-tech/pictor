@@ -6,6 +6,7 @@ import {
     GenericMapper, LiteralValue,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {useValidateValue} from "../DFlowDataType.validation.value";
 
 
 @staticImplements<DFlowDataTypeRule>()
@@ -31,7 +32,7 @@ export class DFlowDataTypeContainsKeyRule {
         //use generic given type for checking against value
         if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return !!service?.getDataType(genericType)?.validateValue((value as LiteralValue).value[(config?.key ?? "")], ((genericType.genericType)!!.genericMappers as GenericMapper[]))
+                return useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(genericType)!!, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
             })
 
             const combination = checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -47,9 +48,9 @@ export class DFlowDataTypeContainsKeyRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return ((config?.key ?? "") in value) && (!!service?.getDataType(config.dataTypeIdentifier)?.validateValue((value as LiteralValue).value[(config?.key ?? "")]))
+            return ((config?.key ?? "") in value) && useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier)!!)
         }
 
-        return ((config?.key ?? "") in value) && (!!service?.getDataType(config.dataTypeIdentifier!!)?.validateValue((value as LiteralValue).value[(config?.key ?? "")], genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics)))
+        return ((config?.key ?? "") in value) && useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier!!)!!, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
     }
 }

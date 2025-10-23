@@ -22,9 +22,12 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
 
     const result = useSuggestions(undefined, [], props.data.flowId, 0, [0], 0)
     const flowService = useService(DFlowReactiveService)
+    const flow = flowService.getById(props.data.flowId)
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-        props.data.parentFunction.nextNode = new NodeFunctionView(suggestion.value as NodeFunction)
+        const nodeFunction = new NodeFunctionView(suggestion.value as NodeFunction)
+        props.data.parentFunction.nextNodeId = nodeFunction.id!!
+        flow?.addNode(nodeFunction)
         flowService.update()
     }} suggestions={result} triggerContent={
         <Button top={0} variant={"normal"} color={"secondary"}>

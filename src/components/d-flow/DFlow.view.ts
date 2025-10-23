@@ -180,6 +180,10 @@ export class NodeFunctionView {
         this._nextNodeId = value;
     }
 
+    deleteNextNode() {
+        this._nextNodeId = undefined;
+    }
+
     json(): NodeFunction | undefined {
         return undefined
     }

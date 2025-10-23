@@ -30,7 +30,7 @@ import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {FileTabsService} from "../../../file-tabs/FileTabs.service";
 import {DFlowViewportDefaultTabContent} from "../file-tabs/DFlowViewportDefaultTabContent";
-import {DataTypeVariant} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeVariant, Maybe, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunctionView
@@ -53,14 +53,14 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const definition = functionService.getFunctionDefinition(data.instance.id)
-    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json : p.value!!), useService(DFlowDataTypeReactiveService)!!)
+    const definition = functionService.getFunctionDefinition(data.instance.functionDefinition?.id!!)
+    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), useService(DFlowDataTypeReactiveService)!!)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
-    function isParamConnected(paramId: string): boolean {
+    function isParamConnected(paramId: Maybe<Scalars["NodeParameterID"]["output"]>): boolean {
         return edges.some(e =>
             e.target === id &&
             e.targetHandle === `param-${paramId}`
@@ -221,7 +221,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                                     }}
                                     id={`param-${param.id}`}
                                     isConnectable={false}
-                                    hidden={!isParamConnected(param.id)}
+                                    hidden={!isParamConnected(param.id!!)}
                                     className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                                 />
                             </Flex> : null

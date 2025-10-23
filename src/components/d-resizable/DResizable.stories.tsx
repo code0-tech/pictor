@@ -8,11 +8,6 @@ import {IconDatabase, IconFileFilled, IconHierarchy3, IconSettings, IconTicket} 
 import Flex from "../flex/Flex";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {useFlowViewportNodes} from "../d-flow/viewport/DFlowViewport.nodes.hook";
-import {useFlowViewportEdges} from "../d-flow/viewport/DFlowViewport.edges.hook";
-import {DFlow} from "../d-flow/DFlow";
-import {Background, BackgroundVariant} from "@xyflow/react";
-import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
 import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -45,13 +40,11 @@ export default meta
 export const Dashboard = () => {
 
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
-    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, (service) => {
-        return dataTypes.map(dataType => (new DataTypeView(dataType, service)))
-    })
-    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, functionData.map((fd) => new FunctionDefinitionView(fd)));
-    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView(flow1)]);
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService);
+    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [REST_FLOW_TYPE]);
+    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService);
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
@@ -141,7 +134,6 @@ export const Dashboard = () => {
                         <ContextStoreProvider
                             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
                             <DResizablePanel>
-                                <FlowExample/>
                             </DResizablePanel>
                             <DResizableHandle/>
                             <DResizablePanel>
@@ -155,19 +147,4 @@ export const Dashboard = () => {
         </Flex>
     </DFullScreen>
 
-}
-
-const FlowExample = () => {
-    const initialNodes = useFlowViewportNodes("some_database_id")
-    const initialEdges = useFlowViewportEdges("some_database_id")
-
-    return <DFlow
-        nodes={initialNodes}
-        edges={initialEdges}
-        fitView
-    >
-        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-        <DFlowViewportControls/>
-        {/*<DFlowViewportMiniMap/>*/}
-    </DFlow>
 }

@@ -1,10 +1,9 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
-import DOrganizationCard from "./DOrganizationCard"
+import DOrganizationCard, {DOrganizationReactiveServiceExtended} from "./DOrganizationCard"
 import {ContextStoreProvider} from "../../utils/contextStore"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
-import {DOrgaView} from "./DOrga.view"
-import {DOrgaReactiveService} from "./DOrga.service"
+import {DOrganizationView} from "./DOrganizationView"
 
 const meta: Meta = {
     title: "DOrganizationCard",
@@ -18,11 +17,14 @@ type DOrganizationCardStory = StoryObj<typeof DOrganizationCard>;
 export const DOrganizationCardExample: DOrganizationCardStory = {
     render: (props) => {
 
-        const [organizationStore, organizationService] = useReactiveArrayService<DOrgaView, DOrgaReactiveService>(DOrgaReactiveService, [{
+        const [organizationStore, organizationService] = useReactiveArrayService<DOrganizationView, DOrganizationReactiveServiceExtended>(DOrganizationReactiveServiceExtended, [{
             id: "gid://sagittarius/Organization/1",
             name: "Example Organization",
             namespace: {
-                id: "gid://sagittarius/Namespace/1"
+                id: "gid://sagittarius/Namespace/1",
+                projects: {
+                  count: 5
+                }
             },
             createdAt: new Date().toString(),
             updatedAt: new Date().toString()

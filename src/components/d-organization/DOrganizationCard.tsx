@@ -2,28 +2,45 @@
 
 import React from "react"
 import {Code0Component} from "../../utils/types"
-import {Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {
+    OrganizationsCreateInput,
+    OrganizationsDeleteInput,
+    OrganizationsUpdateInput,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types"
 import {Card} from "../../index"
 import Text from "../text/Text"
 import {useService, useStore} from "../../utils/contextStore"
-import {DOrgaReactiveService} from "./DOrga.service"
+import {DOrganizationReactiveService} from "./DOrganizationService"
 import Row from "../row/Row"
 import Badge from "../badge/Badge"
 import {IconUsersGroup} from "@tabler/icons-react"
 import Col from "../col/Col"
-import {DNamespaceProjectReactiveServiceExtended} from "../d-namespace/project/DNamespaceProjectCard"
+import {DOrganizationView} from "./DOrganizationView"
+
+export class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService {
+    organizationCreate(payload: OrganizationsCreateInput): DOrganizationView | undefined {
+        return undefined
+    }
+
+    organizationDelete(payload: OrganizationsDeleteInput): void {
+    }
+
+    organizationUpdate(payload: OrganizationsUpdateInput): DOrganizationView | undefined {
+        return undefined
+    }
+}
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']
 }
 
 const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
-    const organizationStore = useStore(DOrgaReactiveService)
-    const organizationService = useService(DOrgaReactiveService)
-    const projectService = useService(DNamespaceProjectReactiveServiceExtended)
+    const organizationStore = useStore(DOrganizationReactiveServiceExtended)
+    const organizationService = useService(DOrganizationReactiveServiceExtended)
 
     const organization = organizationService.findById(props.organizationId)
-    //get projects count
+    const projectCount = organization?.namespace?.projects?.count
 
     return React.useMemo(() => {
         return (
@@ -35,7 +52,7 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
                             {organization?.name}
                         </Text>
                         <Badge color={"secondary"} style={{fontSize: "0.8rem", width: "100%", borderRadius: "8px"}}>
-                            {"Projects: 0"}
+                            {"Projects: " + (projectCount ?? 0)}
                         </Badge>
                     </Col>
                 </Row>

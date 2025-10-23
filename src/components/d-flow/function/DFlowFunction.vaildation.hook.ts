@@ -32,7 +32,7 @@ export const useFunctionValidation = (
     parameters.forEach((parameter, index) => {
         const value = values[index]
         const parameterType = parameter.dataTypeIdentifier
-        const valueType = value.__typename === "NodeFunction" ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).id)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value);
+        const valueType = value.__typename === "NodeFunction" ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value);
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
         const valueDataType = dataTypeService.getDataType(valueType!!)
 

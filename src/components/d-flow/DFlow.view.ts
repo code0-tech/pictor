@@ -119,6 +119,10 @@ export class FlowView {
         }
         return this._nodes.find(node => node.id === nodeId);
     }
+
+    json(): Flow | undefined {
+        return undefined
+    }
 }
 
 export class NodeFunctionView {
@@ -175,6 +179,10 @@ export class NodeFunctionView {
     set nextNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {
         this._nextNodeId = value;
     }
+
+    json(): NodeFunction | undefined {
+        return undefined
+    }
 }
 
 export class NodeParameterView {
@@ -230,6 +238,10 @@ export class NodeParameterView {
             this._value = value as LiteralValue | ReferenceValue;
         }
     }
+
+    json(): NodeParameter | undefined {
+        return undefined
+    }
 }
 
 export class FlowSettingView {
@@ -274,5 +286,9 @@ export class FlowSettingView {
 
     set value(value: Maybe<Scalars["JSON"]["output"]>) {
         this._value = value;
+    }
+
+    json(): FlowSetting | undefined {
+        return undefined
     }
 }

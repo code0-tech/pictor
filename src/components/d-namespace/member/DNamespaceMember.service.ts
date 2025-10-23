@@ -2,46 +2,38 @@ import {
     Maybe,
     NamespacesMembersAssignRolesInput,
     NamespacesMembersDeleteInput,
-    NamespacesMembersInviteInput, Scalars
+    NamespacesMembersInviteInput,
+    Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceMemberView} from "./DNamespaceMember.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 
-export interface DNamespaceMemberService {
-    membersInvite(payload: NamespacesMembersInviteInput): DNamespaceMemberView | undefined
-
-    membersDelete(payload: NamespacesMembersDeleteInput): void
-
-    membersAssignRoles(payload: NamespacesMembersAssignRolesInput): DNamespaceMemberView | undefined
-
-    findById(id: Maybe<Scalars['NamespaceMemberID']['output']>): DNamespaceMemberView | undefined
-}
-
-export class DNamespaceMemberReactiveService extends ReactiveArrayService<DNamespaceMemberView> implements DNamespaceMemberService {
+export abstract class DNamespaceMemberService extends ReactiveArrayService<DNamespaceMemberView> {
 
     constructor(payload: ReactiveArrayStore<DNamespaceMemberView>) {
         super(payload);
     }
 
+    abstract membersInvite(payload: NamespacesMembersInviteInput): DNamespaceMemberView | undefined
+
+    abstract membersDelete(payload: NamespacesMembersDeleteInput): void
+
+    abstract membersAssignRoles(payload: NamespacesMembersAssignRolesInput): DNamespaceMemberView | undefined
+
+    abstract findById(id: Maybe<Scalars['NamespaceMemberID']['output']>): DNamespaceMemberView | undefined
+}
+
+export abstract class DNamespaceMemberReactiveService extends DNamespaceMemberService {
+
     findById(id: Maybe<Scalars["NamespaceMemberID"]["output"]>): DNamespaceMemberView | undefined {
         return this.values().find(member => member.id === id);
     }
 
-    membersAssignRoles(payload: NamespacesMembersAssignRolesInput): DNamespaceMemberView | undefined {
-        return undefined;
-    }
+    abstract override membersAssignRoles(payload: NamespacesMembersAssignRolesInput): DNamespaceMemberView | undefined
 
-    membersDelete(payload: NamespacesMembersDeleteInput): void {
-        if (this.findById(payload.namespaceMemberId)) {
-            const index = this.values().findIndex(member => member.id === payload.namespaceMemberId);
-            this.delete(index);
-            this.update()
-        }
-    }
+    abstract override membersDelete(payload: NamespacesMembersDeleteInput): void
 
-    membersInvite(payload: NamespacesMembersInviteInput): DNamespaceMemberView | undefined {
-        return undefined;
-    }
+    abstract override membersInvite(payload: NamespacesMembersInviteInput): DNamespaceMemberView | undefined
 
 
 }

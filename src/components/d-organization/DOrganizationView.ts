@@ -1,6 +1,6 @@
 import {Maybe, Namespace, Organization, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
-export class DOrgaView {
+export class DOrganizationView {
 
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Organization */

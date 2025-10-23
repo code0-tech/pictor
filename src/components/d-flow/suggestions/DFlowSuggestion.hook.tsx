@@ -92,9 +92,10 @@ export const useSuggestions = (
 
         matchingFunctions.forEach(funcDefinition => {
             const nodeFunctionSuggestion: NodeFunction = {
-                id: funcDefinition.id,
-                runtimeFunction: {
-                  identifier: ""
+                //TODO: generate unique id
+                id: `gid://sagittarius/NodeFunction/1`,
+                functionDefinition: {
+                    id: funcDefinition.id,
                 },
                 parameters: {
                     nodes: (funcDefinition.parameterDefinitions?.map(definition => {
@@ -214,7 +215,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
         let current: NodeFunctionView | undefined = fn;
 
         while (current) {
-            const def = functionService.getFunctionDefinition(current.id);
+            const def = functionService.getFunctionDefinition(current.functionDefinition?.id!!);
             if (!def) break;
 
             // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
@@ -235,7 +236,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                         const valuesArray =
                             rawValue !== undefined
                                 ? rawValue instanceof NodeFunctionView
-                                    ? [rawValue.json]
+                                    ? [rawValue.json()!!]
                                     : [rawValue]
                                 : [];
 
@@ -261,7 +262,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                     current.parameters?.map((p) => p.value).filter((v) => v !== undefined) ?? [];
                 const resolvedReturnType = useReturnType(
                     def,
-                    paramValues.map((v) => (v instanceof NodeFunctionView ? v.json : v)),
+                    paramValues.map((v) => (v instanceof NodeFunctionView ? v.json()!! : v)),
                     dataTypeService
                 );
                 if (resolvedReturnType) {

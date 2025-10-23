@@ -15,7 +15,9 @@ import {DUserView} from "./DUser.view";
 
 export abstract class DUserService extends ReactiveArrayService<DUserView> {
 
-    constructor(store: ReactiveArrayStore<DUserView>) { super(store); }
+    constructor(store: ReactiveArrayStore<DUserView>) {
+        super(store);
+    }
 
     abstract userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
 
@@ -69,10 +71,15 @@ export abstract class DUserReactiveService extends DUserService {
     }
 
     abstract override userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
+
     abstract override userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
+
     abstract override userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
+
     abstract override userRegister(payload: UsersRegisterInput): User | undefined
+
     abstract override userUpdate(payload: UsersUpdateInput): User | undefined
+
     abstract override userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
 
 

@@ -13,7 +13,7 @@ export class DFlowDataTypeContainsKeyRule {
     public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
-        const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sources
+        const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers
         const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
         //TODO: seperate general validation

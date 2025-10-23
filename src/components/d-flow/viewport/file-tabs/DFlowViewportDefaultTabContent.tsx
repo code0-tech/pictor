@@ -29,7 +29,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
-    const definition = functionService.getFunctionDefinition(functionInstance.id)
+    const definition = functionService.getFunctionDefinition(functionInstance.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameterDefinitions?.forEach(pd => {

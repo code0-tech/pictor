@@ -4,18 +4,18 @@ import {DataTypeView} from "./DFlowDataType.view";
 import {useService} from "../../../utils/contextStore";
 import {DFlowDataTypeReactiveService} from "./DFlowDataType.service";
 import {DFlowReactiveService} from "../DFlow.service";
+import {FlowView} from "../DFlow.view";
 
 export const useValidateValue = (
     value: NodeParameterValue,
     dataType: DataTypeView,
+    flow?: FlowView,
     generics?: GenericMapper[],
-    flowId?: Scalars["NodeFunctionID"]["output"]
 ): boolean => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
 
-    const flow = flowId ? flowService.getById(flowId) : undefined
     const map = new Map<string, GenericMapper>(generics?.map(generic => [generic.target!!, generic]))
 
     return dataType.rules?.nodes?.every(rule => {

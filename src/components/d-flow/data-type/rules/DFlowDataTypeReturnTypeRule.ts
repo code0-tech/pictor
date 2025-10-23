@@ -1,8 +1,11 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {
-    DataTypeRulesReturnTypeConfig, GenericCombinationStrategyType,
-    GenericMapper, GenericType, NodeFunction,
+    DataTypeRulesReturnTypeConfig,
+    GenericCombinationStrategyType,
+    GenericMapper,
+    GenericType,
+    NodeFunction,
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
@@ -71,7 +74,7 @@ export class DFlowDataTypeReturnTypeRule {
             if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
 
                 const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                    return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(genericType)!!,  ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                    return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(genericType)!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -87,7 +90,7 @@ export class DFlowDataTypeReturnTypeRule {
                 return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!)
             }
 
-            return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, genericMapping(config.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
+            return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, flow, genericMapping(config.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
 
         }
 

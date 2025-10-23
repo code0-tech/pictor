@@ -7,11 +7,12 @@ import {
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValidateValue} from "../DFlowDataType.validation.value";
+import {FlowView} from "../../DFlow.view";
 
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsKeyRule {
-    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService): boolean {
+    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeService, flow?: FlowView): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
         const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers
@@ -32,7 +33,7 @@ export class DFlowDataTypeContainsKeyRule {
         //use generic given type for checking against value
         if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(genericType)!!, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
+                return useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(genericType)!!, flow, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
             })
 
             const combination = checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -51,6 +52,6 @@ export class DFlowDataTypeContainsKeyRule {
             return ((config?.key ?? "") in value) && useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier)!!)
         }
 
-        return ((config?.key ?? "") in value) && useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier!!)!!, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
+        return ((config?.key ?? "") in value) && useValidateValue((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier!!)!!, flow, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
     }
 }

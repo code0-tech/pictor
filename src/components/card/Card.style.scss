@@ -3,7 +3,7 @@
 @use "../../styles/variables";
 @use "sass:math";
 
-$padding: variables.$md;
+$padding: variables.$xs;
 
 .card {
 
@@ -16,29 +16,31 @@ $padding: variables.$md;
     @include helpers.fontStyle();
   }
 
-  * {
+  > .card__section {
+    > img { border-radius: math.div(variables.$borderRadius, 2); }
 
+    /* erste Section */
+    &:first-child {
+      margin-top: 0;
+    }
+    &--border:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    /* letzte Section: kein weiteres .card__section folgt */
+    &:not(:has(~ .card__section)) {
+      margin-bottom: 0;
+    }
+    &--border:not(:has(~ .card__section)) {
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  * {
     &.card__section > img {
       border-radius: math.div(variables.$borderRadius, 2);
-    }
-
-    &:first-child.card__section {
-      margin-top: 0;
-
-      &--border {
-        padding-top: 0;
-        border-top: none;
-      }
-
-    }
-
-    &:last-child.card__section {
-      margin-bottom: 0;
-
-      &--border {
-        padding-bottom: 0;
-        border-bottom: none;
-      }
     }
   }
 
@@ -98,13 +100,13 @@ $padding: variables.$md;
   }
 
   .card--outline-#{$name} {
-    outline-offset: $padding;
-    margin: $padding;
+    outline-offset: $padding/2;
+    margin: $padding/2;
     outline: helpers.borderColor($color) solid 1px;
   }
 
   .card--border-#{$name} {
-    border-color: helpers.borderColor($color);
+    box-shadow: inset 0 0 0 1px helpers.borderColor($color);
   }
 
   .card--border--dashed {

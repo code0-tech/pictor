@@ -1,147 +1,166 @@
-import {Translation} from "../../../utils/translation";
-import {GenericMapper, Type, Value} from "../data-type/DFlowDataType.view";
+import {
+    DataTypeIdentifier,
+    FunctionDefinition,
+    Maybe, ParameterDefinition,
+    RuntimeFunctionDefinition,
+    Scalars,
+    TranslationConnection
+} from "@code0-tech/sagittarius-graphql-types";
 
-export interface FunctionGenericMapper extends GenericMapper {
-    parameter_id?: string
-}
+export class FunctionDefinitionView {
 
-export interface FunctionDefinitionObject {
-    function_id: string
-    runtime_function_id: string //runtime function id
-    return_type?: Type // data type id
-    parameters?: ParameterDefinitionObject[]
-    throwing?: string[] // data type id
-    deprecatedMessage?: Translation[]
-    name?: Translation[]
-    description?: Translation[]
-    documentation?: Translation[] //as markdown
-    generic_keys?: string[]
-    generic_mapper?: FunctionGenericMapper[] //TODO: remove
-}
+    /** Time when this FunctionDefinition was created */
+    private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** Deprecation message of the function */
+    private readonly _deprecationMessages?: Maybe<TranslationConnection>;
+    /** Description of the function */
+    private readonly _descriptions?: Maybe<TranslationConnection>;
+    /** Documentation of the function */
+    private readonly _documentations?: Maybe<TranslationConnection>;
+    /** Generic keys of the function */
+    private readonly _genericKeys?: Maybe<Array<Scalars['String']['output']>>;
+    /** Global ID of this FunctionDefinition */
+    private readonly _id?: Maybe<Scalars['FunctionDefinitionID']['output']>;
+    /** Name of the function */
+    private readonly _names?: Maybe<TranslationConnection>;
+    /** Parameters of the function */
+    private readonly _parameterDefinitions?: Maybe<ParameterDefinitionView[]>;
+    /** Return type of the function */
+    private readonly _returnType?: Maybe<DataTypeIdentifier>;
+    /** Runtime function definition */
+    private readonly _runtimeFunctionDefinition?: Maybe<RuntimeFunctionDefinition>;
+    /** Indicates if the function can throw an error */
+    private readonly _throwsError?: Maybe<Scalars['Boolean']['output']>;
+    /** Time when this FunctionDefinition was last updated */
+    private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
-export interface ParameterDefinitionObject {
-    parameter_id: string
-    runtime_parameter_id: string
-    type: Type
-    name?: Translation[] // overrides the runtime parameter name and ref to language entry
-    description?: Translation[]
-    default_value?: Value
-}
-
-export class FunctionDefinition {
-
-    private readonly _function_id: string
-    private readonly _runtime_function_id: string
-    private readonly _return_type?: Type
-    private readonly _parameters?: ParameterDefinition[]
-    private readonly _throwing?: string[]
-    private readonly _deprecatedMessage?: Translation[]
-    private readonly _name?: Translation[]
-    private readonly _description?: Translation[]
-    private readonly _documentation?: Translation[]
-    private readonly _genericKeys?: string[]
-    private readonly _genericMapper?: FunctionGenericMapper[]
-
-    constructor(object: FunctionDefinitionObject) {
-        this._function_id = object.function_id
-        this._runtime_function_id = object.runtime_function_id
-        this._return_type = object.return_type
-        this._parameters = object.parameters?.map(parameters => new ParameterDefinition(parameters))
-        this._throwing = object.throwing
-        this._deprecatedMessage = object.deprecatedMessage
-        this._name = object.name
-        this._description = object.description
-        this._documentation = object.documentation
-        this._genericKeys = object.generic_keys
-        this._genericMapper = object.generic_mapper
+    constructor(object: FunctionDefinition) {
+        this._createdAt = object.createdAt;
+        this._deprecationMessages = object.deprecationMessages;
+        this._descriptions = object.descriptions;
+        this._documentations = object.documentations;
+        this._genericKeys = object.genericKeys;
+        this._id = object.id;
+        this._names = object.names;
+        this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterDefinitionView(definition!!)) ?? undefined;
+        this._returnType = object.returnType;
+        this._runtimeFunctionDefinition = object.runtimeFunctionDefinition;
+        this._throwsError = object.throwsError;
+        this._updatedAt = object.updatedAt;
     }
 
-    get function_id(): string {
-        return this._function_id;
+
+    get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._createdAt;
     }
 
-    get runtime_function_id(): string {
-        return this._runtime_function_id;
+    get deprecationMessages(): Maybe<TranslationConnection> | undefined {
+        return this._deprecationMessages;
     }
 
-    get return_type(): Type | undefined {
-        return this._return_type;
+    get descriptions(): Maybe<TranslationConnection> | undefined {
+        return this._descriptions;
     }
 
-    get parameters(): ParameterDefinition[] | undefined {
-        return this._parameters;
+    get documentations(): Maybe<TranslationConnection> | undefined {
+        return this._documentations;
     }
 
-    get throwing(): string[] | undefined {
-        return this._throwing;
-    }
-
-    get deprecatedMessage(): Translation[] | undefined {
-        return this._deprecatedMessage;
-    }
-
-    get name(): Translation[] | undefined {
-        return this._name;
-    }
-
-    get description(): Translation[] | undefined {
-        return this._description;
-    }
-
-    get documentation(): Translation[] | undefined {
-        return this._documentation;
-    }
-
-    get genericKeys(): string[] | undefined {
+    get genericKeys(): Maybe<Array<Scalars["String"]["output"]>> | undefined {
         return this._genericKeys;
     }
 
-    get genericMapper(): FunctionGenericMapper[] | undefined {
-        return this._genericMapper;
+    get id(): Maybe<Scalars["FunctionDefinitionID"]["output"]> | undefined {
+        return this._id;
+    }
+
+    get names(): Maybe<TranslationConnection> | undefined {
+        return this._names;
+    }
+
+    get parameterDefinitions(): Maybe<ParameterDefinitionView[]> | undefined {
+        return this._parameterDefinitions;
+    }
+
+    get returnType(): Maybe<DataTypeIdentifier> | undefined {
+        return this._returnType;
+    }
+
+    get runtimeFunctionDefinition(): Maybe<RuntimeFunctionDefinition> | undefined {
+        return this._runtimeFunctionDefinition;
+    }
+
+    get throwsError(): Maybe<Scalars["Boolean"]["output"]> | undefined {
+        return this._throwsError;
+    }
+
+    get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._updatedAt;
+    }
+
+    json(): FunctionDefinition | undefined {
+        return undefined
     }
 }
 
-export class ParameterDefinition {
+export class ParameterDefinitionView {
 
-    private readonly _parameter_id: string
-    private readonly _runtime_function_id: string
-    private readonly _type: Type
-    private readonly _name?: Translation[]
-    private readonly _description?: Translation[]
-    private readonly _default_value?: Value
+    /** Time when this ParameterDefinition was created */
+    private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** Data type of the parameter */
+    private readonly _dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
+    /** Description of the parameter */
+    private readonly _descriptions?: Maybe<TranslationConnection>;
+    /** Documentation of the parameter */
+    private readonly _documentations?: Maybe<TranslationConnection>;
+    /** Global ID of this ParameterDefinition */
+    private readonly _id?: Maybe<Scalars['ParameterDefinitionID']['output']>;
+    /** Name of the parameter */
+    private readonly _names?: Maybe<TranslationConnection>;
+    /** Time when this ParameterDefinition was last updated */
+    private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
-    constructor(object: ParameterDefinitionObject) {
-        this._parameter_id = object.parameter_id
-        this._runtime_function_id = object.runtime_parameter_id
-        this._type = object.type
-        this._name = object.name
-        this._description = object.description
-        this._default_value = object.default_value
+    constructor(object: ParameterDefinition) {
+        this._createdAt = object.createdAt;
+        this._dataTypeIdentifier = object.dataTypeIdentifier;
+        this._descriptions = object.descriptions;
+        this._documentations = object.documentations;
+        this._id = object.id;
+        this._names = object.names;
+        this._updatedAt = object.updatedAt;
     }
 
 
-    get parameter_id(): string {
-        return this._parameter_id;
+    get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._createdAt;
     }
 
-    get runtime_function_id(): string {
-        return this._runtime_function_id;
+    get dataTypeIdentifier(): Maybe<DataTypeIdentifier> | undefined {
+        return this._dataTypeIdentifier;
     }
 
-    get type(): Type {
-        return this._type;
+    get descriptions(): Maybe<TranslationConnection> | undefined {
+        return this._descriptions;
     }
 
-    get name(): Translation[] | undefined {
-        return this._name;
+    get documentations(): Maybe<TranslationConnection> | undefined {
+        return this._documentations;
     }
 
-    get description(): Translation[] | undefined {
-        return this._description;
+    get id(): Maybe<Scalars["ParameterDefinitionID"]["output"]> | undefined {
+        return this._id;
     }
 
-    get default_value(): Value | undefined {
-        return this._default_value;
+    get names(): Maybe<TranslationConnection> | undefined {
+        return this._names;
+    }
+
+    get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._updatedAt;
+    }
+
+    json(): ParameterDefinition | undefined {
+        return undefined
     }
 }
 

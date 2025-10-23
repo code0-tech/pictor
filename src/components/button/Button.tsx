@@ -19,7 +19,7 @@ export interface ButtonProps extends Code0Component<HTMLButtonElement> {
 
 const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
 
-    const {children, variant = "outlined", color = "secondary", active = false, disabled = false, ...args} = props
+    const {children, variant = "normal", color = "secondary", active = false, disabled = false, ...args} = props
 
     return <button ref={ref} {...mergeCode0Props(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant}`, args)}
               aria-disabled={disabled ? "true" : "false"}>

@@ -1,32 +1,20 @@
-import {EDataTypeRuleType} from "../DFlowDataType.view";
-import {DFlowDataTypeRegexRule, DFlowDataTypeRegexRuleConfig} from "./DFlowDataTypeRegexRule";
-import {DFlowDataTypeNumberRangeRuleConfig, DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
+import {DFlowDataTypeRegexRule} from "./DFlowDataTypeRegexRule";
+import {DFlowDataTypeRangeRule} from "./DFlowDataTypeNumberRangeRule";
 import {
-    DFlowDataTypeItemOfCollectionRule,
-    DFlowDataTypeItemOfCollectionRuleConfig
+    DFlowDataTypeItemOfCollectionRule
 } from "./DFlowDataTypeItemOfCollectionRule";
-import {DFlowDataTypeContainsTypeRule, DFlowDataTypeContainsTypeRuleConfig} from "./DFlowDataTypeContainsTypeRule";
-import {DFlowDataTypeContainsKeyRule, DFlowDataTypeContainsKeyRuleConfig} from "./DFlowDataTypeContainsKeyRule";
+import {DFlowDataTypeContainsTypeRule} from "./DFlowDataTypeContainsTypeRule";
+import {DFlowDataTypeContainsKeyRule} from "./DFlowDataTypeContainsKeyRule";
 import {DFlowDataTypeRule} from "./DFlowDataTypeRule";
-import {DFlowDataTypeReturnTypeRule, DFlowDataTypeReturnTypeRuleConfig} from "./DFlowDataTypeReturnTypeRule";
-import {DFlowDataTypeParentRule, DFlowDataTypeParentRuleConfig} from "./DFlowDataTypeParentRule";
+import {DFlowDataTypeReturnTypeRule} from "./DFlowDataTypeReturnTypeRule";
+import {DataTypeRulesVariant} from "@code0-tech/sagittarius-graphql-types";
 
-export const RuleMap = new Map<EDataTypeRuleType, DFlowDataTypeRule>([
-    [EDataTypeRuleType.REGEX, DFlowDataTypeRegexRule],
-    [EDataTypeRuleType.NUMBER_RANGE, DFlowDataTypeRangeRule],
-    [EDataTypeRuleType.ITEM_OF_COLLECTION, DFlowDataTypeItemOfCollectionRule],
-    [EDataTypeRuleType.CONTAINS_TYPE, DFlowDataTypeContainsTypeRule],
-    [EDataTypeRuleType.CONTAINS_KEY, DFlowDataTypeContainsKeyRule],
-    [EDataTypeRuleType.RETURNS_TYPE, DFlowDataTypeReturnTypeRule],
-    [EDataTypeRuleType.PARENT, DFlowDataTypeParentRule]
+export const RuleMap = new Map<DataTypeRulesVariant, DFlowDataTypeRule>([
+    [DataTypeRulesVariant.Regex, DFlowDataTypeRegexRule],
+    [DataTypeRulesVariant.NumberRange, DFlowDataTypeRangeRule],
+    [DataTypeRulesVariant.ItemOfCollection, DFlowDataTypeItemOfCollectionRule],
+    [DataTypeRulesVariant.ContainsType, DFlowDataTypeContainsTypeRule],
+    [DataTypeRulesVariant.ContainsKey, DFlowDataTypeContainsKeyRule],
+    [DataTypeRulesVariant.ReturnType, DFlowDataTypeReturnTypeRule]
 
 ])
-
-//TODO: add input type rule
-export type CombinesRuleConfig = DFlowDataTypeRegexRuleConfig
-    | DFlowDataTypeNumberRangeRuleConfig
-    | DFlowDataTypeItemOfCollectionRuleConfig
-    | DFlowDataTypeContainsTypeRuleConfig
-    | DFlowDataTypeContainsKeyRuleConfig
-    | DFlowDataTypeReturnTypeRuleConfig
-    | DFlowDataTypeParentRuleConfig

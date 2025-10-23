@@ -1,91 +1,139 @@
 import {useService} from "../../../utils/contextStore";
-import {DFlowReactiveSuggestionService} from "./DFlowReactiveSuggestionService";
+import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {EDataType, EDataTypeRuleType, RefObject, Type} from "../data-type/DFlowDataType.view";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {DFlowDataTypeItemOfCollectionRuleConfig} from "../data-type/rules/DFlowDataTypeItemOfCollectionRule";
-import {DFlowDataTypeNumberRangeRuleConfig} from "../data-type/rules/DFlowDataTypeNumberRangeRule";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
-import {NodeFunction, NodeFunctionObject} from "../DFlow.view";
+import {NodeFunctionView} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
-import {DFlowDataTypeInputTypeRuleConfig} from "../data-type/rules/DFlowDataTypeInputTypeRule";
 import {useInputType} from "../function/DFlowFunction.input.hook";
+import {
+    DataTypeIdentifier,
+    DataTypeRulesInputTypeConfig,
+    DataTypeRulesItemOfCollectionConfig,
+    DataTypeRulesNumberRangeConfig,
+    DataTypeRulesVariant,
+    DataTypeVariant,
+    Maybe,
+    NodeFunction,
+    NodeParameter,
+    ReferenceValue
+} from "@code0-tech/sagittarius-graphql-types";
 
 //TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
+//TODO: calculate FUNCTION_COMBINATION deepness max 2
 
-export const useSuggestions = (type: Type, genericKeys: string[], flowId: string, contextLevel: number = 0, nodeLevel: number = 1): DFlowSuggestion[] => {
+export const useSuggestions = (
+    type: DataTypeIdentifier | undefined,
+    genericKeys: string[] | undefined,
+    flowId: string,
+    depth: number = 0,
+    scope: number[] = [0],
+    node: number = 1): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
 
-    const dataType = dataTypeService?.getDataType(type)
+    const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
-    if (!dataType || !suggestionService || !dataTypeService) return []
+    if (!suggestionService || !dataTypeService) return []
 
-    const hashedType = useTypeHash(type)
-    const resolvedType = replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys)
-    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
+    const hashedType = type ? useTypeHash(type) : undefined
+    const resolvedType = type ? replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys) : undefined
     const state: DFlowSuggestion[] = []
-    if (!hashedType) return []
+    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
 
     if (cached.length <= 0) {
 
-        //calculate VALUE
-        dataType.rules?.forEach(rule => {
-            if (rule.type === EDataTypeRuleType.ITEM_OF_COLLECTION) {
-                (rule.config as DFlowDataTypeItemOfCollectionRuleConfig).items.forEach(value => {
-                    const suggestion = new DFlowSuggestion(hashedType, [], value, DFlowSuggestionType.VALUE);
+        if (hashedType && dataType) {
+            //calculate VALUE
+            dataType.rules?.nodes?.forEach(rule => {
+                if (rule?.variant === DataTypeRulesVariant.ItemOfCollection) {
+                    (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
+                        const suggestion = new DFlowSuggestion(hashedType, [], {
+                            createdAt: "",
+                            id: undefined,
+                            updatedAt: "",
+                            value: value
+                        }, DFlowSuggestionType.VALUE, [value.toString()])
+                        suggestionService.addSuggestion(suggestion)
+                        state.push(suggestion)
+                    })
+                } else if (rule?.variant === DataTypeRulesVariant.NumberRange) {
+                    const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
+                    const suggestion = new DFlowSuggestion(hashedType, [], {
+                        createdAt: "",
+                        id: undefined,
+                        updatedAt: "",
+                        value: config.from
+                    }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                     suggestionService.addSuggestion(suggestion)
                     state.push(suggestion)
-                })
-            } else if (rule.type === EDataTypeRuleType.NUMBER_RANGE) {
-                const config: DFlowDataTypeNumberRangeRuleConfig = rule.config as DFlowDataTypeNumberRangeRuleConfig
-                const suggestion = new DFlowSuggestion(hashedType, [], config.from, DFlowSuggestionType.VALUE)
-                suggestionService.addSuggestion(suggestion)
-                state.push(suggestion)
-            }
-        })
+                }
+            })
+        }
+
 
         //calculate FUNCTION
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
-            if (!funcDefinition.return_type) return false
-            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.return_type, dataTypeService), funcDefinition.genericKeys)
+            if (!type || !resolvedType || !hashedType) return true
+            if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
+            if (dataType?.variant === DataTypeVariant.Node) return true
+            if (!funcDefinition.returnType) return false
+            if (!funcDefinition.genericKeys) return false
+            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
-
         })
 
         matchingFunctions.forEach(funcDefinition => {
-            const suggestion = new DFlowSuggestion(hashedType, [], {
-                function: {
-                    function_id: funcDefinition.function_id,
-                    runtime_function_id: funcDefinition.runtime_function_id
+            const nodeFunctionSuggestion: NodeFunction = {
+                //TODO: generate unique id
+                id: `gid://sagittarius/NodeFunction/1`,
+                functionDefinition: {
+                    id: funcDefinition.id,
                 },
-            } as NodeFunctionObject, DFlowSuggestionType.FUNCTION)
+                parameters: {
+                    nodes: (funcDefinition.parameterDefinitions?.map(definition => {
+                        return {
+                            id: definition.id,
+                            runtimeParameter: {
+                                id: definition.id
+                            }
+                        }
+                    }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
+                }
+            }
+            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.id as string])
             suggestionService.addSuggestion(suggestion)
             state.push(suggestion)
         })
 
-
-        //calculate FUNCTION_COMBINATION deepness max 2
-
     }
 
+
     //calculate REF_OBJECTS && FUNCTION_COMBINATION
-    const refObjects = useRefObjects(flowId)
+    const refObjects = type ? useRefObjects(flowId) : []
+
     refObjects.forEach(value => {
-        if (value.primaryLevel > contextLevel && value.secondaryLevel > nodeLevel) return
-        const suggestion = new DFlowSuggestion(hashedType, [], value as RefObject, DFlowSuggestionType.REF_OBJECT)
+        if (value?.node ?? 0 >= node) return
+        if (value?.depth ?? 0 > depth) return
+        if ((value?.scope ?? []).some(r => !scope.includes(r))) return
+        if (!resolvedType) return
+
+        const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
+        if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
+
+        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.dataTypeIdentifier)])
         state.push(suggestion)
     })
 
 
-    return state
+    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")]
 
 }
 
@@ -103,7 +151,7 @@ export const useSuggestions = (type: Type, genericKeys: string[], flowId: string
  * @param generic_keys  (optional) Array of string keys that should be normalized as generics (can be any string)
  * @returns             MD5 hash string if type/service available, otherwise undefined
  */
-export const useTypeHash = (type: Type, generic_keys?: string[]): string | undefined => {
+export const useTypeHash = (type: DataTypeIdentifier, generic_keys?: string[]): string | undefined => {
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     if (!type || !dataTypeService) return undefined
 
@@ -120,106 +168,143 @@ export const useTypeHash = (type: Type, generic_keys?: string[]): string | undef
 }
 
 /**
- * Traverses a flow (starting from its startingNode as NodeFunction) and collects all RefObjects ("variables") that are in scope.
- * - Each context (primaryLevel) starts at 0 for the main flow.
- * - Every parameter of a NodeFunction with DataType NODE creates a *new* context (new primaryLevel, incrementing globally).
- * - secondaryLevel is the position of the Node within its vertical context (starts at 1, increments down the block).
- * - Each context number (primaryLevel) is unique, incrementing depth-first, left-to-right through parameters/subNodes.
- * - Handles recursive/branching contexts via NodeFunctionParameter.subNode.
+ * Walks the flow starting at its startingNode (depth-first, left-to-right) and collects
+ * all RefObjects (variables/outputs) with contextual metadata:
+ *  - depth: nesting level (root 0; +1 per NODE-parameter sub-block)
+ *  - scope: PATH of scope ids as number[], e.g. [0], [0,1], [0,2], [0,2,3] ...
+ *           (root is [0]; each NODE-parameter group appends a new unique id)
+ *  - node:  GLOBAL visit index across the entire flow (1-based, strictly increasing)
  *
- * @param flowId The ID of the flow to traverse.
- * @returns Array of RefObject (all collected variables/outputs with contextual levels)
+ * Notes:
+ *  - A NODE-typed parameter opens a new group/lane: depth+1 and scopePath+[newId].
+ *  - Functions passed as non-NODE parameters are traversed in the SAME depth/scopePath.
+ *  - The `node` id is incremented globally for every visited node and shared by all
+ *    RefObjects (inputs from rules and the return value) produced by that node.
  */
-export const useRefObjects = (flowId: string): Array<RefObject> => {
+export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
 
-    const refObjects: Array<RefObject> = [];
+    const refObjects: Array<ReferenceValue> = [];
     if (!dataTypeService || !flowService || !functionService) return refObjects;
 
-    const flow = flowService.values().find(f => f.id === flowId);
-    if (!flow?.startingNode) return refObjects;
+    const flow = flowService.values().find((f) => f.id === flowId);
+    if (!flow?.startingNodeId) return refObjects;
 
-    let contextCounter = 0; // Global context counter for primaryLevel
+    // Global, strictly increasing group id used to extend the scope PATH.
+    // Root scope path is [0]; first created group gets id 1, then 2, ...
+    let globalGroupId = 0;
+    const nextGroupId = () => ++globalGroupId;
+
+    // Global, strictly increasing node id across the ENTIRE flow (1-based).
+    let globalNodeId = 0;
+    const nextNodeId = () => ++globalNodeId;
 
     /**
-     * Recursively traverses a vertical block (nextNode chain) and collects RefObjects,
-     * entering new contexts on each NODE-typed parameter via NodeFunctionParameter.subNode.
-     * @param node The starting NodeFunction of this context/block
-     * @param primaryLevel The context number (scope/block)
+     * DFS across a lane: visit node, recurse into NODE-parameter groups, then follow nextNode.
+     * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
      */
-    function traverseBlock(node: NodeFunction | undefined, primaryLevel: number) {
-        let currentNode = node;
-        let secondaryLevel = 1; // Node position within the context
+    const traverse = (
+        fn: NodeFunctionView | undefined,
+        depth: number,
+        scopePath: number[]
+    ) => {
+        if (!fn) return;
 
-        while (currentNode) {
-            const functionDefinition = functionService.getFunctionDefinition(currentNode.id);
-            if (!functionDefinition) break;
+        let current: NodeFunctionView | undefined = fn;
 
-            // Handle NODE-typed parameters (start new context for each subNode)
-            if (currentNode.parameters && functionDefinition.parameters) {
-                for (const paramDef of functionDefinition.parameters) {
-                    const paramType = dataTypeService.getDataType(paramDef.type);
-                    if (paramType && paramType.type === EDataType.NODE) {
-                        // Finde passendes Parameter-Objekt
-                        const paramInstance = currentNode.parameters.find(p => p.id === paramDef.parameter_id);
-                        if (paramInstance?.subNode) {
-                            contextCounter++; // neuer Kontext
-                            traverseBlock(paramInstance.subNode, contextCounter);
+        while (current) {
+            const def = functionService.getFunctionDefinition(current.functionDefinition?.id!!);
+            if (!def) break;
+
+            // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
+            const node = nextNodeId();
+
+            // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
+            if (current.parameters && def.parameterDefinitions) {
+                for (const pDef of def.parameterDefinitions) {
+                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
+                    if (!pType || pType.variant === DataTypeVariant.Node) continue;
+
+                    const inputTypeRules =
+                        pType.rules?.nodes?.filter((r) => r?.variant === DataTypeRulesVariant.InputType) ?? [];
+
+                    if (inputTypeRules.length) {
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
+                        const rawValue = paramInstance?.value;
+                        const valuesArray =
+                            rawValue !== undefined
+                                ? rawValue instanceof NodeFunctionView
+                                    ? [rawValue.json()!!]
+                                    : [rawValue]
+                                : [];
+
+                        for (const rule of inputTypeRules) {
+                            const cfg = rule?.config as DataTypeRulesInputTypeConfig;
+                            const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
+                            if (resolved) {
+                                refObjects.push({
+                                    dataTypeIdentifier: resolved,
+                                    depth,
+                                    scope: scopePath,
+                                    node,
+                                });
+                            }
                         }
                     }
                 }
             }
 
-            // Handle INPUT_TYPE rules (RefObject for each input-type parameter)
-            if (currentNode.parameters && functionDefinition.parameters) {
-                for (const paramDef of functionDefinition.parameters) {
-                    const paramType = dataTypeService.getDataType(paramDef.type);
-                    if (!paramType || paramType.type === EDataType.NODE) continue;
-                    const inputTypeRules = paramType.rules?.filter(
-                        rule => rule.type === EDataTypeRuleType.INPUT_TYPE
-                    ) || [];
-                    for (const rule of inputTypeRules) {
-                        const config = rule.config as DFlowDataTypeInputTypeRuleConfig;
-                        const paramInstance = currentNode.parameters.find(p => p.id === paramDef.parameter_id);
-                        const paramValue = paramInstance?.value;
-                        const resolvedInputType = useInputType(
-                            config.type,
-                            functionDefinition,
-                            paramValue !== undefined ? [paramValue] : [],
-                            dataTypeService
-                        );
-                        if (resolvedInputType) {
-                            refObjects.push({
-                                type: resolvedInputType,
-                                primaryLevel,
-                                secondaryLevel,
-                                tertiaryLevel: config.key
-                            });
+            // 2) Return type (main output of the current node)
+            {
+                const paramValues =
+                    current.parameters?.map((p) => p.value).filter((v) => v !== undefined) ?? [];
+                const resolvedReturnType = useReturnType(
+                    def,
+                    paramValues.map((v) => (v instanceof NodeFunctionView ? v.json()!! : v)),
+                    dataTypeService
+                );
+                if (resolvedReturnType) {
+                    refObjects.push({
+                        dataTypeIdentifier: resolvedReturnType,
+                        depth,
+                        scope: scopePath,
+                        node,
+                    });
+                }
+            }
+
+            // 3) For each NODE-typed parameter: create a NEW group/lane
+            if (current.parameters && def.parameterDefinitions) {
+                for (const pDef of def.parameterDefinitions) {
+                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
+                    if (pType?.variant === DataTypeVariant.Node) {
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
+                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
+                            const childFn = paramInstance.value as NodeFunctionView;
+
+                            // New group: extend the scope path with a fresh id; increase depth by 1.
+                            const childScopePath = [...scopePath, nextGroupId()];
+                            traverse(childFn, depth + 1, childScopePath);
+                        }
+                    } else {
+                        // Functions passed as NON-NODE parameters: same depth and same scope path.
+                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
+                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
+                            traverse(paramInstance.value as NodeFunctionView, depth, scopePath);
                         }
                     }
                 }
             }
 
-            // Handle return type (main output of this node)
-            const paramValues = currentNode.parameters?.map(p => p.value).filter(v => v !== undefined) || [];
-            const resolvedReturnType = useReturnType(functionDefinition, paramValues, dataTypeService);
-            if (resolvedReturnType) {
-                refObjects.push({
-                    type: resolvedReturnType,
-                    primaryLevel,
-                    secondaryLevel
-                });
-            }
-
-            currentNode = currentNode.nextNode;
-            secondaryLevel++;
+            // 4) Continue the linear chain in the same lane/scope.
+            current = flow.getNodeById(current.nextNodeId!!);
         }
-    }
+    };
 
-    // Start main context (0)
-    traverseBlock(flow.startingNode, 0);
+    // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
+    traverse(flow.getNodeById(flow.startingNodeId), 0, [0]);
 
     return refObjects;
 };

@@ -1,71 +1,90 @@
+// reactiveArrayService.ts
 import React from "react";
-import {ArrayService} from "./arrayService";
+import { ArrayService } from "./arrayService";
 
-/**
- * using a React ref as a store in combination with a map
- * to be able to access and modify the store easily
- */
-export type ReactiveArrayStore<T> = [T[], React.Dispatch<React.SetStateAction<T[]>>]
+// Zugriffstyp: aktueller State via Getter, Updates via setState
+export type ReactiveArrayStore<T> = {
+    getState: () => T[];
+    setState: React.Dispatch<React.SetStateAction<T[]>>;
+};
 
 export class ReactiveArrayService<T> implements ArrayService<T> {
-
-    protected readonly store: ReactiveArrayStore<T>
-
-    constructor(store: ReactiveArrayStore<T>) {
-        this.store = store
+    protected readonly access: ReactiveArrayStore<T>;
+    constructor(access: ReactiveArrayStore<T>) {
+        this.access = access;
     }
 
-    public delete(index: number) {
-        this.store[1](prevState => {
-            const newState = prevState.filter((value, index1) => index1 !== index);
-            return [
-                ...newState,
-            ]
-        })
+    delete(index: number) {
+        this.access.setState(prev => prev.filter((_, i) => i !== index));
     }
 
-    public add(value: T) {
-        this.store[1](prevState => {
-            return [
-                ...prevState,
-                value
-            ]
-        })
+    add(value: T) {
+        this.access.setState(prev => [...prev, value]);
     }
 
-    public set(index: number, value: T) {
-        this.store[1](prevState => {
-            prevState[index] = value
-            return [
-                ...prevState
-            ]
-        })
+    set(index: number, value: T) {
+        this.access.setState(prev => {
+            const next = prev.slice();
+            next[index] = value;
+            return next;
+        });
     }
 
-    public has(index: number) {
-        return !!this.store[0][index]
+    has(index: number) {
+        const arr = this.access.getState();
+        return index >= 0 && index < arr.length;
     }
 
-    public get(index: number) {
-        return this.store[0][index]
+    get(index: number) {
+        return this.access.getState()[index];
     }
 
-    public values() {
-        return this.store[0]
+    values() {
+        return this.access.getState();
     }
 
-    public update() {
-        this.store[1](prevState => [...prevState])
+    update() {
+        this.access.setState(prev => prev.slice());
     }
 
-    clear(): void {
-        this.store[1](_ => [])
+    clear() {
+        this.access.setState(() => []);
     }
-
 }
 
-// @ts-ignore
-export const createReactiveArrayService = <K, T extends ArrayService<K>>(service: typeof T, callback?: (store: ReactiveArrayStore<K>) => T, initial?: K[]): [K[] | undefined, T] => {
-    const store = React.useState<K[]>(initial ?? [])
-    return [store[0], (callback ? callback(store) : new service(store)) as T]
+// Hilfstyp für den Konstruktor des Service
+type ArrayServiceCtor<K, S extends ArrayService<K>> =
+    new (access: ReactiveArrayStore<K>) => S;
+
+// initial kann Array oder Callback sein
+type InitialArg<K, S extends ArrayService<K>> = K[] | ((svc: S) => K[]);
+
+export function useReactiveArrayService<K, S extends ArrayService<K>>(
+    Ctor: ArrayServiceCtor<K, S>,
+    initial: InitialArg<K, S> = []
+): [K[], S] {
+    // 1) State + Ref
+    const [state, setState] = React.useState<K[]>(
+        Array.isArray(initial) ? initial : [] // Platzhalter; Callback folgt in Effect
+    );
+    const ref = React.useRef(state);
+    React.useEffect(() => { ref.current = state; }, [state]);
+
+    // 2) stabiler Getter
+    const getState = React.useCallback(() => ref.current, []);
+
+    // 3) Service erstellen (stabil über getState/setState)
+    const service = React.useMemo(() => new Ctor({ getState, setState }), [Ctor, getState, setState]);
+
+    // 4) Falls initial ein Callback ist, einmalig ausführen, sobald Service existiert
+    React.useEffect(() => {
+        if (typeof initial === "function") {
+            // Nur einmal setzen (überschreibt ggf. den Platzhalter)
+            setState((initial as (svc: S) => K[])(service));
+        }
+        // absichtlich keine Abhängigkeit auf `state` – nur einmal ausführen
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [service]);
+
+    return [state, service];
 }

@@ -9,21 +9,21 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
     public clearLeft(): void {
         const index = this.getActiveIndex()
-        this.store[1](prevState => [...prevState.filter((_, index1) => {
+        this.access.setState(prevState => [...prevState.filter((_, index1) => {
             return index1 >= index
         })])
     }
 
     public clearRight(): void {
         const index = this.getActiveIndex()
-        this.store[1](prevState => [...prevState.filter((_, index1) => {
+        this.access.setState(prevState => [...prevState.filter((_, index1) => {
             return index1 <= index
         })])
     }
 
     public clearWithoutActive(): void {
         const tab = this.getActiveTab()
-        if (tab) this.store[1](prevState => [tab])
+        if (tab) this.access.setState(prevState => [tab])
     }
 
     public activateTab(id: string) {
@@ -33,6 +33,7 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
         const tab = this.values().find((item: FileTabsView) => item.id === id);
         if (tab) tab.active = true
+        this.update()
     }
 
     public delete(index: number) {
@@ -48,6 +49,13 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
     }
 
     public add(value: FileTabsView) {
+        //if tab with id already exists, do not add it again and just activate the existing one
+
+        if (this.values().some(value1 => value1.id == value.id)) {
+            this.activateTab(value.id!!)
+            return
+        }
+
         if (value.active) {
             this.values().forEach((item: FileTabsView) => {
                 item.active = false

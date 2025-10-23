@@ -7,6 +7,7 @@
   display: inline-flex;
   font-size: variables.$xs;
   width: fit-content;
+  align-items: center;
 
   & {
     @include helpers.fontStyle();

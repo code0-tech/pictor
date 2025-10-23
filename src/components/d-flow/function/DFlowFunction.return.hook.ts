@@ -1,17 +1,20 @@
-import {FunctionDefinition} from "./DFlowFunction.view";
-import {Type, Value} from "../data-type/DFlowDataType.view";
-import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
+import {FunctionDefinitionView} from "./DFlowFunction.view";
+import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../data-type/DFlowDataType.service";
 import {replaceGenericKeysInType, resolveGenericKeys} from "../../../utils/generics";
+import {useService} from "../../../utils/contextStore";
+import {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export const useReturnType = (
-    func: FunctionDefinition,
-    values: Value[],
-    dataTypeService: DFlowDataTypeService
-): Type | null => {
+    func: FunctionDefinitionView,
+    values: NodeParameterValue[],
+    dataTypeService?: DFlowDataTypeService
+): DataTypeIdentifier | null => {
 
-    if (!func.return_type) return null
+    dataTypeService = dataTypeService ?? useService(DFlowDataTypeReactiveService)
+
+    if (!func.returnType) return null
 
     const genericTypeMap = resolveGenericKeys(func, values, dataTypeService)
-    return replaceGenericKeysInType(func.return_type, genericTypeMap)
+    return replaceGenericKeysInType(func.returnType, genericTypeMap)
 
 }

@@ -189,7 +189,16 @@ export class NodeFunctionView {
     }
 
     json(): NodeFunction | undefined {
-        return undefined
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            nextNodeId: this._nextNodeId,
+            parameters: this._parameters ? {
+                nodes: this._parameters.map(param => param.json()!!)
+            } : undefined,
+            functionDefinition: this._functionDefinition,
+            updatedAt: this._updatedAt
+        }
     }
 }
 
@@ -248,7 +257,13 @@ export class NodeParameterView {
     }
 
     json(): NodeParameter | undefined {
-        return undefined
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            runtimeParameter: this._runtimeParameter,
+            updatedAt: this._updatedAt,
+            value: this._value instanceof NodeFunctionView ? this._value.json() : this._value,
+        }
     }
 }
 

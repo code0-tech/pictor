@@ -141,7 +141,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
                     target: groupId,     // GroupCard (Ziel – hat Top: target)
                     deletable: false,
                     selectable: false,
-                    label: param.id,
+                    label: def?.names?.nodes!![0]?.content ?? param.id,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                         isParameter: false,

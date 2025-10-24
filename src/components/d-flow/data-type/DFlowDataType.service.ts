@@ -30,12 +30,18 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     //TODO: remove string because of sagittarius types update
     public getDataType = (type: DataTypeIdentifier): DataTypeView | undefined => {
+        if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined
-        const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier ?? (type as string)
-        return this.values().find(value => value.id === id);
+        const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
+        return this.values().find(value => {
+            console.log(value.identifier, id)
+            return value.identifier == id
+        });
     }
 
     public getDataTypeFromValue = (value: NodeParameterValue): DataTypeView | undefined => {
+
+        if (!value) return undefined
 
         if (value.__typename == "LiteralValue") {
             //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
@@ -61,9 +67,12 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     public getTypeFromValue = (value: NodeParameterValue): Maybe<DataTypeIdentifier> | undefined => {
 
+        if (!value) return undefined
+
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
         const dataType = this.getDataTypeFromValue(value)
+        console.log(dataType, value)
         if (!dataType?.genericKeys) return {dataType: {id: dataType?.id}}
 
         //TODO: missing generic combinations

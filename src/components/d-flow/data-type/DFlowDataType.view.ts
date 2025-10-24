@@ -1,5 +1,3 @@
-
-import {DFlowDataTypeService} from "./DFlowDataType.service";
 import {
     DataType,
     DataTypeRuleConnection,
@@ -30,9 +28,8 @@ export class DataTypeView {
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The type of the datatype */
     private readonly _variant?: Maybe<DataTypeVariant>;
-    private readonly _service: DFlowDataTypeService
 
-    constructor(dataType: DataType, service: DFlowDataTypeService) {
+    constructor(dataType: DataType) {
         this._id = dataType.id
         this._createdAt = dataType.createdAt
         this._updatedAt = dataType.updatedAt
@@ -42,7 +39,6 @@ export class DataTypeView {
         this._variant = dataType.variant
         this._genericKeys = dataType.genericKeys ?? undefined
         this._rules = dataType.rules ?? undefined
-        this._service = service
 
     }
 
@@ -80,10 +76,6 @@ export class DataTypeView {
 
     get variant(): Maybe<DataTypeVariant> | undefined {
         return this._variant;
-    }
-
-    get service(): DFlowDataTypeService {
-        return this._service;
     }
 
     get json(): DataType | undefined {

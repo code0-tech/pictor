@@ -82,8 +82,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue = parameter.value instanceof NodeFunctionView ? JSON.stringify(parameter.value) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
-
+            const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({...parameter.value.json(), __typename: "NodeFunction"}) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
 
             return <div>
                 {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value as NodeParameterValue))}
@@ -94,11 +93,12 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                            transformValue={value => {
                                try {
                                    if (!value) return value
-                                   if ((value as NodeParameterValue).__typename === "NodeFunction") {
+                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "NodeFunction") {
+                                       const def = functionService.getFunctionDefinition((JSON.parse(value) as NodeFunction).functionDefinition?.id!!)
                                        return <Badge
-                                           color={"info"}>{(JSON.parse(value) as NodeFunction).id}</Badge>
+                                           color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
                                    }
-                                   if ((value as NodeParameterValue).__typename === "ReferenceValue") {
+                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "ReferenceValue") {
                                        const refObject = JSON.parse(value) as ReferenceValue
                                        return <Badge
                                            color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.dataTypeIdentifier)}</Badge>

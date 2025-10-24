@@ -109,7 +109,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <IconFileLambdaFilled size={16}/>
-                        <Text size={"md"}>{data.instance.id}</Text>
+                        <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>
                     </Flex>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <Menu onOpenChange={event => {
@@ -202,7 +202,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
-                                {param.id}
+                                {parameter?.names?.nodes!![0]?.content ?? param.id}
                                 {!param.value ? (
                                     <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
                                         param.value = suggestion.value

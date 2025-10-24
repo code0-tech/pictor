@@ -62,8 +62,6 @@ export const Dashboard = () => {
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
-    console.log(dataTypeStore)
-
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
             <Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>

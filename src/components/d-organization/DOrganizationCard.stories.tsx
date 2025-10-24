@@ -1,9 +1,11 @@
-import {Meta, StoryObj} from "@storybook/react";
-import React from "react";
-import DOrganizationCard, {DOrganizationReactiveServiceExtended} from "./DOrganizationCard"
+import {Meta, StoryObj} from "@storybook/react"
+import React from "react"
+import DOrganizationCard from "./DOrganizationCard"
 import {ContextStoreProvider} from "../../utils/contextStore"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 import {DOrganizationView} from "./DOrganizationView"
+import {DOrganizationReactiveService} from "./DOrganizationService"
+import { OrganizationsCreateInput, OrganizationsDeleteInput, OrganizationsUpdateInput } from "@code0-tech/sagittarius-graphql-types"
 
 const meta: Meta = {
     title: "DOrganizationCard",
@@ -13,6 +15,19 @@ const meta: Meta = {
 export default meta
 
 type DOrganizationCardStory = StoryObj<typeof DOrganizationCard>;
+
+class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService {
+    organizationCreate(payload: OrganizationsCreateInput): DOrganizationView | undefined {
+        throw new Error("Method not implemented.");
+    }
+    organizationDelete(payload: OrganizationsDeleteInput): void {
+        throw new Error("Method not implemented.");
+    }
+    organizationUpdate(payload: OrganizationsUpdateInput): DOrganizationView | undefined {
+        throw new Error("Method not implemented.");
+    }
+
+}
 
 export const DOrganizationCardExample: DOrganizationCardStory = {
     render: (props) => {

@@ -79,6 +79,16 @@ export class DataTypeView {
     }
 
     get json(): DataType | undefined {
-        return undefined
+        return {
+            id: this._id,
+            createdAt: this._createdAt,
+            updatedAt: this._updatedAt,
+            identifier: this._identifier,
+            name: this._name,
+            runtime: this._runtime,
+            variant: this._variant,
+            genericKeys: this._genericKeys,
+            rules: this._rules
+        }
     }
 }

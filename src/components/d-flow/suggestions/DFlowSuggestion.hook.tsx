@@ -17,8 +17,8 @@ import {
     DataTypeRulesVariant,
     DataTypeVariant,
     Maybe,
-    NodeFunction,
     NodeParameter,
+    NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -36,8 +36,9 @@ export const useSuggestions = (
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-
+    const flow = flowService.getById(flowId)
     const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
     if (!suggestionService || !dataTypeService) return []
@@ -91,9 +92,10 @@ export const useSuggestions = (
         })
 
         matchingFunctions.forEach(funcDefinition => {
-            const nodeFunctionSuggestion: NodeFunction = {
+            const nodeFunctionSuggestion: NodeParameterValue = {
+                __typename: "NodeFunction",
                 //TODO: generate unique id
-                id: `gid://sagittarius/NodeFunction/1`,
+                id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.length ?? 0) + 1}`,
                 functionDefinition: {
                     id: funcDefinition.id,
                 },
@@ -108,8 +110,7 @@ export const useSuggestions = (
                     }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
                 }
             }
-            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.id as string])
-            suggestionService.addSuggestion(suggestion)
+            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes[0].content as string])
             state.push(suggestion)
         })
 
@@ -245,6 +246,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                             const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
                             if (resolved) {
                                 refObjects.push({
+                                    __typename: "ReferenceValue",
                                     dataTypeIdentifier: resolved,
                                     depth,
                                     scope: scopePath,
@@ -267,6 +269,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                 );
                 if (resolvedReturnType) {
                     refObjects.push({
+                        __typename: "ReferenceValue",
                         dataTypeIdentifier: resolvedReturnType,
                         depth,
                         scope: scopePath,

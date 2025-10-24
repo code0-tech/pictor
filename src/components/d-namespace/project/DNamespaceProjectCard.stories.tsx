@@ -1,6 +1,6 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
-import DNamespaceProjectCard, {DNamespaceProjectReactiveServiceExtended} from "./DNamespaceProjectCard"
+import DNamespaceProjectCard from "./DNamespaceProjectCard"
 import {ContextStoreProvider} from "../../../utils/contextStore"
 import {useReactiveArrayService} from "../../../utils/reactiveArrayService"
 import {DNamespaceProjectView} from "./DNamespaceProject.view"
@@ -11,15 +11,28 @@ import {
 } from "@code0-tech/sagittarius-graphql-types"
 
 const meta: Meta = {
-    title: "DProjectCard",
+    title: "DNamespaceProjectCard",
     component: DNamespaceProjectCard
 }
 
 export default meta
 
-type DProjectCardStory = StoryObj<typeof DNamespaceProjectCard>;
+type DNamespaceProjectCardStory = StoryObj<typeof DNamespaceProjectCard>;
 
-export const DProjectCardExample: DProjectCardStory = {
+export class DNamespaceProjectReactiveServiceExtended extends DNamespaceProjectReactiveService {
+    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined {
+        throw new Error("Method not implemented.");
+    }
+    projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined {
+        throw new Error("Method not implemented.");
+    }
+    projectsDelete(payload: NamespacesProjectsDeleteInput): void {
+        throw new Error("Method not implemented.");
+    }
+
+}
+
+export const DNamespaceProjectCardExample: DNamespaceProjectCardStory = {
     render: (props) => {
 
         const [projectStore, projectService] = useReactiveArrayService<DNamespaceProjectView, DNamespaceProjectReactiveServiceExtended>(DNamespaceProjectReactiveServiceExtended, [{
@@ -38,13 +51,11 @@ export const DProjectCardExample: DProjectCardStory = {
         }])
 
         return (
-            <ContextStoreProvider
-                services={[[projectStore, projectService]]}>
+            <ContextStoreProvider services={[[projectStore, projectService]]}>
                 {React.useMemo(() => {
                     return<DNamespaceProjectCard projectId={"gid://sagittarius/NamespaceProject/1"}/>
                 }, [])}
             </ContextStoreProvider>
-
         )
     }
 }

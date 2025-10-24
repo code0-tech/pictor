@@ -21,21 +21,9 @@ export interface DNamespaceProjectCardProps extends Code0Component<HTMLDivElemen
     projectId: Scalars['NamespaceProjectID']['output']
 }
 
-export class DNamespaceProjectReactiveServiceExtended extends DNamespaceProjectReactiveService {
-    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined {
-        return undefined
-    }
-
-    projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined {
-        return undefined
-    }
-
-    projectsDelete(payload: NamespacesProjectsDeleteInput): void {}
-}
-
 const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
-    const projectStore = useStore(DNamespaceProjectReactiveServiceExtended)
-    const projectService = useService(DNamespaceProjectReactiveServiceExtended)
+    const projectStore = useStore(DNamespaceProjectReactiveService)
+    const projectService = useService(DNamespaceProjectReactiveService)
 
     const project = projectService.findById(props.projectId)
 
@@ -51,11 +39,11 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
                         <Text size={"md"} hierarchy={"secondary"} style={{display: "block", marginBottom: ".25rem"}}>
                             {project?.description}
                         </Text>
+                        <Text size={"sm"} hierarchy={"tertiary"} style={{display: "block", marginTop: ".75rem"}}>
+                            {format(new Date(project?.updatedAt ?? ""), "dd/MM/yyyy HH:mm")}
+                        </Text>
                     </Col>
                 </Row>
-                <Text size={"sm"} hierarchy={"tertiary"} style={{display: "block", textAlign: "right", marginTop: ".5rem"}}>
-                    {format(new Date(project?.updatedAt ?? ""), "dd/MM/yyyy HH:mm")}
-                </Text>
             </Card>
         )
     }, [projectStore])

@@ -5,7 +5,7 @@ import {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesVariant,
-    DataTypeVariant,
+    DataTypeVariant, GenericMapper, LiteralValue,
     Maybe,
     NodeParameterValue,
     Scalars
@@ -32,9 +32,10 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
     public getDataType = (type: DataTypeIdentifier): DataTypeView | undefined => {
         if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined
-        const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
+        const identifier = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
+        const id = (type as DataTypeIdentifier).dataType?.id ?? (type as DataTypeIdentifier).genericType?.dataType?.id
         return this.values().find(value => {
-            return value.identifier == id
+            return value.identifier == identifier || value.id == id
         });
     }
 
@@ -74,20 +75,21 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {dataType: {id: dataType?.id}}
 
         //TODO: missing generic combinations
-        const genericMapper: any[] = dataType.genericKeys.map(genericKey => {
+        const genericMapper: GenericMapper[] = dataType.genericKeys.map(genericKey => {
 
             const ruleThatIncludesGenericKey: Maybe<DataTypeRule> | undefined = dataType.rules?.nodes?.find((rule: DataTypeRule) => {
                 // @ts-ignore
-                return "dataTypeIdentifier" in (rule?.config ?? {}) && rule?.config?.dataTypeIdentifier?.genericKey
+                return "dataTypeIdentifier" in (rule?.config ?? {}) && rule?.config?.dataTypeIdentifier?.genericKey == genericKey
             })
 
             if (ruleThatIncludesGenericKey
-                && ruleThatIncludesGenericKey.variant === DataTypeRulesVariant.ContainsType
+                && ruleThatIncludesGenericKey.variant == DataTypeRulesVariant.ContainsType
+                && value?.value
                 && dataType.variant === DataTypeVariant.Array) {
                 return {
-                    types: [this.getTypeFromValue((value as Array<any>)[0])],
-                    generic_target: genericKey
-                }
+                    sourceDataTypeIdentifiers: [this.getTypeFromValue({__typename: "LiteralValue", value: ((value as LiteralValue).value as Array<any>)[0]})],
+                    target: genericKey
+                } as GenericMapper
             }
 
             /*
@@ -123,6 +125,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
             return null
         }).filter(mapper => !!mapper)
+
 
         const resolvedType: DataTypeIdentifier = genericMapper.length > 0 ? {
             genericType: {

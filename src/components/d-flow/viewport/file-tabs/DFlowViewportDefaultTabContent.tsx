@@ -14,7 +14,7 @@ import Badge from "../../../badge/Badge";
 import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
 import {useReturnType} from "../../function/DFlowFunction.return.hook";
 import {resolveGenericKeys} from "../../../../utils/generics";
-import {NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunctionView
@@ -60,11 +60,21 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
 
             const submitValueEvent = (event: any) => {
                 try {
-                    const value = JSON.parse(event.target.value)
+                    const value = JSON.parse(event.target.value) as NodeParameterValue
+                    if (!value.__typename) {
+                        submitValue({
+                            __typename: "LiteralValue",
+                            value: value
+                        })
+                        return
+                    }
                     submitValue(value)
                 } catch (e) {
                     // @ts-ignore
-                    submitValue(event.target.value == "" ? undefined : event.target.value)
+                    submitValue(event.target.value == "" ? undefined : {
+                        __typename: "LiteralValue",
+                        value: event.target.value
+                    } as LiteralValue)
                 }
             }
 

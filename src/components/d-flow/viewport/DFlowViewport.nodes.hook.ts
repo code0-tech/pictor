@@ -143,6 +143,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         }
     })
 
+
     const traverse = (
         fn: NodeFunctionView,
         isParameter = false,
@@ -234,6 +235,20 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     };
 
     // Root lane: depth 0, scope path [0]
-    traverse(flow.getNodeById(flow.startingNodeId!!)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+    if (flow.startingNodeId) {
+        traverse(flow.getNodeById(flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+    } else {
+        nodes.push({
+            id: `${flow.id}-suggestion`,
+            type: "suggestion",
+            position: { x: 0, y: 0 },
+            draggable: false,
+            extent: undefined,
+            data: {
+                flowId: flowId,
+                parentFunction: undefined,
+            },
+        });
+    }
     return nodes;
 };

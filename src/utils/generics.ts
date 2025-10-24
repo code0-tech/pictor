@@ -77,11 +77,11 @@ const getIdentifierMappers = (identifier: IdentifierLike): GenericMapper[] => {
 
 const cloneMapperWithSources = (
     mapper: GenericMapper,
-    sources: DataTypeIdentifier[]
+    sourceDataTypeIdentifiers: DataTypeIdentifier[]
 ): GenericMapper => {
     return {
         ...mapper,
-        sourceDataTypeIdentifiers: sources
+        sourceDataTypeIdentifiers: sourceDataTypeIdentifiers
     };
 };
 
@@ -164,7 +164,7 @@ export const resolveGenericKeyMappings = (
     const result: GenericMappingResult = {};
     const genericKeySet = new Set(genericKeys);
 
-    const recurse = (param: IdentifierLike, value: IdentifierLike) => {
+    const recurse = (param: DataTypeIdentifier, value: DataTypeIdentifier) => {
         if (!param || !value) return;
 
         const paramKey = extractIdentifierGenericKey(param, genericKeySet);
@@ -202,7 +202,7 @@ export const resolveGenericKeyMappings = (
             } else {
                 const length = Math.min(paramMapper.sourceDataTypeIdentifiers?.length ?? 0, valueSources.length);
                 for (let index = 0; index < length; index++) {
-                    recurse(paramMapper.sourceDataTypeIdentifiers?.[index], valueSources[index]);
+                    recurse(paramMapper.sourceDataTypeIdentifiers!![index], valueSources[index]);
                 }
             }
         }
@@ -378,20 +378,20 @@ export const resolveGenericKeys = (
     const genericMap: GenericMap = new Map();
     const genericKeys = func.genericKeys ?? [];
 
-    if (!func.parameterDefinitions || genericKeys.length === 0) return genericMap;
+    if (!func.parameterDefinitions || genericKeys.length <= 0) return genericMap;
 
     const genericKeySet = new Set(genericKeys);
 
     func.parameterDefinitions.forEach((parameter, index) => {
-        const parameterType = parameter.dataTypeIdentifier as IdentifierLike;
+        const parameterType = parameter.dataTypeIdentifier as DataTypeIdentifier;
         const value = values[index];
-        const valueType = dataTypeService.getTypeFromValue(value) as IdentifierLike;
+        const valueType = dataTypeService.getTypeFromValue(value) as DataTypeIdentifier;
 
         if (!parameterType || !valueType) return;
 
         const mappings = resolveGenericKeyMappings(
-            parameterType as DataTypeIdentifier,
-            valueType as DataTypeIdentifier,
+            parameterType,
+            valueType,
             genericKeys
         );
 
@@ -553,7 +553,7 @@ export const resolveType = (
 
     const resolvedMappers = type.genericType.genericMappers?.map(mapper => ({
         ...mapper,
-        sources: mapper?.sourceDataTypeIdentifiers?.map(source => resolveType(source, service))
+        sourceDataTypeIdentifiers: mapper?.sourceDataTypeIdentifiers?.map(source => resolveType(source, service))
     })) ?? [];
 
     return {
@@ -618,7 +618,7 @@ export const replaceGenericsAndSortType = (
                           target: genericKeySet.has(mapper.target!!)
                               ? GENERIC_PLACEHOLDER
                               : mapper.target,
-                          sources: mapper.sourceDataTypeIdentifiers?.map(source => replaceIdentifier(source))
+                          sourceDataTypeIdentifiers: mapper.sourceDataTypeIdentifiers?.map(source => replaceIdentifier(source))
                       };
 
                       return sortValue(replacedMapper) as GenericMapper;

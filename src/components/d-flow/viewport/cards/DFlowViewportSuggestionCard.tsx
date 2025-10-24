@@ -12,7 +12,7 @@ import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
     flowId: string
-    parentFunction: NodeFunctionView
+    parentFunction?: NodeFunctionView
 }
 
 // @ts-ignore
@@ -26,7 +26,11 @@ export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardPr
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
         const nodeFunction = new NodeFunctionView(suggestion.value as NodeFunction)
-        props.data.parentFunction.nextNodeId = nodeFunction.id!!
+        if (props.data.parentFunction) {
+            props.data.parentFunction.nextNodeId = nodeFunction.id!!
+        } else if (flow) {
+            flow.startingNodeId = nodeFunction.id!!
+        }
         flow?.addNode(nodeFunction)
         flowService.update()
     }} suggestions={result} triggerContent={

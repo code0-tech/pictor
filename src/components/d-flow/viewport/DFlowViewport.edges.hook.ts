@@ -227,8 +227,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         return fnId;
     };
 
-    /* ------------------------------------------------------------------ */
-    traverse(flow.getNodeById(flow.startingNodeId!!)!!, undefined, 0, functionCache, dataTypeCache);
+    if (flow.startingNodeId) {
+        traverse(flow.getNodeById(flow.startingNodeId)!!, undefined, 0, functionCache, dataTypeCache);
+    }
 
     return React.useMemo(() => edges, [flowStore, functionStore, dataTypeStore, edges]);
 };

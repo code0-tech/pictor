@@ -276,7 +276,7 @@ export class FlowSettingView {
         return this._createdAt;
     }
 
-    get flowSettingId(): Maybe<Scalars["String"]["output"]> | undefined {
+    get flowSettingIdentifier(): Maybe<Scalars["String"]["output"]> | undefined {
         return this._flowSettingIdentifier;
     }
 

@@ -193,7 +193,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         const definition = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache);
 
         fn.parameters?.forEach((param) => {
-            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.id)?.dataTypeIdentifier;
+            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.runtimeParameter?.id)?.dataTypeIdentifier;
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (paramDataType?.variant === DataTypeVariant.Node) {

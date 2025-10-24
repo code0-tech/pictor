@@ -31,7 +31,7 @@ export class FlowView {
     /** The settings of the flow */
     private readonly _settings?: FlowSettingView[];
     /** The ID of the starting node of the flow */
-    private readonly _startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
+    private _startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The flow type of the flow */
     private readonly _type?: Maybe<FlowType>;
     /** Time when this Flow was last updated */
@@ -85,6 +85,10 @@ export class FlowView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    set startingNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {
+        this._startingNodeId = value;
     }
 
     addNode(node: NodeFunctionView): void {

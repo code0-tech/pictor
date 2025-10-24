@@ -34,7 +34,6 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         if ((type as DataTypeIdentifier).genericKey) return undefined
         const id = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
         return this.values().find(value => {
-            console.log(value.identifier, id)
             return value.identifier == id
         });
     }
@@ -45,10 +44,10 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
         if (value.__typename == "LiteralValue") {
             //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
+            if (Array.isArray(value.value) && Array.from(value.value).length > 0) return this.getDataType({dataType: {identifier: "ARRAY"}})
             if (typeof value.value === "string") return this.getDataType({dataType: {identifier: "TEXT"}})
             if (typeof value.value === "number") return this.getDataType({dataType: {identifier: "NUMBER"}})
             if (typeof value.value === "boolean") return this.getDataType({dataType: {identifier: "BOOLEAN"}})
-            if (Array.isArray(value.value) && Array.from(value.value).length <= 0) return this.getDataType({dataType: {identifier: "ARRAY"}})
         }
 
         //TODO: performance here is bad
@@ -72,8 +71,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
         const dataType = this.getDataTypeFromValue(value)
-        console.log(dataType, value)
-        if (!dataType?.genericKeys) return {dataType: {id: dataType?.id}}
+        if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {dataType: {id: dataType?.id}}
 
         //TODO: missing generic combinations
         const genericMapper: any[] = dataType.genericKeys.map(genericKey => {
@@ -126,7 +124,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
             return null
         }).filter(mapper => !!mapper)
 
-        const resolvedType: DataTypeIdentifier = genericMapper ? {
+        const resolvedType: DataTypeIdentifier = genericMapper.length > 0 ? {
             genericType: {
                 dataType: {id: dataType.id as Maybe<Scalars['DataTypeID']['output']>},
                 genericMappers: genericMapper

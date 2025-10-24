@@ -65,6 +65,7 @@ export const useFunctionValidation = (
                     }
                 } else {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
+
                     isValid = useValidateValue(value, parameterDataType, flow, replacedGenericType?.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Value: Invalid value"));

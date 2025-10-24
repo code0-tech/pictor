@@ -37,6 +37,7 @@ export const useFunctionValidation = (
 
     parameters.forEach((parameter, index) => {
         const value = values[index]
+        if (!value) return;
         const parameterType = parameter.dataTypeIdentifier
         const valueType = value.__typename === "NodeFunction" ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value);
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
@@ -53,12 +54,10 @@ export const useFunctionValidation = (
             if (valueType?.genericType && parameterDataType) {
                 if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedParameterDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(parameterDataType.json!!, genericTypeMap),
-                        dataTypeService
+                        replaceGenericKeysInDataTypeObject(parameterDataType.json!!, genericTypeMap)
                     );
                     const resolvedValueDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
-                        dataTypeService
+                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
                     );
                     isValid = useValidateDataType(resolvedParameterDT, resolvedValueDT)
                     if (!isValid) {
@@ -86,8 +85,7 @@ export const useFunctionValidation = (
             if (valueDataType && parameterDataType && parameterDataType.genericKeys && valueDataType.json && parameterDataType.json) {
                 if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedParameterDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap),
-                        dataTypeService
+                        replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap)
                     );
                     isValid = useValidateDataType(resolvedParameterDT, valueDataType)
                     if (!isValid) {
@@ -109,8 +107,7 @@ export const useFunctionValidation = (
             if (valueType?.genericType && parameterDataType) {
                 if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedValueDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap),
-                        dataTypeService
+                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
                     );
                     isValid = useValidateDataType(parameterDataType, resolvedValueDT)
                     if (!isValid) {

@@ -4,9 +4,17 @@ import React from "react"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 import {DUserReactiveService} from "./DUser.service"
 import DUserMenu from "./DUserMenu"
-import { UsersMfaBackupCodesRotateInput, UsersMfaTotpGenerateSecretInput, UsersMfaTotpValidateSecretInput, UsersRegisterInput, User, UsersUpdateInput, UsersEmailVerificationInput } from "@code0-tech/sagittarius-graphql-types";
+import {
+    User,
+    UsersEmailVerificationInput,
+    UsersMfaBackupCodesRotateInput,
+    UsersMfaTotpGenerateSecretInput,
+    UsersMfaTotpValidateSecretInput,
+    UsersRegisterInput,
+    UsersUpdateInput
+} from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view"
-import {MenuContent, MenuGroup, MenuItem, MenuLabel, MenuPortal, MenuSeparator} from "../menu/Menu"
+import {MenuGroup, MenuItem, MenuLabel, MenuSeparator} from "../menu/Menu"
 
 const meta: Meta = {
     title: "DUserMenu",

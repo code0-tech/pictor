@@ -144,8 +144,7 @@ const replaceIdentifiersInConfig = (
             const typedConfig = config;
             const inputTypes = typedConfig.inputTypes?.map(inputType => ({
                 ...inputType,
-                dataTypeIdentifier: replaceGenericKeysInType(inputType.dataTypeIdentifier!!, genericMap),
-                inputType: replaceGenericKeysInDataTypeObject(inputType.inputType!!, genericMap)
+                dataTypeIdentifier: replaceGenericKeysInType(inputType.dataTypeIdentifier!!, genericMap)
             }));
             return {
                 ...typedConfig,

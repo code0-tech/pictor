@@ -24,17 +24,16 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
 
     return React.useMemo(() => {
         return (
-            <Card style={{ padding: "16px 16px 8px 16px" }}>
-                <Col>
-                    <Text size={"lg"} hierarchy={"primary"} style={{display: "block", marginBottom: ".25rem"}}>
+            <Card style={{ padding: "16px 16px 8px 16px" }} width={"100%"}>
+                <Col style={{minWidth: 0, flex: 1}}>
+                    <Text size={"lg"} hierarchy={"primary"} style={{overflow: "hidden", display: "block", marginBottom: ".25rem", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                         {organization?.name}
                     </Text>
                     <Row align={"center"}>
                         <IconFolder size={32}/>
-                        {`${projectCount ?? 0} Project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
+                        {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
                     </Row>
                 </Col>
-
             </Card>
         )
     }, [organizationStore])

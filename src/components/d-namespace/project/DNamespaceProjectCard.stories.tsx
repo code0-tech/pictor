@@ -53,7 +53,7 @@ export const DNamespaceProjectCardExample: DNamespaceProjectCardStory = {
         return (
             <ContextStoreProvider services={[[projectStore, projectService]]}>
                 {React.useMemo(() => {
-                    return<DNamespaceProjectCard projectId={"gid://sagittarius/NamespaceProject/1"}/>
+                    return <DNamespaceProjectCard projectId={"gid://sagittarius/NamespaceProject/1"}/>
                 }, [])}
             </ContextStoreProvider>
         )

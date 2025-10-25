@@ -29,14 +29,14 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
 
     return React.useMemo(() => {
         return (
-            <Card style={{ padding: "16px" }}>
-                <Row style={{ alignItems: "center"}}>
+            <Card style={{ padding: "16px"}} width={"100%"}>
+                <Row style={{ alignItems: "center" }}>
                     <IconBox size={52}/>
-                    <Col>
-                        <Text size={"lg"} hierarchy={"primary"} style={{display: "block", marginBottom: ".25rem"}}>
+                    <Col style={{minWidth: 0, flex: 1}}>
+                        <Text size={"lg"} hierarchy={"primary"} style={{overflow: "hidden", display: "block", marginBottom: ".25rem", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                             {project?.name}
                         </Text>
-                        <Text size={"md"} hierarchy={"secondary"} style={{display: "block", marginBottom: ".25rem"}}>
+                        <Text size={"md"} hierarchy={"secondary"} style={{overflow: "hidden", display: "block", marginBottom: ".25rem", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                             {project?.description}
                         </Text>
                         <Text size={"sm"} hierarchy={"tertiary"} style={{display: "block", marginTop: ".75rem"}}>

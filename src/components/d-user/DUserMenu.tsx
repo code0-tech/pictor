@@ -1,14 +1,13 @@
 "use client"
 
-import {Code0Component} from "../../utils/types"
 import React from "react"
-import {Menu, MenuContent, MenuPortal, MenuTrigger} from "../menu/Menu"
+import {Menu, MenuContent, MenuPortal, MenuProps, MenuTrigger} from "../menu/Menu"
 import {DUserReactiveService} from "./DUser.service"
 import {useService} from "../../utils/contextStore"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import Avatar from "../avatar/Avatar"
 
-export interface DUserMenuProps extends Code0Component<HTMLDivElement> {
+export interface DUserMenuProps extends MenuProps {
     userId: Scalars['UserID']['output']
 }
 
@@ -20,7 +19,7 @@ const DUserMenu: React.FC<DUserMenuProps> = props => {
 
     return React.useMemo(() => {
         return (
-            <Menu>
+            <Menu {...props}>
                 <MenuTrigger asChild>
                     <Avatar src={currentUser?.avatarPath ?? ""}/>
                 </MenuTrigger>

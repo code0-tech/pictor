@@ -4,22 +4,26 @@ import {resolveType} from "../../../utils/generics";
 import {
     DataTypeIdentifier,
     DataTypeRule,
+    DataTypeRulesContainsKeyConfig, DataTypeRulesInputTypesConfig,
     DataTypeRulesVariant,
-    DataTypeVariant, GenericMapper, LiteralValue,
+    DataTypeVariant,
+    GenericMapper,
+    LiteralValue,
     Maybe,
     NodeParameterValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValidateValue} from "./DFlowDataType.validation.value";
+import {FlowView} from "../DFlow.view";
 
 export interface DFlowDataTypeService {
     getDataType(type: DataTypeIdentifier): DataTypeView | undefined
 
     hasDataTypes(types: DataTypeIdentifier[]): boolean
 
-    getDataTypeFromValue(value: NodeParameterValue): DataTypeView | undefined
+    getDataTypeFromValue(value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined
 
-    getTypeFromValue(value: NodeParameterValue): Maybe<DataTypeIdentifier> | undefined
+    getTypeFromValue(value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined
 }
 
 export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> implements DFlowDataTypeService {
@@ -39,7 +43,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         });
     }
 
-    public getDataTypeFromValue = (value: NodeParameterValue): DataTypeView | undefined => {
+    public getDataTypeFromValue = (value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined => {
 
         if (!value) return undefined
 
@@ -54,7 +58,8 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         //TODO: performance here is bad
         const matchingDataTypes = this.values().filter(type => {
             if (type.identifier === "OBJECT") return false
-            return useValidateValue(value, type)
+            if (value.__typename === "NodeFunction" && type.variant != DataTypeVariant.Node) return false
+            return useValidateValue(value, type, flow)
         })
 
         // .sort((a, b) => {
@@ -65,13 +70,13 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     }
 
-    public getTypeFromValue = (value: NodeParameterValue): Maybe<DataTypeIdentifier> | undefined => {
+    public getTypeFromValue = (value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined => {
 
         if (!value) return undefined
 
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
-        const dataType = this.getDataTypeFromValue(value)
+        const dataType = this.getDataTypeFromValue(value, flow)
         if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {dataType: {id: dataType?.id}}
 
         //TODO: missing generic combinations
@@ -79,53 +84,59 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
             const ruleThatIncludesGenericKey: Maybe<DataTypeRule> | undefined = dataType.rules?.nodes?.find((rule: DataTypeRule) => {
                 // @ts-ignore
-                return "dataTypeIdentifier" in (rule?.config ?? {}) && rule?.config?.dataTypeIdentifier?.genericKey == genericKey
+                return ("dataTypeIdentifier" in (rule?.config ?? {}) && rule?.config?.dataTypeIdentifier?.genericKey == genericKey)
+                    || ("inputTypes" in (rule?.config as DataTypeRulesInputTypesConfig ?? {})) && (rule.config as DataTypeRulesInputTypesConfig).inputTypes?.some(inputType => inputType.dataTypeIdentifier?.genericKey == genericKey)
             })
 
             if (ruleThatIncludesGenericKey
                 && ruleThatIncludesGenericKey.variant == DataTypeRulesVariant.ContainsType
-                && value?.value
+                && "value" in value && value?.value
                 && dataType.variant === DataTypeVariant.Array) {
                 return {
-                    sourceDataTypeIdentifiers: [this.getTypeFromValue({__typename: "LiteralValue", value: ((value as LiteralValue).value as Array<any>)[0]})],
+                    sourceDataTypeIdentifiers: [this.getTypeFromValue({
+                        __typename: "LiteralValue",
+                        value: ((value as LiteralValue).value as Array<any>)[0]
+                    }, flow)],
                     target: genericKey
                 } as GenericMapper
             }
 
-            /*
-
             if (ruleThatIncludesGenericKey
-                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.CONTAINS_TYPE
-                && dataType.type === EDataType.ARRAY) {
+                && ruleThatIncludesGenericKey.variant == DataTypeRulesVariant.ContainsKey
+                && "value" in value && value?.value
+                && dataType.variant === DataTypeVariant.Object) {
                 return {
-                    types: [this.getTypeFromValue((value as Array<any>)[0])],
-                    generic_target: genericKey
-                }
-            }
-
-            //for object its not a rule
-            if (ruleThatIncludesGenericKey
-                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.CONTAINS_KEY
-                && dataType.type === EDataType.OBJECT) {
-                return {
-                    types: [this.getTypeFromValue((value as Object)[(ruleThatIncludesGenericKey.config as DFlowDataTypeContainsKeyRuleConfig).key])],
-                    generic_target: genericKey
-                }
+                    sourceDataTypeIdentifiers: [this.getTypeFromValue({
+                        __typename: "LiteralValue",
+                        /* @ts-ignore */
+                        value: (value.value as Object)[((ruleThatIncludesGenericKey.config as DataTypeRulesContainsKeyConfig)?.key ?? "")]
+                    }, flow)],
+                    target: genericKey
+                } as GenericMapper
             }
 
             if (ruleThatIncludesGenericKey
-                && ruleThatIncludesGenericKey.type === EDataTypeRuleType.RETURNS_TYPE
-                && dataType.type === EDataType.NODE) {
+                && ruleThatIncludesGenericKey.variant == DataTypeRulesVariant.ReturnType
+                && dataType.variant === DataTypeVariant.Node) {
                 return {
-                    types: [this.getTypeFromValue((value as NodeFunctionObject))],
-                    generic_target: genericKey
-                }
+                    sourceDataTypeIdentifiers: [this.getTypeFromValue(value, flow)],
+                    target: genericKey
+                } as GenericMapper
             }
-            */
+
+            if (ruleThatIncludesGenericKey
+                && ruleThatIncludesGenericKey.variant == DataTypeRulesVariant.InputType
+                && dataType.variant === DataTypeVariant.Node) {
+                return {
+                    sourceDataTypeIdentifiers: [{
+                        genericKey: genericKey
+                    }],
+                    target: genericKey
+                } as GenericMapper
+            }
 
             return null
         }).filter(mapper => !!mapper)
-
 
         const resolvedType: DataTypeIdentifier = genericMapper.length > 0 ? {
             genericType: {

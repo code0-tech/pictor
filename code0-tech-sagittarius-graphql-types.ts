@@ -1,10 +1,10 @@
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
     ID: { input: `gid://sagittarius//${number}`; output: `gid://sagittarius//${number}`; }
@@ -12,73 +12,37 @@ export interface Scalars {
     Boolean: { input: boolean; output: boolean; }
     Int: { input: number; output: number; }
     Float: { input: number; output: number; }
-    /** A unique identifier for all DataType entities of the application */
     DataTypeID: { input: `gid://sagittarius/DataType/${number}`; output: `gid://sagittarius/DataType/${number}`; }
-    /** A unique identifier for all DataTypeIdentifier entities of the application */
     DataTypeIdentifierID: { input: `gid://sagittarius/DataTypeIdentifier/${number}`; output: `gid://sagittarius/DataTypeIdentifier/${number}`; }
-    /** A unique identifier for all DataTypeRule entities of the application */
     DataTypeRuleID: { input: `gid://sagittarius/DataTypeRule/${number}`; output: `gid://sagittarius/DataTypeRule/${number}`; }
-    /** A unique identifier for all Flow entities of the application */
     FlowID: { input: `gid://sagittarius/Flow/${number}`; output: `gid://sagittarius/Flow/${number}`; }
-    /** A unique identifier for all FlowSetting entities of the application */
     FlowSettingID: { input: `gid://sagittarius/FlowSetting/${number}`; output: `gid://sagittarius/FlowSetting/${number}`; }
-    /** A unique identifier for all FlowType entities of the application */
     FlowTypeID: { input: `gid://sagittarius/FlowType/${number}`; output: `gid://sagittarius/FlowType/${number}`; }
-    /** A unique identifier for all FlowTypeSetting entities of the application */
     FlowTypeSettingID: { input: `gid://sagittarius/FlowTypeSetting/${number}`; output: `gid://sagittarius/FlowTypeSetting/${number}`; }
-    /** A unique identifier for all FunctionDefinition entities of the application */
     FunctionDefinitionID: { input: `gid://sagittarius/FunctionDefinition/${number}`; output: `gid://sagittarius/FunctionDefinition/${number}`; }
-    /** A unique identifier for all GenericCombinationStrategy entities of the application */
     GenericCombinationStrategyID: { input: `gid://sagittarius/GenericCombinationStrategy/${number}`; output: `gid://sagittarius/GenericCombinationStrategy/${number}`; }
-    /** A unique identifier for all GenericMapper entities of the application */
     GenericMapperID: { input: `gid://sagittarius/GenericMapper/${number}`; output: `gid://sagittarius/GenericMapper/${number}`; }
-    /** A unique identifier for all GenericType entities of the application */
     GenericTypeID: { input: `gid://sagittarius/GenericType/${number}`; output: `gid://sagittarius/GenericType/${number}`; }
-    /** Represents untyped JSON */
     JSON: { input: any; output: any; }
-    /** A unique identifier for all Namespace entities of the application */
     NamespaceID: { input: `gid://sagittarius/Namespace/${number}`; output: `gid://sagittarius/Namespace/${number}`; }
-    /** A unique identifier for all NamespaceLicense entities of the application */
     NamespaceLicenseID: { input: `gid://sagittarius/NamespaceLicense/${number}`; output: `gid://sagittarius/NamespaceLicense/${number}`; }
-    /** A unique identifier for all NamespaceMember entities of the application */
     NamespaceMemberID: { input: `gid://sagittarius/NamespaceMember/${number}`; output: `gid://sagittarius/NamespaceMember/${number}`; }
-    /** A unique identifier for all NamespaceMemberRole entities of the application */
     NamespaceMemberRoleID: { input: `gid://sagittarius/NamespaceMemberRole/${number}`; output: `gid://sagittarius/NamespaceMemberRole/${number}`; }
-    /** A unique identifier for all NamespaceProject entities of the application */
     NamespaceProjectID: { input: `gid://sagittarius/NamespaceProject/${number}`; output: `gid://sagittarius/NamespaceProject/${number}`; }
-    /** A unique identifier for all NamespaceRole entities of the application */
     NamespaceRoleID: { input: `gid://sagittarius/NamespaceRole/${number}`; output: `gid://sagittarius/NamespaceRole/${number}`; }
-    /** A unique identifier for all NodeFunction entities of the application */
     NodeFunctionID: { input: `gid://sagittarius/NodeFunction/${number}`; output: `gid://sagittarius/NodeFunction/${number}`; }
-    /** A unique identifier for all NodeParameter entities of the application */
     NodeParameterID: { input: `gid://sagittarius/NodeParameter/${number}`; output: `gid://sagittarius/NodeParameter/${number}`; }
-    /** A unique identifier for all Organization entities of the application */
     OrganizationID: { input: `gid://sagittarius/Organization/${number}`; output: `gid://sagittarius/Organization/${number}`; }
-    /** A unique identifier for all ParameterDefinition entities of the application */
     ParameterDefinitionID: { input: `gid://sagittarius/ParameterDefinition/${number}`; output: `gid://sagittarius/ParameterDefinition/${number}`; }
-    /** A unique identifier for all ReferencePath entities of the application */
     ReferencePathID: { input: `gid://sagittarius/ReferencePath/${number}`; output: `gid://sagittarius/ReferencePath/${number}`; }
-    /** A unique identifier for all ReferenceValue entities of the application */
     ReferenceValueID: { input: `gid://sagittarius/ReferenceValue/${number}`; output: `gid://sagittarius/ReferenceValue/${number}`; }
-    /** A unique identifier for all RuntimeFunctionDefinition entities of the application */
     RuntimeFunctionDefinitionID: { input: `gid://sagittarius/RuntimeFunctionDefinition/${number}`; output: `gid://sagittarius/RuntimeFunctionDefinition/${number}`; }
-    /** A unique identifier for all Runtime entities of the application */
     RuntimeID: { input: `gid://sagittarius/Runtime/${number}`; output: `gid://sagittarius/Runtime/${number}`; }
-    /** A unique identifier for all RuntimeParameterDefinition entities of the application */
     RuntimeParameterDefinitionID: { input: `gid://sagittarius/RuntimeParameterDefinition/${number}`; output: `gid://sagittarius/RuntimeParameterDefinition/${number}`; }
-    /**
-     * Time represented in ISO 8601.
-     *
-     * For example: "2023-12-15T17:31:00Z".
-     */
     Time: { input: string; output: string; }
-    /** A unique identifier for all Types::FlowType entities of the application */
     TypesFlowTypeID: { input: `gid://sagittarius/TypesFlowType/${number}`; output: `gid://sagittarius/TypesFlowType/${number}`; }
-    /** A unique identifier for all User entities of the application */
     UserID: { input: `gid://sagittarius/User/${number}`; output: `gid://sagittarius/User/${number}`; }
-    /** A unique identifier for all UserIdentity entities of the application */
     UserIdentityID: { input: `gid://sagittarius/UserIdentity/${number}`; output: `gid://sagittarius/UserIdentity/${number}`; }
-    /** A unique identifier for all UserSession entities of the application */
     UserSessionID: { input: `gid://sagittarius/UserSession/${number}`; output: `gid://sagittarius/UserSession/${number}`; }
 }
 
@@ -86,18 +50,18 @@ export interface Scalars {
 export interface ActiveModelError {
     __typename?: 'ActiveModelError';
     /** The affected attribute on the model */
-    attribute: Scalars['String']['output'];
+    attribute?: Maybe<Scalars['String']['output']>;
     /** The validation type that failed for the attribute */
-    type: Scalars['String']['output'];
+    type?: Maybe<Scalars['String']['output']>;
 }
 
 /** Represents the application settings */
 export interface ApplicationSettings {
     __typename?: 'ApplicationSettings';
     /** Shows if organization creation is restricted to administrators */
-    organizationCreationRestricted: Scalars['Boolean']['output'];
+    organizationCreationRestricted?: Maybe<Scalars['Boolean']['output']>;
     /** Shows if user registration is enabled */
-    userRegistrationEnabled: Scalars['Boolean']['output'];
+    userRegistrationEnabled?: Maybe<Scalars['Boolean']['output']>;
 }
 
 /** Autogenerated input type of ApplicationSettingsUpdate */
@@ -118,7 +82,7 @@ export interface ApplicationSettingsUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
 }
 
 /** Objects that can present an authentication */
@@ -128,25 +92,23 @@ export type Authentication = UserSession;
 export interface DataType {
     __typename?: 'DataType';
     /** Time when this DataType was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Generic keys of the datatype */
     genericKeys?: Maybe<Array<Scalars['String']['output']>>;
     /** Global ID of this DataType */
-    id: Scalars['DataTypeID']['output'];
+    id?: Maybe<Scalars['DataTypeID']['output']>;
     /** The identifier scoped to the namespace */
-    identifier: Scalars['String']['output'];
+    identifier?: Maybe<Scalars['String']['output']>;
     /** Names of the flow type setting */
-    name: TranslationConnection;
-    /** The namespace where this datatype belongs to */
-    namespace?: Maybe<Namespace>;
-    /** The parent datatype */
-    parent?: Maybe<DataTypeIdentifier>;
+    name?: Maybe<TranslationConnection>;
     /** Rules of the datatype */
-    rules: DataTypeRuleConnection;
+    rules?: Maybe<DataTypeRuleConnection>;
+    /** The runtime where this datatype belongs to */
+    runtime?: Maybe<Runtime>;
     /** Time when this DataType was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The type of the datatype */
-    variant: DataTypeVariant;
+    variant?: Maybe<DataTypeVariant>;
 }
 
 
@@ -171,20 +133,20 @@ export interface DataTypeRulesArgs {
 export interface DataTypeConnection {
     __typename?: 'DataTypeConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<DataTypeEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<DataType>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface DataTypeEdge {
     __typename?: 'DataTypeEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<DataType>;
 }
@@ -193,7 +155,7 @@ export interface DataTypeEdge {
 export interface DataTypeIdentifier {
     __typename?: 'DataTypeIdentifier';
     /** Time when this DataTypeIdentifier was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The data type of the data type identifier. */
     dataType?: Maybe<DataType>;
     /** The generic key of the data type identifier. */
@@ -201,9 +163,9 @@ export interface DataTypeIdentifier {
     /** The generic type of the data type identifier. */
     genericType?: Maybe<GenericType>;
     /** Global ID of this DataTypeIdentifier */
-    id: Scalars['DataTypeIdentifierID']['output'];
+    id?: Maybe<Scalars['DataTypeIdentifierID']['output']>;
     /** Time when this DataTypeIdentifier was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Input type for data type identifier */
@@ -220,72 +182,72 @@ export interface DataTypeIdentifierInput {
 export interface DataTypeRule {
     __typename?: 'DataTypeRule';
     /** The configuration of the rule */
-    config: DataTypeRulesConfig;
+    config?: Maybe<DataTypeRulesConfig>;
     /** Time when this DataTypeRule was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this DataTypeRule */
-    id: Scalars['DataTypeRuleID']['output'];
+    id?: Maybe<Scalars['DataTypeRuleID']['output']>;
     /** Time when this DataTypeRule was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The type of the rule */
-    variant: DataTypeRulesVariant;
+    variant?: Maybe<DataTypeRulesVariant>;
 }
 
 /** The connection type for DataTypeRule. */
 export interface DataTypeRuleConnection {
     __typename?: 'DataTypeRuleConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<DataTypeRuleEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<DataTypeRule>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface DataTypeRuleEdge {
     __typename?: 'DataTypeRuleEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<DataTypeRule>;
 }
 
 /** Represents a rule that can be applied to a data type. */
-export type DataTypeRulesConfig = DataTypeRulesContainsKeyConfig | DataTypeRulesContainsTypeConfig | DataTypeRulesInputTypesConfig | DataTypeRulesItemOfCollectionConfig | DataTypeRulesNumberRangeConfig | DataTypeRulesRegexConfig | DataTypeRulesReturnTypeConfig;
+export type DataTypeRulesConfig = DataTypeRulesContainsKeyConfig | DataTypeRulesContainsTypeConfig | DataTypeRulesInputTypesConfig | DataTypeRulesItemOfCollectionConfig | DataTypeRulesNumberRangeConfig | DataTypeRulesParentTypeConfig | DataTypeRulesRegexConfig | DataTypeRulesReturnTypeConfig;
 
 /** Represents a rule that can be applied to a data type. */
 export interface DataTypeRulesContainsKeyConfig {
     __typename?: 'DataTypeRulesContainsKeyConfig';
     /** The identifier of the data type this rule belongs to */
-    dataTypeIdentifier: DataTypeIdentifier;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
     /** The key of the rule */
-    key: Scalars['String']['output'];
+    key?: Maybe<Scalars['String']['output']>;
 }
 
 /** Represents a rule that can be applied to a data type. */
 export interface DataTypeRulesContainsTypeConfig {
     __typename?: 'DataTypeRulesContainsTypeConfig';
     /** The identifier of the data type this rule belongs to */
-    dataTypeIdentifier: DataTypeIdentifier;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
 }
 
 /** Represents a subtype of input type configuration for a input data type. */
 export interface DataTypeRulesInputTypeConfig {
     __typename?: 'DataTypeRulesInputTypeConfig';
     /** The identifier of the data type this input type belongs to */
-    dataTypeIdentifier: DataTypeIdentifier;
-    /** The input data type that this configuration applies to */
-    inputType: DataType;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
+    /** The input identifier that this configuration applies to */
+    inputIdentifier?: Maybe<Scalars['String']['output']>;
 }
 
 /** Represents a rule that can be applied to a data type. */
 export interface DataTypeRulesInputTypesConfig {
     __typename?: 'DataTypeRulesInputTypesConfig';
     /** The input types that can be used in this data type rule */
-    inputTypes: Array<DataTypeRulesInputTypeConfig>;
+    inputTypes?: Maybe<Array<DataTypeRulesInputTypeConfig>>;
 }
 
 /** Represents a rule that can be applied to a data type. */
@@ -299,29 +261,36 @@ export interface DataTypeRulesItemOfCollectionConfig {
 export interface DataTypeRulesNumberRangeConfig {
     __typename?: 'DataTypeRulesNumberRangeConfig';
     /** The minimum value of the range */
-    from: Scalars['Int']['output'];
+    from?: Maybe<Scalars['Int']['output']>;
     /** The step value for the range, if applicable */
     steps?: Maybe<Scalars['Int']['output']>;
     /** The maximum value of the range */
-    to: Scalars['Int']['output'];
+    to?: Maybe<Scalars['Int']['output']>;
+}
+
+/** Represents a rule that can be applied to a data type. */
+export interface DataTypeRulesParentTypeConfig {
+    __typename?: 'DataTypeRulesParentTypeConfig';
+    /** The data type identifier for the parent type. */
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
 }
 
 /** Represents a rule that can be applied to a data type. */
 export interface DataTypeRulesRegexConfig {
     __typename?: 'DataTypeRulesRegexConfig';
     /** The regex pattern to match against the data type value. */
-    pattern: Scalars['String']['output'];
+    pattern?: Maybe<Scalars['String']['output']>;
 }
 
 /** Represents a rule that can be applied to a data type. */
 export interface DataTypeRulesReturnTypeConfig {
     __typename?: 'DataTypeRulesReturnTypeConfig';
     /** The data type identifier for the return type. */
-    dataTypeIdentifier: DataTypeIdentifier;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
 }
 
 /** The type of rule that can be applied to a data type. */
-export enum DataTypeRulesVariant {
+export const enum DataTypeRulesVariant {
     /** The rule checks if a key is present in the data type. */
     ContainsKey = 'CONTAINS_KEY',
     /** The rule checks if a specific type is present in the data type. */
@@ -332,6 +301,8 @@ export enum DataTypeRulesVariant {
     ItemOfCollection = 'ITEM_OF_COLLECTION',
     /** The rule checks if a number falls within a specified range. */
     NumberRange = 'NUMBER_RANGE',
+    /** The rule checks if the data type is a child of a specific parent type. */
+    ParentType = 'PARENT_TYPE',
     /** The rule checks if a string matches a specified regular expression. */
     Regex = 'REGEX',
     /** The rule checks if the data type matches a specific return type. */
@@ -339,7 +310,7 @@ export enum DataTypeRulesVariant {
 }
 
 /** Represent all available types of a datatype */
-export enum DataTypeVariant {
+export const enum DataTypeVariant {
     /** Represents an array */
     Array = 'ARRAY',
     /** Represents an data type containing a data type */
@@ -370,7 +341,7 @@ export interface EchoPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** Message returned to the user. */
     message?: Maybe<Scalars['String']['output']>;
 }
@@ -382,41 +353,61 @@ export type Error = ActiveModelError | MessageError;
 export interface Flow {
     __typename?: 'Flow';
     /** Time when this Flow was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Flow */
-    id: Scalars['FlowID']['output'];
+    id?: Maybe<Scalars['FlowID']['output']>;
     /** The input data type of the flow */
     inputType?: Maybe<DataType>;
+    /** Nodes of the flow */
+    nodes?: Maybe<NodeFunctionConnection>;
     /** The return data type of the flow */
     returnType?: Maybe<DataType>;
     /** The settings of the flow */
-    settings?: Maybe<Array<FlowSetting>>;
-    /** The starting node of the flow */
-    startingNode: NodeFunction;
+    settings?: Maybe<FlowSettingConnection>;
+    /** The ID of the starting node of the flow */
+    startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The flow type of the flow */
-    type: FlowType;
+    type?: Maybe<FlowType>;
     /** Time when this Flow was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
+}
+
+
+/** Represents a flow */
+export interface FlowNodesArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
+}
+
+
+/** Represents a flow */
+export interface FlowSettingsArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
 }
 
 /** The connection type for Flow. */
 export interface FlowConnection {
     __typename?: 'FlowConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<FlowEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<Flow>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface FlowEdge {
     __typename?: 'FlowEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<Flow>;
 }
@@ -435,15 +426,37 @@ export interface FlowInput {
 export interface FlowSetting {
     __typename?: 'FlowSetting';
     /** Time when this FlowSetting was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The identifier of the flow setting */
-    flowSettingId: Scalars['String']['output'];
+    flowSettingIdentifier?: Maybe<Scalars['String']['output']>;
     /** Global ID of this FlowSetting */
-    id: Scalars['FlowSettingID']['output'];
+    id?: Maybe<Scalars['FlowSettingID']['output']>;
     /** Time when this FlowSetting was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The value of the flow setting */
-    value: Scalars['JSON']['output'];
+    value?: Maybe<Scalars['JSON']['output']>;
+}
+
+/** The connection type for FlowSetting. */
+export interface FlowSettingConnection {
+    __typename?: 'FlowSettingConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<FlowSettingEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<FlowSetting>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface FlowSettingEdge {
+    __typename?: 'FlowSettingEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<FlowSetting>;
 }
 
 /** Input type for flow settings */
@@ -458,17 +471,17 @@ export interface FlowSettingInput {
 export interface FlowType {
     __typename?: 'FlowType';
     /** Time when this FlowType was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Descriptions of the flow type */
     descriptions?: Maybe<TranslationConnection>;
     /** Editable status of the flow type */
-    editable: Scalars['Boolean']['output'];
+    editable?: Maybe<Scalars['Boolean']['output']>;
     /** Flow type settings of the flow type */
-    flowTypeSettings: Array<FlowTypeSetting>;
+    flowTypeSettings?: Maybe<Array<FlowTypeSetting>>;
     /** Global ID of this FlowType */
-    id: Scalars['TypesFlowTypeID']['output'];
+    id?: Maybe<Scalars['TypesFlowTypeID']['output']>;
     /** Identifier of the flow type */
-    identifier: Scalars['String']['output'];
+    identifier?: Maybe<Scalars['String']['output']>;
     /** Input type of the flow type */
     inputType?: Maybe<DataType>;
     /** Names of the flow type */
@@ -476,7 +489,7 @@ export interface FlowType {
     /** Return type of the flow type */
     returnType?: Maybe<DataType>;
     /** Time when this FlowType was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -501,20 +514,20 @@ export interface FlowTypeNamesArgs {
 export interface FlowTypeConnection {
     __typename?: 'FlowTypeConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<FlowTypeEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<FlowType>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface FlowTypeEdge {
     __typename?: 'FlowTypeEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<FlowType>;
 }
@@ -523,23 +536,23 @@ export interface FlowTypeEdge {
 export interface FlowTypeSetting {
     __typename?: 'FlowTypeSetting';
     /** Time when this FlowTypeSetting was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Data type of the flow type setting */
     dataType?: Maybe<DataType>;
     /** Descriptions of the flow type setting */
-    descriptions: TranslationConnection;
+    descriptions?: Maybe<TranslationConnection>;
     /** Flow type of the flow type setting */
     flowType?: Maybe<FlowType>;
     /** Global ID of this FlowTypeSetting */
-    id: Scalars['FlowTypeSettingID']['output'];
+    id?: Maybe<Scalars['FlowTypeSettingID']['output']>;
     /** Identifier of the flow type setting */
-    identifier: Scalars['String']['output'];
+    identifier?: Maybe<Scalars['String']['output']>;
     /** Names of the flow type setting */
-    names: TranslationConnection;
+    names?: Maybe<TranslationConnection>;
     /** Unique status of the flow type setting */
-    unique: Scalars['Boolean']['output'];
+    unique?: Maybe<Scalars['Boolean']['output']>;
     /** Time when this FlowTypeSetting was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -564,7 +577,7 @@ export interface FlowTypeSettingNamesArgs {
 export interface FunctionDefinition {
     __typename?: 'FunctionDefinition';
     /** Time when this FunctionDefinition was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Deprecation message of the function */
     deprecationMessages?: Maybe<TranslationConnection>;
     /** Description of the function */
@@ -574,7 +587,9 @@ export interface FunctionDefinition {
     /** Generic keys of the function */
     genericKeys?: Maybe<Array<Scalars['String']['output']>>;
     /** Global ID of this FunctionDefinition */
-    id: Scalars['FunctionDefinitionID']['output'];
+    id?: Maybe<Scalars['FunctionDefinitionID']['output']>;
+    /** Identifier of the function */
+    identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the function */
     names?: Maybe<TranslationConnection>;
     /** Parameters of the function */
@@ -584,9 +599,9 @@ export interface FunctionDefinition {
     /** Runtime function definition */
     runtimeFunctionDefinition?: Maybe<RuntimeFunctionDefinition>;
     /** Indicates if the function can throw an error */
-    throwsError: Scalars['Boolean']['output'];
+    throwsError?: Maybe<Scalars['Boolean']['output']>;
     /** Time when this FunctionDefinition was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -638,20 +653,20 @@ export interface FunctionDefinitionParameterDefinitionsArgs {
 export interface FunctionDefinitionConnection {
     __typename?: 'FunctionDefinitionConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<FunctionDefinitionEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<FunctionDefinition>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface FunctionDefinitionEdge {
     __typename?: 'FunctionDefinitionEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<FunctionDefinition>;
 }
@@ -660,19 +675,19 @@ export interface FunctionDefinitionEdge {
 export interface GenericCombinationStrategy {
     __typename?: 'GenericCombinationStrategy';
     /** Time when this GenericCombinationStrategy was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The associated generic mapper, if any. */
     genericMapper?: Maybe<GenericMapper>;
     /** Global ID of this GenericCombinationStrategy */
-    id: Scalars['GenericCombinationStrategyID']['output'];
+    id?: Maybe<Scalars['GenericCombinationStrategyID']['output']>;
     /** The combination type ('AND' or 'OR'). */
-    type: GenericCombinationStrategyType;
+    type?: Maybe<GenericCombinationStrategyType>;
     /** Time when this GenericCombinationStrategy was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** The available combination strategy types. */
-export enum GenericCombinationStrategyType {
+export const enum GenericCombinationStrategyType {
     /** Represents a logical AND combination. */
     And = 'AND',
     /** Represents a logical OR combination. */
@@ -683,17 +698,17 @@ export enum GenericCombinationStrategyType {
 export interface GenericMapper {
     __typename?: 'GenericMapper';
     /** Time when this GenericMapper was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Combination strategies associated with this generic mapper. */
     genericCombinationStrategies?: Maybe<Array<GenericCombinationStrategy>>;
     /** Global ID of this GenericMapper */
-    id: Scalars['GenericMapperID']['output'];
+    id?: Maybe<Scalars['GenericMapperID']['output']>;
     /** The source data type identifier. */
-    sources: Array<DataTypeIdentifier>;
+    sourceDataTypeIdentifiers?: Maybe<Array<DataTypeIdentifier>>;
     /** The target key for the generic value. */
-    target: Scalars['String']['output'];
+    target?: Maybe<Scalars['String']['output']>;
     /** Time when this GenericMapper was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Input type for generic mappers */
@@ -708,15 +723,15 @@ export interface GenericMapperInput {
 export interface GenericType {
     __typename?: 'GenericType';
     /** Time when this GenericType was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The data type associated with this generic type. */
-    dataType: DataType;
+    dataType?: Maybe<DataType>;
     /** The mappers associated with this generic type. */
-    genericMappers: Array<GenericMapper>;
+    genericMappers?: Maybe<Array<GenericMapper>>;
     /** Global ID of this GenericType */
-    id: Scalars['GenericTypeID']['output'];
+    id?: Maybe<Scalars['GenericTypeID']['output']>;
     /** Time when this GenericType was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Input type for generic type operations. */
@@ -737,18 +752,18 @@ export interface IdentityInput {
 export interface LiteralValue {
     __typename?: 'LiteralValue';
     /** Time when this LiteralValue was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Time when this LiteralValue was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The literal value itself as JSON. */
-    value: Scalars['JSON']['output'];
+    value?: Maybe<Scalars['JSON']['output']>;
 }
 
 /** Represents an error message */
 export interface MessageError {
     __typename?: 'MessageError';
     /** The message provided from the error */
-    message: Scalars['String']['output'];
+    message?: Maybe<Scalars['String']['output']>;
 }
 
 /** Represents the input for mfa authentication */
@@ -760,7 +775,7 @@ export interface MfaInput {
 }
 
 /** Represent all available types to authenticate with mfa */
-export enum MfaType {
+export const enum MfaType {
     /** Single use backup code */
     BackupCode = 'BACKUP_CODE',
     /** Time based onetime password */
@@ -777,11 +792,12 @@ export interface Mutation {
      *
      * This is expected to be used for testing of endpoints, to verify
      * that a user has mutation access.
+     *
      */
     echo?: Maybe<EchoPayload>;
-    /** Create a new namespace license. */
+    /** (EE only) Create a new namespace license. */
     namespacesLicensesCreate?: Maybe<NamespacesLicensesCreatePayload>;
-    /** Deletes an namespace license. */
+    /** (EE only) Deletes an namespace license. */
     namespacesLicensesDelete?: Maybe<NamespacesLicensesDeletePayload>;
     /** Update the roles a member is assigned to. */
     namespacesMembersAssignRoles?: Maybe<NamespacesMembersAssignRolesPayload>;
@@ -825,6 +841,8 @@ export interface Mutation {
     runtimesRotateToken?: Maybe<RuntimesRotateTokenPayload>;
     /** Update an existing runtime. */
     runtimesUpdate?: Maybe<RuntimesUpdatePayload>;
+    /** Verify your email when changing it or signing up */
+    usersEmailVerification?: Maybe<UsersEmailVerificationPayload>;
     /** Links an external identity to an existing user */
     usersIdentityLink?: Maybe<UsersIdentityLinkPayload>;
     /** Login to an existing user via an external identity */
@@ -843,6 +861,10 @@ export interface Mutation {
     usersMfaTotpGenerateSecret?: Maybe<UsersMfaTotpGenerateSecretPayload>;
     /** Validates a TOTP value for the given secret and enables TOTP MFA for the user */
     usersMfaTotpValidateSecret?: Maybe<UsersMfaTotpValidateSecretPayload>;
+    /** Reset the password using a reset token */
+    usersPasswordReset?: Maybe<UsersPasswordResetPayload>;
+    /** Request an password reset */
+    usersPasswordResetRequest?: Maybe<UsersPasswordResetRequestPayload>;
     /** Register a new user */
     usersRegister?: Maybe<UsersRegisterPayload>;
     /** Update an existing user. */
@@ -1001,6 +1023,12 @@ export interface MutationRuntimesUpdateArgs {
 
 
 /** Root Mutation type */
+export interface MutationUsersEmailVerificationArgs {
+    input: UsersEmailVerificationInput;
+}
+
+
+/** Root Mutation type */
 export interface MutationUsersIdentityLinkArgs {
     input: UsersIdentityLinkInput;
 }
@@ -1055,6 +1083,18 @@ export interface MutationUsersMfaTotpValidateSecretArgs {
 
 
 /** Root Mutation type */
+export interface MutationUsersPasswordResetArgs {
+    input: UsersPasswordResetInput;
+}
+
+
+/** Root Mutation type */
+export interface MutationUsersPasswordResetRequestArgs {
+    input: UsersPasswordResetRequestInput;
+}
+
+
+/** Root Mutation type */
 export interface MutationUsersRegisterArgs {
     input: UsersRegisterInput;
 }
@@ -1069,23 +1109,23 @@ export interface MutationUsersUpdateArgs {
 export interface Namespace {
     __typename?: 'Namespace';
     /** Time when this Namespace was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Namespace */
-    id: Scalars['NamespaceID']['output'];
+    id?: Maybe<Scalars['NamespaceID']['output']>;
     /** Members of the namespace */
-    members: NamespaceMemberConnection;
-    /** Licenses of the namespace */
-    namespaceLicenses: NamespaceLicenseConnection;
+    members?: Maybe<NamespaceMemberConnection>;
+    /** (EE only) Licenses of the namespace */
+    namespaceLicenses?: Maybe<NamespaceLicenseConnection>;
     /** Parent of this namespace */
-    parent: NamespaceParent;
+    parent?: Maybe<NamespaceParent>;
     /** Projects of the namespace */
-    projects: NamespaceProjectConnection;
+    projects?: Maybe<NamespaceProjectConnection>;
     /** Roles of the namespace */
-    roles: NamespaceRoleConnection;
+    roles?: Maybe<NamespaceRoleConnection>;
     /** Runtime of the namespace */
-    runtimes: RuntimeConnection;
+    runtimes?: Maybe<RuntimeConnection>;
     /** Time when this Namespace was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -1133,37 +1173,43 @@ export interface NamespaceRuntimesArgs {
     last?: InputMaybe<Scalars['Int']['input']>;
 }
 
-/** Represents a Namespace License */
+/** (EE only) Represents a Namespace License */
 export interface NamespaceLicense {
     __typename?: 'NamespaceLicense';
     /** Time when this NamespaceLicense was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
+    /** The end date of the license */
+    endDate?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NamespaceLicense */
-    id: Scalars['NamespaceLicenseID']['output'];
+    id?: Maybe<Scalars['NamespaceLicenseID']['output']>;
+    /** The licensee information */
+    licensee?: Maybe<Scalars['JSON']['output']>;
     /** The namespace the license belongs to */
-    namespace: Namespace;
+    namespace?: Maybe<Namespace>;
+    /** The start date of the license */
+    startDate?: Maybe<Scalars['Time']['output']>;
     /** Time when this NamespaceLicense was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** The connection type for NamespaceLicense. */
 export interface NamespaceLicenseConnection {
     __typename?: 'NamespaceLicenseConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<NamespaceLicenseEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<NamespaceLicense>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface NamespaceLicenseEdge {
     __typename?: 'NamespaceLicenseEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<NamespaceLicense>;
 }
@@ -1172,35 +1218,57 @@ export interface NamespaceLicenseEdge {
 export interface NamespaceMember {
     __typename?: 'NamespaceMember';
     /** Time when this NamespaceMember was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NamespaceMember */
-    id: Scalars['NamespaceMemberID']['output'];
+    id?: Maybe<Scalars['NamespaceMemberID']['output']>;
+    /** Memberroles of the member */
+    memberRoles?: Maybe<NamespaceMemberRoleConnection>;
     /** Namespace this member belongs to */
-    namespace: Namespace;
+    namespace?: Maybe<Namespace>;
+    /** Roles of the member */
+    roles?: Maybe<NamespaceRoleConnection>;
     /** Time when this NamespaceMember was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** User this member belongs to */
-    user: User;
+    user?: Maybe<User>;
+}
+
+
+/** Represents a namespace member */
+export interface NamespaceMemberMemberRolesArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
+}
+
+
+/** Represents a namespace member */
+export interface NamespaceMemberRolesArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
 }
 
 /** The connection type for NamespaceMember. */
 export interface NamespaceMemberConnection {
     __typename?: 'NamespaceMemberConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<NamespaceMemberEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<NamespaceMember>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface NamespaceMemberEdge {
     __typename?: 'NamespaceMemberEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<NamespaceMember>;
 }
@@ -1209,43 +1277,65 @@ export interface NamespaceMemberEdge {
 export interface NamespaceMemberRole {
     __typename?: 'NamespaceMemberRole';
     /** Time when this NamespaceMemberRole was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NamespaceMemberRole */
-    id: Scalars['NamespaceMemberRoleID']['output'];
+    id?: Maybe<Scalars['NamespaceMemberRoleID']['output']>;
     /** The member the role is assigned to */
     member?: Maybe<NamespaceMember>;
     /** The assigned role */
     role?: Maybe<NamespaceRole>;
     /** Time when this NamespaceMemberRole was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
+}
+
+/** The connection type for NamespaceMemberRole. */
+export interface NamespaceMemberRoleConnection {
+    __typename?: 'NamespaceMemberRoleConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<NamespaceMemberRoleEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<NamespaceMemberRole>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface NamespaceMemberRoleEdge {
+    __typename?: 'NamespaceMemberRoleEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<NamespaceMemberRole>;
 }
 
 /** Objects that can present a namespace */
-export type NamespaceParent = Organization;
+export type NamespaceParent = Organization | User;
 
 /** Represents a namespace project */
 export interface NamespaceProject {
     __typename?: 'NamespaceProject';
     /** Time when this NamespaceProject was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Description of the project */
-    description: Scalars['String']['output'];
+    description?: Maybe<Scalars['String']['output']>;
     /** Fetches an flow given by its ID */
     flow?: Maybe<Flow>;
     /** Fetches all flows in this project */
     flows?: Maybe<FlowConnection>;
     /** Global ID of this NamespaceProject */
-    id: Scalars['NamespaceProjectID']['output'];
+    id?: Maybe<Scalars['NamespaceProjectID']['output']>;
     /** Name of the project */
-    name: Scalars['String']['output'];
+    name?: Maybe<Scalars['String']['output']>;
     /** The namespace where this project belongs to */
-    namespace: Namespace;
+    namespace?: Maybe<Namespace>;
     /** The primary runtime for the project */
     primaryRuntime?: Maybe<Runtime>;
     /** Runtimes assigned to this project */
-    runtimes: RuntimeConnection;
+    runtimes?: Maybe<RuntimeConnection>;
     /** Time when this NamespaceProject was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -1276,20 +1366,20 @@ export interface NamespaceProjectRuntimesArgs {
 export interface NamespaceProjectConnection {
     __typename?: 'NamespaceProjectConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<NamespaceProjectEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<NamespaceProject>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface NamespaceProjectEdge {
     __typename?: 'NamespaceProjectEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<NamespaceProject>;
 }
@@ -1298,19 +1388,19 @@ export interface NamespaceProjectEdge {
 export interface NamespaceRole {
     __typename?: 'NamespaceRole';
     /** The abilities the role is granted */
-    abilities: Array<NamespaceRoleAbility>;
+    abilities?: Maybe<Array<NamespaceRoleAbility>>;
     /** The projects this role is assigned to */
     assignedProjects?: Maybe<NamespaceProjectConnection>;
     /** Time when this NamespaceRole was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NamespaceRole */
-    id: Scalars['NamespaceRoleID']['output'];
+    id?: Maybe<Scalars['NamespaceRoleID']['output']>;
     /** The name of this role */
-    name: Scalars['String']['output'];
+    name?: Maybe<Scalars['String']['output']>;
     /** The namespace where this role belongs to */
     namespace?: Maybe<Namespace>;
     /** Time when this NamespaceRole was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -1323,7 +1413,7 @@ export interface NamespaceRoleAssignedProjectsArgs {
 }
 
 /** Represents abilities that can be granted to roles in namespaces. */
-export enum NamespaceRoleAbility {
+export const enum NamespaceRoleAbility {
     /** Allows to change the roles of a namespace member */
     AssignMemberRoles = 'ASSIGN_MEMBER_ROLES',
     /** Allows to assign runtimes to a project in the namespace */
@@ -1382,20 +1472,20 @@ export enum NamespaceRoleAbility {
 export interface NamespaceRoleConnection {
     __typename?: 'NamespaceRoleConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<NamespaceRoleEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<NamespaceRole>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface NamespaceRoleEdge {
     __typename?: 'NamespaceRoleEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<NamespaceRole>;
 }
@@ -1416,7 +1506,7 @@ export interface NamespacesLicensesCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created license. */
     namespaceLicense?: Maybe<NamespaceLicense>;
 }
@@ -1435,7 +1525,7 @@ export interface NamespacesLicensesDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The deleted namespace license. */
     namespaceLicense?: Maybe<NamespaceLicense>;
 }
@@ -1456,7 +1546,7 @@ export interface NamespacesMembersAssignRolesPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The roles the member is now assigned to */
     namespaceMemberRoles?: Maybe<Array<NamespaceMemberRole>>;
 }
@@ -1475,7 +1565,7 @@ export interface NamespacesMembersDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The removed namespace member */
     namespaceMember?: Maybe<NamespaceMember>;
 }
@@ -1496,7 +1586,7 @@ export interface NamespacesMembersInvitePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created namespace member */
     namespaceMember?: Maybe<NamespaceMember>;
 }
@@ -1517,7 +1607,7 @@ export interface NamespacesProjectsAssignRuntimesPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated project with assigned runtimes */
     namespaceProject?: Maybe<NamespaceProject>;
 }
@@ -1540,7 +1630,7 @@ export interface NamespacesProjectsCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created project. */
     namespaceProject?: Maybe<NamespaceProject>;
 }
@@ -1559,7 +1649,7 @@ export interface NamespacesProjectsDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The deleted project. */
     namespaceProject?: Maybe<NamespaceProject>;
 }
@@ -1580,7 +1670,7 @@ export interface NamespacesProjectsFlowsCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created flow. */
     flow?: Maybe<Flow>;
 }
@@ -1599,7 +1689,7 @@ export interface NamespacesProjectsFlowsDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The deleted flow. */
     flow?: Maybe<Flow>;
 }
@@ -1624,7 +1714,7 @@ export interface NamespacesProjectsUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated project. */
     namespaceProject?: Maybe<NamespaceProject>;
 }
@@ -1647,7 +1737,7 @@ export interface NamespacesRolesAssignAbilitiesPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
 }
 
 /** Autogenerated input type of NamespacesRolesAssignProjects */
@@ -1666,7 +1756,7 @@ export interface NamespacesRolesAssignProjectsPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The now assigned projects */
     projects?: Maybe<Array<NamespaceProject>>;
 }
@@ -1687,7 +1777,7 @@ export interface NamespacesRolesCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created namespace role */
     namespaceRole?: Maybe<NamespaceRole>;
 }
@@ -1706,7 +1796,7 @@ export interface NamespacesRolesDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The deleted namespace role */
     namespaceRole?: Maybe<NamespaceRole>;
 }
@@ -1727,7 +1817,7 @@ export interface NamespacesRolesUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated namespace role. */
     namespaceRole?: Maybe<NamespaceRole>;
 }
@@ -1735,24 +1825,24 @@ export interface NamespacesRolesUpdatePayload {
 /** An object with an ID. */
 export interface Node {
     /** ID of the object. */
-    id: Scalars['ID']['output'];
+    id?: Maybe<Scalars['ID']['output']>;
 }
 
 /** Represents a Node Function */
 export interface NodeFunction {
     __typename?: 'NodeFunction';
     /** Time when this NodeFunction was created */
-    createdAt: Scalars['Time']['output'];
-    /** Global ID of this NodeFunction */
-    id: Scalars['NodeFunctionID']['output'];
-    /** The next Node Function in the flow */
-    nextNode?: Maybe<NodeFunction>;
-    /** The parameters of the Node Function */
-    parameters: NodeParameterConnection;
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The definition of the Node Function */
-    runtimeFunction: RuntimeFunctionDefinition;
+    functionDefinition?: Maybe<FunctionDefinition>;
+    /** Global ID of this NodeFunction */
+    id?: Maybe<Scalars['NodeFunctionID']['output']>;
+    /** The ID of the next Node Function in the flow */
+    nextNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
+    /** The parameters of the Node Function */
+    parameters?: Maybe<NodeParameterConnection>;
     /** Time when this NodeFunction was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -1762,6 +1852,28 @@ export interface NodeFunctionParametersArgs {
     before?: InputMaybe<Scalars['String']['input']>;
     first?: InputMaybe<Scalars['Int']['input']>;
     last?: InputMaybe<Scalars['Int']['input']>;
+}
+
+/** The connection type for NodeFunction. */
+export interface NodeFunctionConnection {
+    __typename?: 'NodeFunctionConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<NodeFunctionEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<NodeFunction>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface NodeFunctionEdge {
+    __typename?: 'NodeFunctionEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<NodeFunction>;
 }
 
 /** Input type for a Node Function */
@@ -1778,13 +1890,13 @@ export interface NodeFunctionInput {
 export interface NodeParameter {
     __typename?: 'NodeParameter';
     /** Time when this NodeParameter was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NodeParameter */
-    id: Scalars['NodeParameterID']['output'];
+    id?: Maybe<Scalars['NodeParameterID']['output']>;
     /** The definition of the parameter */
-    runtimeParameter: RuntimeParameterDefinition;
+    runtimeParameter?: Maybe<RuntimeParameterDefinition>;
     /** Time when this NodeParameter was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The value of the parameter */
     value?: Maybe<NodeParameterValue>;
 }
@@ -1793,20 +1905,20 @@ export interface NodeParameter {
 export interface NodeParameterConnection {
     __typename?: 'NodeParameterConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<NodeParameterEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<NodeParameter>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface NodeParameterEdge {
     __typename?: 'NodeParameterEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<NodeParameter>;
 }
@@ -1836,15 +1948,15 @@ export interface NodeParameterValueInput {
 export interface Organization {
     __typename?: 'Organization';
     /** Time when this Organization was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this Organization */
-    id: Scalars['OrganizationID']['output'];
+    id?: Maybe<Scalars['OrganizationID']['output']>;
     /** Name of the organization */
-    name: Scalars['String']['output'];
+    name?: Maybe<Scalars['String']['output']>;
     /** Namespace of this organization */
-    namespace: Namespace;
+    namespace?: Maybe<Namespace>;
     /** Time when this Organization was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Autogenerated input type of OrganizationsCreate */
@@ -1861,7 +1973,7 @@ export interface OrganizationsCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created organization. */
     organization?: Maybe<Organization>;
 }
@@ -1880,7 +1992,7 @@ export interface OrganizationsDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The deleted organization. */
     organization?: Maybe<Organization>;
 }
@@ -1901,7 +2013,7 @@ export interface OrganizationsUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated organization. */
     organization?: Maybe<Organization>;
 }
@@ -1912,9 +2024,9 @@ export interface PageInfo {
     /** When paginating forwards, the cursor to continue. */
     endCursor?: Maybe<Scalars['String']['output']>;
     /** When paginating forwards, are there more items? */
-    hasNextPage: Scalars['Boolean']['output'];
+    hasNextPage?: Maybe<Scalars['Boolean']['output']>;
     /** When paginating backwards, are there more items? */
-    hasPreviousPage: Scalars['Boolean']['output'];
+    hasPreviousPage?: Maybe<Scalars['Boolean']['output']>;
     /** When paginating backwards, the cursor to continue. */
     startCursor?: Maybe<Scalars['String']['output']>;
 }
@@ -1923,19 +2035,21 @@ export interface PageInfo {
 export interface ParameterDefinition {
     __typename?: 'ParameterDefinition';
     /** Time when this ParameterDefinition was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Data type of the parameter */
-    dataType?: Maybe<DataTypeIdentifier>;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
     /** Description of the parameter */
     descriptions?: Maybe<TranslationConnection>;
     /** Documentation of the parameter */
     documentations?: Maybe<TranslationConnection>;
     /** Global ID of this ParameterDefinition */
-    id: Scalars['ParameterDefinitionID']['output'];
+    id?: Maybe<Scalars['ParameterDefinitionID']['output']>;
+    /** Identifier of the parameter */
+    identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the parameter */
     names?: Maybe<TranslationConnection>;
     /** Time when this ParameterDefinition was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -1969,20 +2083,20 @@ export interface ParameterDefinitionNamesArgs {
 export interface ParameterDefinitionConnection {
     __typename?: 'ParameterDefinitionConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<ParameterDefinitionEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<ParameterDefinition>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface ParameterDefinitionEdge {
     __typename?: 'ParameterDefinitionEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<ParameterDefinition>;
 }
@@ -1997,9 +2111,9 @@ export interface Query {
     /** Get the currently logged in user */
     currentUser?: Maybe<User>;
     /** Field available for use to test API access */
-    echo: Scalars['String']['output'];
+    echo?: Maybe<Scalars['String']['output']>;
     /** Find runtimes */
-    globalRuntimes: RuntimeConnection;
+    globalRuntimes?: Maybe<RuntimeConnection>;
     /** Find a namespace */
     namespace?: Maybe<Namespace>;
     /** Fetches an object given its ID */
@@ -2009,7 +2123,7 @@ export interface Query {
     /** Find a organization */
     organization?: Maybe<Organization>;
     /** Find users */
-    users: UserConnection;
+    users?: Maybe<UserConnection>;
 }
 
 
@@ -2067,13 +2181,13 @@ export interface ReferencePath {
     /** The array index of the referenced data by the path */
     arrayIndex?: Maybe<Scalars['Int']['output']>;
     /** Time when this ReferencePath was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this ReferencePath */
-    id: Scalars['ReferencePathID']['output'];
+    id?: Maybe<Scalars['ReferencePathID']['output']>;
     /** The path to the reference in the flow */
     path?: Maybe<Scalars['String']['output']>;
     /** Time when this ReferencePath was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Input type for reference path */
@@ -2088,21 +2202,21 @@ export interface ReferencePathInput {
 export interface ReferenceValue {
     __typename?: 'ReferenceValue';
     /** Time when this ReferenceValue was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** The identifier of the data type this reference value belongs to. */
-    dataTypeIdentifier: DataTypeIdentifier;
+    dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
+    /** The depth of the reference value. */
+    depth?: Maybe<Scalars['Int']['output']>;
     /** Global ID of this ReferenceValue */
-    id: Scalars['ReferenceValueID']['output'];
-    /** The primary level of the reference value. */
-    primaryLevel: Scalars['Int']['output'];
+    id?: Maybe<Scalars['ReferenceValueID']['output']>;
+    /** The node of the reference value. */
+    node?: Maybe<Scalars['Int']['output']>;
     /** The paths associated with this reference value. */
-    referencePath: Array<ReferencePath>;
-    /** The secondary level of the reference value. */
-    secondaryLevel: Scalars['Int']['output'];
-    /** The tertiary level of the reference value, if applicable. */
-    tertiaryLevel?: Maybe<Scalars['Int']['output']>;
+    referencePath?: Maybe<Array<ReferencePath>>;
+    /** The scope of the reference value. */
+    scope?: Maybe<Array<Scalars['Int']['output']>>;
     /** Time when this ReferenceValue was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 /** Input type for reference value */
@@ -2123,27 +2237,27 @@ export interface ReferenceValueInput {
 export interface Runtime {
     __typename?: 'Runtime';
     /** Time when this Runtime was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** DataTypes of the runtime */
-    dataTypes: DataTypeConnection;
+    dataTypes?: Maybe<DataTypeConnection>;
     /** The description for the runtime if present */
-    description: Scalars['String']['output'];
+    description?: Maybe<Scalars['String']['output']>;
     /** FlowTypes of the runtime */
-    flowTypes: FlowTypeConnection;
+    flowTypes?: Maybe<FlowTypeConnection>;
     /** Global ID of this Runtime */
-    id: Scalars['RuntimeID']['output'];
+    id?: Maybe<Scalars['RuntimeID']['output']>;
     /** The name for the runtime */
-    name: Scalars['String']['output'];
+    name?: Maybe<Scalars['String']['output']>;
     /** The parent namespace for the runtime */
     namespace?: Maybe<Namespace>;
     /** Projects associated with the runtime */
-    projects: NamespaceProjectConnection;
+    projects?: Maybe<NamespaceProjectConnection>;
     /** The status of the runtime */
-    status: RuntimeStatusType;
+    status?: Maybe<RuntimeStatusType>;
     /** Token belonging to the runtime, only present on creation */
     token?: Maybe<Scalars['String']['output']>;
     /** Time when this Runtime was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
@@ -2177,41 +2291,45 @@ export interface RuntimeProjectsArgs {
 export interface RuntimeConnection {
     __typename?: 'RuntimeConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<RuntimeEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<Runtime>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface RuntimeEdge {
     __typename?: 'RuntimeEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<Runtime>;
 }
 
-/** Represents a Node Function definition */
+/** Represents a runtime function definition */
 export interface RuntimeFunctionDefinition {
     __typename?: 'RuntimeFunctionDefinition';
     /** Time when this RuntimeFunctionDefinition was created */
-    createdAt: Scalars['Time']['output'];
-    /** Function definitions of the Node Function */
+    createdAt?: Maybe<Scalars['Time']['output']>;
+    /** Function definitions of the runtime function definition */
     functionDefinitions?: Maybe<FunctionDefinitionConnection>;
     /** Global ID of this RuntimeFunctionDefinition */
-    id: Scalars['RuntimeParameterDefinitionID']['output'];
-    /** The runtime this Node Function belongs to */
-    runtime: Runtime;
+    id?: Maybe<Scalars['RuntimeFunctionDefinitionID']['output']>;
+    /** Identifier of the runtime function definition */
+    identifier?: Maybe<Scalars['String']['output']>;
+    /** The runtime this runtime function definition belongs to */
+    runtime?: Maybe<Runtime>;
+    /** Parameter definitions of the runtime function definition */
+    runtimeParameterDefinitions?: Maybe<RuntimeParameterDefinitionConnection>;
     /** Time when this RuntimeFunctionDefinition was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
 }
 
 
-/** Represents a Node Function definition */
+/** Represents a runtime function definition */
 export interface RuntimeFunctionDefinitionFunctionDefinitionsArgs {
     after?: InputMaybe<Scalars['String']['input']>;
     before?: InputMaybe<Scalars['String']['input']>;
@@ -2219,19 +2337,50 @@ export interface RuntimeFunctionDefinitionFunctionDefinitionsArgs {
     last?: InputMaybe<Scalars['Int']['input']>;
 }
 
-/** Represents a Node parameter definition */
+
+/** Represents a runtime function definition */
+export interface RuntimeFunctionDefinitionRuntimeParameterDefinitionsArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
+}
+
+/** Represents a runtime parameter definition */
 export interface RuntimeParameterDefinition {
     __typename?: 'RuntimeParameterDefinition';
     /** Time when this RuntimeParameterDefinition was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this RuntimeParameterDefinition */
-    id: Scalars['RuntimeParameterDefinitionID']['output'];
+    id?: Maybe<Scalars['RuntimeParameterDefinitionID']['output']>;
     /** Time when this RuntimeParameterDefinition was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
+}
+
+/** The connection type for RuntimeParameterDefinition. */
+export interface RuntimeParameterDefinitionConnection {
+    __typename?: 'RuntimeParameterDefinitionConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<RuntimeParameterDefinitionEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<RuntimeParameterDefinition>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface RuntimeParameterDefinitionEdge {
+    __typename?: 'RuntimeParameterDefinitionEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<RuntimeParameterDefinition>;
 }
 
 /** Represent all available types of statuses of a runtime */
-export enum RuntimeStatusType {
+export const enum RuntimeStatusType {
     /** No problem with connection, everything works as expected */
     Connected = 'CONNECTED',
     /** The runtime is disconnected, cause unknown */
@@ -2256,7 +2405,7 @@ export interface RuntimesCreatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The newly created runtime. */
     runtime?: Maybe<Runtime>;
 }
@@ -2275,7 +2424,7 @@ export interface RuntimesDeletePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated organization. */
     runtime?: Maybe<Runtime>;
 }
@@ -2294,7 +2443,7 @@ export interface RuntimesRotateTokenPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated runtime. */
     runtime?: Maybe<Runtime>;
 }
@@ -2317,7 +2466,7 @@ export interface RuntimesUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated runtime. */
     runtime?: Maybe<Runtime>;
 }
@@ -2326,29 +2475,29 @@ export interface RuntimesUpdatePayload {
 export interface Translation {
     __typename?: 'Translation';
     /** Code of the translation */
-    code: Scalars['String']['output'];
+    code?: Maybe<Scalars['String']['output']>;
     /** Content of the translation */
-    content: Scalars['String']['output'];
+    content?: Maybe<Scalars['String']['output']>;
 }
 
 /** The connection type for Translation. */
 export interface TranslationConnection {
     __typename?: 'TranslationConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<TranslationEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<Translation>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface TranslationEdge {
     __typename?: 'TranslationEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<Translation>;
 }
@@ -2357,27 +2506,42 @@ export interface TranslationEdge {
 export interface User {
     __typename?: 'User';
     /** Global admin status of the user */
-    admin: Scalars['Boolean']['output'];
+    admin?: Maybe<Scalars['Boolean']['output']>;
     /** The avatar if present of the user */
     avatarPath?: Maybe<Scalars['String']['output']>;
     /** Time when this User was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Email of the user */
-    email: Scalars['String']['output'];
+    email?: Maybe<Scalars['String']['output']>;
+    /** Email verification date of the user if present */
+    emailVerifiedAt?: Maybe<Scalars['Time']['output']>;
     /** Firstname of the user */
-    firstname: Scalars['String']['output'];
+    firstname?: Maybe<Scalars['String']['output']>;
     /** Global ID of this User */
-    id: Scalars['UserID']['output'];
+    id?: Maybe<Scalars['UserID']['output']>;
+    /** Identities of this user */
+    identities?: Maybe<UserIdentityConnection>;
     /** Lastname of the user */
-    lastname: Scalars['String']['output'];
+    lastname?: Maybe<Scalars['String']['output']>;
     /** Namespace of this user */
     namespace?: Maybe<Namespace>;
     /** Namespace Memberships of this user */
-    namespaceMemberships: NamespaceMemberConnection;
+    namespaceMemberships?: Maybe<NamespaceMemberConnection>;
+    /** Sessions of this user */
+    sessions?: Maybe<UserSessionConnection>;
     /** Time when this User was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** Username of the user */
-    username: Scalars['String']['output'];
+    username?: Maybe<Scalars['String']['output']>;
+}
+
+
+/** Represents a user */
+export interface UserIdentitiesArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
 }
 
 
@@ -2389,24 +2553,33 @@ export interface UserNamespaceMembershipsArgs {
     last?: InputMaybe<Scalars['Int']['input']>;
 }
 
+
+/** Represents a user */
+export interface UserSessionsArgs {
+    after?: InputMaybe<Scalars['String']['input']>;
+    before?: InputMaybe<Scalars['String']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
+}
+
 /** The connection type for User. */
 export interface UserConnection {
     __typename?: 'UserConnection';
     /** Total count of collection. */
-    count: Scalars['Int']['output'];
+    count?: Maybe<Scalars['Int']['output']>;
     /** A list of edges. */
     edges?: Maybe<Array<Maybe<UserEdge>>>;
     /** A list of nodes. */
     nodes?: Maybe<Array<Maybe<User>>>;
     /** Information to aid in pagination. */
-    pageInfo: PageInfo;
+    pageInfo?: Maybe<PageInfo>;
 }
 
 /** An edge in a connection. */
 export interface UserEdge {
     __typename?: 'UserEdge';
     /** A cursor for use in pagination. */
-    cursor: Scalars['String']['output'];
+    cursor?: Maybe<Scalars['String']['output']>;
     /** The item at the end of the edge. */
     node?: Maybe<User>;
 }
@@ -2415,34 +2588,97 @@ export interface UserEdge {
 export interface UserIdentity {
     __typename?: 'UserIdentity';
     /** Time when this UserIdentity was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this UserIdentity */
-    id: Scalars['UserIdentityID']['output'];
+    id?: Maybe<Scalars['UserIdentityID']['output']>;
     /** The description for the runtime if present */
-    identifier: Scalars['String']['output'];
+    identifier?: Maybe<Scalars['String']['output']>;
     /** The name for the runtime */
-    providerId: Scalars['String']['output'];
+    providerId?: Maybe<Scalars['String']['output']>;
     /** Time when this UserIdentity was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** The correlating user of the identity */
-    user: User;
+    user?: Maybe<User>;
+}
+
+/** The connection type for UserIdentity. */
+export interface UserIdentityConnection {
+    __typename?: 'UserIdentityConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<UserIdentityEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<UserIdentity>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface UserIdentityEdge {
+    __typename?: 'UserIdentityEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<UserIdentity>;
 }
 
 /** Represents a user session */
 export interface UserSession {
     __typename?: 'UserSession';
     /** Whether or not the session is active and can be used */
-    active: Scalars['Boolean']['output'];
+    active?: Maybe<Scalars['Boolean']['output']>;
     /** Time when this UserSession was created */
-    createdAt: Scalars['Time']['output'];
+    createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this UserSession */
-    id: Scalars['UserSessionID']['output'];
+    id?: Maybe<Scalars['UserSessionID']['output']>;
     /** Token belonging to the session, only present on creation */
     token?: Maybe<Scalars['String']['output']>;
     /** Time when this UserSession was last updated */
-    updatedAt: Scalars['Time']['output'];
+    updatedAt?: Maybe<Scalars['Time']['output']>;
     /** User that belongs to the session */
-    user: User;
+    user?: Maybe<User>;
+}
+
+/** The connection type for UserSession. */
+export interface UserSessionConnection {
+    __typename?: 'UserSessionConnection';
+    /** Total count of collection. */
+    count?: Maybe<Scalars['Int']['output']>;
+    /** A list of edges. */
+    edges?: Maybe<Array<Maybe<UserSessionEdge>>>;
+    /** A list of nodes. */
+    nodes?: Maybe<Array<Maybe<UserSession>>>;
+    /** Information to aid in pagination. */
+    pageInfo?: Maybe<PageInfo>;
+}
+
+/** An edge in a connection. */
+export interface UserSessionEdge {
+    __typename?: 'UserSessionEdge';
+    /** A cursor for use in pagination. */
+    cursor?: Maybe<Scalars['String']['output']>;
+    /** The item at the end of the edge. */
+    node?: Maybe<UserSession>;
+}
+
+/** Autogenerated input type of UsersEmailVerification */
+export interface UsersEmailVerificationInput {
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    /** The email verification token */
+    token: Scalars['String']['input'];
+}
+
+/** Autogenerated return type of UsersEmailVerification. */
+export interface UsersEmailVerificationPayload {
+    __typename?: 'UsersEmailVerificationPayload';
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: Maybe<Scalars['String']['output']>;
+    /** Errors encountered during execution of the mutation. */
+    errors?: Maybe<Array<Error>>;
+    /** The user whose email was verified */
+    user?: Maybe<User>;
 }
 
 /** Autogenerated input type of UsersIdentityLink */
@@ -2461,7 +2697,7 @@ export interface UsersIdentityLinkPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created user identity */
     userIdentity?: Maybe<UserIdentity>;
 }
@@ -2482,7 +2718,7 @@ export interface UsersIdentityLoginPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created user session */
     userSession?: Maybe<UserSession>;
 }
@@ -2503,7 +2739,7 @@ export interface UsersIdentityRegisterPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created users session */
     userSession?: Maybe<UserSession>;
 }
@@ -2522,7 +2758,7 @@ export interface UsersIdentityUnlinkPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The removed identity */
     userIdentity?: Maybe<UserIdentity>;
 }
@@ -2547,7 +2783,7 @@ export interface UsersLoginPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created user session */
     userSession?: Maybe<UserSession>;
 }
@@ -2566,7 +2802,7 @@ export interface UsersLogoutPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The logged out user session */
     userSession?: Maybe<UserSession>;
 }
@@ -2585,7 +2821,7 @@ export interface UsersMfaBackupCodesRotatePayload {
     /** The newly rotated backup codes. */
     codes?: Maybe<Array<Scalars['String']['output']>>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
 }
 
 /** Autogenerated input type of UsersMfaTotpGenerateSecret */
@@ -2600,7 +2836,7 @@ export interface UsersMfaTotpGenerateSecretPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created and signed secret */
     secret?: Maybe<Scalars['String']['output']>;
 }
@@ -2624,9 +2860,51 @@ export interface UsersMfaTotpValidateSecretPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The modified user */
     user?: Maybe<User>;
+}
+
+/** Autogenerated input type of UsersPasswordReset */
+export interface UsersPasswordResetInput {
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    /** The new password to set for the user */
+    newPassword: Scalars['String']['input'];
+    /** The confirmation of the new password to set for the user needs to be the same as the new password */
+    newPasswordConfirmation: Scalars['String']['input'];
+    /** The password reset token sent to the user email */
+    resetToken: Scalars['String']['input'];
+}
+
+/** Autogenerated return type of UsersPasswordReset. */
+export interface UsersPasswordResetPayload {
+    __typename?: 'UsersPasswordResetPayload';
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: Maybe<Scalars['String']['output']>;
+    /** Errors encountered during execution of the mutation. */
+    errors?: Maybe<Array<Error>>;
+    /** A message indicating the result of the password reset request */
+    message?: Maybe<Scalars['String']['output']>;
+}
+
+/** Autogenerated input type of UsersPasswordResetRequest */
+export interface UsersPasswordResetRequestInput {
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    /** Email of the user to reset the password */
+    email: Scalars['String']['input'];
+}
+
+/** Autogenerated return type of UsersPasswordResetRequest. */
+export interface UsersPasswordResetRequestPayload {
+    __typename?: 'UsersPasswordResetRequestPayload';
+    /** A unique identifier for the client performing the mutation. */
+    clientMutationId?: Maybe<Scalars['String']['output']>;
+    /** Errors encountered during execution of the mutation. */
+    errors?: Maybe<Array<Error>>;
+    /** A message indicating the result of the password reset request */
+    message?: Maybe<Scalars['String']['output']>;
 }
 
 /** Autogenerated input type of UsersRegister */
@@ -2649,7 +2927,7 @@ export interface UsersRegisterPayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The created users session */
     userSession?: Maybe<UserSession>;
 }
@@ -2684,7 +2962,7 @@ export interface UsersUpdatePayload {
     /** A unique identifier for the client performing the mutation. */
     clientMutationId?: Maybe<Scalars['String']['output']>;
     /** Errors encountered during execution of the mutation. */
-    errors: Array<Error>;
+    errors?: Maybe<Array<Error>>;
     /** The updated user. */
     user?: Maybe<User>;
 }

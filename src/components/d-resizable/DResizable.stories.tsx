@@ -31,6 +31,7 @@ import {useFlowViewportEdges} from "../d-flow/viewport/DFlowViewport.edges.hook"
 import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
+import {DFlowViewportValidations} from "../d-flow/viewport/DFlowViewportValidations";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -187,6 +188,7 @@ const FlowExample = () => {
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
         <DFlowViewportControls/>
+        <DFlowViewportValidations flowId={"gid://sagittarius/Flow/1"}/>
         {/*<DFlowViewportMiniMap/>*/}
     </DFlow>
 }

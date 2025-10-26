@@ -9,7 +9,7 @@ import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
-import {FlowTypeSetting} from "@code0-tech/sagittarius-graphql-types";
+import {FlowTypeSetting, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportTriggerTabContentProps {
     instance: FlowView
@@ -18,22 +18,15 @@ export interface DFlowViewportTriggerTabContentProps {
 export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabContentProps> = (props) => {
 
     const {instance} = props
-    const flowService = useService(DFlowReactiveService)
     const flowTypeService = useService(DFlowTypeReactiveService)
+    const flowService = useService(DFlowReactiveService)
     const definition = flowTypeService.getById(instance.type?.id!!)
-
-    const flowTypeSettingsDefinition = React.useMemo(() => {
-        const map: Record<string, FlowTypeSetting> = {}
-        definition?.flowTypeSettings?.forEach(def => {
-            map[def.identifier!!] = def
-        })
-        return map
-    }, [definition?.flowTypeSettings])
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
         suggestionsById[settingDefinition.identifier!!] = useSuggestions({dataType: settingDefinition.dataType}, [], "some_database_id", 0, [0], 0)
     })
+
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {definition?.flowTypeSettings?.map(settingDefinition => {
@@ -41,14 +34,45 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
             const title = settingDefinition.names?.nodes!![0]?.content ?? ""
             const description = settingDefinition?.descriptions?.nodes!![0]?.content ?? ""
             const result = suggestionsById[settingDefinition.identifier!!]
-            const defaultValue = typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
+
+            if (!setting) return null
+
+            // @ts-ignore
+            const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
+
+            const submitValue = (value: NodeParameterValue) => {
+                if (value.__typename == "LiteralValue") {
+                    setting.value = value.value
+                } else {
+                    setting.value = value
+                }
+                flowService.update()
+            }
+
+            const submitValueEvent = (event: any) => {
+                try {
+                    const value = JSON.parse(event.target.value) as Scalars['JSON']['output']
+                    if (value.__typename == "LiteralValue") {
+                        submitValue(value.value)
+                        return
+                    }
+                    submitValue(value)
+                } catch (e) {
+                    // @ts-ignore
+                    submitValue(event.target.value)
+                }
+            }
 
             return <div>
                 <TextInput title={title}
                            description={description}
                            clearable
-                           key={JSON.stringify(setting?.value)}
+                           key={JSON.stringify(setting.value)}
                            defaultValue={defaultValue}
+                           onClear={submitValueEvent}
+                           onSuggestionSelect={(suggestion) => {
+                               submitValue(suggestion.value)
+                           }}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                            suggestions={toInputSuggestions(result)}
                            />

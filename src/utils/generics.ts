@@ -13,6 +13,7 @@ import {
     GenericType,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {FlowView} from "../components/d-flow/DFlow.view";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 
@@ -373,7 +374,8 @@ export const replaceGenericKeysInDataTypeObject = (
 export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
-    dataTypeService: DFlowDataTypeService
+    dataTypeService: DFlowDataTypeService,
+    flow?: FlowView
 ): GenericMap => {
     const genericMap: GenericMap = new Map();
     const genericKeys = func.genericKeys ?? [];
@@ -385,7 +387,7 @@ export const resolveGenericKeys = (
     func.parameterDefinitions.forEach((parameter, index) => {
         const parameterType = parameter.dataTypeIdentifier as DataTypeIdentifier;
         const value = values[index];
-        const valueType = dataTypeService.getTypeFromValue(value) as DataTypeIdentifier;
+        const valueType = dataTypeService.getTypeFromValue(value, flow) as DataTypeIdentifier;
 
         if (!parameterType || !valueType) return;
 

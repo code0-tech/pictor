@@ -20,7 +20,7 @@ export class DFlowDataTypeContainsTypeRule {
         const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
         //TODO: seperate general validation
-        //if (!(Array.isArray(value))) return false
+        if ("value" in value && !(Array.isArray(value.value))) return false
 
         //TODO: only if its really a generic key
         if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true

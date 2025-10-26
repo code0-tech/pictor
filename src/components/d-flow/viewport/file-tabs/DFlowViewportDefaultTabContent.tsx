@@ -85,7 +85,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({...parameter.value.json(), __typename: "NodeFunction"}) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
 
             return <div>
-                {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value as NodeParameterValue))}
                 <TextInput title={title}
                            description={description}
                            clearable
@@ -127,10 +126,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 />
             </div>
         })}
-        {JSON.stringify(returnType)}
-        <br/>
-        <br/>
-        {JSON.stringify(genericTypeMap)}
     </Flex>
 
 }

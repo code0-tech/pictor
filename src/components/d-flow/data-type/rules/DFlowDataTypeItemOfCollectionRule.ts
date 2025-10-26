@@ -8,6 +8,6 @@ import {DataTypeRulesItemOfCollectionConfig, NodeParameterValue} from "@code0-te
 export class DFlowDataTypeItemOfCollectionRule {
     public static validate(value: NodeParameterValue, config: DataTypeRulesItemOfCollectionConfig): boolean {
         if (!config.items) return false
-        return config.items.includes(value)
+        return "value" in value && config.items.includes(value.value)
     }
 }

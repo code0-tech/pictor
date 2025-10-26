@@ -1,0 +1,12 @@
+@use "../../../styles/variables";
+@use "../../../styles/helpers";
+@use "../../../styles/box";
+
+.d-flow-viewport-validations {
+  padding: variables.$xxs;
+
+  & {
+    @include box.box(variables.$primary);
+    @include helpers.borderRadius();
+  }
+}

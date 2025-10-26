@@ -55,7 +55,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.instance.functionDefinition?.id!!)
-    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), useService(DFlowDataTypeReactiveService)!!, props.data.flowId)
+    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), dataTypeService!!, props.data.flowId)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0

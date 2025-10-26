@@ -30,7 +30,7 @@ export const useFunctionValidation = (
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flow = flowService.getById(flowId)
-    const genericTypeMap = resolveGenericKeys(func, values, dataTypeService)
+    const genericTypeMap = resolveGenericKeys(func, values, dataTypeService, flow)
     const parameters = func.parameterDefinitions ?? []
     const genericKeys = func.genericKeys ?? []
     const errors: ValidationResult[] = [];
@@ -39,15 +39,11 @@ export const useFunctionValidation = (
         const value = values[index]
         if (!value) return;
         const parameterType = parameter.dataTypeIdentifier
-        const valueType = value.__typename === "NodeFunction" ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value);
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
+        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != DataTypeVariant.Node ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
         const valueDataType = dataTypeService.getDataType(valueType!!)
 
         const paramLabel: string = `Parameter #${index + 1}`
-
-        if (value.__typename === "NodeFunction") {
-            console.log("valueType", valueType)
-        }
 
         // Check if the parameter is generic (by key or by structure)
         const isParameterGeneric = (parameterDataType && parameterType?.genericType) || (parameterType?.genericKey && genericKeys.includes(parameterType.genericKey))
@@ -63,6 +59,8 @@ export const useFunctionValidation = (
                     const resolvedValueDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
                     );
+
+                    console.log(resolvedParameterDT, resolvedValueDT, useValidateDataType(resolvedParameterDT, resolvedValueDT))
                     isValid = useValidateDataType(resolvedParameterDT, resolvedValueDT)
                     if (!isValid) {
                         errors.push(errorResult(paramLabel, parameterType, value, "Generic Ref: Type mismatch"));

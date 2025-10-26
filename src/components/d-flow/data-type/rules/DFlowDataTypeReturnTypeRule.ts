@@ -100,6 +100,8 @@ export class DFlowDataTypeReturnTypeRule {
 }
 
 const findReturnNode = (n: NodeFunction, flow: FlowView): NodeFunction | undefined => {
+
+    if (!flow) return undefined
     if (n.functionDefinition?.runtimeFunctionDefinition?.identifier === 'RETURN') return n
 
     if (flow.getNodeById(n.nextNodeId!!)) {

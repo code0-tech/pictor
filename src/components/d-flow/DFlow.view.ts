@@ -197,7 +197,8 @@ export class NodeFunctionView {
                 nodes: this._parameters.map(param => param.json()!!)
             } : undefined,
             functionDefinition: this._functionDefinition,
-            updatedAt: this._updatedAt
+            updatedAt: this._updatedAt,
+            __typename: "NodeFunction",
         }
     }
 }
@@ -249,6 +250,7 @@ export class NodeParameterView {
     }
 
     set value(value: NodeParameterValue) {
+        console.log("setValue", value)
         if (value.__typename === "NodeFunction") {
             this._value = new NodeFunctionView(value as NodeFunction);
         } else {

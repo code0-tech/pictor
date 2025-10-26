@@ -45,6 +45,10 @@ export const useFunctionValidation = (
 
         const paramLabel: string = `Parameter #${index + 1}`
 
+        if (value.__typename === "NodeFunction") {
+            console.log("valueType", valueType)
+        }
+
         // Check if the parameter is generic (by key or by structure)
         const isParameterGeneric = (parameterDataType && parameterType?.genericType) || (parameterType?.genericKey && genericKeys.includes(parameterType.genericKey))
 

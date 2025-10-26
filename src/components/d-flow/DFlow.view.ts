@@ -249,9 +249,8 @@ export class NodeParameterView {
         return this._value;
     }
 
-    set value(value: NodeParameterValue) {
-        console.log("setValue", value)
-        if (value.__typename === "NodeFunction") {
+    set value(value: NodeParameterValue | undefined) {
+        if (value?.__typename === "NodeFunction") {
             this._value = new NodeFunctionView(value as NodeFunction);
         } else {
             this._value = value as LiteralValue | ReferenceValue;

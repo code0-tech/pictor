@@ -22,7 +22,6 @@ export class DFlowDataTypeContainsTypeRule {
         //TODO: seperate general validation
         if ("value" in value && !(Array.isArray(value.value))) return false
 
-        //TODO: only if its really a generic key
         if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
         if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false

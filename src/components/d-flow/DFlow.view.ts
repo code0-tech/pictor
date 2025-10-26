@@ -15,6 +15,7 @@ import {
     RuntimeParameterDefinition,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {ValidationResult} from "../../utils/inspection";
 
 export class FlowView {
 
@@ -155,7 +156,6 @@ export class NodeFunctionView {
         this._parameters = nodeFunction.parameters ? nodeFunction.parameters.nodes?.map(param => new NodeParameterView(param!!)) : undefined
     }
 
-
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
     }
@@ -216,6 +216,8 @@ export class NodeParameterView {
     /** The value of the parameter */
     private _value?: LiteralValue | ReferenceValue | NodeFunctionView;
 
+    private _validationResults: ValidationResult[]
+
     constructor(nodeParameter: NodeParameter) {
         this._createdAt = nodeParameter.createdAt
         this._id = nodeParameter.id
@@ -226,6 +228,7 @@ export class NodeParameterView {
         } else {
             this._value = nodeParameter.value as LiteralValue | ReferenceValue;
         }
+        this._validationResults = []
 
     }
 
@@ -247,6 +250,14 @@ export class NodeParameterView {
 
     get value(): LiteralValue | ReferenceValue | NodeFunctionView | undefined {
         return this._value;
+    }
+
+    get validationResults(): ValidationResult[] {
+        return this._validationResults;
+    }
+
+    set validationResults(value: ValidationResult[]) {
+        this._validationResults = value;
     }
 
     set value(value: NodeParameterValue | undefined) {

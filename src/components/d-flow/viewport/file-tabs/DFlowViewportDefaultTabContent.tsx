@@ -53,7 +53,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
-            const submitValue = (value: NodeParameterValue) => {
+            const submitValue = (value: NodeParameterValue | undefined) => {
                 parameter.value = value
                 flowService.update()
             }
@@ -62,16 +62,16 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 try {
                     const value = JSON.parse(event.target.value) as NodeParameterValue
                     if (!value.__typename) {
-                        submitValue({
+                        submitValue(value ? {
                             __typename: "LiteralValue",
                             value: value
-                        })
+                        } : undefined)
                         return
                     }
-                    submitValue(value)
+                    submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
                 } catch (e) {
                     // @ts-ignore
-                    submitValue(event.target.value == "" ? undefined : {
+                    submitValue(event.target.value == "" || !event.target.value ? undefined : {
                         __typename: "LiteralValue",
                         value: event.target.value
                     } as LiteralValue)
@@ -82,7 +82,10 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({...parameter.value.json(), __typename: "NodeFunction"}) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
+            const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({
+                ...parameter.value.json(),
+                __typename: "NodeFunction"
+            }) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
 
             return <div>
                 <TextInput title={title}

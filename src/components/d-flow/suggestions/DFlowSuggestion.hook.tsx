@@ -110,7 +110,7 @@ export const useSuggestions = (
                     }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
                 }
             }
-            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes[0].content as string])
+            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
             state.push(suggestion)
         })
 

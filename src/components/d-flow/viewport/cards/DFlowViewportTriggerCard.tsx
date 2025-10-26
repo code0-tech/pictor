@@ -48,7 +48,7 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
                          id: id,
                          active: true,
                          closeable: true,
-                         children: <Text size={"md"}>{data.instance.id}</Text>,
+                         children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
                          content: <DFlowViewportTriggerTabContent instance={data.instance}/>
                      })
                  }}>

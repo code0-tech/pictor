@@ -100,7 +100,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     id: id,
                     active: true,
                     closeable: true,
-                    children: <Text size={"md"}>{data.instance.id}</Text>,
+                    children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
                     content: <DFlowViewportDefaultTabContent depthLevel={data.depth} scopeLevel={data.scope}
                                                              nodeLevel={data.index} functionInstance={data.instance}/>
                 })

@@ -43,8 +43,6 @@ export const useFunctionValidation = (
         const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != DataTypeVariant.Node ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
         const valueDataType = dataTypeService.getDataType(valueType!!)
 
-        const paramLabel: string = `Parameter #${index + 1}`
-
         // Check if the parameter is generic (by key or by structure)
         const isParameterGeneric = (parameterDataType && parameterType?.genericType) || (parameterType?.genericKey && genericKeys.includes(parameterType.genericKey))
 
@@ -85,7 +83,7 @@ export const useFunctionValidation = (
                 }
                 return;
             }
-            if (valueDataType && parameterDataType && parameterDataType.genericKeys && valueDataType.json && parameterDataType.json) {
+            if (valueDataType && parameterDataType && valueDataType.json && parameterDataType.json) {
                 if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
                     const resolvedParameterDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap)

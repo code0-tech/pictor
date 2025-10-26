@@ -61,6 +61,13 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const width = props.width ?? 0
     const height = props.height ?? 0
 
+    data.instance.parameters?.forEach(parameter => {
+        const parameterDefinition = definition?.parameterDefinitions!!.find(p => p.id == parameter?.id)
+        console.log(validation)
+        parameter.validationResults = validation ? validation.filter(v => v.parameterId === parameterDefinition?.id) : []
+        console.log(parameter.validationResults)
+    })
+
     // Helper, ob zu diesem Parameter eine Edge existiert:
     function isParamConnected(paramId: Maybe<Scalars["NodeParameterID"]["output"]>): boolean {
         return edges.some(e =>

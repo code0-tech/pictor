@@ -27,7 +27,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
 
     const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
@@ -48,8 +47,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
         suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
     })
 
-    const returnType = useReturnType(definition!!, sortedParameters.map(p => p.value as NodeParameterValue), dataTypeService)
-    const genericTypeMap = resolveGenericKeys(definition!!, sortedParameters.map(p => p.value as NodeParameterValue), dataTypeService)
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
@@ -120,6 +117,11 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                            defaultValue={defaultValue}
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)
+                           }}
+                           formValidation={{
+                               setValue: () => {},
+                               valid: parameter.validationResults.length <= 0,
+                               notValidMessage: parameter.validationResults.map(value => value.message.nodes!![0]?.content).join(", ")
                            }}
                            onBlur={submitValueEvent}
                            onClear={submitValueEvent}

@@ -56,9 +56,7 @@ export const useSuggestions = (
                 if (rule?.variant === DataTypeRulesVariant.ItemOfCollection) {
                     (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
                         const suggestion = new DFlowSuggestion(hashedType, [], {
-                            createdAt: "",
-                            id: undefined,
-                            updatedAt: "",
+                            __typename: "LiteralValue",
                             value: value
                         }, DFlowSuggestionType.VALUE, [value.toString()])
                         suggestionService.addSuggestion(suggestion)
@@ -67,9 +65,7 @@ export const useSuggestions = (
                 } else if (rule?.variant === DataTypeRulesVariant.NumberRange) {
                     const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
                     const suggestion = new DFlowSuggestion(hashedType, [], {
-                        createdAt: "",
-                        id: undefined,
-                        updatedAt: "",
+                        __typename: "LiteralValue",
                         value: config.from
                     }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                     suggestionService.addSuggestion(suggestion)

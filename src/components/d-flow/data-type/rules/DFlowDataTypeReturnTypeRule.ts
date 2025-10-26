@@ -30,6 +30,9 @@ export class DFlowDataTypeReturnTypeRule {
 
         if (value.__typename != "NodeFunction") return false
 
+        const foundReturnFunction = findReturnNode(value, flow!!)
+        if (!foundReturnFunction) return false
+
         //TODO: only if its really a generic key
         if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
@@ -40,9 +43,6 @@ export class DFlowDataTypeReturnTypeRule {
 
         //check if all generic combinations are set
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
-
-        const foundReturnFunction = findReturnNode(value, flow!!)
-        if (!foundReturnFunction) return false
 
         if (foundReturnFunction?.parameters?.nodes!![0]?.value!!.__typename === "ReferenceValue") {
 
@@ -101,7 +101,6 @@ export class DFlowDataTypeReturnTypeRule {
 
 const findReturnNode = (n: NodeFunction, flow: FlowView): NodeFunction | undefined => {
 
-    if (!flow) return undefined
     if (n.functionDefinition?.runtimeFunctionDefinition?.identifier === 'RETURN') return n
 
     if (flow.getNodeById(n.nextNodeId!!)) {

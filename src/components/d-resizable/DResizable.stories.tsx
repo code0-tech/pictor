@@ -56,6 +56,15 @@ export const Dashboard = () => {
         id: "gid://sagittarius/Flow/1",
         type: {
             id: "gid://sagittarius/TypesFlowType/735",
+        },
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
         }
     })]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);

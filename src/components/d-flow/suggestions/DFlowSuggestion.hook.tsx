@@ -123,10 +123,9 @@ export const useSuggestions = (
         if (!resolvedType) return
 
         const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
-        console.log(resolvedRefObjectType, resolvedType)
         if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
-        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.dataTypeIdentifier)])
+        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`])
         state.push(suggestion)
     })
 

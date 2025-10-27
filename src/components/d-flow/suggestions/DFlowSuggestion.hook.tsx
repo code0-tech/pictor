@@ -117,12 +117,13 @@ export const useSuggestions = (
     const refObjects = type ? useRefObjects(flowId) : []
 
     refObjects.forEach(value => {
-        if (value?.node ?? 0 >= node) return
-        if (value?.depth ?? 0 > depth) return
+        if ((value?.node ?? 0) >= node) return
+        if ((value?.depth ?? 0) > depth) return
         if ((value?.scope ?? []).some(r => !scope.includes(r))) return
         if (!resolvedType) return
 
         const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
+        console.log(resolvedRefObjectType, resolvedType)
         if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
         const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.dataTypeIdentifier)])

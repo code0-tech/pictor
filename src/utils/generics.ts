@@ -494,7 +494,7 @@ export function isMatchingType(
     };
 
     const deepMatch = (s: unknown, t: unknown): boolean => {
-        if (wildcard(t)) return true;
+        if (wildcard(s) || wildcard(t)) return true;
         if (s == null || t == null) return s === t;
 
         if (Array.isArray(t)) {
@@ -604,36 +604,65 @@ export const replaceGenericsAndSortType = (
 ): DataTypeIdentifier => {
     const genericKeySet = new Set(genericKeys);
 
-    const replaceIdentifier = (identifier: DataTypeIdentifier): DataTypeIdentifier => {
-        const genericKey =
-            typeof identifier.genericKey === "string" && genericKeySet.has(identifier.genericKey)
-                ? GENERIC_PLACEHOLDER
-                : identifier.genericKey;
-
-        const genericType = identifier.genericType;
-        const replacedGenericType = genericType
-            ? (sortValue({
-                  ...genericType,
-                  genericMappers: (genericType.genericMappers ?? []).map(mapper => {
-                      const replacedMapper = {
-                          ...mapper,
-                          target: genericKeySet.has(mapper.target!!)
-                              ? GENERIC_PLACEHOLDER
-                              : mapper.target,
-                          sourceDataTypeIdentifiers: mapper.sourceDataTypeIdentifiers?.map(source => replaceIdentifier(source))
-                      };
-
-                      return sortValue(replacedMapper) as GenericMapper;
-                  })
-              }) as GenericType)
-            : genericType;
-
-        return sortValue({
-            ...identifier,
-            genericKey,
-            genericType: replacedGenericType
-        }) as DataTypeIdentifier;
+    const shouldReplace = (key: string | undefined | null): boolean => {
+        if (!key) return false;
+        if (genericKeySet.size === 0) return true;
+        return genericKeySet.has(key);
     };
 
-    return replaceIdentifier(type);
+    const replaceMapper = (mapper: GenericMapper): GenericMapper => {
+        const replaceTarget = shouldReplace(mapper.target);
+        const target = replaceTarget ? GENERIC_PLACEHOLDER : mapper.target;
+        const sources = (mapper.sourceDataTypeIdentifiers ?? []).map(source => visit(source) as DataTypeIdentifier);
+
+        return sortValue({
+            ...mapper,
+            target,
+            sourceDataTypeIdentifiers: sources
+        }) as GenericMapper;
+    };
+
+    const replaceIdentifier = (identifier: DataTypeIdentifier): DataTypeIdentifier => {
+        const replaceKey = shouldReplace(identifier.genericKey);
+        const genericKey = replaceKey ? GENERIC_PLACEHOLDER : identifier.genericKey;
+
+        const replaced = {
+            ...identifier,
+            genericKey,
+            dataType: identifier.dataType ? (visit(identifier.dataType) as DataType) : identifier.dataType,
+            genericType: identifier.genericType ? (visit(identifier.genericType) as GenericType) : identifier.genericType
+        };
+
+        return sortValue(replaced) as DataTypeIdentifier;
+    };
+
+    function visit(value: unknown): unknown {
+        if (value == null) return value;
+
+        if (Array.isArray(value)) {
+            const mapped = value.map(item => visit(item));
+            return sortValue(mapped);
+        }
+
+        if (isDataTypeIdentifier(value)) {
+            return replaceIdentifier(value as DataTypeIdentifier);
+        }
+
+        if (isGenericMapper(value as GenericMapper)) {
+            return replaceMapper(value as GenericMapper);
+        }
+
+        if (isPlainObject(value)) {
+            const entries = Object.entries(value as Record<string, unknown>).reduce<Record<string, unknown>>((acc, [key, val]) => {
+                acc[key] = visit(val);
+                return acc;
+            }, {});
+
+            return sortValue(entries);
+        }
+
+        return value;
+    }
+
+    return visit(type) as DataTypeIdentifier;
 };

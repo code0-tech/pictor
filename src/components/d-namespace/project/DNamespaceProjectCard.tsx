@@ -15,7 +15,6 @@ import Col from "../../col/Col"
 import {format} from "date-fns"
 import {useService, useStore} from "../../../utils/contextStore"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
-import {DNamespaceProjectView} from "./DNamespaceProject.view"
 
 export interface DNamespaceProjectCardProps extends Code0Component<HTMLDivElement> {
     projectId: Scalars['NamespaceProjectID']['output']

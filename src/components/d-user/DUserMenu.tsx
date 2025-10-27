@@ -6,6 +6,8 @@ import {DUserReactiveService} from "./DUser.service"
 import {useService} from "../../utils/contextStore"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import Avatar from "../avatar/Avatar"
+import Text from "../text/Text"
+import Row from "../row/Row"
 
 export interface DUserMenuProps extends MenuProps {
     userId: Scalars['UserID']['output']
@@ -21,7 +23,12 @@ const DUserMenu: React.FC<DUserMenuProps> = props => {
         return (
             <Menu {...props}>
                 <MenuTrigger asChild>
-                    <Avatar src={currentUser?.avatarPath ?? ""}/>
+                    <Row align={"center"}>
+                        <Avatar src={currentUser?.avatarPath ?? ""} identifier={currentUser?.email ?? ""}/>
+                        <Text size={"md"} hierarchy={"secondary"} style={{display: "block"}}>
+                            {currentUser?.username}
+                        </Text>
+                    </Row>
                 </MenuTrigger>
                 <MenuPortal>
                     <MenuContent side={"bottom"} align={"end"} sideOffset={4}>

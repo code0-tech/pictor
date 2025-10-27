@@ -54,7 +54,7 @@ export const DUserMenuExample: DUserMenuStory = {
         {
             id: "gid://sagittarius/User/1",
             username: "exampleuser",
-            email: "",
+            email: "test@gmail.com",
             admin: undefined,
             avatarPath: undefined,
             firstname: undefined,

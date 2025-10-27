@@ -57,8 +57,7 @@ export const useFunctionValidation = (
                     const resolvedValueDT = new DataTypeView(
                         replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
                     );
-
-                    console.log(resolvedParameterDT, resolvedValueDT, useValidateDataType(resolvedParameterDT, resolvedValueDT))
+                    
                     isValid = useValidateDataType(resolvedParameterDT, resolvedValueDT)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));

@@ -11,13 +11,17 @@ import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
-import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
-import {useReturnType} from "../../function/DFlowFunction.return.hook";
-import {resolveGenericKeys} from "../../../../utils/generics";
-import {LiteralValue, NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    LiteralValue,
+    NodeFunction,
+    NodeParameterValue,
+    ReferenceValue,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunctionView
+    flowId: Scalars["FlowID"]["output"]
     depthLevel?: number
     scopeLevel?: number[]
     nodeLevel?: number
@@ -25,7 +29,7 @@ export interface DFlowViewportFileTabsContentProps {
 
 export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
 
-    const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
+    const {functionInstance, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.functionDefinition?.id!!)
@@ -44,7 +48,7 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     sortedParameters.forEach(parameter => {
         const parameterDefinition = paramDefinitions[parameter.id!!]
-        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
+        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>

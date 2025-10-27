@@ -10,6 +10,7 @@ import {DOrganizationReactiveService} from "./DOrganizationService"
 import {IconFolder} from "@tabler/icons-react"
 import Col from "../col/Col"
 import Row from "../row/Row"
+import Badge from "../badge/Badge"
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']
@@ -29,10 +30,10 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
                     <Text size={"lg"} hierarchy={"primary"} style={{overflow: "hidden", display: "block", marginBottom: ".25rem", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                         {organization?.name}
                     </Text>
-                    <Row align={"center"}>
-                        <IconFolder size={32}/>
+                    <Badge style={{background: "transparent", gap: 4, padding: 0, fontSize: ".8rem"}}>
+                        <IconFolder size={18}/>
                         {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
-                    </Row>
+                    </Badge>
                 </Col>
             </Card>
         )

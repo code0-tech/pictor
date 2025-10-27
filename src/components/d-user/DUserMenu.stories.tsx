@@ -56,7 +56,7 @@ export const DUserMenuExample: DUserMenuStory = {
             username: "exampleuser",
             email: "test@gmail.com",
             admin: undefined,
-            avatarPath: undefined,
+            avatarPath: "",
             firstname: undefined,
             lastname: undefined,
             namespace: undefined,

@@ -1,9 +1,12 @@
 import {DataTypeView} from "./DFlowDataType.view";
 
+const IGNORE_ID_KEYS = ["id", "__typename", "createdAt", "updatedAt"];
+
 export const useValidateDataType = (
     firstDataType: DataTypeView,
     secondDataType: DataTypeView
 ) => {
+
     if (firstDataType.variant !== secondDataType.variant) return false
 
     const isObject = (value: unknown): value is Record<string, unknown> => {
@@ -30,7 +33,10 @@ export const useValidateDataType = (
 
             if (objKeys1.length !== objKeys2.length) return false
 
-            return objKeys1.every(key => isDeepEqual((value1 as Record<string, unknown>)[key], (value2 as Record<string, unknown>)[key]))
+            return objKeys1.every(key => {
+                if (IGNORE_ID_KEYS.includes(key)) return true // Ignore IDs in deep comparison
+                return isDeepEqual((value1 as Record<string, unknown>)[key], (value2 as Record<string, unknown>)[key])
+            })
         }
 
         return false

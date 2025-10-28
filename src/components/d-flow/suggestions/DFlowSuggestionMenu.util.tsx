@@ -26,10 +26,26 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
             </div>
         </>
 
+        let groupLabel: string | undefined
+
+        if (suggestion.type === DFlowSuggestionType.FUNCTION || suggestion.type === DFlowSuggestionType.FUNCTION_COMBINATION) {
+            const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"
+                ? suggestion.value.functionDefinition?.runtimeFunctionDefinition?.identifier
+                : undefined
+
+            if (runtimeIdentifier) {
+                const [runtime, pkg] = runtimeIdentifier.split("::")
+                if (runtime && pkg) {
+                    groupLabel = `${runtime}::${pkg}`
+                }
+            }
+        }
+
         return {
             children,
             ref: suggestion,
-            value: suggestion.value
+            value: suggestion.value,
+            groupLabel,
         };
     })
 }

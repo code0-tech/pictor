@@ -6,6 +6,11 @@ import Text from "../../text/Text";
 
 export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggestion[] => {
 
+    const staticGroupLabels: Partial<Record<DFlowSuggestionType, string>> = {
+        [DFlowSuggestionType.VALUE]: "Values",
+        [DFlowSuggestionType.REF_OBJECT]: "Variables",
+    }
+
     return suggestions.map(suggestion => {
 
         const iconMap: Record<DFlowSuggestionType, React.ReactNode> = {
@@ -26,7 +31,7 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
             </div>
         </>
 
-        let groupLabel: string | undefined
+        let groupLabel: string | undefined = staticGroupLabels[suggestion.type]
 
         if (suggestion.type === DFlowSuggestionType.FUNCTION || suggestion.type === DFlowSuggestionType.FUNCTION_COMBINATION) {
             const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"

@@ -85,6 +85,20 @@ export const useSuggestions = (
             if (!funcDefinition.genericKeys) return false
             const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
             return isMatchingType(resolvedType, resolvedReturnType)
+        }).sort((a, b) => {
+            const [rA, pA, fA] = a.runtimeFunctionDefinition!!.identifier!!.split("::");
+            const [rB, pB, fB] = b.runtimeFunctionDefinition!!.identifier!!.split("::");
+
+            // Erst runtime vergleichen
+            const runtimeCmp = rA.localeCompare(rB);
+            if (runtimeCmp !== 0) return runtimeCmp;
+
+            // Dann package vergleichen
+            const packageCmp = pA.localeCompare(pB);
+            if (packageCmp !== 0) return packageCmp;
+
+            // Dann function name
+            return fA.localeCompare(fB);
         })
 
         matchingFunctions.forEach(funcDefinition => {
@@ -94,6 +108,7 @@ export const useSuggestions = (
                 id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.length ?? 0) + 1}`,
                 functionDefinition: {
                     id: funcDefinition.id,
+                    runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
                 },
                 parameters: {
                     nodes: (funcDefinition.parameterDefinitions?.map(definition => {
@@ -130,7 +145,7 @@ export const useSuggestions = (
     })
 
 
-    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")]
+    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")].sort()
 
 }
 

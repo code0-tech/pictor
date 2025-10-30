@@ -9,4 +9,9 @@
   padding-left: variables.$xxs;
   padding-right: variables.$xxs;
   border-radius: 0 !important;
+
+  > input {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }

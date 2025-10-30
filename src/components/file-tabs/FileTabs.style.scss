@@ -90,6 +90,9 @@
 
   &__content {
     padding: variables.$xs + variables.$xs;
+    overflow: scroll;
+    position: relative;
+    height: 100%;
   }
 
 }

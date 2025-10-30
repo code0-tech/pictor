@@ -1,0 +1,21 @@
+@use "../../../../styles/helpers";
+@use "../../../../styles/variables";
+@use "../../../../styles/box";
+
+.d-flow-viewport-data-type-input {
+  padding: variables.$md;
+  box-sizing: border-box;
+
+  & {
+    @include box.box(variables.$secondary, variables.$white, variables.$white);
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
+  }
+
+  &__rule {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: variables.$lg;
+  }
+}

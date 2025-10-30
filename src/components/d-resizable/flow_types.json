@@ -16,7 +16,7 @@
         ]
       },
       "rules": {
-        "count": 5,
+        "count": 3,
         "nodes": [
           {
             "variant": "CONTAINS_KEY",

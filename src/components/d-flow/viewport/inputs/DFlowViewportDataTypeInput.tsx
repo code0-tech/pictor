@@ -22,21 +22,23 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     } = props
 
     return <div>
+        {/**
         <Flex justify={"space-between"}>
             <Text mb={1} display={"block"}>{initialValue?.name?.nodes!![0]?.content}</Text>
             <IconChevronDown size={16}/>
         </Flex>
+        **/}
 
         <div className={"d-flow-viewport-data-type-input"}>
 
             {initialValue?.rules?.nodes?.map(rule => {
                 return <div className={"d-flow-viewport-data-type-input__rule"}>
+                    <Text hierarchy={"tertiary"} size={"xs"}>{rule?.variant} {rule?.variant == "PARENT_TYPE" ? (rule?.config?.dataTypeIdentifier?.dataType?.identifier ?? "") : ""}</Text>
                     {rule?.config?.dataTypeIdentifier?.dataType || rule?.config?.dataTypeIdentifier?.genericType   ?
                         <DFlowViewportDataTypeInput initialValue={rule.config.dataTypeIdentifier.dataType || rule.config.dataTypeIdentifier.genericType.dataType}/> : null}
                     {!rule?.config?.dataTypeIdentifier?.dataType && !rule?.config?.dataTypeIdentifier?.genericType  ?
                         (
                             <div>
-                                <Text hierarchy={"tertiary"} size={"xs"}>{rule?.variant}</Text>
                                 <Flex align={"center"}>
                                     <Button variant={"none"}><IconGripVertical size={16}/></Button>
                                     <div style={{flex: 1}}>

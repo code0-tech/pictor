@@ -1,5 +1,9 @@
 import {ValidationProps} from "../../../form/useForm";
-import {DataType} from "@code0-tech/sagittarius-graphql-types";
+import {
+    DataType,
+    DataTypeRulesContainsKeyConfig,
+    DataTypeRulesParentTypeConfig
+} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import InputMessage from "../../../form/InputMessage";
 import "./DFlowViewportDataTypeInput.style.scss"
@@ -21,7 +25,10 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
         initialValue
     } = props
 
+    //TODO: dataTypeIdentifiers need to be mapped with potential existing generic mapper
+
     return <div>
+
         {/**
         <Flex justify={"space-between"}>
             <Text mb={1} display={"block"}>{initialValue?.name?.nodes!![0]?.content}</Text>
@@ -32,23 +39,42 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
         <div className={"d-flow-viewport-data-type-input"}>
 
             {initialValue?.rules?.nodes?.map(rule => {
-                return <div className={"d-flow-viewport-data-type-input__rule"}>
-                    <Text hierarchy={"tertiary"} size={"xs"}>{rule?.variant} {rule?.variant == "PARENT_TYPE" ? (rule?.config?.dataTypeIdentifier?.dataType?.identifier ?? "") : ""}</Text>
-                    {rule?.config?.dataTypeIdentifier?.dataType || rule?.config?.dataTypeIdentifier?.genericType   ?
-                        <DFlowViewportDataTypeInput initialValue={rule.config.dataTypeIdentifier.dataType || rule.config.dataTypeIdentifier.genericType.dataType}/> : null}
-                    {!rule?.config?.dataTypeIdentifier?.dataType && !rule?.config?.dataTypeIdentifier?.genericType  ?
-                        (
-                            <div>
-                                <Flex align={"center"}>
-                                    <Button variant={"none"}><IconGripVertical size={16}/></Button>
-                                    <div style={{flex: 1}}>
-                                        <TextInput clearable defaultValue={getConfigValue(rule?.config!!)} w={"100%"}/>
-                                    </div>
+                const isParentType = rule?.variant === "PARENT_TYPE";
+                const ptConfig = rule?.config as DataTypeRulesParentTypeConfig | undefined;
 
+                const parentHasRules =
+                    ((ptConfig?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? 0) > 0) ||
+                    ((ptConfig?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? 0) > 0);
+
+                const shouldRender = !isParentType || parentHasRules;
+
+                return shouldRender ? (
+                    <div className="d-flow-viewport-data-type-input__rule">
+                        <Text hierarchy="tertiary" size="xs">
+                            {rule?.variant} {rule?.variant === "CONTAINS_KEY" ? ((rule?.config as DataTypeRulesContainsKeyConfig).key ?? "") : ""}
+                        </Text>
+
+                        {rule?.config?.dataTypeIdentifier?.dataType || rule?.config?.dataTypeIdentifier?.genericType?.dataType ? (
+                            <DFlowViewportDataTypeInput
+                                initialValue={
+                                    rule.config.dataTypeIdentifier.dataType ??
+                                    rule.config.dataTypeIdentifier.genericType?.dataType
+                                }
+                            />
+                        ) : (
+                            <div>
+                                <Flex align="center">
+                                    <Button variant="none">
+                                        <IconGripVertical size={16} />
+                                    </Button>
+                                    <div style={{ flex: 1 }}>
+                                        <TextInput clearable defaultValue={getConfigValue(rule?.config!!)} w="100%" />
+                                    </div>
                                 </Flex>
                             </div>
-                        ) : null}
-                </div>
+                        )}
+                    </div>
+                ) : null;
             })}
             <Button color={"primary"}><IconSettings size={16}/> add new rule</Button>
         </div>

@@ -22,7 +22,6 @@ import {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
-//TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
 

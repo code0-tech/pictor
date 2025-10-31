@@ -36,7 +36,8 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const {
         formValidation,
         initialValue,
-        onChange = (_) => {},
+        onChange = (_) => {
+        },
         blockingDataType
     } = props
 
@@ -367,13 +368,13 @@ const RuleHeader: React.FC<{
 
             <InputLabel>Configuration</InputLabel>
             <Flex align={"center"} style={{gap: ".7rem"}}>
-                <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
-                           disabled
-                           value={dataTypeLabel ?? ""}/>
                 {rule.variant === "CONTAINS_KEY" ?
                     <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
                                disabled
                                value={rule.config?.key ?? ""}/> : null}
+                <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
+                           disabled
+                           value={dataTypeLabel ?? ""}/>
             </Flex>
             <InputLabel>
                 <Flex align={"center"} style={{gap: ".7rem"}}>
@@ -422,7 +423,7 @@ const buildConfigFromValue = (value: string, fallback?: DataTypeRulesConfig | nu
     }
 }
 
-const deepClone = <T,>(value: T): T => {
+const deepClone = <T, >(value: T): T => {
     if (value === undefined || value === null) {
         return value
     }
@@ -448,7 +449,10 @@ const areValuesEqual = (valueA?: DataType | GenericType, valueB?: DataType | Gen
 
 const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): boolean => {
     if (!ruleA || !ruleB) return false
-    return JSON.stringify({variant: ruleA.variant, config: ruleA.config}) === JSON.stringify({variant: ruleB.variant, config: ruleB.config})
+    return JSON.stringify({variant: ruleA.variant, config: ruleA.config}) === JSON.stringify({
+        variant: ruleB.variant,
+        config: ruleB.config
+    })
 }
 
 const isDataType = (value: DataType | GenericType): value is DataType => {

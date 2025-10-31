@@ -67,7 +67,7 @@ export abstract class DUserReactiveService extends DUserService {
     }
 
     override getUserSession(): UserSession | undefined {
-        return window.localStorage.getItem("ide_code-zero_session") as UserSession
+        return JSON.parse(<string>window.localStorage.getItem("ide_code-zero_session")) as UserSession
     }
 
     abstract override userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void

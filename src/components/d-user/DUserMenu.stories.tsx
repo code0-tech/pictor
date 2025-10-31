@@ -65,6 +65,24 @@ export const DUserMenuExample: DUserMenuStory = {
             updatedAt: new Date().toString(),
         }])
 
+        userService.createUserSession({
+            user: {
+                id: "gid://sagittarius/User/1",
+                username: "exampleuser",
+                email: "test@gmail.com",
+                admin: undefined,
+                avatarPath: "",
+                firstname: undefined,
+                lastname: undefined,
+                namespace: undefined,
+                namespaceMemberships: undefined,
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+            },
+            active: true,
+            token: ""
+        })
+
         return (
             <ContextStoreProvider
                 services={[[userStore, userService]]}>

@@ -2,7 +2,7 @@ import {ValidationProps} from "../../../form/useForm";
 import {
     DataType,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesParentTypeConfig
+    DataTypeRulesParentTypeConfig, GenericMapper
 } from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import InputMessage from "../../../form/InputMessage";
@@ -13,6 +13,7 @@ import {IconChevronDown, IconGripVertical, IconSettings} from "@tabler/icons-rea
 import Text from "../../../text/Text";
 import Flex from "../../../flex/Flex";
 import {DataTypeRulesConfig} from "@code0-tech/sagittarius-graphql-types";
+import {replaceGenericKeysInDataTypeObject} from "../../../../utils/generics";
 
 export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType> {
 }
@@ -58,7 +59,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             <DFlowViewportDataTypeInput
                                 initialValue={
                                     rule.config.dataTypeIdentifier.dataType ??
-                                    rule.config.dataTypeIdentifier.genericType?.dataType
+                                    replaceGenericKeysInDataTypeObject((rule?.config?.dataTypeIdentifier?.genericType?.dataType as DataType), new Map<string, GenericMapper>(rule?.config?.dataTypeIdentifier?.genericType?.genericMappers?.map((generic: GenericMapper) => [generic.target, generic])))
                                 }
                             />
                         ) : (

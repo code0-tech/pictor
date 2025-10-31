@@ -9,6 +9,7 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
     const staticGroupLabels: Partial<Record<DFlowSuggestionType, string>> = {
         [DFlowSuggestionType.VALUE]: "Values",
         [DFlowSuggestionType.REF_OBJECT]: "Variables",
+        [DFlowSuggestionType.DATA_TYPE]: "Datatypes",
     }
 
     return suggestions.map(suggestion => {
@@ -18,6 +19,7 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
             [DFlowSuggestionType.FUNCTION_COMBINATION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
             [DFlowSuggestionType.REF_OBJECT]: <IconCirclesRelation color="#FFBE0B" size={16}/>,
             [DFlowSuggestionType.VALUE]: <IconCircleDot color="#D90429" size={16}/>,
+            [DFlowSuggestionType.DATA_TYPE]: <IconCircleDot color="#D90429" size={16}/>,
         }
 
         const children: React.ReactNode = <>

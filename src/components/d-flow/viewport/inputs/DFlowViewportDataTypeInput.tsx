@@ -19,6 +19,12 @@ import Text from "../../../text/Text";
 import Flex from "../../../flex/Flex";
 import Badge from "../../../badge/Badge";
 import InputLabel from "../../../form/InputLabel";
+import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
+import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
+import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
+import {DFlowSuggestionType} from "../../suggestions/DFlowSuggestion.view";
+import {Menu, MenuPortal, MenuTrigger} from "../../../menu/Menu";
+import {InputSuggestionMenuContent, InputSuggestionMenuContentItems} from "../../../form/InputSuggestion";
 
 const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
     DataTypeRulesVariant.ItemOfCollection,
@@ -153,6 +159,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
         })
     }, [updateValue])
 
+
     return <div>
 
         <div className={"d-flow-viewport-data-type-input"}>
@@ -185,7 +192,34 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                     />
                 ) : null;
             })}
-            <Button color={"primary"}><IconSettings size={16}/> Add new rule</Button>
+            <Menu>
+                <MenuTrigger asChild>
+                    <Button color={"primary"}><IconSettings size={16}/> Add new rule</Button>
+                </MenuTrigger>
+                <MenuPortal>
+                    <InputSuggestionMenuContent>
+                        <InputSuggestionMenuContentItems onSuggestionSelect={(suggestion) => {
+                            updateValue(nextValue => {
+                                console.log(nextValue)
+
+                                if ("rules" in nextValue) {
+                                    nextValue?.rules?.nodes?.push(suggestion.value)
+                                } else if ("dataType" in nextValue.genericType) {
+                                    nextValue.genericType.dataType?.rules?.nodes?.push(suggestion.value)
+                                }
+                            })
+
+                        }} suggestions={Object.entries(DataTypeRulesVariant).map(variant => ({
+                            children: variant[1],
+                            value: {
+                                variant: variant[1],
+                            }
+                        }))}/>
+                        <DFlowSuggestionMenuFooter/>
+                    </InputSuggestionMenuContent>
+                </MenuPortal>
+            </Menu>
+
         </div>
 
         {!formValidation?.valid && formValidation?.notValidMessage && (
@@ -205,7 +239,7 @@ const RuleItem: React.FC<{
     onGenericMapperChange: (targetKey: string, sourceIndex: number, value: DataType | GenericType) => void,
 }> = ({rule, blockingRule, genericMap, onRemove, onConfigChange, onNestedChange, onGenericMapperChange}) => {
 
-    const identifier = rule?.config?.dataTypeIdentifier
+    const identifier = rule?.config?.dataTypeIdentifier ?? undefined
     const hasGenericKey = Boolean(identifier?.genericKey)
     const hasNestedValue = Boolean(getRuleIdentifierValue(rule))
     const [isOpen, setIsOpen] = React.useState<boolean>(() => hasNestedValue || hasGenericKey)
@@ -333,7 +367,7 @@ const RuleItem: React.FC<{
                     />
                     <TextInput
                         clearable
-                        value={configValue}
+                        defaultValue={configValue}
                         onChange={handleConfigChange}
                         w={"100%"}
                         disabled={isBlocked}
@@ -354,6 +388,11 @@ const RuleHeader: React.FC<{
 
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
+    const suggestions = isTypeRule ? useSuggestions({
+        dataType: {
+            id: "gid://sagittarius/DataType/878634678"
+        }
+    }, [], "", 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
 
     return isTypeRule ? <div>
         <Flex justify={"space-between"}>
@@ -368,13 +407,14 @@ const RuleHeader: React.FC<{
 
             <InputLabel>Configuration</InputLabel>
             <Flex align={"center"} style={{gap: ".7rem"}}>
-                {rule.variant === "CONTAINS_KEY" ?
-                    <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
-                               disabled
-                               value={rule.config?.key ?? ""}/> : null}
+                {rule.variant === "CONTAINS_KEY" ? <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
+                                                              disabled={isBlocked}
+                                                              defaultValue={rule.config?.key ?? ""}/> : null}
                 <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
-                           disabled
-                           value={dataTypeLabel ?? ""}/>
+                           disabled={isBlocked}
+                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                           suggestions={toInputSuggestions(suggestions)}
+                           defaultValue={dataTypeLabel ?? ""}/>
             </Flex>
             <InputLabel>
                 <Flex align={"center"} style={{gap: ".7rem"}}>

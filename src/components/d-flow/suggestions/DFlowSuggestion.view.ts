@@ -4,7 +4,8 @@ export enum DFlowSuggestionType {
     REF_OBJECT,
     VALUE,
     FUNCTION,
-    FUNCTION_COMBINATION
+    FUNCTION_COMBINATION,
+    DATA_TYPE,
 }
 
 export class DFlowSuggestion {

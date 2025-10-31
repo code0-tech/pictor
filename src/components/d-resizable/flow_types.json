@@ -40,7 +40,7 @@
                     "count": 0,
                     "nodes": []
                   },
-                  "variant": "TYPE"
+                  "variant": "OBJECT"
                 }
               },
               "key": "body"

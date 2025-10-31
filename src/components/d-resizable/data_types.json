@@ -1332,6 +1332,25 @@
     "variant": "PRIMITIVE"
   },
   {
+    "id": "gid://sagittarius/DataType/878634678",
+    "genericKeys": [],
+    "identifier": "DATATYPE",
+    "name": {
+      "count": 1,
+      "nodes": [
+        {
+          "code": "en-US",
+          "content": "DataType"
+        }
+      ]
+    },
+    "rules": {
+      "count": 0,
+      "nodes": []
+    },
+    "variant": "DATA_TYPE"
+  },
+  {
     "id": "gid://sagittarius/DataType/37",
     "genericKeys": [],
     "identifier": "TEXT_ENCODING",

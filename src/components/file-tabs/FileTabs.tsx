@@ -13,6 +13,7 @@ import {mergeCode0Props} from "../../utils/utils";
 import {Code0ComponentProps} from "../../utils/types";
 import "./FileTabs.style.scss"
 import {IconX} from "@tabler/icons-react";
+import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 
 type FileTabsProps = Code0ComponentProps & TabsProps
 type FileTabsListProps = Code0ComponentProps & TabsListProps & { controls?: React.ReactNode };
@@ -42,5 +43,12 @@ export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
 }
 
 export const FileTabsContent: React.FC<FileTabsContentProps> = (props) => {
-    return <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}/>
+    return <ScrollArea h={"50%"}>
+        <ScrollAreaViewport>
+            <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}/>
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar orientation={"horizontal"}>
+            <ScrollAreaThumb/>
+        </ScrollAreaScrollbar>
+    </ScrollArea>
 }

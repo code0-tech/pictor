@@ -24,7 +24,11 @@ import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFo
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 import {DFlowSuggestionType} from "../../suggestions/DFlowSuggestion.view";
 import {Menu, MenuPortal, MenuTrigger} from "../../../menu/Menu";
-import {InputSuggestionMenuContent, InputSuggestionMenuContentItems} from "../../../form/InputSuggestion";
+import {
+    InputSuggestion,
+    InputSuggestionMenuContent,
+    InputSuggestionMenuContentItems
+} from "../../../form/InputSuggestion";
 
 const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
     DataTypeRulesVariant.ItemOfCollection,
@@ -105,20 +109,24 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
             const ruleNodes = ensureRuleNodes(nextDataType)
             const existingRule = ruleNodes[index]
             if (!existingRule) return
+            if (isRuleBlocked(existingRule, blockingData)) return
             const updatedRule = updater(deepClone(existingRule))
             if (updatedRule === undefined) return
             ruleNodes[index] = updatedRule
         })
-    }, [updateValue])
+    }, [blockingData, updateValue])
 
     const removeRuleAtIndex = React.useCallback((index: number) => {
         updateValue(nextValue => {
             const nextDataType = getDataTypeFromValue(nextValue)
             if (!nextDataType) return
             const ruleNodes = ensureRuleNodes(nextDataType)
+            const targetRule = ruleNodes[index]
+            if (!targetRule) return
+            if (isRuleBlocked(targetRule, blockingData)) return
             ruleNodes.splice(index, 1)
         })
-    }, [updateValue])
+    }, [blockingData, updateValue])
 
     const handleNestedChange = React.useCallback((index: number, value: DataType | GenericType) => {
         updateRuleAtIndex(index, (rule) => {
@@ -187,6 +195,38 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             currentRule.config = config
                             return currentRule
                         })}
+                        onHeaderKeyChange={(value) => updateRuleAtIndex(index, (currentRule) => {
+                            if (!currentRule.config) return currentRule
+                            if ("key" in currentRule.config) {
+                                // @ts-ignore - GraphQL union typing
+                                currentRule.config.key = value || null
+                            }
+                            return currentRule
+                        })}
+                        onHeaderDataTypeChange={(value) => updateRuleAtIndex(index, (currentRule) => {
+                            if (!currentRule.config) return currentRule
+                            if (!currentRule.config.dataTypeIdentifier) {
+                                currentRule.config.dataTypeIdentifier = {}
+                            }
+
+                            const identifier = currentRule.config.dataTypeIdentifier
+
+                            if (!value) {
+                                delete identifier?.dataType
+                                delete identifier?.genericType
+                                return currentRule
+                            }
+
+                            if (isDataType(value)) {
+                                identifier.dataType = value
+                                delete identifier.genericType
+                            } else if (isGenericType(value)) {
+                                identifier.genericType = value
+                                delete identifier.dataType
+                            }
+
+                            return currentRule
+                        })}
                         onNestedChange={(value) => handleNestedChange(index, value)}
                         onGenericMapperChange={handleGenericMapperChange}
                     />
@@ -235,9 +275,21 @@ const RuleItem: React.FC<{
     genericMap: Map<string, GenericMapper>,
     onRemove: () => void,
     onConfigChange: (config: DataTypeRulesConfig) => void,
+    onHeaderKeyChange: (value: string) => void,
+    onHeaderDataTypeChange: (value?: DataType | GenericType) => void,
     onNestedChange: (value: DataType | GenericType) => void,
     onGenericMapperChange: (targetKey: string, sourceIndex: number, value: DataType | GenericType) => void,
-}> = ({rule, blockingRule, genericMap, onRemove, onConfigChange, onNestedChange, onGenericMapperChange}) => {
+}> = ({
+    rule,
+    blockingRule,
+    genericMap,
+    onRemove,
+    onConfigChange,
+    onHeaderKeyChange,
+    onHeaderDataTypeChange,
+    onNestedChange,
+    onGenericMapperChange
+}) => {
 
     const identifier = rule?.config?.dataTypeIdentifier ?? undefined
     const hasGenericKey = Boolean(identifier?.genericKey)
@@ -279,13 +331,16 @@ const RuleItem: React.FC<{
     const handleConfigChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value
         setConfigValue(value)
+    }, [])
+
+    const handleConfigCommit = React.useCallback(() => {
         if (isBlocked) return
 
-        const updatedConfig = buildConfigFromValue(value, rule.config)
+        const updatedConfig = buildConfigFromValue(configValue, rule.config)
         if (updatedConfig) {
             onConfigChange(updatedConfig)
         }
-    }, [isBlocked, onConfigChange, rule.config])
+    }, [configValue, isBlocked, onConfigChange, rule.config])
 
     const nestedInitialValue = getRuleIdentifierValue(rule)
     const nestedBlockingValue = getRuleIdentifierValue(blockingRule)
@@ -302,6 +357,8 @@ const RuleItem: React.FC<{
                 dataTypeLabel={dataTypeLabel}
                 onClick={() => setIsOpen(prevState => !prevState)}
                 onRemove={!isBlocked ? onRemove : undefined}
+                onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
+                onDataTypeChange={!isBlocked ? onHeaderDataTypeChange : undefined}
             />
         )
 
@@ -364,11 +421,14 @@ const RuleItem: React.FC<{
                         isBlocked={isBlocked}
                         dataTypeLabel={dataTypeLabel}
                         onRemove={!isBlocked ? onRemove : undefined}
+                        onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
+                        onDataTypeChange={!isBlocked ? onHeaderDataTypeChange : undefined}
                     />
                     <TextInput
                         clearable
-                        defaultValue={configValue}
+                        value={configValue}
                         onChange={handleConfigChange}
+                        onBlur={handleConfigCommit}
                         w={"100%"}
                         disabled={isBlocked}
                     />
@@ -383,8 +443,10 @@ const RuleHeader: React.FC<{
     dataTypeLabel?: string,
     onClick?: () => void,
     onRemove?: () => void,
-    isBlocked?: boolean
-}> = ({rule, dataTypeLabel, onClick, onRemove, isBlocked}) => {
+    isBlocked?: boolean,
+    onKeyChange?: (value: string) => void,
+    onDataTypeChange?: (value?: DataType | GenericType) => void,
+}> = ({rule, dataTypeLabel, onClick, onRemove, isBlocked, onKeyChange, onDataTypeChange}) => {
 
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
@@ -393,8 +455,41 @@ const RuleHeader: React.FC<{
             id: "gid://sagittarius/DataType/878634678"
         }
     }, [], "", 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
+    const rulesCount = rule?.config?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? rule?.config?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? 0
 
-    return isTypeRule ? <div>
+    const [keyValue, setKeyValue] = React.useState<string>(() => ("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : ""))
+    const [dataTypeValue, setDataTypeValue] = React.useState<string>(() => dataTypeLabel ?? "")
+
+    React.useEffect(() => {
+        setKeyValue("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : "")
+    }, [rule])
+
+    React.useEffect(() => {
+        setDataTypeValue(dataTypeLabel ?? "")
+    }, [dataTypeLabel])
+
+    const handleKeyBlur = React.useCallback(() => {
+        if (!onKeyChange || isBlocked) return
+        onKeyChange(keyValue)
+    }, [isBlocked, keyValue, onKeyChange])
+
+    const handleDataTypeBlur = React.useCallback(() => {
+        if (!onDataTypeChange || isBlocked) return
+        if (dataTypeValue.trim() === "") {
+            onDataTypeChange(undefined)
+        }
+    }, [dataTypeValue, isBlocked, onDataTypeChange])
+
+    const handleSuggestionSelect = React.useCallback((suggestion: InputSuggestion) => {
+        if (!onDataTypeChange || isBlocked) return
+        const nextValue = suggestion.value
+        if (!nextValue) return
+        onDataTypeChange(nextValue)
+        const label = suggestion?.ref?.displayText?.join(" ") ?? dataTypeLabel ?? ""
+        setDataTypeValue(label)
+    }, [dataTypeLabel, isBlocked, onDataTypeChange])
+
+    return <div>
         <Flex justify={"space-between"}>
             <Badge color={"info"}>
                 {rule?.variant}
@@ -404,30 +499,35 @@ const RuleHeader: React.FC<{
             </Button> : null}
         </Flex>
         <Flex mt={0.7} style={{flexDirection: "column", gap: ".7rem"}}>
-
-            <InputLabel>Configuration</InputLabel>
-            <Flex align={"center"} style={{gap: ".7rem"}}>
-                {rule.variant === "CONTAINS_KEY" ? <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
-                                                              disabled={isBlocked}
-                                                              defaultValue={rule.config?.key ?? ""}/> : null}
-                <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
-                           disabled={isBlocked}
-                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                           suggestions={toInputSuggestions(suggestions)}
-                           defaultValue={dataTypeLabel ?? ""}/>
-            </Flex>
-            <InputLabel>
+            {isTypeRule ? (
                 <Flex align={"center"} style={{gap: ".7rem"}}>
-                    +{rule?.config?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? rule?.config?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? 0} rules
-                    included
-                    <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
+                    {rule.variant === "CONTAINS_KEY" ? <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
+                                                                  disabled={isBlocked}
+                                                                  value={keyValue}
+                                                                  onChange={(event) => setKeyValue(event.target.value)}
+                                                                  onBlur={handleKeyBlur}/> : null}
+                    <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
+                               disabled={isBlocked}
+                               suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                               suggestions={toInputSuggestions(suggestions)}
+                               value={dataTypeValue}
+                               onChange={(event) => setDataTypeValue(event.target.value)}
+                               onBlur={handleDataTypeBlur}
+                               onSuggestionSelect={handleSuggestionSelect}/>
                 </Flex>
-            </InputLabel>
+            ) : null}
+            {rulesCount > 0 ? (
+                <InputLabel>
+                    <Flex align={"center"} style={{gap: ".7rem"}}>
+                        +{rulesCount} rules
+                        included
+                        <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
+                    </Flex>
+                </InputLabel>
+            ) : null}
         </Flex>
 
-    </div> : <Badge color={"info"} mb={0.35}>
-        {rule?.variant}
-    </Badge>
+    </div>
 
 }
 
@@ -493,6 +593,12 @@ const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): 
         variant: ruleB.variant,
         config: ruleB.config
     })
+}
+
+const isRuleBlocked = (rule?: DataTypeRule | null, blockingDataType?: DataType): boolean => {
+    if (!rule || !blockingDataType?.rules?.nodes) return false
+    const blockingRules = blockingDataType.rules.nodes as (DataTypeRule | null | undefined)[]
+    return blockingRules?.filter(Boolean).some(candidate => isRuleEqual(candidate as DataTypeRule, rule)) ?? false
 }
 
 const isDataType = (value: DataType | GenericType): value is DataType => {

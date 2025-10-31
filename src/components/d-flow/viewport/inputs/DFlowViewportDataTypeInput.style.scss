@@ -5,6 +5,7 @@
 .d-flow-viewport-data-type-input {
   padding: variables.$md;
   box-sizing: border-box;
+  position: relative;
 
   & {
     @include box.box(variables.$secondary, variables.$white, variables.$white);
@@ -15,7 +16,14 @@
   &__rule {
     margin-bottom: 1rem;
     display: flex;
+    position: relative;
     flex-direction: column;
     gap: variables.$lg;
+    padding: variables.$md;
+
+    & {
+      @include helpers.borderRadius();
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
+    }
   }
 }

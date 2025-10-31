@@ -11,7 +11,6 @@ import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFo
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
 import {NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowViewportDataTypeInput} from "../inputs/DFlowViewportDataTypeInput";
-import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../../../scroll-area/ScrollArea";
 
 export interface DFlowViewportTriggerTabContentProps {
     instance: FlowView
@@ -30,63 +29,56 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
     })
 
 
-    return <ScrollArea h={"700px"}>
-        <ScrollAreaViewport>
-            <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-                {definition?.inputType ? <DFlowViewportDataTypeInput initialValue={definition.inputType}/> : null}
-                {definition?.flowTypeSettings?.map(settingDefinition => {
-                    const setting = instance.settings?.find(s => s.flowSettingIdentifier == settingDefinition.identifier)
-                    const title = settingDefinition.names?.nodes!![0]?.content ?? ""
-                    const description = settingDefinition?.descriptions?.nodes!![0]?.content ?? ""
-                    const result = suggestionsById[settingDefinition.identifier!!]
+    return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
+        {definition?.inputType ? <DFlowViewportDataTypeInput initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
+        {definition?.flowTypeSettings?.map(settingDefinition => {
+            const setting = instance.settings?.find(s => s.flowSettingIdentifier == settingDefinition.identifier)
+            const title = settingDefinition.names?.nodes!![0]?.content ?? ""
+            const description = settingDefinition?.descriptions?.nodes!![0]?.content ?? ""
+            const result = suggestionsById[settingDefinition.identifier!!]
 
-                    if (!setting) return null
+            if (!setting) return null
 
+            // @ts-ignore
+            const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
+
+            const submitValue = (value: NodeParameterValue) => {
+                if (value.__typename == "LiteralValue") {
+                    setting.value = value.value
+                } else {
+                    setting.value = value
+                }
+                flowService.update()
+            }
+
+            const submitValueEvent = (event: any) => {
+                try {
+                    const value = JSON.parse(event.target.value) as Scalars['JSON']['output']
+                    if (value.__typename == "LiteralValue") {
+                        submitValue(value.value)
+                        return
+                    }
+                    submitValue(value)
+                } catch (e) {
                     // @ts-ignore
-                    const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
+                    submitValue(event.target.value)
+                }
+            }
 
-                    const submitValue = (value: NodeParameterValue) => {
-                        if (value.__typename == "LiteralValue") {
-                            setting.value = value.value
-                        } else {
-                            setting.value = value
-                        }
-                        flowService.update()
-                    }
-
-                    const submitValueEvent = (event: any) => {
-                        try {
-                            const value = JSON.parse(event.target.value) as Scalars['JSON']['output']
-                            if (value.__typename == "LiteralValue") {
-                                submitValue(value.value)
-                                return
-                            }
-                            submitValue(value)
-                        } catch (e) {
-                            // @ts-ignore
-                            submitValue(event.target.value)
-                        }
-                    }
-
-                    return <div>
-                        <TextInput title={title}
-                                   description={description}
-                                   clearable
-                                   key={JSON.stringify(setting.value)}
-                                   defaultValue={defaultValue}
-                                   onClear={submitValueEvent}
-                                   onSuggestionSelect={(suggestion) => {
-                                       submitValue(suggestion.value)
-                                   }}
-                                   suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                                   suggestions={toInputSuggestions(result)}
-                        />
-                    </div>
-                })}
-            </Flex>
-        </ScrollAreaViewport>
-        <ScrollAreaScrollbar orientation={"vertical"}>
-            <ScrollAreaThumb/>
-        </ScrollAreaScrollbar>
-    </ScrollArea>
+            return <div>
+                <TextInput title={title}
+                           description={description}
+                           clearable
+                           key={JSON.stringify(setting.value)}
+                           defaultValue={defaultValue}
+                           onClear={submitValueEvent}
+                           onSuggestionSelect={(suggestion) => {
+                               submitValue(suggestion.value)
+                           }}
+                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                           suggestions={toInputSuggestions(result)}
+                />
+            </div>
+        })}
+    </Flex>
 }

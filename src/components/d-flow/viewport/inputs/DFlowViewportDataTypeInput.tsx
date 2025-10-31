@@ -503,7 +503,7 @@ const RuleHeader: React.FC<{
                 <Flex align={"center"} style={{gap: ".7rem"}}>
                     {rule.variant === "CONTAINS_KEY" ? <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
                                                                   disabled={isBlocked}
-                                                                  value={keyValue}
+                                                                  defaultValue={keyValue}
                                                                   onChange={(event) => setKeyValue(event.target.value)}
                                                                   onBlur={handleKeyBlur}/> : null}
                     <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}

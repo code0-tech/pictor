@@ -223,6 +223,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                         <input
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
+                            disabled={disabled}
                             {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />
                     )}

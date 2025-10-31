@@ -196,15 +196,17 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             return currentRule
                         })}
                         onHeaderKeyChange={(value) => updateRuleAtIndex(index, (currentRule) => {
-                            if (!currentRule.config) return currentRule
-                            if ("key" in currentRule.config) {
-                                // @ts-ignore - GraphQL union typing
-                                currentRule.config.key = value || null
+                            if (!currentRule.config) {
+                                currentRule.config = {} as DataTypeRulesConfig
                             }
+                            // @ts-ignore - GraphQL union typing
+                            currentRule.config.key = value || null
                             return currentRule
                         })}
                         onHeaderDataTypeChange={(value) => updateRuleAtIndex(index, (currentRule) => {
-                            if (!currentRule.config) return currentRule
+                            if (!currentRule.config) {
+                                currentRule.config = {} as DataTypeRulesConfig
+                            }
                             if (!currentRule.config.dataTypeIdentifier) {
                                 currentRule.config.dataTypeIdentifier = {}
                             }
@@ -240,8 +242,6 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                     <InputSuggestionMenuContent>
                         <InputSuggestionMenuContentItems onSuggestionSelect={(suggestion) => {
                             updateValue(nextValue => {
-                                console.log(nextValue)
-
                                 if ("rules" in nextValue) {
                                     nextValue?.rules?.nodes?.push(suggestion.value)
                                 } else if ("dataType" in nextValue.genericType) {

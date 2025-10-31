@@ -19,11 +19,6 @@
     position: relative;
     flex-direction: column;
     gap: variables.$lg;
-    padding: variables.$md;
 
-    & {
-      @include helpers.borderRadius();
-      @include box.box(variables.$secondary, variables.$white, variables.$white);
-    }
   }
 }

@@ -43,11 +43,11 @@ export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
 }
 
 export const FileTabsContent: React.FC<FileTabsContentProps> = (props) => {
-    return <ScrollArea h={"50%"}>
+    return <ScrollArea h={"96%"}>
         <ScrollAreaViewport>
             <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}/>
         </ScrollAreaViewport>
-        <ScrollAreaScrollbar orientation={"horizontal"}>
+        <ScrollAreaScrollbar orientation={"vertical"}>
             <ScrollAreaThumb/>
         </ScrollAreaScrollbar>
     </ScrollArea>

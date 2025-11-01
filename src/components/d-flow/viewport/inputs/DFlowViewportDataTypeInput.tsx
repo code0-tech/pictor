@@ -4,7 +4,7 @@ import {
     DataType,
     DataTypeRule,
     DataTypeRuleConnection,
-    DataTypeRulesConfig,
+    DataTypeRulesConfig, DataTypeRulesNumberRangeConfig,
     DataTypeRulesParentTypeConfig,
     DataTypeRulesVariant,
     GenericMapper,
@@ -239,6 +239,9 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             children: variant[1],
                             value: {
                                 variant: variant[1],
+                                config: {
+                                    __typename: variant[0],
+                                },
                             }
                         }))}/>
                         <DFlowSuggestionMenuFooter/>
@@ -284,7 +287,7 @@ const RuleItem: React.FC<{
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
 
-    const [configValue, setConfigValue] = React.useState<string>(() => getConfigValue(rule?.config as DataTypeRulesConfig))
+    const [configValue, setConfigValue] = React.useState<string | DataTypeRulesConfig>(() => getConfigValue(rule?.config as DataTypeRulesConfig))
 
     React.useEffect(() => {
         setConfigValue(getConfigValue(rule?.config as DataTypeRulesConfig))
@@ -393,20 +396,17 @@ const RuleItem: React.FC<{
 
     return (
         <div className="d-flow-viewport-data-type-input__rule">
-            <Flex align={"center"}>
-                <Button disabled variant={"none"}>
-                    <IconGripVertical size={16}/>
-                </Button>
-                <div style={{flex: 1}}>
-                    <RuleHeader
-                        rule={rule}
-                        genericMap={genericMap}
-                        isBlocked={isBlocked}
-                        dataTypeLabel={dataTypeLabel}
-                        onRemove={!isBlocked ? onRemove : undefined}
-                        onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
-                        onDataTypeChange={!isBlocked ? onHeaderDataTypeChange : undefined}
-                    />
+            <div style={{flex: 1}}>
+                <RuleHeader
+                    rule={rule}
+                    genericMap={genericMap}
+                    isBlocked={isBlocked}
+                    dataTypeLabel={dataTypeLabel}
+                    onRemove={!isBlocked ? onRemove : undefined}
+                    onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
+                    onDataTypeChange={!isBlocked ? onHeaderDataTypeChange : undefined}
+                />
+                {rule.variant === "REGEX" || rule.variant === "ITEM_OF_COLLECTION" ? (
                     <TextInput
                         clearable
                         defaultValue={configValue}
@@ -415,8 +415,35 @@ const RuleItem: React.FC<{
                         w={"100%"}
                         disabled={isBlocked}
                     />
-                </div>
-            </Flex>
+                ) : rule.variant === "NUMBER_RANGE" ? (
+                    <>
+                        <TextInput
+                            clearable
+                            defaultValue={(configValue as DataTypeRulesNumberRangeConfig)?.from?.toString() ?? ""}
+                            onChange={handleConfigChange}
+                            onBlur={handleConfigCommit}
+                            w={"100%"}
+                            disabled={isBlocked}
+                        />
+                        <TextInput
+                            clearable
+                            defaultValue={(configValue as DataTypeRulesNumberRangeConfig)?.steps?.toString() ?? ""}
+                            onChange={handleConfigChange}
+                            onBlur={handleConfigCommit}
+                            w={"100%"}
+                            disabled={isBlocked}
+                        />
+                        <TextInput
+                            clearable
+                            defaultValue={(configValue as DataTypeRulesNumberRangeConfig)?.to?.toString() ?? ""}
+                            onChange={handleConfigChange}
+                            onBlur={handleConfigCommit}
+                            w={"100%"}
+                            disabled={isBlocked}
+                        />
+                    </>
+                ) : null}
+            </div>
         </div>
     )
 }
@@ -513,15 +540,17 @@ const RuleHeader: React.FC<{
 
 }
 
-const getConfigValue = (payload: DataTypeRulesConfig): string => {
+const getConfigValue = (payload: DataTypeRulesConfig): string | DataTypeRulesConfig => {
 
     if (!payload) return ""
 
-    if ("pattern" in payload || payload?.__typename === "DataTypeRulesRegexConfig") {
+    if ("pattern" in payload && payload?.__typename === "DataTypeRulesRegexConfig") {
         return payload?.pattern ?? ""
+    } else if ("items" in payload && payload?.__typename === "DataTypeRulesItemOfCollectionConfig") {
+        return JSON.stringify(payload.items)
     }
 
-    return JSON.stringify(payload)
+    return payload
 
 }
 
@@ -534,8 +563,16 @@ const buildConfigFromValue = (value: string, fallback?: DataTypeRulesConfig | nu
         }
     }
 
-    if ("pattern" in fallback || fallback?.__typename === "DataTypeRulesRegexConfig") {
+    if ("pattern" in fallback && fallback?.__typename === "DataTypeRulesRegexConfig") {
         return {...fallback, pattern: value}
+    } else if ("items" in fallback && fallback?.__typename === "DataTypeRulesItemOfCollectionConfig") {
+        return {...fallback, items: JSON.parse(value)}
+    } else if ("from" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
+        return {...fallback, from: Number.parseInt(value)}
+    } else if ("steps" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
+        return {...fallback, steps: Number.parseInt(value)}
+    } else if ("to" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
+        return {...fallback, to: Number.parseInt(value)}
     }
 
     try {

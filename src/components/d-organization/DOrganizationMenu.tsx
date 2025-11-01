@@ -10,7 +10,7 @@ import {useService} from "../../utils/contextStore"
 
 export interface DOrganizationMenuProps extends MenuProps {
     organizationId: Scalars["OrganizationID"]["input"]
-    onOrganizationSelect: (payload: DOrganizationView) => void
+    onOrganizationSelect: (id: Scalars["OrganizationID"]["input"]) => void
 }
 
 const DOrganizationMenu: React.FC<DOrganizationMenuProps> = props => {
@@ -32,7 +32,7 @@ const DOrganizationMenu: React.FC<DOrganizationMenuProps> = props => {
                         {organizationService.values().map((organization) => (
                             <MenuItem
                                 key={organization.id}
-                                onSelect={() => props.onOrganizationSelect(organization)}
+                                onSelect={() => props.onOrganizationSelect(organization.id!!)}
                             >
                                 {organization.name}
                             </MenuItem>

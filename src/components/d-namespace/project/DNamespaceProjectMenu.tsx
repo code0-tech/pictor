@@ -10,7 +10,7 @@ import Button from "../../button/Button"
 
 export interface DNamespaceProjectMenuProps extends MenuProps {
     projectId: Scalars['NamespaceProjectID']['output']
-    onProjectSelect: (payload: DNamespaceProjectView) => void
+    onProjectSelect: (id: Scalars['NamespaceProjectID']['output']) => void
 }
 
 const DNamespaceProjectMenu: React.FC<DNamespaceProjectMenuProps> = props => {
@@ -31,7 +31,7 @@ const DNamespaceProjectMenu: React.FC<DNamespaceProjectMenuProps> = props => {
                     {projectService.values().map((project) => (
                         <MenuItem
                             key={project.id}
-                            onSelect={() => props.onProjectSelect(project)}
+                            onSelect={() => props.onProjectSelect(project.id!!)}
                         >
                             {project.name}
                         </MenuItem>

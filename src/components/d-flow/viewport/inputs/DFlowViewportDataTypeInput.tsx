@@ -58,9 +58,6 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     // Tracks whether the latest state update originated from a prop change so we can suppress
     // duplicate onChange notifications that would otherwise create an update loop upstream.
     const isSyncingFromProps = React.useRef(true)
-    // Holds the most recent user-driven change so we can synchronously notify listeners once React
-    // has committed the new state.
-    const pendingChangeRef = React.useRef<DataType | GenericType | undefined>(undefined)
 
     React.useEffect(() => {
         const merged = mergeWithBlocking(initialValue, blockingDataType)
@@ -78,13 +75,10 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
         if (!currentValue) return
         if (isSyncingFromProps.current) {
             isSyncingFromProps.current = false
-            pendingChangeRef.current = undefined
             return
         }
 
-        const nextValue = pendingChangeRef.current ?? currentValue
-        pendingChangeRef.current = undefined
-        onChange(nextValue)
+        onChange(currentValue)
     }, [currentValue, onChange])
 
     const dataType = React.useMemo(() => getDataTypeFromValue(currentValue), [currentValue])
@@ -104,7 +98,6 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                 return prev
             }
 
-            pendingChangeRef.current = draft
             return draft
         })
     }, [])

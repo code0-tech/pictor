@@ -9,7 +9,7 @@ import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
-import {NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {DataType, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowViewportDataTypeInput} from "../inputs/DFlowViewportDataTypeInput";
 
 export interface DFlowViewportTriggerTabContentProps {
@@ -31,7 +31,8 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {definition?.inputType ? <DFlowViewportDataTypeInput onDataTypeChange={value => {
-            console.log(value)
+            instance.inputType = value as DataType
+            flowService.update()
         }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {
             const setting = instance.settings?.find(s => s.flowSettingIdentifier == settingDefinition.identifier)

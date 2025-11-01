@@ -36,6 +36,8 @@ const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
     DataTypeRulesVariant.NumberRange
 ])
 
+const BLOCKING_SIGNATURE_KEY = "__blockingSignature"
+
 export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType | GenericType> {
     onDataTypeChange?: (value: DataType | GenericType) => void
     blockingDataType?: DataType | GenericType
@@ -76,16 +78,25 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
         })
     }, [])
 
-    const updateRuleAtIndex = React.useCallback((index: number, updater: (rule: DataTypeRule) => DataTypeRule | undefined) => {
+    const updateRuleAtIndex = React.useCallback((
+        index: number,
+        updater: (rule: DataTypeRule) => DataTypeRule | undefined,
+        options?: {allowBlocked?: boolean}
+    ) => {
         updateValue(nextValue => {
             const nextDataType = getDataTypeFromValue(nextValue)
             if (!nextDataType) return
             const ruleNodes = ensureRuleNodes(nextDataType)
             const existingRule = ruleNodes[index]
             if (!existingRule) return
-            if (isRuleBlocked(existingRule, blockingData)) return
+            const blockingMatch = findMatchingBlockingRule(existingRule, blockingData)
+            if (blockingMatch && !options?.allowBlocked) return
             const updatedRule = updater(deepClone(existingRule))
             if (updatedRule === undefined) return
+            if (blockingMatch) {
+                applyBlockingSignature(updatedRule, blockingMatch)
+                mergeNestedRules(updatedRule, blockingMatch)
+            }
             ruleNodes[index] = updatedRule
         })
     }, [blockingData, updateValue])
@@ -113,7 +124,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                 delete rule.config.dataTypeIdentifier.dataType
             }
             return rule
-        })
+        }, {allowBlocked: true})
     }, [updateRuleAtIndex])
 
     const handleGenericMapperChange = React.useCallback((targetKey: string, sourceIndex: number, value: DataType | GenericType) => {
@@ -148,7 +159,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
 
             {dataType?.rules?.nodes?.map((rule, index) => {
                 if (!rule) return null
-                const blockingRule = blockingRules?.find(candidate => isRuleEqual(candidate, rule))
+                const blockingRule = blockingRules?.find(candidate => doesRuleMatchBlocking(rule, candidate))
                 const isParentType = rule?.variant === "PARENT_TYPE";
                 const ptConfig = rule?.config as DataTypeRulesParentTypeConfig | undefined;
 
@@ -563,26 +574,18 @@ const areValuesEqual = (valueA?: DataType | GenericType, valueB?: DataType | Gen
     return serializeValue(valueA) === serializeValue(valueB)
 }
 
-const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): boolean => {
-    if (!ruleA || !ruleB) return false
-
-    if (ruleA.id && ruleB.id) {
-        return ruleA.id === ruleB.id
-    }
-
-    return JSON.stringify({variant: ruleA.variant, config: ruleA.config}) === JSON.stringify({
-        variant: ruleB.variant,
-        config: ruleB.config
-    })
-}
-
 const isRuleBlocked = (rule?: DataTypeRule | null, blockingDataType?: DataType): boolean => {
     if (!rule || !blockingDataType?.rules?.nodes) return false
+    const signature = getBlockingSignature(rule)
+    if (!signature) return false
+
+    return Boolean(findMatchingBlockingRule(rule, blockingDataType))
+}
+
+const findMatchingBlockingRule = (rule?: DataTypeRule | null, blockingDataType?: DataType): DataTypeRule | undefined => {
+    if (!rule || !blockingDataType?.rules?.nodes) return undefined
     const blockingRules = blockingDataType.rules.nodes as (DataTypeRule | null | undefined)[]
-    return blockingRules?.filter(Boolean).some(candidate => {
-        const blockingRule = candidate as DataTypeRule
-        return Boolean(blockingRule?.id && rule?.id && blockingRule.id === rule.id)
-    }) ?? false
+    return blockingRules?.filter(Boolean).find(candidate => doesRuleMatchBlocking(rule, candidate as DataTypeRule)) as DataTypeRule | undefined
 }
 
 const isDataType = (value: DataType | GenericType): value is DataType => {
@@ -611,9 +614,8 @@ const ensureRuleNodes = (dataType: DataType): DataTypeRule[] => {
 
 const mergeWithBlocking = (value?: DataType | GenericType, blocking?: DataType | GenericType): DataType | GenericType | undefined => {
     if (!value && !blocking) return undefined
-    if (!value) return deepClone(blocking)
 
-    const result = deepClone(value)
+    const result = deepClone(value ?? blocking)
     const resultDataType = getDataTypeFromValue(result)
     const blockingDataType = getDataTypeFromValue(blocking)
 
@@ -628,11 +630,15 @@ const mergeWithBlocking = (value?: DataType | GenericType, blocking?: DataType |
     // that locked sections stay in sync with the template.
     blockingRules?.forEach(blockRule => {
         if (!blockRule) return
-        const existingRuleIndex = resultRules.findIndex(rule => isRuleEqual(rule, blockRule))
+        const existingRuleIndex = resultRules.findIndex(rule => doesRuleMatchBlocking(rule, blockRule))
         if (existingRuleIndex === -1) {
-            resultRules.push(deepClone(blockRule))
+            const blockingClone = deepClone(blockRule)
+            applyBlockingSignature(blockingClone, blockRule)
+            resultRules.push(blockingClone)
+            mergeNestedRules(blockingClone, blockRule)
         } else {
             const existingRule = resultRules[existingRuleIndex]
+            applyBlockingSignature(existingRule, blockRule)
             mergeNestedRules(existingRule, blockRule)
         }
     })
@@ -659,4 +665,44 @@ const mergeNestedRules = (target: DataTypeRule, blocking: DataTypeRule) => {
     } else {
         targetIdentifier.genericType = merged
     }
+}
+
+const doesRuleMatchBlocking = (rule?: DataTypeRule | null, blockingRule?: DataTypeRule | null): boolean => {
+    if (!rule || !blockingRule) return false
+
+    const ruleSignature = getBlockingSignature(rule)
+    const blockingSignature = computeBlockingSignature(blockingRule)
+
+    if (ruleSignature && blockingSignature) {
+        return ruleSignature === blockingSignature
+    }
+
+    if (rule.id && blockingRule.id) {
+        return rule.id === blockingRule.id
+    }
+
+    return JSON.stringify({variant: rule.variant, config: rule.config}) === JSON.stringify({
+        variant: blockingRule.variant,
+        config: blockingRule.config
+    })
+}
+
+const getBlockingSignature = (rule?: DataTypeRule | null): string | undefined => {
+    if (!rule) return undefined
+    return (rule as any)?.[BLOCKING_SIGNATURE_KEY]
+}
+
+const computeBlockingSignature = (rule?: DataTypeRule | null): string | undefined => {
+    if (!rule) return undefined
+    if (rule.id) {
+        return `id:${rule.id}`
+    }
+
+    return `config:${JSON.stringify({variant: rule.variant, config: rule.config})}`
+}
+
+const applyBlockingSignature = (target: DataTypeRule, blockingRule: DataTypeRule) => {
+    const signature = computeBlockingSignature(blockingRule)
+    if (!signature) return
+    (target as any)[BLOCKING_SIGNATURE_KEY] = signature
 }

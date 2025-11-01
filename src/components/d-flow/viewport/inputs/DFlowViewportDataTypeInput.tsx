@@ -37,7 +37,7 @@ const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
 ])
 
 export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType | GenericType> {
-    onChange?: (value: DataType | GenericType) => void
+    onDataTypeChange?: (value: DataType | GenericType) => void
     blockingDataType?: DataType | GenericType
 }
 
@@ -46,14 +46,16 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const {
         formValidation,
         initialValue,
-        onChange = (_) => {
-        },
+        onDataTypeChange,
         blockingDataType
     } = props
 
-    const [currentValue, setCurrentValue] = React.useState<DataType | GenericType | undefined>(() =>
-        mergeWithBlocking(initialValue, blockingDataType)
-    )
+    const [currentValue, setCurrentValue] = React.useState<DataType | GenericType | undefined>(() => mergeWithBlocking(initialValue, blockingDataType))
+
+    React.useEffect(() => {
+        console.log(currentValue, onDataTypeChange)
+        if (onDataTypeChange) onDataTypeChange(currentValue!!)
+    }, [currentValue])
 
     // Tracks whether the latest state update originated from a prop change so we can suppress
     // duplicate onChange notifications that would otherwise create an update loop upstream.
@@ -78,8 +80,8 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
             return
         }
 
-        onChange(currentValue)
-    }, [currentValue, onChange])
+        onDataTypeChange(currentValue)
+    }, [currentValue, onDataTypeChange])
 
     const dataType = React.useMemo(() => getDataTypeFromValue(currentValue), [currentValue])
     const blockingData = React.useMemo(() => getDataTypeFromValue(blockingDataType), [blockingDataType])
@@ -280,16 +282,16 @@ const RuleItem: React.FC<{
     onNestedChange: (value: DataType | GenericType) => void,
     onGenericMapperChange: (targetKey: string, sourceIndex: number, value: DataType | GenericType) => void,
 }> = ({
-    rule,
-    blockingRule,
-    genericMap,
-    onRemove,
-    onConfigChange,
-    onHeaderKeyChange,
-    onHeaderDataTypeChange,
-    onNestedChange,
-    onGenericMapperChange
-}) => {
+          rule,
+          blockingRule,
+          genericMap,
+          onRemove,
+          onConfigChange,
+          onHeaderKeyChange,
+          onHeaderDataTypeChange,
+          onNestedChange,
+          onGenericMapperChange
+      }) => {
 
     const identifier = rule?.config?.dataTypeIdentifier ?? undefined
     const hasGenericKey = Boolean(identifier?.genericKey)
@@ -370,7 +372,7 @@ const RuleItem: React.FC<{
                         <DFlowViewportDataTypeInput
                             initialValue={nestedInitialValue}
                             blockingDataType={nestedBlockingValue}
-                            onChange={onNestedChange}
+                            onDataTypeChange={onNestedChange}
                         />
                     ) : null}
                 </>
@@ -394,7 +396,7 @@ const RuleItem: React.FC<{
                                 key={`${targetKey}-${index}`}
                                 initialValue={nestedValue}
                                 blockingDataType={nestedBlocking}
-                                onChange={(value) => onGenericMapperChange(targetKey, index, value)}
+                                onDataTypeChange={(value) => onGenericMapperChange(targetKey, index, value)}
                             />
                         )
                     }) : null}

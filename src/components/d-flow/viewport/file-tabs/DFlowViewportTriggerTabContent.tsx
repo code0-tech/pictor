@@ -30,7 +30,7 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
 
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DFlowViewportDataTypeInput onChange={value => {
+        {definition?.inputType ? <DFlowViewportDataTypeInput onDataTypeChange={value => {
             console.log(value)
         }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {

@@ -4,7 +4,8 @@ import {
     DataType,
     DataTypeRule,
     DataTypeRuleConnection,
-    DataTypeRulesConfig, DataTypeRulesNumberRangeConfig,
+    DataTypeRulesConfig,
+    DataTypeRulesNumberRangeConfig,
     DataTypeRulesParentTypeConfig,
     DataTypeRulesVariant,
     GenericMapper,
@@ -14,7 +15,7 @@ import InputMessage from "../../../form/InputMessage";
 import "./DFlowViewportDataTypeInput.style.scss";
 import TextInput from "../../../form/TextInput";
 import Button from "../../../button/Button";
-import {IconGripVertical, IconSettings, IconTrash} from "@tabler/icons-react";
+import {IconSettings, IconTrash} from "@tabler/icons-react";
 import Text from "../../../text/Text";
 import Flex from "../../../flex/Flex";
 import Badge from "../../../badge/Badge";
@@ -48,7 +49,8 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const {
         formValidation,
         initialValue,
-        onDataTypeChange = () => {},
+        onDataTypeChange = () => {
+        },
         blockingDataType
     } = props
 
@@ -81,7 +83,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const updateRuleAtIndex = React.useCallback((
         index: number,
         updater: (rule: DataTypeRule) => DataTypeRule | undefined,
-        options?: {allowBlocked?: boolean}
+        options?: { allowBlocked?: boolean }
     ) => {
         updateValue(nextValue => {
             const nextDataType = getDataTypeFromValue(nextValue)
@@ -240,7 +242,12 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             value: {
                                 variant: variant[1],
                                 config: {
-                                    __typename: variant[0],
+                                    __typename: `DataTypeRules${variant[0]}Config`,
+                                    ...(variant[1] === DataTypeRulesVariant.NumberRange ? {
+                                        from: undefined,
+                                        to: undefined,
+                                        steps: undefined
+                                    } : {})
                                 },
                             }
                         }))}/>
@@ -409,6 +416,7 @@ const RuleItem: React.FC<{
                 {rule.variant === "REGEX" || rule.variant === "ITEM_OF_COLLECTION" ? (
                     <TextInput
                         clearable
+                        left={<Text size={"sm"}>{rule.variant === "REGEX" ? "Pattern" : "Items"}</Text>} leftType={"icon"}
                         defaultValue={configValue}
                         onChange={handleConfigChange}
                         onBlur={handleConfigCommit}
@@ -423,6 +431,7 @@ const RuleItem: React.FC<{
                             onChange={handleConfigChange}
                             onBlur={handleConfigCommit}
                             w={"100%"}
+                            left={<Text size={"sm"}>From</Text>} leftType={"icon"}
                             disabled={isBlocked}
                         />
                         <TextInput
@@ -430,11 +439,13 @@ const RuleItem: React.FC<{
                             defaultValue={(configValue as DataTypeRulesNumberRangeConfig)?.steps?.toString() ?? ""}
                             onChange={handleConfigChange}
                             onBlur={handleConfigCommit}
+                            left={<Text size={"sm"}>Steps</Text>} leftType={"icon"}
                             w={"100%"}
                             disabled={isBlocked}
                         />
                         <TextInput
                             clearable
+                            left={<Text size={"sm"}>To</Text>} leftType={"icon"}
                             defaultValue={(configValue as DataTypeRulesNumberRangeConfig)?.to?.toString() ?? ""}
                             onChange={handleConfigChange}
                             onBlur={handleConfigCommit}
@@ -527,13 +538,16 @@ const RuleHeader: React.FC<{
                                onSuggestionSelect={handleSuggestionSelect}/>
                 </Flex>
             ) : null}
-            <InputLabel>
-                <Flex align={"center"} style={{gap: ".7rem"}}>
-                    +{rulesCount} rules
-                    included
-                    <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
-                </Flex>
-            </InputLabel>
+            {rule.variant != "REGEX" && rule.variant != "ITEM_OF_COLLECTION" && rule.variant != "NUMBER_RANGE" ? (
+                <InputLabel>
+                    <Flex align={"center"} style={{gap: ".7rem"}}>
+                        +{rulesCount} rules
+                        included
+                        <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
+                    </Flex>
+                </InputLabel>
+            ) : null}
+
         </Flex>
 
     </div>
@@ -563,9 +577,9 @@ const buildConfigFromValue = (value: string, fallback?: DataTypeRulesConfig | nu
         }
     }
 
-    if ("pattern" in fallback && fallback?.__typename === "DataTypeRulesRegexConfig") {
+    if ("pattern" in fallback || fallback?.__typename === "DataTypeRulesRegexConfig") {
         return {...fallback, pattern: value}
-    } else if ("items" in fallback && fallback?.__typename === "DataTypeRulesItemOfCollectionConfig") {
+    } else if ("items" in fallback || fallback?.__typename === "DataTypeRulesItemOfCollectionConfig") {
         return {...fallback, items: JSON.parse(value)}
     } else if ("from" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
         return {...fallback, from: Number.parseInt(value)}

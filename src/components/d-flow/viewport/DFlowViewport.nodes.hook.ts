@@ -154,7 +154,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         fnCache = functionCache,
         dtCache = dataTypeCache,
     ) => {
-        const id = `${fn.functionDefinition?.identifier}-${idCounter++}`;
+        const id = `${fn.id}-${idCounter++}`;
         const index = ++globalNodeIndex; // global node level
 
         nodes.push({

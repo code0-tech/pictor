@@ -72,7 +72,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     ): string => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
-        const fnId = `${fn.functionDefinition?.identifier}-${idCounter++}`;
+        const fnId = `${fn.id}-${idCounter++}`;
 
         if (idCounter == 1) {
             // erste Function-Card → Verbindung Trigger → Function

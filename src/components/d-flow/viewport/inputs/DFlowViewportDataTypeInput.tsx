@@ -46,42 +46,16 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const {
         formValidation,
         initialValue,
-        onDataTypeChange,
+        onDataTypeChange = () => {},
         blockingDataType
     } = props
 
-    const [currentValue, setCurrentValue] = React.useState<DataType | GenericType | undefined>(() => mergeWithBlocking(initialValue, blockingDataType))
+    const mergedInitialValue = React.useMemo(
+        () => mergeWithBlocking(initialValue, blockingDataType),
+        [initialValue, blockingDataType]
+    )
 
-    React.useEffect(() => {
-        console.log(currentValue, onDataTypeChange)
-        if (onDataTypeChange) onDataTypeChange(currentValue!!)
-    }, [currentValue])
-
-    // Tracks whether the latest state update originated from a prop change so we can suppress
-    // duplicate onChange notifications that would otherwise create an update loop upstream.
-    const isSyncingFromProps = React.useRef(true)
-
-    React.useEffect(() => {
-        const merged = mergeWithBlocking(initialValue, blockingDataType)
-        setCurrentValue(prev => {
-            if (areValuesEqual(prev, merged)) {
-                return prev
-            }
-
-            isSyncingFromProps.current = true
-            return merged
-        })
-    }, [initialValue, blockingDataType])
-
-    React.useEffect(() => {
-        if (!currentValue) return
-        if (isSyncingFromProps.current) {
-            isSyncingFromProps.current = false
-            return
-        }
-
-        onDataTypeChange(currentValue)
-    }, [currentValue, onDataTypeChange])
+    const [currentValue, setCurrentValue] = React.useState<DataType | GenericType | undefined>(mergedInitialValue)
 
     const dataType = React.useMemo(() => getDataTypeFromValue(currentValue), [currentValue])
     const blockingData = React.useMemo(() => getDataTypeFromValue(blockingDataType), [blockingDataType])
@@ -95,11 +69,10 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
 
             const draft = deepClone(prev)
             updater(draft)
-
+            onDataTypeChange(draft)
             if (areValuesEqual(prev, draft)) {
-                return prev
+                return draft
             }
-
             return draft
         })
     }, [])
@@ -572,6 +545,11 @@ const deepClone = <T, >(value: T): T => {
     return JSON.parse(JSON.stringify(value))
 }
 
+const serializeValue = (value?: DataType | GenericType): string | undefined => {
+    if (!value) return undefined
+    return JSON.stringify(value)
+}
+
 const getRuleIdentifierValue = (rule?: DataTypeRule | null): DataType | GenericType | undefined => {
     if (!rule?.config?.dataTypeIdentifier) return undefined
 
@@ -583,10 +561,7 @@ const getRuleIdentifierValue = (rule?: DataTypeRule | null): DataType | GenericT
 }
 
 const areValuesEqual = (valueA?: DataType | GenericType, valueB?: DataType | GenericType): boolean => {
-    if (!valueA && !valueB) return true
-    if (!valueA || !valueB) return false
-
-    return JSON.stringify(valueA) === JSON.stringify(valueB)
+    return serializeValue(valueA) === serializeValue(valueB)
 }
 
 const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): boolean => {

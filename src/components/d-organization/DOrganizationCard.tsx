@@ -7,10 +7,20 @@ import {Card} from "../../index"
 import Text from "../text/Text"
 import {useService, useStore} from "../../utils/contextStore"
 import {DOrganizationReactiveService} from "./DOrganizationService"
-import {IconFolder} from "@tabler/icons-react"
-import Col from "../col/Col"
-import Row from "../row/Row"
+import {
+    IconAward,
+    IconFolder,
+    IconLicense,
+    IconLogout,
+    IconServer,
+    IconSettings,
+    IconSitemap,
+    IconUser
+} from "@tabler/icons-react"
 import Badge from "../badge/Badge"
+import Flex from "../flex/Flex";
+import Button from "../button/Button";
+import CardSection from "../card/CardSection";
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']
@@ -25,16 +35,44 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
 
     return React.useMemo(() => {
         return (
-            <Card style={{ padding: "16px 16px 8px 16px" }} width={"100%"}>
-                <Col style={{minWidth: 0, flex: 1}}>
-                    <Text size={"lg"} hierarchy={"primary"} style={{overflow: "hidden", display: "block", marginBottom: ".25rem", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
+            <Card maw={"400px"}>
+                <Flex align={"center"} style={{gap: "0.7rem"}} justify={"space-between"}>
+                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>
                         {organization?.name}
                     </Text>
-                    <Badge style={{background: "transparent", gap: 4, padding: 0, fontSize: ".8rem"}}>
-                        <IconFolder size={18}/>
-                        {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
-                    </Badge>
-                </Col>
+                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                        <Button color={"secondary"}><IconSettings size={16}/></Button>
+                        <Button color={"error"}><IconLogout size={16}/> Leave</Button>
+                    </Flex>
+                </Flex>
+                <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>
+                    {organization?.name}
+                </Text>
+                <CardSection border>
+                    <Flex align={"center"} style={{gap: "0.35rem", flexWrap: "wrap"}}>
+                        {/* Project count */}
+                        <Badge color={"info"}>
+                            <IconFolder size={18}/>
+                            {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
+                        </Badge>
+                        {/* Members count */}
+                        <Badge color={"info"}>
+                            <IconUser size={18}/>
+                            {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
+                        </Badge>
+                        {/* Which License (CE / EE) */}
+                        <Badge color={"info"}>
+                            <IconAward size={18}/>
+                            {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
+                        </Badge>
+                        {/* Runtime Count */}
+                        <Badge color={"info"}>
+                            <IconServer size={18}/>
+                            {`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}
+                        </Badge>
+                    </Flex>
+
+                </CardSection>
             </Card>
         )
     }, [organizationStore])

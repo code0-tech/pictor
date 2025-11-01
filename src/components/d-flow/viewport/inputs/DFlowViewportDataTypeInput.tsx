@@ -278,17 +278,12 @@ const RuleItem: React.FC<{
 
     const identifier = rule?.config?.dataTypeIdentifier ?? undefined
     const hasGenericKey = Boolean(identifier?.genericKey)
-    const hasNestedValue = Boolean(getRuleIdentifierValue(rule))
-    const [isOpen, setIsOpen] = React.useState<boolean>(() => hasNestedValue || hasGenericKey)
+    const [isOpen, setIsOpen] = React.useState<boolean>(false)
     const isBlocked = Boolean(blockingRule)
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
 
     const [configValue, setConfigValue] = React.useState<string>(() => getConfigValue(rule?.config as DataTypeRulesConfig))
-
-    React.useEffect(() => {
-        setIsOpen(hasNestedValue || hasGenericKey)
-    }, [hasGenericKey, hasNestedValue])
 
     React.useEffect(() => {
         setConfigValue(getConfigValue(rule?.config as DataTypeRulesConfig))
@@ -338,6 +333,7 @@ const RuleItem: React.FC<{
         const header = (
             <RuleHeader
                 rule={rule}
+                genericMap={genericMap}
                 isBlocked={isBlocked}
                 dataTypeLabel={dataTypeLabel}
                 onClick={() => setIsOpen(prevState => !prevState)}
@@ -403,6 +399,7 @@ const RuleItem: React.FC<{
                 <div style={{flex: 1}}>
                     <RuleHeader
                         rule={rule}
+                        genericMap={genericMap}
                         isBlocked={isBlocked}
                         dataTypeLabel={dataTypeLabel}
                         onRemove={!isBlocked ? onRemove : undefined}
@@ -425,13 +422,14 @@ const RuleItem: React.FC<{
 
 const RuleHeader: React.FC<{
     rule: DataTypeRule,
+    genericMap: Map<string, GenericMapper>,
     dataTypeLabel?: string,
     onClick?: () => void,
     onRemove?: () => void,
     isBlocked?: boolean,
     onKeyChange?: (value: string) => void,
     onDataTypeChange?: (value?: DataType | GenericType) => void,
-}> = ({rule, dataTypeLabel, onClick, onRemove, isBlocked, onKeyChange, onDataTypeChange}) => {
+}> = ({rule, dataTypeLabel, onClick, onRemove, isBlocked, onKeyChange, onDataTypeChange, genericMap}) => {
 
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
@@ -440,7 +438,7 @@ const RuleHeader: React.FC<{
             id: "gid://sagittarius/DataType/878634678"
         }
     }, [], "", 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
-    const rulesCount = rule?.config?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? rule?.config?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? 0
+    const rulesCount = rule?.config?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? rule?.config?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get(rule?.config?.dataTypeIdentifier?.genericKey)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0
 
     const [keyValue, setKeyValue] = React.useState<string>(() => ("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : ""))
     const [dataTypeValue, setDataTypeValue] = React.useState<string>(() => dataTypeLabel ?? "")
@@ -501,15 +499,13 @@ const RuleHeader: React.FC<{
                                onSuggestionSelect={handleSuggestionSelect}/>
                 </Flex>
             ) : null}
-            {rulesCount > 0 ? (
-                <InputLabel>
-                    <Flex align={"center"} style={{gap: ".7rem"}}>
-                        +{rulesCount} rules
-                        included
-                        <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
-                    </Flex>
-                </InputLabel>
-            ) : null}
+            <InputLabel>
+                <Flex align={"center"} style={{gap: ".7rem"}}>
+                    +{rulesCount} rules
+                    included
+                    <Button color={"primary"} onClick={onClick}>Show/Hide Rules</Button>
+                </Flex>
+            </InputLabel>
         </Flex>
 
     </div>

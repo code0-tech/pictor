@@ -115,6 +115,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
 
     const handleNestedChange = React.useCallback((index: number, value: DataType | GenericType) => {
         updateRuleAtIndex(index, (rule) => {
+            if (!("dataTypeIdentifier" in rule?.config!!)) return rule
             if (!rule?.config?.dataTypeIdentifier) return rule
             if (isDataType(value)) {
                 rule.config.dataTypeIdentifier.dataType = value
@@ -192,7 +193,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             if (!currentRule.config) {
                                 currentRule.config = {} as DataTypeRulesConfig
                             }
-                            if (!currentRule.config.dataTypeIdentifier) {
+                            if (!currentRule.config?.dataTypeIdentifier) {
                                 currentRule.config.dataTypeIdentifier = {}
                             }
 
@@ -608,7 +609,7 @@ const ensureRuleNodes = (dataType: DataType): DataTypeRule[] => {
     return dataType.rules.nodes as DataTypeRule[]
 }
 
-const mergeWithBlocking = (value?: DataType | GenericType, blocking?: DataType | GenericType): DataType | GenericType | undefined => {
+const mergeWithBlocking = (value?: DataType | GenericType | null, blocking?: DataType | GenericType): DataType | GenericType | undefined => {
     if (!value && !blocking) return undefined
 
     const result = deepClone(value ?? blocking)

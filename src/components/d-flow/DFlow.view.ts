@@ -24,7 +24,7 @@ export class FlowView {
     /** Global ID of this Flow */
     private readonly _id?: Maybe<Scalars['FlowID']['output']>;
     /** The input data type of the flow */
-    private readonly _inputType?: Maybe<DataType>;
+    private _inputType?: Maybe<DataType>;
     /** Nodes of the flow */
     private _nodes?: NodeFunctionView[];
     /** The return data type of the flow */
@@ -86,6 +86,10 @@ export class FlowView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    set inputType(value: Maybe<DataType>) {
+        this._inputType = value;
     }
 
     set startingNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {

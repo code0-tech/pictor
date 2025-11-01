@@ -565,6 +565,11 @@ const areValuesEqual = (valueA?: DataType | GenericType, valueB?: DataType | Gen
 
 const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): boolean => {
     if (!ruleA || !ruleB) return false
+
+    if (ruleA.id && ruleB.id) {
+        return ruleA.id === ruleB.id
+    }
+
     return JSON.stringify({variant: ruleA.variant, config: ruleA.config}) === JSON.stringify({
         variant: ruleB.variant,
         config: ruleB.config
@@ -574,7 +579,10 @@ const isRuleEqual = (ruleA?: DataTypeRule | null, ruleB?: DataTypeRule | null): 
 const isRuleBlocked = (rule?: DataTypeRule | null, blockingDataType?: DataType): boolean => {
     if (!rule || !blockingDataType?.rules?.nodes) return false
     const blockingRules = blockingDataType.rules.nodes as (DataTypeRule | null | undefined)[]
-    return blockingRules?.filter(Boolean).some(candidate => isRuleEqual(candidate as DataTypeRule, rule)) ?? false
+    return blockingRules?.filter(Boolean).some(candidate => {
+        const blockingRule = candidate as DataTypeRule
+        return Boolean(blockingRule?.id && rule?.id && blockingRule.id === rule.id)
+    }) ?? false
 }
 
 const isDataType = (value: DataType | GenericType): value is DataType => {

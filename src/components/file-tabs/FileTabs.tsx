@@ -34,7 +34,8 @@ export const FileTabsList: React.FC<FileTabsListProps> = (props) => {
 }
 
 export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
-    return <Trigger data-slot="tabs" data-value={props.value} {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
+    return <Trigger data-slot="tabs"
+                    data-value={props.value} {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
         {props.children}
         {props.closable ? <div className={"file-tabs__trigger-icon"} onClick={props.onClose}>
             <IconX size={16}/>
@@ -42,13 +43,15 @@ export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
     </Trigger>
 }
 
-export const FileTabsContent: React.FC<FileTabsContentProps> = (props) => {
-    return <ScrollArea h={"93%"}>
-        <ScrollAreaViewport>
-            <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}/>
-        </ScrollAreaViewport>
-        <ScrollAreaScrollbar orientation={"vertical"}>
-            <ScrollAreaThumb/>
-        </ScrollAreaScrollbar>
-    </ScrollArea>
+export const FileTabsContent: React.FC<FileTabsContentProps> = ({children, ...props}) => {
+    return <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}>
+        <ScrollArea h={"700px"}>
+            <ScrollAreaViewport>
+                {children}
+            </ScrollAreaViewport>
+            <ScrollAreaScrollbar orientation={"vertical"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+        </ScrollArea>
+    </Content>
 }

@@ -408,7 +408,7 @@ const RuleItem: React.FC<{
                     />
                     <TextInput
                         clearable
-                        value={configValue}
+                        defaultValue={configValue}
                         onChange={handleConfigChange}
                         onBlur={handleConfigCommit}
                         w={"100%"}

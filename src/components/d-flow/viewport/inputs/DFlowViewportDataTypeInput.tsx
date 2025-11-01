@@ -66,7 +66,6 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
     const updateValue = React.useCallback((updater: (next: DataType | GenericType) => void) => {
         setCurrentValue(prev => {
             if (!prev) return prev
-
             const draft = deepClone(prev)
             updater(draft)
             onDataTypeChange(draft)

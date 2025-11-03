@@ -2,6 +2,7 @@ import React from "react";
 import {ValidationProps} from "../../../form/useForm";
 import {
     DataType,
+    DataTypeIdentifier,
     DataTypeRule,
     DataTypeRuleConnection,
     DataTypeRulesConfig,
@@ -195,11 +196,11 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             if (!currentRule.config) {
                                 currentRule.config = {} as DataTypeRulesConfig
                             }
-                            if (!currentRule.config?.dataTypeIdentifier) {
-                                currentRule.config.dataTypeIdentifier = {}
+                            if (!("dataTypeIdentifier" in currentRule.config)) {
+                                (currentRule.config as DataTypeRulesParentTypeConfig).dataTypeIdentifier = {}
                             }
 
-                            const identifier = currentRule.config.dataTypeIdentifier
+                            const identifier = (currentRule.config as DataTypeRulesParentTypeConfig).dataTypeIdentifier
 
                             if (!value) {
                                 delete identifier?.dataType
@@ -208,11 +209,11 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             }
 
                             if (isDataType(value)) {
-                                identifier.dataType = value
-                                delete identifier.genericType
+                                identifier!!.dataType = value
+                                delete identifier!!.genericType
                             } else if (isGenericType(value)) {
-                                identifier.genericType = value
-                                delete identifier.dataType
+                                identifier!!.genericType = value
+                                delete identifier!!.dataType
                             }
 
                             return currentRule
@@ -232,8 +233,8 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                             updateValue(nextValue => {
                                 if ("rules" in nextValue) {
                                     nextValue?.rules?.nodes?.push(suggestion.value)
-                                } else if ("dataType" in nextValue.genericType) {
-                                    nextValue.genericType.dataType?.rules?.nodes?.push(suggestion.value)
+                                } else if ("dataType" in (nextValue as DataTypeIdentifier)?.genericType!!) {
+                                    (nextValue as DataTypeIdentifier)?.genericType?.dataType?.rules?.nodes?.push(suggestion.value)
                                 }
                             })
 
@@ -293,7 +294,7 @@ const RuleItem: React.FC<{
           onGenericMapperChange
       }) => {
 
-    const identifier = rule?.config?.dataTypeIdentifier ?? undefined
+    const identifier = (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier ?? undefined
     const hasGenericKey = Boolean(identifier?.genericKey)
     const [isOpen, setIsOpen] = React.useState<boolean>(false)
     const isBlocked = Boolean(blockingRule)
@@ -356,7 +357,7 @@ const RuleItem: React.FC<{
                 rule={rule}
                 genericMap={genericMap}
                 isBlocked={isBlocked}
-                dataTypeLabel={dataTypeLabel}
+                dataTypeLabel={dataTypeLabel!!}
                 onClick={() => setIsOpen(prevState => !prevState)}
                 onRemove={!isBlocked ? onRemove : undefined}
                 onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
@@ -418,7 +419,7 @@ const RuleItem: React.FC<{
                     rule={rule}
                     genericMap={genericMap}
                     isBlocked={isBlocked}
-                    dataTypeLabel={dataTypeLabel}
+                    dataTypeLabel={dataTypeLabel!!}
                     onRemove={!isBlocked ? onRemove : undefined}
                     onKeyChange={!isBlocked ? onHeaderKeyChange : undefined}
                     onDataTypeChange={!isBlocked ? onHeaderDataTypeChange : undefined}
@@ -426,8 +427,9 @@ const RuleItem: React.FC<{
                 {rule.variant === "REGEX" || rule.variant === "ITEM_OF_COLLECTION" ? (
                     <TextInput
                         clearable
-                        left={<Text size={"sm"}>{rule.variant === "REGEX" ? "Pattern" : "Items"}</Text>} leftType={"icon"}
-                        defaultValue={configValue}
+                        left={<Text size={"sm"}>{rule.variant === "REGEX" ? "Pattern" : "Items"}</Text>}
+                        leftType={"icon"}
+                        defaultValue={(configValue as string)}
                         onChange={handleConfigChange}
                         onBlur={handleConfigCommit}
                         w={"100%"}
@@ -490,7 +492,7 @@ const RuleHeader: React.FC<{
             id: "gid://sagittarius/DataType/878634678"
         }
     }, [], "", 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
-    const rulesCount = rule?.config?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? rule?.config?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get(rule?.config?.dataTypeIdentifier?.genericKey)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0
+    const rulesCount = (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get((rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0
 
     const [keyValue, setKeyValue] = React.useState<string>(() => ("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : ""))
     const [dataTypeValue, setDataTypeValue] = React.useState<string>(() => dataTypeLabel ?? "")
@@ -539,14 +541,14 @@ const RuleHeader: React.FC<{
                     {rule.variant === "CONTAINS_KEY" ? <TextInput left={<Text size={"sm"}>Key</Text>} leftType={"icon"}
                                                                   disabled={isBlocked}
                                                                   defaultValue={keyValue}
-                                                                  onChange={(event) => setKeyValue(event.target.value)}
+                                                                  onChange={(event) => "value" in event.target && setKeyValue(event.target.value as string)}
                                                                   onBlur={handleKeyBlur}/> : null}
                     <TextInput left={<Text size={"sm"}>DataType</Text>} leftType={"icon"}
                                disabled={isBlocked}
                                suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                                suggestions={toInputSuggestions(suggestions)}
                                value={dataTypeValue}
-                               onChange={(event) => setDataTypeValue(event.target.value)}
+                               onChange={(event) => "value" in event.target && setDataTypeValue(event.target.value as string)}
                                onBlur={handleDataTypeBlur}
                                onSuggestionSelect={handleSuggestionSelect}/>
                 </Flex>
@@ -687,11 +689,11 @@ const serializeValue = (value?: DataType | GenericType): string | undefined => {
 }
 
 const getRuleIdentifierValue = (rule?: DataTypeRule | null): DataType | GenericType | undefined => {
-    if (!rule?.config?.dataTypeIdentifier) return undefined
+    if (!(rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier) return undefined
 
     return (
-        rule.config.dataTypeIdentifier.dataType ??
-        rule.config.dataTypeIdentifier.genericType ??
+        (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.dataType ??
+        (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericType ??
         undefined
     )
 }
@@ -773,8 +775,8 @@ const mergeWithBlocking = (value?: DataType | GenericType | null, blocking?: Dat
 }
 
 const mergeNestedRules = (target: DataTypeRule, blocking: DataTypeRule) => {
-    const targetIdentifier = target?.config?.dataTypeIdentifier
-    const blockingIdentifier = blocking?.config?.dataTypeIdentifier
+    const targetIdentifier = (target?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier
+    const blockingIdentifier = (blocking?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier
 
     if (!targetIdentifier || !blockingIdentifier) return
 

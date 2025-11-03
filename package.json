@@ -21,7 +21,7 @@
     "@ariakit/react": "^0.4.17",
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
-    "@code0-tech/sagittarius-graphql-types": "^0.0.0-56198dce107a9c09cc5eca0773f239d9c3eba598",
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-65144a9920c6a8de3bcf24acdcb8eec4158cef73",
     "@dagrejs/dagre": "^1.1.5",
     "@mdx-js/react": "^3.1.1",
     "@radix-ui/react-checkbox": "^1.3.3",

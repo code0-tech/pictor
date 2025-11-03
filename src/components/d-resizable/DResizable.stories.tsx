@@ -16,22 +16,22 @@ import {DataTypeView} from "../d-flow/data-type/DFlowDataType.view";
 import {DFlowDataTypeReactiveService} from "../d-flow/data-type/DFlowDataType.service";
 import {DFlowFunctionReactiveService} from "../d-flow/function/DFlowFunction.service";
 import {DFlowReactiveService} from "../d-flow/DFlow.service";
-import {DFlowSuggestion} from "../d-flow/suggestions/DFlowSuggestion.view";
-import {DFlowReactiveSuggestionService} from "../d-flow/suggestions/DFlowSuggestion.service";
+import {DFlowSuggestion} from "../d-flow/suggestion/DFlowSuggestion.view";
+import {DFlowReactiveSuggestionService} from "../d-flow/suggestion/DFlowSuggestion.service";
 import {FlowView} from "../d-flow/DFlow.view";
 import {ContextStoreProvider} from "../../utils/contextStore";
-import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
+import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
 import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
 import {FlowTypeView} from "../d-flow/type/DFlowType.view";
 import DataTypesData from "./data_types.json";
 import FunctionsData from "./runtime_functions.json";
 import FlowTypeData from "./flow_types.json";
-import {useFlowViewportNodes} from "../d-flow/viewport/DFlowViewport.nodes.hook";
-import {useFlowViewportEdges} from "../d-flow/viewport/DFlowViewport.edges.hook";
+import {useFlowNodes} from "../d-flow/DFlow.nodes.hook";
+import {useFlowEdges} from "../d-flow/DFlow.edges.hook";
 import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
-import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
-import {DFlowViewportValidations} from "../d-flow/viewport/DFlowViewportValidations";
+import {DFlowControls} from "../d-flow/DFlowControls";
+import {DFlowValidation} from "../d-flow/DFlowValidation";
 import {DLayout} from "../d-layout/DLayout";
 
 const meta: Meta = {
@@ -155,7 +155,7 @@ export const Dashboard = () => {
                         </DResizablePanel>
                         <DResizableHandle/>
                         <DResizablePanel>
-                            <DFlowViewportTabs/>
+                            <DFlowTabs/>
                         </DResizablePanel>
                     </ContextStoreProvider>
                 </DResizablePanelGroup>
@@ -167,8 +167,8 @@ export const Dashboard = () => {
 
 
 const FlowExample = () => {
-    const initialNodes = useFlowViewportNodes("gid://sagittarius/Flow/1")
-    const initialEdges = useFlowViewportEdges("gid://sagittarius/Flow/1")
+    const initialNodes = useFlowNodes("gid://sagittarius/Flow/1")
+    const initialEdges = useFlowEdges("gid://sagittarius/Flow/1")
 
     return <DFlow
         nodes={initialNodes}
@@ -176,8 +176,8 @@ const FlowExample = () => {
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-        <DFlowViewportControls/>
-        <DFlowViewportValidations flowId={"gid://sagittarius/Flow/1"}/>
+        <DFlowControls/>
+        <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
         {/*<DFlowViewportMiniMap/>*/}
     </DFlow>
 }

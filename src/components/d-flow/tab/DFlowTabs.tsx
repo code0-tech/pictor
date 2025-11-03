@@ -1,13 +1,13 @@
-import {useService, useStore} from "../../../../utils/contextStore";
-import {FileTabsService} from "../../../file-tabs/FileTabs.service";
-import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../../../file-tabs/FileTabs";
+import {useService, useStore} from "../../../utils/contextStore";
+import {FileTabsService} from "../../file-tabs/FileTabs.service";
+import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../../file-tabs/FileTabs";
 import React from "react";
-import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../../menu/Menu";
-import Button from "../../../button/Button";
+import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../menu/Menu";
+import Button from "../../button/Button";
 import {IconChevronDown, IconDotsVertical} from "@tabler/icons-react";
-import {FileTabsView} from "../../../file-tabs/FileTabs.view";
+import {FileTabsView} from "../../file-tabs/FileTabs.view";
 
-export const DFlowViewportTabs = () => {
+export const DFlowTabs = () => {
 
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)

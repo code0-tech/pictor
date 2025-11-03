@@ -13,11 +13,11 @@ import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import {DFlowViewportDefaultCard} from "./viewport/cards/DFlowViewportDefaultCard";
-import {DFlowViewportGroupCard} from "./viewport/cards/DFlowViewportGroupCard";
-import {DFlowViewportSuggestionCard} from "./viewport/cards/DFlowViewportSuggestionCard";
-import {DFlowViewportTriggerCard} from "./viewport/cards/DFlowViewportTriggerCard";
-import {DFlowViewportEdge} from "./viewport/DFlowViewportEdge";
+import {DFlowFunctionDefaultCard} from "./function/DFlowFunctionDefaultCard";
+import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
+import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
+import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
+import {DFlowEdge} from "./DFlowEdge";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -523,15 +523,15 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
     }, [updateNodeInternals])
 
     const nodeTypes = {
-        default: DFlowViewportDefaultCard,
-        group: DFlowViewportGroupCard,
-        suggestion: DFlowViewportSuggestionCard,
-        trigger: DFlowViewportTriggerCard,
+        default: DFlowFunctionDefaultCard,
+        group: DFlowFunctionGroupCard,
+        suggestion: DFlowFunctionSuggestionCard,
+        trigger: DFlowFunctionTriggerCard,
         ...props.nodeTypes
     }
 
     const edgeTypes = {
-        default: DFlowViewportEdge,
+        default: DFlowEdge,
         ...props.edgeTypes
     }
 

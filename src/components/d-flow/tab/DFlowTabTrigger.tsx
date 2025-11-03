@@ -1,22 +1,22 @@
 import React from "react";
-import {FlowView} from "../../DFlow.view";
-import {useService} from "../../../../utils/contextStore";
-import {DFlowReactiveService} from "../../DFlow.service";
-import TextInput from "../../../form/TextInput";
-import Flex from "../../../flex/Flex";
-import {DFlowTypeReactiveService} from "../../type/DFlowType.service";
-import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
-import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
+import {FlowView} from "../DFlow.view";
+import {useService} from "../../../utils/contextStore";
+import {DFlowReactiveService} from "../DFlow.service";
+import TextInput from "../../form/TextInput";
+import Flex from "../../flex/Flex";
+import {DFlowTypeReactiveService} from "../type/DFlowType.service";
+import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
+import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
 import {DataType, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowViewportDataTypeInput} from "../inputs/DFlowViewportDataTypeInput";
+import {DFlowInputDataType} from "../input/DFlowInputDataType";
 
-export interface DFlowViewportTriggerTabContentProps {
+export interface DFlowTabTriggerProps {
     instance: FlowView
 }
 
-export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabContentProps> = (props) => {
+export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const {instance} = props
     const flowTypeService = useService(DFlowTypeReactiveService)
@@ -30,7 +30,7 @@ export const DFlowViewportTriggerTabContent: React.FC<DFlowViewportTriggerTabCon
 
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DFlowViewportDataTypeInput onDataTypeChange={value => {
+        {definition?.inputType ? <DFlowInputDataType onDataTypeChange={value => {
             instance.inputType = value as DataType
             flowService.update()
         }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}

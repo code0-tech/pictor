@@ -1,16 +1,16 @@
 import React from "react";
-import {NodeFunctionView} from "../../DFlow.view";
-import TextInput from "../../../form/TextInput";
-import Flex from "../../../flex/Flex";
-import {useService} from "../../../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service";
-import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
-import {DFlowReactiveService} from "../../DFlow.service";
-import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
-import {ParameterDefinitionView} from "../../function/DFlowFunction.view";
-import Badge from "../../../badge/Badge";
+import {NodeFunctionView} from "../DFlow.view";
+import TextInput from "../../form/TextInput";
+import Flex from "../../flex/Flex";
+import {useService} from "../../../utils/contextStore";
+import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
+import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
+import {DFlowReactiveService} from "../DFlow.service";
+import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
+import {ParameterDefinitionView} from "../function/DFlowFunction.view";
+import Badge from "../../badge/Badge";
 import {
     LiteralValue,
     NodeFunction,
@@ -19,7 +19,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export interface DFlowViewportFileTabsContentProps {
+export interface DFlowTabDefaultProps {
     functionInstance: NodeFunctionView
     flowId: Scalars["FlowID"]["output"]
     depthLevel?: number
@@ -27,7 +27,7 @@ export interface DFlowViewportFileTabsContentProps {
     nodeLevel?: number
 }
 
-export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
+export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
     const {functionInstance, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)

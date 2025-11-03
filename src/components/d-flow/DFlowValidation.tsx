@@ -1,18 +1,18 @@
 import {Panel} from "@xyflow/react";
 import React from "react";
-import {useDFlowValidations} from "../DFlow.validation.hook";
+import {useDFlowValidations} from "./DFlow.validation.hook";
 import {Scalars} from "@code0-tech/sagittarius-graphql-types";
-import Flex from "../../flex/Flex";
-import {InspectionSeverity} from "../../../utils/inspection";
-import Badge from "../../badge/Badge";
+import Flex from "../flex/Flex";
+import {InspectionSeverity} from "../../utils/inspection";
+import Badge from "../badge/Badge";
 import {IconAlertTriangle, IconExclamationCircle, IconMessageExclamation} from "@tabler/icons-react";
-import "./DFlowViewportValidations.style.scss"
+import "./DFlowValidation.style.scss"
 
-export interface DFlowViewportValidationsProps {
+export interface DFlowValidationProps {
     flowId: Scalars['FlowID']['output']
 }
 
-export const DFlowViewportValidations: React.FC<DFlowViewportValidationsProps> = (props) => {
+export const DFlowValidation: React.FC<DFlowValidationProps> = (props) => {
 
     const {flowId} = props
     const validations = useDFlowValidations(flowId)

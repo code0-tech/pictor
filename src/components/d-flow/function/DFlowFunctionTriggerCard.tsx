@@ -1,27 +1,27 @@
 import React, {memo} from "react";
-import {Code0Component} from "../../../../utils/types";
-import {FlowView} from "../../DFlow.view";
+import {Code0Component} from "../../../utils/types";
+import {FlowView} from "../DFlow.view";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import Text from "../../../text/Text";
-import {useService} from "../../../../utils/contextStore";
-import {FileTabsService} from "../../../file-tabs/FileTabs.service";
-import Card from "../../../card/Card";
-import CardSection from "../../../card/CardSection";
-import Flex from "../../../flex/Flex";
+import Text from "../../text/Text";
+import {useService} from "../../../utils/contextStore";
+import {FileTabsService} from "../../file-tabs/FileTabs.service";
+import Card from "../../card/Card";
+import CardSection from "../../card/CardSection";
+import Flex from "../../flex/Flex";
 import {IconBolt, IconLayoutNavbarCollapseFilled} from "@tabler/icons-react";
-import Button from "../../../button/Button";
-import Badge from "../../../badge/Badge";
-import {DFlowViewportTriggerTabContent} from "../file-tabs/DFlowViewportTriggerTabContent";
-import {DFlowTypeReactiveService} from "../../type/DFlowType.service";
+import Button from "../../button/Button";
+import Badge from "../../badge/Badge";
+import {DFlowTabTrigger} from "../tab/DFlowTabTrigger";
+import {DFlowTypeReactiveService} from "../type/DFlowType.service";
 
-export interface DFlowViewportTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+export interface DFlowFunctionTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: FlowView
 }
 
 // @ts-ignore
-export type DFlowViewportTriggerCardProps = NodeProps<Node<DFlowViewportTriggerCardDataProps>>
+export type DFlowFunctionTriggerCardProps = NodeProps<Node<DFlowFunctionTriggerCardDataProps>>
 
-export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> = memo((props) => {
+export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> = memo((props) => {
 
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)
@@ -49,7 +49,7 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
                          active: true,
                          closeable: true,
                          children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
-                         content: <DFlowViewportTriggerTabContent instance={data.instance}/>
+                         content: <DFlowTabTrigger instance={data.instance}/>
                      })
                  }}>
         <Flex mb={"0.35"} style={{gap: "0.35rem"}} align={"center"} justify={"space-between"}>

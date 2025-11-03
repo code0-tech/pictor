@@ -1,12 +1,12 @@
 import React, {memo} from "react";
 import {Handle, NodeProps, Position, useStore} from "@xyflow/react";
-import {FLOW_EDGE_RAINBOW} from "../DFlowViewport.edges.hook";
-import Card from "../../../card/Card";
+import {FLOW_EDGE_RAINBOW} from "../DFlow.edges.hook";
+import Card from "../../card/Card";
 
-export interface DFlowViewportGroupCardProps extends NodeProps {
+export interface DFlowFunctionGroupCardProps extends NodeProps {
 }
 
-export const DFlowViewportGroupCard: React.FC<DFlowViewportGroupCardProps> = memo((props) => {
+export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
     const {data, id} = props
     const depth = (data as any)?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];

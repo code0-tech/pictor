@@ -9,6 +9,7 @@ import {
     DataTypeRulesNumberRangeConfig,
     DataTypeRulesParentTypeConfig,
     DataTypeRulesVariant,
+    DataTypeVariant,
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
@@ -41,8 +42,8 @@ const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
 const BLOCKING_SIGNATURE_KEY = "__blockingSignature"
 
 const DATA_TYPE_RULES_VARIANTS = [
-    "CONTAINS_KEY","CONTAINS_TYPE","ITEM_OF_COLLECTION",
-    "NUMBER_RANGE","REGEX",
+    DataTypeRulesVariant.ContainsKey, DataTypeRulesVariant.ContainsType, DataTypeRulesVariant.ItemOfCollection,
+    DataTypeRulesVariant.NumberRange, DataTypeRulesVariant.Regex,
 ]
 
 export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType | GenericType> {
@@ -243,21 +244,33 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                                 }
                             })
 
-                        }} suggestions={Object.entries(DATA_TYPE_RULES_VARIANTS).map(variant => ({
-                            children: variant[1],
+                        }} suggestions={DATA_TYPE_RULES_VARIANTS.filter(ruleType => {
+                            if (dataType?.variant == DataTypeVariant.Object) {
+                                return ruleType == DataTypeRulesVariant.ContainsKey
+                            } else if (dataType?.variant == DataTypeVariant.Array) {
+                                return ruleType == DataTypeRulesVariant.ContainsType
+                            }
+                            return !(ruleType == DataTypeRulesVariant.ContainsType || ruleType == DataTypeRulesVariant.ContainsKey)
+                        }).map(variant => ({
+                            children: <>
+                                <IconSettings size={16}/>
+                                <Text>
+                                    {variant}
+                                </Text>
+                            </>,
                             value: {
-                                variant: variant[1],
+                                variant: variant,
                                 config: {
                                     __typename: `DataTypeRules${variant[0]}Config`,
-                                    ...(variant[1] === DataTypeRulesVariant.NumberRange ? {
+                                    ...(variant === DataTypeRulesVariant.NumberRange ? {
                                         from: undefined,
                                         to: undefined,
                                         steps: undefined
                                     } : {}),
-                                    ...(variant[1] === DataTypeRulesVariant.Regex ? {
+                                    ...(variant === DataTypeRulesVariant.Regex ? {
                                         pattern: undefined
                                     } : {}),
-                                    ...(variant[1] === DataTypeRulesVariant.ItemOfCollection ? {
+                                    ...(variant === DataTypeRulesVariant.ItemOfCollection ? {
                                         items: undefined
                                     } : {})
                                 },

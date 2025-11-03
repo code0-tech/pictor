@@ -2,26 +2,10 @@
 
 import React from "react"
 import {Code0Component} from "../../../utils/types"
-import {
-    NamespacesProjectsAssignRuntimesInput,
-    NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput,
-    Scalars
-} from "@code0-tech/sagittarius-graphql-types"
+import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Card} from "../../../index"
 import Text from "../../text/Text"
-import {
-    IconAward,
-    IconBox,
-    IconFolder, IconGitFork,
-    IconLogout,
-    IconServer,
-    IconServer2,
-    IconSettings,
-    IconUser
-} from "@tabler/icons-react"
-import Row from "../../row/Row"
-import Col from "../../col/Col"
-import {format} from "date-fns"
+import {IconGitFork, IconServer, IconServer2, IconSettings} from "@tabler/icons-react"
 import {useService, useStore} from "../../../utils/contextStore"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
 import Flex from "../../flex/Flex"
@@ -29,7 +13,6 @@ import Button from "../../button/Button"
 import CardSection from "../../card/CardSection"
 import Badge from "../../badge/Badge"
 import {DNamespaceReactiveService} from "../DNamespace.service"
-import {DFlowReactiveService} from "../../d-flow/DFlow.service"
 import {DRuntimeReactiveService} from "../../d-runtime/DRuntime.service"
 
 export interface DNamespaceProjectCardProps extends Code0Component<HTMLDivElement> {

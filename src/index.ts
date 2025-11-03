@@ -6,7 +6,6 @@ export { default as Col} from "./components/col/Col"
 export { default as Container} from "./components/container/Container"
 
 export {default as DFullScreen} from "./components/d-fullscreen/DFullScreen"
-export {default as DZoomPanPinch} from "./components/d-zoom-pan-pinch/DZoomPanPinch"
 
 export { default as Flex} from "./components/flex/Flex"
 export { default as Quote} from "./components/quote/Quote"

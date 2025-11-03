@@ -38,6 +38,8 @@ export class FlowView {
     /** Time when this Flow was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
+    private _name?: Maybe<Scalars['String']['output']>;
+
     constructor(flow: Flow) {
 
         this._createdAt = flow.createdAt
@@ -49,6 +51,7 @@ export class FlowView {
         this._startingNodeId = flow.startingNodeId
         this._type = flow.type
         this._updatedAt = flow.updatedAt
+        this._name = flow.name
 
     }
 
@@ -88,12 +91,20 @@ export class FlowView {
         return this._updatedAt;
     }
 
+    get name(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._name;
+    }
+
     set inputType(value: Maybe<DataType>) {
         this._inputType = value;
     }
 
     set startingNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {
         this._startingNodeId = value;
+    }
+
+    set name(value: Maybe<Scalars["String"]["output"]>) {
+        this._name = value;
     }
 
     addNode(node: NodeFunctionView): void {

@@ -1,9 +1,9 @@
-import {useService} from "../../../utils/contextStore";
-import {DFlowReactiveService} from "../DFlow.service";
-import {NodeFunctionView} from "../DFlow.view";
+import {useService} from "../../utils/contextStore";
+import {DFlowReactiveService} from "./DFlow.service";
+import {NodeFunctionView} from "./DFlow.view";
 import {Node} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import {DataTypeIdentifier, DataTypeVariant, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 const packageNodes = new Map<string, string>([
@@ -90,7 +90,7 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
     return bestKey !== null ? map.get(bestKey)! : "";
 };
 
-export const useFlowViewportNodes = (flowId: string): Node[] => {
+export const useFlowNodes = (flowId: string): Node[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);

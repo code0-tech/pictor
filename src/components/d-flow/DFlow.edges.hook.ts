@@ -1,9 +1,9 @@
-import {useService, useStore} from "../../../utils/contextStore";
-import {DFlowReactiveService} from "../DFlow.service";
+import {useService, useStore} from "../../utils/contextStore";
+import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
-import {NodeFunctionView} from "../DFlow.view";
-import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {NodeFunctionView} from "./DFlow.view";
+import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
+import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import React from "react";
 import {DataTypeIdentifier, DataTypeVariant, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
@@ -19,7 +19,7 @@ export const FLOW_EDGE_RAINBOW: string[] = [
     '#fff170', // 7 – Gelb
 ];
 
-export const useFlowViewportEdges = (flowId: string): Edge[] => {
+export const useFlowEdges = (flowId: string): Edge[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);

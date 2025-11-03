@@ -1,6 +1,6 @@
-@use "../../styles/helpers";
-@use "../../styles/box";
-@use "../../styles/variables";
+@use "../../../styles/helpers";
+@use "../../../styles/box";
+@use "../../../styles/variables";
 
 .d-folder {
   padding: variables.$xxs variables.$xs;
@@ -40,13 +40,15 @@
   }
 
   &__content {
+    $spacing: variables.$xxs;
+
     margin-left: variables.$xs;
     position: relative;
+    padding-left: calc(5px + $spacing);
 
     &:before {
-      z-index: 10;
       height: 100%;
-      width: 2px;
+      width: 1px;
       background: helpers.backgroundColor(variables.$secondary);
       position: absolute;
       content: "";
@@ -64,14 +66,15 @@
     align-items: center;
     cursor: pointer;
     font-size: variables.$sm;
+    position: relative;
 
     & {
       @include helpers.borderRadius();
       @include box.box(variables.$primary);
       @include box.boxHover(variables.$secondary);
+      @include box.boxActive(variables.$secondary);
       @include helpers.fontStyle();
       box-shadow: none;
-      background: transparent;
     }
   }
 }

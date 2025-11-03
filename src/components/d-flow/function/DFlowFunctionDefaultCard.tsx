@@ -1,11 +1,11 @@
-import {Code0Component} from "../../../../utils/types";
+import {Code0Component} from "../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
-import {NodeFunctionView, NodeParameterView} from "../../DFlow.view";
+import {NodeFunctionView, NodeParameterView} from "../DFlow.view";
 import React, {memo} from "react";
-import Card from "../../../card/Card";
-import "./DFlowViewportDefaultCard.style.scss";
-import CardSection from "../../../card/CardSection";
-import Flex from "../../../flex/Flex";
+import Card from "../../card/Card";
+import "./DFlowFunctionDefaultCard.style.scss";
+import CardSection from "../../card/CardSection";
+import Flex from "../../flex/Flex";
 import {
     IconAlertTriangle,
     IconArrowRightCircle, IconCopy,
@@ -16,23 +16,23 @@ import {
     IconMessageExclamation,
     IconTrash
 } from "@tabler/icons-react";
-import Text from "../../../text/Text";
-import Button from "../../../button/Button";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../../menu/Menu";
-import Badge from "../../../badge/Badge";
-import {useService} from "../../../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "../../function/DFlowFunction.service";
-import {useFunctionValidation} from "../../function/DFlowFunction.vaildation.hook";
-import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
-import {InspectionSeverity} from "../../../../utils/inspection";
-import {DFlowReactiveService} from "../../DFlow.service";
-import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
-import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {FileTabsService} from "../../../file-tabs/FileTabs.service";
-import {DFlowViewportDefaultTabContent} from "../file-tabs/DFlowViewportDefaultTabContent";
+import Text from "../../text/Text";
+import Button from "../../button/Button";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../menu/Menu";
+import Badge from "../../badge/Badge";
+import {useService} from "../../../utils/contextStore";
+import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
+import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
+import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {InspectionSeverity} from "../../../utils/inspection";
+import {DFlowReactiveService} from "../DFlow.service";
+import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {FileTabsService} from "../../file-tabs/FileTabs.service";
+import {DFlowTabDefault} from "../tab/DFlowTabDefault";
 import {DataTypeVariant, Maybe, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
-export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunctionView
     flowId: Scalars["FlowID"]["output"]
     isParameter: boolean
@@ -42,9 +42,9 @@ export interface DFlowViewportDefaultCardDataProps extends Omit<Code0Component<H
 }
 
 // @ts-ignore
-export type DFlowViewportDefaultCardProps = NodeProps<Node<DFlowViewportDefaultCardDataProps>>
+export type DFlowFunctionDefaultCardProps = NodeProps<Node<DFlowFunctionDefaultCardDataProps>>
 
-export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> = memo((props) => {
+export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> = memo((props) => {
     const {data, id} = props;
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
@@ -106,8 +106,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     active: true,
                     closeable: true,
                     children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
-                    content: <DFlowViewportDefaultTabContent flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                                             nodeLevel={data.index} functionInstance={data.instance}/>
+                    content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
+                                              nodeLevel={data.index} functionInstance={data.instance}/>
                 })
             }} style={{position: "relative"}}>
 

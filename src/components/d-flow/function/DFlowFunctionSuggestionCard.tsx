@@ -1,24 +1,24 @@
-import {Code0Component} from "../../../../utils/types";
+import {Code0Component} from "../../../utils/types";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import React, {memo} from "react";
-import Button from "../../../button/Button";
+import Button from "../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
-import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {NodeFunctionView} from "../../DFlow.view";
-import {useService} from "../../../../utils/contextStore";
-import {DFlowReactiveService} from "../../DFlow.service";
-import {DFlowSuggestionMenu} from "../../suggestions/DFlowSuggestionMenu";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {NodeFunctionView} from "../DFlow.view";
+import {useService} from "../../../utils/contextStore";
+import {DFlowReactiveService} from "../DFlow.service";
+import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
 import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
-export interface DFlowViewportSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
+export interface DFlowFunctionSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
     flowId: string
     parentFunction?: NodeFunctionView
 }
 
 // @ts-ignore
-export type DFlowViewportSuggestionCardProps = NodeProps<Node<DFlowViewportSuggestionCardDataProps>>
+export type DFlowFunctionSuggestionCardProps = NodeProps<Node<DFlowFunctionSuggestionCardDataProps>>
 
-export const DFlowViewportSuggestionCard: React.FC<DFlowViewportSuggestionCardProps> = memo((props) => {
+export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardProps> = memo((props) => {
 
     const result = useSuggestions(undefined, [], props.data.flowId, 0, [0], 0)
     const flowService = useService(DFlowReactiveService)

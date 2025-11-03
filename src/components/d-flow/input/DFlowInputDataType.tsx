@@ -1,5 +1,5 @@
 import React from "react";
-import {ValidationProps} from "../../../form/useForm";
+import {ValidationProps} from "../../form/useForm";
 import {
     DataType,
     DataTypeIdentifier,
@@ -13,25 +13,25 @@ import {
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
-import InputMessage from "../../../form/InputMessage";
-import "./DFlowViewportDataTypeInput.style.scss";
-import TextInput from "../../../form/TextInput";
-import Button from "../../../button/Button";
+import InputMessage from "../../form/InputMessage";
+import "./DFlowInputDataType.style.scss";
+import TextInput from "../../form/TextInput";
+import Button from "../../button/Button";
 import {IconSettings, IconTrash} from "@tabler/icons-react";
-import Text from "../../../text/Text";
-import Flex from "../../../flex/Flex";
-import Badge from "../../../badge/Badge";
-import InputLabel from "../../../form/InputLabel";
-import {useSuggestions} from "../../suggestions/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "../../suggestions/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "../../suggestions/DFlowSuggestionMenu.util";
-import {DFlowSuggestionType} from "../../suggestions/DFlowSuggestion.view";
-import {Menu, MenuPortal, MenuTrigger} from "../../../menu/Menu";
+import Text from "../../text/Text";
+import Flex from "../../flex/Flex";
+import Badge from "../../badge/Badge";
+import InputLabel from "../../form/InputLabel";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
+import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
+import {DFlowSuggestionType} from "../suggestion/DFlowSuggestion.view";
+import {Menu, MenuPortal, MenuTrigger} from "../../menu/Menu";
 import {
     InputSuggestion,
     InputSuggestionMenuContent,
     InputSuggestionMenuContentItems
-} from "../../../form/InputSuggestion";
+} from "../../form/InputSuggestion";
 
 const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
     DataTypeRulesVariant.ItemOfCollection,
@@ -46,12 +46,12 @@ const DATA_TYPE_RULES_VARIANTS = [
     DataTypeRulesVariant.NumberRange, DataTypeRulesVariant.Regex,
 ]
 
-export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType | GenericType> {
+export interface DFlowInputDataTypeProps extends ValidationProps<DataType | GenericType> {
     onDataTypeChange?: (value: DataType | GenericType) => void
     blockingDataType?: DataType | GenericType
 }
 
-export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProps> = (props) => {
+export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => {
 
     const {
         formValidation,
@@ -388,7 +388,7 @@ const RuleItem: React.FC<{
                 <>
                     {header}
                     {isOpen ? (
-                        <DFlowViewportDataTypeInput
+                        <DFlowInputDataType
                             initialValue={nestedInitialValue}
                             blockingDataType={nestedBlockingValue}
                             onDataTypeChange={onNestedChange}
@@ -411,7 +411,7 @@ const RuleItem: React.FC<{
                         const targetKey = identifier.genericKey
                         if (!targetKey) return null
                         return (
-                            <DFlowViewportDataTypeInput
+                            <DFlowInputDataType
                                 key={`${targetKey}-${index}`}
                                 initialValue={nestedValue}
                                 blockingDataType={nestedBlocking}

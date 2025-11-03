@@ -247,6 +247,12 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                                         from: undefined,
                                         to: undefined,
                                         steps: undefined
+                                    } : {}),
+                                    ...(variant[1] === DataTypeRulesVariant.Regex ? {
+                                        pattern: undefined
+                                    } : {}),
+                                    ...(variant[1] === DataTypeRulesVariant.ItemOfCollection ? {
+                                        items: undefined
                                     } : {})
                                 },
                             }
@@ -324,14 +330,18 @@ const RuleItem: React.FC<{
         setConfigValue(value)
     }, [])
 
-    const handleConfigCommit = React.useCallback(() => {
+    const handleConfigCommit = React.useCallback((event?: React.FocusEvent<HTMLInputElement>) => {
         if (isBlocked) return
 
-        const updatedConfig = buildConfigFromValue(configValue, rule.config)
+        const numberRangeKey = event?.target?.name as NumberRangeField | undefined
+        const updatedConfig = buildConfigFromValue(configValue, rule.config, {
+            variant,
+            numberRangeKey
+        })
         if (updatedConfig) {
             onConfigChange(updatedConfig)
         }
-    }, [configValue, isBlocked, onConfigChange, rule.config])
+    }, [configValue, isBlocked, onConfigChange, rule.config, variant])
 
     const nestedInitialValue = getRuleIdentifierValue(rule)
     const nestedBlockingValue = getRuleIdentifierValue(blockingRule)
@@ -433,6 +443,7 @@ const RuleItem: React.FC<{
                             w={"100%"}
                             left={<Text size={"sm"}>From</Text>} leftType={"icon"}
                             disabled={isBlocked}
+                            name={"from"}
                         />
                         <TextInput
                             clearable
@@ -442,6 +453,7 @@ const RuleItem: React.FC<{
                             left={<Text size={"sm"}>Steps</Text>} leftType={"icon"}
                             w={"100%"}
                             disabled={isBlocked}
+                            name={"steps"}
                         />
                         <TextInput
                             clearable
@@ -451,6 +463,7 @@ const RuleItem: React.FC<{
                             onBlur={handleConfigCommit}
                             w={"100%"}
                             disabled={isBlocked}
+                            name={"to"}
                         />
                     </>
                 ) : null}
@@ -554,13 +567,15 @@ const RuleHeader: React.FC<{
 
 }
 
+type NumberRangeField = Exclude<keyof DataTypeRulesNumberRangeConfig, "__typename">
+
 const getConfigValue = (payload: DataTypeRulesConfig): string | DataTypeRulesConfig => {
 
     if (!payload) return ""
 
-    if ("pattern" in payload && payload?.__typename === "DataTypeRulesRegexConfig") {
+    if ("pattern" in payload || payload?.__typename === "DataTypeRulesRegexConfig") {
         return payload?.pattern ?? ""
-    } else if ("items" in payload && payload?.__typename === "DataTypeRulesItemOfCollectionConfig") {
+    } else if ("items" in payload || payload?.__typename === "DataTypeRulesItemOfCollectionConfig") {
         return JSON.stringify(payload.items)
     }
 
@@ -568,8 +583,67 @@ const getConfigValue = (payload: DataTypeRulesConfig): string | DataTypeRulesCon
 
 }
 
-const buildConfigFromValue = (value: string, fallback?: DataTypeRulesConfig | null): DataTypeRulesConfig | undefined => {
-    if (!fallback) {
+const buildConfigFromValue = (
+    value: string | DataTypeRulesConfig,
+    fallback?: DataTypeRulesConfig | null,
+    options?: { variant?: DataTypeRulesVariant | string | null; numberRangeKey?: NumberRangeField }
+): DataTypeRulesConfig | undefined => {
+    const {variant, numberRangeKey} = options ?? {}
+
+    const isNumberRange = variant === DataTypeRulesVariant.NumberRange
+    const fallbackConfig = fallback ?? undefined
+
+    if (isNumberRange) {
+        const baseConfig: DataTypeRulesNumberRangeConfig = {
+            __typename: "DataTypeRulesNumberRangeConfig",
+            ...(fallbackConfig as DataTypeRulesNumberRangeConfig | undefined)
+        }
+
+        if (typeof value !== "string") {
+            return {
+                ...baseConfig,
+                ...(value as Partial<DataTypeRulesNumberRangeConfig>)
+            }
+        }
+
+        if (!numberRangeKey) {
+            return baseConfig
+        }
+
+        const nextConfig: DataTypeRulesNumberRangeConfig = {...baseConfig}
+
+        switch (numberRangeKey) {
+            case "from":
+                nextConfig.from = (() => {
+                    if (value.trim() === "") return undefined
+                    const parsed = Number(value)
+                    return Number.isFinite(parsed) ? parsed : baseConfig.from
+                })()
+                break
+            case "steps":
+                nextConfig.steps = (() => {
+                    if (value.trim() === "") return undefined
+                    const parsed = Number(value)
+                    return Number.isFinite(parsed) ? parsed : baseConfig.steps
+                })()
+                break
+            case "to":
+                nextConfig.to = (() => {
+                    if (value.trim() === "") return undefined
+                    const parsed = Number(value)
+                    return Number.isFinite(parsed) ? parsed : baseConfig.to
+                })()
+                break
+        }
+
+        return nextConfig
+    }
+
+    if (!fallbackConfig) {
+        if (typeof value !== "string") {
+            return value
+        }
+
         try {
             return JSON.parse(value)
         } catch (e) {
@@ -577,22 +651,26 @@ const buildConfigFromValue = (value: string, fallback?: DataTypeRulesConfig | nu
         }
     }
 
-    if ("pattern" in fallback || fallback?.__typename === "DataTypeRulesRegexConfig") {
-        return {...fallback, pattern: value}
-    } else if ("items" in fallback || fallback?.__typename === "DataTypeRulesItemOfCollectionConfig") {
-        return {...fallback, items: JSON.parse(value)}
-    } else if ("from" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
-        return {...fallback, from: Number.parseInt(value)}
-    } else if ("steps" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
-        return {...fallback, steps: Number.parseInt(value)}
-    } else if ("to" in fallback && fallback?.__typename === "DataTypeRulesNumberRangeConfig") {
-        return {...fallback, to: Number.parseInt(value)}
+    if (typeof value !== "string") {
+        return value
+    }
+
+    if (fallbackConfig.__typename === "DataTypeRulesRegexConfig" || "pattern" in fallbackConfig) {
+        return {...fallbackConfig, pattern: value}
+    }
+
+    if (fallbackConfig.__typename === "DataTypeRulesItemOfCollectionConfig" || "items" in fallbackConfig) {
+        try {
+            return {...fallbackConfig, items: JSON.parse(value)}
+        } catch (e) {
+            return fallbackConfig
+        }
     }
 
     try {
         return JSON.parse(value)
     } catch (e) {
-        return fallback
+        return fallbackConfig
     }
 }
 

@@ -2,11 +2,9 @@ import {Meta} from "@storybook/react";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import DFullScreen from "../d-fullscreen/DFullScreen";
-import DFolder from "../d-folder/DFolder";
 import Button from "../button/Button";
-import {IconDatabase, IconFileFilled, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
+import {IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import Flex from "../flex/Flex";
-import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
@@ -33,6 +31,7 @@ import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowControls} from "../d-flow/DFlowControls";
 import {DFlowValidation} from "../d-flow/DFlowValidation";
 import {DLayout} from "../d-layout/DLayout";
+import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -74,82 +73,67 @@ export const Dashboard = () => {
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
     return <DFullScreen p={1}>
-        <DLayout leftContent={<Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
-            <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                color={"secondary"}>
-                            <IconHierarchy3 size={12}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent sideOffset={5.6} side={"left"}>
-                            All Flows
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                color={"warning"}>
-                            <IconTicket size={12}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent sideOffset={5.6} side={"left"}>
-                            Issue Management
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
-                            <IconDatabase size={12}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent sideOffset={5.6} side={"left"}>
-                            Database
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-            </Flex>
-            <div>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                color={"primary"}>
-                            <IconSettings size={12}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent sideOffset={5.6} side={"left"}>
-                            Settings
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-            </div>
-        </Flex>}>
-            <DLayout leftContent={<ScrollArea h={"100%"}>
-                <ScrollAreaViewport>
-                    {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
-                        return <DFolder key={index} name={"Google Cloud Flows"} defaultOpen>
-                            <DFolder name={"Google Cloud Flows"}>
-                                <DFolder.Item icon={<IconFileFilled size={12}/>}
-                                              name={"Google Cloud Flows"}/>
-                                <DFolder.Item active={index === 1} name={"Google Cloud Flows"}/>
-                            </DFolder>
-                        </DFolder>
-                    })}
-                </ScrollAreaViewport>
-                <ScrollAreaScrollbar orientation={"vertical"}>
-                    <ScrollAreaThumb/>
-                </ScrollAreaScrollbar>
-            </ScrollArea>}>
-                <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
-                    <ContextStoreProvider
-                        services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+        <ContextStoreProvider
+            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+            <DLayout leftContent={<Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
+                <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                    color={"secondary"}>
+                                <IconHierarchy3 size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                All Flows
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                    color={"warning"}>
+                                <IconTicket size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Issue Management
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
+                                <IconDatabase size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Database
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                </Flex>
+                <div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                    color={"primary"}>
+                                <IconSettings size={12}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent sideOffset={5.6} side={"left"}>
+                                Settings
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                </div>
+            </Flex>}>
+                <DLayout leftContent={<DFlowFolder flowId={"gid://sagittarius/Flow/1"}/>}>
+                    <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
                         <DResizablePanel>
                             <FlowExample/>
                         </DResizablePanel>
@@ -157,10 +141,10 @@ export const Dashboard = () => {
                         <DResizablePanel>
                             <DFlowTabs/>
                         </DResizablePanel>
-                    </ContextStoreProvider>
-                </DResizablePanelGroup>
+                    </DResizablePanelGroup>
+                </DLayout>
             </DLayout>
-        </DLayout>
+        </ContextStoreProvider>
     </DFullScreen>
 
 }

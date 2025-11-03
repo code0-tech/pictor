@@ -1,6 +1,6 @@
 {
   "name": "@code0-tech/pictor",
-  "version": "0.2.3",
+  "version": "0.0.0",
   "type": "module",
   "description": "A simple template for a custom React component library",
   "scripts": {

@@ -32,6 +32,7 @@ import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
 import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
 import {DFlowViewportValidations} from "../d-flow/viewport/DFlowViewportValidations";
+import {DLayout} from "../d-layout/DLayout";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -73,65 +74,64 @@ export const Dashboard = () => {
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
     return <DFullScreen p={1}>
-        <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
-            <Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
-                <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"secondary"}>
-                                <IconHierarchy3 size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                All Flows
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"warning"}>
-                                <IconTicket size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Issue Management
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
-                                <IconDatabase size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Database
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </Flex>
-                <div>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"primary"}>
-                                <IconSettings size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Settings
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </div>
+        <DLayout leftContent={<Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
+            <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                color={"secondary"}>
+                            <IconHierarchy3 size={12}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={5.6} side={"left"}>
+                            All Flows
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                color={"warning"}>
+                            <IconTicket size={12}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={5.6} side={"left"}>
+                            Issue Management
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
+                            <IconDatabase size={12}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={5.6} side={"left"}>
+                            Database
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
             </Flex>
-            <ScrollArea>
+            <div>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
+                                color={"primary"}>
+                            <IconSettings size={12}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent sideOffset={5.6} side={"left"}>
+                            Settings
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+            </div>
+        </Flex>}>
+            <DLayout leftContent={<ScrollArea h={"100%"}>
                 <ScrollAreaViewport>
                     {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, index) => {
                         return <DFolder key={index} name={"Google Cloud Flows"} defaultOpen>
@@ -146,32 +146,21 @@ export const Dashboard = () => {
                 <ScrollAreaScrollbar orientation={"vertical"}>
                     <ScrollAreaThumb/>
                 </ScrollAreaScrollbar>
-            </ScrollArea>
-            <Flex style={{
-                position: "relative",
-                flex: 1,
-                flexDirection: "column",
-                width: "100%",
-                height: "100%",
-                boxSizing: "border-box"
-            }}>
-                <div style={{position: "relative", overflow: "auto", flex: "1 1 auto", boxSizing: "border-box"}}>
-                    <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
-                        <ContextStoreProvider
-                            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-                            <DResizablePanel>
-                                <FlowExample/>
-                            </DResizablePanel>
-                            <DResizableHandle/>
-                            <DResizablePanel>
-                                <DFlowViewportTabs/>
-                            </DResizablePanel>
-                        </ContextStoreProvider>
-                    </DResizablePanelGroup>
-                </div>
-            </Flex>
-
-        </Flex>
+            </ScrollArea>}>
+                <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
+                    <ContextStoreProvider
+                        services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+                        <DResizablePanel>
+                            <FlowExample/>
+                        </DResizablePanel>
+                        <DResizableHandle/>
+                        <DResizablePanel>
+                            <DFlowViewportTabs/>
+                        </DResizablePanel>
+                    </ContextStoreProvider>
+                </DResizablePanelGroup>
+            </DLayout>
+        </DLayout>
     </DFullScreen>
 
 }

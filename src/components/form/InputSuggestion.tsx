@@ -43,7 +43,10 @@ export const InputSuggestionMenuContent: React.FC<InputSuggestionMenuContentProp
 
 export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuContentItemsProps> = React.forwardRef<InputSuggestionMenuContentItemsHandle, InputSuggestionMenuContentItemsProps>((props, ref) => {
 
-    const {suggestions, onSuggestionSelect = () => {}, ...rest} = props
+    const {
+        suggestions, onSuggestionSelect = () => {
+        }, ...rest
+    } = props
     const itemRefs = React.useRef<(HTMLDivElement | null)[]>([])
     const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({})
 
@@ -121,7 +124,12 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
                     {showGroupLabel && suggestion.groupLabel && <MenuLabel
                         onPointerDown={event => event.preventDefault()}
                         onClick={() => toggleGroup(suggestion.groupLabel!)}
-                        style={{display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer"}}>
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            cursor: "pointer"
+                        }}>
                         <span>{suggestion.groupLabel}</span>
                         {isCollapsed
                             ? <IconChevronDown size={16}/>
@@ -129,6 +137,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
                     </MenuLabel>}
                     {!isCollapsed && <MenuItem textValue={""}
                                                onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)}
+                                                /**@ts-ignore */
                                                ref={el => itemRefs.current[visibleIndex] = el}>
                         {suggestion.children}
                     </MenuItem>}

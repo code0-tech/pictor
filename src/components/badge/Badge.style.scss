@@ -8,6 +8,7 @@
   font-size: variables.$xs;
   width: fit-content;
   align-items: center;
+  gap: variables.$xxs;
 
   & {
     @include helpers.fontStyle();

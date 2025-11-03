@@ -40,6 +40,11 @@ const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
 
 const BLOCKING_SIGNATURE_KEY = "__blockingSignature"
 
+const DATA_TYPE_RULES_VARIANTS = [
+    "CONTAINS_KEY","CONTAINS_TYPE","ITEM_OF_COLLECTION",
+    "NUMBER_RANGE","REGEX",
+]
+
 export interface DFlowViewportDataTypeInputProps extends ValidationProps<DataType | GenericType> {
     onDataTypeChange?: (value: DataType | GenericType) => void
     blockingDataType?: DataType | GenericType
@@ -238,7 +243,7 @@ export const DFlowViewportDataTypeInput: React.FC<DFlowViewportDataTypeInputProp
                                 }
                             })
 
-                        }} suggestions={Object.entries(DataTypeRulesVariant).map(variant => ({
+                        }} suggestions={Object.entries(DATA_TYPE_RULES_VARIANTS).map(variant => ({
                             children: variant[1],
                             value: {
                                 variant: variant[1],

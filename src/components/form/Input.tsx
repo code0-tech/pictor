@@ -193,7 +193,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
                                 // Update value and dispatch event
-                                setElementKey(ref.current, "value", typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value, "change");
+                                if (!onSuggestionSelect) setElementKey(ref.current, "value", typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value, "change");
                                 onSuggestionSelect(suggestion)
                                 setOpen(false)
                             }}
@@ -223,6 +223,7 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
                         <input
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
+                            disabled={disabled}
                             {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />
                     )}

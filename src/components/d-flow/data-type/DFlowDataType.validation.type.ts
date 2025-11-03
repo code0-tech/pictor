@@ -1,38 +1,54 @@
 import {DataTypeView} from "./DFlowDataType.view";
 
+const IGNORE_ID_KEYS = ["id", "__typename", "createdAt", "updatedAt"];
+
 export const useValidateDataType = (
     firstDataType: DataTypeView,
     secondDataType: DataTypeView
 ) => {
-    if (firstDataType.variant != secondDataType.variant) return false
 
-    const isObject = (object: object) => {
-        return object != null && typeof object === "object";
+    if (firstDataType.variant !== secondDataType.variant) return false
+
+    const isObject = (value: unknown): value is Record<string, unknown> => {
+        return value !== null && typeof value === "object"
     }
 
-    //all rules need to match
-    const isDeepEqual = (object1: { [index: string]: any }, object2: { [index: string]: any }) => {
-        const objKeys1 = Object.keys(object1)
-        const objKeys2 = Object.keys(object2)
+    const isDeepEqual = (value1: unknown, value2: unknown): boolean => {
+        if (value1 === value2) return true
 
-        if (objKeys1.length !== objKeys2.length) return false
+        const value1IsArray = Array.isArray(value1)
+        const value2IsArray = Array.isArray(value2)
 
-        for (const key of objKeys1) {
-            const value1 = object1[key]
-            const value2 = object2[key]
-            const isObjects = isObject(value1) && isObject(value2)
+        if (value1IsArray || value2IsArray) {
+            if (!value1IsArray || !value2IsArray) return false
 
-            if ((isObjects && !isDeepEqual(value1, value2)) || (!isObjects && value1 !== value2)) return false
+            if (value1.length !== value2.length) return false
+
+            return (value1 as unknown[]).every((entry, index) => isDeepEqual(entry, (value2 as unknown[])[index]))
         }
-        return true
+
+        if (isObject(value1) && isObject(value2)) {
+            const objKeys1 = Object.keys(value1)
+            const objKeys2 = Object.keys(value2)
+
+            if (objKeys1.length !== objKeys2.length) return false
+
+            return objKeys1.every(key => {
+                if (IGNORE_ID_KEYS.includes(key)) return true // Ignore IDs in deep comparison
+                return isDeepEqual((value1 as Record<string, unknown>)[key], (value2 as Record<string, unknown>)[key])
+            })
+        }
+
+        return false
     }
 
-    const arraysEqual = (a1: [], a2: []): boolean =>
-        a1.length === a2.length && a1.every((o: any, idx: any) => isDeepEqual(o, a2[idx]))
+    const firstRules = firstDataType.rules?.nodes ?? []
+    const secondRules = secondDataType.rules?.nodes ?? []
 
+    if (!firstRules.length && !secondRules.length) return true
+    if (!firstRules.length || !secondRules.length) return false
 
-    if (firstDataType.rules && !secondDataType.rules) return false
-    if (firstDataType.rules && secondDataType.rules) return false
+    if (firstRules.length !== secondRules.length) return false
 
-    return arraysEqual(firstDataType.rules?.nodes as [], secondDataType.rules?.nodes as [])
+    return firstRules.every((rule, index) => isDeepEqual(rule, secondRules[index]))
 }

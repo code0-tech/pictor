@@ -17,12 +17,11 @@ import {
     DataTypeRulesVariant,
     DataTypeVariant,
     Maybe,
-    NodeFunction,
     NodeParameter,
+    NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
-//TODO: instead of GENERIC use some uuid or hash for replacement
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
 
@@ -32,12 +31,15 @@ export const useSuggestions = (
     flowId: string,
     depth: number = 0,
     scope: number[] = [0],
-    node: number = 1): DFlowSuggestion[] => {
+    node: number = 1,
+    suggestionTypes: DFlowSuggestionType[] = [DFlowSuggestionType.REF_OBJECT, DFlowSuggestionType.VALUE, DFlowSuggestionType.FUNCTION, DFlowSuggestionType.FUNCTION_COMBINATION, DFlowSuggestionType.DATA_TYPE]
+): DFlowSuggestion[] => {
 
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-
+    const flow = flowService.getById(flowId)
     const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
     if (!suggestionService || !dataTypeService) return []
@@ -49,15 +51,13 @@ export const useSuggestions = (
 
     if (cached.length <= 0) {
 
-        if (hashedType && dataType) {
+        if (hashedType && dataType && suggestionTypes.includes(DFlowSuggestionType.VALUE)) {
             //calculate VALUE
             dataType.rules?.nodes?.forEach(rule => {
                 if (rule?.variant === DataTypeRulesVariant.ItemOfCollection) {
                     (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
                         const suggestion = new DFlowSuggestion(hashedType, [], {
-                            createdAt: "",
-                            id: undefined,
-                            updatedAt: "",
+                            __typename: "LiteralValue",
                             value: value
                         }, DFlowSuggestionType.VALUE, [value.toString()])
                         suggestionService.addSuggestion(suggestion)
@@ -66,9 +66,7 @@ export const useSuggestions = (
                 } else if (rule?.variant === DataTypeRulesVariant.NumberRange) {
                     const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
                     const suggestion = new DFlowSuggestion(hashedType, [], {
-                        createdAt: "",
-                        id: undefined,
-                        updatedAt: "",
+                        __typename: "LiteralValue",
                         value: config.from
                     }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                     suggestionService.addSuggestion(suggestion)
@@ -77,63 +75,90 @@ export const useSuggestions = (
             })
         }
 
+        //TODO: need to validate given type
+        if (hashedType && dataType && dataType.variant === DataTypeVariant.DataType && suggestionTypes.includes(DFlowSuggestionType.DATA_TYPE)) {
+            dataTypeService.values().forEach(dataType => {
+                //TODO: need to wait for sagittarius update to support DataTypes as values
+                // @ts-ignore
+                const suggestion = new DFlowSuggestion(hashedType, [], dataType.json, DFlowSuggestionType.DATA_TYPE, [dataType.name?.nodes!![0]?.content])
+                suggestionService.addSuggestion(suggestion)
+                state.push(suggestion)
+            })
+        }
 
-        //calculate FUNCTION
-        //generics to be replaced with GENERIC todo is written on top
-        const matchingFunctions = functionService.values().filter(funcDefinition => {
-            if (!type || !resolvedType || !hashedType) return true
-            if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
-            if (dataType?.variant === DataTypeVariant.Node) return true
-            if (!funcDefinition.returnType) return false
-            if (!funcDefinition.genericKeys) return false
-            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
-            return isMatchingType(resolvedType, resolvedReturnType)
-        })
+        if (suggestionTypes.includes(DFlowSuggestionType.FUNCTION_COMBINATION)) {
+            //calculate FUNCTION
+            //generics to be replaced with GENERIC todo is written on top
+            const matchingFunctions = functionService.values().filter(funcDefinition => {
+                if (!type || !resolvedType || !hashedType) return true
+                if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
+                if (dataType?.variant === DataTypeVariant.Node) return true
+                if (!funcDefinition.returnType) return false
+                if (!funcDefinition.genericKeys) return false
+                const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
+                return isMatchingType(resolvedType, resolvedReturnType)
+            }).sort((a, b) => {
+                const [rA, pA, fA] = a.runtimeFunctionDefinition!!.identifier!!.split("::");
+                const [rB, pB, fB] = b.runtimeFunctionDefinition!!.identifier!!.split("::");
 
-        matchingFunctions.forEach(funcDefinition => {
-            const nodeFunctionSuggestion: NodeFunction = {
-                //TODO: generate unique id
-                id: `gid://sagittarius/NodeFunction/1`,
-                functionDefinition: {
-                    id: funcDefinition.id,
-                },
-                parameters: {
-                    nodes: (funcDefinition.parameterDefinitions?.map(definition => {
-                        return {
-                            id: definition.id,
-                            runtimeParameter: {
-                                id: definition.id
+                // Erst runtime vergleichen
+                const runtimeCmp = rA.localeCompare(rB);
+                if (runtimeCmp !== 0) return runtimeCmp;
+
+                // Dann package vergleichen
+                const packageCmp = pA.localeCompare(pB);
+                if (packageCmp !== 0) return packageCmp;
+
+                // Dann function name
+                return fA.localeCompare(fB);
+            })
+
+            matchingFunctions.forEach(funcDefinition => {
+                const nodeFunctionSuggestion: NodeParameterValue = {
+                    __typename: "NodeFunction",
+                    //TODO: generate unique id
+                    id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.length ?? 0) + 1}`,
+                    functionDefinition: {
+                        id: funcDefinition.id,
+                        runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
+                    },
+                    parameters: {
+                        nodes: (funcDefinition.parameterDefinitions?.map(definition => {
+                            return {
+                                id: definition.id,
+                                runtimeParameter: {
+                                    id: definition.id
+                                }
                             }
-                        }
-                    }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
+                        }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
+                    }
                 }
-            }
-            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.id as string])
-            suggestionService.addSuggestion(suggestion)
-            state.push(suggestion)
-        })
+                const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
+                state.push(suggestion)
+            })
+        }
 
     }
 
+    if (suggestionTypes.includes(DFlowSuggestionType.REF_OBJECT)) {
+        //calculate REF_OBJECTS && FUNCTION_COMBINATION
+        const refObjects = type ? useRefObjects(flowId) : []
 
-    //calculate REF_OBJECTS && FUNCTION_COMBINATION
-    const refObjects = type ? useRefObjects(flowId) : []
+        refObjects.forEach(value => {
+            if ((value?.node ?? 0) >= node) return
+            if ((value?.depth ?? 0) > depth) return
+            if ((value?.scope ?? []).some(r => !scope.includes(r))) return
+            if (!resolvedType) return
 
-    refObjects.forEach(value => {
-        if (value?.node ?? 0 >= node) return
-        if (value?.depth ?? 0 > depth) return
-        if ((value?.scope ?? []).some(r => !scope.includes(r))) return
-        if (!resolvedType) return
+            const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
+            if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
-        const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
-        if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
+            const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`])
+            state.push(suggestion)
+        })
+    }
 
-        const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`, JSON.stringify(value.dataTypeIdentifier)])
-        state.push(suggestion)
-    })
-
-
-    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")]
+    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")].sort()
 
 }
 
@@ -245,6 +270,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                             const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
                             if (resolved) {
                                 refObjects.push({
+                                    __typename: "ReferenceValue",
                                     dataTypeIdentifier: resolved,
                                     depth,
                                     scope: scopePath,
@@ -267,6 +293,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
                 );
                 if (resolvedReturnType) {
                     refObjects.push({
+                        __typename: "ReferenceValue",
                         dataTypeIdentifier: resolvedReturnType,
                         depth,
                         scope: scopePath,

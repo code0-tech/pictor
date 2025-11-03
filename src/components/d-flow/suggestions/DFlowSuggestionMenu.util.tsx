@@ -6,6 +6,12 @@ import Text from "../../text/Text";
 
 export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggestion[] => {
 
+    const staticGroupLabels: Partial<Record<DFlowSuggestionType, string>> = {
+        [DFlowSuggestionType.VALUE]: "Values",
+        [DFlowSuggestionType.REF_OBJECT]: "Variables",
+        [DFlowSuggestionType.DATA_TYPE]: "Datatypes",
+    }
+
     return suggestions.map(suggestion => {
 
         const iconMap: Record<DFlowSuggestionType, React.ReactNode> = {
@@ -13,6 +19,7 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
             [DFlowSuggestionType.FUNCTION_COMBINATION]: <IconFileFunctionFilled color="#70ffb2" size={16}/>,
             [DFlowSuggestionType.REF_OBJECT]: <IconCirclesRelation color="#FFBE0B" size={16}/>,
             [DFlowSuggestionType.VALUE]: <IconCircleDot color="#D90429" size={16}/>,
+            [DFlowSuggestionType.DATA_TYPE]: <IconCircleDot color="#D90429" size={16}/>,
         }
 
         const children: React.ReactNode = <>
@@ -26,10 +33,26 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
             </div>
         </>
 
+        let groupLabel: string | undefined = staticGroupLabels[suggestion.type]
+
+        if (suggestion.type === DFlowSuggestionType.FUNCTION || suggestion.type === DFlowSuggestionType.FUNCTION_COMBINATION) {
+            const runtimeIdentifier = suggestion.value.__typename === "NodeFunction"
+                ? suggestion.value.functionDefinition?.runtimeFunctionDefinition?.identifier
+                : undefined
+
+            if (runtimeIdentifier) {
+                const [runtime, pkg] = runtimeIdentifier.split("::")
+                if (runtime && pkg) {
+                    groupLabel = `${runtime}::${pkg}`
+                }
+            }
+        }
+
         return {
             children,
             ref: suggestion,
-            value: suggestion.value
+            value: suggestion.value,
+            groupLabel,
         };
     })
 }

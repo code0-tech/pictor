@@ -1,8 +1,10 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeService} from "../DFlowDataType.service";
 import {
-    DataTypeRulesContainsKeyConfig, GenericCombinationStrategyType,
-    GenericMapper, GenericType,
+    DataTypeRulesContainsKeyConfig,
+    GenericCombinationStrategyType,
+    GenericMapper,
+    GenericType,
     LiteralValue,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
@@ -18,9 +20,8 @@ export class DFlowDataTypeContainsTypeRule {
         const genericCombination = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.genericCombinationStrategies
 
         //TODO: seperate general validation
-        //if (!(Array.isArray(value))) return false
+        if ("value" in value && !(Array.isArray(value.value))) return false
 
-        //TODO: only if its really a generic key
         if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
         if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
@@ -35,7 +36,10 @@ export class DFlowDataTypeContainsTypeRule {
         if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
                 return (value as LiteralValue).value.every((value1: any) => {
-                    return useValidateValue(value1, service?.getDataType(genericType)!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                    if (genericType.genericType) {
+                        return useValidateValue({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                    }
+                    return useValidateValue({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, flow)
                 })
             })
 

@@ -23,6 +23,10 @@
     @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
   }
 
+  &--not-valid {
+    @include box.box(variables.$error, variables.$white, variables.$error);
+  }
+
   &__syntax {
     position: absolute;
     z-index: -1;

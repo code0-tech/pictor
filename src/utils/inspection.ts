@@ -1,4 +1,4 @@
-import {Translation} from "./translation";
+import {Maybe, Scalars, TranslationConnection} from "@code0-tech/sagittarius-graphql-types";
 
 export enum InspectionSeverity {
     TYPO,
@@ -9,6 +9,7 @@ export enum InspectionSeverity {
 }
 
 export interface ValidationResult {
+    parameterId: Maybe<Scalars["ParameterDefinitionID"]["output"]>
     type: InspectionSeverity
-    message: Translation[]
+    message: TranslationConnection
 }

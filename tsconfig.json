@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "skipLibCheck": true,
     "module": "esnext",
     "target": "es6",
     "lib": [

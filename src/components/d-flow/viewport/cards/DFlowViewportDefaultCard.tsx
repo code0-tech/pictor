@@ -55,10 +55,16 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const definition = functionService.getFunctionDefinition(data.instance.functionDefinition?.id!!)
-    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), useService(DFlowDataTypeReactiveService)!!, props.data.flowId)
+    //TODO: some problems with react memorization here, need to investigate and also with hook calling
+    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), dataTypeService!!, props.data.flowId)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0
+
+    data.instance.parameters?.forEach(parameter => {
+        const parameterDefinition = definition?.parameterDefinitions!!.find(p => p.id == parameter?.id)
+        parameter.validationResults = validation ? validation.filter(v => v.parameterId === parameterDefinition?.id) : []
+    })
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
     function isParamConnected(paramId: Maybe<Scalars["NodeParameterID"]["output"]>): boolean {
@@ -99,8 +105,8 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                     id: id,
                     active: true,
                     closeable: true,
-                    children: <Text size={"md"}>{data.instance.id}</Text>,
-                    content: <DFlowViewportDefaultTabContent depthLevel={data.depth} scopeLevel={data.scope}
+                    children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
+                    content: <DFlowViewportDefaultTabContent flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
                                                              nodeLevel={data.index} functionInstance={data.instance}/>
                 })
             }} style={{position: "relative"}}>
@@ -109,7 +115,7 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
                 <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <IconFileLambdaFilled size={16}/>
-                        <Text size={"md"}>{data.instance.id}</Text>
+                        <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>
                     </Flex>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <Menu onOpenChange={event => {
@@ -198,11 +204,11 @@ export const DFlowViewportDefaultCard: React.FC<DFlowViewportDefaultCardProps> =
 
                         const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
                         const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === DataTypeVariant.Node;
-                        const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], "some_database_id", data.depth, data.scope, data.index)
+                        const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], props.data.flowId, data.depth, data.scope, data.index)
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
-                                {param.id}
+                                {parameter?.names?.nodes!![0]?.content ?? param.id}
                                 {!param.value ? (
                                     <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
                                         param.value = suggestion.value

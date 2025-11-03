@@ -72,7 +72,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
     ): string => {
 
         /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
-        const fnId = `${fn.functionDefinition?.identifier}-${idCounter++}`;
+        const fnId = `${fn.id}-${idCounter++}`;
 
         if (idCounter == 1) {
             // erste Function-Card → Verbindung Trigger → Function
@@ -141,7 +141,7 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
                     target: groupId,     // GroupCard (Ziel – hat Top: target)
                     deletable: false,
                     selectable: false,
-                    label: param.id,
+                    label: def?.names?.nodes!![0]?.content ?? param.id,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                         isParameter: false,
@@ -227,8 +227,9 @@ export const useFlowViewportEdges = (flowId: string): Edge[] => {
         return fnId;
     };
 
-    /* ------------------------------------------------------------------ */
-    traverse(flow.getNodeById(flow.startingNodeId!!)!!, undefined, 0, functionCache, dataTypeCache);
+    if (flow.startingNodeId) {
+        traverse(flow.getNodeById(flow.startingNodeId)!!, undefined, 0, functionCache, dataTypeCache);
+    }
 
     return React.useMemo(() => edges, [flowStore, functionStore, dataTypeStore, edges]);
 };

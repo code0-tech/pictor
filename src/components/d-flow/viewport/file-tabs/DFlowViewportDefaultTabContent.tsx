@@ -11,13 +11,17 @@ import {DFlowReactiveService} from "../../DFlow.service";
 import {DFlowSuggestion} from "../../suggestions/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../../function/DFlowFunction.view";
 import Badge from "../../../badge/Badge";
-import {DFlowDataTypeReactiveService} from "../../data-type/DFlowDataType.service";
-import {useReturnType} from "../../function/DFlowFunction.return.hook";
-import {resolveGenericKeys} from "../../../../utils/generics";
-import {NodeFunction, NodeParameterValue, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {
+    LiteralValue,
+    NodeFunction,
+    NodeParameterValue,
+    ReferenceValue,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowViewportFileTabsContentProps {
     functionInstance: NodeFunctionView
+    flowId: Scalars["FlowID"]["output"]
     depthLevel?: number
     scopeLevel?: number[]
     nodeLevel?: number
@@ -25,9 +29,8 @@ export interface DFlowViewportFileTabsContentProps {
 
 export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsContentProps> = (props) => {
 
-    const {functionInstance, depthLevel, scopeLevel, nodeLevel} = props
+    const {functionInstance, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const definition = functionService.getFunctionDefinition(functionInstance.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
@@ -45,26 +48,34 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     sortedParameters.forEach(parameter => {
         const parameterDefinition = paramDefinitions[parameter.id!!]
-        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], "some_database_id", depthLevel, scopeLevel, nodeLevel)
+        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
     })
 
-    const returnType = useReturnType(definition!!, sortedParameters.map(p => p.value as NodeParameterValue), dataTypeService)
-    const genericTypeMap = resolveGenericKeys(definition!!, sortedParameters.map(p => p.value as NodeParameterValue), dataTypeService)
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
-            const submitValue = (value: NodeParameterValue) => {
+            const submitValue = (value: NodeParameterValue | undefined) => {
                 parameter.value = value
                 flowService.update()
             }
 
             const submitValueEvent = (event: any) => {
                 try {
-                    const value = JSON.parse(event.target.value)
-                    submitValue(value)
+                    const value = JSON.parse(event.target.value) as NodeParameterValue
+                    if (!value.__typename) {
+                        submitValue(value ? {
+                            __typename: "LiteralValue",
+                            value: value
+                        } : undefined)
+                        return
+                    }
+                    submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
                 } catch (e) {
                     // @ts-ignore
-                    submitValue(event.target.value == "" ? undefined : event.target.value)
+                    submitValue(event.target.value == "" || !event.target.value ? undefined : {
+                        __typename: "LiteralValue",
+                        value: event.target.value
+                    } as LiteralValue)
                 }
             }
 
@@ -72,11 +83,12 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue = parameter.value instanceof NodeFunctionView ? JSON.stringify(parameter.value) : typeof parameter.value == "object" || typeof parameter.value == "boolean" ? JSON.stringify(parameter.value) : parameter.value
-
+            const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({
+                ...parameter.value.json(),
+                __typename: "NodeFunction"
+            }) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
 
             return <div>
-                {JSON.stringify(dataTypeService.getTypeFromValue(parameter.value as NodeParameterValue))}
                 <TextInput title={title}
                            description={description}
                            clearable
@@ -84,11 +96,12 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                            transformValue={value => {
                                try {
                                    if (!value) return value
-                                   if ((value as NodeParameterValue).__typename === "NodeFunction") {
+                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "NodeFunction") {
+                                       const def = functionService.getFunctionDefinition((JSON.parse(value) as NodeFunction).functionDefinition?.id!!)
                                        return <Badge
-                                           color={"info"}>{(JSON.parse(value) as NodeFunction).id}</Badge>
+                                           color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
                                    }
-                                   if ((value as NodeParameterValue).__typename === "ReferenceValue") {
+                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "ReferenceValue") {
                                        const refObject = JSON.parse(value) as ReferenceValue
                                        return <Badge
                                            color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.dataTypeIdentifier)}</Badge>
@@ -109,6 +122,11 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)
                            }}
+                           formValidation={{
+                               setValue: () => {},
+                               valid: parameter.validationResults.length <= 0,
+                               notValidMessage: parameter.validationResults.map(value => value.message.nodes!![0]?.content).join(", ")
+                           }}
                            onBlur={submitValueEvent}
                            onClear={submitValueEvent}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
@@ -117,10 +135,6 @@ export const DFlowViewportDefaultTabContent: React.FC<DFlowViewportFileTabsConte
                 />
             </div>
         })}
-        {JSON.stringify(returnType)}
-        <br/>
-        <br/>
-        {JSON.stringify(genericTypeMap)}
     </Flex>
 
 }

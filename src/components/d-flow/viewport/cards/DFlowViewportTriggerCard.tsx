@@ -12,6 +12,7 @@ import {IconBolt, IconLayoutNavbarCollapseFilled} from "@tabler/icons-react";
 import Button from "../../../button/Button";
 import Badge from "../../../badge/Badge";
 import {DFlowViewportTriggerTabContent} from "../file-tabs/DFlowViewportTriggerTabContent";
+import {DFlowTypeReactiveService} from "../../type/DFlowType.service";
 
 export interface DFlowViewportTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: FlowView
@@ -25,6 +26,8 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)
     const flowInstance = useReactFlow()
+    const flowTypeService = useService(DFlowTypeReactiveService)
+    const definition = flowTypeService.getById(data.instance.type?.id!!)
     const width = props.width ?? 0
     const height = props.height ?? 0
     const viewportWidth = useStore(s => s.width)
@@ -45,7 +48,7 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
                          id: id,
                          active: true,
                          closeable: true,
-                         children: <Text size={"md"}>{data.instance.id}</Text>,
+                         children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
                          content: <DFlowViewportTriggerTabContent instance={data.instance}/>
                      })
                  }}>
@@ -65,8 +68,8 @@ export const DFlowViewportTriggerCard: React.FC<DFlowViewportTriggerCardProps> =
             color={"secondary"}
             style={{borderRadius: "calc(1rem - 0.35rem)"}}>
             <CardSection border maw={"300px"}>
-                <Text mb={0.35} display={"block"} size={"md"}>{data.instance.id}</Text>
-                <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy.</Text>
+                <Text mb={0.35} display={"block"} size={"md"}>{definition?.names?.nodes!![0]?.content ?? definition?.id}</Text>
+                <Text hierarchy={"tertiary"} size={"xs"}>{definition?.descriptions?.nodes!![0]?.content ?? definition?.id}</Text>
             </CardSection>
         </Card>
 

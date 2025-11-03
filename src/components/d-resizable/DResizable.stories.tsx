@@ -23,6 +23,15 @@ import {ContextStoreProvider} from "../../utils/contextStore";
 import {DFlowViewportTabs} from "../d-flow/viewport/file-tabs/DFlowViewportTabs";
 import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
 import {FlowTypeView} from "../d-flow/type/DFlowType.view";
+import DataTypesData from "./data_types.json";
+import FunctionsData from "./runtime_functions.json";
+import FlowTypeData from "./flow_types.json";
+import {useFlowViewportNodes} from "../d-flow/viewport/DFlowViewport.nodes.hook";
+import {useFlowViewportEdges} from "../d-flow/viewport/DFlowViewport.edges.hook";
+import {DFlow} from "../d-flow/DFlow";
+import {Background, BackgroundVariant} from "@xyflow/react";
+import {DFlowViewportControls} from "../d-flow/viewport/DFlowViewportControls";
+import {DFlowViewportValidations} from "../d-flow/viewport/DFlowViewportValidations";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -40,11 +49,28 @@ export default meta
 export const Dashboard = () => {
 
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
-    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService)
-    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService);
-    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService);
+    // @ts-ignore
+    const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, [...DataTypesData.map(data => new DataTypeView(data))]);
+    // @ts-ignore
+    const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, [...FunctionsData.map(data => new FunctionDefinitionView(data))]);
+    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView({
+        id: "gid://sagittarius/Flow/1",
+        type: {
+            id: "gid://sagittarius/TypesFlowType/842",
+        },
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        }
+    })]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
-    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService);
+    // @ts-ignore
+    const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
     return <DFullScreen p={1}>
         <Flex style={{gap: "1rem", width: "100%", height: "100%", position: "relative"}}>
@@ -134,6 +160,7 @@ export const Dashboard = () => {
                         <ContextStoreProvider
                             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
                             <DResizablePanel>
+                                <FlowExample/>
                             </DResizablePanel>
                             <DResizableHandle/>
                             <DResizablePanel>
@@ -147,4 +174,21 @@ export const Dashboard = () => {
         </Flex>
     </DFullScreen>
 
+}
+
+
+const FlowExample = () => {
+    const initialNodes = useFlowViewportNodes("gid://sagittarius/Flow/1")
+    const initialEdges = useFlowViewportEdges("gid://sagittarius/Flow/1")
+
+    return <DFlow
+        nodes={initialNodes}
+        edges={initialEdges}
+        fitView
+    >
+        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
+        <DFlowViewportControls/>
+        <DFlowViewportValidations flowId={"gid://sagittarius/Flow/1"}/>
+        {/*<DFlowViewportMiniMap/>*/}
+    </DFlow>
 }

@@ -1,0 +1,731 @@
+[
+  {
+    "id": "gid://sagittarius/TypesFlowType/842",
+    "identifier": "HTTP",
+    "inputType": {
+      "id": "gid://sagittarius/DataType/14",
+      "genericKeys": [],
+      "identifier": "HTTP_REQUEST",
+      "name": {
+        "count": 1,
+        "nodes": [
+          {
+            "code": "en-US",
+            "content": "HTTP Request"
+          }
+        ]
+      },
+      "rules": {
+        "count": 3,
+        "nodes": [
+          {
+            "variant": "CONTAINS_KEY",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/18",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/5",
+                  "genericKeys": [],
+                  "identifier": "OBJECT",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "Object"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 0,
+                    "nodes": []
+                  },
+                  "variant": "OBJECT"
+                }
+              },
+              "key": "body"
+            }
+          },
+          {
+            "variant": "CONTAINS_KEY",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/19",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/6",
+                  "genericKeys": [],
+                  "identifier": "HTTP_HEADER_MAP",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "HTTP Headers"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "variant": "PARENT_TYPE",
+                        "config": {
+                          "dataTypeIdentifier": {
+                            "id": "gid://sagittarius/DataTypeIdentifier/7",
+                            "genericType": {
+                              "id": "gid://sagittarius/GenericType/8",
+                              "dataType": {
+                                "id": "gid://sagittarius/DataType/9",
+                                "genericKeys": [
+                                  "T"
+                                ],
+                                "identifier": "ARRAY",
+                                "name": {
+                                  "count": 1,
+                                  "nodes": [
+                                    {
+                                      "code": "en-US",
+                                      "content": "Generic Array"
+                                    }
+                                  ]
+                                },
+                                "rules": {
+                                  "count": 1,
+                                  "nodes": [
+                                    {
+                                      "variant": "CONTAINS_TYPE",
+                                      "config": {
+                                        "dataTypeIdentifier": {
+                                          "id": "gid://sagittarius/DataTypeIdentifier/10",
+                                          "genericKey": "T"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "variant": "ARRAY"
+                              },
+                              "genericMappers": [
+                                {
+                                  "genericCombinationStrategies": [],
+                                  "sourceDataTypeIdentifiers": [
+                                    {
+                                      "id": "gid://sagittarius/DataTypeIdentifier/11",
+                                      "dataType": {
+                                        "id": "gid://sagittarius/DataType/0",
+                                        "genericKeys": [],
+                                        "identifier": "HTTP_HEADER_ENTRY",
+                                        "name": {
+                                          "count": 1,
+                                          "nodes": [
+                                            {
+                                              "code": "en-US",
+                                              "content": "HTTP Header Entry"
+                                            }
+                                          ]
+                                        },
+                                        "rules": {
+                                          "count": 3,
+                                          "nodes": [
+                                            {
+                                              "variant": "CONTAINS_KEY",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/1",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/2",
+                                                    "genericKeys": [],
+                                                    "identifier": "TEXT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Text"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "variant": "REGEX",
+                                                          "config": {
+                                                            "pattern": "[\\s\\S]*"
+                                                          }
+                                                        }
+                                                      ]
+                                                    },
+                                                    "variant": "PRIMITIVE"
+                                                  }
+                                                },
+                                                "key": "key"
+                                              }
+                                            },
+                                            {
+                                              "variant": "CONTAINS_KEY",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/3",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/2",
+                                                    "genericKeys": [],
+                                                    "identifier": "TEXT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Text"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "variant": "REGEX",
+                                                          "config": {
+                                                            "pattern": "[\\s\\S]*"
+                                                          }
+                                                        }
+                                                      ]
+                                                    },
+                                                    "variant": "PRIMITIVE"
+                                                  }
+                                                },
+                                                "key": "value"
+                                              }
+                                            },
+                                            {
+                                              "variant": "PARENT_TYPE",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/4",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/5",
+                                                    "genericKeys": [],
+                                                    "identifier": "OBJECT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 0,
+                                                      "nodes": []
+                                                    },
+                                                    "variant": "TYPE"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        "variant": "OBJECT"
+                                      }
+                                    }
+                                  ],
+                                  "target": "T",
+                                  "id": "gid://sagittarius/GenericMapper/12"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "variant": "ARRAY"
+                }
+              },
+              "key": "headers"
+            }
+          },
+          {
+            "variant": "PARENT_TYPE",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/20",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/5",
+                  "genericKeys": [],
+                  "identifier": "OBJECT",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "Object"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 0,
+                    "nodes": []
+                  },
+                  "variant": "TYPE"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "variant": "OBJECT"
+    },
+    "returnType": {
+      "id": "gid://sagittarius/DataType/21",
+      "genericKeys": [],
+      "identifier": "HTTP_RESPONSE",
+      "name": {
+        "count": 1,
+        "nodes": [
+          {
+            "code": "en-US",
+            "content": "HTTP Response"
+          }
+        ]
+      },
+      "rules": {
+        "count": 3,
+        "nodes": [
+          {
+            "variant": "CONTAINS_KEY",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/22",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/6",
+                  "genericKeys": [],
+                  "identifier": "HTTP_HEADER_MAP",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "HTTP Headers"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "variant": "PARENT_TYPE",
+                        "config": {
+                          "dataTypeIdentifier": {
+                            "id": "gid://sagittarius/DataTypeIdentifier/7",
+                            "genericType": {
+                              "id": "gid://sagittarius/GenericType/8",
+                              "dataType": {
+                                "id": "gid://sagittarius/DataType/9",
+                                "genericKeys": [
+                                  "T"
+                                ],
+                                "identifier": "ARRAY",
+                                "name": {
+                                  "count": 1,
+                                  "nodes": [
+                                    {
+                                      "code": "en-US",
+                                      "content": "Generic Array"
+                                    }
+                                  ]
+                                },
+                                "rules": {
+                                  "count": 1,
+                                  "nodes": [
+                                    {
+                                      "variant": "CONTAINS_TYPE",
+                                      "config": {
+                                        "dataTypeIdentifier": {
+                                          "id": "gid://sagittarius/DataTypeIdentifier/10",
+                                          "genericKey": "T"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                },
+                                "variant": "ARRAY"
+                              },
+                              "genericMappers": [
+                                {
+                                  "genericCombinationStrategies": [],
+                                  "sourceDataTypeIdentifiers": [
+                                    {
+                                      "id": "gid://sagittarius/DataTypeIdentifier/11",
+                                      "dataType": {
+                                        "id": "gid://sagittarius/DataType/0",
+                                        "genericKeys": [],
+                                        "identifier": "HTTP_HEADER_ENTRY",
+                                        "name": {
+                                          "count": 1,
+                                          "nodes": [
+                                            {
+                                              "code": "en-US",
+                                              "content": "HTTP Header Entry"
+                                            }
+                                          ]
+                                        },
+                                        "rules": {
+                                          "count": 3,
+                                          "nodes": [
+                                            {
+                                              "variant": "CONTAINS_KEY",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/1",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/2",
+                                                    "genericKeys": [],
+                                                    "identifier": "TEXT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Text"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "variant": "REGEX",
+                                                          "config": {
+                                                            "pattern": "[\\s\\S]*"
+                                                          }
+                                                        }
+                                                      ]
+                                                    },
+                                                    "variant": "PRIMITIVE"
+                                                  }
+                                                },
+                                                "key": "key"
+                                              }
+                                            },
+                                            {
+                                              "variant": "CONTAINS_KEY",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/3",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/2",
+                                                    "genericKeys": [],
+                                                    "identifier": "TEXT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Text"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "variant": "REGEX",
+                                                          "config": {
+                                                            "pattern": "[\\s\\S]*"
+                                                          }
+                                                        }
+                                                      ]
+                                                    },
+                                                    "variant": "PRIMITIVE"
+                                                  }
+                                                },
+                                                "key": "value"
+                                              }
+                                            },
+                                            {
+                                              "variant": "PARENT_TYPE",
+                                              "config": {
+                                                "dataTypeIdentifier": {
+                                                  "id": "gid://sagittarius/DataTypeIdentifier/4",
+                                                  "dataType": {
+                                                    "id": "gid://sagittarius/DataType/5",
+                                                    "genericKeys": [],
+                                                    "identifier": "OBJECT",
+                                                    "name": {
+                                                      "count": 1,
+                                                      "nodes": [
+                                                        {
+                                                          "code": "en-US",
+                                                          "content": "Object"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "rules": {
+                                                      "count": 0,
+                                                      "nodes": []
+                                                    },
+                                                    "variant": "TYPE"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        "variant": "OBJECT"
+                                      }
+                                    }
+                                  ],
+                                  "target": "T",
+                                  "id": "gid://sagittarius/GenericMapper/12"
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "variant": "ARRAY"
+                }
+              },
+              "key": "headers"
+            }
+          },
+          {
+            "variant": "CONTAINS_KEY",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/23",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/5",
+                  "genericKeys": [],
+                  "identifier": "OBJECT",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "Object"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 0,
+                    "nodes": []
+                  },
+                  "variant": "TYPE"
+                }
+              },
+              "key": "body"
+            }
+          },
+          {
+            "variant": "PARENT_TYPE",
+            "config": {
+              "dataTypeIdentifier": {
+                "id": "gid://sagittarius/DataTypeIdentifier/24",
+                "dataType": {
+                  "id": "gid://sagittarius/DataType/5",
+                  "genericKeys": [],
+                  "identifier": "OBJECT",
+                  "name": {
+                    "count": 1,
+                    "nodes": [
+                      {
+                        "code": "en-US",
+                        "content": "Object"
+                      }
+                    ]
+                  },
+                  "rules": {
+                    "count": 0,
+                    "nodes": []
+                  },
+                  "variant": "TYPE"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "variant": "OBJECT"
+    },
+    "flowTypeSettings": [
+      {
+        "id": "gid://sagittarius/FlowTypeSetting/843",
+        "names": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "URL"
+            }
+          ]
+        },
+        "descriptions": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "Specifies the HTTP URL endpoint."
+            }
+          ]
+        },
+        "dataType": {
+          "id": "gid://sagittarius/DataType/17",
+          "genericKeys": [],
+          "identifier": "HTTP_URL",
+          "name": {
+            "count": 1,
+            "nodes": [
+              {
+                "code": "en-US",
+                "content": "HTTP Route"
+              }
+            ]
+          },
+          "rules": {
+            "count": 1,
+            "nodes": [
+              {
+                "variant": "REGEX",
+                "config": {
+                  "pattern": "/^/\\w+(?:[.:~-]\\w+)*(?:/\\w+(?:[.:~-]\\w+)*)*$/"
+                }
+              }
+            ]
+          },
+          "variant": "TYPE"
+        },
+        "identifier": "HTTP_URL",
+        "unique": false
+      },
+      {
+        "id": "gid://sagittarius/FlowTypeSetting/844",
+        "names": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "Method"
+            }
+          ]
+        },
+        "descriptions": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "Specifies the HTTP request method (e.g., GET, POST, PUT, DELETE)."
+            }
+          ]
+        },
+        "dataType": {
+          "id": "gid://sagittarius/DataType/13",
+          "genericKeys": [],
+          "identifier": "HTTP_METHOD",
+          "name": {
+            "count": 1,
+            "nodes": [
+              {
+                "code": "en-US",
+                "content": "HTTP Method"
+              }
+            ]
+          },
+          "rules": {
+            "count": 1,
+            "nodes": [
+              {
+                "variant": "ITEM_OF_COLLECTION",
+                "config": {
+                  "items": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "DELETE",
+                    "PATCH",
+                    "HEAD"
+                  ]
+                }
+              }
+            ]
+          },
+          "variant": "TYPE"
+        },
+        "identifier": "HTTP_METHOD",
+        "unique": false
+      },
+      {
+        "id": "gid://sagittarius/FlowTypeSetting/845",
+        "names": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "Host"
+            }
+          ]
+        },
+        "descriptions": {
+          "count": 1,
+          "nodes": [
+            {
+              "code": "en-US",
+              "content": "Specifies the target host name or IP address."
+            }
+          ]
+        },
+        "dataType": {
+          "id": "gid://sagittarius/DataType/2",
+          "genericKeys": [],
+          "identifier": "TEXT",
+          "name": {
+            "count": 1,
+            "nodes": [
+              {
+                "code": "en-US",
+                "content": "Text"
+              }
+            ]
+          },
+          "rules": {
+            "count": 1,
+            "nodes": [
+              {
+                "variant": "REGEX",
+                "config": {
+                  "pattern": "[\\s\\S]*"
+                }
+              }
+            ]
+          },
+          "variant": "PRIMITIVE"
+        },
+        "identifier": "HTTP_HOST",
+        "unique": false
+      }
+    ],
+    "names": {
+      "count": 1,
+      "nodes": [
+        {
+          "code": "en-US",
+          "content": "Rest Endpoint"
+        }
+      ]
+    },
+    "descriptions": {
+      "count": 1,
+      "nodes": [
+        {
+          "code": "en-US",
+          "content": "A REST API is a web service that lets clients interact with data on a server using standard HTTP methods like GET, POST, PUT, and DELETE usually returning results in JSON format."
+        }
+      ]
+    },
+    "editable": false
+  }
+]

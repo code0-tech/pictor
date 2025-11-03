@@ -15,6 +15,7 @@ import {
     RuntimeParameterDefinition,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {ValidationResult} from "../../utils/inspection";
 
 export class FlowView {
 
@@ -23,7 +24,7 @@ export class FlowView {
     /** Global ID of this Flow */
     private readonly _id?: Maybe<Scalars['FlowID']['output']>;
     /** The input data type of the flow */
-    private readonly _inputType?: Maybe<DataType>;
+    private _inputType?: Maybe<DataType>;
     /** Nodes of the flow */
     private _nodes?: NodeFunctionView[];
     /** The return data type of the flow */
@@ -31,7 +32,7 @@ export class FlowView {
     /** The settings of the flow */
     private readonly _settings?: FlowSettingView[];
     /** The ID of the starting node of the flow */
-    private readonly _startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
+    private _startingNodeId?: Maybe<Scalars['NodeFunctionID']['output']>;
     /** The flow type of the flow */
     private readonly _type?: Maybe<FlowType>;
     /** Time when this Flow was last updated */
@@ -85,6 +86,14 @@ export class FlowView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    set inputType(value: Maybe<DataType>) {
+        this._inputType = value;
+    }
+
+    set startingNodeId(value: Maybe<Scalars["NodeFunctionID"]["output"]>) {
+        this._startingNodeId = value;
     }
 
     addNode(node: NodeFunctionView): void {
@@ -151,7 +160,6 @@ export class NodeFunctionView {
         this._parameters = nodeFunction.parameters ? nodeFunction.parameters.nodes?.map(param => new NodeParameterView(param!!)) : undefined
     }
 
-
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
     }
@@ -185,7 +193,17 @@ export class NodeFunctionView {
     }
 
     json(): NodeFunction | undefined {
-        return undefined
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            nextNodeId: this._nextNodeId,
+            parameters: this._parameters ? {
+                nodes: this._parameters.map(param => param.json()!!)
+            } : undefined,
+            functionDefinition: this._functionDefinition,
+            updatedAt: this._updatedAt,
+            __typename: "NodeFunction",
+        }
     }
 }
 
@@ -202,6 +220,8 @@ export class NodeParameterView {
     /** The value of the parameter */
     private _value?: LiteralValue | ReferenceValue | NodeFunctionView;
 
+    private _validationResults: ValidationResult[]
+
     constructor(nodeParameter: NodeParameter) {
         this._createdAt = nodeParameter.createdAt
         this._id = nodeParameter.id
@@ -212,6 +232,7 @@ export class NodeParameterView {
         } else {
             this._value = nodeParameter.value as LiteralValue | ReferenceValue;
         }
+        this._validationResults = []
 
     }
 
@@ -235,8 +256,16 @@ export class NodeParameterView {
         return this._value;
     }
 
-    set value(value: NodeParameterValue) {
-        if (value.__typename === "NodeFunction") {
+    get validationResults(): ValidationResult[] {
+        return this._validationResults;
+    }
+
+    set validationResults(value: ValidationResult[]) {
+        this._validationResults = value;
+    }
+
+    set value(value: NodeParameterValue | undefined) {
+        if (value?.__typename === "NodeFunction") {
             this._value = new NodeFunctionView(value as NodeFunction);
         } else {
             this._value = value as LiteralValue | ReferenceValue;
@@ -244,7 +273,13 @@ export class NodeParameterView {
     }
 
     json(): NodeParameter | undefined {
-        return undefined
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            runtimeParameter: this._runtimeParameter,
+            updatedAt: this._updatedAt,
+            value: this._value instanceof NodeFunctionView ? this._value.json() : this._value,
+        }
     }
 }
 
@@ -272,7 +307,7 @@ export class FlowSettingView {
         return this._createdAt;
     }
 
-    get flowSettingId(): Maybe<Scalars["String"]["output"]> | undefined {
+    get flowSettingIdentifier(): Maybe<Scalars["String"]["output"]> | undefined {
         return this._flowSettingIdentifier;
     }
 

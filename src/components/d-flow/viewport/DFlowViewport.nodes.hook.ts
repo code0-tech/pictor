@@ -143,6 +143,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         }
     })
 
+
     const traverse = (
         fn: NodeFunctionView,
         isParameter = false,
@@ -153,7 +154,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         fnCache = functionCache,
         dtCache = dataTypeCache,
     ) => {
-        const id = `${fn.functionDefinition?.identifier}-${idCounter++}`;
+        const id = `${fn.id}-${idCounter++}`;
         const index = ++globalNodeIndex; // global node level
 
         nodes.push({
@@ -192,7 +193,7 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
         const definition = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache);
 
         fn.parameters?.forEach((param) => {
-            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.id)?.dataTypeIdentifier;
+            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.runtimeParameter?.id)?.dataTypeIdentifier;
             const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
             if (paramDataType?.variant === DataTypeVariant.Node) {
@@ -234,6 +235,20 @@ export const useFlowViewportNodes = (flowId: string): Node[] => {
     };
 
     // Root lane: depth 0, scope path [0]
-    traverse(flow.getNodeById(flow.startingNodeId!!)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+    if (flow.startingNodeId) {
+        traverse(flow.getNodeById(flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+    } else {
+        nodes.push({
+            id: `${flow.id}-suggestion`,
+            type: "suggestion",
+            position: { x: 0, y: 0 },
+            draggable: false,
+            extent: undefined,
+            data: {
+                flowId: flowId,
+                parentFunction: undefined,
+            },
+        });
+    }
     return nodes;
 };

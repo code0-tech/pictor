@@ -58,6 +58,22 @@ export const Dashboard = () => {
         type: {
             id: "gid://sagittarius/TypesFlowType/842",
         },
+        name: "test/test2/Flow Example",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        }
+    }), new FlowView({
+        id: "gid://sagittarius/Flow/1",
+        type: {
+            id: "gid://sagittarius/TypesFlowType/842",
+        },
+        name: "test1/test2/Flow",
         settings: {
             nodes: [{
                 flowSettingIdentifier: "HTTP_URL",

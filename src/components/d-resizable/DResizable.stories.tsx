@@ -28,8 +28,8 @@ import {useFlowNodes} from "../d-flow/DFlow.nodes.hook";
 import {useFlowEdges} from "../d-flow/DFlow.edges.hook";
 import {DFlow} from "../d-flow/DFlow";
 import {Background, BackgroundVariant} from "@xyflow/react";
-import {DFlowControls} from "../d-flow/DFlowControls";
-import {DFlowValidation} from "../d-flow/DFlowValidation";
+import {DFlowControl} from "../d-flow/control/DFlowControl";
+import {DFlowValidation} from "../d-flow/validation/DFlowValidation";
 import {DLayout} from "../d-layout/DLayout";
 import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
 import {
@@ -177,7 +177,7 @@ const FlowExample = () => {
         fitView
     >
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-        <DFlowControls/>
+        <DFlowControl/>
         <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
         {/*<DFlowViewportMiniMap/>*/}
     </DFlow>

@@ -1,6 +1,6 @@
 import React from "react";
 import {MiniMap, useNodes} from "@xyflow/react";
-import {FLOW_EDGE_RAINBOW} from "./DFlow.edges.hook";
+import {FLOW_EDGE_RAINBOW} from "../DFlow.edges.hook";
 import "./DFlowMiniMap.style.scss"
 
 export const DFlowMiniMap: React.FC = (props) => {

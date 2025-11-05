@@ -24,7 +24,7 @@ import {
     UsersMfaTotpValidateSecretInput,
     UsersMfaTotpValidateSecretPayload,
     UsersPasswordResetInput,
-    UsersPasswordResetPayload,
+    UsersPasswordResetPayload, UsersPasswordResetRequestInput,
     UsersPasswordResetRequestPayload,
     UsersRegisterInput,
     UsersRegisterPayload,
@@ -71,7 +71,7 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
 
     abstract usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined>;
 
-    abstract usersPasswordResetRequest(payload: UsersMfaTotpValidateSecretInput): Promise<UsersPasswordResetRequestPayload | undefined>;
+    abstract usersPasswordResetRequest(payload: UsersPasswordResetRequestInput): Promise<UsersPasswordResetRequestPayload | undefined>;
 
     abstract usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>;
 }

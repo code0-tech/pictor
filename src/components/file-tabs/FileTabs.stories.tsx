@@ -22,8 +22,8 @@ export const ExampleFileTabs = () => {
 
     React.useEffect(() => {
         const parent = document.querySelector("[data-id=" + '"' + id + '"' + "]") as HTMLDivElement
-        const tabList = parent.querySelector(".file-tabs__list-content") as HTMLDivElement
-        const trigger = tabList.querySelector("[data-value=" + '"' + service.getActiveTab()?.id + '"' + "]") as HTMLDivElement
+        const tabList = parent?.querySelector(".file-tabs__list-content") as HTMLDivElement
+        const trigger = tabList?.querySelector("[data-value=" + '"' + service.getActiveTab()?.id + '"' + "]") as HTMLDivElement
 
 
         if (tabList && trigger) {

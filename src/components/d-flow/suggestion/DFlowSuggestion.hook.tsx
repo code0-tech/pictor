@@ -15,7 +15,7 @@ import {
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig,
     DataTypeRulesVariant,
-    DataTypeVariant,
+    DataTypeVariant, Flow,
     Maybe,
     NodeParameter,
     NodeParameterValue,
@@ -28,7 +28,7 @@ import {
 export const useSuggestions = (
     type: DataTypeIdentifier | undefined,
     genericKeys: string[] | undefined,
-    flowId: string,
+    flowId: Flow['id'],
     depth: number = 0,
     scope: number[] = [0],
     node: number = 1,
@@ -60,7 +60,7 @@ export const useSuggestions = (
                             __typename: "LiteralValue",
                             value: value
                         }, DFlowSuggestionType.VALUE, [value.toString()])
-                        suggestionService.addSuggestion(suggestion)
+                        suggestionService.add(suggestion)
                         state.push(suggestion)
                     })
                 } else if (rule?.variant === DataTypeRulesVariant.NumberRange) {
@@ -69,7 +69,7 @@ export const useSuggestions = (
                         __typename: "LiteralValue",
                         value: config.from
                     }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
-                    suggestionService.addSuggestion(suggestion)
+                    suggestionService.add(suggestion)
                     state.push(suggestion)
                 }
             })
@@ -81,7 +81,7 @@ export const useSuggestions = (
                 //TODO: need to wait for sagittarius update to support DataTypes as values
                 // @ts-ignore
                 const suggestion = new DFlowSuggestion(hashedType, [], dataType.json, DFlowSuggestionType.DATA_TYPE, [dataType.name?.nodes!![0]?.content])
-                suggestionService.addSuggestion(suggestion)
+                suggestionService.add(suggestion)
                 state.push(suggestion)
             })
         }
@@ -206,7 +206,7 @@ export const useTypeHash = (type: DataTypeIdentifier, generic_keys?: string[]): 
  *  - The `node` id is incremented globally for every visited node and shared by all
  *    RefObjects (inputs from rules and the return value) produced by that node.
  */
-export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
+export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);

@@ -32,6 +32,10 @@ import {DFlowControls} from "../d-flow/DFlowControls";
 import {DFlowValidation} from "../d-flow/DFlowValidation";
 import {DLayout} from "../d-layout/DLayout";
 import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
+import {
+    NamespacesProjectsFlowsCreateInput,
+    NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput, NamespacesProjectsFlowsDeletePayload
+} from "@code0-tech/sagittarius-graphql-types";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -46,6 +50,18 @@ const meta: Meta = {
 
 export default meta
 
+class DFlowReactiveServiceExtend extends DFlowReactiveService {
+    flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+}
+
+class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionService {}
+
 export const Dashboard = () => {
 
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
@@ -53,7 +69,7 @@ export const Dashboard = () => {
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, [...DataTypesData.map(data => new DataTypeView(data))]);
     // @ts-ignore
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, [...FunctionsData.map(data => new FunctionDefinitionView(data))]);
-    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveService, [new FlowView({
+    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveServiceExtend, [new FlowView({
         id: "gid://sagittarius/Flow/1",
         type: {
             id: "gid://sagittarius/TypesFlowType/842",
@@ -69,7 +85,7 @@ export const Dashboard = () => {
             }]
         }
     })]);
-    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionService);
+    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionServiceExtend);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 

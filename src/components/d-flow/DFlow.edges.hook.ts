@@ -5,7 +5,7 @@ import {NodeFunctionView} from "./DFlow.view";
 import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import React from "react";
-import {DataTypeIdentifier, DataTypeVariant, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -19,7 +19,7 @@ export const FLOW_EDGE_RAINBOW: string[] = [
     '#fff170', // 7 – Gelb
 ];
 
-export const useFlowEdges = (flowId: string): Edge[] => {
+export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);

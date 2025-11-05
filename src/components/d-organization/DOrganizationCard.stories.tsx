@@ -6,8 +6,8 @@ import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
-    NamespacesLicensesCreateInput,
-    NamespacesLicensesDeleteInput,
+    NamespacesLicensesCreateInput, NamespacesLicensesCreatePayload,
+    NamespacesLicensesDeleteInput, NamespacesLicensesDeletePayload,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsCreateInput,
     NamespacesProjectsDeleteInput,
@@ -61,13 +61,13 @@ class DNamespaceReactiveServiceExtended extends DNamespaceReactiveService {
 }
 
 class DNamespaceLicenseReactiveServiceExtended extends DNamespaceLicenseReactiveService {
-    licenseCreate(payload: NamespacesLicensesCreateInput): DNamespaceLicenseView | undefined {
-        return undefined
+    licenseCreate(payload: NamespacesLicensesCreateInput): Promise<NamespacesLicensesCreatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
-    licenseDelete(payload: NamespacesLicensesDeleteInput): void {
+    licenseDelete(payload: NamespacesLicensesDeleteInput): Promise<NamespacesLicensesDeletePayload | undefined> {
+        return Promise.resolve(undefined);
     }
-
 }
 
 export const DOrganizationCardExample: DOrganizationCardStory = {

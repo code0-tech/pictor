@@ -1,5 +1,5 @@
 import {FunctionDefinitionView} from "../components/d-flow/function/DFlowFunction.view";
-import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService} from "../components/d-flow/data-type/DFlowDataType.service";
 import {
     DataType,
     DataTypeIdentifier,
@@ -374,7 +374,7 @@ export const replaceGenericKeysInDataTypeObject = (
 export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
-    dataTypeService: DFlowDataTypeService,
+    dataTypeService: DFlowDataTypeReactiveService,
     flow?: FlowView
 ): GenericMap => {
     const genericMap: GenericMap = new Map();

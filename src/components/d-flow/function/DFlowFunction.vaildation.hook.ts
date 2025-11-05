@@ -1,6 +1,6 @@
 import {FunctionDefinitionView} from "./DFlowFunction.view";
 import {DataTypeView} from "../data-type/DFlowDataType.view";
-import {DFlowDataTypeService} from "../data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
 import {
     replaceGenericKeysInDataTypeObject,
@@ -24,7 +24,7 @@ import {DFlowReactiveService} from "../DFlow.service";
 export const useFunctionValidation = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
-    dataTypeService: DFlowDataTypeService,
+    dataTypeService: DFlowDataTypeReactiveService,
     flowId: Scalars['FlowID']['output']
 ): ValidationResult[] | null => {
     const functionService = useService(DFlowFunctionReactiveService)

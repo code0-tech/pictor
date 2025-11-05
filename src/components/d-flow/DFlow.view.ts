@@ -37,7 +37,7 @@ export class FlowView {
     private readonly _type?: Maybe<FlowType>;
     /** Time when this Flow was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
-
+    /** Name of the flow */
     private _name?: Maybe<Scalars['String']['output']>;
 
     constructor(flow: Flow) {

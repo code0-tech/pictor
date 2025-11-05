@@ -40,7 +40,7 @@ export const useFunctionValidation = (
         if (!value) return;
         const parameterType = parameter.dataTypeIdentifier
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
-        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != DataTypeVariant.Node ? useReturnType(functionService.getFunctionDefinition((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
+        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != DataTypeVariant.Node ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
         const valueDataType = dataTypeService.getDataType(valueType!!)
 
         // Check if the parameter is generic (by key or by structure)

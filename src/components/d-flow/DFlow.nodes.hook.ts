@@ -101,7 +101,7 @@ export const useFlowNodes = (flowId: string): Node[] => {
     const nodes: Node[] = [];
     let idCounter = 0;
 
-    const functionCache = new Map<string, ReturnType<typeof functionService.getFunctionDefinition>>();
+    const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
     const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
     const getFunctionDefinitionCached = (
@@ -109,7 +109,7 @@ export const useFlowNodes = (flowId: string): Node[] => {
         cache = functionCache,
     ) => {
         if (!cache.has(id)) {
-            cache.set(id, functionService.getFunctionDefinition(id));
+            cache.set(id, functionService.getById(id));
         }
         return cache.get(id);
     };

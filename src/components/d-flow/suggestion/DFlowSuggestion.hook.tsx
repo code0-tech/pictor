@@ -240,7 +240,7 @@ export const useRefObjects = (flowId: string): Array<ReferenceValue> => {
         let current: NodeFunctionView | undefined = fn;
 
         while (current) {
-            const def = functionService.getFunctionDefinition(current.functionDefinition?.id!!);
+            const def = functionService.getById(current.functionDefinition?.id!!);
             if (!def) break;
 
             // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).

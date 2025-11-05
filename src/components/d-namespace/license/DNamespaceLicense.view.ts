@@ -53,4 +53,16 @@ export class DNamespaceLicenseView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): NamespaceLicense {
+        return {
+            createdAt: this._createdAt,
+            endDate: this._endDate,
+            id: this._id,
+            licensee: this._licensee,
+            namespace: this._namespace,
+            startDate: this._startDate,
+            updatedAt: this._updatedAt
+        };
+    }
 }

@@ -61,4 +61,16 @@ export class DNamespaceMemberView {
     get user(): Maybe<User> | undefined {
         return this._user;
     }
+
+    json(): NamespaceMember {
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            memberRoles: this._memberRoles,
+            namespace: this._namespace,
+            roles: this._roles,
+            updatedAt: this._updatedAt,
+            user: this._user
+        };
+    }
 }

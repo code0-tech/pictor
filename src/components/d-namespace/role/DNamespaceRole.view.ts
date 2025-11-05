@@ -60,4 +60,16 @@ export class DNamespaceRoleView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): NamespaceRole {
+        return {
+            abilities: this._abilities,
+            assignedProjects: this._assignedProjects,
+            createdAt: this._createdAt,
+            id: this._id,
+            name: this._name,
+            namespace: this._namespace,
+            updatedAt: this._updatedAt
+        };
+    }
 }

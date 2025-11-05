@@ -83,4 +83,19 @@ export class DNamespaceProjectView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): NamespaceProject {
+        return {
+            createdAt: this._createdAt,
+            description: this._description,
+            flow: this._flow,
+            flows: this._flows,
+            id: this._id,
+            name: this._name,
+            namespace: this._namespace,
+            primaryRuntime: this._primaryRuntime,
+            runtimes: this._runtimes,
+            updatedAt: this._updatedAt
+        };
+    }
 }

@@ -3,7 +3,11 @@ import DNamespaceProjectMenu from "./DNamespaceProjectMenu"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
 import {
     NamespacesProjectsAssignRuntimesInput,
-    NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput
+    NamespacesProjectsAssignRuntimesPayload,
+    NamespacesProjectsCreateInput,
+    NamespacesProjectsCreatePayload,
+    NamespacesProjectsDeleteInput,
+    NamespacesProjectsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types"
 import {DNamespaceProjectView} from "./DNamespaceProject.view"
 import {ContextStoreProvider} from "../../../utils/contextStore"
@@ -20,16 +24,17 @@ export default meta
 type DNamespaceProjectMenuStory = StoryObj<typeof DNamespaceProjectMenu>;
 
 export class DNamespaceProjectReactiveServiceExtended extends DNamespaceProjectReactiveService {
-    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined {
-        throw new Error("Method not implemented.");
-    }
-    projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined {
-        throw new Error("Method not implemented.");
-    }
-    projectsDelete(payload: NamespacesProjectsDeleteInput): void {
-        throw new Error("Method not implemented.");
+    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
+    projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
 }
 
 export const DProjectMenuExample: DNamespaceProjectMenuStory = {

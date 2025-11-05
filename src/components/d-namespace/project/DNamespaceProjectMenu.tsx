@@ -16,7 +16,7 @@ export interface DNamespaceProjectMenuProps extends MenuProps {
 const DNamespaceProjectMenu: React.FC<DNamespaceProjectMenuProps> = props => {
     const projectService = useService(DNamespaceProjectReactiveService)
     const projectStore = useService(DNamespaceProjectReactiveService)
-    const currentProject = projectService.findById(props.projectId)
+    const currentProject = projectService.getById(props.projectId)
 
     return React.useMemo(() => {
         return (

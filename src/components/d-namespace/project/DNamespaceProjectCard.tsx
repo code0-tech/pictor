@@ -30,7 +30,7 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
     const runtimeStore = useStore(DRuntimeReactiveService)
     const runtimeService = useService(DRuntimeReactiveService)
 
-    const project = projectService.findById(props.projectId)
+    const project = projectService.getById(props.projectId)
     if (!project?.namespace?.id || !project?.primaryRuntime?.id) return
 
     const namespace = namespaceService.getById(project?.namespace?.id)

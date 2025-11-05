@@ -24,6 +24,5 @@ export abstract class DRuntimeReactiveService extends ReactiveArrayService<DRunt
 
     abstract runtimeRotateToken(payload: RuntimesRotateTokenInput): Promise<RuntimesRotateTokenPayload | undefined>
 
-    abstract runtimeUpdate(payload: RuntimesUpdateInput): Promise<RuntimesUpdatePayload | undefined>
 
 }

@@ -6,7 +6,7 @@ import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Card} from "../../index"
 import Text from "../text/Text"
 import {useService, useStore} from "../../utils/contextStore"
-import {DOrganizationReactiveService} from "./DOrganizationService"
+import {DOrganizationReactiveService} from "./DOrganization.service"
 import {IconFolder, IconLogout, IconServer, IconSettings, IconUser} from "@tabler/icons-react"
 import Badge from "../badge/Badge"
 import Flex from "../flex/Flex";

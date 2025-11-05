@@ -1,5 +1,5 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
-import {DOrganizationView} from "./DOrganizationView";
+import {DOrganizationView} from "./DOrganization.view";
 import {
     OrganizationsCreateInput,
     OrganizationsDeleteInput,

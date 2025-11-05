@@ -2,13 +2,13 @@ import {Meta, StoryObj} from "@storybook/react";
 import {ContextStoreProvider} from "../../utils/contextStore"
 import React from "react"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
-import {DOrganizationReactiveService} from "./DOrganizationService"
+import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
     OrganizationsCreateInput,
     OrganizationsDeleteInput,
     OrganizationsUpdateInput
 } from "@code0-tech/sagittarius-graphql-types"
-import {DOrganizationView} from "./DOrganizationView"
+import {DOrganizationView} from "./DOrganization.view"
 import DOrganizationMenu from "./DOrganizationMenu"
 
 const meta: Meta = {

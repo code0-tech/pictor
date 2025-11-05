@@ -3,8 +3,8 @@ import React from "react"
 import DOrganizationCard from "./DOrganizationCard"
 import {ContextStoreProvider} from "../../utils/contextStore"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
-import {DOrganizationView} from "./DOrganizationView"
-import {DOrganizationReactiveService} from "./DOrganizationService"
+import {DOrganizationView} from "./DOrganization.view"
+import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
     NamespacesLicensesCreateInput, NamespacesLicensesDeleteInput,
     NamespacesProjectsAssignRuntimesInput, NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput,

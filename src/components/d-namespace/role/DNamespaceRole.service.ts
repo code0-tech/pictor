@@ -27,5 +27,4 @@ export abstract class DNamespaceRoleReactiveService extends ReactiveArrayService
 
     abstract roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined>
 
-    abstract roleUpdate(payload: NamespacesRolesUpdateInput): Promise<NamespacesRolesUpdatePayload | undefined>
 }

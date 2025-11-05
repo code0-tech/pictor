@@ -9,6 +9,9 @@ import {
 
 export abstract class DOrganizationService extends ReactiveArrayService<DOrganizationView> {
 
+    //TODO: inject UI error handler for toasts
+    //no id's need to be injected here because the root query has a organizations field
+
     constructor(payload: ReactiveArrayStore<DOrganizationView>) {
         super(payload);
     }

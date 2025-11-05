@@ -7,6 +7,9 @@ export interface DFlowService {
 
 export class DFlowReactiveService extends ReactiveArrayService<FlowView> implements DFlowService {
 
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId and projectId because the runtimes query needs it
+
     constructor(store: ReactiveArrayStore<FlowView>) {
         super(store);
     }

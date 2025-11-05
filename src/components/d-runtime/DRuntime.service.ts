@@ -9,6 +9,10 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 
 export abstract class DRuntimeService extends ReactiveArrayService<DRuntimeView> {
+
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId because the runtimes query needs it
+
     constructor(payload: ReactiveArrayStore<DRuntimeView>) {
         super(payload);
     }

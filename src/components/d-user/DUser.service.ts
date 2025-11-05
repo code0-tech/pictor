@@ -15,7 +15,8 @@ import {DUserView} from "./DUser.view";
 
 export abstract class DUserReactiveService extends ReactiveArrayService<DUserView> {
 
-    //id's for queries and mutations and an error handler will be injected
+    //TODO: inject UI error handler for toasts
+    //no id's need to be injected here because the root query has a users field
 
     abstract userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>
 

@@ -9,6 +9,9 @@ import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveA
 
 export abstract class DNamespaceProjectService extends ReactiveArrayService<DNamespaceProjectView> {
 
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId because the runtimes query needs it
+
     constructor(payload: ReactiveArrayStore<DNamespaceProjectView>) {
         super(payload);
     }

@@ -11,6 +11,9 @@ import {
 
 export abstract class DNamespaceRoleService extends ReactiveArrayService<DNamespaceRoleView> {
 
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId because the runtimes query needs it
+
     constructor(payload: ReactiveArrayStore<DNamespaceRoleView>) {
         super(payload);
 

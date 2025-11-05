@@ -102,6 +102,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
 
     React.useImperativeHandle(ref, () => ({
         focusFirstItem: () => itemRefs.current[0]?.focus(),
+        // @ts-ignore
         focusLastItem: () => itemRefs.current.at(-1)?.focus(),
     }), [])
 

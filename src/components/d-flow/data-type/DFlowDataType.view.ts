@@ -78,7 +78,7 @@ export class DataTypeView {
         return this._variant;
     }
 
-    get json(): DataType | undefined {
+    get json(): DataType {
         return {
             id: this._id,
             createdAt: this._createdAt,

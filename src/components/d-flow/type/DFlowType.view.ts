@@ -86,7 +86,18 @@ export class FlowTypeView {
         return this._updatedAt;
     }
 
-    json(): FlowType | undefined {
-        return undefined
+    json(): FlowType {
+        return {
+            createdAt: this._createdAt,
+            descriptions: this._descriptions,
+            editable: this._editable,
+            flowTypeSettings: this._flowTypeSettings,
+            id: this._id,
+            identifier: this._identifier,
+            inputType: this._inputType,
+            names: this._names,
+            returnType: this._returnType,
+            updatedAt: this._updatedAt
+        }
     }
 }

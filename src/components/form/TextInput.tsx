@@ -10,7 +10,7 @@ export interface TextInputProps extends Omit<InputProps<string | null>, "wrapper
     onClear?: (event: Event) => void
 }
 
-const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -37,5 +37,3 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
     />
 
 })
-
-export default TextInput

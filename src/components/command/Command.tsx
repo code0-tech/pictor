@@ -4,7 +4,7 @@ import {mergeCode0Props} from "../../utils/utils"
 import {Code0ComponentProps} from "../../utils/types"
 import {Dialog, DialogContent} from "../dialog/Dialog"
 import "./Command.style.scss"
-import Badge from "../badge/Badge"
+import {Badge} from "../badge/Badge"
 import TextInput, {TextInputProps} from "../form/TextInput"
 
 export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>

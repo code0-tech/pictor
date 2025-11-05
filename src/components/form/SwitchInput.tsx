@@ -6,7 +6,7 @@ interface SwitchInputProps extends Omit<InputProps<boolean | null>, "wrapperComp
 
 }
 
-const SwitchInput: React.ForwardRefExoticComponent<SwitchInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const SwitchInput: React.ForwardRefExoticComponent<SwitchInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -31,5 +31,3 @@ const SwitchInput: React.ForwardRefExoticComponent<SwitchInputProps> = React.for
     />
 
 })
-
-export default SwitchInput

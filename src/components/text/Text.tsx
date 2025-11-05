@@ -10,11 +10,9 @@ export interface FontType extends Omit<Omit<Code0Component<HTMLSpanElement>, "ch
     hierarchy?: "primary" | "secondary" | "tertiary"
 }
 
-const Text: React.FC<FontType> = ({size = "sm", children, hierarchy = "secondary", ...rest}) => {
+export const Text: React.FC<FontType> = ({size = "sm", children, hierarchy = "secondary", ...rest}) => {
 
     return <span {...mergeCode0Props(`text text--${hierarchy} text--${size}`, rest)}>
         {children}
     </span>
 }
-
-export default Text

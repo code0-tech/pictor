@@ -16,7 +16,7 @@ interface EmailInputProps extends Omit<InputProps<string | null>, "wrapperCompon
 
 export const emailValidation = (email: string) => EMAIL_REGEX.test(email)
 
-const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -42,5 +42,3 @@ const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwa
     />
 
 })
-
-export default EmailInput

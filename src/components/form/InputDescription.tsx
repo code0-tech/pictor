@@ -4,7 +4,7 @@ export interface InputDescriptionProps {
     children: React.ReactNode | React.ReactElement
 }
 
-const InputDescription: React.FC<InputDescriptionProps> = (props) => {
+export const InputDescription: React.FC<InputDescriptionProps> = (props) => {
 
     const {children} = props
 
@@ -13,5 +13,3 @@ const InputDescription: React.FC<InputDescriptionProps> = (props) => {
     </span>
 
 }
-
-export default InputDescription

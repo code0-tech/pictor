@@ -1,8 +1,11 @@
+export { default as Avatar} from "./components/avatar/Avatar"
 export { default as Badge} from "./components/badge/Badge"
+export { default as Breadcrumb} from "./components/breadcrumb/Breadcrumb"
 export { default as Button} from "./components/button/Button"
 export { default as ButtonGroup} from "./components/button-group/ButtonGroup"
 export { default as Card} from "./components/card/Card"
 export { default as Col} from "./components/col/Col"
+export * from "./components/command/Command"
 export { default as Container} from "./components/container/Container"
 
 export {default as DFullScreen} from "./components/d-fullscreen/DFullScreen"

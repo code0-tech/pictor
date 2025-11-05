@@ -15,7 +15,7 @@ export interface ColType extends Code0Component<HTMLDivElement> {
     xxl?: ColBreakPointRange
 }
 
-const Col: React.FC<ColType> = (props) => {
+export const Col: React.FC<ColType> = (props) => {
 
     const {children, xs, sm, md, lg, xl, xxl, ...args} = props
 
@@ -23,5 +23,3 @@ const Col: React.FC<ColType> = (props) => {
         {children}
     </div>
 }
-
-export default Col

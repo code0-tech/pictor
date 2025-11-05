@@ -8,7 +8,7 @@ export interface ButtonGroupType extends Code0Component<HTMLDivElement> {
     children: ReactElement<ButtonProps>[]
 }
 
-const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
+export const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
 
     const {children, ...args} = props
 
@@ -22,5 +22,3 @@ const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
         })}
     </div>
 }
-
-export default ButtonGroup;

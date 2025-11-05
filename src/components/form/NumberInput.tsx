@@ -8,7 +8,7 @@ interface NumberInputProps extends Omit<InputProps<string | null>, "wrapperCompo
 
 }
 
-const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -42,5 +42,3 @@ const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = React.for
     />
 
 })
-
-export default NumberInput

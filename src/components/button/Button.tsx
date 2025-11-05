@@ -17,7 +17,7 @@ export interface ButtonProps extends Code0Component<HTMLButtonElement> {
     disabled?: boolean
 }
 
-const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
+export const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
 
     const {children, variant = "normal", color = "secondary", active = false, disabled = false, ...args} = props
 
@@ -26,7 +26,3 @@ const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
         {children}
     </button>
 })
-
-
-
-export default Object.assign(Button);

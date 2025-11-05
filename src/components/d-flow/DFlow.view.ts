@@ -140,8 +140,23 @@ export class FlowView {
         return this._nodes.find(node => node.id === nodeId);
     }
 
-    json(): Flow | undefined {
-        return undefined
+    json(): Flow {
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            inputType: this._inputType,
+            nodes: this._nodes ? {
+                nodes: this._nodes.map(node => node.json()!!)
+            } : undefined,
+            returnType: this._returnType,
+            settings: this._settings ? {
+                nodes: this._settings.map(setting => setting.json()!!)
+            } : undefined,
+            startingNodeId: this._startingNodeId,
+            type: this._type,
+            updatedAt: this._updatedAt,
+            name: this._name,
+        }
     }
 }
 
@@ -213,7 +228,6 @@ export class NodeFunctionView {
             } : undefined,
             functionDefinition: this._functionDefinition,
             updatedAt: this._updatedAt,
-            __typename: "NodeFunction",
         }
     }
 }
@@ -338,7 +352,13 @@ export class FlowSettingView {
         this._value = value;
     }
 
-    json(): FlowSetting | undefined {
-        return undefined
+    json(): FlowSetting {
+        return {
+            createdAt: this._createdAt,
+            flowSettingIdentifier: this._flowSettingIdentifier,
+            id: this._id,
+            value: this._value,
+            updatedAt: this._updatedAt
+        }
     }
 }

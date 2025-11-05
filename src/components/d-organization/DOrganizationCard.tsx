@@ -34,7 +34,7 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
     const organization = organizationService.getById(props.organizationId)
     if (!organization?.namespace?.id) return
 
-    const namespace = namespaceService.findById(organization?.namespace?.id)
+    const namespace = namespaceService.getById(organization?.namespace?.id)
 
     const projectCount = organization?.namespace?.projects?.count
     const memberCount = namespace?.members?.count

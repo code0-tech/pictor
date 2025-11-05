@@ -43,4 +43,14 @@ export class DOrganizationView {
     set name(value: Maybe<Scalars["String"]["output"]>) {
         this._name = value;
     }
+
+    json(): Organization {
+        return {
+            createdAt: this._createdAt,
+            id: this._id,
+            name: this._name,
+            namespace: this._namespace,
+            updatedAt: this._updatedAt
+        };
+    }
 }

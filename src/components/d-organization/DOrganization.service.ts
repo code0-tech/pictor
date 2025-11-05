@@ -20,5 +20,4 @@ export abstract class DOrganizationReactiveService extends ReactiveArrayService<
 
     abstract organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined>
 
-    abstract organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined>
 }

@@ -91,4 +91,20 @@ export class DRuntimeView {
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
+
+    json(): Runtime {
+        return {
+            createdAt: this._createdAt,
+            dataTypes: this._dataTypes,
+            description: this._description,
+            flowTypes: this._flowTypes,
+            id: this._id,
+            name: this._name,
+            namespace: this._namespace,
+            projects: this._projects,
+            status: this._status,
+            token: this._token,
+            updatedAt: this._updatedAt,
+        };
+    }
 }

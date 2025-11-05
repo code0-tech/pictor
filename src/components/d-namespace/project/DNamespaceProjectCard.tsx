@@ -34,7 +34,7 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
     if (!project?.namespace?.id || !project?.primaryRuntime?.id) return
 
     const namespace = namespaceService.findById(project?.namespace?.id)
-    const assignedRuntime = runtimeService.findById(project?.primaryRuntime?.id)
+    const assignedRuntime = runtimeService.getById(project?.primaryRuntime?.id)
 
     const flowCount = project?.flows?.count
     const runtimeCount = namespace?.runtimes?.count

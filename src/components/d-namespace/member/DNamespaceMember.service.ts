@@ -13,7 +13,7 @@ export abstract class DNamespaceMemberReactiveService extends ReactiveArrayServi
     //TODO: inject UI error handler for toasts
     //inject: namespaceId because the runtimes query needs it
 
-    findById(id: NamespaceMember['id']): DNamespaceMemberView | undefined {
+    getById(id: NamespaceMember['id']): DNamespaceMemberView | undefined {
         return this.values().find(member => member.id === id);
     }
 

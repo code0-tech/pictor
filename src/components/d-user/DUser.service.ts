@@ -18,6 +18,18 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
     //TODO: inject UI error handler for toasts
     //no id's need to be injected here because the root query has a users field
 
+    createUserSession(payload: UserSession): void {
+        window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
+    }
+
+    getUserSession(): UserSession | undefined {
+        return JSON.parse(window.localStorage.getItem("ide_code-zero_session")!!) as UserSession
+    }
+
+    getById(id: User['id']): DUserView | undefined {
+        return this.values().find(user => user.id === id);
+    }
+
     abstract userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>
 
     abstract userLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined>
@@ -31,12 +43,4 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
     abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined>
 
     abstract userRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>
-
-    createUserSession(payload: UserSession): void {
-        window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
-    }
-
-    getUserSession(): UserSession | undefined {
-        return JSON.parse(window.localStorage.getItem("ide_code-zero_session")!!) as UserSession
-    }
 }

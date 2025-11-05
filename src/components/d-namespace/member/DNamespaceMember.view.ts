@@ -1,12 +1,23 @@
-import {Maybe, Namespace, NamespaceMember, Scalars, User} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Maybe,
+    Namespace,
+    NamespaceMember,
+    NamespaceMemberRoleConnection, NamespaceRoleConnection,
+    Scalars,
+    User
+} from "@code0-tech/sagittarius-graphql-types";
 
 export class DNamespaceMemberView {
     /** Time when this NamespaceMember was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Global ID of this NamespaceMember */
     private readonly _id?: Maybe<Scalars['NamespaceMemberID']['output']>;
+    /** Memberroles of the member */
+    private readonly _memberRoles?: Maybe<NamespaceMemberRoleConnection>;
     /** Namespace this member belongs to */
     private readonly _namespace?: Maybe<Namespace>;
+    /** Roles of the member */
+    private readonly _roles?: Maybe<NamespaceRoleConnection>;
     /** Time when this NamespaceMember was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** User this member belongs to */
@@ -15,10 +26,13 @@ export class DNamespaceMemberView {
     constructor(payload: NamespaceMember) {
         this._createdAt = payload.createdAt;
         this._id = payload.id;
+        this._memberRoles = payload.memberRoles;
         this._namespace = payload.namespace;
+        this._roles = payload.roles;
         this._updatedAt = payload.updatedAt;
         this._user = payload.user;
     }
+
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
@@ -28,8 +42,16 @@ export class DNamespaceMemberView {
         return this._id;
     }
 
+    get memberRoles(): Maybe<NamespaceMemberRoleConnection> | undefined {
+        return this._memberRoles;
+    }
+
     get namespace(): Maybe<Namespace> | undefined {
         return this._namespace;
+    }
+
+    get roles(): Maybe<NamespaceRoleConnection> | undefined {
+        return this._roles;
     }
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {

@@ -29,7 +29,7 @@ import {DFlowEdge} from "./DFlowEdge";
  * @param edges Array of edge objects, unchanged by this function (used only for return type symmetry).
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
-const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
+const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) {
         return {nodes};
     }
@@ -503,6 +503,8 @@ const getLayoutedElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     return {nodes: work};
 }
 
+const getCachedLayoutElements = React.cache(getLayoutElements)
+
 export type DFlowProps = Code0ComponentProps & ReactFlowProps
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
@@ -560,7 +562,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                 } as Node;
             });
 
-            const layouted = getLayoutedElements(localNodes, new Set(changedIds));
+            const layouted = getCachedLayoutElements(localNodes, new Set(changedIds));
             return layouted.nodes as Node[];
         });
 
@@ -579,7 +581,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             } as Node;
         });
 
-        const layouted = getLayoutedElements(localNodes, new Set(localNodes.map(n => n.id)))
+        const layouted = getCachedLayoutElements(localNodes, new Set(localNodes.map(n => n.id)))
         setNodes(layouted.nodes as Node[])
         setEdges(props.edges as Edge[])
 

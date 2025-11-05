@@ -17,19 +17,19 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
 
     //id's for queries and mutations and an error handler will be injected
 
-    abstract userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload>
+    abstract userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>
 
-    abstract userLogin(payload: UsersLoginInput): Promise<UsersLoginPayload>
+    abstract userLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined>
 
-    abstract userLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload>
+    abstract userLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined>
 
-    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload>
+    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined>
 
-    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload>
+    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined>
 
-    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload>
+    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined>
 
-    abstract userRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload>
+    abstract userRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>
 
     createUserSession(payload: UserSession): void {
         window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));

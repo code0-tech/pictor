@@ -1,14 +1,33 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 import {
+    Maybe,
     User,
-    UsersEmailVerificationInput, UsersEmailVerificationPayload,
+    UsersEmailVerificationInput,
+    UsersEmailVerificationPayload,
     UserSession,
-    UsersLoginInput, UsersLoginPayload,
-    UsersLogoutInput, UsersLogoutPayload,
-    UsersMfaBackupCodesRotateInput, UsersMfaBackupCodesRotatePayload,
-    UsersMfaTotpGenerateSecretInput, UsersMfaTotpGenerateSecretPayload,
-    UsersMfaTotpValidateSecretInput, UsersMfaTotpValidateSecretPayload,
-    UsersRegisterInput, UsersRegisterPayload,
+    UsersIdentityLinkInput,
+    UsersIdentityLinkPayload,
+    UsersIdentityLoginInput,
+    UsersIdentityLoginPayload,
+    UsersIdentityRegisterInput,
+    UsersIdentityRegisterPayload,
+    UsersIdentityUnlinkInput,
+    UsersIdentityUnlinkPayload,
+    UsersLoginInput,
+    UsersLoginPayload,
+    UsersLogoutInput,
+    UsersLogoutPayload,
+    UsersMfaBackupCodesRotateInput,
+    UsersMfaBackupCodesRotatePayload,
+    UsersMfaTotpGenerateSecretInput,
+    UsersMfaTotpGenerateSecretPayload,
+    UsersMfaTotpValidateSecretInput,
+    UsersMfaTotpValidateSecretPayload,
+    UsersPasswordResetInput,
+    UsersPasswordResetPayload,
+    UsersPasswordResetRequestPayload,
+    UsersRegisterInput,
+    UsersRegisterPayload,
     UsersUpdateInput
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view";
@@ -30,17 +49,29 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
         return this.values().find(user => user.id === id);
     }
 
-    abstract userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>
+    abstract usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>;
 
-    abstract userLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined>
+    abstract usersIdentityLink(payload: UsersIdentityLinkInput): Promise<UsersIdentityLinkPayload | undefined>;
 
-    abstract userLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined>
+    abstract usersIdentityLogin(payload: UsersIdentityLoginInput): Promise<UsersIdentityLoginPayload | undefined>;
 
-    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined>
+    abstract usersIdentityRegister(payload: UsersIdentityRegisterInput): Promise<UsersIdentityRegisterPayload | undefined>;
 
-    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined>
+    abstract usersIdentityUnlink(payload: UsersIdentityUnlinkInput): Promise<UsersIdentityUnlinkPayload | undefined>;
 
-    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined>
+    abstract usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined>;
 
-    abstract userRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>
+    abstract usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined>;
+
+    abstract usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined>;
+
+    abstract usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined>;
+
+    abstract usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined>;
+
+    abstract usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined>;
+
+    abstract usersPasswordResetRequest(payload: UsersMfaTotpValidateSecretInput): Promise<UsersPasswordResetRequestPayload | undefined>;
+
+    abstract usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>;
 }

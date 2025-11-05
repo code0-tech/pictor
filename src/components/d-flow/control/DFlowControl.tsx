@@ -1,13 +1,12 @@
 import React from "react";
 import {Panel, useReactFlow, useViewport} from "@xyflow/react";
-import ButtonGroup from "../button-group/ButtonGroup";
-import Button from "../button/Button";
+import {ButtonGroup} from "../../button-group/ButtonGroup";
+import {Button} from "../../button/Button";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
-import Badge from "../badge/Badge";
-import Flex from "../flex/Flex";
-import {DFlowMiniMap} from "./DFlowMiniMap";
+import {Badge} from "../../badge/Badge";
+import {Flex} from "../../flex/Flex";
 
-export const DFlowControls: React.FC = () => {
+export const DFlowControl: React.FC = () => {
 
     const viewport = useViewport();
     const reactFlow = useReactFlow();

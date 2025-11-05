@@ -71,7 +71,7 @@ class Validation<Values> implements IValidation<Values> {
     }
 }
 
-const useForm = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
+export const useForm = <Values extends Record<string, any> = Record<string, any>>(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
     const {initialValues, validate = {}, onSubmit} = props
     const [values, setValues] = useState<Values>(initialValues)
@@ -97,5 +97,3 @@ const useForm = <Values extends Record<string, any> = Record<string, any>>(props
     ]
 
 }
-
-export default useForm

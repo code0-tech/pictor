@@ -2,12 +2,12 @@ import {Meta} from "@storybook/react";
 import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "./FileTabs";
 import React from "react";
 import {IconChevronDown, IconDotsVertical, IconFileLambdaFilled} from "@tabler/icons-react";
-import Flex from "../flex/Flex";
+import {Flex} from "../flex/Flex";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "./FileTabs.view";
 import {FileTabsService} from "./FileTabs.service";
-import Button from "../button/Button";
-import Text from "../text/Text";
+import {Button} from "../button/Button";
+import {Text} from "../text/Text";
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
 
 export default {

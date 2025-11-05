@@ -1,14 +1,14 @@
 import {Meta} from "@storybook/react";
-import Container from "./Container";
-import Card from "../card/Card";
-import Text from "../text/Text";
-import Badge from "../badge/Badge";
-import ButtonGroup from "../button-group/ButtonGroup";
-import Button from "../button/Button";
+import {Container} from "./Container";
+import {Card} from "../card/Card";
+import {Text} from "../text/Text";
+import {Badge} from "../badge/Badge";
+import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Button} from "../button/Button";
 import {IconHeart, IconShare} from "@tabler/icons-react";
 import React from "react";
-import Row from "../row/Row";
-import Col from "../col/Col";
+import {Row} from "../row/Row";
+import {Col} from "../col/Col";
 import CardSection from "../card/CardSection";
 
 const meta: Meta = {

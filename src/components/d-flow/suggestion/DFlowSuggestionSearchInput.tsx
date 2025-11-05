@@ -1,6 +1,6 @@
-import Input, {InputProps, setElementKey} from "../../form/Input";
+import {InputProps, Input, setElementKey} from "../../form/Input";
 import React, {RefObject} from "react";
-import Button from "../../button/Button";
+import {Button} from "../../button/Button";
 import {IconX} from "@tabler/icons-react";
 import "./DFlowSuggestionSearchInput.style.scss"
 

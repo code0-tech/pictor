@@ -3,14 +3,14 @@
 import React from "react"
 import {Code0Component} from "../../utils/types"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
-import {Card} from "../../index"
-import Text from "../text/Text"
+import {Card} from "../card/Card"
+import {Text} from "../text/Text"
 import {useService, useStore} from "../../utils/contextStore"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {IconFolder, IconLogout, IconServer, IconSettings, IconUser} from "@tabler/icons-react"
-import Badge from "../badge/Badge"
-import Flex from "../flex/Flex";
-import Button from "../button/Button";
+import {Badge} from "../badge/Badge"
+import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
 import CardSection from "../card/CardSection";
 import {DNamespaceReactiveService} from "../d-namespace/DNamespace.service"
 import {DNamespaceLicenseReactiveService} from "../d-namespace/license/DNamespaceLicense.service"
@@ -22,6 +22,7 @@ export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
 }
 
 const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
+    const {organizationId, onSettingsClick = () => {}, onLeaveClick = () => {}} = props
     const organizationStore = useStore(DOrganizationReactiveService)
     const organizationService = useService(DOrganizationReactiveService)
 
@@ -31,7 +32,7 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
     const licenseStore = useStore(DNamespaceLicenseReactiveService)
     const licenseService = useService(DNamespaceLicenseReactiveService)
 
-    const organization = organizationService.getById(props.organizationId)
+    const organization = organizationService.getById(organizationId)
     if (!organization?.namespace?.id) return
 
     const namespace = namespaceService.getById(organization?.namespace?.id)
@@ -48,8 +49,8 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
                         {organization?.name}
                     </Text>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        <Button color={"secondary"} onClick={props.onSettingsClick}><IconSettings size={16}/></Button>
-                        <Button color={"error"} onClick={props.onLeaveClick}><IconLogout size={16}/> Leave</Button>
+                        <Button color={"secondary"} onClick={() => onSettingsClick(organizationId)}><IconSettings size={16}/></Button>
+                        <Button color={"error"} onClick={() => onLeaveClick(organizationId)}><IconLogout size={16}/> Leave</Button>
                     </Flex>
                 </Flex>
                 <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>

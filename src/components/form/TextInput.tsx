@@ -1,16 +1,16 @@
 import React, {RefObject} from "react";
-import Input, {InputProps, setElementKey} from "./Input";
+import {Input, InputProps, setElementKey} from "./Input";
 import {IconX} from "@tabler/icons-react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 
 
 export interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
-    onClear?: (event: Event) => void
+    onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
-const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -20,13 +20,13 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
         ...rest
     } = props
 
-    const toClearable = (event: Event) => {
+    const toClearable = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (ref.current) setElementKey(ref.current, "value", "", "change")
         if (props.onClear) props.onClear(event)
     }
 
     const rightAction = [right]
-    clearable && rightAction.push(<Button variant={"none"} onClick={toClearable}><IconX size={13}/></Button>)
+    clearable && rightAction.push(<Button variant={"none"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
 
     return <Input
@@ -37,5 +37,3 @@ const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.forward
     />
 
 })
-
-export default TextInput

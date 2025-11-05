@@ -5,10 +5,9 @@ import {Menu, MenuContent, MenuPortal, MenuProps, MenuTrigger} from "../menu/Men
 import {DUserReactiveService} from "./DUser.service"
 import {useService} from "../../utils/contextStore"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
-import Avatar from "../avatar/Avatar"
-import Text from "../text/Text"
-import Row from "../row/Row"
-import Flex from "../flex/Flex";
+import {Avatar} from "../avatar/Avatar"
+import {Text} from "../text/Text"
+import {Flex} from "../flex/Flex";
 
 export interface DUserMenuProps extends MenuProps {
     userId: Scalars['UserID']['output']

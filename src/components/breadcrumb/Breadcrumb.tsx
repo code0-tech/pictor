@@ -8,7 +8,7 @@ export interface BreadcrumbProps extends Code0Component<HTMLDivElement> {
     children?: React.ReactNode | React.ReactNode[];
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = props => {
+export const Breadcrumb: React.FC<BreadcrumbProps> = props => {
 
     const {splitter = "/", children, ...rest} = props
 
@@ -23,5 +23,3 @@ const Breadcrumb: React.FC<BreadcrumbProps> = props => {
         }
     </div>
 }
-
-export default Breadcrumb

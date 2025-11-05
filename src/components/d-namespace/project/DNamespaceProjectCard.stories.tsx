@@ -66,52 +66,58 @@ export class DRuntimeReactiveServiceExtended extends DRuntimeReactiveService {
 export const DNamespaceProjectCardExample: DNamespaceProjectCardStory = {
     render: (props) => {
 
-        const [projectStore, projectService] = useReactiveArrayService<DNamespaceProjectView, DNamespaceProjectReactiveServiceExtended>(DNamespaceProjectReactiveServiceExtended, [{
-            id: "gid://sagittarius/NamespaceProject/1",
-            name: "Example Project",
-            description: "This is an example project description.",
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            namespace: {
-                id: "gid://sagittarius/Namespace/1"
-            },
-            flow: undefined,
-            flows: {
-                count: 10
-            },
-            primaryRuntime: {
-                id: "gid://sagittarius/Runtime/1"
-            },
-            runtimes: undefined
-        }])
+        const [projectStore, projectService] = useReactiveArrayService<DNamespaceProjectView, DNamespaceProjectReactiveServiceExtended>(DNamespaceProjectReactiveServiceExtended, [
+            new DNamespaceProjectView({
+                id: "gid://sagittarius/NamespaceProject/1",
+                name: "Example Project",
+                description: "This is an example project description.",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1"
+                },
+                flow: undefined,
+                flows: {
+                    count: 10
+                },
+                primaryRuntime: {
+                    id: "gid://sagittarius/Runtime/1"
+                },
+                runtimes: undefined
+            })
+        ])
 
-        const [namespaceStore, namespaceService] = useReactiveArrayService<DNamespaceView, DNamespaceReactiveServiceExtended>(DNamespaceReactiveServiceExtended, [{
-            id: "gid://sagittarius/Namespace/1",
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            projects: undefined,
-            runtimes: {
-                count: 5
-            },
-            members: undefined,
-            namespaceLicenses: undefined,
-            parent: undefined,
-            roles: undefined
-        }])
+        const [namespaceStore, namespaceService] = useReactiveArrayService<DNamespaceView, DNamespaceReactiveServiceExtended>(DNamespaceReactiveServiceExtended, [
+            new DNamespaceView({
+                id: "gid://sagittarius/Namespace/1",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                projects: undefined,
+                runtimes: {
+                    count: 5
+                },
+                members: undefined,
+                namespaceLicenses: undefined,
+                parent: undefined,
+                roles: undefined
+            })
+        ])
 
-        const [runtimeStore, runtimeService] = useReactiveArrayService<DRuntimeView, DRuntimeReactiveServiceExtended>(DRuntimeReactiveServiceExtended, [{
-            id: "gid://sagittarius/Runtime/1",
-            name: "Example Runtime",
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            token: "example-token",
-            dataTypes: undefined,
-            description: undefined,
-            flowTypes: undefined,
-            namespace: undefined,
-            projects: undefined,
-            status: undefined
-        }])
+        const [runtimeStore, runtimeService] = useReactiveArrayService<DRuntimeView, DRuntimeReactiveServiceExtended>(DRuntimeReactiveServiceExtended, [
+            new DRuntimeView({
+                id: "gid://sagittarius/Runtime/1",
+                name: "Example Runtime",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                token: "example-token",
+                dataTypes: undefined,
+                description: undefined,
+                flowTypes: undefined,
+                namespace: undefined,
+                projects: undefined,
+                status: undefined
+            })
+        ])
 
         return (
             <ContextStoreProvider services={[[projectStore, projectService], [namespaceStore, namespaceService], [runtimeStore, runtimeService]]}>

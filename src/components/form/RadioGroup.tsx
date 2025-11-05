@@ -2,9 +2,9 @@ import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
 import {InputProps} from "./Input";
-import InputLabel from "./InputLabel";
-import InputDescription from "./InputDescription";
-import InputMessage from "./InputMessage";
+import {InputLabel} from "./InputLabel";
+import {InputDescription} from "./InputDescription";
+import {InputMessage} from "./InputMessage";
 import "./Input.style.scss"
 
 export type RadioGroupProps =

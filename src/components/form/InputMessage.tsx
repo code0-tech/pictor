@@ -5,7 +5,7 @@ export interface InputMessageProps {
     children: string
 }
 
-const InputMessage: React.FC<InputMessageProps> = (props) => {
+export const InputMessage: React.FC<InputMessageProps> = (props) => {
 
     const {children} = props
 
@@ -15,5 +15,3 @@ const InputMessage: React.FC<InputMessageProps> = (props) => {
     </span>
 
 }
-
-export default InputMessage

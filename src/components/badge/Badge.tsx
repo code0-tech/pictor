@@ -9,7 +9,7 @@ export interface BadgeType extends Code0Component<HTMLSpanElement>{
     color?: Color
 }
 
-const Badge: React.FC<BadgeType> = (props) => {
+export const Badge: React.FC<BadgeType> = (props) => {
     
     const {color = "primary", children, ...args} = props
     
@@ -17,5 +17,3 @@ const Badge: React.FC<BadgeType> = (props) => {
         {children}
     </span>
 }
-
-export default Badge

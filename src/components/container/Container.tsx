@@ -7,7 +7,7 @@ export interface ContainerType extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
 }
 
-const Container: React.FC<ContainerType> = (props) => {
+export const Container: React.FC<ContainerType> = (props) => {
 
     const {children, ...args} = props
 
@@ -15,5 +15,3 @@ const Container: React.FC<ContainerType> = (props) => {
         {children}
     </div>
 }
-
-export default Container

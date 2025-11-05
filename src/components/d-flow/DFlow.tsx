@@ -17,7 +17,7 @@ import {DFlowFunctionDefaultCard} from "./function/DFlowFunctionDefaultCard";
 import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
 import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
 import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
-import {DFlowEdge} from "./DFlowEdge";
+import {DFlowEdge} from "./edge/DFlowEdge";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.

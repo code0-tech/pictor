@@ -1,7 +1,7 @@
 import React from "react";
 import {Code0Component} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
-import Flex from "../flex/Flex";
+import {Flex} from "../flex/Flex";
 import "./DLayout.style.scss"
 
 export interface DLayoutProps extends Code0Component<HTMLDivElement> {

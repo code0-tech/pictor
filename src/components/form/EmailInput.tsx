@@ -1,7 +1,7 @@
 import React, {RefObject} from "react";
-import Input, {InputProps, setElementKey} from "./Input";
+import {Input, InputProps, setElementKey} from "./Input";
 import {IconX} from "@tabler/icons-react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 
 /**
  * This regex is based on the validation behind the type="email" validation of html.
@@ -16,7 +16,7 @@ interface EmailInputProps extends Omit<InputProps<string | null>, "wrapperCompon
 
 export const emailValidation = (email: string) => EMAIL_REGEX.test(email)
 
-const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
 
     ref = ref || React.useRef(null)
 
@@ -42,5 +42,3 @@ const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwa
     />
 
 })
-
-export default EmailInput

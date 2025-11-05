@@ -2,10 +2,10 @@ import {Code0Component} from "../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
 import {NodeFunctionView, NodeParameterView} from "../DFlow.view";
 import React, {memo} from "react";
-import Card from "../../card/Card";
+import {Card} from "../../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import CardSection from "../../card/CardSection";
-import Flex from "../../flex/Flex";
+import {Flex} from "../../flex/Flex";
 import {
     IconAlertTriangle,
     IconArrowRightCircle, IconCopy,
@@ -16,10 +16,10 @@ import {
     IconMessageExclamation,
     IconTrash
 } from "@tabler/icons-react";
-import Text from "../../text/Text";
-import Button from "../../button/Button";
+import {Text} from "../../text/Text";
+import {Button} from "../../button/Button";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../menu/Menu";
-import Badge from "../../badge/Badge";
+import {Badge} from "../../badge/Badge";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";

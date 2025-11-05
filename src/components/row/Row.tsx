@@ -7,7 +7,7 @@ export interface RowType extends Code0Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
 }
 
-const Row: React.FC<RowType> = (props) => {
+export const Row: React.FC<RowType> = (props) => {
 
     const {children, ...args} = props
 
@@ -15,5 +15,3 @@ const Row: React.FC<RowType> = (props) => {
         {children}
     </div>
 }
-
-export default Row

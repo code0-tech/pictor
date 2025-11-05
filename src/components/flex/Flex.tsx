@@ -7,7 +7,7 @@ interface FlexType extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
-const Flex: React.FC<FlexType> = props => {
+export const Flex: React.FC<FlexType> = props => {
 
     const {children, ...rest} = props
 
@@ -16,5 +16,3 @@ const Flex: React.FC<FlexType> = props => {
     </div>
 
 }
-
-export default Flex

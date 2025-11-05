@@ -84,7 +84,7 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
     return <canvas ref={canvas}/>
 }
 
-const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
+export const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
 
     const {identifier, src, size = 25, ...rest} = props
 
@@ -95,5 +95,3 @@ const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
         }
     </div>
 }
-
-export default Avatar

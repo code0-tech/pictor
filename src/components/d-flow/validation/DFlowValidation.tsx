@@ -1,10 +1,10 @@
 import {Panel} from "@xyflow/react";
 import React from "react";
-import {useDFlowValidations} from "./DFlow.validation.hook";
+import {useDFlowValidations} from "./DFlowValidation.hook";
 import {Scalars} from "@code0-tech/sagittarius-graphql-types";
-import Flex from "../flex/Flex";
-import {InspectionSeverity} from "../../utils/inspection";
-import Badge from "../badge/Badge";
+import {Flex} from "../../flex/Flex";
+import {InspectionSeverity} from "../../../utils/inspection";
+import {Badge} from "../../badge/Badge";
 import {IconAlertTriangle, IconExclamationCircle, IconMessageExclamation} from "@tabler/icons-react";
 import "./DFlowValidation.style.scss"
 

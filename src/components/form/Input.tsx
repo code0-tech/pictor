@@ -15,9 +15,9 @@ import {mergeCode0Props} from "../../utils/utils";
 
 import "./Input.style.scss";
 
-import InputLabel from "./InputLabel";
-import InputDescription from "./InputDescription";
-import InputMessage from "./InputMessage";
+import {InputLabel} from "./InputLabel";
+import {InputDescription} from "./InputDescription";
+import {InputMessage} from "./InputMessage";
 
 import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {
@@ -73,7 +73,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
 }
 
-const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
+export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
         const inputRef = ref || useRef<HTMLInputElement>(null); // External ref or fallback internal ref
         const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
@@ -241,5 +241,3 @@ const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
         );
     }
 );
-
-export default Input;

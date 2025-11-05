@@ -4,7 +4,7 @@ export interface InputLabelProps {
     children: React.ReactNode | React.ReactElement
 }
 
-const InputLabel: React.FC<InputLabelProps> = (props) => {
+export const InputLabel: React.FC<InputLabelProps> = (props) => {
 
     const {children} = props
 
@@ -13,5 +13,3 @@ const InputLabel: React.FC<InputLabelProps> = (props) => {
     </label>
 
 }
-
-export default InputLabel

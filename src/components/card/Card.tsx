@@ -25,7 +25,7 @@ export interface Card extends Code0Component<HTMLDivElement> {
 }
 
 
-const Card: React.FC<Card> = (props) => {
+export const Card: React.FC<Card> = (props) => {
 
     const {
         children,
@@ -56,6 +56,3 @@ const Card: React.FC<Card> = (props) => {
         </div>
     </>
 }
-
-
-export default Card

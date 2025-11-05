@@ -6,9 +6,16 @@ import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
-    NamespacesLicensesCreateInput, NamespacesLicensesDeleteInput,
-    NamespacesProjectsAssignRuntimesInput, NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput,
-    OrganizationsCreateInput, OrganizationsDeleteInput, OrganizationsUpdateInput
+    NamespacesLicensesCreateInput,
+    NamespacesLicensesDeleteInput,
+    NamespacesProjectsAssignRuntimesInput,
+    NamespacesProjectsCreateInput,
+    NamespacesProjectsDeleteInput,
+    OrganizationsCreateInput,
+    OrganizationsCreatePayload,
+    OrganizationsDeleteInput, OrganizationsDeletePayload,
+    OrganizationsUpdateInput,
+    OrganizationsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types"
 import {DNamespaceProjectReactiveService} from "../d-namespace/project/DNamespaceProject.service"
 import {DNamespaceProjectView} from "../d-namespace/project/DNamespaceProject.view"
@@ -27,16 +34,17 @@ export default meta
 type DOrganizationCardStory = StoryObj<typeof DOrganizationCard>;
 
 class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService {
-    organizationCreate(payload: OrganizationsCreateInput): DOrganizationView | undefined {
-        throw new Error("Method not implemented.");
-    }
-    organizationDelete(payload: OrganizationsDeleteInput): void {
-        throw new Error("Method not implemented.");
-    }
-    organizationUpdate(payload: OrganizationsUpdateInput): DOrganizationView | undefined {
-        throw new Error("Method not implemented.");
+    organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
+    organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
 }
 
 class DNamespaceReactiveServiceExtended extends DNamespaceReactiveService {

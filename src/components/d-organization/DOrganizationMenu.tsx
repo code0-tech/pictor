@@ -17,7 +17,7 @@ const DOrganizationMenu: React.FC<DOrganizationMenuProps> = props => {
     const organizationService = useService(DOrganizationReactiveService)
     const organizationStore = useService(DOrganizationReactiveService)
 
-    const currentOrganization = organizationService.findById(props.organizationId)
+    const currentOrganization = organizationService.getById(props.organizationId)
 
     return React.useMemo(() => {
         return (

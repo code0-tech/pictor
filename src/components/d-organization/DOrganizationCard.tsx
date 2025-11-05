@@ -31,7 +31,7 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
     const licenseStore = useStore(DNamespaceLicenseReactiveService)
     const licenseService = useService(DNamespaceLicenseReactiveService)
 
-    const organization = organizationService.findById(props.organizationId)
+    const organization = organizationService.getById(props.organizationId)
     if (!organization?.namespace?.id) return
 
     const namespace = namespaceService.findById(organization?.namespace?.id)

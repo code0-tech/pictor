@@ -69,7 +69,7 @@
     "react-resizable-panels": "^3.0.6",
     "react-zoom-pan-pinch": "^3.7.0",
     "rimraf": "^6.1.0",
-    "sass": "^1.89.2",
+    "sass": "^1.93.3",
     "sass-loader": "^16.0.6",
     "storybook": "^10.0.4",
     "style-loader": "^4.0.0",

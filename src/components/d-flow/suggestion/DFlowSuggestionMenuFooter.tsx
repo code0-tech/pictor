@@ -2,7 +2,6 @@
 
 import React from "react";
 import {MenuLabel} from "../../menu/Menu";
-import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {
     IconArrowsShuffle,
     IconBulb,
@@ -11,10 +10,9 @@ import {
     IconCornerDownLeft,
     IconFileFunctionFilled
 } from "@tabler/icons-react";
-import Text from "../../text/Text";
-import Flex from "../../flex/Flex";
+import {Text} from "../../text/Text";
+import {Flex} from "../../flex/Flex";
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../../tooltip/Tooltip";
-import {InputSuggestion} from "../../form/InputSuggestion";
 
 export const DFlowSuggestionMenuFooter: React.FC = () => {
     return <MenuLabel>

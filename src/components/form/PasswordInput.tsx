@@ -1,7 +1,7 @@
 import React, {RefObject} from "react";
-import Input, {InputProps, setElementKey} from "./Input";
+import {Input, InputProps, setElementKey} from "./Input";
 import {IconEye, IconX} from "@tabler/icons-react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 
 interface PasswordInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     clearable?: boolean,
@@ -20,14 +20,14 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         ...rest
     } = props
 
-    const toClearable = (event: MouseEvent) => {
+    const toClearable = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (ref.current) setElementKey(ref.current, "value", "", "change")
         event.stopPropagation()
         event.preventDefault()
         return false
     }
 
-    const toVisible = (event: MouseEvent) => {
+    const toVisible = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (ref.current && ref.current.type == "password") ref.current.type = "text"
         else if (ref.current && ref.current.type == "text") ref.current.type = "password"
         event.stopPropagation()
@@ -36,8 +36,8 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
     }
 
     const rightAction = [right]
-    visible && rightAction.push(<Button variant={"none"} onClick={toVisible}><IconEye size={13}/></Button>)
-    clearable && rightAction.push(<Button variant={"none"} onClick={toClearable}><IconX size={13}/></Button>)
+    visible && rightAction.push(<Button variant={"none"} onClick={(event) => toVisible(event)}><IconEye size={13}/></Button>)
+    clearable && rightAction.push(<Button variant={"none"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
 
     return <Input

@@ -1,10 +1,10 @@
 import React from "react";
 import {Checkbox, CheckboxIndicator, CheckboxProps, CheckedState} from "@radix-ui/react-checkbox"
 import {InputProps} from "./Input";
-import InputLabel from "./InputLabel";
-import InputDescription from "./InputDescription";
+import {InputLabel} from "./InputLabel";
+import {InputDescription} from "./InputDescription";
 import {mergeCode0Props} from "../../utils/utils";
-import InputMessage from "./InputMessage";
+import {InputMessage} from "./InputMessage";
 import "./Input.style.scss"
 import {IconCheck, IconMinus} from "@tabler/icons-react";
 

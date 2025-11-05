@@ -38,7 +38,7 @@ export const DOrganizationMenuExample: DOrganizationMenuStory = {
     render: (props) => {
 
         const [organizationStore, organizationService] = useReactiveArrayService<DOrganizationView, DOrganizationReactiveServiceExtended>(DOrganizationReactiveServiceExtended, [
-            {
+            new DOrganizationView({
                 id: "gid://sagittarius/Organization/1",
                 name: "Example Organization",
                 namespace: {
@@ -46,8 +46,8 @@ export const DOrganizationMenuExample: DOrganizationMenuStory = {
                 },
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString()
-            },
-            {
+            }),
+            new DOrganizationView({
                 id: "gid://sagittarius/Organization/2",
                 name: "Another Organization",
                 namespace: {
@@ -55,7 +55,8 @@ export const DOrganizationMenuExample: DOrganizationMenuStory = {
                 },
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString()
-            }])
+            })
+        ])
 
         return (
             <ContextStoreProvider services={[[organizationStore, organizationService]]}>

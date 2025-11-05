@@ -13,15 +13,15 @@ import {
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
-import InputMessage from "../../form/InputMessage";
+import {InputMessage} from "../../form/InputMessage";
 import "./DFlowInputDataType.style.scss";
-import TextInput from "../../form/TextInput";
-import Button from "../../button/Button";
+import {TextInput} from "../../form/TextInput";
+import {Button} from "../../button/Button";
 import {IconSettings, IconTrash} from "@tabler/icons-react";
-import Text from "../../text/Text";
-import Flex from "../../flex/Flex";
-import Badge from "../../badge/Badge";
-import InputLabel from "../../form/InputLabel";
+import {Text} from "../../text/Text";
+import {Flex} from "../../flex/Flex";
+import {Badge} from "../../badge/Badge";
+import {InputLabel} from "../../form/InputLabel";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";

@@ -1,7 +1,7 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import {Input, InputProps} from "./Input";
 import {IconMinus, IconPlus} from "@tabler/icons-react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 
 
 interface NumberInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type" | "left" | "right" | "leftType" | "rightType"> {

@@ -73,49 +73,55 @@ class DNamespaceLicenseReactiveServiceExtended extends DNamespaceLicenseReactive
 export const DOrganizationCardExample: DOrganizationCardStory = {
     render: (props) => {
 
-        const [organizationStore, organizationService] = useReactiveArrayService<DOrganizationView, DOrganizationReactiveServiceExtended>(DOrganizationReactiveServiceExtended, [{
-            id: "gid://sagittarius/Organization/1",
-            name: "Example Organization",
-            namespace: {
+        const [organizationStore, organizationService] = useReactiveArrayService<DOrganizationView, DOrganizationReactiveServiceExtended>(DOrganizationReactiveServiceExtended, [
+            new DOrganizationView({
+                id: "gid://sagittarius/Organization/1",
+                name: "Example Organization",
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1",
+                    projects: {
+                        count: 5
+                    }
+                },
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString()
+            })
+        ])
+
+        const [namespaceStore, namespaceService] = useReactiveArrayService<DNamespaceView, DNamespaceReactiveServiceExtended>(DNamespaceReactiveServiceExtended, [
+            new DNamespaceView({
                 id: "gid://sagittarius/Namespace/1",
-                projects: {
-                  count: 5
-                }
-            },
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString()
-        }])
+                members: {
+                    count: 12
+                },
+                runtimes: {
+                    count: 3
+                },
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                namespaceLicenses: {
+                    count: 1,
+                    nodes: [{
+                        id: "gid://sagittarius/NamespaceLicense/1",
+                    }]
+                },
+                parent: undefined,
+                projects: undefined,
+                roles: undefined
+            })
+        ])
 
-        const [namespaceStore, namespaceService] = useReactiveArrayService<DNamespaceView, DNamespaceReactiveServiceExtended>(DNamespaceReactiveServiceExtended, [{
-            id: "gid://sagittarius/Namespace/1",
-            members: {
-                count: 12
-            },
-            runtimes: {
-                count: 3
-            },
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            namespaceLicenses: {
-                count: 1,
-                nodes: [{
-                    id: "gid://sagittarius/NamespaceLicense/1",
-                }]
-            },
-            parent: undefined,
-            projects: undefined,
-            roles: undefined
-        }])
-
-        const [licenseStore, licenseService] = useReactiveArrayService<DNamespaceLicenseView, DNamespaceLicenseReactiveServiceExtended>(DNamespaceLicenseReactiveServiceExtended, [{
-            id: "gid://sagittarius/NamespaceLicense/1",
-            createdAt: undefined,
-            endDate: undefined,
-            licensee: undefined,
-            namespace: undefined,
-            startDate: undefined,
-            updatedAt: undefined
-        }])
+        const [licenseStore, licenseService] = useReactiveArrayService<DNamespaceLicenseView, DNamespaceLicenseReactiveServiceExtended>(DNamespaceLicenseReactiveServiceExtended, [
+            new DNamespaceLicenseView({
+                id: "gid://sagittarius/NamespaceLicense/1",
+                createdAt: undefined,
+                endDate: undefined,
+                licensee: undefined,
+                namespace: undefined,
+                startDate: undefined,
+                updatedAt: undefined
+            })
+        ])
 
         return (
             <ContextStoreProvider services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService]]}>

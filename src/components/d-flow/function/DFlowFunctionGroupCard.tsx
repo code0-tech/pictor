@@ -1,7 +1,7 @@
 import React, {memo} from "react";
 import {Handle, NodeProps, Position, useStore} from "@xyflow/react";
 import {FLOW_EDGE_RAINBOW} from "../DFlow.edges.hook";
-import Card from "../../card/Card";
+import {Card} from "../../card/Card";
 
 export interface DFlowFunctionGroupCardProps extends NodeProps {
 }

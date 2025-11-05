@@ -1,7 +1,7 @@
 import {Meta} from "@storybook/react";
 import React from "react";
-import Avatar from "./Avatar";
-import Flex from "../flex/Flex";
+import {Avatar} from "./Avatar";
+import {Flex} from "../flex/Flex";
 
 const meta: Meta = {
     title: "Avatar",

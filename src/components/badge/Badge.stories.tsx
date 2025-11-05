@@ -1,7 +1,7 @@
 import {Meta} from "@storybook/react";
 import React from "react";
-import Badge from "./Badge";
-import Button from "../button/Button";
+import {Badge} from "./Badge";
+import {Button} from "../button/Button";
 import {IconGitBranch} from "@tabler/icons-react";
 import {Colors as BadgeVariants}  from "../../utils/types";
 

@@ -1,14 +1,14 @@
 import React from "react";
-import useForm from "./useForm";
-import Card from "../card/Card";
-import Button from "../button/Button";
+import {useForm} from "./useForm";
+import {Card} from "../card/Card";
+import {Button} from "../button/Button";
 import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
-import Text from "../text/Text";
-import PasswordInput from "./PasswordInput";
-import TextInput from "./TextInput";
-import EmailInput, {emailValidation} from "./EmailInput";
-import NumberInput from "./NumberInput";
-import SwitchInput from "./SwitchInput";
+import {Text} from "../text/Text";
+import {PasswordInput} from "./PasswordInput";
+import {TextInput} from "./TextInput";
+import {EmailInput, emailValidation} from "./EmailInput";
+import {NumberInput} from "./NumberInput";
+import {SwitchInput} from "./SwitchInput";
 import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
@@ -106,7 +106,7 @@ export const Login = () => {
             <Button
                 w={"100%"}
                 color={"primary"}
-                variant={"contained"}
+                variant={"normal"}
                 onClick={async () => {
                     const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
                         challenge: crypto.getRandomValues(new Uint8Array(32)), // Demo: sollte vom Server kommen!

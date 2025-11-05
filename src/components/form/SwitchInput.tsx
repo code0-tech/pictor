@@ -1,5 +1,5 @@
 import React, {RefObject} from "react";
-import Input, {InputProps} from "./Input";
+import {Input, InputProps} from "./Input";
 
 
 interface SwitchInputProps extends Omit<InputProps<boolean | null>, "wrapperComponent" | "type" | "left" | "leftType"> {

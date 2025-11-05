@@ -5,7 +5,7 @@ import {Code0ComponentProps} from "../../utils/types"
 import {Dialog, DialogContent} from "../dialog/Dialog"
 import "./Command.style.scss"
 import {Badge} from "../badge/Badge"
-import TextInput, {TextInputProps} from "../form/TextInput"
+import {TextInputProps, TextInput} from "../form/TextInput"
 
 export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>
 export type CommandDialogProps = {

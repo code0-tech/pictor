@@ -1,7 +1,7 @@
 import {Code0Component} from "../../../utils/types";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import React, {memo} from "react";
-import Button from "../../button/Button";
+import {Button} from "../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {NodeFunctionView} from "../DFlow.view";

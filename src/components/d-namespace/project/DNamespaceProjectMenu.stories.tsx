@@ -41,34 +41,35 @@ export const DProjectMenuExample: DNamespaceProjectMenuStory = {
     render: (props) => {
 
         const [projectStore, projectService] = useReactiveArrayService<DNamespaceProjectView, DNamespaceProjectReactiveServiceExtended>(DNamespaceProjectReactiveServiceExtended, [
-        {
-            id: "gid://sagittarius/NamespaceProject/1",
-            name: "Example Project",
-            description: "This is an example project description.",
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            namespace: {
-                id: "gid://sagittarius/Namespace/1"
-            },
-            flow: undefined,
-            flows: undefined,
-            primaryRuntime: undefined,
-            runtimes: undefined
-        },
-        {
-            id: "gid://sagittarius/NamespaceProject/2",
-            name: "Another Project",
-            description: "This is another project description.",
-            createdAt: new Date().toString(),
-            updatedAt: new Date().toString(),
-            namespace: {
-                id: "gid://sagittarius/Namespace/1"
-            },
-            flow: undefined,
-            flows: undefined,
-            primaryRuntime: undefined,
-            runtimes: undefined
-        }])
+            new DNamespaceProjectView({
+                id: "gid://sagittarius/NamespaceProject/1",
+                name: "Example Project",
+                description: "This is an example project description.",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1"
+                },
+                flow: undefined,
+                flows: undefined,
+                primaryRuntime: undefined,
+                runtimes: undefined
+            }),
+            new DNamespaceProjectView({
+                id: "gid://sagittarius/NamespaceProject/2",
+                name: "Another Project",
+                description: "This is another project description.",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1"
+                },
+                flow: undefined,
+                flows: undefined,
+                primaryRuntime: undefined,
+                runtimes: undefined
+            })
+        ])
 
         return (
             <ContextStoreProvider services={[[projectStore, projectService]]}>

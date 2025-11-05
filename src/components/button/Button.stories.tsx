@@ -1,7 +1,7 @@
-import Button from "./Button";
+import {Button} from "./Button";
 import {StoryObj} from "@storybook/react";
 import React from "react";
-import ButtonGroup from "../button-group/ButtonGroup";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 import {IconAbc, IconPhoneFilled} from "@tabler/icons-react";
 import {Colors} from "../../utils/types";
 

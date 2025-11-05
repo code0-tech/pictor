@@ -3,15 +3,15 @@
 import React from "react"
 import {Code0Component} from "../../../utils/types"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
-import {Card} from "../../../index"
-import Text from "../../text/Text"
+import {Card} from "../../card/Card"
+import {Text} from "../../text/Text"
 import {IconGitFork, IconServer, IconServer2, IconSettings} from "@tabler/icons-react"
 import {useService, useStore} from "../../../utils/contextStore"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
-import Flex from "../../flex/Flex"
-import Button from "../../button/Button"
+import {Flex} from "../../flex/Flex"
+import {Button} from "../../button/Button"
 import CardSection from "../../card/CardSection"
-import Badge from "../../badge/Badge"
+import {Badge} from "../../badge/Badge"
 import {DNamespaceReactiveService} from "../DNamespace.service"
 import {DRuntimeReactiveService} from "../../d-runtime/DRuntime.service"
 
@@ -21,6 +21,9 @@ export interface DNamespaceProjectCardProps extends Code0Component<HTMLDivElemen
 }
 
 const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
+
+    const {projectId, onSettingsClick = (_) => {}} = props
+
     const projectStore = useStore(DNamespaceProjectReactiveService)
     const projectService = useService(DNamespaceProjectReactiveService)
 
@@ -30,7 +33,7 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
     const runtimeStore = useStore(DRuntimeReactiveService)
     const runtimeService = useService(DRuntimeReactiveService)
 
-    const project = projectService.getById(props.projectId)
+    const project = projectService.getById(projectId)
     if (!project?.namespace?.id || !project?.primaryRuntime?.id) return
 
     const namespace = namespaceService.getById(project?.namespace?.id)
@@ -48,7 +51,7 @@ const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
                         {project?.name}
                     </Text>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        <Button color={"secondary"} onClick={props.onSettingsClick}><IconSettings size={16}/>Settings</Button>
+                        <Button color={"secondary"} onClick={() => onSettingsClick(props.projectId)}><IconSettings size={16}/>Settings</Button>
                     </Flex>
                 </Flex>
                 <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>

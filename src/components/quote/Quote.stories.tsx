@@ -1,5 +1,5 @@
 import {Meta, StoryObj} from "@storybook/react";
-import Quote from "./Quote";
+import {Quote} from "./Quote";
 import React from "react";
 import {Colors} from "../../utils/types";
 
@@ -33,7 +33,7 @@ type QuoteStory = StoryObj<typeof Quote>;
 
 
 export const QuoteWithLogo: QuoteStory = {
-    render: (args) => {
+    render: (args: any) => {
         return <Quote {...args} name={"Nico Sammito"}
                       position={"Co-founder"}
                       logo={"https://code0.tech/code0_logo.png"}
@@ -55,7 +55,7 @@ export const QuoteWithLogo: QuoteStory = {
 }
 
 export const QuoteWithoutLogo: QuoteStory = {
-    render: (args) => {
+    render: (args: any) => {
         return <Quote {...args} name={"Nico Sammito"}
                       position={"Co-founder"}
                       w={"300px"}>

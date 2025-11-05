@@ -1,7 +1,7 @@
 import {Meta} from "@storybook/react";
 import React from "react";
-import Breadcrumb from "./Breadcrumb";
-import Text from "../text/Text";
+import {Breadcrumb} from "./Breadcrumb";
+import {Text} from "../text/Text";
 
 const meta: Meta = {
     title: "Breadcrumb",

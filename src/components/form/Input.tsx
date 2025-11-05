@@ -15,9 +15,9 @@ import {mergeCode0Props} from "../../utils/utils";
 
 import "./Input.style.scss";
 
-import InputLabel from "./InputLabel";
-import InputDescription from "./InputDescription";
-import InputMessage from "./InputMessage";
+import {InputLabel} from "./InputLabel";
+import {InputDescription} from "./InputDescription";
+import {InputMessage} from "./InputMessage";
 
 import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {

@@ -1,7 +1,7 @@
 import React, {RefObject} from "react";
-import Input, {InputProps, setElementKey} from "./Input";
+import {Input, InputProps, setElementKey} from "./Input";
 import {IconX} from "@tabler/icons-react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 
 /**
  * This regex is based on the validation behind the type="email" validation of html.

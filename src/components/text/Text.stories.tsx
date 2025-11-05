@@ -1,4 +1,4 @@
-import Text from "./Text";
+import {Text} from "./Text";
 import React from "react";
 import {StoryObj} from "@storybook/react";
 
@@ -20,7 +20,7 @@ export default {
 
 
 export const TextSizes: StoryObj<typeof Text> = {
-    render: (args) => {
+    render: (args: any) => {
         const {size, hierarchy} = args
 
         return <Text hierarchy={hierarchy} size={size}>{size}</Text>

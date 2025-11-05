@@ -1,7 +1,7 @@
 import React from "react";
 import {NodeFunctionView} from "../DFlow.view";
-import TextInput from "../../form/TextInput";
-import Flex from "../../flex/Flex";
+import {TextInput} from "../../form/TextInput";
+import {Flex} from "../../flex/Flex";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
@@ -10,7 +10,7 @@ import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
 import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../function/DFlowFunction.view";
-import Badge from "../../badge/Badge";
+import {Badge} from "../../badge/Badge";
 import {
     LiteralValue,
     NodeFunction,

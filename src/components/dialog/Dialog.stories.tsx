@@ -9,12 +9,11 @@ import {
     DialogTrigger
 } from "./Dialog";
 import React, {useState} from "react";
-import Flex from "../flex/Flex";
-import Text from "../text/Text";
-import EmailInput from "../form/EmailInput";
+import {Text} from "../text/Text";
+import {EmailInput} from "../form/EmailInput";
 import {IconChartDonutFilled, IconKey, IconMail} from "@tabler/icons-react";
-import PasswordInput from "../form/PasswordInput";
-import Button from "../button/Button";
+import {PasswordInput} from "../form/PasswordInput";
+import {Button} from "../button/Button";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
 
 export default {

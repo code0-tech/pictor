@@ -1,5 +1,5 @@
 import {Meta} from "@storybook/react";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 import React from "react";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "./Tooltip";
 

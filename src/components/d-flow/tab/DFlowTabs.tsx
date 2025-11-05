@@ -3,7 +3,7 @@ import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../../file-tabs/FileTabs";
 import React from "react";
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../menu/Menu";
-import Button from "../../button/Button";
+import {Button} from "../../button/Button";
 import {IconChevronDown, IconDotsVertical} from "@tabler/icons-react";
 import {FileTabsView} from "../../file-tabs/FileTabs.view";
 

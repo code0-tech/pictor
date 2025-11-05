@@ -11,9 +11,9 @@ import {
     MenuSubTrigger,
     MenuTrigger
 } from "./Menu";
-import Button from "../button/Button";
+import {Button} from "../button/Button";
 import {IconChevronRight, IconStar, IconUserCircle} from "@tabler/icons-react";
-import Flex from "../flex/Flex";
+import {Flex} from "../flex/Flex";
 
 const meta: Meta = {
     title: "Menu"

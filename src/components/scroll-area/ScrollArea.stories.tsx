@@ -1,8 +1,8 @@
 import {Meta} from "@storybook/react";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "./ScrollArea";
 import React from "react";
-import Button from "../button/Button";
-import Flex from "../flex/Flex";
+import {Button} from "../button/Button";
+import {Flex} from "../flex/Flex";
 
 export default {
     title: "Scroll Area",

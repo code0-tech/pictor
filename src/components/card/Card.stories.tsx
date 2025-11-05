@@ -1,11 +1,11 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React, {useState} from "react";
-import Card from "./Card";
-import Badge from "../badge/Badge";
-import Text from "../text/Text";
+import {Card} from "./Card";
+import {Badge} from "../badge/Badge";
+import {Text} from "../text/Text";
 import {Colors} from "../../utils/types";
-import ButtonGroup from "../button-group/ButtonGroup";
-import Button from "../button/Button";
+import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Button} from "../button/Button";
 import {IconHeart, IconHeartFilled, IconShare} from "@tabler/icons-react";
 import CardSection from "./CardSection";
 

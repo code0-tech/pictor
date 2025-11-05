@@ -1,10 +1,11 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {DataTypeView} from "./DFlowDataType.view";
 import {resolveType} from "../../../utils/generics";
 import {
     DataTypeIdentifier,
     DataTypeRule,
-    DataTypeRulesContainsKeyConfig, DataTypeRulesInputTypesConfig,
+    DataTypeRulesContainsKeyConfig,
+    DataTypeRulesInputTypesConfig,
     DataTypeRulesVariant,
     DataTypeVariant,
     GenericMapper,
@@ -16,24 +17,10 @@ import {
 import {useValidateValue} from "./DFlowDataType.validation.value";
 import {FlowView} from "../DFlow.view";
 
-export interface DFlowDataTypeService {
-    getDataType(type: DataTypeIdentifier): DataTypeView | undefined
-
-    hasDataTypes(types: DataTypeIdentifier[]): boolean
-
-    getDataTypeFromValue(value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined
-
-    getTypeFromValue(value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined
-}
-
-export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> implements DFlowDataTypeService {
-
-    constructor(store: ReactiveArrayStore<DataTypeView>) {
-        super(store);
-    }
+export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> {
 
     //TODO: remove string because of sagittarius types update
-    public getDataType = (type: DataTypeIdentifier): DataTypeView | undefined => {
+    getDataType (type: DataTypeIdentifier): DataTypeView | undefined {
         if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined
         const identifier = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
@@ -43,7 +30,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
         });
     }
 
-    public getDataTypeFromValue = (value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined => {
+    getDataTypeFromValue (value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined {
 
         if (!value) return undefined
 
@@ -66,7 +53,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     }
 
-    public getTypeFromValue = (value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined => {
+    getTypeFromValue (value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined {
 
         if (!value) return undefined
 
@@ -149,7 +136,7 @@ export class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeV
 
     }
 
-    public hasDataTypes = (types: DataTypeIdentifier[]): boolean => {
+    hasDataTypes(types: DataTypeIdentifier[]): boolean {
         return types.every(type => {
             return this.values().find(value => {
                 return value.id === (type.genericType?.dataType?.id ?? type.dataType?.id)

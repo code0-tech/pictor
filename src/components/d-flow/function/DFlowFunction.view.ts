@@ -98,8 +98,23 @@ export class FunctionDefinitionView {
         return this._updatedAt;
     }
 
-    json(): FunctionDefinition | undefined {
-        return undefined
+    json(): FunctionDefinition {
+        return {
+            createdAt: this._createdAt,
+            deprecationMessages: this._deprecationMessages,
+            descriptions: this._descriptions,
+            documentations: this._documentations,
+            genericKeys: this._genericKeys,
+            id: this._id,
+            names: this._names,
+            parameterDefinitions: this._parameterDefinitions ? {
+                nodes: this._parameterDefinitions.map(definitionView => definitionView.json()!!)
+            } : undefined,
+            returnType: this._returnType,
+            runtimeFunctionDefinition: this._runtimeFunctionDefinition,
+            throwsError: this._throwsError,
+            updatedAt: this._updatedAt
+        }
     }
 }
 
@@ -159,8 +174,16 @@ export class ParameterDefinitionView {
         return this._updatedAt;
     }
 
-    json(): ParameterDefinition | undefined {
-        return undefined
+    json(): ParameterDefinition {
+        return {
+            createdAt: this._createdAt,
+            dataTypeIdentifier: this._dataTypeIdentifier,
+            descriptions: this._descriptions,
+            documentations: this._documentations,
+            id: this._id,
+            names: this._names,
+            updatedAt: this._updatedAt
+        }
     }
 }
 

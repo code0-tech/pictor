@@ -1,37 +1,26 @@
 import {
-    NamespacesProjectsAssignRuntimesInput,
-    NamespacesProjectsCreateInput,
-    NamespacesProjectsDeleteInput,
+    NamespaceProject,
+    NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
+    NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
+    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceProjectView} from "./DNamespaceProject.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 
-export abstract class DNamespaceProjectService extends ReactiveArrayService<DNamespaceProjectView> {
+export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView> {
 
-    constructor(payload: ReactiveArrayStore<DNamespaceProjectView>) {
-        super(payload);
-    }
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId because the runtimes query needs it
 
-    abstract projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined
 
-    abstract projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined
-
-    abstract projectsDelete(payload: NamespacesProjectsDeleteInput): void
-
-    abstract findById(id: Scalars['NamespaceProjectID']['output']): DNamespaceProjectView | undefined
-}
-
-export abstract class DNamespaceProjectReactiveService extends DNamespaceProjectService {
-
-    findById(id: Scalars["NamespaceProjectID"]["output"]): DNamespaceProjectView | undefined {
+    getById(id: NamespaceProject['id']): DNamespaceProjectView | undefined {
         return this.values().find(project => project.id === id)
     }
 
-    abstract projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined
+    abstract projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined>
 
-    abstract projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined
+    abstract projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined>
 
-    abstract projectsDelete(payload: NamespacesProjectsDeleteInput): void
-
+    abstract projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined>
 }

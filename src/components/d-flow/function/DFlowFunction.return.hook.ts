@@ -1,5 +1,5 @@
 import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {DFlowDataTypeReactiveService, DFlowDataTypeService} from "../data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {replaceGenericKeysInType, resolveGenericKeys} from "../../../utils/generics";
 import {useService} from "../../../utils/contextStore";
 import {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
@@ -7,7 +7,7 @@ import {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittarius-gr
 export const useReturnType = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
-    dataTypeService?: DFlowDataTypeService
+    dataTypeService?: DFlowDataTypeReactiveService
 ): DataTypeIdentifier | null => {
 
     dataTypeService = dataTypeService ?? useService(DFlowDataTypeReactiveService)

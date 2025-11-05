@@ -1,32 +1,23 @@
 import {
-    NamespacesLicensesCreateInput,
-    NamespacesLicensesDeleteInput,
+    NamespaceLicense,
+    NamespacesLicensesCreateInput, NamespacesLicensesCreatePayload,
+    NamespacesLicensesDeleteInput, NamespacesLicensesDeletePayload,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceLicenseView} from "./DNamespaceLicense.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
 
-export abstract class DNamespaceLicenseService extends ReactiveArrayService<DNamespaceLicenseView> {
+export abstract class DNamespaceLicenseReactiveService extends ReactiveArrayService<DNamespaceLicenseView> {
 
-    constructor(payload: ReactiveArrayStore<DNamespaceLicenseView>) {
-        super(payload);
-    }
+    //TODO: inject UI error handler for toasts
+    //inject: namespaceId because the runtimes query needs it
 
-    abstract licenseCreate(payload: NamespacesLicensesCreateInput): DNamespaceLicenseView | undefined
-
-    abstract licenseDelete(payload: NamespacesLicensesDeleteInput): void
-
-    abstract findById(id: Scalars['NamespaceLicenseID']['output']): DNamespaceLicenseView | undefined
-}
-
-export abstract class DNamespaceLicenseReactiveService extends DNamespaceLicenseService {
-
-    findById(id: Scalars["NamespaceLicenseID"]["output"]): DNamespaceLicenseView | undefined {
+    getById(id: NamespaceLicense['id']): DNamespaceLicenseView | undefined {
         return this.values().find(license => license.id === id);
     }
 
-    abstract override licenseCreate(payload: NamespacesLicensesCreateInput): DNamespaceLicenseView | undefined
+    abstract licenseCreate(payload: NamespacesLicensesCreateInput): Promise<NamespacesLicensesCreatePayload | undefined>
 
-    abstract override licenseDelete(payload: NamespacesLicensesDeleteInput): void
+    abstract licenseDelete(payload: NamespacesLicensesDeleteInput): Promise<NamespacesLicensesDeletePayload | undefined>
 
 }

@@ -8,10 +8,10 @@ import {NodeFunctionView} from "../DFlow.view";
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
-import {NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFunctionSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
-    flowId: string
+    flowId: Flow['id']
     parentFunction?: NodeFunctionView
 }
 

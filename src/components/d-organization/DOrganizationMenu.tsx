@@ -3,8 +3,8 @@
 import React from "react"
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuProps, MenuTrigger} from "../menu/Menu"
 import Button from "../button/Button"
-import {DOrganizationView} from "./DOrganizationView"
-import {DOrganizationReactiveService} from "./DOrganizationService"
+import {DOrganizationView} from "./DOrganization.view"
+import {DOrganizationReactiveService} from "./DOrganization.service"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {useService} from "../../utils/contextStore"
 
@@ -17,7 +17,7 @@ const DOrganizationMenu: React.FC<DOrganizationMenuProps> = props => {
     const organizationService = useService(DOrganizationReactiveService)
     const organizationStore = useService(DOrganizationReactiveService)
 
-    const currentOrganization = organizationService.findById(props.organizationId)
+    const currentOrganization = organizationService.getById(props.organizationId)
 
     return React.useMemo(() => {
         return (

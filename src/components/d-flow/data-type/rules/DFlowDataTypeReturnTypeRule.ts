@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
-import {DFlowDataTypeService} from "../DFlowDataType.service";
+import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import {
     DataTypeRulesReturnTypeConfig,
     GenericCombinationStrategyType,
@@ -20,7 +20,7 @@ export class DFlowDataTypeReturnTypeRule {
         value: NodeParameterValue,
         config: DataTypeRulesReturnTypeConfig,
         generics?: Map<string, GenericMapper>,
-        service?: DFlowDataTypeService,
+        service?: DFlowDataTypeReactiveService,
         flow?: FlowView
     ): boolean {
 

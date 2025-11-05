@@ -25,7 +25,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
-        suggestionsById[settingDefinition.identifier!!] = useSuggestions({dataType: settingDefinition.dataType}, [], "some_database_id", 0, [0], 0)
+        suggestionsById[settingDefinition.identifier!!] = useSuggestions({dataType: settingDefinition.dataType}, [], instance.id, 0, [0], 0)
     })
 
 

@@ -6,9 +6,14 @@ import {useReactiveArrayService} from "../../../utils/reactiveArrayService"
 import {DNamespaceProjectView} from "./DNamespaceProject.view"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
 import {
-    NamespacesProjectsAssignRuntimesInput,
-    NamespacesProjectsCreateInput, NamespacesProjectsDeleteInput, RuntimesCreateInput, RuntimesDeleteInput,
-    RuntimesRotateTokenInput, RuntimesUpdateInput
+    NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
+    NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
+    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload,
+    RuntimesCreateInput,
+    RuntimesCreatePayload,
+    RuntimesDeleteInput, RuntimesDeletePayload,
+    RuntimesRotateTokenInput, RuntimesRotateTokenPayload,
+    RuntimesUpdateInput, RuntimesUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types"
 import {DNamespaceReactiveService} from "../DNamespace.service"
 import {DNamespaceView} from "../DNamespace.view"
@@ -25,37 +30,37 @@ export default meta
 type DNamespaceProjectCardStory = StoryObj<typeof DNamespaceProjectCard>;
 
 export class DNamespaceProjectReactiveServiceExtended extends DNamespaceProjectReactiveService {
-    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined {
-        throw new Error("Method not implemented.");
+    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined {
-        throw new Error("Method not implemented.");
+
+    projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    projectsDelete(payload: NamespacesProjectsDeleteInput): void {
-        throw new Error("Method not implemented.");
+
+    projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 }
 
 export class DNamespaceReactiveServiceExtended extends DNamespaceReactiveService {}
 
 export class DRuntimeReactiveServiceExtended extends DRuntimeReactiveService {
-    runtimeCreate(payload: RuntimesCreateInput): DRuntimeView | undefined {
-        return undefined
+    runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
-    runtimeDelete(payload: RuntimesDeleteInput): DRuntimeView | undefined {
-        return undefined
+    runtimeDelete(payload: RuntimesDeleteInput): Promise<RuntimesDeletePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
-    runtimeRotateToken(payload: RuntimesRotateTokenInput): DRuntimeView | undefined {
-        return undefined
+    runtimeRotateToken(payload: RuntimesRotateTokenInput): Promise<RuntimesRotateTokenPayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
-    runtimeUpdate(payload: RuntimesUpdateInput): DRuntimeView | undefined {
-        return undefined
+    runtimeUpdate(payload: RuntimesUpdateInput): Promise<RuntimesUpdatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
-
-
 }
 
 export const DNamespaceProjectCardExample: DNamespaceProjectCardStory = {

@@ -1,86 +1,77 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 import {
+    Maybe,
     User,
     UsersEmailVerificationInput,
+    UsersEmailVerificationPayload,
     UserSession,
+    UsersIdentityLinkInput,
+    UsersIdentityLinkPayload,
+    UsersIdentityLoginInput,
+    UsersIdentityLoginPayload,
+    UsersIdentityRegisterInput,
+    UsersIdentityRegisterPayload,
+    UsersIdentityUnlinkInput,
+    UsersIdentityUnlinkPayload,
     UsersLoginInput,
+    UsersLoginPayload,
     UsersLogoutInput,
+    UsersLogoutPayload,
     UsersMfaBackupCodesRotateInput,
+    UsersMfaBackupCodesRotatePayload,
     UsersMfaTotpGenerateSecretInput,
+    UsersMfaTotpGenerateSecretPayload,
     UsersMfaTotpValidateSecretInput,
+    UsersMfaTotpValidateSecretPayload,
+    UsersPasswordResetInput,
+    UsersPasswordResetPayload, UsersPasswordResetRequestInput,
+    UsersPasswordResetRequestPayload,
     UsersRegisterInput,
+    UsersRegisterPayload,
     UsersUpdateInput
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view";
 
-export abstract class DUserService extends ReactiveArrayService<DUserView> {
+export abstract class DUserReactiveService extends ReactiveArrayService<DUserView> {
 
-    constructor(store: ReactiveArrayStore<DUserView>) {
-        super(store);
-    }
+    //TODO: inject UI error handler for toasts
+    //no id's need to be injected here because the root query has a users field
 
-    abstract userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
-
-    abstract userLogin(payload: UsersLoginInput): User | undefined
-
-    abstract userLogout(payload: UsersLogoutInput): void
-
-    abstract userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
-
-    abstract userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
-
-    abstract userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
-
-    abstract userRegister(payload: UsersRegisterInput): User | undefined
-
-    abstract userUpdate(payload: UsersUpdateInput): User | undefined
-
-    abstract createUserSession(payload: UserSession): void
-
-    abstract getUserSession(): UserSession | undefined
-}
-
-export abstract class DUserReactiveService extends DUserService {
-
-    override userLogin(payload: UsersLoginInput): User | undefined {
-        //check if a session already exists
-        if (this.getUserSession()) {
-            return this.values().find(user => user.id === this.getUserSession()?.user?.id);
-        }
-
-        return undefined;
-    }
-
-    override userLogout(payload: UsersLogoutInput): void {
-        if (!this.getUserSession()) return
-
-        const user = this.values().find(user => user.id === this.getUserSession()?.user?.id);
-        window.localStorage.removeItem("ide_code-zero_session");
-        const index = this.values().findIndex(lUser => lUser.id === user?.id)
-        this.delete(index)
-        this.update()
-
-    }
-
-    override createUserSession(payload: UserSession): void {
+    createUserSession(payload: UserSession): void {
         window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
     }
 
-    override getUserSession(): UserSession | undefined {
+    getUserSession(): UserSession | undefined {
         return JSON.parse(window.localStorage.getItem("ide_code-zero_session")!!) as UserSession
     }
 
-    abstract override userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void
+    getById(id: User['id']): DUserView | undefined {
+        return this.values().find(user => user.id === id);
+    }
 
-    abstract override userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void
+    abstract usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>;
 
-    abstract override userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void
+    abstract usersIdentityLink(payload: UsersIdentityLinkInput): Promise<UsersIdentityLinkPayload | undefined>;
 
-    abstract override userRegister(payload: UsersRegisterInput): User | undefined
+    abstract usersIdentityLogin(payload: UsersIdentityLoginInput): Promise<UsersIdentityLoginPayload | undefined>;
 
-    abstract override userUpdate(payload: UsersUpdateInput): User | undefined
+    abstract usersIdentityRegister(payload: UsersIdentityRegisterInput): Promise<UsersIdentityRegisterPayload | undefined>;
 
-    abstract override userEmailVerification(payload: UsersEmailVerificationInput): User | undefined
+    abstract usersIdentityUnlink(payload: UsersIdentityUnlinkInput): Promise<UsersIdentityUnlinkPayload | undefined>;
 
+    abstract usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined>;
 
+    abstract usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined>;
+
+    abstract usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined>;
+
+    abstract usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined>;
+
+    abstract usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined>;
+
+    abstract usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined>;
+
+    abstract usersPasswordResetRequest(payload: UsersPasswordResetRequestInput): Promise<UsersPasswordResetRequestPayload | undefined>;
+
+    abstract usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined>;
 }

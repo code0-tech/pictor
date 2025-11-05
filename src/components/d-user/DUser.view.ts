@@ -1,25 +1,38 @@
-import {Maybe, Namespace, NamespaceMemberConnection, Scalars, User} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Maybe,
+    Namespace,
+    NamespaceMemberConnection,
+    Scalars,
+    User,
+    UserIdentityConnection, UserSessionConnection
+} from "@code0-tech/sagittarius-graphql-types";
 
 export class DUserView {
 
     /** Global admin status of the user */
     private _admin?: Maybe<Scalars['Boolean']['output']>;
     /** The avatar if present of the user */
-    private _avatarPath?: Maybe<Scalars['String']['output']>;
+    private readonly _avatarPath?: Maybe<Scalars['String']['output']>;
     /** Time when this User was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Email of the user */
     private _email?: Maybe<Scalars['String']['output']>;
+    /** Email verification date of the user if present */
+    private readonly _emailVerifiedAt?: Maybe<Scalars['Time']['output']>;
     /** Firstname of the user */
     private _firstname?: Maybe<Scalars['String']['output']>;
     /** Global ID of this User */
     private readonly _id?: Maybe<Scalars['UserID']['output']>;
+    /** Identities of this user */
+    private readonly _identities?: Maybe<UserIdentityConnection>;
     /** Lastname of the user */
     private _lastname?: Maybe<Scalars['String']['output']>;
     /** Namespace of this user */
     private readonly _namespace?: Maybe<Namespace>;
     /** Namespace Memberships of this user */
     private readonly _namespaceMemberships?: Maybe<NamespaceMemberConnection>;
+    /** Sessions of this user */
+    private readonly _sessions?: Maybe<UserSessionConnection>;
     /** Time when this User was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** Username of the user */
@@ -30,13 +43,17 @@ export class DUserView {
         this._avatarPath = user.avatarPath;
         this._createdAt = user.createdAt;
         this._email = user.email;
+        this._emailVerifiedAt = user.emailVerifiedAt;
         this._firstname = user.firstname;
         this._id = user.id;
+        this._identities = user.identities;
         this._lastname = user.lastname;
         this._namespace = user.namespace;
         this._namespaceMemberships = user.namespaceMemberships;
+        this._sessions = user.sessions;
         this._updatedAt = user.updatedAt;
         this._username = user.username;
+
     }
 
     get admin(): Maybe<Scalars["Boolean"]["output"]> | undefined {
@@ -55,12 +72,20 @@ export class DUserView {
         return this._email;
     }
 
+    get emailVerifiedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
+        return this._emailVerifiedAt;
+    }
+
     get firstname(): Maybe<Scalars["String"]["output"]> | undefined {
         return this._firstname;
     }
 
     get id(): Maybe<Scalars["UserID"]["output"]> | undefined {
         return this._id;
+    }
+
+    get identities(): Maybe<UserIdentityConnection> | undefined {
+        return this._identities;
     }
 
     get lastname(): Maybe<Scalars["String"]["output"]> | undefined {
@@ -75,6 +100,10 @@ export class DUserView {
         return this._namespaceMemberships;
     }
 
+    get sessions(): Maybe<UserSessionConnection> | undefined {
+        return this._sessions;
+    }
+
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
@@ -85,10 +114,6 @@ export class DUserView {
 
     set admin(value: Maybe<Scalars["Boolean"]["output"]>) {
         this._admin = value;
-    }
-
-    set avatarPath(value: Maybe<Scalars["String"]["output"]>) {
-        this._avatarPath = value;
     }
 
     set email(value: Maybe<Scalars["String"]["output"]>) {
@@ -105,5 +130,24 @@ export class DUserView {
 
     set username(value: Maybe<Scalars["String"]["output"]>) {
         this._username = value;
+    }
+
+    json(): User {
+        return {
+            admin: this._admin,
+            avatarPath: this._avatarPath,
+            createdAt: this._createdAt,
+            email: this._email,
+            emailVerifiedAt: this._emailVerifiedAt,
+            firstname: this._firstname,
+            id: this._id,
+            identities: this._identities,
+            lastname: this._lastname,
+            namespace: this._namespace,
+            namespaceMemberships: this._namespaceMemberships,
+            sessions: this._sessions,
+            updatedAt: this._updatedAt,
+            username: this._username,
+        };
     }
 }

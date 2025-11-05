@@ -32,7 +32,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const {functionInstance, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
-    const definition = functionService.getFunctionDefinition(functionInstance.functionDefinition?.id!!)
+    const definition = functionService.getById(functionInstance.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameterDefinitions?.forEach(pd => {
@@ -97,7 +97,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                try {
                                    if (!value) return value
                                    if ((JSON.parse(value) as NodeParameterValue).__typename === "NodeFunction") {
-                                       const def = functionService.getFunctionDefinition((JSON.parse(value) as NodeFunction).functionDefinition?.id!!)
+                                       const def = functionService.getById((JSON.parse(value) as NodeFunction).functionDefinition?.id!!)
                                        return <Badge
                                            color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
                                    }

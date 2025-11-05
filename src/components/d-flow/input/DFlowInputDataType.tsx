@@ -9,7 +9,7 @@ import {
     DataTypeRulesNumberRangeConfig,
     DataTypeRulesParentTypeConfig,
     DataTypeRulesVariant,
-    DataTypeVariant,
+    DataTypeVariant, Flow,
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
@@ -509,7 +509,7 @@ const RuleHeader: React.FC<{
         dataType: {
             id: "gid://sagittarius/DataType/878634678"
         }
-    }, [], "", 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
+    }, [], "" as Flow['id'], 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
     const rulesCount = (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get((rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0
 
     const [keyValue, setKeyValue] = React.useState<string>(() => ("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : ""))

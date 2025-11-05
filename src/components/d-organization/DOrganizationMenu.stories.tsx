@@ -2,13 +2,13 @@ import {Meta, StoryObj} from "@storybook/react";
 import {ContextStoreProvider} from "../../utils/contextStore"
 import React from "react"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"
-import {DOrganizationReactiveService} from "./DOrganizationService"
+import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
-    OrganizationsCreateInput,
-    OrganizationsDeleteInput,
-    OrganizationsUpdateInput
+    OrganizationsCreateInput, OrganizationsCreatePayload,
+    OrganizationsDeleteInput, OrganizationsDeletePayload,
+    OrganizationsUpdateInput, OrganizationsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DOrganizationView} from "./DOrganizationView"
+import {DOrganizationView} from "./DOrganization.view"
 import DOrganizationMenu from "./DOrganizationMenu"
 
 const meta: Meta = {
@@ -21,16 +21,17 @@ export default meta
 type DOrganizationMenuStory = StoryObj<typeof DOrganizationMenu>;
 
 class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService {
-    organizationCreate(payload: OrganizationsCreateInput): DOrganizationView | undefined {
-        throw new Error("Method not implemented.");
-    }
-    organizationDelete(payload: OrganizationsDeleteInput): void {
-        throw new Error("Method not implemented.");
-    }
-    organizationUpdate(payload: OrganizationsUpdateInput): DOrganizationView | undefined {
-        throw new Error("Method not implemented.");
+    organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
+    organizationDelete(payload: OrganizationsDeleteInput): Promise<OrganizationsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    organizationUpdate(payload: OrganizationsUpdateInput): Promise<OrganizationsUpdatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
 }
 
 export const DOrganizationMenuExample: DOrganizationMenuStory = {

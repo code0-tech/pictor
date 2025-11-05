@@ -7,10 +7,15 @@ import DUserMenu from "./DUserMenu"
 import {
     User,
     UsersEmailVerificationInput,
-    UsersMfaBackupCodesRotateInput,
-    UsersMfaTotpGenerateSecretInput,
-    UsersMfaTotpValidateSecretInput,
-    UsersRegisterInput,
+    UsersEmailVerificationPayload,
+    UsersLoginInput,
+    UsersLoginPayload,
+    UsersLogoutInput,
+    UsersLogoutPayload,
+    UsersMfaBackupCodesRotateInput, UsersMfaBackupCodesRotatePayload,
+    UsersMfaTotpGenerateSecretInput, UsersMfaTotpGenerateSecretPayload,
+    UsersMfaTotpValidateSecretInput, UsersMfaTotpValidateSecretPayload,
+    UsersRegisterInput, UsersRegisterPayload,
     UsersUpdateInput
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view"
@@ -26,26 +31,36 @@ export default meta
 type DUserMenuStory = StoryObj<typeof DUserMenu>;
 
 class DUserReactiveServiceExtended extends DUserReactiveService {
-    userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): void {
-        throw new Error("Method not implemented.");
+    userEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): void {
-        throw new Error("Method not implemented.");
+
+    userLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): void {
-        throw new Error("Method not implemented.");
+
+    userLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    userRegister(payload: UsersRegisterInput): User | undefined {
-        throw new Error("Method not implemented.");
+
+    userMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    userUpdate(payload: UsersUpdateInput): User | undefined {
-        throw new Error("Method not implemented.");
+
+    userMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
+        return Promise.resolve(undefined);
     }
-    userEmailVerification(payload: UsersEmailVerificationInput): User | undefined {
-        throw new Error("Method not implemented.");
+
+    userMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    userRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined> {
+        return Promise.resolve(undefined);
     }
 
 }
+
 
 export const DUserMenuExample: DUserMenuStory = {
     render: (props) => {

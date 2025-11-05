@@ -1,6 +1,6 @@
 // reactiveArrayService.ts
-import React from "react";
-import { ArrayService } from "./arrayService";
+import React, {startTransition} from "react";
+import {ArrayService} from "./arrayService";
 
 // Zugriffstyp: aktueller State via Getter, Updates via setState
 export type ReactiveArrayStore<T> = {
@@ -10,24 +10,31 @@ export type ReactiveArrayStore<T> = {
 
 export class ReactiveArrayService<T> implements ArrayService<T> {
     protected readonly access: ReactiveArrayStore<T>;
+
     constructor(access: ReactiveArrayStore<T>) {
         this.access = access;
     }
 
     delete(index: number) {
-        this.access.setState(prev => prev.filter((_, i) => i !== index));
+        startTransition(() => {
+            this.access.setState(prev => prev.filter((_, i) => i !== index));
+        })
     }
 
     add(value: T) {
-        this.access.setState(prev => [...prev, value]);
+        startTransition(() => {
+            this.access.setState(prev => [...prev, value]);
+        })
     }
 
     set(index: number, value: T) {
-        this.access.setState(prev => {
-            const next = prev.slice();
-            next[index] = value;
-            return next;
-        });
+        startTransition(() => {
+            this.access.setState(prev => {
+                const next = prev.slice();
+                next[index] = value;
+                return next;
+            });
+        })
     }
 
     has(index: number) {
@@ -44,11 +51,15 @@ export class ReactiveArrayService<T> implements ArrayService<T> {
     }
 
     update() {
-        this.access.setState(prev => prev.slice());
+        startTransition(() => {
+            this.access.setState(prev => prev.slice());
+        })
     }
 
     clear() {
-        this.access.setState(() => []);
+        startTransition(() => {
+            this.access.setState(() => []);
+        })
     }
 }
 
@@ -68,13 +79,15 @@ export function useReactiveArrayService<K, S extends ArrayService<K>>(
         Array.isArray(initial) ? initial : [] // Platzhalter; Callback folgt in Effect
     );
     const ref = React.useRef(state);
-    React.useEffect(() => { ref.current = state; }, [state]);
+    React.useEffect(() => {
+        ref.current = state;
+    }, [state]);
 
     // 2) stabiler Getter
     const getState = React.useCallback(() => ref.current, []);
 
     // 3) Service erstellen (stabil über getState/setState)
-    const service = React.useMemo(() => new Ctor({ getState, setState }), [Ctor, getState, setState]);
+    const service = React.useMemo(() => new Ctor({getState, setState}), [Ctor, getState, setState]);
 
     // 4) Falls initial ein Callback ist, einmalig ausführen, sobald Service existiert
     React.useEffect(() => {

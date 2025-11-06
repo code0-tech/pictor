@@ -142,6 +142,7 @@ export class FlowView {
 
     json(): Flow {
         return {
+            __typename: "Flow",
             createdAt: this._createdAt,
             id: this._id,
             inputType: this._inputType,
@@ -220,6 +221,7 @@ export class NodeFunctionView {
 
     json(): NodeFunction | undefined {
         return {
+            __typename: "NodeFunction",
             createdAt: this._createdAt,
             id: this._id,
             nextNodeId: this._nextNodeId,
@@ -299,6 +301,7 @@ export class NodeParameterView {
 
     json(): NodeParameter | undefined {
         return {
+            __typename: "NodeParameter",
             createdAt: this._createdAt,
             id: this._id,
             runtimeParameter: this._runtimeParameter,
@@ -354,6 +357,7 @@ export class FlowSettingView {
 
     json(): FlowSetting {
         return {
+            __typename: "FlowSetting",
             createdAt: this._createdAt,
             flowSettingIdentifier: this._flowSettingIdentifier,
             id: this._id,

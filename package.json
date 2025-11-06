@@ -88,10 +88,6 @@
   "files": [
     "dist"
   ],
-  "overrides": {
-    "storybook": "^10.0.4",
-    "@storybook/*": "^10.0.4"
-  },
   "types": "dist/index.d.ts",
   "peerDependencies": {
     "@ariakit/react": "^0.4.5",

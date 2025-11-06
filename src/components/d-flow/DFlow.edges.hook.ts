@@ -5,7 +5,7 @@ import {NodeFunctionView} from "./DFlow.view";
 import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
 import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
 import React from "react";
-import {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 // Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
@@ -131,7 +131,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
             if (!val) return
 
             /* --- NODE-Parameter → Group-Card ------------------------- */
-            if (paramDT?.variant === DataTypeVariant.Node) {
+            if (paramDT?.variant === "NODE") {
                 const groupId = `${fnId}-group-${idCounter++}`;
 
                 /* Verbindung Gruppe  → Function-Card (horizontal)       */

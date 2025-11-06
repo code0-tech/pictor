@@ -1,4 +1,4 @@
-import {NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export enum DFlowSuggestionType {
     REF_OBJECT,

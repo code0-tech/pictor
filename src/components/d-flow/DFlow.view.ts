@@ -1,4 +1,4 @@
-import {
+import type {
     DataType,
     Flow,
     FlowSetting,
@@ -6,12 +6,9 @@ import {
     LiteralValue,
     Maybe,
     NodeFunction,
-    NodeFunctionConnection,
     NodeParameter,
-    NodeParameterConnection,
     NodeParameterValue,
     ReferenceValue,
-    RuntimeFunctionDefinition,
     RuntimeParameterDefinition,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";

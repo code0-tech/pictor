@@ -11,7 +11,7 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../function/DFlowFunction.view";
 import {Badge} from "../../badge/Badge";
-import {
+import type {
     LiteralValue,
     NodeFunction,
     NodeParameterValue,

@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {DataTypeRulesNumberRangeConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeRulesNumberRangeConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRangeRule {

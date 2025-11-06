@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {DataTypeRulesRegexConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeRulesRegexConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRegexRule {

@@ -1,7 +1,7 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import {replaceGenericKeysInType} from "../../../../utils/generics";
-import {DataTypeIdentifier, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {useValidateValue} from "../DFlowDataType.validation.value";
 import {FlowView} from "../../DFlow.view";
 

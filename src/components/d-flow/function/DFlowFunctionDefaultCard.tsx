@@ -30,7 +30,7 @@ import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
-import {DataTypeVariant, Maybe, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeVariant, Maybe, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: NodeFunctionView
@@ -194,7 +194,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
 
             {data.instance.parameters?.some(param => {
                 const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
-                const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === DataTypeVariant.Node;
+                const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
                 return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
             }) ? (
                 <CardSection>
@@ -203,7 +203,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
 
 
                         const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
-                        const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === DataTypeVariant.Node;
+                        const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
                         const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], props.data.flowId, data.depth, data.scope, data.index)
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?

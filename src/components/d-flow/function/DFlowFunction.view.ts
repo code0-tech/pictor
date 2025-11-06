@@ -1,4 +1,4 @@
-import {
+import type {
     DataTypeIdentifier,
     FunctionDefinition,
     Maybe, ParameterDefinition,

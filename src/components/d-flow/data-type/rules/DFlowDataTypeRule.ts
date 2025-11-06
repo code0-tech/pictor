@@ -1,5 +1,5 @@
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
-import {GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {FlowView} from "../../DFlow.view";
 
 export interface DFlowDataTypeRule {

@@ -5,7 +5,7 @@ import React from "react";
 import {Code0Component} from "../../../utils/types";
 import {mergeCode0Props} from "../../../utils/utils";
 import {IconChevronDown, IconChevronRight, IconFolder} from "@tabler/icons-react";
-import {Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../../scroll-area/ScrollArea";

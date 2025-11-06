@@ -1,4 +1,4 @@
-import {GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 import {RuleMap} from "./rules/DFlowDataTypeRules";
 import {DataTypeView} from "./DFlowDataType.view";
 import {useService} from "../../../utils/contextStore";

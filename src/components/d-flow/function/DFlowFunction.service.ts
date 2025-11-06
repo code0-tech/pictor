@@ -1,6 +1,6 @@
 import {ReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {FunctionDefinition} from "@code0-tech/sagittarius-graphql-types";
+import type {FunctionDefinition} from "@code0-tech/sagittarius-graphql-types";
 
 
 export abstract class DFlowFunctionReactiveService extends ReactiveArrayService<FunctionDefinitionView> {

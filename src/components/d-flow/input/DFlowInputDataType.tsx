@@ -1,6 +1,6 @@
 import React from "react";
 import {ValidationProps} from "../../form/useForm";
-import {
+import type {
     DataType,
     DataTypeIdentifier,
     DataTypeRule,
@@ -9,7 +9,7 @@ import {
     DataTypeRulesNumberRangeConfig,
     DataTypeRulesParentTypeConfig,
     DataTypeRulesVariant,
-    DataTypeVariant, Flow,
+    Flow,
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
@@ -34,16 +34,16 @@ import {
 } from "../../form/InputSuggestion";
 
 const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
-    DataTypeRulesVariant.ItemOfCollection,
-    DataTypeRulesVariant.Regex,
-    DataTypeRulesVariant.NumberRange
+    "ITEM_OF_COLLECTION" as DataTypeRulesVariant.ItemOfCollection,
+    "REGEX" as DataTypeRulesVariant.Regex,
+    "NUMBER_RANGE" as DataTypeRulesVariant.NumberRange,
 ])
 
 const BLOCKING_SIGNATURE_KEY = "__blockingSignature"
 
-const DATA_TYPE_RULES_VARIANTS = [
-    DataTypeRulesVariant.ContainsKey, DataTypeRulesVariant.ContainsType, DataTypeRulesVariant.ItemOfCollection,
-    DataTypeRulesVariant.NumberRange, DataTypeRulesVariant.Regex,
+const DATA_TYPE_RULES_VARIANTS: Array<DataTypeRulesVariant> = [
+    "CONTAINS_KEY" as DataTypeRulesVariant.ContainsKey, "CONTAINS_TYPE" as DataTypeRulesVariant.ContainsType, "ITEM_OF_COLLECTION" as DataTypeRulesVariant.ItemOfCollection,
+    "NUMBER_RANGE" as DataTypeRulesVariant.NumberRange, "REGEX" as DataTypeRulesVariant.Regex,
 ]
 
 export interface DFlowInputDataTypeProps extends ValidationProps<DataType | GenericType> {
@@ -245,12 +245,12 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
                             })
 
                         }} suggestions={DATA_TYPE_RULES_VARIANTS.filter(ruleType => {
-                            if (dataType?.variant == DataTypeVariant.Object) {
-                                return ruleType == DataTypeRulesVariant.ContainsKey
-                            } else if (dataType?.variant == DataTypeVariant.Array) {
-                                return ruleType == DataTypeRulesVariant.ContainsType
+                            if (dataType?.variant == "OBJECT") {
+                                return ruleType == "CONTAINS_KEY"
+                            } else if (dataType?.variant == "ARRAY") {
+                                return ruleType == "CONTAINS_TYPE"
                             }
-                            return !(ruleType == DataTypeRulesVariant.ContainsType || ruleType == DataTypeRulesVariant.ContainsKey)
+                            return !(ruleType == "CONTAINS_TYPE" || ruleType == "CONTAINS_KEY")
                         }).map(variant => ({
                             children: <>
                                 <IconSettings size={16}/>
@@ -262,15 +262,15 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
                                 variant: variant,
                                 config: {
                                     __typename: `DataTypeRules${variant[0]}Config`,
-                                    ...(variant === DataTypeRulesVariant.NumberRange ? {
+                                    ...(variant === "NUMBER_RANGE" ? {
                                         from: undefined,
                                         to: undefined,
                                         steps: undefined
                                     } : {}),
-                                    ...(variant === DataTypeRulesVariant.Regex ? {
+                                    ...(variant === "REGEX" ? {
                                         pattern: undefined
                                     } : {}),
-                                    ...(variant === DataTypeRulesVariant.ItemOfCollection ? {
+                                    ...(variant === "ITEM_OF_COLLECTION" ? {
                                         items: undefined
                                     } : {})
                                 },
@@ -610,7 +610,7 @@ const buildConfigFromValue = (
 ): DataTypeRulesConfig | undefined => {
     const {variant, numberRangeKey} = options ?? {}
 
-    const isNumberRange = variant === DataTypeRulesVariant.NumberRange
+    const isNumberRange = variant === "NUMBER_RANGE"
     const fallbackConfig = fallback ?? undefined
 
     if (isNumberRange) {

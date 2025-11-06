@@ -1,7 +1,7 @@
 import {Panel} from "@xyflow/react";
 import React from "react";
 import {useDFlowValidations} from "./DFlowValidation.hook";
-import {Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Flex} from "../../flex/Flex";
 import {InspectionSeverity} from "../../../utils/inspection";
 import {Badge} from "../../badge/Badge";

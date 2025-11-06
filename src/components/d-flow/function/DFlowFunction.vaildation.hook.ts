@@ -10,7 +10,7 @@ import {
 import {useReturnType} from "./DFlowFunction.return.hook";
 import {useService} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
-import {DataTypeVariant, Maybe, NodeFunction, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeVariant, Maybe, NodeFunction, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {useValidateDataType} from "../data-type/DFlowDataType.validation.type";
 import {useValidateValue} from "../data-type/DFlowDataType.validation.value";
 import {DFlowReactiveService} from "../DFlow.service";
@@ -40,7 +40,7 @@ export const useFunctionValidation = (
         if (!value) return;
         const parameterType = parameter.dataTypeIdentifier
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
-        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != DataTypeVariant.Node ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
+        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != "NODE" ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
         const valueDataType = dataTypeService.getDataType(valueType!!)
 
         // Check if the parameter is generic (by key or by structure)
@@ -123,7 +123,7 @@ export const useFunctionValidation = (
             }
 
             if (valueDataType) {
-                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.variant !== DataTypeVariant.Node) {
+                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.variant !== "NODE") {
                     isValid = useValidateDataType(parameterDataType, valueDataType)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));

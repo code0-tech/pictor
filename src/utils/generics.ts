@@ -1,6 +1,6 @@
 import {FunctionDefinitionView} from "../components/d-flow/function/DFlowFunction.view";
 import {DFlowDataTypeReactiveService} from "../components/d-flow/data-type/DFlowDataType.service";
-import {
+import type {
     DataType,
     DataTypeIdentifier,
     DataTypeRule,
@@ -193,7 +193,7 @@ export const resolveGenericKeyMappings = (
             const valueSources = matchingValueMapper.sourceDataTypeIdentifiers ?? [];
 
             if (
-                (combination.has(GenericCombinationStrategyType.And) || combination.has(GenericCombinationStrategyType.Or)) &&
+                (combination.has("AND" as GenericCombinationStrategyType.And) || combination.has("OR" as GenericCombinationStrategyType.Or)) &&
                 valueSources.length === 1 &&
                 keysInSources.length === (paramMapper.sourceDataTypeIdentifiers?.length ?? 0)
             ) {
@@ -434,19 +434,19 @@ function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolea
     if (sourceRule.variant !== targetRule.variant) return false;
 
     switch (targetRule.variant) {
-        case DataTypeRulesVariant.ContainsType:
-        case DataTypeRulesVariant.ReturnType:
+        case "CONTAINS_TYPE":
+        case "RETURN_TYPE":
             return identifiersMatch(
                 (sourceRule.config as { dataTypeIdentifier?: DataTypeIdentifier }).dataTypeIdentifier,
                 (targetRule.config as { dataTypeIdentifier?: DataTypeIdentifier }).dataTypeIdentifier
             );
-        case DataTypeRulesVariant.ContainsKey: {
+        case "CONTAINS_KEY": {
             const sourceConfig = sourceRule.config as { key: string; dataTypeIdentifier?: DataTypeIdentifier };
             const targetConfig = targetRule.config as { key: string; dataTypeIdentifier?: DataTypeIdentifier };
             if (sourceConfig.key !== targetConfig.key) return false;
             return identifiersMatch(sourceConfig.dataTypeIdentifier, targetConfig.dataTypeIdentifier);
         }
-        case DataTypeRulesVariant.InputType: {
+        case "INPUT_TYPE": {
             const sourceConfig = sourceRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
             const targetConfig = targetRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
             const targetInputTypes = targetConfig.inputTypes ?? [];
@@ -457,13 +457,13 @@ function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolea
                 )
             );
         }
-        case DataTypeRulesVariant.ItemOfCollection: {
+        case "ITEM_OF_COLLECTION": {
             const sourceItems = (sourceRule.config as { items?: unknown[] }).items ?? [];
             const targetItems = (targetRule.config as { items?: unknown[] }).items ?? [];
             if (sourceItems.length !== targetItems.length) return false;
             return sourceItems.every((item, index) => item === targetItems[index]);
         }
-        case DataTypeRulesVariant.NumberRange: {
+        case "NUMBER_RANGE": {
             const sourceConfig = sourceRule.config as { from: number; to: number; steps?: number };
             const targetConfig = targetRule.config as { from: number; to: number; steps?: number };
             return (
@@ -472,7 +472,7 @@ function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolea
                 sourceConfig.steps === targetConfig.steps
             );
         }
-        case DataTypeRulesVariant.Regex: {
+        case "REGEX": {
             const sourcePattern = (sourceRule.config as { pattern: string }).pattern;
             const targetPattern = (targetRule.config as { pattern: string }).pattern;
             return sourcePattern === targetPattern;
@@ -525,8 +525,8 @@ export const resolveType = (
         if (!dataType) return type;
         const genericKeys = dataType.genericKeys ?? [];
 
-        if (dataType.variant === DataTypeVariant.Array && genericKeys.length > 0) {
-            const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === DataTypeRulesVariant.ContainsType);
+        if (dataType.variant === "ARRAY" && genericKeys.length > 0) {
+            const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === "CONTAINS_TYPE");
             const innerIdentifier = (innerTypeRule?.config as { dataTypeIdentifier?: DataTypeIdentifier })?.dataTypeIdentifier;
             if (innerIdentifier) {
                 const [genericKey] = genericKeys;

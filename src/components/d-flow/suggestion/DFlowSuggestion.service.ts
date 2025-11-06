@@ -1,4 +1,4 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {DFlowSuggestion} from "./DFlowSuggestion.view";
 
 export abstract class DFlowReactiveSuggestionService extends ReactiveArrayService<DFlowSuggestion> {

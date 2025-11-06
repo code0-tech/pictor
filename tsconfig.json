@@ -19,19 +19,12 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
     "baseUrl": "src/",
-    "paths": {
-      "utils": [
-        "src/utils/*"
-      ],
-      "components": [
-        "src/components/*"
-      ]
-    }
   },
   "exclude": [
     "node_modules",
     "build",
-    "dist"
+    "dist",
+    [".storybook"]
   ],
   "types": [
     "typePatches"

@@ -1,5 +1,5 @@
 import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
-import {DataTypeRulesItemOfCollectionConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeRulesItemOfCollectionConfig, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 /**
  * @todo deep equality check for arrays and objects

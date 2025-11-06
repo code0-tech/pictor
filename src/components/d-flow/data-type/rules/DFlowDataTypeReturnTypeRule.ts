@@ -1,6 +1,6 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
-import {
+import type {
     DataTypeRulesReturnTypeConfig,
     GenericCombinationStrategyType,
     GenericMapper,
@@ -54,7 +54,7 @@ export class DFlowDataTypeReturnTypeRule {
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
-                    if (genericCombination && genericCombination[currentIndex - 1].type == GenericCombinationStrategyType.Or) {
+                    if (genericCombination && genericCombination[currentIndex - 1].type == "OR") {
                         return previousValue || currentValue
                     }
 
@@ -78,7 +78,7 @@ export class DFlowDataTypeReturnTypeRule {
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
-                    if (genericCombination && genericCombination[currentIndex - 1].type == GenericCombinationStrategyType.Or) {
+                    if (genericCombination && genericCombination[currentIndex - 1].type == "OR") {
                         return previousValue || currentValue
                     }
 

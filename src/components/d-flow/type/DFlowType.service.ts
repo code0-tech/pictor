@@ -1,6 +1,6 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../../utils/reactiveArrayService";
 import {FlowTypeView} from "./DFlowType.view";
-import {FlowType, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {FlowType} from "@code0-tech/sagittarius-graphql-types";
 
 export abstract class DFlowTypeReactiveService extends ReactiveArrayService<FlowTypeView> {
 

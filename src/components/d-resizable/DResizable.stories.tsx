@@ -1,7 +1,7 @@
 import {Meta} from "@storybook/react";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
-import DFullScreen from "../d-fullscreen/DFullScreen";
+import {DFullScreen} from "../d-fullscreen/DFullScreen";
 import {Button} from "../button/Button";
 import {IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
 import {Flex} from "../flex/Flex";

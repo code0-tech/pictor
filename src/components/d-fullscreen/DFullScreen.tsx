@@ -9,7 +9,7 @@ export interface DFullScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
-const DFullScreen: React.FC<DFullScreenProps> = props => {
+export const DFullScreen: React.FC<DFullScreenProps> = props => {
 
     const divRef = React.useRef<HTMLDivElement>(null);
 
@@ -28,5 +28,3 @@ const DFullScreen: React.FC<DFullScreenProps> = props => {
         {props.children}
     </div>
 }
-
-export default Object.assign(DFullScreen)

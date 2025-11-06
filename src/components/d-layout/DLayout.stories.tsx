@@ -2,7 +2,7 @@ import {Meta} from "@storybook/react";
 import {DLayout} from "./DLayout";
 import React from "react";
 import {Text} from "../text/Text";
-import DFullScreen from "../d-fullscreen/DFullScreen";
+import {DFullScreen} from "../d-fullscreen/DFullScreen";
 
 const meta: Meta = {
     title: "Dashboard Layout",

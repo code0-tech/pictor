@@ -55,8 +55,6 @@
       color: helpers.color(variables.$white, 25%);
     }
 
-    @include helpers.disabled();
-
     .input__right {
       padding-right: 0;
     }

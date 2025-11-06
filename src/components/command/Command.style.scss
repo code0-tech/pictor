@@ -48,16 +48,14 @@
     display: flex;
     height: 2rem;
     color: helpers.color(variables.$white, variables.$hierarchySecondary);
-    font-size: variables.$sm;;
+    font-size: variables.$sm;
     border-radius: variables.$borderRadius - variables.$xxs;
 
     &::placeholder {
       color: helpers.color(variables.$white, 25%);
     }
 
-    &:disabled {
-      @include helpers.disabled()
-    }
+    @include helpers.disabled();
 
     .input__right {
       padding-right: 0;

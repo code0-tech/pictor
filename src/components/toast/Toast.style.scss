@@ -1,0 +1,61 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "../../styles/box";
+
+.toast {
+  @include helpers.borderRadius();
+  @include box.box(variables.$primary, variables.$primary, variables.$secondary);
+
+  padding: .5rem 1rem;
+
+  &__heading {
+    font-weight: 500;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__content {
+    margin: .5rem -.5rem -.5rem -.5rem;
+    padding: .5rem;
+  }
+
+  &__header-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    color: helpers.color(variables.$white);
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: .5rem;
+
+    > * {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  &__dismissible {
+    @include helpers.borderRadius();
+
+    color: helpers.color(variables.$white);
+
+    & {
+      width: 1rem;
+      height: 1rem;
+      padding: .25rem;
+      cursor: pointer;
+      margin-left: .5rem;
+    }
+
+    > * {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}

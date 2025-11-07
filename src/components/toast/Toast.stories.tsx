@@ -1,7 +1,7 @@
 import React from "react"
 import {Toast, toast} from "./Toast"
 import {Meta, StoryObj} from "@storybook/react"
-import Button from "../button/Button"
+import {Button} from "../button/Button"
 import {Toaster} from "sonner"
 
 const meta: Meta<typeof Toast> = {

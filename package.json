@@ -21,6 +21,7 @@
     "@ariakit/react": "^0.4.17",
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@code0-tech/definition-reader": "^0.0.16",
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-65144a9920c6a8de3bcf24acdcb8eec4158cef73",
     "@dagrejs/dagre": "^1.1.8",
     "@mdx-js/react": "^3.1.1",
@@ -78,8 +79,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.2.2",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-lib-inject-css": "^2.2.2",
-    "@code0-tech/definition-reader": "^0.0.16"
+    "vite-plugin-lib-inject-css": "^2.2.2"
   },
   "main": "dist/index.js",
   "repository": {
@@ -115,5 +115,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "sonner": "^2.0.7"
   }
 }

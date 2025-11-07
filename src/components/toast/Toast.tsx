@@ -6,7 +6,7 @@ import "./Toast.style.scss"
 import {Code0Component, Color} from "../../utils/types"
 import {mergeCode0Props} from "../../utils/utils"
 import {IconAlertCircle, IconCircleCheck, IconCircleMinus, IconCircleX, IconLoaderQuarter, IconX} from "@tabler/icons-react"
-import Text from "../text/Text"
+import {Text} from "../text/Text"
 
 type ToastType = "success" | "info" | "warning" | "error" | "loading"
 

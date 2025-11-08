@@ -70,10 +70,10 @@ export function useReactiveArrayService<K, S extends ArrayService<K>>(
     Ctor: ArrayServiceCtor<K, S> | ((store: ReactiveArrayStore<K>) => S),
     initial: InitialArg<K, S> = []
 ): [K[], S] {
-
     const [state, setState] = React.useState<K[]>(
         Array.isArray(initial) ? initial : []
     );
+
     const ref = React.useRef(state);
     React.useEffect(() => {
         ref.current = state;
@@ -81,21 +81,33 @@ export function useReactiveArrayService<K, S extends ArrayService<K>>(
 
     const getState = React.useCallback(() => ref.current, []);
 
-    const service = React.useMemo(() =>
-        (
-            typeof Ctor === "function"
-            && Ctor.prototype
-            && Object.getOwnPropertyNames(Ctor.prototype).some((n) => n !== "constructor"
-            )
-        ) ? (
-            (Ctor as ((store: ReactiveArrayStore<K>) => S))({getState, setState})
-        ) : new (Ctor as ArrayServiceCtor<K, S>)({getState, setState}), [Ctor, getState, setState]);
+    const service = React.useMemo(() => {
+        const store = {getState, setState};
+
+        const handler = {
+            construct() {
+                return handler
+            }
+        }
+
+        const isConstructor = (x: any) => {
+            try {
+                return !!(new (new Proxy(x, handler))())
+            } catch (e) {
+                return false
+            }
+        }
+
+        return isConstructor(Ctor)
+            ? new (Ctor as ArrayServiceCtor<K, S>)(store) // Klasse → mit new
+            : (Ctor as (store: ReactiveArrayStore<K>) => S)(store); // Factory → direkt aufrufen
+    }, [Ctor, getState, setState]);
 
     React.useEffect(() => {
         if (typeof initial === "function") {
             setState((initial as (svc: S) => K[])(service));
         }
-    }, [service]);
+    }, [service, initial]);
 
     return [state, service];
 }

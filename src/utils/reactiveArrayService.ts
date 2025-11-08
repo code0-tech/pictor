@@ -82,7 +82,12 @@ export function useReactiveArrayService<K, S extends ArrayService<K>>(
     const getState = React.useCallback(() => ref.current, []);
 
     const service = React.useMemo(() =>
-        typeof Ctor === "function" ? (
+        (
+            typeof Ctor === "function"
+            && Ctor.prototype
+            && Object.getOwnPropertyNames(Ctor.prototype).some((n) => n !== "constructor"
+            )
+        ) ? (
             (Ctor as ((store: ReactiveArrayStore<K>) => S))({getState, setState})
         ) : new (Ctor as ArrayServiceCtor<K, S>)({getState, setState}), [Ctor, getState, setState]);
 

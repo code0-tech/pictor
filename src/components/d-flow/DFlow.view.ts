@@ -1,12 +1,12 @@
-import type {
+import {
     DataType,
-    Flow,
-    FlowSetting,
+    Flow, FlowInput,
+    FlowSetting, FlowSettingInput,
     FlowType, FunctionDefinition,
     LiteralValue,
     Maybe,
-    NodeFunction,
-    NodeParameter,
+    NodeFunction, NodeFunctionInput,
+    NodeParameter, NodeParameterInput,
     NodeParameterValue,
     ReferenceValue,
     RuntimeParameterDefinition,
@@ -156,6 +156,12 @@ export class FlowView {
             name: this._name,
         }
     }
+
+    inputJson(): FlowInput {
+        return {
+            name: this._name!!,
+        }
+    }
 }
 
 export class NodeFunctionView {
@@ -227,6 +233,12 @@ export class NodeFunctionView {
             } : undefined,
             functionDefinition: this._functionDefinition,
             updatedAt: this._updatedAt,
+        }
+    }
+
+    inputJson(): NodeFunctionInput {
+        return {
+            nextNode: this
         }
     }
 }
@@ -306,6 +318,15 @@ export class NodeParameterView {
             value: this._value instanceof NodeFunctionView ? this._value.json() : this._value,
         }
     }
+
+    inputJson(): NodeParameterInput {
+        return {
+            runtimeParameterDefinitionId: this._runtimeParameter!!.id!!,
+            value: {
+                ...(this.value ins)
+            }
+        }
+    }
 }
 
 export class FlowSettingView {
@@ -360,6 +381,13 @@ export class FlowSettingView {
             id: this._id,
             value: this._value,
             updatedAt: this._updatedAt
+        }
+    }
+
+    inputJson(): FlowSettingInput {
+        return {
+            flowSettingId: this._flowSettingIdentifier!!,
+            object: this._value!!,
         }
     }
 }

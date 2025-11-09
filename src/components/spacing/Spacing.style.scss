@@ -1,0 +1,11 @@
+@use "../../styles/variables";
+
+.spacing {
+  position: relative;
+}
+
+@each $name, $size in variables.$sizes {
+  .spacing--#{$name} {
+    margin-bottom: $size;
+  }
+}

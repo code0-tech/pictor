@@ -3,18 +3,21 @@
 @use "../../styles/variables";
 
 .button {
-  padding: variables.$xxs variables.$xs;
+  padding: variables.$xs variables.$md;
   gap: .5rem;
   cursor: pointer;
   height: fit-content;
   display: flex;
   align-items: center;
   width: fit-content;
-  border-radius: 50rem;
   justify-content: center;
   font-size: variables.$sm;
 
   @include helpers.disabled;
+
+  & {
+    @include helpers.borderRadius()
+  }
 }
 
 

@@ -17,7 +17,7 @@ const DUserMenu: React.FC<DUserMenuProps> = props => {
     const userService = useService(DUserReactiveService)
     const userStore = useService(DUserReactiveService)
 
-    const currentUser = userService.getUserSession()?.user
+    const currentUser = userService.getById(props.userId)
 
     return React.useMemo(() => {
         return (

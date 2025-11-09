@@ -17,11 +17,15 @@ export const DFullScreen: React.FC<DFullScreenProps> = props => {
         if (!divRef.current) return
 
         window.addEventListener("resize", () => {
-            divRef.current!!.style.height = window.innerHeight + "px";
-            divRef.current!!.style.width = window.innerWidth + "px";
+            const vw = Math.round(window.visualViewport?.width ?? window.innerWidth);
+            const vh = Math.round(window.visualViewport?.height ?? window.innerHeight);
+            divRef.current!!.style.height = vh + "px";
+            divRef.current!!.style.width = vw + "px";
         })
-        divRef.current!!.style.height = window.innerHeight + "px";
-        divRef.current!!.style.width = window.innerWidth + "px";
+        const vw = Math.round(window.visualViewport?.width ?? window.innerWidth);
+        const vh = Math.round(window.visualViewport?.height ?? window.innerHeight);
+        divRef.current!!.style.height = vh + "px";
+        divRef.current!!.style.width = vw + "px";
     }, [divRef])
 
     return <div {...mergeCode0Props("d-full-screen", props)} ref={divRef}>

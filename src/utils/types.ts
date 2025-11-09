@@ -4,9 +4,9 @@ export type Color = "primary" | "secondary" | "info" | "success" | "warning" | "
 
 export const Colors: Color[] = ["primary", "secondary", "info", "success", "warning", "error"]
 
-export type Code0Sizes = "xs" | "sm" | "md" | "lg" | "xl";
+export type Code0Sizes = "xxs" | "xs" | "sm" | "md" | "lg" | "xl";
 
-export type Code0FontSizes = "0.75" | "0.8" | "1" | "1.2" | "1.25"
+export type Code0FontSizes = "0.35" | "0.7" | "0.8" | "1" | "1.2" | "1.3"
 
 export type StyleProp<Value> = Value;
 

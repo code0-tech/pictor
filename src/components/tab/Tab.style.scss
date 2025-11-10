@@ -23,19 +23,36 @@
     position: relative;
     box-sizing: border-box;
 
-    &[data-orientation="vertical"] {
-      border-left: 2px solid transparent;
+    &:after {
+      content: "";
+      position: absolute;
+      background: transparent;
+      border-radius: 50rem;
     }
+
+    &[data-orientation="vertical"] {
+      &:after {
+        height: 100%;
+        width: 2px;
+        top: 0;
+        left: 0;
+      }
+    }
+
     &[data-orientation="horizontal"] {
-      border-bottom: 2px solid transparent;
+      &:after {
+        width: 100%;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+      }
     }
 
     &[aria-selected=true] {
-      &[data-orientation="vertical"] {
-        border-left: 2px solid helpers.borderColor(variables.$info);
-      }
-      &[data-orientation="horizontal"] {
-        border-bottom: 2px solid helpers.borderColor(variables.$info);
+      &[data-orientation="vertical"], &[data-orientation="horizontal"] {
+        &:after {
+          background: variables.$info;
+        }
       }
     }
 

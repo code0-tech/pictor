@@ -3,7 +3,7 @@
 import React from "react"
 import {Menu, MenuContent, MenuPortal, MenuProps, MenuTrigger} from "../menu/Menu"
 import {DUserReactiveService} from "./DUser.service"
-import {useService} from "../../utils/contextStore"
+import {useService, useStore} from "../../utils/contextStore"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Avatar} from "../avatar/Avatar"
 import {Text} from "../text/Text"
@@ -15,9 +15,8 @@ export interface DUserMenuProps extends MenuProps {
 
 const DUserMenu: React.FC<DUserMenuProps> = props => {
     const userService = useService(DUserReactiveService)
-    const userStore = useService(DUserReactiveService)
-
-    const currentUser = userService.getById(props.userId)
+    const userStore = useStore(DUserReactiveService)
+    const currentUser = React.useMemo(() => userService.getById(props.userId), [userStore])
 
     return React.useMemo(() => {
         return (
@@ -43,7 +42,7 @@ const DUserMenu: React.FC<DUserMenuProps> = props => {
                 </MenuPortal>
             </Menu>
         )
-    }, [userStore])
+    }, [currentUser])
 }
 
 export default DUserMenu

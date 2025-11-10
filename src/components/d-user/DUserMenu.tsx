@@ -16,7 +16,7 @@ export interface DUserMenuProps extends MenuProps {
 const DUserMenu: React.FC<DUserMenuProps> = props => {
     const userService = useService(DUserReactiveService)
     const userStore = useStore(DUserReactiveService)
-    const currentUser = React.useMemo(() => userService.getById(props.userId), [userStore])
+    const currentUser = React.useMemo(() => userService.getById(props.userId), [userStore, userService])
 
     return React.useMemo(() => {
         return (

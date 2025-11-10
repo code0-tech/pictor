@@ -1,0 +1,65 @@
+@use "../../styles/variables";
+@use "../../styles/helpers";
+
+.tab {
+
+  &[data-orientation="vertical"] {
+    display: flex;
+  }
+
+  &__list {
+    display: flex;
+
+    &[data-orientation="vertical"] {
+      flex-direction: column;
+    }
+  }
+
+  &__trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+
+    &:after {
+      content: "";
+      position: absolute;
+      background: transparent;
+      border-radius: 50rem;
+    }
+
+    &[data-orientation="vertical"] {
+      &:after {
+        height: 100%;
+        width: 2px;
+        top: 0;
+        left: 0;
+      }
+    }
+
+    &[data-orientation="horizontal"] {
+      &:after {
+        width: 100%;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+      }
+    }
+
+    &[aria-selected=true] {
+      &[data-orientation="vertical"], &[data-orientation="horizontal"] {
+        &:after {
+          background: variables.$info;
+        }
+      }
+    }
+
+  }
+
+  &__content {
+
+  }
+
+}

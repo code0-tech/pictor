@@ -1,0 +1,48 @@
+@use "../../styles/variables";
+@use "../../styles/helpers";
+
+.tab {
+
+  &[data-orientation="vertical"] {
+    display: flex;
+  }
+
+  &__list {
+    display: flex;
+
+    &[data-orientation="vertical"] {
+      flex-direction: column;
+    }
+  }
+
+  &__trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+
+    &[data-orientation="vertical"] {
+      border-left: 2px solid transparent;
+    }
+    &[data-orientation="horizontal"] {
+      border-bottom: 2px solid transparent;
+    }
+
+    &[aria-selected=true] {
+      &[data-orientation="vertical"] {
+        border-left: 2px solid helpers.borderColor(variables.$info);
+      }
+      &[data-orientation="horizontal"] {
+        border-bottom: 2px solid helpers.borderColor(variables.$info);
+      }
+    }
+
+  }
+
+  &__content {
+
+  }
+
+}

@@ -26,6 +26,7 @@ export * from "./components/row/Row"
 export * from "./components/scroll-area/ScrollArea"
 export * from "./components/segmented-control/SegmentedControl"
 export * from "./components/spacing/Spacing"
+export * from "./components/tab/Tab"
 export * from "./components/text/Text"
 export * from "./components/tooltip/Tooltip"
 

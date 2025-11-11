@@ -6,23 +6,26 @@ import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
-    NamespacesLicensesCreateInput, NamespacesLicensesCreatePayload,
-    NamespacesLicensesDeleteInput, NamespacesLicensesDeletePayload,
+    NamespacesLicensesCreateInput,
+    NamespacesLicensesCreatePayload,
+    NamespacesLicensesDeleteInput,
+    NamespacesLicensesDeletePayload,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsCreateInput,
     NamespacesProjectsDeleteInput,
     OrganizationsCreateInput,
     OrganizationsCreatePayload,
-    OrganizationsDeleteInput, OrganizationsDeletePayload,
+    OrganizationsDeleteInput,
+    OrganizationsDeletePayload,
     OrganizationsUpdateInput,
     OrganizationsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceProjectReactiveService} from "../d-namespace/project/DNamespaceProject.service"
 import {DNamespaceProjectView} from "../d-namespace/project/DNamespaceProject.view"
 import {DNamespaceLicenseReactiveService} from "../d-namespace/license/DNamespaceLicense.service"
 import {DNamespaceLicenseView} from "../d-namespace/license/DNamespaceLicense.view"
 import {DNamespaceView} from "../d-namespace/DNamespace.view"
 import {DNamespaceReactiveService} from "../d-namespace/DNamespace.service"
+import {Container} from "../container/Container";
 
 const meta: Meta = {
     title: "DOrganizationCard",
@@ -124,10 +127,11 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
         ])
 
         return (
-            <ContextStoreProvider services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService]]}>
-                {React.useMemo(() => {
-                    return <DOrganizationCard organizationId={"gid://sagittarius/Organization/1"}/>
-                }, [])}
+            <ContextStoreProvider
+                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService]]}>
+                <Container>
+                    <DOrganizationCard organizationId={"gid://sagittarius/Organization/1"}/>
+                </Container>
             </ContextStoreProvider>
         )
     }

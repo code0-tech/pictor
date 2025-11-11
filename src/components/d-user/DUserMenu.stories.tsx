@@ -34,6 +34,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view"
 import {MenuGroup, MenuItem, MenuLabel, MenuSeparator} from "../menu/Menu"
+import {setUserSession} from "./DUser.session.hook";
 
 const meta: Meta = {
     title: "DUserMenu",
@@ -118,7 +119,7 @@ export const DUserMenuExample: DUserMenuStory = {
             })
         ])
 
-        userService.createUserSession({
+        setUserSession({
             user: {
                 id: "gid://sagittarius/User/1",
                 username: "exampleuser",

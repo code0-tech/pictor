@@ -37,14 +37,6 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
     //TODO: inject UI error handler for toasts
     //no id's need to be injected here because the root query has a users field
 
-    createUserSession(payload: UserSession): void {
-        window.localStorage.setItem("ide_code-zero_session", JSON.stringify(payload));
-    }
-
-    getUserSession(): UserSession | undefined {
-        return JSON.parse(window.localStorage.getItem("ide_code-zero_session")!!) as UserSession
-    }
-
     getById(id: User['id']): DUserView | undefined {
         return this.values().find(user => user.id === id);
     }

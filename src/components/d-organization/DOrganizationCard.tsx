@@ -14,6 +14,7 @@ import {Button} from "../button/Button";
 import CardSection from "../card/CardSection";
 import {DNamespaceReactiveService} from "../d-namespace/DNamespace.service"
 import {DNamespaceLicenseReactiveService} from "../d-namespace/license/DNamespaceLicense.service"
+import {Spacing} from "../spacing/Spacing";
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']
@@ -43,45 +44,33 @@ const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {
 
     return React.useMemo(() => {
         return (
-            <Card maw={"400px"}>
+            <Card>
                 <Flex align={"center"} style={{gap: "0.7rem"}} justify={"space-between"}>
-                    <Text size={"lg"} hierarchy={"primary"} display={"block"}>
-                        {organization?.name}
-                    </Text>
+                    <Flex style={{flexDirection: "column"}}>
+                        <Text size={"lg"} hierarchy={"primary"} display={"block"}>
+                            {organization?.name}
+                        </Text>
+                        <Spacing spacing={"md"}/>
+                        <Flex align={"center"} style={{gap: "1.3rem", flexWrap: "wrap"}}>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconFolder size={18}/>
+                                <Text size={"xs"} hierarchy={"tertiary"}>{`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}</Text>
+                            </Flex>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconUser size={18}/>
+                                <Text size={"xs"} hierarchy={"tertiary"}> {`${memberCount ?? 0} member${(memberCount ?? 0) !== 1 ? "s" : ""}`}</Text>
+                            </Flex>
+                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                <IconServer size={18}/>
+                                <Text size={"xs"} hierarchy={"tertiary"}>{`${runtimeCount ?? 0} runtime${(runtimeCount ?? 0) !== 1 ? "s" : ""}`}</Text>
+                            </Flex>
+                        </Flex>
+                    </Flex>
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                         <Button color={"secondary"} onClick={() => onSettingsClick(organizationId)}><IconSettings size={16}/></Button>
                         <Button color={"error"} onClick={() => onLeaveClick(organizationId)}><IconLogout size={16}/> Leave</Button>
                     </Flex>
                 </Flex>
-                <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>
-                    {organization?.name}
-                </Text>
-                <CardSection border>
-                    <Flex align={"center"} style={{gap: "0.35rem", flexWrap: "wrap"}}>
-                        {/* Project count */}
-                        <Badge color={"info"}>
-                            <IconFolder size={18}/>
-                            <Text size={"xs"}>{`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}</Text>
-                        </Badge>
-                        {/* Members count */}
-                        <Badge color={"info"}>
-                            <IconUser size={18}/>
-                            <Text size={"xs"}>{`${memberCount ?? 0} member${(memberCount ?? 0) !== 1 ? "s" : ""}`}</Text>
-                        </Badge>
-                        {/* Which License (CE / EE) */}
-                        {/*
-                        <Badge color={"info"}>
-                            <IconAward size={18}/>
-                            <Text size={"xs"}>{`${licenseName} license`}</Text>
-                        </Badge>
-                        */}
-                        {/* Runtime Count */}
-                        <Badge color={"info"}>
-                            <IconServer size={18}/>
-                            <Text size={"xs"}>{`${runtimeCount ?? 0} runtime${(runtimeCount ?? 0) !== 1 ? "s" : ""}`}</Text>
-                        </Badge>
-                    </Flex>
-                </CardSection>
             </Card>
         )
     }, [organizationStore, namespaceStore, licenseStore])

@@ -5,20 +5,24 @@ import { toast as sonnerToast } from 'sonner'
 import "./Toast.style.scss"
 import {Code0Component, Color} from "../../utils/types"
 import {mergeCode0Props} from "../../utils/utils"
-import {IconAlertCircle, IconCircleCheck, IconCircleMinus, IconCircleX, IconLoaderQuarter, IconX} from "@tabler/icons-react"
+import {
+    IconAlertCircle,
+    IconCircleCheck, IconCircleDot,
+    IconCircleMinus,
+    IconCircleX, IconInfoCircle,
+    IconLoaderQuarter,
+    IconProps,
+    IconX
+} from "@tabler/icons-react"
 import {Text} from "../text/Text"
 import {Flex} from "../flex/Flex";
-
-type ToastType = "success" | "info" | "warning" | "error" | "loading"
 
 export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title" | "id"> {
     children?: React.ReactNode | React.ReactNode[]
     id: string | number
     title: React.ReactNode
-    //defaults to primary
-    color?: Color
     //defaults to true
-    type?: ToastType
+    color?: Color
     //defaults to false
     dismissible?: boolean
     onClose?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
@@ -26,13 +30,7 @@ export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title"
 
 export function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
-        <Toast
-            id={id}
-            title={toast.title}
-            color={toast.color}
-            type={toast.type}
-            dismissible={toast.dismissible}
-        >
+        <Toast id={id} {...toast}>
             {toast.children}
         </Toast>
     ), {
@@ -41,13 +39,13 @@ export function toast(toast: Omit<ToastProps, 'id'>) {
 }
 
 export function Toast(props: ToastProps) {
-    const {dismissible = false, type, title, onClose = () => {}, children, ...rest} = props
+    const {dismissible = false, color = "secondary", title, onClose = () => {}, children, ...rest} = props
 
     return (
-        <div {...mergeCode0Props("toast", rest)}>
+        <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
             <div className={"toast__header"}>
-                <Flex align={"center"}>
-                    {type && <ToastIcon type={type}/>}
+                <Flex align={"center"} className={"toast__header-wrapper"}>
+                    {color && <ToastIcon color={color}/>}
                     <Text size={"md"} hierarchy={"primary"}>{title}</Text>
                 </Flex>
                 {dismissible &&
@@ -65,14 +63,15 @@ export function Toast(props: ToastProps) {
     )
 }
 
-const ToastIcon: React.FC<{type: ToastType}> = ({ type }) => {
-    const icons = {
-        success: <IconCircleCheck size={16} className={"toast__icon"} />,
-        info: <IconAlertCircle size={16} className={"toast__icon"}/>,
-        warning: <IconCircleMinus size={16} className={"toast__icon"}/>,
-        error: <IconCircleX size={16} className={"toast__icon"}/>,
-        loading: <IconLoaderQuarter size={16} className={"toast__icon"}/>
+const ToastIcon: React.FC<{color: Color}> = ({ color }) => {
+    const icons: Record<Color, React.ReactElement<IconProps>> = {
+        "primary": <IconCircleDot size={16}/>,
+        "secondary": <IconCircleDot size={16}/>,
+        "info": <IconInfoCircle size={16}/>,
+        "success": <IconCircleCheck size={16}/>,
+        "warning": <IconAlertCircle size={16}/>,
+        "error": <IconCircleX size={16}/>,
     }
 
-    return icons[type] ?? null
+    return icons[color] ?? null
 }

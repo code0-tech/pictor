@@ -3,10 +3,14 @@
 @use "../../styles/box";
 
 .toast {
-  @include helpers.borderRadius();
-  @include box.box(variables.$primary, variables.$primary, variables.$secondary);
 
-  padding: .5rem 1rem;
+  padding: variables.$md;
+
+  & {
+    @include helpers.borderRadius();
+    @include box.box(variables.$primary);
+    @include helpers.fontStyle()
+  }
 
   &__header {
     display: flex;
@@ -16,23 +20,18 @@
 
   &__content {
     margin: variables.$xxs 0;
+    box-sizing: border-box;
   }
 
   &__header-wrapper {
     display: flex;
     align-items: center;
+    gap: variables.$xxs;
   }
 
   &__icon {
-    color: helpers.color(variables.$white);
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: .5rem;
-
-    > * {
-      width: 1.25rem;
-      height: 1.25rem;
-    }
+    min-width: variables.$md;
+    min-height: variables.$md;
   }
 
   &__dismissible {
@@ -52,5 +51,11 @@
       width: 1rem;
       height: 1rem;
     }
+  }
+}
+
+@each $name, $color in variables.$colors {
+  .toast--#{$name} {
+    @include box.box($color);
   }
 }

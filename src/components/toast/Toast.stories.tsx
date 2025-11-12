@@ -18,10 +18,9 @@ export const ExampleToast = () => {
     const renderToast = () => {
         toast({
             title: 'This is a headless toast',
-            color: "primary",
-            type: "success",
+            color: "warning",
             dismissible: true,
-            children: <Text>'You can customize the content of the toast as you like.'</Text>
+            children: <Text hierarchy={"tertiary"}>'You can customize the content of the toast as you like.'</Text>
         })
     }
 

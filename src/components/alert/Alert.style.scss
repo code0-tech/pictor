@@ -1,0 +1,28 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.alert {
+  padding: variables.$md;
+  font-size: variables.$sm;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: variables.$xxs;
+
+  & {
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
+  }
+
+  > svg {
+    min-width: variables.$md;
+    min-height: variables.$md;
+  }
+}
+
+@each $name, $color in variables.$colors {
+    .alert--#{$name} {
+      @include box.box($color);
+    }
+}

@@ -33,9 +33,7 @@ export function toast(toast: Omit<ToastProps, 'id'>) {
         <Toast id={id} {...toast}>
             {toast.children}
         </Toast>
-    ), {
-        duration: 10000000
-    })
+    ))
 }
 
 export function Toast(props: ToastProps) {
@@ -43,7 +41,7 @@ export function Toast(props: ToastProps) {
 
     return (
         <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
-            <div className={"toast__header"}>
+            <Flex className={"toast__header"}>
                 <Flex align={"center"} className={"toast__header-wrapper"}>
                     {color && <ToastIcon color={color}/>}
                     <Text size={"md"} hierarchy={"primary"}>{title}</Text>
@@ -53,7 +51,7 @@ export function Toast(props: ToastProps) {
                         <IconX size={16}/>
                     </span>
                 }
-            </div>
+            </Flex>
             {children &&
                 <div className={"toast__content"}>
                     {children}

@@ -8,12 +8,10 @@
 
   & {
     @include helpers.borderRadius();
-    @include box.box(variables.$primary);
     @include helpers.fontStyle()
   }
 
   &__header {
-    display: flex;
     align-items: center;
     justify-content: space-between;
   }
@@ -24,32 +22,30 @@
   }
 
   &__header-wrapper {
-    display: flex;
     align-items: center;
     gap: variables.$xxs;
-  }
 
-  &__icon {
-    min-width: variables.$md;
-    min-height: variables.$md;
+    > svg {
+      min-width: variables.$md;
+      min-height: variables.$md;
+    }
+
   }
 
   &__dismissible {
-    @include helpers.borderRadius();
 
-    color: helpers.color(variables.$white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     & {
-      width: 1rem;
-      height: 1rem;
-      padding: .25rem;
-      cursor: pointer;
-      margin-left: .5rem;
+      @include helpers.borderRadius();
     }
 
-    > * {
-      width: 1rem;
-      height: 1rem;
+    svg {
+        min-width: variables.$md;
+        min-height: variables.$md;
     }
   }
 }

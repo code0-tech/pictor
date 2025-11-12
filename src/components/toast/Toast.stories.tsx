@@ -3,6 +3,7 @@ import {Toast, toast} from "./Toast"
 import {Meta, StoryObj} from "@storybook/react"
 import {Button} from "../button/Button"
 import {Toaster} from "sonner"
+import {Text} from "../text/Text";
 
 const meta: Meta<typeof Toast> = {
     title: "Toast",
@@ -20,6 +21,7 @@ export const ExampleToast = () => {
             color: "primary",
             type: "success",
             dismissible: true,
+            children: <Text>'You can customize the content of the toast as you like.'</Text>
         })
     }
 

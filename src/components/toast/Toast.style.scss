@@ -8,10 +8,6 @@
 
   padding: .5rem 1rem;
 
-  &__heading {
-    font-weight: 500;
-  }
-
   &__header {
     display: flex;
     align-items: center;
@@ -19,8 +15,7 @@
   }
 
   &__content {
-    margin: .5rem -.5rem -.5rem -.5rem;
-    padding: .5rem;
+    margin: variables.$xxs 0;
   }
 
   &__header-wrapper {

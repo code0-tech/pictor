@@ -1,0 +1,57 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "../../styles/box";
+
+.toast {
+
+  padding: variables.$md;
+
+  & {
+    @include helpers.borderRadius();
+    @include helpers.fontStyle()
+  }
+
+  &__header {
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__content {
+    margin: variables.$xxs 0;
+    box-sizing: border-box;
+  }
+
+  &__header-wrapper {
+    align-items: center;
+    gap: variables.$xxs;
+
+    > svg {
+      min-width: variables.$md;
+      min-height: variables.$md;
+    }
+
+  }
+
+  &__dismissible {
+
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & {
+      @include helpers.borderRadius();
+    }
+
+    svg {
+        min-width: variables.$md;
+        min-height: variables.$md;
+    }
+  }
+}
+
+@each $name, $color in variables.$colors {
+  .toast--#{$name} {
+    @include box.box($color);
+  }
+}

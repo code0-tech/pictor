@@ -29,6 +29,7 @@ export * from "./components/segmented-control/SegmentedControl"
 export * from "./components/spacing/Spacing"
 export * from "./components/tab/Tab"
 export * from "./components/text/Text"
+export * from "./components/toast/Toast"
 export * from "./components/tooltip/Tooltip"
 
 export * from "./utils/index"

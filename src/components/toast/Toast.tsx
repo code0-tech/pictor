@@ -3,14 +3,12 @@
 import React from 'react'
 import { toast as sonnerToast } from 'sonner'
 import "./Toast.style.scss"
-import {Code0Component, Color} from "../../utils/types"
-import {mergeCode0Props} from "../../utils/utils"
+import {Code0Component, Color} from "../../utils"
+import {mergeCode0Props} from "../../utils"
 import {
     IconAlertCircle,
     IconCircleCheck, IconCircleDot,
-    IconCircleMinus,
     IconCircleX, IconInfoCircle,
-    IconLoaderQuarter,
     IconProps,
     IconX
 } from "@tabler/icons-react"

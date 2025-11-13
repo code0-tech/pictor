@@ -12,12 +12,19 @@
   }
 
   &__header {
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
+    gap: variables.$xxs;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__content {
-    margin: variables.$xxs 0;
+    margin-top: variables.$xxs;
     box-sizing: border-box;
   }
 

@@ -17,16 +17,16 @@ export const ExampleToast = () => {
 
     const renderToast = () => {
         toast({
-            title: 'This is a headless toast',
-            color: "warning",
+            title: "Error",
+            color: "error",
             dismissible: true,
-            children: <Text hierarchy={"tertiary"}>'You can customize the content of the toast as you like.'</Text>
+            children: "INVALID_LOGIN_DATA",
         })
     }
 
     return (
         <div className={"h-screen w-screen flex items-center justify-center"}>
-            <Toaster position="top-right"/>
+            <Toaster duration={Infinity} position="top-right"/>
             <Button onClick={() => renderToast()}>
                 Test
             </Button>

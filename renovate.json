@@ -18,15 +18,27 @@
     },
     {
       "matchPackageNames": [
-        "playwright"
+        "playwright",
+        "ghcr.io/code0-tech/build-images/node-playwright",
+        "node"
       ],
-      "dependencyDashboardApproval": true
+      "groupName": "node-playwright",
+      "separateMajorMinor": false,
+      "extends": [
+        ":assignee(Taucher2003)"
+      ]
     },
     {
       "matchDepTypes": [
         "devDependencies"
       ],
       "rangeStrategy": "bump"
+    },
+    {
+      "matchPackageNames": [
+        "ghcr.io/code0-tech/build-images/node-playwright"
+      ],
+      "versioning": "regex:^(?<build>\\d+)\\.(?<revision>\\d+)-node-(?<major>\\d+)\\.(?<minor>\\d+)$"
     }
   ]
 }

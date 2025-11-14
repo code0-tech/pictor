@@ -1,10 +1,13 @@
 @use "../../styles/helpers";
 @use "../../styles/variables";
 @use "../../styles/box";
+@use "sass:math";
 
 .toast {
 
   padding: variables.$md;
+  width: 100%;
+  overflow: hidden;
 
   & {
     @include helpers.borderRadius();
@@ -14,7 +17,7 @@
   &__header {
     align-items: flex-start;
     justify-content: space-between;
-    gap: variables.$xxs;
+    gap: variables.$xs;
   }
 
   &__icon {
@@ -24,13 +27,13 @@
   }
 
   &__content {
-    margin-top: variables.$xxs;
     box-sizing: border-box;
+    margin-left: 27px;
   }
 
   &__header-wrapper {
-    align-items: center;
-    gap: variables.$xxs;
+    align-items: flex-start;
+    gap: variables.$xs;
 
     > svg {
       min-width: variables.$md;
@@ -51,8 +54,49 @@
     }
 
     svg {
-        min-width: variables.$md;
-        min-height: variables.$md;
+      min-width: variables.$md;
+      min-height: variables.$md;
+    }
+  }
+
+  @keyframes toast-duration {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  &:hover {
+    .toast__duration {
+      &:after {
+        animation-play-state: paused;
+      }
+    }
+  }
+
+  &__duration {
+    position: relative;
+    margin: variables.$md (-1 * variables.$md) (-1 * variables.$md);
+    padding: variables.$xxs variables.$md (variables.$xxs + 0.25rem);
+
+    & {
+      border-top: 1px solid helpers.borderColor();
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%; // Start: leer
+      height: 4px;
+      background: helpers.borderColor();
+      animation-name: toast-duration;
+      animation-duration: var(--toast-duration, 4000ms);
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
     }
   }
 }

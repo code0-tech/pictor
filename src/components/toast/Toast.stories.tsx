@@ -17,16 +17,17 @@ export const ExampleToast = () => {
 
     const renderToast = () => {
         toast({
-            title: "Error",
-            color: "error",
+            title: "Cannot delete the last administrative role",
+            color: "warning",
             dismissible: true,
-            children: "INVALID_LOGIN_DATA",
+            duration: 10000,
+            children: <Text>Some content</Text>
         })
     }
 
     return (
         <div className={"h-screen w-screen flex items-center justify-center"}>
-            <Toaster duration={Infinity} position="top-right"/>
+            <Toaster className={"sdsasa"} duration={Infinity} position="top-right"/>
             <Button onClick={() => renderToast()}>
                 Test
             </Button>

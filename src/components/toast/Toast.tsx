@@ -24,6 +24,7 @@ export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title"
     //defaults to false
     dismissible?: boolean
     onClose?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
+    duration?: number //defaults to 4000
 }
 
 export function toast(toast: Omit<ToastProps, 'id'>) {
@@ -31,18 +32,20 @@ export function toast(toast: Omit<ToastProps, 'id'>) {
         <Toast id={id} {...toast}>
             {toast.children}
         </Toast>
-    ))
+    ), {
+        duration: toast.duration ?? 4000
+    })
 }
 
 export function Toast(props: ToastProps) {
-    const {dismissible = false, color = "secondary", title, onClose = () => {}, children, ...rest} = props
+    const {dismissible = false, color = "secondary", title, onClose = () => {}, children, duration = 4000, ...rest} = props
 
     return (
         <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
                     {color && <ToastIcon color={color}/>}
-                    <Text size={"md"} hierarchy={"primary"}>{title}</Text>
+                    <Text size={"md"}>{title}</Text>
                 </Flex>
                 {dismissible &&
                     <span className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
@@ -55,6 +58,11 @@ export function Toast(props: ToastProps) {
                     {children}
                 </div>
             }
+            <div className={"toast__duration"}  style={{
+                ["--toast-duration" as any]: `${duration}ms`,
+            }}>
+                <Text hierarchy={"tertiary"}>This message will close in <Text hierarchy={"primary"}>{duration / 1000}</Text> seconds</Text>
+            </div>
         </div>
     )
 }

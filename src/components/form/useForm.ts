@@ -3,7 +3,7 @@
 import {useCallback, useMemo, useState} from "react";
 
 export type Validations<Values> = Partial<{
-    [Key in keyof Values]: (value: Values[Key]) => string | null;
+    [Key in keyof Values]: (value: Values[Key], values?: Values) => string | null;
 }>
 
 export interface FormValidationProps<Values> {
@@ -30,6 +30,7 @@ export type FormValidationReturn<Values> = [IValidation<Values>, () => void]
 
 export interface IValidation<Values> {
     getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]>
+    isValid(): boolean
 }
 
 class Validation<Values> implements IValidation<Values> {
@@ -46,12 +47,25 @@ class Validation<Values> implements IValidation<Values> {
         this.initialRender = initial
     }
 
-    public getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]> {
+    isValid(): boolean {
+        if (!this.currentValidations) return true
+        for (const key in this.currentValidations) {
+            const validateFn = this.currentValidations[key]
+            if (validateFn) {
+                const message = validateFn(this.currentValues[key], this.currentValues)
+                if (message !== null) return false
+            }
+        }
+
+        return true
+    }
+
+    getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]> {
 
         const currentValue = ((this.currentValues[key]) || null)!!
         const currentName = key as string
         const currentFc = !!this.currentValidations && !!this.currentValidations[key] ? this.currentValidations[key] : (value: typeof currentValue) => null
-        const message = !this.initialRender ? currentFc(currentValue) : null
+        const message = !this.initialRender ? currentFc(currentValue, this.currentValues) : null
 
         return {
             initialValue: currentValue,
@@ -87,7 +101,7 @@ export const useForm = <Values extends Record<string, any> = Record<string, any>
         let inputProps: IValidation<Values> = new Validation(changeValue, values, validate, false)
 
         setInputProps(() => inputProps)
-        if (onSubmit) onSubmit(values as Values)
+        if (onSubmit && inputProps.isValid()) onSubmit(values as Values)
 
     }, [])
 

@@ -1,15 +1,21 @@
 import {Meta, StoryObj} from "@storybook/react"
 import React from "react"
 import DOrganizationCard from "./DOrganizationCard"
-import {ContextStoreProvider} from "../../utils/contextStore"
-import {useReactiveArrayService} from "../../utils/reactiveArrayService"
+import {ContextStoreProvider} from "../../utils"
+import {useReactiveArrayService} from "../../utils"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
-import {
+import type {
     NamespacesLicensesCreateInput,
     NamespacesLicensesCreatePayload,
     NamespacesLicensesDeleteInput,
     NamespacesLicensesDeletePayload,
+    NamespacesMembersAssignRolesInput,
+    NamespacesMembersAssignRolesPayload,
+    NamespacesMembersDeleteInput,
+    NamespacesMembersDeletePayload,
+    NamespacesMembersInviteInput,
+    NamespacesMembersInvitePayload,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsCreateInput,
     NamespacesProjectsDeleteInput,
@@ -18,14 +24,42 @@ import {
     OrganizationsDeleteInput,
     OrganizationsDeletePayload,
     OrganizationsUpdateInput,
-    OrganizationsUpdatePayload
+    OrganizationsUpdatePayload,
+    UsersEmailVerificationInput,
+    UsersEmailVerificationPayload,
+    UsersIdentityLinkInput,
+    UsersIdentityLinkPayload,
+    UsersIdentityLoginInput,
+    UsersIdentityLoginPayload,
+    UsersIdentityRegisterInput,
+    UsersIdentityRegisterPayload,
+    UsersIdentityUnlinkInput,
+    UsersIdentityUnlinkPayload,
+    UsersLoginInput,
+    UsersLoginPayload,
+    UsersLogoutInput,
+    UsersLogoutPayload,
+    UsersMfaBackupCodesRotateInput,
+    UsersMfaBackupCodesRotatePayload,
+    UsersMfaTotpGenerateSecretInput,
+    UsersMfaTotpGenerateSecretPayload,
+    UsersMfaTotpValidateSecretInput,
+    UsersMfaTotpValidateSecretPayload,
+    UsersPasswordResetInput,
+    UsersPasswordResetPayload,
+    UsersPasswordResetRequestInput,
+    UsersPasswordResetRequestPayload,
+    UsersRegisterInput,
+    UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceProjectView} from "../d-namespace/project/DNamespaceProject.view"
-import {DNamespaceLicenseReactiveService} from "../d-namespace/license/DNamespaceLicense.service"
-import {DNamespaceLicenseView} from "../d-namespace/license/DNamespaceLicense.view"
-import {DNamespaceView} from "../d-namespace/DNamespace.view"
-import {DNamespaceReactiveService} from "../d-namespace/DNamespace.service"
+import {DNamespaceProjectView} from "../d-namespace"
+import {DNamespaceLicenseReactiveService} from "../d-namespace"
+import {DNamespaceLicenseView} from "../d-namespace"
+import {DNamespaceView} from "../d-namespace"
+import {DNamespaceReactiveService} from "../d-namespace"
 import {Container} from "../container/Container";
+import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
+import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-namespace";
 
 const meta: Meta = {
     title: "DOrganizationCard",
@@ -73,6 +107,75 @@ class DNamespaceLicenseReactiveServiceExtended extends DNamespaceLicenseReactive
     }
 }
 
+class DUserReactiveServiceExtended extends DUserReactiveService {
+    usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersIdentityLink(payload: UsersIdentityLinkInput): Promise<UsersIdentityLinkPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersIdentityLogin(payload: UsersIdentityLoginInput): Promise<UsersIdentityLoginPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersIdentityRegister(payload: UsersIdentityRegisterInput): Promise<UsersIdentityRegisterPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersIdentityUnlink(payload: UsersIdentityUnlinkInput): Promise<UsersIdentityUnlinkPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersLogin(payload: UsersLoginInput): Promise<UsersLoginPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersLogout(payload: UsersLogoutInput): Promise<UsersLogoutPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersMfaBackupCodesRotate(payload: UsersMfaBackupCodesRotateInput): Promise<UsersMfaBackupCodesRotatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersMfaTotpGenerateSecret(payload: UsersMfaTotpGenerateSecretInput): Promise<UsersMfaTotpGenerateSecretPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersMfaTotpValidateSecret(payload: UsersMfaTotpValidateSecretInput): Promise<UsersMfaTotpValidateSecretPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersPasswordReset(payload: UsersPasswordResetInput): Promise<UsersPasswordResetPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersPasswordResetRequest(payload: UsersPasswordResetRequestInput): Promise<UsersPasswordResetRequestPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    usersRegister(payload: UsersRegisterInput): Promise<UsersRegisterPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+}
+
+class DNamespaceMemberReactiveServiceExtend extends DNamespaceMemberReactiveService {
+    memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+}
+
 export const DOrganizationCardExample: DOrganizationCardStory = {
     render: (props) => {
 
@@ -82,12 +185,12 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                 name: "Example Organization",
                 namespace: {
                     id: "gid://sagittarius/Namespace/1",
-                    projects: {
-                        count: 5
-                    }
                 },
                 createdAt: new Date().toString(),
-                updatedAt: new Date().toString()
+                updatedAt: new Date().toString(),
+                userAbilities: {
+                    deleteOrganization: true
+                }
             })
         ])
 
@@ -100,6 +203,9 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                 runtimes: {
                     count: 3
                 },
+                projects: {
+                    count: 5
+                },
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString(),
                 namespaceLicenses: {
@@ -109,7 +215,6 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                     }]
                 },
                 parent: undefined,
-                projects: undefined,
                 roles: undefined
             })
         ])
@@ -126,9 +231,58 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
             })
         ])
 
+        const [memberStore, memberService] = useReactiveArrayService<DNamespaceMemberView, DNamespaceMemberReactiveService>(DNamespaceMemberReactiveServiceExtend, [
+            new DNamespaceMemberView({
+                id: "gid://sagittarius/NamespaceMember/1",
+                user: {
+                    id: "gid://sagittarius/User/1",
+                },
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1",
+                },
+                userAbilities: {
+                    deleteMember: true
+                }
+            })
+        ])
+
+        const [userStore, userService] = useReactiveArrayService<DUserView, DUserReactiveServiceExtended>(DUserReactiveServiceExtended, [
+            new DUserView({
+                id: "gid://sagittarius/User/1",
+                username: "exampleuser",
+                email: "test@gmail.com",
+                admin: true,
+                avatarPath: "",
+                firstname: undefined,
+                lastname: undefined,
+                namespace: undefined,
+                namespaceMemberships: undefined,
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+            })
+        ])
+
+        setUserSession({
+            user: {
+                id: "gid://sagittarius/User/1",
+                username: "exampleuser",
+                email: "test@gmail.com",
+                admin: undefined,
+                avatarPath: "",
+                firstname: undefined,
+                lastname: undefined,
+                namespace: undefined,
+                namespaceMemberships: undefined,
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+            },
+            active: true,
+            token: "test"
+        })
+
         return (
             <ContextStoreProvider
-                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService]]}>
+                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService], [userStore, userService], [memberStore, memberService]]}>
                 <Container>
                     <DOrganizationCard organizationId={"gid://sagittarius/Organization/1"}/>
                 </Container>

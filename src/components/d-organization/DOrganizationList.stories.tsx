@@ -51,18 +51,13 @@ import {
     UsersRegisterInput,
     UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {
-    DNamespaceLicenseReactiveService,
-    DNamespaceLicenseView,
-    DNamespaceMemberReactiveService,
-    DNamespaceMemberView,
-    DNamespaceProjectView,
-    DNamespaceReactiveService,
-    DNamespaceView
-} from "../d-namespace"
 import {Container} from "../container/Container";
 import {DOrganizationList} from "./DOrganizationList";
 import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
+import {DNamespaceReactiveService, DNamespaceView} from "../d-namespace";
+import {DNamespaceProjectView} from "../d-project";
+import {DNamespaceLicenseReactiveService, DNamespaceLicenseView} from "../d-license";
+import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-member";
 
 const meta: Meta = {
     title: "DOrganizationList",

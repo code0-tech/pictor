@@ -1,11 +1,11 @@
 "use client"
 
 import React from "react"
-import {Menu, MenuContent, MenuItem, MenuPortal, MenuProps, MenuTrigger} from "../../menu/Menu"
+import {Menu, MenuContent, MenuItem, MenuPortal, MenuProps, MenuTrigger} from "../menu/Menu"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
-import {useService} from "../../../utils/contextStore"
+import {useService} from "../../utils/contextStore"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
-import {Button} from "../../button/Button"
+import {Button} from "../button/Button"
 
 export interface DNamespaceProjectMenuProps extends MenuProps {
     projectId: Scalars['NamespaceProjectID']['output']

@@ -1,4 +1,10 @@
-import {Maybe, Namespace, Organization, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {
+    Maybe,
+    Namespace,
+    Organization,
+    OrganizationUserAbilities,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 
 export class DOrganizationView {
 
@@ -11,6 +17,8 @@ export class DOrganizationView {
     private readonly _namespace?: Maybe<Namespace>;
     /** Time when this Organization was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
+    /** Abilities for the current user on this Organization */
+    private readonly _userAbilities?: Maybe<OrganizationUserAbilities>;
 
     constructor(payload: Organization) {
         this._createdAt = payload.createdAt;
@@ -18,6 +26,7 @@ export class DOrganizationView {
         this._name = payload.name;
         this._namespace = payload.namespace;
         this._updatedAt = payload.updatedAt;
+        this._userAbilities = payload.userAbilities;
     }
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
@@ -38,6 +47,10 @@ export class DOrganizationView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    get userAbilities(): Maybe<OrganizationUserAbilities> | undefined {
+        return this._userAbilities;
     }
 
     set name(value: Maybe<Scalars["String"]["output"]>) {

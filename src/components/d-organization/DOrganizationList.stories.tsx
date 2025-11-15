@@ -1,8 +1,7 @@
 import {Meta, StoryObj} from "@storybook/react"
 import React from "react"
 import DOrganizationCard from "./DOrganizationCard"
-import {ContextStoreProvider} from "../../utils"
-import {useReactiveArrayService} from "../../utils"
+import {ContextStoreProvider, useReactiveArrayService} from "../../utils"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
@@ -10,6 +9,12 @@ import {
     NamespacesLicensesCreatePayload,
     NamespacesLicensesDeleteInput,
     NamespacesLicensesDeletePayload,
+    NamespacesMembersAssignRolesInput,
+    NamespacesMembersAssignRolesPayload,
+    NamespacesMembersDeleteInput,
+    NamespacesMembersDeletePayload,
+    NamespacesMembersInviteInput,
+    NamespacesMembersInvitePayload,
     NamespacesProjectsAssignRuntimesInput,
     NamespacesProjectsCreateInput,
     NamespacesProjectsDeleteInput,
@@ -46,11 +51,15 @@ import {
     UsersRegisterInput,
     UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceProjectView} from "../d-namespace"
-import {DNamespaceLicenseReactiveService} from "../d-namespace"
-import {DNamespaceLicenseView} from "../d-namespace"
-import {DNamespaceView} from "../d-namespace"
-import {DNamespaceReactiveService} from "../d-namespace"
+import {
+    DNamespaceLicenseReactiveService,
+    DNamespaceLicenseView,
+    DNamespaceMemberReactiveService,
+    DNamespaceMemberView,
+    DNamespaceProjectView,
+    DNamespaceReactiveService,
+    DNamespaceView
+} from "../d-namespace"
 import {Container} from "../container/Container";
 import {DOrganizationList} from "./DOrganizationList";
 import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
@@ -155,6 +164,21 @@ class DUserReactiveServiceExtended extends DUserReactiveService {
     }
 }
 
+class DNamespaceMemberReactiveServiceExtend extends DNamespaceMemberReactiveService {
+    memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+}
+
 export const DOrganizationCardExample: DOrganizationCardStory = {
     render: (props) => {
 
@@ -166,7 +190,22 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                     id: "gid://sagittarius/Namespace/1",
                 },
                 createdAt: new Date().toString(),
-                updatedAt: new Date().toString()
+                updatedAt: new Date().toString(),
+                userAbilities: {
+                    deleteOrganization: true
+                }
+            }),
+            new DOrganizationView({
+                id: "gid://sagittarius/Organization/2",
+                name: "Example Organization",
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1",
+                },
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                userAbilities: {
+                    deleteOrganization: true
+                }
             })
         ])
 
@@ -207,12 +246,27 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
             })
         ])
 
+        const [memberStore, memberService] = useReactiveArrayService<DNamespaceMemberView, DNamespaceMemberReactiveService>(DNamespaceMemberReactiveServiceExtend, [
+            new DNamespaceMemberView({
+                id: "gid://sagittarius/NamespaceMember/1",
+                user: {
+                    id: "gid://sagittarius/User/1",
+                },
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1",
+                },
+                userAbilities: {
+                    deleteMember: true
+                }
+            })
+        ])
+
         const [userStore, userService] = useReactiveArrayService<DUserView, DUserReactiveServiceExtended>(DUserReactiveServiceExtended, [
             new DUserView({
                 id: "gid://sagittarius/User/1",
                 username: "exampleuser",
                 email: "test@gmail.com",
-                admin: undefined,
+                admin: true,
                 avatarPath: "",
                 firstname: undefined,
                 lastname: undefined,
@@ -243,7 +297,7 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
 
         return (
             <ContextStoreProvider
-                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService], [userStore, userService]]}>
+                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService], [userStore, userService], [memberStore, memberService]]}>
                 <Container>
                     <DOrganizationList/>
                 </Container>

@@ -10,9 +10,9 @@ import {
     NamespacesProjectsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types"
 import {DNamespaceProjectView} from "./DNamespaceProject.view"
-import {ContextStoreProvider} from "../../../utils/contextStore"
+import {ContextStoreProvider} from "../../utils/contextStore"
 import React from "react"
-import {useReactiveArrayService} from "../../../utils/reactiveArrayService"
+import {useReactiveArrayService} from "../../utils/reactiveArrayService"
 
 const meta: Meta = {
     title: "DNamespaceProjectMenu",

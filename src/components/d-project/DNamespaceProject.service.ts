@@ -6,7 +6,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceProjectView} from "./DNamespaceProject.view";
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
+import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 
 export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView> {
 

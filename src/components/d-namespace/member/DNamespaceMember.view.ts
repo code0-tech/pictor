@@ -2,7 +2,7 @@ import {
     Maybe,
     Namespace,
     NamespaceMember,
-    NamespaceMemberRoleConnection, NamespaceRoleConnection,
+    NamespaceMemberRoleConnection, NamespaceMemberUserAbilities, NamespaceRoleConnection,
     Scalars,
     User
 } from "@code0-tech/sagittarius-graphql-types";
@@ -22,6 +22,8 @@ export class DNamespaceMemberView {
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** User this member belongs to */
     private readonly _user?: Maybe<User>;
+    /** Abilities for the current user on this NamespaceMember */
+    private readonly _userAbilities?: Maybe<NamespaceMemberUserAbilities>;
 
     constructor(payload: NamespaceMember) {
         this._createdAt = payload.createdAt;
@@ -31,6 +33,7 @@ export class DNamespaceMemberView {
         this._roles = payload.roles;
         this._updatedAt = payload.updatedAt;
         this._user = payload.user;
+        this._userAbilities = payload.userAbilities;
     }
 
 
@@ -60,6 +63,10 @@ export class DNamespaceMemberView {
 
     get user(): Maybe<User> | undefined {
         return this._user;
+    }
+
+    get userAbilities(): Maybe<NamespaceMemberUserAbilities> | undefined {
+        return this._userAbilities;
     }
 
     json(): NamespaceMember {

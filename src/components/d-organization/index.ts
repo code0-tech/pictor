@@ -1,4 +1,5 @@
 export * from "./DOrganization.service"
 export * from "./DOrganization.view"
 export * from "./DOrganizationCard"
+export * from "./DOrganizationList"
 export * from "./DOrganizationMenu"

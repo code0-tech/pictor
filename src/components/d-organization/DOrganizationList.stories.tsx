@@ -1,11 +1,10 @@
 import {Meta, StoryObj} from "@storybook/react"
 import React from "react"
 import DOrganizationCard from "./DOrganizationCard"
-import {ContextStoreProvider} from "../../utils"
-import {useReactiveArrayService} from "../../utils"
+import {ContextStoreProvider, useReactiveArrayService} from "../../utils"
 import {DOrganizationView} from "./DOrganization.view"
 import {DOrganizationReactiveService} from "./DOrganization.service"
-import type {
+import {
     NamespacesLicensesCreateInput,
     NamespacesLicensesCreatePayload,
     NamespacesLicensesDeleteInput,
@@ -52,18 +51,22 @@ import type {
     UsersRegisterInput,
     UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceProjectView} from "../d-namespace"
-import {DNamespaceLicenseReactiveService} from "../d-namespace"
-import {DNamespaceLicenseView} from "../d-namespace"
-import {DNamespaceView} from "../d-namespace"
-import {DNamespaceReactiveService} from "../d-namespace"
+import {
+    DNamespaceLicenseReactiveService,
+    DNamespaceLicenseView,
+    DNamespaceMemberReactiveService,
+    DNamespaceMemberView,
+    DNamespaceProjectView,
+    DNamespaceReactiveService,
+    DNamespaceView
+} from "../d-namespace"
 import {Container} from "../container/Container";
+import {DOrganizationList} from "./DOrganizationList";
 import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
-import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-namespace";
 
 const meta: Meta = {
-    title: "DOrganizationCard",
-    component: DOrganizationCard
+    title: "DOrganizationList",
+    component: DOrganizationList
 }
 
 export default meta
@@ -191,6 +194,18 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                 userAbilities: {
                     deleteOrganization: true
                 }
+            }),
+            new DOrganizationView({
+                id: "gid://sagittarius/Organization/2",
+                name: "Example Organization",
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1",
+                },
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                userAbilities: {
+                    deleteOrganization: true
+                }
             })
         ])
 
@@ -284,7 +299,7 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
             <ContextStoreProvider
                 services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService], [userStore, userService], [memberStore, memberService]]}>
                 <Container>
-                    <DOrganizationCard organizationId={"gid://sagittarius/Organization/1"}/>
+                    <DOrganizationList/>
                 </Container>
             </ContextStoreProvider>
         )

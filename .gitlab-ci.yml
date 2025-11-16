@@ -49,7 +49,7 @@ storybook:test:
   extends:
     - .storybook:test:base
   script:
-    - npm run storybook:test -- --ci || exit_code=$?
+    - npm run storybook:test || exit_code=$?
     - |
       if [[ $exit_code -ne 0 && -d "__snapshots__/__diff_output__" ]]; then
         echo -e "\e[0Ksection_start:`date +%s`:glpa_summary\r\e[0KHeader of the summary"

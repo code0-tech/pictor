@@ -9,7 +9,7 @@ import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service";
 import {Avatar} from "../avatar/Avatar";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
-import {IconGitFork, IconServer, IconServer2, IconSettings} from "@tabler/icons-react";
+import {IconGitFork, IconServer, IconServerSpark, IconSettings} from "@tabler/icons-react";
 import {DRuntimeReactiveService} from "../d-runtime";
 import {Button} from "../button/Button";
 
@@ -54,38 +54,40 @@ export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> =
                                     : "")
                             ?? ""
                         }/>
-                <Flex style={{flexDirection: "column"}}>
+                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>
                         {project?.name}
                     </Text>
                     <Text size={"sm"} hierarchy={"tertiary"} display={"block"}>
                         {project?.description}
                     </Text>
-                    <Flex align={"center"} style={{gap: "0.35rem", flexWrap: "wrap"}}>
-                        {/* Flow count */}
-                        <Badge color={"info"}>
-                            <IconGitFork size={18}/>
-                            <Text
-                                size={"xs"}>{`${project?.flows?.count ?? 0} flow${(project?.flows?.count ?? 0) !== 1 ? "s" : ""}`}</Text>
-                        </Badge>
-                        {/* Runtime Count */}
-                        <Badge color={"info"}>
-                            <IconServer size={18}/>
-                            <Text
-                                size={"xs"}>{`${project?.runtimes?.count ?? 0} runtime${(project?.runtimes?.count ?? 0) !== 1 ? "s" : ""}`}</Text>
-                        </Badge>
-                        {/* Assigned Runtime */}
-                        {assignedRuntime && (
-                            <Badge color={"info"}>
-                                <IconServer2 size={18}/>
-                                <Text size={"xs"} hierarchy={"tertiary"}>Assigned:</Text>
-                                <Text size={"xs"}>{assignedRuntime.name}</Text>
-                            </Badge>
-                        )}
-                    </Flex>
                 </Flex>
             </Flex>
-            <Flex align={"center"} style={{gap: "0.35rem"}}>
+            <Flex align={"center"} style={{gap: "1.3rem"}}>
+                <Flex align={"center"} style={{gap: "0.35rem", flexWrap: "wrap"}}>
+                    {/* Flow count */}
+                    <Badge color={"secondary"}>
+                        <IconGitFork size={16}/>
+                        <Text size={"xs"}>
+                            {project?.flows?.count ?? 0}
+                        </Text>
+                    </Badge>
+                    {/* Runtime Count */}
+                    <Badge color={"secondary"}>
+                        <IconServer size={16}/>
+                        <Text size={"xs"}>
+                            {project?.runtimes?.count ?? 0}
+                        </Text>
+                    </Badge>
+                    {/* Assigned Runtime */}
+                    {assignedRuntime && (
+                        <Badge color={"secondary"}>
+                            <IconServerSpark size={16}/>
+                            <Text size={"xs"}>{assignedRuntime.name}</Text>
+                        </Badge>
+                    )}
+                </Flex>
+                {/*TODO: check if the user has the ability to go to settings page*/}
                 <Button color={"secondary"} onClick={() => onSetting(projectId)}>
                     <IconSettings size={16}/>
                 </Button>

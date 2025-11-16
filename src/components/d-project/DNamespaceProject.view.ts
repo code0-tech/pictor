@@ -2,7 +2,7 @@ import {
     Flow,
     FlowConnection,
     Maybe,
-    Namespace, NamespaceProject,
+    Namespace, NamespaceProject, NamespaceProjectUserAbilities,
     Runtime,
     RuntimeConnection,
     Scalars
@@ -29,6 +29,8 @@ export class DNamespaceProjectView {
     private readonly _runtimes?: Maybe<RuntimeConnection>;
     /** Time when this NamespaceProject was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
+    /** Abilities for the current user on this NamespaceProject */
+    private readonly _userAbilities?: Maybe<NamespaceProjectUserAbilities>;
 
     constructor(payload: NamespaceProject) {
         this._createdAt = payload.createdAt;
@@ -41,6 +43,7 @@ export class DNamespaceProjectView {
         this._primaryRuntime = payload.primaryRuntime;
         this._runtimes = payload.runtimes;
         this._updatedAt = payload.updatedAt;
+        this._userAbilities = payload.userAbilities;
     }
 
 
@@ -82,6 +85,10 @@ export class DNamespaceProjectView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    get userAbilities(): Maybe<NamespaceProjectUserAbilities> | undefined {
+        return this._userAbilities;
     }
 
     json(): NamespaceProject {

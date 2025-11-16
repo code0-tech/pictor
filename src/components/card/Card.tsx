@@ -1,6 +1,6 @@
 import React, {ReactNode} from "react";
 import "./Card.style.scss"
-import {Code0Component, Color} from "../../utils/types";
+import {Code0Component, Code0Sizes, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 
 
@@ -22,6 +22,7 @@ export interface Card extends Code0Component<HTMLDivElement> {
     outlineColor?: Color
     //defaults to false
     dashed?: boolean
+    paddingSize?: Code0Sizes
 }
 
 
@@ -37,6 +38,7 @@ export const Card: React.FC<Card> = (props) => {
         outlineColor = "secondary",
         outline = false,
         dashed = false,
+        paddingSize = "xl",
         ...args
     } = props
 
@@ -45,11 +47,13 @@ export const Card: React.FC<Card> = (props) => {
             `
                     card 
                     card--${color} card--${variant}
+                    card--${paddingSize}
                     ${outline ? `card--outline-${outlineColor}` : ""} 
                     ${gradient ? "card--gradient" : ""} 
                     ${borderColor ? `card--border-${borderColor}` : ""} 
                     ${dashed ? `card--border--dashed` : ""} 
                     ${gradient ? `card--gradient-${gradientColor}` : ""} 
+                   
                `
             , args)}>
             {children}

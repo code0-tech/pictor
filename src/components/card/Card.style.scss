@@ -3,12 +3,8 @@
 @use "../../styles/variables";
 @use "sass:math";
 
-$padding: variables.$xl;
-
 .card {
-
   display: block;
-  padding: $padding;
   position: relative;
   font-size: variables.$sm;
 
@@ -17,12 +13,15 @@ $padding: variables.$xl;
   }
 
   > .card__section {
-    > img { border-radius: math.div(variables.$borderRadius, 2); }
+    > img {
+      border-radius: math.div(variables.$borderRadius, 2);
+    }
 
     /* erste Section */
     &:first-child {
       margin-top: 0;
     }
+
     &--border:first-child {
       padding-top: 0;
       border-top: none;
@@ -32,6 +31,7 @@ $padding: variables.$xl;
     &:not(:has(~ .card__section)) {
       margin-bottom: 0;
     }
+
     &--border:not(:has(~ .card__section)) {
       padding-bottom: 0;
       border-bottom: none;
@@ -45,14 +45,14 @@ $padding: variables.$xl;
   }
 
   &__section {
-    margin-bottom: $padding;
-    margin-top: $padding;
+    margin-bottom: var(--padding);
+    margin-top: var(--padding);
     position: relative;
 
     &--border {
-      margin-right: -1 * $padding;
-      margin-left: -1 * $padding;
-      padding: $padding;
+      margin-right: calc(-1 * var(--padding));
+      margin-left: calc(-1 * var(--padding));
+      padding: var(--padding);
 
       border-top: 1px solid helpers.borderColor();
       border-bottom: 1px solid helpers.borderColor();
@@ -100,8 +100,8 @@ $padding: variables.$xl;
   }
 
   .card--outline-#{$name} {
-    outline-offset: $padding/2;
-    margin: $padding/2;
+    outline-offset: calc(var(--padding) / 2);
+    margin: calc(var(--padding)/2);
     outline: helpers.borderColor($color) solid 1px;
   }
 
@@ -111,5 +111,12 @@ $padding: variables.$xl;
 
   .card--border--dashed {
     border-style: dashed;
+  }
+}
+
+@each $name, $size in variables.$sizes {
+  .card--#{$name} {
+    --padding: #{$size};
+    padding: var(--padding);
   }
 }

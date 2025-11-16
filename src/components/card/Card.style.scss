@@ -17,19 +17,9 @@
       border-radius: math.div(variables.$borderRadius, 2);
     }
 
-    /* erste Section */
-    &:first-child {
-      margin-top: 0;
-    }
-
     &--border:first-child {
       padding-top: 0;
       border-top: none;
-    }
-
-    /* letzte Section: kein weiteres .card__section folgt */
-    &:not(:has(~ .card__section)) {
-      margin-bottom: 0;
     }
 
     &--border:not(:has(~ .card__section)) {
@@ -45,8 +35,6 @@
   }
 
   &__section {
-    margin-bottom: var(--padding);
-    margin-top: var(--padding);
     position: relative;
 
     &--border {
@@ -59,7 +47,7 @@
 
       + .card__section--border {
         border-top: none;
-        margin-top: -.5em;
+
       }
     }
   }

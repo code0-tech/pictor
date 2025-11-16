@@ -1,5 +1,5 @@
 import './global.scss';
-import type {Preview} from "@storybook/react";
+import type {Preview} from "@storybook/react-vite";
 
 const preview: Preview = {
     parameters: {
@@ -13,7 +13,7 @@ const preview: Preview = {
         },
         a11y: {
             // Optional selector to inspect
-            element: '#storybook-root',
+            context: '#storybook-root',
             config: {
                 rules: [
                     {id: 'landmark-one-main', enabled: false}, // not relevant to single components

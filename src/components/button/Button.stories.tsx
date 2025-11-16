@@ -1,5 +1,5 @@
 import {Button} from "./Button";
-import {StoryObj} from "@storybook/react";
+import {StoryObj} from "@storybook/react-vite";
 import React from "react";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {IconAbc, IconPhoneFilled} from "@tabler/icons-react";

@@ -1,6 +1,6 @@
 import React from "react"
 import {Toast, toast} from "./Toast"
-import {Meta, StoryObj} from "@storybook/react"
+import {Meta, StoryObj} from "@storybook/react-vite"
 import {Button} from "../button/Button"
 import {Toaster} from "sonner"
 import {Text} from "../text/Text";

@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "./FileTabs";
 import React from "react";
 import {IconChevronDown, IconDotsVertical, IconFileLambdaFilled} from "@tabler/icons-react";

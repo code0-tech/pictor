@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import React from "react";
 import {Flex} from "./Flex";
 import {Text} from "../text/Text";

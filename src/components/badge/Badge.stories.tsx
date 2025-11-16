@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import React from "react";
 import {Badge} from "./Badge";
 import {Button} from "../button/Button";

@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import React from "react";
 import {Breadcrumb} from "./Breadcrumb";
 import {Text} from "../text/Text";

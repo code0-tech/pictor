@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {SegmentedControl, SegmentedControlItem} from "./SegmentedControl";
 import React from "react";
 

@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {DUserView} from "./DUser.view";
 import {setUserSession} from "./DUser.session.hook";

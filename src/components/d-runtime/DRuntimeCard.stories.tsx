@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {DRuntimeCard} from "./DRuntimeCard";
 import {DRuntimeReactiveService} from "./DRuntime.service";
 import {

@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {Container} from "./Container";
 import {Card} from "../card/Card";
 import {Text} from "../text/Text";

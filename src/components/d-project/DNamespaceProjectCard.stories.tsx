@@ -1,10 +1,8 @@
 import {Meta, StoryObj} from "@storybook/react";
 import React from "react";
 import DNamespaceProjectCard from "./DNamespaceProjectCard"
-import {ContextStoreProvider} from "../../utils/contextStore"
-import {useReactiveArrayService} from "../../utils/reactiveArrayService"
-import {DNamespaceProjectView} from "./DNamespaceProject.view"
-import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
+import {ContextStoreProvider} from "../../utils"
+import {useReactiveArrayService} from "../../utils"
 import {
     NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
@@ -15,10 +13,10 @@ import {
     RuntimesRotateTokenInput, RuntimesRotateTokenPayload,
     RuntimesUpdateInput, RuntimesUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceReactiveService} from "../d-namespace/DNamespace.service"
-import {DNamespaceView} from "../d-namespace/DNamespace.view"
-import {DRuntimeReactiveService} from "../d-runtime/DRuntime.service"
-import {DRuntimeView} from "../d-runtime/DRuntime.view"
+import {DNamespaceReactiveService, DNamespaceView} from "../d-namespace"
+import {DRuntimeReactiveService, DRuntimeView} from "../d-runtime"
+import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service";
+import {DNamespaceProjectView} from "./DNamespaceProject.view";
 
 const meta: Meta = {
     title: "DNamespaceProjectCard",

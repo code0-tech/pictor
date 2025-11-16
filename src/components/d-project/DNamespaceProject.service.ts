@@ -2,11 +2,10 @@ import {
     NamespaceProject,
     NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
-    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload,
-    Scalars
+    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceProjectView} from "./DNamespaceProject.view";
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 
 export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView> {
 

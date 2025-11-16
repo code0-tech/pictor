@@ -4,7 +4,7 @@ import {
     NamespaceMemberConnection,
     Scalars,
     User,
-    UserIdentityConnection, UserSessionConnection
+    UserIdentityConnection, UserSessionConnection, UserUserAbilities
 } from "@code0-tech/sagittarius-graphql-types";
 
 export class DUserView {
@@ -37,6 +37,8 @@ export class DUserView {
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** Username of the user */
     private _username?: Maybe<Scalars['String']['output']>;
+    /** Abilities for the current user on this User */
+    private readonly _userAbilities?: Maybe<UserUserAbilities>;
 
     constructor(user: User) {
         this._admin = user.admin;
@@ -53,6 +55,7 @@ export class DUserView {
         this._sessions = user.sessions;
         this._updatedAt = user.updatedAt;
         this._username = user.username;
+        this._userAbilities = user.userAbilities;
 
     }
 
@@ -110,6 +113,10 @@ export class DUserView {
 
     get username(): Maybe<Scalars["String"]["output"]> | undefined {
         return this._username;
+    }
+
+    get userAbilities(): Maybe<UserUserAbilities> | undefined {
+        return this._userAbilities;
     }
 
     set admin(value: Maybe<Scalars["Boolean"]["output"]>) {

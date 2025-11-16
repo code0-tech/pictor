@@ -12,7 +12,6 @@
     "storybook:dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "storybook:test": "vitest --project=storybook",
-    "storybook:test:all": "test-storybook --browsers chromium firefox webkit",
     "storybook:test:update": "npm run storybook:test:all -- -u",
     "docs:preview": "npm run --prefix ../telescopium project:preview pictor"
   },

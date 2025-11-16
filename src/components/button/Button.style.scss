@@ -39,3 +39,14 @@
     }
   }
 }
+
+@each $name, $size in variables.$sizes {
+  $keys: map-keys(variables.$sizes);
+  $index: index($keys, $name);
+
+  $next-size: if($index < length($keys), map-get(variables.$sizes, nth($keys, $index + 1)), $size);
+
+  .button--#{$name} {
+    padding: $size $next-size;
+  }
+}

@@ -209,6 +209,9 @@ export const DNamespaceProjectListExample: DNamespaceProjectListStory = {
                 },
                 runtimes: {
                     count: 2
+                },
+                userAbilities: {
+                    updateNamespaceProject: true
                 }
             }),
             new DNamespaceProjectView({

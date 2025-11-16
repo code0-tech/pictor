@@ -87,10 +87,11 @@ export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> =
                         </Badge>
                     )}
                 </Flex>
-                {/*TODO: check if the user has the ability to go to settings page*/}
-                <Button color={"secondary"} onClick={() => onSetting(projectId)}>
-                    <IconSettings size={16}/>
-                </Button>
+                {project?.userAbilities?.deleteNamespaceProject || project?.userAbilities?.updateNamespaceProject ? (
+                    <Button color={"secondary"} onClick={() => onSetting(projectId)}>
+                        <IconSettings size={16}/>
+                    </Button>
+                ) : null}
             </Flex>
         </Flex>
     )

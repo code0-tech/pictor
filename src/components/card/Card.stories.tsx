@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from "@storybook/react";
+import {Meta, StoryObj} from "@storybook/react-vite";
 import React, {useState} from "react";
 import {Card} from "./Card";
 import {Badge} from "../badge/Badge";

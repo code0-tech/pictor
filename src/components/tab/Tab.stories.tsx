@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {Tab, TabContent, TabList, TabTrigger} from "./Tab";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";

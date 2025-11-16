@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from "@storybook/react"
+import {Meta, StoryObj} from "@storybook/react-vite"
 import {ContextStoreProvider} from "../../utils/contextStore"
 import React from "react"
 import {useReactiveArrayService} from "../../utils/reactiveArrayService"

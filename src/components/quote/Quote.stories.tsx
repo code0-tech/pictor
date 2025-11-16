@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from "@storybook/react";
+import {Meta, StoryObj} from "@storybook/react-vite";
 import {Quote} from "./Quote";
 import React from "react";
 import {Colors} from "../../utils/types";

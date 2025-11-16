@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";

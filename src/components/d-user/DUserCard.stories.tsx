@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {DUserCard} from "./DUserCard";
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {DUserView} from "./DUser.view";

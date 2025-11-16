@@ -1,4 +1,4 @@
-import {Meta} from "@storybook/react";
+import {Meta} from "@storybook/react-vite";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "./ScrollArea";
 import React from "react";
 import {Button} from "../button/Button";

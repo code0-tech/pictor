@@ -1,4 +1,4 @@
-import {Meta, StoryObj} from "@storybook/react"
+import {Meta, StoryObj} from "@storybook/react-vite"
 import DNamespaceProjectMenu from "./DNamespaceProjectMenu"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
 import {

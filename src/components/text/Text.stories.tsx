@@ -1,6 +1,6 @@
 import {Text} from "./Text";
 import React from "react";
-import {StoryObj} from "@storybook/react";
+import {StoryObj} from "@storybook/react-vite";
 
 
 export default {

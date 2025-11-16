@@ -4,27 +4,27 @@ const config: StorybookConfig = {
     stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
     addons: [
         "@storybook/addon-links",
-        "@storybook/addon-essentials",
         "@storybook/addon-onboarding",
-        "@storybook/addon-interactions",
-        "@storybook/addon-interactions",
         "@storybook/addon-a11y",
+        "@storybook/addon-docs",
+        "@storybook/addon-vitest"
     ],
+
     framework: {
         name: "@storybook/react-vite",
         options: {
             strictMode: true
         },
     },
-    docs: {
-        autodocs: "tag",
-    },
+
     typescript: {
         reactDocgen: 'react-docgen-typescript'
     },
+
     core: {
         builder: '@storybook/builder-vite',
     },
+
     async viteFinal(config) {
         // Merge custom configuration into the default config
         const {mergeConfig} = await import('vite');
@@ -39,6 +39,6 @@ const config: StorybookConfig = {
                 },
             },
         });
-    },
+    }
 };
 export default config;

@@ -14,6 +14,7 @@ const preview: Preview = {
         a11y: {
             // Optional selector to inspect
             context: '#storybook-root',
+
             config: {
                 rules: [
                     {id: 'landmark-one-main', enabled: false}, // not relevant to single components
@@ -22,6 +23,11 @@ const preview: Preview = {
                     {id: 'aria-allowed-attr', enabled: false} // disable all aria checks
                 ],
             },
+
+            // 'todo' - show a11y violations in the test UI only
+            // 'error' - fail CI on a11y violations
+            // 'off' - skip a11y checks entirely
+            test: 'todo'
         },
     },
 }

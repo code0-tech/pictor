@@ -5,7 +5,7 @@ import {
     Namespace,
     NamespaceProjectConnection,
     Runtime,
-    RuntimeStatusType,
+    RuntimeStatusType, RuntimeUserAbilities,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -33,6 +33,8 @@ export class DRuntimeView {
     private readonly _token?: Maybe<Scalars['String']['output']>;
     /** Time when this Runtime was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
+    /** Abilities for the current user on this Runtime */
+    private readonly _userAbilities?: Maybe<RuntimeUserAbilities>;
 
     constructor(payload: Runtime) {
         this._createdAt = payload.createdAt;
@@ -46,6 +48,7 @@ export class DRuntimeView {
         this._status = payload.status;
         this._token = payload.token;
         this._updatedAt = payload.updatedAt;
+        this._userAbilities = payload.userAbilities;
     }
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
@@ -90,6 +93,10 @@ export class DRuntimeView {
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
+    }
+
+    get userAbilities(): Maybe<RuntimeUserAbilities> | undefined {
+        return this._userAbilities;
     }
 
     json(): Runtime {

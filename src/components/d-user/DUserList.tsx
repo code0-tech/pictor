@@ -8,7 +8,7 @@ import CardSection from "../card/CardSection";
 import {DUserContent} from "./DUserContent";
 
 export interface DUserListProps extends Omit<Card, "children"> {
-    filter?: (organizations: DUserView, index: number) => boolean
+    filter?: (user: DUserView, index: number) => boolean
     onRemove?: (userId: User['id']) => void
 }
 

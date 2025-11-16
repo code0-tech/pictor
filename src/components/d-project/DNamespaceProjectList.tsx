@@ -8,7 +8,7 @@ import CardSection from "../card/CardSection";
 import {DNamespaceProjectContent} from "./DNamespaceProjectContent";
 
 export interface DNamespaceProjectListProps extends Omit<Card, "children"> {
-    filter?: (organizations: DNamespaceProjectView, index: number) => boolean
+    filter?: (project: DNamespaceProjectView, index: number) => boolean
     onSetting?: (projectId: NamespaceProject["id"]) => void
 }
 

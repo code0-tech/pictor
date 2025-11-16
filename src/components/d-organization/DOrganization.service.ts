@@ -1,6 +1,7 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 import {DOrganizationView} from "./DOrganization.view";
 import {
+    Organization,
     OrganizationsCreateInput, OrganizationsCreatePayload,
     OrganizationsDeleteInput, OrganizationsDeletePayload,
     OrganizationsUpdateInput, OrganizationsUpdatePayload,
@@ -12,7 +13,7 @@ export abstract class DOrganizationReactiveService extends ReactiveArrayService<
     //TODO: inject UI error handler for toasts
     //no id's need to be injected here because the root query has a organizations field
 
-    getById(id: Scalars["OrganizationID"]["input"]): DOrganizationView | undefined {
+    getById(id: Organization["id"]): DOrganizationView | undefined {
         return this.values().find(organization => organization.id === id)
     }
 

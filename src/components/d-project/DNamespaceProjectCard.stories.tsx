@@ -1,72 +1,71 @@
-import {Meta, StoryObj} from "@storybook/react"
-import React from "react"
-import DOrganizationCard from "./DOrganizationCard"
+import {Meta, StoryObj} from "@storybook/react";
+import React from "react";
+import DNamespaceProjectCard from "./DNamespaceProjectCard"
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils"
-import {DOrganizationView} from "./DOrganization.view"
-import {DOrganizationReactiveService} from "./DOrganization.service"
 import {
-    NamespacesLicensesCreateInput,
-    NamespacesLicensesCreatePayload,
-    NamespacesLicensesDeleteInput,
-    NamespacesLicensesDeletePayload,
-    NamespacesMembersAssignRolesInput,
-    NamespacesMembersAssignRolesPayload,
-    NamespacesMembersDeleteInput,
-    NamespacesMembersDeletePayload,
-    NamespacesMembersInviteInput,
-    NamespacesMembersInvitePayload,
     NamespacesProjectsAssignRuntimesInput,
+    NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput,
+    NamespacesProjectsCreatePayload,
     NamespacesProjectsDeleteInput,
-    OrganizationsCreateInput,
-    OrganizationsCreatePayload,
-    OrganizationsDeleteInput,
-    OrganizationsDeletePayload,
-    OrganizationsUpdateInput,
-    OrganizationsUpdatePayload,
-    UsersEmailVerificationInput,
-    UsersEmailVerificationPayload,
-    UsersIdentityLinkInput,
-    UsersIdentityLinkPayload,
-    UsersIdentityLoginInput,
-    UsersIdentityLoginPayload,
-    UsersIdentityRegisterInput,
-    UsersIdentityRegisterPayload,
-    UsersIdentityUnlinkInput,
-    UsersIdentityUnlinkPayload,
-    UsersLoginInput,
-    UsersLoginPayload,
-    UsersLogoutInput,
-    UsersLogoutPayload,
-    UsersMfaBackupCodesRotateInput,
-    UsersMfaBackupCodesRotatePayload,
-    UsersMfaTotpGenerateSecretInput,
-    UsersMfaTotpGenerateSecretPayload,
-    UsersMfaTotpValidateSecretInput,
-    UsersMfaTotpValidateSecretPayload,
-    UsersPasswordResetInput,
-    UsersPasswordResetPayload,
-    UsersPasswordResetRequestInput,
-    UsersPasswordResetRequestPayload,
-    UsersRegisterInput,
-    UsersRegisterPayload
+    NamespacesProjectsDeletePayload,
+    type OrganizationsCreateInput,
+    type OrganizationsCreatePayload,
+    type OrganizationsDeleteInput,
+    type OrganizationsDeletePayload,
+    type OrganizationsUpdateInput,
+    type OrganizationsUpdatePayload,
+    RuntimesCreateInput,
+    RuntimesCreatePayload,
+    RuntimesDeleteInput,
+    RuntimesDeletePayload,
+    RuntimesRotateTokenInput,
+    RuntimesRotateTokenPayload,
+    RuntimesUpdateInput,
+    RuntimesUpdatePayload,
+    type UsersEmailVerificationInput,
+    type UsersEmailVerificationPayload,
+    type UsersIdentityLinkInput,
+    type UsersIdentityLinkPayload,
+    type UsersIdentityLoginInput,
+    type UsersIdentityLoginPayload,
+    type UsersIdentityRegisterInput,
+    type UsersIdentityRegisterPayload,
+    type UsersIdentityUnlinkInput,
+    type UsersIdentityUnlinkPayload,
+    type UsersLoginInput,
+    type UsersLoginPayload,
+    type UsersLogoutInput,
+    type UsersLogoutPayload,
+    type UsersMfaBackupCodesRotateInput,
+    type UsersMfaBackupCodesRotatePayload,
+    type UsersMfaTotpGenerateSecretInput,
+    type UsersMfaTotpGenerateSecretPayload,
+    type UsersMfaTotpValidateSecretInput,
+    type UsersMfaTotpValidateSecretPayload,
+    type UsersPasswordResetInput,
+    type UsersPasswordResetPayload,
+    type UsersPasswordResetRequestInput,
+    type UsersPasswordResetRequestPayload,
+    type UsersRegisterInput,
+    type UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {Container} from "../container/Container";
-import {DOrganizationList} from "./DOrganizationList";
+import {DNamespaceReactiveService, DNamespaceView} from "../d-namespace"
+import {DRuntimeReactiveService, DRuntimeView} from "../d-runtime"
+import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service";
+import {DNamespaceProjectView} from "./DNamespaceProject.view";
+import {DOrganizationReactiveService, DOrganizationView} from "../d-organization";
 import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
-import {DNamespaceReactiveService, DNamespaceView} from "../d-namespace";
-import {DNamespaceProjectView} from "../d-project";
-import {DNamespaceLicenseReactiveService, DNamespaceLicenseView} from "../d-license";
-import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-member";
+import {Container} from "../container/Container";
 
 const meta: Meta = {
-    title: "DOrganizationList",
-    component: DOrganizationList
+    title: "DNamespaceProjectCard",
+    component: DNamespaceProjectCard,
 }
 
 export default meta
 
-type DOrganizationCardStory = StoryObj<typeof DOrganizationCard>;
+type DNamespaceProjectCardStory = StoryObj<typeof DNamespaceProjectCard>;
 
 class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService {
     organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined> {
@@ -82,25 +81,37 @@ class DOrganizationReactiveServiceExtended extends DOrganizationReactiveService 
     }
 }
 
-class DNamespaceReactiveServiceExtended extends DNamespaceReactiveService {
-    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): DNamespaceProjectView | undefined {
-        return undefined
-    }
-
-    projectsCreate(payload: NamespacesProjectsCreateInput): DNamespaceProjectView | undefined {
-        return undefined
-    }
-
-    projectsDelete(payload: NamespacesProjectsDeleteInput): void {
-    }
-}
-
-class DNamespaceLicenseReactiveServiceExtended extends DNamespaceLicenseReactiveService {
-    licenseCreate(payload: NamespacesLicensesCreateInput): Promise<NamespacesLicensesCreatePayload | undefined> {
+export class DNamespaceProjectReactiveServiceExtended extends DNamespaceProjectReactiveService {
+    projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined> {
         return Promise.resolve(undefined);
     }
 
-    licenseDelete(payload: NamespacesLicensesDeleteInput): Promise<NamespacesLicensesDeletePayload | undefined> {
+    projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    projectDelete(payload: NamespacesProjectsDeleteInput): Promise<NamespacesProjectsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+}
+
+export class DNamespaceReactiveServiceExtended extends DNamespaceReactiveService {
+}
+
+export class DRuntimeReactiveServiceExtended extends DRuntimeReactiveService {
+    runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    runtimeDelete(payload: RuntimesDeleteInput): Promise<RuntimesDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    runtimeRotateToken(payload: RuntimesRotateTokenInput): Promise<RuntimesRotateTokenPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    runtimeUpdate(payload: RuntimesUpdateInput): Promise<RuntimesUpdatePayload | undefined> {
         return Promise.resolve(undefined);
     }
 }
@@ -159,22 +170,8 @@ class DUserReactiveServiceExtended extends DUserReactiveService {
     }
 }
 
-class DNamespaceMemberReactiveServiceExtend extends DNamespaceMemberReactiveService {
-    memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
-        return Promise.resolve(undefined);
-    }
 
-    memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
-        return Promise.resolve(undefined);
-    }
-
-    memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
-        return Promise.resolve(undefined);
-    }
-
-}
-
-export const DOrganizationCardExample: DOrganizationCardStory = {
+export const DNamespaceProjectCardExample: DNamespaceProjectCardStory = {
     render: (props) => {
 
         const [organizationStore, organizationService] = useReactiveArrayService<DOrganizationView, DOrganizationReactiveServiceExtended>(DOrganizationReactiveServiceExtended, [
@@ -189,17 +186,28 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
                 userAbilities: {
                     deleteOrganization: true
                 }
-            }),
-            new DOrganizationView({
-                id: "gid://sagittarius/Organization/2",
-                name: "Example Organization",
-                namespace: {
-                    id: "gid://sagittarius/Namespace/1",
-                },
+            })
+        ])
+
+        const [projectStore, projectService] = useReactiveArrayService<DNamespaceProjectView, DNamespaceProjectReactiveServiceExtended>(DNamespaceProjectReactiveServiceExtended, [
+            new DNamespaceProjectView({
+                id: "gid://sagittarius/NamespaceProject/1",
+                name: "Example Project",
+                description: "This is an example project description.",
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString(),
-                userAbilities: {
-                    deleteOrganization: true
+                namespace: {
+                    id: "gid://sagittarius/Namespace/1"
+                },
+                flow: undefined,
+                flows: {
+                    count: 10
+                },
+                primaryRuntime: {
+                    id: "gid://sagittarius/Runtime/1"
+                },
+                runtimes: {
+                    count: 2
                 }
             })
         ])
@@ -207,52 +215,35 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
         const [namespaceStore, namespaceService] = useReactiveArrayService<DNamespaceView, DNamespaceReactiveServiceExtended>(DNamespaceReactiveServiceExtended, [
             new DNamespaceView({
                 id: "gid://sagittarius/Namespace/1",
-                members: {
-                    count: 12
-                },
-                runtimes: {
-                    count: 3
-                },
-                projects: {
-                    count: 5
-                },
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString(),
-                namespaceLicenses: {
-                    count: 1,
-                    nodes: [{
-                        id: "gid://sagittarius/NamespaceLicense/1",
-                    }]
+                projects: undefined,
+                runtimes: {
+                    count: 5
                 },
-                parent: undefined,
+                members: undefined,
+                namespaceLicenses: undefined,
+                parent: {
+                    __typename: "Organization",
+                    id: "gid://sagittarius/Organization/1"
+                },
                 roles: undefined
             })
         ])
 
-        const [licenseStore, licenseService] = useReactiveArrayService<DNamespaceLicenseView, DNamespaceLicenseReactiveServiceExtended>(DNamespaceLicenseReactiveServiceExtended, [
-            new DNamespaceLicenseView({
-                id: "gid://sagittarius/NamespaceLicense/1",
-                createdAt: undefined,
-                endDate: undefined,
-                licensee: undefined,
+        const [runtimeStore, runtimeService] = useReactiveArrayService<DRuntimeView, DRuntimeReactiveServiceExtended>(DRuntimeReactiveServiceExtended, [
+            new DRuntimeView({
+                id: "gid://sagittarius/Runtime/1",
+                name: "Example Runtime",
+                createdAt: new Date().toString(),
+                updatedAt: new Date().toString(),
+                token: "example-token",
+                dataTypes: undefined,
+                description: undefined,
+                flowTypes: undefined,
                 namespace: undefined,
-                startDate: undefined,
-                updatedAt: undefined
-            })
-        ])
-
-        const [memberStore, memberService] = useReactiveArrayService<DNamespaceMemberView, DNamespaceMemberReactiveService>(DNamespaceMemberReactiveServiceExtend, [
-            new DNamespaceMemberView({
-                id: "gid://sagittarius/NamespaceMember/1",
-                user: {
-                    id: "gid://sagittarius/User/1",
-                },
-                namespace: {
-                    id: "gid://sagittarius/Namespace/1",
-                },
-                userAbilities: {
-                    deleteMember: true
-                }
+                projects: undefined,
+                status: undefined
             })
         ])
 
@@ -292,9 +283,11 @@ export const DOrganizationCardExample: DOrganizationCardStory = {
 
         return (
             <ContextStoreProvider
-                services={[[organizationStore, organizationService], [namespaceStore, namespaceService], [licenseStore, licenseService], [userStore, userService], [memberStore, memberService]]}>
+                services={[[projectStore, projectService], [namespaceStore, namespaceService], [runtimeStore, runtimeService], [organizationStore, organizationService], [userStore, userService]]}>
                 <Container>
-                    <DOrganizationList/>
+                    {React.useMemo(() => {
+                        return <DNamespaceProjectCard projectId={"gid://sagittarius/NamespaceProject/1"}/>
+                    }, [])}
                 </Container>
             </ContextStoreProvider>
         )

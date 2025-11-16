@@ -8,11 +8,12 @@ import {DOrganizationReactiveService} from "./DOrganization.service"
 import {IconFolder, IconLogout, IconServer, IconSettings, IconUser} from "@tabler/icons-react"
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
-import {DNamespaceMemberReactiveService, DNamespaceReactiveService} from "../d-namespace"
 import {Spacing} from "../spacing/Spacing";
 import {Avatar} from "../avatar/Avatar";
 import {DUserReactiveService, useUserSession} from "../d-user";
 import {Badge} from "../badge/Badge";
+import {DNamespaceReactiveService} from "../d-namespace";
+import {DNamespaceMemberReactiveService} from "../d-member";
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']

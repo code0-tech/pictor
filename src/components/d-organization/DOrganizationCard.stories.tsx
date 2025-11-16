@@ -52,14 +52,14 @@ import type {
     UsersRegisterInput,
     UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types"
-import {DNamespaceProjectView} from "../d-namespace"
-import {DNamespaceLicenseReactiveService} from "../d-namespace"
-import {DNamespaceLicenseView} from "../d-namespace"
+import {DNamespaceProjectView} from "../d-project"
+import {DNamespaceLicenseReactiveService} from "../d-license"
+import {DNamespaceLicenseView} from "../d-license"
 import {DNamespaceView} from "../d-namespace"
 import {DNamespaceReactiveService} from "../d-namespace"
 import {Container} from "../container/Container";
 import {DUserReactiveService, DUserView, setUserSession} from "../d-user";
-import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-namespace";
+import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-member";
 
 const meta: Meta = {
     title: "DOrganizationCard",

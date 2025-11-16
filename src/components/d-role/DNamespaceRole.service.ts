@@ -1,4 +1,4 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../../utils/reactiveArrayService";
+import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 import {DNamespaceRoleView} from "./DNamespaceRole.view";
 import {
     NamespaceRole,

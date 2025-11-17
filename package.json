@@ -20,7 +20,7 @@
     "@ariakit/react": "^0.4.17",
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
-    "@code0-tech/definition-reader": "^0.0.16",
+    "@code0-tech/definition-reader": "^0.0.18",
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-beb91167a8ea12eb6d4a6e3933483bacf845f2f6",
     "@dagrejs/dagre": "^1.1.8",
     "@mdx-js/react": "^3.1.1",

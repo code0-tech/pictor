@@ -13,37 +13,41 @@ export interface DLayoutProps extends Code0Component<HTMLDivElement> {
 }
 
 export const DLayout: React.FC<DLayoutProps> = (props) => {
-
     const {children, topContent, bottomContent, leftContent, rightContent, ...rest} = props
 
-    return <div {...mergeCode0Props("d-layout", rest)}>
-        <Flex style={{flexDirection: "column"}}>
-            {topContent ? (
-                <div className={"d-layout__top"}>
-                    {topContent}
-                </div>
-            ) : null}
-            <Flex>
-                {leftContent ? (
-                    <div className={"d-layout__left"}>
-                        {leftContent}
+    return (
+        <div {...mergeCode0Props("d-layout", rest)}>
+            <Flex className="d-layout__inner" style={{ flexDirection: "column" }}>
+                {topContent && (
+                    <div className="d-layout__top">
+                        {topContent}
                     </div>
-                ) : null}
-                <div className={"d-layout__content"}>
-                    {children}
-                </div>
-                {rightContent ? (
-                    <div className={"d-layout__right"}>
-                        {rightContent}
-                    </div>
-                ) : null}
-            </Flex>
-            {bottomContent ? (
-                <div className={"d-layout__bottom"}>
-                    {bottomContent}
-                </div>
-            ) : null}
-        </Flex>
-    </div>
+                )}
 
+                <Flex className="d-layout__middle">
+                    {leftContent && (
+                        <div className="d-layout__left">
+                            {leftContent}
+                        </div>
+                    )}
+
+                    <div className="d-layout__content">
+                        {children}
+                    </div>
+
+                    {rightContent && (
+                        <div className="d-layout__right">
+                            {rightContent}
+                        </div>
+                    )}
+                </Flex>
+
+                {bottomContent && (
+                    <div className="d-layout__bottom">
+                        {bottomContent}
+                    </div>
+                )}
+            </Flex>
+        </div>
+    )
 }

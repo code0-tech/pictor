@@ -11,7 +11,7 @@
     box-sizing: border-box;
 
     & {
-      @include box.box(variables.$primary, variables.$primary, variables.$primary);
+      @include box.box(variables.$primary);
       @include helpers.borderRadius();
     }
   }
@@ -45,12 +45,12 @@
       @include helpers.noFocusStyle();
       @include helpers.fontStyle();
       @include helpers.disabled();
-      box-shadow: none;
+      border: none;
     }
 
     &:focus {
       @include box.box(variables.$white, variables.$white, variables.$white);
-      box-shadow: none;
+      border: none;
       width: 100%;
     }
   }

@@ -8,6 +8,7 @@ export interface SectionType extends Code0Component<HTMLDivElement> {
     image?: boolean,
     //defaults to false
     border?: boolean
+    hover?: boolean
 }
 
 const CardSection: React.FC<SectionType> = (props) => {
@@ -15,12 +16,18 @@ const CardSection: React.FC<SectionType> = (props) => {
     const {
         image = false,
         border = false,
+        hover = false,
         children,
         ...args
     } = props;
 
     return <>
-        <div {...mergeCode0Props(`card__section ${border ? "card__section--border" : ""} ${image ? "card__section--image" : ""}`, args)}>
+        <div {...mergeCode0Props(`
+                                card__section 
+                                ${border ? "card__section--border" : ""} 
+                                ${image ? "card__section--image" : ""}
+                                ${hover ? "card__section--hover" : ""}
+        `, args)}>
             {children}
         </div>
     </>

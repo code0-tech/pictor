@@ -1,5 +1,6 @@
 @use "variables";
 @use "sass:color";
+@use "helpers";
 
 @mixin box(
   $background: variables.$secondary,
@@ -10,12 +11,11 @@
   $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
   $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
 
-  border: none;
-  background: color.mix($background, variables.$primary, 10%);
+  background: helpers.backgroundColor($background);
+  border: 1px solid helpers.borderColor($borderColor);
   color: rgba($color, .75);
   position: relative;
   box-sizing: border-box;
-  box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .1);
 
 }
 
@@ -28,7 +28,7 @@
   $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
 
   &:hover {
-    box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .25);
+    border-color: rgba($mixedBorderWhite, .25);
   }
 }
 
@@ -40,7 +40,7 @@
   $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
   $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
 
-  box-shadow: inset 0 0 0 1px rgba($mixedBorderWhite, .05), inset 0 0 3rem 0 rgba($mixedBorderWhite, .1);
+  border-color: rgba($mixedBorderWhite, .1);
   outline: none;
 }
 

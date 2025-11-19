@@ -7,6 +7,7 @@
   display: block;
   position: relative;
   font-size: variables.$sm;
+  overflow: hidden;
 
   & {
     @include helpers.fontStyle();
@@ -18,12 +19,12 @@
     }
 
     &--border:first-child {
-      padding-top: 0;
+      margin-top: calc(-1 * var(--padding));
       border-top: none;
     }
 
     &--border:not(:has(~ .card__section)) {
-      padding-bottom: 0;
+      margin-bottom: calc(-1 * var(--padding));
       border-bottom: none;
     }
   }
@@ -36,6 +37,7 @@
 
   &__section {
     position: relative;
+    box-sizing: border-box;
 
     &--border {
       margin-right: calc(-1 * var(--padding));
@@ -48,6 +50,13 @@
       + .card__section--border {
         border-top: none;
 
+      }
+    }
+
+    &--hover {
+      cursor: pointer;
+      &:hover {
+        background: helpers.backgroundColor(variables.$secondary);
       }
     }
   }
@@ -94,7 +103,7 @@
   }
 
   .card--border-#{$name} {
-    box-shadow: inset 0 0 0 1px helpers.borderColor($color);
+    box-shadow: 1px solid helpers.borderColor($color);
   }
 
   .card--border--dashed {

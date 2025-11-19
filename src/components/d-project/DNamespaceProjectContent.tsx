@@ -88,7 +88,10 @@ export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> =
                     )}
                 </Flex>
                 {project?.userAbilities?.deleteNamespaceProject || project?.userAbilities?.updateNamespaceProject ? (
-                    <Button color={"secondary"} onClick={() => onSetting(projectId)}>
+                    <Button color={"secondary"} onClick={(event) => {
+                        event.stopPropagation()
+                        onSetting(projectId)
+                    }}>
                         <IconSettings size={16}/>
                     </Button>
                 ) : null}

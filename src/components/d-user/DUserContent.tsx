@@ -53,10 +53,16 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
                     {
                         remove ? (
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <Button color={"error"} onClick={() => onRemove(userId)}>
+                                <Button color={"error"} onClick={(event) => {
+                                    event.stopPropagation()
+                                    onRemove(userId)
+                                }}>
                                     Confirm remove
                                 </Button>
-                                <Button onClick={() => setRemove(false)} color={"success"}>
+                                <Button onClick={(event) => {
+                                    event.stopPropagation()
+                                    setRemove(false)
+                                }} color={"success"}>
                                     Cancel
                                 </Button>
                             </Flex>

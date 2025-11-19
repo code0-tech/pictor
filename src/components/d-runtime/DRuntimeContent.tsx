@@ -43,7 +43,10 @@ export const DRuntimeContent: React.FC<DRuntimeContentProps> = (props) => {
                 )}
             </Flex>
             {runtime?.userAbilities?.deleteRuntime || runtime?.userAbilities?.updateRuntime || runtime?.userAbilities?.rotateRuntimeToken ? (
-                <Button color={"secondary"} onClick={() => onSetting(runtimeId)}>
+                <Button color={"secondary"} onClick={(event) => {
+                    event.stopPropagation()
+                    onSetting(runtimeId)
+                }}>
                     <IconSettings size={16}/>
                 </Button>
             ) : null}

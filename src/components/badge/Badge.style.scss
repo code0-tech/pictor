@@ -3,16 +3,16 @@
 @use "../../styles/variables";
 
 .badge {
-  padding: variables.$xxs / 2 variables.$xs;
+  padding: variables.$xxs / 3 variables.$xxs;
   display: inline-flex;
   font-size: variables.$xs;
   width: fit-content;
   align-items: center;
   gap: variables.$xxs;
+  border-radius: variables.$xxs;
 
   & {
     @include helpers.fontStyle();
-    @include helpers.borderRadius();
   }
 }
 

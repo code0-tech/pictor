@@ -30,7 +30,7 @@
 
     &.button--none {
       background: transparent;
-      box-shadow: none;
+      border: none;
       //@include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
     }
   }

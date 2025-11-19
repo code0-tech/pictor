@@ -21,7 +21,7 @@
     "@babel/plugin-proposal-decorators": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@code0-tech/definition-reader": "^0.0.18",
-    "@code0-tech/sagittarius-graphql-types": "^0.0.0-beb91167a8ea12eb6d4a6e3933483bacf845f2f6",
+    "@code0-tech/sagittarius-graphql-types": "^0.0.0-f91466f0f343596ad170e7e5c5316a70b072594d",
     "@dagrejs/dagre": "^1.1.8",
     "@mdx-js/react": "^3.1.1",
     "@radix-ui/react-checkbox": "^1.3.3",

@@ -24,7 +24,9 @@ export const DOrganizationList: React.FC<DOrganizationListProps> = (props) => {
 
     return <Card {...rest}>
         {organizations.filter(filter).map((organization) => organization.id && (
-            <CardSection border key={organization.id}>
+            <CardSection border hover onClick={() => {
+                console.log("tets")
+            }} key={organization.id}>
                 <DOrganizationContent onLeave={onLeave} onSetting={onSetting} organizationId={organization?.id}/>
             </CardSection>
         ))}

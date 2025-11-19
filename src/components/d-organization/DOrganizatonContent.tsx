@@ -21,7 +21,6 @@ export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     onLeave?: (organizationId: Scalars['OrganizationID']['output']) => void
 }
 
-//TODO: handle skeleton
 export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
 
     const {
@@ -86,12 +85,18 @@ export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
             </Flex>
             <Flex align={"center"} style={{gap: "0.35rem"}}>
                 {(organization?.userAbilities?.deleteOrganization || organization?.userAbilities?.updateOrganization) ? (
-                    <Button color={"secondary"} onClick={() => onSetting(organizationId)}>
+                    <Button color={"secondary"} onClick={(event) => {
+                        event.stopPropagation()
+                        onSetting(organizationId)
+                    }}>
                         <IconSettings size={16}/>
                     </Button>
                 ) : null}
                 {namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
-                    <Button color={"error"} onClick={() => onLeave(organizationId)}>
+                    <Button color={"error"} onClick={(event) => {
+                        event.stopPropagation()
+                        onLeave(organizationId)
+                    }}>
                         <IconLogout size={16}/> Leave
                     </Button>
                 ) : null}

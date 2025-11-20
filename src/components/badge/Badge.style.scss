@@ -9,10 +9,10 @@
   width: fit-content;
   align-items: center;
   gap: variables.$xxs;
-  border-radius: variables.$xxs;
 
   & {
     @include helpers.fontStyle();
+    @include helpers.borderRadius()
   }
 }
 

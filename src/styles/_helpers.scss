@@ -33,7 +33,7 @@
 }
 
 @function backgroundColor($color: variables.$secondary) {
-  @return color.mix($color, variables.$primary, 15%);
+  @return color.mix($color, variables.$primary, 10%);
 }
 
 @mixin noFocusStyle() {

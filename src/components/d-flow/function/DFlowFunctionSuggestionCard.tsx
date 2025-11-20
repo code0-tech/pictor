@@ -34,7 +34,7 @@ export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardPr
         flow?.addNode(nodeFunction)
         flowService.update()
     }} suggestions={result} triggerContent={
-        <Button top={0} variant={"normal"} color={"secondary"}>
+        <Button paddingSize={"xxs"} variant={"normal"} color={"secondary"}>
             <Handle
                 isConnectable={false}
                 draggable={false}

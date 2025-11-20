@@ -7,13 +7,11 @@ import {useService} from "../../../utils/contextStore";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {Card} from "../../card/Card";
 import {Flex} from "../../flex/Flex";
-import {IconBolt, IconChevronDown, IconCopy, IconDots, IconFileLambdaFilled, IconTrash} from "@tabler/icons-react";
+import {IconBolt, IconChevronDown} from "@tabler/icons-react";
 import {Button} from "../../button/Button";
 import {DFlowTabTrigger} from "../tab/DFlowTabTrigger";
 import {DFlowTypeReactiveService} from "../type/DFlowType.service";
 import {Badge} from "../../badge/Badge";
-import CardSection from "../../card/CardSection";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../menu/Menu";
 
 export interface DFlowFunctionTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: FlowView

@@ -7,7 +7,6 @@
   display: block;
   position: relative;
   font-size: variables.$sm;
-  overflow: hidden;
 
   & {
     @include helpers.fontStyle();
@@ -56,7 +55,16 @@
     &--hover {
       cursor: pointer;
       &:hover {
-        background: helpers.backgroundColor(variables.$secondary);
+        background: rgba(helpers.backgroundColor(variables.$secondary), .25);
+      }
+      &:first-child {
+        border-top-left-radius: variables.$borderRadius;
+        border-top-right-radius: variables.$borderRadius;
+      }
+
+      &:last-child {
+        border-bottom-left-radius: variables.$borderRadius;
+        border-bottom-right-radius: variables.$borderRadius;
       }
     }
   }

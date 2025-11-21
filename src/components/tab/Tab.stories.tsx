@@ -15,22 +15,16 @@ export const TabExample = () => {
             <TabTrigger value={"overview"}>
                 <Button variant={"none"}>
                     <IconHome size={16}/>
-                    Overview
+                    <Text size={"md"} hierarchy={"primary"}>Collaborative documents</Text>
                 </Button>
             </TabTrigger>
             <TabTrigger value={"organizations"}>
                 <Button variant={"none"}>
                     <IconBuilding size={16}/>
-                    Organizations
+                    <Text size={"md"} hierarchy={"primary"}>Inline comments</Text>
                 </Button>
             </TabTrigger>
         </TabList>
-        <TabContent value={"overview"}>
-            <Text>Overview</Text>
-        </TabContent>
-        <TabContent value={"organizations"}>
-            <Text>Organizations</Text>
-        </TabContent>
     </Tab>
 }
 
@@ -38,23 +32,20 @@ export const TabExampleVertical = () => {
     return <Tab orientation={"vertical"} defaultValue={"overview"}>
         <TabList>
             <TabTrigger value={"overview"}>
-                <Button variant={"none"}>
-                    <IconHome size={16}/>
-                    Overview
+                <Button paddingSize={"xxs"} variant={"none"}>
+                    <Text size={"md"} hierarchy={"primary"}>Collaborative documents</Text>
                 </Button>
             </TabTrigger>
             <TabTrigger value={"organizations"}>
-                <Button variant={"none"}>
-                    <IconBuilding size={16}/>
-                    Organizations
+                <Button paddingSize={"xxs"} variant={"none"}>
+                    <Text size={"md"} hierarchy={"primary"}>Inline comments</Text>
+                </Button>
+            </TabTrigger>
+            <TabTrigger value={"commands"}>
+                <Button paddingSize={"xxs"} variant={"none"}>
+                    <Text size={"md"} hierarchy={"primary"}>Text-to-issue commands</Text>
                 </Button>
             </TabTrigger>
         </TabList>
-        <TabContent w={"200px"} value={"overview"}>
-            <Text>Overview</Text>
-        </TabContent>
-        <TabContent w={"200px"} value={"organizations"}>
-            <Text>Organizations</Text>
-        </TabContent>
     </Tab>
 }

@@ -29,13 +29,13 @@ export const DFlowControl: React.FC = () => {
 
     return <Panel position="bottom-left">
         <Flex style={{flexDirection: "column", gap: "1rem"}}>
-            <Flex align="stretch" style={{gap: ".35rem"}}>
+            <Flex align="stretch" style={{gap: ".7rem"}}>
                 <ButtonGroup>
-                    <Button color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
-                    <Button color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
-                    <Button color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
+                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
+                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
+                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
                 </ButtonGroup>
-                <Badge color={"secondary"}>{getCurrentZoomInPercent()}%</Badge>
+                <Badge color={"primary"} style={{border: "none"}}>{getCurrentZoomInPercent()}%</Badge>
             </Flex>
         </Flex>
     </Panel>

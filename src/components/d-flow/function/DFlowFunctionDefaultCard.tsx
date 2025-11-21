@@ -8,7 +8,7 @@ import CardSection from "../../card/CardSection";
 import {Flex} from "../../flex/Flex";
 import {
     IconAlertTriangle,
-    IconArrowRightCircle, IconCopy,
+    IconArrowRightCircle, IconChevronDown, IconChevronRight, IconCopy,
     IconDots,
     IconExclamationCircle,
     IconFileLambdaFilled,
@@ -89,10 +89,11 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
 
     return (
         <Card
+            paddingSize={"xs"}
             outline={firstItem.id === id}
             borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
             className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
-            color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "secondary"}
+            color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "primary"}
             onClick={() => {
                 flowInstance.setViewport({
                     x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
@@ -112,7 +113,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             }} style={{position: "relative"}}>
 
             <CardSection border>
-                <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}}>
+                <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
                     <Flex align={"center"} style={{gap: "0.7rem"}}>
                         <IconFileLambdaFilled size={16}/>
                         <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>
@@ -128,7 +129,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                             }, 250) // Timeout to ensure the menu is fully opened before changing the state
                         }}>
                             <MenuTrigger asChild>
-                                <Button variant={"none"}>
+                                <Button p={"0"} variant={"none"}>
                                     <IconDots size={16}/>
                                 </Button>
                             </MenuTrigger>
@@ -143,8 +144,8 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
-                        <Button disabled>
-                            <IconLayoutNavbarCollapseFilled size={16}/>
+                        <Button p={"0"} variant={"none"} disabled>
+                            <IconChevronDown size={16}/>
                         </Button>
                     </Flex>
                 </Flex>
@@ -197,7 +198,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
                 return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
             }) ? (
-                <CardSection>
+                <CardSection border>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
                     {data.instance.parameters?.map((param: NodeParameterView, index: number) => {
 
@@ -208,13 +209,17 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
 
                         return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
-                                {parameter?.names?.nodes!![0]?.content ?? param.id}
+                                <Text size={"xs"} hierarchy={"tertiary"}>
+                                    {parameter?.names?.nodes!![0]?.content ?? param.id}
+                                </Text>
                                 {!param.value ? (
                                     <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
                                         param.value = suggestion.value
                                         flowService.update()
-                                    }} suggestions={result} triggerContent={<Button
-                                        variant={"none"}><IconArrowRightCircle size={12}/></Button>}/>
+                                    }} suggestions={result} triggerContent={
+                                        <Button p={"0"} variant={"none"}>
+                                            <IconArrowRightCircle size={16}/>
+                                        </Button>}/>
                                 ) : null}
                                 <Handle
                                     key={param.id}

@@ -23,7 +23,7 @@
     @include box.box(variables.$primary);
     @include box.boxHover(variables.$secondary);
     @include helpers.fontStyle();
-    box-shadow: none;
+    border: none;
     background: variables.$primary;
   }
 
@@ -74,7 +74,7 @@
       @include box.boxHover(variables.$secondary);
       @include box.boxActive(variables.$secondary);
       @include helpers.fontStyle();
-      box-shadow: none;
+      border: none;
     }
   }
 }

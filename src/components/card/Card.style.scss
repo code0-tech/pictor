@@ -105,8 +105,8 @@
   }
 
   .card--outline-#{$name} {
-    outline-offset: calc(var(--padding) / 2);
-    margin: calc(var(--padding)/2);
+    outline-offset: calc(var(--padding) / 3);
+    margin: calc(var(--padding)/3);
     outline: helpers.borderColor($color) solid 1px;
   }
 

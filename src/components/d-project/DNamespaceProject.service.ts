@@ -1,4 +1,5 @@
 import {
+    Namespace,
     NamespaceProject,
     NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
@@ -7,11 +8,11 @@ import {
 import {DNamespaceProjectView} from "./DNamespaceProject.view";
 import {ReactiveArrayService} from "../../utils";
 
-export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView> {
+export type DProjectDependencies = {
+    namespaceId: Namespace['id']
+}
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId because the runtimes query needs it
-
+export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView, DProjectDependencies> {
 
     getById(id: NamespaceProject['id']): DNamespaceProjectView | undefined {
         return this.values().find(project => project.id === id)

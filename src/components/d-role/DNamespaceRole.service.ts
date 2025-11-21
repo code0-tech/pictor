@@ -1,6 +1,7 @@
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 import {DNamespaceRoleView} from "./DNamespaceRole.view";
 import {
+    Namespace,
     NamespaceRole,
     NamespacesRolesAssignAbilitiesInput, NamespacesRolesAssignAbilitiesPayload,
     NamespacesRolesAssignProjectsInput, NamespacesRolesAssignProjectsPayload,
@@ -10,10 +11,11 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
-export abstract class DNamespaceRoleReactiveService extends ReactiveArrayService<DNamespaceRoleView> {
+export type DRoleDependencies = {
+    namespaceId: Namespace['id']
+}
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId because the runtimes query needs it
+export abstract class DNamespaceRoleReactiveService extends ReactiveArrayService<DNamespaceRoleView, DRoleDependencies> {
 
     getById(id: NamespaceRole['id']): DNamespaceRoleView | undefined {
         return this.values().find(role => role.id === id);

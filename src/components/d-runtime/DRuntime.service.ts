@@ -1,18 +1,21 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils/reactiveArrayService";
 import {DRuntimeView} from "./DRuntime.view";
 import {
+    Namespace,
     Runtime,
-    RuntimesCreateInput, RuntimesCreatePayload,
-    RuntimesDeleteInput, RuntimesDeletePayload,
-    RuntimesRotateTokenInput, RuntimesRotateTokenPayload,
-    RuntimesUpdateInput, RuntimesUpdatePayload,
-    Scalars
+    RuntimesCreateInput,
+    RuntimesCreatePayload,
+    RuntimesDeleteInput,
+    RuntimesDeletePayload,
+    RuntimesRotateTokenInput,
+    RuntimesRotateTokenPayload
 } from "@code0-tech/sagittarius-graphql-types";
 
-export abstract class DRuntimeReactiveService extends ReactiveArrayService<DRuntimeView> {
+export type DRuntimeDependencies = {
+    namespaceId: Namespace['id']
+}
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId because the runtimes query needs it
+export abstract class DRuntimeReactiveService extends ReactiveArrayService<DRuntimeView, DRuntimeDependencies> {
 
     getById(id: Runtime['id']): DRuntimeView | undefined {
         return this.values().find(runtime => runtime.id === id);

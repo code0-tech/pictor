@@ -8,10 +8,11 @@ import {
 import {DNamespaceMemberView} from "./DNamespaceMember.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 
-export abstract class DNamespaceMemberReactiveService extends ReactiveArrayService<DNamespaceMemberView> {
+export type DMemberDependencies = {
+    namespaceId: Namespace['id']
+}
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId because the runtimes query needs it
+export abstract class DNamespaceMemberReactiveService extends ReactiveArrayService<DNamespaceMemberView, DMemberDependencies> {
 
     getById(id: NamespaceMember['id']): DNamespaceMemberView | undefined {
         return this.values().find(member => member.id === id);

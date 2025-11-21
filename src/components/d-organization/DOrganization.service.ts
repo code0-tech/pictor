@@ -10,9 +10,6 @@ import {
 
 export abstract class DOrganizationReactiveService extends ReactiveArrayService<DOrganizationView> {
 
-    //TODO: inject UI error handler for toasts
-    //no id's need to be injected here because the root query has a organizations field
-
     getById(id: Organization["id"]): DOrganizationView | undefined {
         return this.values().find(organization => organization.id === id)
     }

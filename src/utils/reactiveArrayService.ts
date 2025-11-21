@@ -6,7 +6,7 @@ export type ReactiveArrayStore<T> = {
     setState: React.Dispatch<React.SetStateAction<T[]>>;
 };
 
-export class ReactiveArrayService<T> implements ArrayService<T> {
+export class ReactiveArrayService<T, D = Record<string, any>> implements ArrayService<T, D> {
     protected readonly access: ReactiveArrayStore<T>;
 
     constructor(access: ReactiveArrayStore<T>) {
@@ -44,7 +44,7 @@ export class ReactiveArrayService<T> implements ArrayService<T> {
         return this.access.getState()[index];
     }
 
-    values() {
+    values(_dependencies?: D): T[] {
         return this.access.getState();
     }
 

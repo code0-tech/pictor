@@ -1,4 +1,5 @@
 import {
+    Namespace,
     NamespaceLicense,
     NamespacesLicensesCreateInput, NamespacesLicensesCreatePayload,
     NamespacesLicensesDeleteInput, NamespacesLicensesDeletePayload,
@@ -7,10 +8,11 @@ import {
 import {DNamespaceLicenseView} from "./DNamespaceLicense.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
 
-export abstract class DNamespaceLicenseReactiveService extends ReactiveArrayService<DNamespaceLicenseView> {
+export type DLicenseDependencies = {
+    namespaceId: Namespace['id']
+}
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId because the runtimes query needs it
+export abstract class DNamespaceLicenseReactiveService extends ReactiveArrayService<DNamespaceLicenseView, DLicenseDependencies> {
 
     getById(id: NamespaceLicense['id']): DNamespaceLicenseView | undefined {
         return this.values().find(license => license.id === id);

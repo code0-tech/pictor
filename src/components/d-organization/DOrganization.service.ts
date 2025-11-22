@@ -1,11 +1,11 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 import {DOrganizationView} from "./DOrganization.view";
 import {
     Organization,
-    OrganizationsCreateInput, OrganizationsCreatePayload,
-    OrganizationsDeleteInput, OrganizationsDeletePayload,
-    OrganizationsUpdateInput, OrganizationsUpdatePayload,
-    Scalars
+    OrganizationsCreateInput,
+    OrganizationsCreatePayload,
+    OrganizationsDeleteInput,
+    OrganizationsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
 
 export abstract class DOrganizationReactiveService extends ReactiveArrayService<DOrganizationView> {

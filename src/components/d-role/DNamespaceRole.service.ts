@@ -1,14 +1,16 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 import {DNamespaceRoleView} from "./DNamespaceRole.view";
 import {
     Namespace,
     NamespaceRole,
-    NamespacesRolesAssignAbilitiesInput, NamespacesRolesAssignAbilitiesPayload,
-    NamespacesRolesAssignProjectsInput, NamespacesRolesAssignProjectsPayload,
-    NamespacesRolesCreateInput, NamespacesRolesCreatePayload,
-    NamespacesRolesDeleteInput, NamespacesRolesDeletePayload,
-    NamespacesRolesUpdateInput, NamespacesRolesUpdatePayload,
-    Scalars
+    NamespacesRolesAssignAbilitiesInput,
+    NamespacesRolesAssignAbilitiesPayload,
+    NamespacesRolesAssignProjectsInput,
+    NamespacesRolesAssignProjectsPayload,
+    NamespacesRolesCreateInput,
+    NamespacesRolesCreatePayload,
+    NamespacesRolesDeleteInput,
+    NamespacesRolesDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
 
 export type DRoleDependencies = {
@@ -17,8 +19,8 @@ export type DRoleDependencies = {
 
 export abstract class DNamespaceRoleReactiveService extends ReactiveArrayService<DNamespaceRoleView, DRoleDependencies> {
 
-    getById(id: NamespaceRole['id']): DNamespaceRoleView | undefined {
-        return this.values().find(role => role.id === id);
+    getById(id: NamespaceRole['id'], dependencies?: DRoleDependencies): DNamespaceRoleView | undefined {
+        return this.values(dependencies).find(role => role.id === id);
     }
 
     abstract roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined>

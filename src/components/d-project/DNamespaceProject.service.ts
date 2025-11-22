@@ -14,8 +14,8 @@ export type DProjectDependencies = {
 
 export abstract class DNamespaceProjectReactiveService extends ReactiveArrayService<DNamespaceProjectView, DProjectDependencies> {
 
-    getById(id: NamespaceProject['id']): DNamespaceProjectView | undefined {
-        return this.values().find(project => project.id === id)
+    getById(id: NamespaceProject['id'], dependencies?: DProjectDependencies): DNamespaceProjectView | undefined {
+        return this.values(dependencies).find(project => project.id === id)
     }
 
     abstract projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined>

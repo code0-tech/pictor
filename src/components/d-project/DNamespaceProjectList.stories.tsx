@@ -310,7 +310,7 @@ export const DNamespaceProjectListExample: DNamespaceProjectListStory = {
                 services={[[projectStore, projectService], [namespaceStore, namespaceService], [runtimeStore, runtimeService], [organizationStore, organizationService], [userStore, userService]]}>
                 <Container>
                     {React.useMemo(() => {
-                        return <DNamespaceProjectList/>
+                        return <DNamespaceProjectList namespaceId={"gid://sagittarius/Namespace/1"}/>
                     }, [])}
                 </Container>
             </ContextStoreProvider>

@@ -1,0 +1,79 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.gradient-button {
+  padding: variables.$xs variables.$md;
+  gap: .5rem;
+  cursor: pointer;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  justify-content: center;
+  position: relative;
+  font-size: variables.$sm;
+
+  @include helpers.disabled;
+}
+
+
+@each $name, $color in variables.$colors {
+  .gradient-button--#{$name} {
+    background: variables.$primary;
+    border: none;
+    color: white;
+    box-shadow: inset 0 1px 1px rgba(white, 0.5), inset 0 5px 1.5rem helpers.backgroundColor($color);
+    --gradient-button--padding: 4px;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: calc(-1 * var(--gradient-button--padding));
+      left: calc(-1 * var(--gradient-button--padding));
+      width: 100%;
+      height: 100%;
+      @if($color == variables.$primary) {
+        background: radial-gradient(rgba(variables.$secondary, .75), rgba(variables.$secondary, 0));
+      } @else {
+        background: radial-gradient(rgba($color, .75), rgba($color, 0));
+      }
+      z-index: -1;
+      padding: var(--gradient-button--padding);
+      border-radius: 1rem;
+      @if($color == variables.$primary) {
+        box-shadow: inset 0 0 1px rgba(variables.$secondary, 1);
+      } @else {
+        box-shadow: inset 0 0 1px rgba($color, 1);
+      }
+    }
+
+    &:hover {
+      --gradient-button--padding: 6px;
+      box-shadow: inset 0 1px 1px rgba(white, 0.5), inset 0 5px 1.5rem rgba(helpers.backgroundColor($color), 0.75);
+      &:before {
+        border-radius: 1.15rem;
+      }
+    }
+
+    &:active {
+      --gradient-button--padding: 4px;
+      box-shadow: inset 0 1px 1px rgba(white, 0.5), inset 0 5px 1.5rem rgba(helpers.backgroundColor($color), 0.5);
+      &:before {
+        border-radius: 1rem;
+      }
+    }
+  }
+}
+
+@each $name, $size in variables.$sizes {
+  $keys: map-keys(variables.$sizes);
+  $index: index($keys, $name);
+
+  $next-size: if($index < length($keys), map-get(variables.$sizes, nth($keys, $index + 1)), $size);
+
+  .gradient-button--#{$name} {
+    padding: $size $next-size;
+    border-radius: $next-size;
+  }
+}

@@ -19,7 +19,7 @@ export const DNamespaceProjectList: React.FC<DNamespaceProjectListProps> = (prop
 
     const projectService = useService(DNamespaceProjectReactiveService)
     const projectStore = useStore(DNamespaceProjectReactiveService)
-    const projects = React.useMemo(() => projectService.values({namespaceId}), [projectStore])
+    const projects = React.useMemo(() => projectService.values({namespaceId: namespaceId}), [projectStore, namespaceId])
 
     return <Card {...rest}>
         {projects.filter(filter).map((project) => project.id && (

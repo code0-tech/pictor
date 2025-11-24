@@ -9,8 +9,8 @@ import {DRuntimeContent} from "./DRuntimeContent";
 
 export interface DRuntimeListProps extends Omit<Card, "children" | "onSelect"> {
     filter?: (runtime: DRuntimeView, index: number) => boolean
-    onSelect?: (userId: Runtime['id']) => void
-    onSetting?: (runtimeId: Runtime['id']) => void
+    onSelect?: (runtime: DRuntimeView) => void
+    onSetting?: (runtime: DRuntimeView) => void
 }
 
 export const DRuntimeList: React.FC<DRuntimeListProps> = (props) => {
@@ -24,7 +24,7 @@ export const DRuntimeList: React.FC<DRuntimeListProps> = (props) => {
     return <Card {...rest}>
         {runtimes.filter(filter).map((runtime) => runtime.id && (
             <CardSection border hover onClick={() => {
-                if (onSelect) onSelect(runtime.id)
+                if (onSelect) onSelect(runtime)
             }} key={runtime.id}>
                 <DRuntimeContent onSetting={onSetting} runtimeId={runtime?.id}/>
             </CardSection>

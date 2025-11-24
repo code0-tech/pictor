@@ -35,6 +35,10 @@ import {
 import {DUserView} from "./DUser.view"
 import {MenuGroup, MenuItem, MenuLabel, MenuSeparator} from "../menu/Menu"
 import {setUserSession} from "./DUser.session.hook";
+import {IconSparkles} from "@tabler/icons-react";
+import {Text} from "../text/Text";
+import {Badge} from "../badge/Badge";
+import {GradientButton} from "../gradient-button/GradientButton";
 
 const meta: Meta = {
     title: "DUserMenu",
@@ -143,6 +147,16 @@ export const DUserMenuExample: DUserMenuStory = {
                 {React.useMemo(() => {
                     return (
                         <DUserMenu userId={"gid://sagittarius/User/1"}>
+                            <MenuGroup>
+                                <MenuLabel>Upgrade</MenuLabel>
+                                <GradientButton paddingSize={"xxs"} color={"info"}>
+                                    <IconSparkles size={16}/>
+                                    <Text hierarchy={"primary"}>
+                                        Upgrade to <Badge style={{verticalAlign: "middle"}}>PRO</Badge>
+                                    </Text>
+                                </GradientButton>
+                            </MenuGroup>
+                            <MenuSeparator/>
                             <MenuGroup>
                                 <MenuLabel>Label</MenuLabel>
                                 <MenuItem>Profile</MenuItem>

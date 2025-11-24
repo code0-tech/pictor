@@ -23,7 +23,7 @@ export abstract class DNamespaceMemberReactiveService extends ReactiveArrayServi
     }
 
     getByNamespaceIdAndUserId(namespaceId: Namespace['id'], userId: User['id']): DNamespaceMemberView | undefined {
-        return this.values().find(member => member.namespace?.id === namespaceId && member.user?.id === userId)
+        return this.values({namespaceId: namespaceId}).find(member => member.namespace?.id === namespaceId && member.user?.id === userId)
     }
 
     abstract memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined>

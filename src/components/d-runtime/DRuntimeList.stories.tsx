@@ -48,7 +48,9 @@ export const DRuntimeListExample = () => {
             dataTypes: undefined,
             description: "Example Runtime",
             flowTypes: undefined,
-            namespace: undefined,
+            namespace: {
+                id: "gid://sagittarius/Namespace/1"
+            },
             projects: undefined,
             status: RuntimeStatusType.Connected,
             userAbilities: {
@@ -64,7 +66,9 @@ export const DRuntimeListExample = () => {
             dataTypes: undefined,
             description: "Example Runtime",
             flowTypes: undefined,
-            namespace: undefined,
+            namespace: {
+                id: "gid://sagittarius/Namespace/1"
+            },
             projects: undefined,
             status: RuntimeStatusType.Disconnected,
         })
@@ -72,7 +76,7 @@ export const DRuntimeListExample = () => {
 
     return <ContextStoreProvider services={[[runtimeStore, runtimeService]]}>
         <Container>
-            <DRuntimeList/>
+            <DRuntimeList namespaceId={"gid://sagittarius/Namespace/1"}/>
         </Container>
     </ContextStoreProvider>
 }

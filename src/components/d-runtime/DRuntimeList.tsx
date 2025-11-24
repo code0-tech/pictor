@@ -1,4 +1,4 @@
-import {Runtime} from "@code0-tech/sagittarius-graphql-types";
+import {Namespace, Runtime} from "@code0-tech/sagittarius-graphql-types";
 import {DRuntimeView} from "./DRuntime.view";
 import {Card} from "../card/Card";
 import React from "react";
@@ -8,6 +8,7 @@ import CardSection from "../card/CardSection";
 import {DRuntimeContent} from "./DRuntimeContent";
 
 export interface DRuntimeListProps extends Omit<Card, "children" | "onSelect"> {
+    namespaceId: Namespace["id"]
     filter?: (runtime: DRuntimeView, index: number) => boolean
     onSelect?: (runtime: DRuntimeView) => void
     onSetting?: (runtime: DRuntimeView) => void
@@ -15,11 +16,11 @@ export interface DRuntimeListProps extends Omit<Card, "children" | "onSelect"> {
 
 export const DRuntimeList: React.FC<DRuntimeListProps> = (props) => {
 
-    const {filter = () => true, onSetting, onSelect, ...rest} = props
+    const {namespaceId, filter = () => true, onSetting, onSelect, ...rest} = props
 
     const runtimeService = useService(DRuntimeReactiveService)
     const runtimeStore = useStore(DRuntimeReactiveService)
-    const runtimes = React.useMemo(() => runtimeService.values(), [runtimeStore])
+    const runtimes = React.useMemo(() => runtimeService.values({namespaceId: namespaceId}), [runtimeStore, namespaceId])
 
     return <Card {...rest}>
         {runtimes.filter(filter).map((runtime) => runtime.id && (

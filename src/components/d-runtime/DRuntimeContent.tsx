@@ -7,10 +7,11 @@ import {Button} from "../button/Button";
 import {useService, useStore} from "../../utils";
 import {DRuntimeReactiveService} from "./DRuntime.service";
 import {Badge} from "../badge/Badge";
+import {DRuntimeView} from "./DRuntime.view";
 
 export interface DRuntimeContentProps {
     runtimeId: Runtime['id']
-    onSetting?: (runtimeId: Runtime['id']) => void
+    onSetting?: (runtime: DRuntimeView) => void
 }
 
 export const DRuntimeContent: React.FC<DRuntimeContentProps> = (props) => {
@@ -45,7 +46,7 @@ export const DRuntimeContent: React.FC<DRuntimeContentProps> = (props) => {
             {runtime?.userAbilities?.deleteRuntime || runtime?.userAbilities?.updateRuntime || runtime?.userAbilities?.rotateRuntimeToken ? (
                 <Button color={"secondary"} onClick={(event) => {
                     event.stopPropagation()
-                    onSetting(runtimeId)
+                    onSetting(runtime)
                 }}>
                     <IconSettings size={16}/>
                 </Button>

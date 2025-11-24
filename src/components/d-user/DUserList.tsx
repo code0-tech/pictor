@@ -9,8 +9,8 @@ import {DUserContent} from "./DUserContent";
 
 export interface DUserListProps extends Omit<Card, "children" | "onSelect"> {
     filter?: (user: DUserView, index: number) => boolean
-    onSelect?: (userId: User['id']) => void
-    onRemove?: (userId: User['id']) => void
+    onSelect?: (user: DUserView) => void
+    onRemove?: (user: DUserView) => void
 }
 
 export const DUserList: React.FC<DUserListProps> = (props) => {
@@ -23,7 +23,7 @@ export const DUserList: React.FC<DUserListProps> = (props) => {
     return <Card {...rest}>
         {users.filter(filter).map((user) => user && user.id && (
             <CardSection border hover onClick={() => {
-                if (onSelect) onSelect(user.id)
+                if (onSelect) onSelect(user)
             }} key={user.id}>
                 <DUserContent onRemove={onRemove} userId={user?.id}/>
             </CardSection>

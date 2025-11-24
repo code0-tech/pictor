@@ -9,10 +9,11 @@ import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
 import {IconMailCheck} from "@tabler/icons-react";
 import {Button} from "../button/Button";
+import {DUserView} from "./DUser.view";
 
 export interface DUserContentProps {
     userId: User['id']
-    onRemove?: (userId: User['id']) => void
+    onRemove?: (user: DUserView) => void
 }
 
 export const DUserContent: React.FC<DUserContentProps> = (props) => {
@@ -55,7 +56,7 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                 <Button color={"error"} onClick={(event) => {
                                     event.stopPropagation()
-                                    onRemove(userId)
+                                    onRemove(user)
                                 }}>
                                     Confirm remove
                                 </Button>

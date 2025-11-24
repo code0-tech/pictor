@@ -1,6 +1,6 @@
 import {Meta, StoryObj} from "@storybook/react-vite";
 import React from "react";
-import DNamespaceProjectCard from "./DNamespaceProjectCard"
+import {DNamespaceProjectCard} from "./DNamespaceProjectCard"
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils"
 import {
     NamespacesProjectsAssignRuntimesInput,

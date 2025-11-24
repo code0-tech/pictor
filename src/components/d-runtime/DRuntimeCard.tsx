@@ -2,10 +2,11 @@ import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {Card} from "../card/Card";
 import {DRuntimeContent} from "./DRuntimeContent";
+import {DRuntimeView} from "./DRuntime.view";
 
 export interface DRuntimeCardProps {
     runtimeId: Runtime['id']
-    onSetting?: (runtimeId: Runtime['id']) => void
+    onSetting?: (runtime: DRuntimeView) => void
 }
 
 export const DRuntimeCard: React.FC<DRuntimeCardProps> = (props) => {

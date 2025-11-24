@@ -10,8 +10,8 @@ import {DNamespaceProjectContent} from "./DNamespaceProjectContent";
 export interface DNamespaceProjectListProps extends Omit<Card, "children" | "onSelect"> {
     namespaceId: Namespace["id"]
     filter?: (project: DNamespaceProjectView, index: number) => boolean
-    onSetting?: (projectId: NamespaceProject["id"]) => void
-    onSelect?: (projectId: NamespaceProject["id"]) => void
+    onSetting?: (project: DNamespaceProjectView) => void
+    onSelect?: (project: DNamespaceProjectView) => void
 }
 
 export const DNamespaceProjectList: React.FC<DNamespaceProjectListProps> = (props) => {
@@ -24,7 +24,7 @@ export const DNamespaceProjectList: React.FC<DNamespaceProjectListProps> = (prop
     return <Card {...rest}>
         {projects.filter(filter).map((project) => project.id && (
             <CardSection border hover onClick={() => {
-                if (onSelect) onSelect(project.id)
+                if (onSelect) onSelect(project)
             }} key={project.id}>
                 <DNamespaceProjectContent onSetting={onSetting} projectId={project?.id}/>
             </CardSection>

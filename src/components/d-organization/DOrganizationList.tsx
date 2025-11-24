@@ -11,9 +11,9 @@ import {Organization, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DOrganizationListProps extends Omit<Card, "children" | "onSelect"> {
     filter?: (organizations: DOrganizationView, index: number) => boolean
-    onSetting?: (organizationId: Organization['id']) => void
-    onLeave?: (organizationId: Organization['id']) => void
-    onSelect?: (organizationId: Organization['id']) => void
+    onSetting?: (organization: DOrganizationView) => void
+    onLeave?: (organization: DOrganizationView) => void
+    onSelect?: (organization: DOrganizationView) => void
 }
 
 export const DOrganizationList: React.FC<DOrganizationListProps> = (props) => {
@@ -26,7 +26,7 @@ export const DOrganizationList: React.FC<DOrganizationListProps> = (props) => {
     return <Card {...rest}>
         {organizations.filter(filter).map((organization) => organization.id && (
             <CardSection border hover onClick={() => {
-                if (onSelect) onSelect(organization.id)
+                if (onSelect) onSelect(organization)
             }} key={organization.id}>
                 <DOrganizationContent onLeave={onLeave} onSetting={onSetting} organizationId={organization?.id}/>
             </CardSection>

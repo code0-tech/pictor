@@ -5,11 +5,12 @@ import {Code0Component} from "../../utils"
 import {Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Card} from "../card/Card"
 import {DOrganizationContent} from "./DOrganizatonContent";
+import {DOrganizationView} from "./DOrganization.view";
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
     organizationId: Scalars['OrganizationID']['output']
-    onSetting?: (organizationId: Scalars['OrganizationID']['output']) => void
-    onLeave?: (organizationId: Scalars['OrganizationID']['output']) => void
+    onSetting?: (organization: DOrganizationView) => void
+    onLeave?: (organization: DOrganizationView) => void
 }
 
 const DOrganizationCard: React.FC<DOrganizationCardProps> = props => {

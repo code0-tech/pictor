@@ -2,10 +2,11 @@ import {User} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {Card} from "../card/Card";
 import {DUserContent} from "./DUserContent";
+import {DUserView} from "./DUser.view";
 
 export interface DUserCardProps {
     userId: User['id']
-    onRemove?: (userId: User['id']) => void
+    onRemove?: (user: DUserView) => void
 }
 
 export const DUserCard: React.FC<DUserCardProps> = (props) => {

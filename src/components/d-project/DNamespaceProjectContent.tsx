@@ -12,10 +12,11 @@ import {Badge} from "../badge/Badge";
 import {IconGitFork, IconServer, IconServerSpark, IconSettings} from "@tabler/icons-react";
 import {DRuntimeReactiveService} from "../d-runtime";
 import {Button} from "../button/Button";
+import {DNamespaceProjectView} from "./DNamespaceProject.view";
 
 export interface DNamespaceProjectContentProps extends Code0Component<HTMLDivElement> {
     projectId: NamespaceProject["id"]
-    onSetting?: (projectId: NamespaceProject["id"]) => void
+    onSetting?: (project: DNamespaceProjectView) => void
 }
 
 export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> = (props) => {
@@ -90,7 +91,7 @@ export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> =
                 {project?.userAbilities?.deleteNamespaceProject || project?.userAbilities?.updateNamespaceProject ? (
                     <Button color={"secondary"} onClick={(event) => {
                         event.stopPropagation()
-                        onSetting(projectId)
+                        onSetting(project)
                     }}>
                         <IconSettings size={16}/>
                     </Button>

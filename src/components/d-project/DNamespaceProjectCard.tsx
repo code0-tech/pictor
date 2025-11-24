@@ -2,26 +2,25 @@
 
 import React from "react"
 import {Code0Component} from "../../utils"
-import {Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {NamespaceProject, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Card} from "../card/Card"
 import {DNamespaceProjectContent} from "./DNamespaceProjectContent";
+import {DNamespaceProjectView} from "./DNamespaceProject.view";
 
 export interface DNamespaceProjectCardProps extends Code0Component<HTMLDivElement> {
-    projectId: Scalars['NamespaceProjectID']['output']
-    onSettingsClick?: (projectId: Scalars['NamespaceProjectID']['output']) => void
+    projectId: NamespaceProject['id']
+    onSetting?: (project: DNamespaceProjectView) => void
 }
 
-const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
+export const DNamespaceProjectCard: React.FC<DNamespaceProjectCardProps> = props => {
 
     const {
-        projectId, onSettingsClick = (_) => {
+        projectId, onSetting = (_) => {
         }
     } = props
     return (
         <Card>
-            <DNamespaceProjectContent projectId={projectId}/>
+            <DNamespaceProjectContent onSetting={onSetting} projectId={projectId}/>
         </Card>
     )
 }
-
-export default DNamespaceProjectCard

@@ -6,8 +6,11 @@ import {Text} from "../text/Text";
 import {Colors} from "../../utils/types";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconHeart, IconHeartFilled, IconShare} from "@tabler/icons-react";
+import {IconHeart, IconHeartFilled, IconShare, IconSparkles} from "@tabler/icons-react";
 import CardSection from "./CardSection";
+import {Flex} from "../flex/Flex";
+import {GradientButton} from "../gradient-button/GradientButton";
+import {Container} from "../container/Container";
 
 const meta: Meta = {
     title: "Card",
@@ -109,4 +112,33 @@ export const CardNews: CardStory = {
         gradient: false,
         dashed: false,
     }
+}
+
+export const CardGetPro = () => {
+    return <Container>
+        <Card gradient gradientColor={"info"}>
+            <Flex justify={"space-between"} align={"center"} style={{gap: "1.3rem"}}>
+                <Flex style={{flexDirection: "column"}}>
+                    <Text size={"md"} hierarchy={"tertiary"} display={"inline"} align={"center"} style={{gap: ".7rem"}}>
+                        Get CodeZero <Badge style={{verticalAlign: "middle"}}>PRO</Badge>
+                    </Text>
+                    <Text size={"md"} hierarchy={"tertiary"}>
+                        and unlock all available features
+                    </Text>
+                </Flex>
+                <Flex align={"center"} style={{gap: "1.3rem"}}>
+                    <Text>
+                        14,95€
+                        <Text size={"xs"} style={{verticalAlign: "text-bottom"}}>/mo per user</Text>
+                    </Text>
+                    <GradientButton color={"info"}>
+                        <IconSparkles size={16}/>
+                        <Text hierarchy={"primary"}>
+                            Upgrade to <Badge style={{verticalAlign: "middle"}}>PRO</Badge>
+                        </Text>
+                    </GradientButton>
+                </Flex>
+            </Flex>
+        </Card>
+    </Container>
 }

@@ -2,7 +2,7 @@
 
 import React from "react"
 import {Code0Component, useService, useStore} from "../../utils"
-import {Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {Organization, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Text} from "../text/Text"
 import {DOrganizationReactiveService} from "./DOrganization.service"
 import {IconFolder, IconLogout, IconServer, IconSettings, IconUser} from "@tabler/icons-react"
@@ -14,11 +14,12 @@ import {DUserReactiveService, useUserSession} from "../d-user";
 import {Badge} from "../badge/Badge";
 import {DNamespaceReactiveService} from "../d-namespace";
 import {DNamespaceMemberReactiveService} from "../d-member";
+import {DOrganizationView} from "./DOrganization.view";
 
 export interface DOrganizationCardProps extends Code0Component<HTMLDivElement> {
-    organizationId: Scalars['OrganizationID']['output']
-    onSetting?: (organizationId: Scalars['OrganizationID']['output']) => void
-    onLeave?: (organizationId: Scalars['OrganizationID']['output']) => void
+    organizationId: Organization['id']
+    onSetting?: (organization: DOrganizationView) => void
+    onLeave?: (organization: DOrganizationView) => void
 }
 
 export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
@@ -87,7 +88,7 @@ export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
                 {(organization?.userAbilities?.deleteOrganization || organization?.userAbilities?.updateOrganization) ? (
                     <Button color={"secondary"} onClick={(event) => {
                         event.stopPropagation()
-                        onSetting(organizationId)
+                        onSetting(organization)
                     }}>
                         <IconSettings size={16}/>
                     </Button>
@@ -95,7 +96,7 @@ export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
                 {namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
                     <Button color={"error"} onClick={(event) => {
                         event.stopPropagation()
-                        onLeave(organizationId)
+                        if (organization) onLeave(organization)
                     }}>
                         <IconLogout size={16}/> Leave
                     </Button>

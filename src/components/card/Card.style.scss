@@ -97,7 +97,7 @@
 
       @each $gradientName, $gradientColor in variables.$colors {
         &-#{$gradientName} {
-          //box-shadow: inset 0 0 ($padding * 2) math.div($padding, 2) helpers.backgroundColor($gradientColor);
+          box-shadow: inset 0 0 (1rem * 2) math.div(1rem, 2) helpers.backgroundColor($gradientColor);
         }
       }
     }

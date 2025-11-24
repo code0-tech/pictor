@@ -18,9 +18,11 @@ export const GradientButton: React.FC<GradientButtonProps> = (props) => {
         ...args
     } = props
 
-    return <button
-        {...mergeCode0Props(`gradient-button gradient-button--${color} ${active ? "gradient-button--active" : ""} ${disabled ? "gradient-button--disabled" : ""} gradient-button--${variant} gradient-button--${paddingSize}`, args)}
-        aria-disabled={disabled ? "true" : "false"}>
-        {children}
-    </button>
+    return <div className={`gradient-button-wrapper gradient-button-wrapper--${color}`}>
+        <button
+            {...mergeCode0Props(`gradient-button gradient-button--${color} ${active ? "gradient-button--active" : ""} ${disabled ? "gradient-button--disabled" : ""} gradient-button--${variant} gradient-button--${paddingSize}`, args)}
+            aria-disabled={disabled ? "true" : "false"}>
+            {children}
+        </button>
+    </div>
 }

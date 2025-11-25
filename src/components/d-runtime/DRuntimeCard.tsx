@@ -7,16 +7,18 @@ import {DRuntimeView} from "./DRuntime.view";
 export interface DRuntimeCardProps {
     runtimeId: Runtime['id']
     onSetting?: (runtime: DRuntimeView) => void
+    minimized?: boolean
 }
 
 export const DRuntimeCard: React.FC<DRuntimeCardProps> = (props) => {
     const {
         runtimeId,
+        minimized = false,
         onSetting = () => {
         }
     } = props
 
     return <Card>
-        <DRuntimeContent runtimeId={runtimeId} onSetting={onSetting}/>
+        <DRuntimeContent minimized={minimized} runtimeId={runtimeId} onSetting={onSetting}/>
     </Card>
 }

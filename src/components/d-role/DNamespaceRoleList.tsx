@@ -1,4 +1,4 @@
-import {DNamespaceRoleContent, DNamespaceRoleContentProps} from "./DNamespaceRoleContent";
+import {DNamespaceRoleContent} from "./DNamespaceRoleContent";
 import {Namespace} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {Card} from "../card/Card";

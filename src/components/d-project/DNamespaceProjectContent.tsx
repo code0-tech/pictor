@@ -27,34 +27,16 @@ export const DNamespaceProjectContent: React.FC<DNamespaceProjectContentProps> =
         }
     } = props
     const projectService = useService(DNamespaceProjectReactiveService)
-    const namespaceService = useService(DNamespaceReactiveService)
-    const organizationService = useService(DOrganizationReactiveService)
-    const userService = useService(DUserReactiveService)
     const runtimeService = useService(DRuntimeReactiveService)
 
-    const project = React.useMemo(() => projectService.getById(props.projectId), [projectService, props.projectId])
+    const project = React.useMemo(() => projectService.getById(projectId), [projectService, projectId])
     const assignedRuntime = React.useMemo(() => project ? runtimeService.getById(project.primaryRuntime?.id) : null, [project])
-    const namespace = React.useMemo(() => project ? namespaceService.getById(project.namespace?.id) : null, [namespaceService, project])
-    const namespaceParent = React.useMemo(() => namespace && namespace.parent
-        ? (namespace.parent.__typename === "Organization"
-            ? organizationService.getById((namespace.parent as Organization).id)
-            : namespace.parent.__typename === "User"
-                ? userService.getById((namespace.parent as User).id)
-                : null)
-        : null, [])
 
     return (
         <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
             <Flex align={"center"} style={{gap: "1.3rem"}}>
                 <Avatar bg={"transparent"}
-                        identifier={
-                            (namespace?.parent?.__typename === "User"
-                                ? (namespaceParent as DUserView).username
-                                : namespace?.parent?.__typename === "Organization"
-                                    ? (namespaceParent as DOrganizationView).name
-                                    : "")
-                            ?? ""
-                        }/>
+                        identifier={project?.name ?? ""}/>
                 <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                     <Text size={"lg"} hierarchy={"primary"} display={"block"}>
                         {project?.name}

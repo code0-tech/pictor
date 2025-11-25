@@ -4,6 +4,12 @@ import {DNamespaceRoleView} from "./DNamespaceRole.view";
 import {DNamespaceRoleReactiveService} from "./DNamespaceRole.service";
 import {
     NamespaceRoleAbility,
+    NamespacesMembersAssignRolesInput,
+    NamespacesMembersAssignRolesPayload,
+    NamespacesMembersDeleteInput,
+    NamespacesMembersDeletePayload,
+    NamespacesMembersInviteInput,
+    NamespacesMembersInvitePayload,
     NamespacesRolesAssignAbilitiesInput,
     NamespacesRolesAssignAbilitiesPayload,
     NamespacesRolesAssignProjectsInput,
@@ -18,6 +24,7 @@ import React from "react";
 import {DNamespaceProjectView} from "../d-project";
 import {DNamespaceRoleList} from "./DNamespaceRoleList";
 import {DNamespaceProjectReactiveServiceExtended} from "../d-project/DNamespaceProjectList.stories";
+import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-member";
 
 const meta: Meta = {
     title: "DNamespaceRole",
@@ -26,7 +33,7 @@ const meta: Meta = {
 
 export default meta
 
-class DNamespaceRoleReactiveServiceExtended extends DNamespaceRoleReactiveService {
+export class DNamespaceRoleReactiveServiceExtended extends DNamespaceRoleReactiveService {
     roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined> {
         return Promise.resolve(undefined);
     }
@@ -42,6 +49,21 @@ class DNamespaceRoleReactiveServiceExtended extends DNamespaceRoleReactiveServic
     roleDelete(payload: NamespacesRolesDeleteInput): Promise<NamespacesRolesDeletePayload | undefined> {
         return Promise.resolve(undefined);
     }
+}
+
+export class DNamespaceMemberReactiveServiceExtended extends DNamespaceMemberReactiveService {
+    memberAssignRoles(payload: NamespacesMembersAssignRolesInput): Promise<NamespacesMembersAssignRolesPayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberDelete(payload: NamespacesMembersDeleteInput): Promise<NamespacesMembersDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    memberInvite(payload: NamespacesMembersInviteInput): Promise<NamespacesMembersInvitePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
 }
 
 export const DNamespaceRoleCard = () => {
@@ -124,9 +146,20 @@ export const DNamespaceRoleCard = () => {
         })
     ])
 
+    const members = useReactiveArrayService<DNamespaceMemberView, DNamespaceMemberReactiveServiceExtended>(DNamespaceMemberReactiveServiceExtended, [
+        new DNamespaceMemberView({
+            id: "gid://sagittarius/NamespaceMember/1",
+            roles: {
+                nodes: [{
+                    id: "gid://sagittarius/NamespaceRole/1"
+                }]
+            }
+        })
+    ])
+
     return (
         <ContextStoreProvider
-            services={[role, project]}>
+            services={[role, project, members]}>
             <Container>
                 {React.useMemo(() => {
                     return <DNamespaceRoleList namespaceId={"gid://sagittarius/Namespace/1"}/>

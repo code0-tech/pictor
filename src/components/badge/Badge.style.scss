@@ -9,6 +9,7 @@
   width: fit-content;
   align-items: center;
   gap: variables.$xxs;
+  height: fit-content;
 
   & {
     @include helpers.fontStyle();

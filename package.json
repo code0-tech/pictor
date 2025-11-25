@@ -49,8 +49,8 @@
     "@types/jest-image-snapshot": "^6.4.0",
     "@types/react": "^19.2.5",
     "@vitejs/plugin-react": "^5.1.1",
-    "@vitest/browser-playwright": "^4.0.12",
-    "@vitest/coverage-v8": "^4.0.12",
+    "@vitest/browser-playwright": "^4.0.13",
+    "@vitest/coverage-v8": "^4.0.13",
     "@xyflow/react": "^12.9.3",
     "axe-playwright": "^2.2.2",
     "babel-loader": "^10.0.0",
@@ -81,7 +81,7 @@
     "vite": "^7.2.4",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-lib-inject-css": "^2.2.2",
-    "vitest": "^4.0.12"
+    "vitest": "^4.0.13"
   },
   "main": "dist/index.js",
   "repository": {

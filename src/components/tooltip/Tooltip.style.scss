@@ -18,9 +18,9 @@
   }
 
   &__arrow {
-    & {
-      fill: helpers.backgroundColor(variables.$secondary);
-    }
+    stroke: helpers.borderColor(variables.$secondary);
+    stroke-width: 1px;
+    fill: helpers.backgroundColor(variables.$secondary);
   }
 
 }

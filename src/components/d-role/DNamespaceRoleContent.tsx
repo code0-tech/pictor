@@ -90,7 +90,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                             <Spacing spacing={"xxs"}/>
                                             <Card paddingSize={"xs"} mb={-0.3} mx={-0.65}>
                                                 {assignedProjects.slice(0, 1).map(project => (
-                                                    <CardSection border>
+                                                    <CardSection key={project.id} border>
                                                         <Flex align={"center"} style={{gap: "0.7rem"}}>
                                                             <Avatar bg={"transparent"}
                                                                     identifier={project?.name ?? ""}/>
@@ -106,7 +106,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                     </CardSection>
                                                 ))}
                                                 {assignedProjects.slice(1, assignedProjects.length).length > 0 ? (
-                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} style={{background: "rgba(255,255,255,0.05)"}}>
+                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} active hover>
                                                         <Button p={"0"} variant={"none"}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
@@ -136,7 +136,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                             <Card paddingSize={"xs"} mb={-0.3} mx={-0.65}>
                                                 {assignedMembers.slice(0, 1).map(member => {
                                                     const user = userService.getById(member.user?.id)
-                                                    return <CardSection border>
+                                                    return <CardSection key={member.id} border>
                                                         <Flex align={"center"} style={{gap: "0.7rem"}}>
                                                             <Avatar bg={"transparent"}
                                                                     identifier={user?.username ?? ""}/>
@@ -152,7 +152,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                     </CardSection>
                                                 })}
                                                 {assignedMembers.slice(1, assignedMembers.length).length > 0 ? (
-                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} style={{background: "rgba(255,255,255,0.05)"}}>
+                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} active hover>
                                                         <Button p={"0"} variant={"none"}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>

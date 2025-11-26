@@ -13,7 +13,7 @@
 
   background: helpers.backgroundColor($background);
   border: 1px solid helpers.borderColor($borderColor);
-  color: rgba($color, .75);
+  color: helpers.color($color, variables.$hierarchySecondary);
   position: relative;
   box-sizing: border-box;
 

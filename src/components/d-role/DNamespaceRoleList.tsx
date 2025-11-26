@@ -11,10 +11,12 @@ export interface DNamespaceRoleListProps extends Omit<Card, "children" | "onSele
     namespaceId: Namespace["id"]
     filter?: (role: DNamespaceRoleView, index: number) => boolean
     onSetting?: (role: DNamespaceRoleView) => void
+    onMembersViewMore?: (role: DNamespaceRoleView) => void
+    onProjectsViewMore?: (role: DNamespaceRoleView) => void
 }
 
 export const DNamespaceRoleList: React.FC<DNamespaceRoleListProps> = (props) => {
-    const {namespaceId, filter = () => true, onSetting, ...rest} = props
+    const {namespaceId, filter = () => true, onSetting, onProjectsViewMore, onMembersViewMore, ...rest} = props
 
     const roleService = useService(DNamespaceRoleReactiveService)
     const roleStore = useStore(DNamespaceRoleReactiveService)
@@ -24,7 +26,8 @@ export const DNamespaceRoleList: React.FC<DNamespaceRoleListProps> = (props) => 
     return <Card {...rest}>
         {roles.filter(filter).map((role) => role.id && (
             <CardSection border key={role.id}>
-                <DNamespaceRoleContent onSetting={onSetting} roleId={role?.id}/>
+                <DNamespaceRoleContent onSetting={onSetting} onProjectsViewMore={onProjectsViewMore}
+                                       onMembersViewMore={onMembersViewMore} roleId={role?.id}/>
             </CardSection>
         ))}
     </Card>

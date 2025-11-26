@@ -52,19 +52,20 @@
       }
     }
 
+    &:first-child {
+      border-top-left-radius: variables.$borderRadius;
+      border-top-right-radius: variables.$borderRadius;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: variables.$borderRadius;
+      border-bottom-right-radius: variables.$borderRadius;
+    }
+
     &--hover {
       cursor: pointer;
       &:hover {
         background: rgba(helpers.backgroundColor(variables.$secondary), .25);
-      }
-      &:first-child {
-        border-top-left-radius: variables.$borderRadius;
-        border-top-right-radius: variables.$borderRadius;
-      }
-
-      &:last-child {
-        border-bottom-left-radius: variables.$borderRadius;
-        border-bottom-right-radius: variables.$borderRadius;
       }
     }
   }

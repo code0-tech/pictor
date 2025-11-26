@@ -3,12 +3,12 @@
 @use "../../styles/variables";
 
 .menu {
-  z-index: 999;
 
   &__content, &__sub-content {
     padding: variables.$xxs;
     position: relative;
     box-sizing: border-box;
+    z-index: 999;
 
     & {
       @include box.box(variables.$primary);

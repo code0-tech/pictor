@@ -2,6 +2,8 @@
 
 .text {
   font-family: "Inter", sans-serif;
+  display: block;
+  vertical-align: middle;
 }
 
 @each $name, $font in variables.$sizes {

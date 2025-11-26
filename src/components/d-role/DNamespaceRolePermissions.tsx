@@ -129,7 +129,7 @@ function renderPermissionSummary(categories: AbilityCategoryInfo[]) {
                         <Flex style={{flexDirection: "column", gap: "0.25rem"}}>
                             {category.abilities.map(ability => (
                                 <Flex key={ability} align="center" style={{gap: "0.35rem"}}>
-                                    <IconCheck size={14}/>
+                                    <IconCheck size={16}/>
                                     <Text size="xs">{ability}</Text>
                                 </Flex>
                             ))}

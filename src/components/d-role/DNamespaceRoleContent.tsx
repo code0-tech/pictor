@@ -23,12 +23,18 @@ import {DUserReactiveService} from "../d-user";
 export interface DNamespaceRoleContentProps {
     roleId: NamespaceRole["id"]
     onSetting?: (role: DNamespaceRoleView) => void
+    onMembersViewMore?: (role: DNamespaceRoleView) => void
+    onProjectsViewMore?: (role: DNamespaceRoleView) => void
 }
 
 export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (props) => {
     const {
         roleId,
         onSetting = () => {
+        },
+        onMembersViewMore = () => {
+        },
+        onProjectsViewMore = () => {
         }
     } = props
 
@@ -105,9 +111,11 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         </Flex>
                                                     </CardSection>
                                                 ))}
-                                                {assignedProjects.slice(1, assignedProjects.length).length > 0 ? (
-                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} active hover>
-                                                        <Button p={"0"} variant={"none"}>
+                                                {role && assignedProjects.slice(1, assignedProjects.length).length > 0 ? (
+                                                    <CardSection border display={"flex"} p={0.35} justify={"center"}
+                                                                 active hover>
+                                                        <Button p={"0"} variant={"none"}
+                                                                onClick={() => onProjectsViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
                                                         </Button>
@@ -151,9 +159,11 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         </Flex>
                                                     </CardSection>
                                                 })}
-                                                {assignedMembers.slice(1, assignedMembers.length).length > 0 ? (
-                                                    <CardSection border display={"flex"} p={0.35} justify={"center"} active hover>
-                                                        <Button p={"0"} variant={"none"}>
+                                                {role && assignedMembers.slice(1, assignedMembers.length).length > 0 ? (
+                                                    <CardSection border display={"flex"} p={0.35} justify={"center"}
+                                                                 active hover>
+                                                        <Button p={"0"} variant={"none"}
+                                                                onClick={() => onMembersViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>
                                                         </Button>

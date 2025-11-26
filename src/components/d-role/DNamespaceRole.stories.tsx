@@ -25,6 +25,8 @@ import {DNamespaceProjectView} from "../d-project";
 import {DNamespaceRoleList} from "./DNamespaceRoleList";
 import {DNamespaceProjectReactiveServiceExtended} from "../d-project/DNamespaceProjectList.stories";
 import {DNamespaceMemberReactiveService, DNamespaceMemberView} from "../d-member";
+import {DUserView} from "../d-user";
+import {DUserReactiveServiceExtended} from "../d-user/DUserList.stories";
 
 const meta: Meta = {
     title: "DNamespaceRole",
@@ -149,6 +151,20 @@ export const DNamespaceRoleCard = () => {
     const members = useReactiveArrayService<DNamespaceMemberView, DNamespaceMemberReactiveServiceExtended>(DNamespaceMemberReactiveServiceExtended, [
         new DNamespaceMemberView({
             id: "gid://sagittarius/NamespaceMember/1",
+            user: {
+                id: "gid://sagittarius/User/1",
+            },
+            roles: {
+                nodes: [{
+                    id: "gid://sagittarius/NamespaceRole/1"
+                }]
+            }
+        }),
+        new DNamespaceMemberView({
+            id: "gid://sagittarius/NamespaceMember/2",
+            user: {
+                id: "gid://sagittarius/User/2",
+            },
             roles: {
                 nodes: [{
                     id: "gid://sagittarius/NamespaceRole/1"
@@ -157,9 +173,40 @@ export const DNamespaceRoleCard = () => {
         })
     ])
 
+    const user = useReactiveArrayService<DUserView, DUserReactiveServiceExtended>(DUserReactiveServiceExtended, [
+        new DUserView({
+            id: "gid://sagittarius/User/1",
+            username: "nsammito",
+            email: "nsammito@code0.tech",
+            admin: undefined,
+            avatarPath: "",
+            firstname: undefined,
+            lastname: undefined,
+            namespace: undefined,
+            namespaceMemberships: undefined,
+            createdAt: new Date().toString(),
+            updatedAt: new Date().toString(),
+            emailVerifiedAt: "sd"
+        }),
+        new DUserView({
+            id: "gid://sagittarius/User/2",
+            username: "exampleuser",
+            email: "test@gmail.com",
+            admin: undefined,
+            avatarPath: "",
+            firstname: undefined,
+            lastname: undefined,
+            namespace: undefined,
+            namespaceMemberships: undefined,
+            createdAt: new Date().toString(),
+            updatedAt: new Date().toString(),
+            emailVerifiedAt: "sd"
+        })
+    ])
+
     return (
         <ContextStoreProvider
-            services={[role, project, members]}>
+            services={[role, project, members, user]}>
             <Container>
                 {React.useMemo(() => {
                     return <DNamespaceRoleList namespaceId={"gid://sagittarius/Namespace/1"}/>

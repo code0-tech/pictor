@@ -10,6 +10,7 @@
   align-items: center;
   gap: variables.$xxs;
   height: fit-content;
+  vertical-align: middle;
 
   & {
     @include helpers.fontStyle();
@@ -21,8 +22,7 @@
   .badge--#{$name} {
 
     & {
-      @include box.box($color);
-      box-shadow: none;
+      @include box.box($color, $color, $color);
     }
   }
 }

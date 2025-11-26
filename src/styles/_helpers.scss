@@ -34,8 +34,8 @@
   @return rgba($color, $hierarchy);
 }
 
-@function backgroundColor($color: variables.$secondary) {
-  @return color.mix($color, variables.$primary, 10%);
+@function backgroundColor($color: variables.$secondary, $level: 1) {
+  @return color.mix($color, variables.$primary, 10% * $level);
 }
 
 @mixin noFocusStyle() {

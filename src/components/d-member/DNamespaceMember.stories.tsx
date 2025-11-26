@@ -7,7 +7,7 @@ import {
     DNamespaceMemberReactiveServiceExtended,
     DNamespaceRoleReactiveServiceExtended
 } from "../d-role/DNamespaceRole.stories";
-import {DNamespaceRoleList, DNamespaceRoleView} from "../d-role";
+import {DNamespaceRoleView} from "../d-role";
 import {NamespaceRoleAbility} from "@code0-tech/sagittarius-graphql-types";
 import {Container} from "../container/Container";
 import React from "react";
@@ -54,7 +54,6 @@ export const MemberListExample = () => {
             }
         })
     ])
-
     const user = useReactiveArrayService<DUserView, DUserReactiveServiceExtended>(DUserReactiveServiceExtended, [
         new DUserView({
             id: "gid://sagittarius/User/1",
@@ -85,7 +84,6 @@ export const MemberListExample = () => {
             emailVerifiedAt: "sd"
         })
     ])
-
     const role = useReactiveArrayService<DNamespaceRoleView, DNamespaceRoleReactiveServiceExtended>(DNamespaceRoleReactiveServiceExtended, [
         new DNamespaceRoleView({
             id: "gid://sagittarius/NamespaceRole/1",

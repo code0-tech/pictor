@@ -21,13 +21,16 @@
 }
 
 @function borderColor($color: variables.$secondary) {
-  @if($color == variables.$secondary) {
-    @return rgba($color, .1);
+  @if ($color == variables.$primary) {
+    @return rgba(variables.$secondary, .1);
   }
-  @return rgba($color, .25);
+  @return rgba($color, .1);
 }
 
 @function color($color: variables.$white, $hierarchy: variables.$hierarchyTertiary) {
+  @if ($color == variables.$primary) {
+    @return rgba(variables.$secondary, $hierarchy);
+  }
   @return rgba($color, $hierarchy);
 }
 

@@ -9,7 +9,6 @@ export interface SectionType extends Code0Component<HTMLDivElement> {
     //defaults to false
     border?: boolean
     hover?: boolean
-    active?: boolean
 }
 
 const CardSection: React.FC<SectionType> = (props) => {
@@ -18,7 +17,6 @@ const CardSection: React.FC<SectionType> = (props) => {
         image = false,
         border = false,
         hover = false,
-        active = false,
         children,
         ...args
     } = props;
@@ -29,7 +27,6 @@ const CardSection: React.FC<SectionType> = (props) => {
                                 ${border ? "card__section--border" : ""} 
                                 ${image ? "card__section--image" : ""}
                                 ${hover ? "card__section--hover" : ""}
-                                ${active ? "card__section--active" : ""}
         `, args)}>
             {children}
         </div>

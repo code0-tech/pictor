@@ -113,8 +113,8 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                 ))}
                                                 {role && assignedProjects.slice(1, assignedProjects.length).length > 0 ? (
                                                     <CardSection border display={"flex"} p={0.35} justify={"center"}
-                                                                 active hover>
-                                                        <Button p={"0"} variant={"none"}
+                                                                 hover>
+                                                        <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onProjectsViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
@@ -161,8 +161,8 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                 })}
                                                 {role && assignedMembers.slice(1, assignedMembers.length).length > 0 ? (
                                                     <CardSection border display={"flex"} p={0.35} justify={"center"}
-                                                                 active hover>
-                                                        <Button p={"0"} variant={"none"}
+                                                                 hover>
+                                                        <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onMembersViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>

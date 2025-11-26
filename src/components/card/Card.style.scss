@@ -56,13 +56,8 @@
       cursor: pointer;
 
       &:hover {
-        background: helpers.backgroundColor(variables.$secondary, 0.75);
+        background: helpers.backgroundColor(variables.$secondary, 0.5);
       }
-    }
-
-    &--active {
-      cursor: pointer;
-      background: helpers.backgroundColor(variables.$secondary, 0.5);
     }
 
     &:first-child {

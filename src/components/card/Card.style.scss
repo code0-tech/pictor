@@ -52,6 +52,19 @@
       }
     }
 
+    &--hover {
+      cursor: pointer;
+
+      &:hover {
+        background: helpers.backgroundColor(variables.$secondary, 0.75);
+      }
+    }
+
+    &--active {
+      cursor: pointer;
+      background: helpers.backgroundColor(variables.$secondary, 0.5);
+    }
+
     &:first-child {
       border-top-left-radius: variables.$borderRadius;
       border-top-right-radius: variables.$borderRadius;
@@ -62,12 +75,6 @@
       border-bottom-right-radius: variables.$borderRadius;
     }
 
-    &--hover {
-      cursor: pointer;
-      &:hover {
-        background: rgba(helpers.backgroundColor(variables.$secondary), .25);
-      }
-    }
   }
 
 }
@@ -107,7 +114,7 @@
 
   .card--outline-#{$name} {
     outline-offset: calc(var(--padding) / 3);
-    margin: calc(var(--padding)/3);
+    margin: calc(var(--padding) / 3);
     outline: helpers.borderColor($color) solid 1px;
   }
 

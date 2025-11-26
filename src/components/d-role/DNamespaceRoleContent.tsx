@@ -107,7 +107,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                 ))}
                                                 {assignedProjects.slice(1, assignedProjects.length).length > 0 ? (
                                                     <CardSection border display={"flex"} p={0.35} justify={"center"} style={{background: "rgba(255,255,255,0.05)"}}>
-                                                        <Button paddingSize={"xxs"} variant={"none"}>
+                                                        <Button p={"0"} variant={"none"}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
                                                         </Button>
@@ -153,7 +153,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                 })}
                                                 {assignedMembers.slice(1, assignedMembers.length).length > 0 ? (
                                                     <CardSection border display={"flex"} p={0.35} justify={"center"} style={{background: "rgba(255,255,255,0.05)"}}>
-                                                        <Button paddingSize={"xxs"} variant={"none"}>
+                                                        <Button p={"0"} variant={"none"}>
                                                             <Text size={"xs"}>View more</Text>
                                                             <Badge>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>
                                                         </Button>

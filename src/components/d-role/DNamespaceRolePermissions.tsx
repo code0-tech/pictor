@@ -121,11 +121,11 @@ function renderPermissionSummary(categories: AbilityCategoryInfo[]) {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Badge color="info" style={{verticalAlign: "middle"}}>
-                        <Text>{category.label}</Text>
+                        <Text style={{color: "inherit"}}>{category.label}</Text>
                     </Badge>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent side={"bottom"}>
                         <Flex style={{flexDirection: "column", gap: "0.25rem"}}>
                             {category.abilities.map(ability => (
                                 <Flex key={ability} align="center" style={{gap: "0.35rem"}}>

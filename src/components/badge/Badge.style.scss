@@ -16,6 +16,10 @@
     @include helpers.fontStyle();
     @include helpers.borderRadius()
   }
+
+  &--border {
+    border: none !important;
+  }
 }
 
 @each $name, $color in variables.$colors {
@@ -26,3 +30,4 @@
     }
   }
 }
+

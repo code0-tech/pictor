@@ -8,10 +8,11 @@ import {DNamespaceRoleReactiveService} from "../d-role";
 import {Avatar} from "../avatar/Avatar";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
-import {IconDots, IconMailCheck} from "@tabler/icons-react";
+import {IconDots, IconMailCheck, IconUserCog, IconUserOff} from "@tabler/icons-react";
 import {Button} from "../button/Button";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../menu/Menu";
 
 export interface DNamespaceMemberContentProps {
     memberId: NamespaceMember['id']
@@ -69,11 +70,11 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
         <Flex align={"center"} style={{gap: "1.3rem"}}>
             <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
                 <Flex style={{gap: "0.35rem"}} align={"center"}>
-                    {user?.admin ? <Badge color={"primary"}>
+                    {user?.admin ? <Badge border color={"primary"}>
                         <Text hierarchy={"tertiary"}>Owner</Text>
                     </Badge> : null}
                     {user?.emailVerifiedAt ? (
-                        <Badge color={"primary"}>
+                        <Badge border color={"primary"}>
                             <IconMailCheck size={16}/>
                             <Text hierarchy={"tertiary"}>Email verified</Text>
                         </Badge>
@@ -81,9 +82,30 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                 </Flex>
             </Flex>
             {member?.userAbilities?.deleteMember || member?.userAbilities?.assignMemberRoles ? (
-                <Button color="secondary">
-                    <IconDots size={16}/>
-                </Button>
+                <Menu>
+                    <MenuTrigger asChild>
+                        <Button color="secondary">
+                            <IconDots size={16}/>
+                        </Button>
+                    </MenuTrigger>
+                    <MenuPortal>
+                        <MenuContent align={"end"} side={"bottom"} sideOffset={8}>
+                            <MenuLabel>Actions</MenuLabel>
+                            {member?.userAbilities?.deleteMember && (
+                                <MenuItem>
+                                    <IconUserOff size={16}/>
+                                    <Text>Remove member</Text>
+                                </MenuItem>
+                            )}
+                            {member?.userAbilities?.assignMemberRoles && (
+                                <MenuItem>
+                                    <IconUserCog size={16}/>
+                                    <Text>Assign role</Text>
+                                </MenuItem>
+                            )}
+                        </MenuContent>
+                    </MenuPortal>
+                </Menu>
             ) : null}
         </Flex>
     </Flex>

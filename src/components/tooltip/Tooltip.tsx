@@ -30,13 +30,5 @@ export const TooltipContent: React.FC<TooltipContentProps> = (props) => {
 }
 
 export const TooltipArrow: React.FC<TooltipArrowProps> = (props) => {
-    return <RadixTooltip.TooltipArrow {...mergeCode0Props("tooltip__arrow", {}) as TooltipArrowProps} asChild>
-        <svg className="tooltip__arrow" width="10" height="5" viewBox="0 0 30 10" preserveAspectRatio="none"
-             style={{display: "block"}}>
-            <polygon points="0,0 30,0 15,8"/>
-            <path
-                d="M0 0 L15 8 L30 0"
-            />
-        </svg>
-    </RadixTooltip.TooltipArrow>
+    return <RadixTooltip.TooltipArrow {...mergeCode0Props("tooltip__arrow", {}) as TooltipArrowProps}/>
 }

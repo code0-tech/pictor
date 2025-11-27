@@ -34,7 +34,7 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
 
     const member = React.useMemo(() => memberService.getById(memberId), [memberStore, memberId])
     const user = React.useMemo(() => userService.getById(member?.user?.id), [userStore, member])
-    const assignedRoles = React.useMemo(() => member?.roles?.nodes?.map(role => roleService.getById(role?.id)) || [], [roleStore, member])
+    const assignedRoles = React.useMemo(() => member?.roles?.nodes?.map(role => roleService.getById(role?.id, {namespaceId: member?.namespace?.id})) || [], [roleStore, member])
 
     return <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
         <Flex style={{gap: "1.3rem"}} align={"center"}>

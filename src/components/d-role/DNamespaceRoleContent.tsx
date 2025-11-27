@@ -82,7 +82,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                     <Flex align={"center"} style={{gap: "0.35rem"}}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge style={{verticalAlign: "middle"}}>
+                                <Badge border style={{verticalAlign: "middle"}}>
                                     <IconFolders size={16}/>
                                     <Text hierarchy={"tertiary"} size={"xs"}>{assignedProjects.length}</Text>
                                 </Badge>
@@ -94,7 +94,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                     {assignedProjects.length > 0 ? (
                                         <>
                                             <Spacing spacing={"xxs"}/>
-                                            <Card paddingSize={"xs"} mb={-0.3} mx={-0.65}>
+                                            <Card paddingSize={"xs"} mb={-0.35} mx={-0.7} style={{borderWidth: "2px"}}>
                                                 {assignedProjects.slice(0, 1).map(project => (
                                                     <CardSection key={project.id} border>
                                                         <Flex align={"center"} style={{gap: "0.7rem"}}>
@@ -117,7 +117,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onProjectsViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
-                                                            <Badge>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
+                                                            <Badge border>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
                                                         </Button>
                                                     </CardSection>
                                                 ) : null}
@@ -129,7 +129,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                         </Tooltip>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge style={{verticalAlign: "middle"}}>
+                                <Badge border style={{verticalAlign: "middle"}}>
                                     <IconUsers size={16}/>
                                     <Text hierarchy={"tertiary"} size={"xs"}>{assignedMembers.length}</Text>
                                 </Badge>
@@ -141,7 +141,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                     {assignedMembers.length > 0 ? (
                                         <>
                                             <Spacing spacing={"xxs"}/>
-                                            <Card paddingSize={"xs"} mb={-0.3} mx={-0.65}>
+                                            <Card paddingSize={"xs"} mb={-0.35} mx={-0.7} style={{borderWidth: "2px"}}>
                                                 {assignedMembers.slice(0, 1).map(member => {
                                                     const user = userService.getById(member.user?.id)
                                                     return <CardSection key={member.id} border>
@@ -165,7 +165,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onMembersViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
-                                                            <Badge>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>
+                                                            <Badge border>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>
                                                         </Button>
                                                     </CardSection>
                                                 ) : null}

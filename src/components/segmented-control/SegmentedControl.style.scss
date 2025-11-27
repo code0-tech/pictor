@@ -22,13 +22,12 @@
     & {
       @include box.box();
       border-radius: variables.$borderRadius - variables.$xxs;
-      @include helpers.fontStyle();
-      font-size: variables.$sm;
-      box-shadow: none;
+      border: none;
     }
 
     &[data-state="off"] {
       background: transparent;
+      opacity: .6666666666;
     }
 
   }

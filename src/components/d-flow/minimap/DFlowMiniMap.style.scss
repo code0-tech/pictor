@@ -8,7 +8,7 @@
     @include box.box(variables.$primary);
     @include helpers.borderRadius();
     margin: 0;
-    width: 100%;
+    width: fit-content;
   }
 
   > svg {

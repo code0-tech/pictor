@@ -1,7 +1,7 @@
 import React from "react";
-import {Code0ComponentProps} from "../../utils/types";
+import {Code0ComponentProps} from "../../utils";
 import {ToggleGroupSingleProps, ToggleGroupItemProps, Root, Item} from "@radix-ui/react-toggle-group";
-import {mergeCode0Props} from "../../utils/utils";
+import {mergeCode0Props} from "../../utils";
 import "./SegmentedControl.style.scss"
 
 type SegmentedControlProps = Code0ComponentProps & ToggleGroupSingleProps

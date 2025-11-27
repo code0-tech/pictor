@@ -12,11 +12,13 @@ import {DNamespaceMemberContent} from "./DNamespaceMemberContent";
 export interface DNamespaceMemberListProps extends Omit<Card, "children" | "onSelect"> {
     namespaceId: Namespace["id"]
     filter?: (runtime: DNamespaceMemberView, index: number) => boolean
+    onRemove?: (member: DNamespaceMemberView) => void
+    onAssignRole?: (member: DNamespaceMemberView) => void
 }
 
 export const DNamespaceMemberList: React.FC<DNamespaceMemberListProps> = (props) => {
 
-    const {namespaceId, filter = () => true, ...rest} = props
+    const {namespaceId, filter = () => true, onRemove, onAssignRole, ...rest} = props
 
     const memberService = useService(DNamespaceMemberReactiveService)
     const memberStore = useStore(DNamespaceMemberReactiveService)
@@ -26,7 +28,7 @@ export const DNamespaceMemberList: React.FC<DNamespaceMemberListProps> = (props)
     return <Card {...rest}>
         {members.filter(filter).map((member) => member && member.id && (
             <CardSection border key={member.id}>
-                <DNamespaceMemberContent memberId={member?.id}/>
+                <DNamespaceMemberContent onRemove={onRemove} onAssignRole={onAssignRole} memberId={member?.id}/>
             </CardSection>
         ))}
     </Card>

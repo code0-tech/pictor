@@ -13,14 +13,18 @@ import {Button} from "../button/Button";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../menu/Menu";
+import {DNamespaceMemberView} from "./DNamespaceMember.view";
 
 export interface DNamespaceMemberContentProps {
     memberId: NamespaceMember['id']
+    onRemove?: (member: DNamespaceMemberView) => void
+    onAssignRole?: (member: DNamespaceMemberView) => void
 }
 
 export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (props) => {
 
-    const {memberId} = props
+    const {memberId, onAssignRole = () => undefined, onRemove = () => undefined} = props
+
     const memberService = useService(DNamespaceMemberReactiveService)
     const memberStore = useStore(DNamespaceMemberReactiveService)
     const userService = useService(DUserReactiveService)
@@ -92,13 +96,13 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         <MenuContent align={"end"} side={"bottom"} sideOffset={8}>
                             <MenuLabel>Actions</MenuLabel>
                             {member?.userAbilities?.deleteMember && (
-                                <MenuItem>
+                                <MenuItem onSelect={() => onRemove(member)}>
                                     <IconUserOff size={16}/>
                                     <Text>Remove member</Text>
                                 </MenuItem>
                             )}
                             {member?.userAbilities?.assignMemberRoles && (
-                                <MenuItem>
+                                <MenuItem onSelect={() => onAssignRole(member)}>
                                     <IconUserCog size={16}/>
                                     <Text>Assign role</Text>
                                 </MenuItem>

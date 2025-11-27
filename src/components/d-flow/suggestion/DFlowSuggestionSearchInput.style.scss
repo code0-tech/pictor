@@ -2,10 +2,9 @@
 @use "../../../styles/helpers";
 
 .d-flow-suggestion-search-input {
-  box-shadow: none !important;
+  border: none !important;
   background: none !important;
-  margin-left: -1 * variables.$xxs;
-  margin-right: -1 * variables.$xxs;
+  margin: -1 * variables.$xxs;
   padding-left: variables.$xxs;
   padding-right: variables.$xxs;
   border-radius: 0 !important;

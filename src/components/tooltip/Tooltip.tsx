@@ -30,5 +30,5 @@ export const TooltipContent: React.FC<TooltipContentProps> = (props) => {
 }
 
 export const TooltipArrow: React.FC<TooltipArrowProps> = (props) => {
-    return <RadixTooltip.TooltipArrow {...mergeCode0Props("tooltip__arrow", {}) as TooltipArrowProps}/>
+    return <RadixTooltip.TooltipArrow {...mergeCode0Props("tooltip__arrow", props) as TooltipArrowProps}/>
 }

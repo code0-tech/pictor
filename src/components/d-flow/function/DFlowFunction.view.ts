@@ -9,18 +9,24 @@ import type {
 
 export class FunctionDefinitionView {
 
+    /** Name of the function */
+    private readonly _aliases?: Maybe<TranslationConnection>;
     /** Time when this FunctionDefinition was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Deprecation message of the function */
     private readonly _deprecationMessages?: Maybe<TranslationConnection>;
     /** Description of the function */
     private readonly _descriptions?: Maybe<TranslationConnection>;
+    /** Display message of the function */
+    private readonly _displayMessages?: Maybe<TranslationConnection>;
     /** Documentation of the function */
     private readonly _documentations?: Maybe<TranslationConnection>;
     /** Generic keys of the function */
     private readonly _genericKeys?: Maybe<Array<Scalars['String']['output']>>;
     /** Global ID of this FunctionDefinition */
     private readonly _id?: Maybe<Scalars['FunctionDefinitionID']['output']>;
+    /** Identifier of the function */
+    private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the function */
     private readonly _names?: Maybe<TranslationConnection>;
     /** Parameters of the function */
@@ -35,12 +41,15 @@ export class FunctionDefinitionView {
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
     constructor(object: FunctionDefinition) {
+        this._aliases = object.aliases;
         this._createdAt = object.createdAt;
         this._deprecationMessages = object.deprecationMessages;
         this._descriptions = object.descriptions;
+        this._displayMessages = object.displayMessages;
         this._documentations = object.documentations;
         this._genericKeys = object.genericKeys;
         this._id = object.id;
+        this._identifier = object.identifier;
         this._names = object.names;
         this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterDefinitionView(definition!!)) ?? undefined;
         this._returnType = object.returnType;
@@ -49,6 +58,10 @@ export class FunctionDefinitionView {
         this._updatedAt = object.updatedAt;
     }
 
+
+    get aliases(): Maybe<TranslationConnection> | undefined {
+        return this._aliases;
+    }
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
@@ -62,6 +75,10 @@ export class FunctionDefinitionView {
         return this._descriptions;
     }
 
+    get displayMessages(): Maybe<TranslationConnection> | undefined {
+        return this._displayMessages;
+    }
+
     get documentations(): Maybe<TranslationConnection> | undefined {
         return this._documentations;
     }
@@ -72,6 +89,10 @@ export class FunctionDefinitionView {
 
     get id(): Maybe<Scalars["FunctionDefinitionID"]["output"]> | undefined {
         return this._id;
+    }
+
+    get identifier(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._identifier;
     }
 
     get names(): Maybe<TranslationConnection> | undefined {
@@ -100,12 +121,15 @@ export class FunctionDefinitionView {
 
     json(): FunctionDefinition {
         return {
+            aliases: this._aliases,
             createdAt: this._createdAt,
             deprecationMessages: this._deprecationMessages,
+            displayMessages: this._displayMessages,
             descriptions: this._descriptions,
             documentations: this._documentations,
             genericKeys: this._genericKeys,
             id: this._id,
+            identifier: this._identifier,
             names: this._names,
             parameterDefinitions: this._parameterDefinitions ? {
                 nodes: this._parameterDefinitions.map(definitionView => definitionView.json()!!)

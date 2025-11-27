@@ -1,5 +1,12 @@
 import {Code0Component} from "../../../utils/types";
-import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
+import {
+    BaseEdge,
+    Edge,
+    EdgeLabelRenderer,
+    EdgeProps,
+    getSmoothStepPath,
+    Position
+} from "@xyflow/react";
 import React, {memo} from "react";
 import {Badge} from "../../badge/Badge";
 
@@ -14,8 +21,17 @@ export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
 export type DFlowEdgeProps = EdgeProps<Edge<DFlowEdgeDataProps>>
 
 export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
-
-    const {sourceX, sourceY, targetX, targetY, id, data, ...rest} = props
+    const {
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+        id,
+        data,
+        label,
+        style,
+        ...rest
+    } = props
 
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
@@ -25,26 +41,54 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
         targetY,
         targetPosition: data?.isParameter ? Position.Right : Position.Top,
         borderRadius: 16,
-        centerY: data?.isSuggestion ? targetY - 37.5 : targetY - 37.5
+        centerY: data?.isSuggestion ? targetY - 25 : targetY - 25
     })
 
-    return <>
-        <BaseEdge id={id} path={edgePath} style={{stroke: data?.color}}/>
-        {props.label ? (
-            <EdgeLabelRenderer>
-                <div style={{
-                    position: 'absolute',
-                    transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-                    pointerEvents: 'all',
-                    zIndex: 100,
-                }}>
-                    <Badge>
-                        {props.label}
-                    </Badge>
-                </div>
-            </EdgeLabelRenderer>
-        ) : null}
+    const color = data?.color ?? "#ffffff"
+    const gradientId = `dflow-edge-gradient-${id}`
 
-    </>
+    return (
+        <>
+            {/* Gradient-Definition für genau diese Edge */}
+            <defs>
+                <linearGradient
+                    id={gradientId}
+                    x1={sourceX}
+                    y1={sourceY}
+                    x2={targetX}
+                    y2={targetY}
+                    gradientUnits="userSpaceOnUse"
+                >
+                    {/* Start: volle Farbe */}
+                    <stop offset="0" stopColor={color} stopOpacity={0.75}/>
+                    {/* Ende: gleiche Farbe, aber transparent */}
+                    <stop offset="1" stopColor={color} stopOpacity={0.25}/>
+                </linearGradient>
+            </defs>
 
+            <BaseEdge
+                id={id}
+                path={edgePath}
+                {...rest}
+                style={{stroke: `url(#${gradientId})`, strokeWidth: "2px", strokeLinecap: "round"}}
+            />
+
+            {label ? (
+                <EdgeLabelRenderer>
+                    <div
+                        style={{
+                            position: "absolute",
+                            transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+                            pointerEvents: "all",
+                            zIndex: 100,
+                        }}
+                    >
+                        <Badge color={"info"}>
+                            {label}
+                        </Badge>
+                    </div>
+                </EdgeLabelRenderer>
+            ) : null}
+        </>
+    )
 })

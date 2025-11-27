@@ -154,6 +154,8 @@ export class ParameterDefinitionView {
     private readonly _documentations?: Maybe<TranslationConnection>;
     /** Global ID of this ParameterDefinition */
     private readonly _id?: Maybe<Scalars['ParameterDefinitionID']['output']>;
+    /** Identifier of the parameter */
+    private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the parameter */
     private readonly _names?: Maybe<TranslationConnection>;
     /** Time when this ParameterDefinition was last updated */
@@ -165,6 +167,7 @@ export class ParameterDefinitionView {
         this._descriptions = object.descriptions;
         this._documentations = object.documentations;
         this._id = object.id;
+        this._identifier = object.identifier;
         this._names = object.names;
         this._updatedAt = object.updatedAt;
     }
@@ -188,6 +191,10 @@ export class ParameterDefinitionView {
 
     get id(): Maybe<Scalars["ParameterDefinitionID"]["output"]> | undefined {
         return this._id;
+    }
+
+    get identifier(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._identifier;
     }
 
     get names(): Maybe<TranslationConnection> | undefined {

@@ -165,7 +165,7 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onMembersViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
-                                                            <Badge border>{(role?.assignedProjects?.count ?? assignedMembers.length) - 1}</Badge>
+                                                            <Badge border>{(assignedMembers.length) - 1}</Badge>
                                                         </Button>
                                                     </CardSection>
                                                 ) : null}

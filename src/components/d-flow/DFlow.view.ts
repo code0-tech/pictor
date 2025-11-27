@@ -163,7 +163,7 @@ export class FlowView {
             nodes: this._nodes?.map(node => node.jsonInput()),
             settings: this._settings?.map(setting => setting.jsonInput()),
             startingNodeId: this._startingNodeId,
-            type: this._type?.id
+            type: `gid://sagittarius/FlowType/1`
 
         }
     }

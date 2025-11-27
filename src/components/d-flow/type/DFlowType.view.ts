@@ -10,10 +10,14 @@ import type {
 
 export class FlowTypeView {
 
+    /** Name of the function */
+    private readonly _aliases?: Maybe<TranslationConnection>;
     /** Time when this FlowType was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Descriptions of the flow type */
     private readonly _descriptions?: Maybe<TranslationConnection>;
+    /** Display message of the function */
+    private readonly _displayMessages?: Maybe<TranslationConnection>;
     /** Editable status of the flow type */
     private readonly _editable?: Maybe<Scalars['Boolean']['output']>;
     /** Flow type settings of the flow type */
@@ -33,8 +37,10 @@ export class FlowTypeView {
 
 
     constructor(flowType: FlowType) {
+        this._aliases = flowType.aliases;
         this._createdAt = flowType.createdAt;
         this._descriptions = flowType.descriptions;
+        this._displayMessages = flowType.displayMessages;
         this._editable = flowType.editable;
         this._flowTypeSettings = flowType.flowTypeSettings;
         this._id = flowType.id;
@@ -45,6 +51,9 @@ export class FlowTypeView {
         this._updatedAt = flowType.updatedAt;
     }
 
+    get aliases(): Maybe<TranslationConnection> | undefined {
+        return this._aliases;
+    }
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
@@ -52,6 +61,10 @@ export class FlowTypeView {
 
     get descriptions(): Maybe<TranslationConnection> | undefined {
         return this._descriptions;
+    }
+
+    get displayMessages(): Maybe<TranslationConnection> | undefined {
+        return this._displayMessages;
     }
 
     get editable(): Maybe<Scalars["Boolean"]["output"]> | undefined {

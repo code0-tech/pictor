@@ -36,16 +36,16 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
             <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
                     <Text size={"md"} hierarchy={"primary"}>{user.username}</Text>
-                    {user.admin ? <Badge color={"secondary"}>Admin</Badge> : null}
+                    {user.admin ? <Badge color={"secondary"}>Owner</Badge> : null}
                 </Flex>
-                <Text size={"md"} hierarchy={"tertiary"}>{user.email}</Text>
+                <Text size={"sm"} hierarchy={"tertiary"}>{user.email}</Text>
             </Flex>
         </Flex>
         <Flex style={{gap: "1.3rem"}} align={"center"}>
-            {user.emailVerifiedAt ? (
-                <Badge color={"secondary"}>
+            {user?.emailVerifiedAt ? (
+                <Badge color={"primary"}>
                     <IconMailCheck size={16}/>
-                    <Text size={"xs"}>Email verified</Text>
+                    <Text size={"xs"} hierarchy={"tertiary"}>Email verified</Text>
                 </Badge>
             ) : null}
             {/*TODO: need to wait until the delete mutation is available*/}

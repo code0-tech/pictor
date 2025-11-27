@@ -25,7 +25,8 @@ export const TooltipPortal: React.FC<TooltipPortalProps> = (props) => {
 }
 
 export const TooltipContent: React.FC<TooltipContentProps> = (props) => {
-    return <RadixTooltip.TooltipContent {...mergeCode0Props("tooltip__content", props) as TooltipContentProps}/>
+    return <RadixTooltip.TooltipContent
+        align={props.align} {...mergeCode0Props("tooltip__content", props) as TooltipContentProps}/>
 }
 
 export const TooltipArrow: React.FC<TooltipArrowProps> = (props) => {

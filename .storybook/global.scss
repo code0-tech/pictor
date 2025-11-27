@@ -1,11 +1,13 @@
+@use "../src/styles/variables";
+
 html {
   overscroll-behavior: none;
 }
 
 .sb-show-main {
-  background: #030014 !important;
+  background: variables.$primary !important;
 }
 
 .sb-main-fullscreen {
-  background: #030014 !important;
+  background: variables.$primary !important;
 }

@@ -1,6 +1,7 @@
 import {Meta} from "@storybook/react-vite";
 import {SegmentedControl, SegmentedControlItem} from "./SegmentedControl";
 import React from "react";
+import {Text} from "../text/Text";
 
 export default {
     title: "Segmented Control",
@@ -9,13 +10,13 @@ export default {
 export const SegmentedControlExample = () => {
     return <SegmentedControl defaultValue={"codezero"} type={"single"}>
         <SegmentedControlItem value={"codezero"}>
-            CodeZero
+            <Text>CodeZero</Text>
         </SegmentedControlItem>
         <SegmentedControlItem value={"github"}>
-            Github
+            <Text>Github</Text>
         </SegmentedControlItem>
         <SegmentedControlItem value={"apple"}>
-            Apple
+            <Text>Apple</Text>
         </SegmentedControlItem>
     </SegmentedControl>
 }

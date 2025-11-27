@@ -9,10 +9,16 @@
   width: fit-content;
   align-items: center;
   gap: variables.$xxs;
+  height: fit-content;
+  vertical-align: middle;
 
   & {
     @include helpers.fontStyle();
     @include helpers.borderRadius()
+  }
+
+  &--border {
+    border: none !important;
   }
 }
 
@@ -20,8 +26,8 @@
   .badge--#{$name} {
 
     & {
-      @include box.box($color);
-      box-shadow: none;
+      @include box.box($color, $color, $color);
     }
   }
 }
+

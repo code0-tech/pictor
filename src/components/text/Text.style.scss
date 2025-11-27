@@ -1,7 +1,14 @@
 @use "../../styles/variables";
+@use "../../styles/helpers";
 
 .text {
   font-family: "Inter", sans-serif;
+  display: block;
+  vertical-align: middle;
+
+  & {
+    @include helpers.fontStyle()
+  }
 }
 
 @each $name, $font in variables.$sizes {
@@ -15,8 +22,6 @@
     @if ($name == "primary") {
       font-family: "Inter", sans-serif;
     }
-    line-height: 1.1;
-    letter-spacing: -0.75px;
     color: rgba(variables.$white, $opacity);
   }
 }

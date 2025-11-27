@@ -42,7 +42,7 @@ const meta: Meta = {
 
 export default meta
 
-class DUserReactiveServiceExtended extends DUserReactiveService {
+export class DUserReactiveServiceExtended extends DUserReactiveService {
     usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined> {
         return Promise.resolve(undefined);
     }

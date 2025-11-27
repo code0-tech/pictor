@@ -329,7 +329,13 @@ export class NodeParameterView {
 
     jsonInput(): NodeParameterInput {
         return <NodeParameterInput>{
-            value: this._value instanceof NodeFunctionView ? this._value.jsonInput() : this._value,
+            value: this._value instanceof NodeFunctionView ? {
+                functionValue: this._value.jsonInput()
+            } : this._value?.__typename === "ReferenceValue" ? {
+                referenceValue: this._value as ReferenceValue
+            } : {
+                literalValue: this._value as LiteralValue
+            },
             runtimeParameterDefinitionId: this.runtimeParameter?.id
         }
     }

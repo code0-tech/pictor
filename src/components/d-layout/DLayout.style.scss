@@ -31,16 +31,6 @@
   gap: variables.$xl;
 }
 
-.d-layout__left {
-  padding-right: variables.$xl;
-  border-right: 1px solid helpers.borderColor();
-}
-
-.d-layout__right {
-  padding-left: variables.$xl;
-  border-left: 1px solid helpers.borderColor();
-}
-
 .d-layout__left,
 .d-layout__right {
   flex: 0 0 auto;

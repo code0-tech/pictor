@@ -12,6 +12,7 @@ import {
     PanelResizeHandleProps
 } from "react-resizable-panels";
 import "./DResizable.style.scss"
+import {IconFolder, IconGripVertical} from "@tabler/icons-react";
 
 type DResizablePanelGroupProps = Code0ComponentProps & PanelGroupProps
 type DResizablePanelProps = Code0ComponentProps & PanelProps
@@ -33,7 +34,9 @@ export const DResizableHandle: React.FC<DResizableHandleProps> = (props) => {
     return <PanelResizeHandle
         data-slot="resizable-handle"
         {...mergeCode0Props("d-resizable__handle", props)}>
-        <div className={"d-resizable__handle-bar"}/>
+        <div className={"d-resizable__handle-bar"}>
+            <IconGripVertical size={16}/>
+        </div>
     </PanelResizeHandle>
 
 }

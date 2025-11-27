@@ -44,7 +44,6 @@ export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardPr
                 position={Position.Top}
             />
             <IconPlus size={16}/>
-            Add next
         </Button>
     }/>
 

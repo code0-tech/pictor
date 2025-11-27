@@ -33,9 +33,9 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
     const viewportHeight = useStore(s => s.height)
 
     return <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
-        <Badge color={"primary"}>START</Badge>
+        <Badge color={"info"}>Starting node</Badge>
         <Card variant={"normal"}
-              color={"success"}
+              color={"info"}
               paddingSize={"xs"}
               className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
               onClick={() => {

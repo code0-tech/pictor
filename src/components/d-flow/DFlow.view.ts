@@ -329,7 +329,7 @@ export class NodeParameterView {
 
     jsonInput(): NodeParameterInput {
         return <NodeParameterInput>{
-            value: this._value instanceof NodeFunctionView ? this._value.json() : this._value,
+            value: this._value instanceof NodeFunctionView ? this._value.jsonInput() : this._value,
             runtimeParameterDefinitionId: this.runtimeParameter?.id
         }
     }

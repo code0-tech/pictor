@@ -4,21 +4,24 @@ import {NamespaceMember} from "@code0-tech/sagittarius-graphql-types";
 import {useService, useStore} from "../../utils";
 import {DNamespaceMemberReactiveService} from "./DNamespaceMember.service";
 import {DUserReactiveService} from "../d-user";
-import {DNamespaceRoleReactiveService} from "../d-role";
+import {DNamespaceRoleReactiveService, DNamespaceRoleView} from "../d-role";
 import {Avatar} from "../avatar/Avatar";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
-import {IconDots, IconMailCheck, IconUserCog, IconUserOff} from "@tabler/icons-react";
+import {IconDots, IconMailCheck, IconTrash, IconUserCog, IconUserOff} from "@tabler/icons-react";
 import {Button} from "../button/Button";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {DNamespaceMemberView} from "./DNamespaceMember.view";
+import {Dialog, DialogContent, DialogPortal} from "../dialog/Dialog";
+import {Card} from "../card/Card";
+import CardSection from "../card/CardSection";
 
 export interface DNamespaceMemberContentProps {
     memberId: NamespaceMember['id']
     onRemove?: (member: DNamespaceMemberView) => void
-    onAssignRole?: (member: DNamespaceMemberView) => void
+    onAssignRole?: (member: DNamespaceMemberView, roles: DNamespaceRoleView[]) => void
 }
 
 export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (props) => {
@@ -35,8 +38,77 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
     const member = React.useMemo(() => memberService.getById(memberId), [memberStore, memberId])
     const user = React.useMemo(() => userService.getById(member?.user?.id), [userStore, member])
     const assignedRoles = React.useMemo(() => member?.roles?.nodes?.map(role => roleService.getById(role?.id, {namespaceId: member?.namespace?.id})) || [], [roleStore, member])
+    const [localAssignedRoles, setLocalAssignedRoles] = React.useState(assignedRoles)
+    const [openRemovedMemberDialog, setOpenRemovedMemberDialog] = React.useState(false)
+    const [openAssignRolesDialog, setOpenAssignRolesDialog] = React.useState(false)
 
     return <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
+        <Dialog open={openRemovedMemberDialog} onOpenChange={open => setOpenRemovedMemberDialog(open)}>
+            <DialogPortal>
+                <DialogContent showCloseButton title={"Remove member"}>
+                    <Text size={"md"} hierarchy={"secondary"}>
+                        Are you sure you want to remove {" "}
+                        <Badge color={"info"}>
+                            <Text size={"md"} style={{color: "inherit"}}>@{user?.username}</Text>
+                        </Badge> {" "}
+                        from the namespace members?
+                    </Text>
+                    <Flex justify={"space-between"} align={"center"}>
+                        <Button color={"secondary"}>No, go back!</Button>
+                        <Button color={"error"} onClick={() => onRemove(member!!)}>Yes, remove!</Button>
+                    </Flex>
+                </DialogContent>
+            </DialogPortal>
+        </Dialog>
+        <Dialog open={openAssignRolesDialog} onOpenChange={open => setOpenAssignRolesDialog(open)}>
+            <DialogPortal>
+                <DialogContent autoFocus showCloseButton title={"Assign roles"}>
+                    <Text size={"md"} hierarchy={"tertiary"}>Assign, remove and manage the roles of a active
+                        member</Text>
+                    <Card paddingSize={"xs"} color={"secondary"}>
+                        {localAssignedRoles.map(role => {
+                            return <CardSection border key={role?.id}>
+                                <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                        <Text hierarchy={"primary"}>{role?.name}</Text>
+                                        <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                                    </Flex>
+                                    <Button color={"error"} paddingSize={"xxs"} onClick={() => {
+                                        setLocalAssignedRoles(prevState => prevState.filter(aRole => aRole?.id != role?.id))
+                                    }}>
+                                        <IconTrash size={16}/>
+                                    </Button>
+                                </Flex>
+
+                            </CardSection>
+                        })}
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <CardSection hover p={0.35} border display={"flex"} justify={"center"}>
+                                    <Button paddingSize={"xxs"} variant={"none"}>Assign roles</Button>
+                                </CardSection>
+                            </MenuTrigger>
+                            <MenuPortal>
+                                <MenuContent side={"bottom"} sideOffset={8} align={"center"}>
+                                    <MenuLabel>Roles to add</MenuLabel>
+                                    {roleService.values({namespaceId: member?.namespace?.id}).filter(role => !localAssignedRoles.find(aRole => aRole?.id == role.id)).map(role => {
+                                        return <MenuItem onSelect={() => {
+                                            setLocalAssignedRoles(prevState => [...prevState, role])
+                                        }}>
+                                            {role.name}
+                                        </MenuItem>
+                                    })}
+                                </MenuContent>
+                            </MenuPortal>
+                        </Menu>
+                    </Card>
+                    <Flex justify={"space-between"} align={"center"}>
+                        <Button color={"secondary"}>No, go back!</Button>
+                        <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])} color={"success"}>Yes, save!</Button>
+                    </Flex>
+                </DialogContent>
+            </DialogPortal>
+        </Dialog>
         <Flex style={{gap: "1.3rem"}} align={"center"}>
             <Flex align={"center"} style={{gap: ".7rem"}}>
                 <Avatar identifier={user?.username!!} bg={"transparent"}/>
@@ -96,13 +168,13 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         <MenuContent align={"end"} side={"bottom"} sideOffset={8}>
                             <MenuLabel>Actions</MenuLabel>
                             {member?.userAbilities?.deleteMember && (
-                                <MenuItem onSelect={() => onRemove(member)}>
+                                <MenuItem onSelect={() => setOpenRemovedMemberDialog(true)}>
                                     <IconUserOff size={16}/>
                                     <Text>Remove member</Text>
                                 </MenuItem>
                             )}
                             {member?.userAbilities?.assignMemberRoles && (
-                                <MenuItem onSelect={() => onAssignRole(member)}>
+                                <MenuItem onSelect={() => setOpenAssignRolesDialog(true)}>
                                     <IconUserCog size={16}/>
                                     <Text>Assign role</Text>
                                 </MenuItem>

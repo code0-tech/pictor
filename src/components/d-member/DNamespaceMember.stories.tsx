@@ -50,7 +50,8 @@ export const MemberListExample = () => {
                 }]
             },
             userAbilities: {
-                deleteMember: true
+                deleteMember: true,
+                assignMemberRoles: true
             }
         })
     ])

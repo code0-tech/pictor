@@ -1,18 +1,18 @@
 import type {
     DataType,
-    Flow,
-    FlowSetting,
+    Flow, FlowInput,
+    FlowSetting, FlowSettingInput,
     FlowType, FunctionDefinition,
     LiteralValue,
     Maybe,
-    NodeFunction,
-    NodeParameter,
+    NodeFunction, NodeFunctionInput,
+    NodeParameter, NodeParameterInput,
     NodeParameterValue,
     ReferenceValue,
     RuntimeParameterDefinition,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
-import {ValidationResult} from "../../utils/inspection";
+import {ValidationResult} from "../../utils";
 
 export class FlowView {
 
@@ -156,6 +156,17 @@ export class FlowView {
             name: this._name,
         }
     }
+
+    jsonInput(): FlowInput {
+        return <FlowInput>{
+            name: this._name,
+            nodes: this._nodes?.map(node => node.jsonInput()),
+            settings: this._settings?.map(setting => setting.jsonInput()),
+            startingNodeId: this._startingNodeId,
+            type: `gid://sagittarius/FlowType/1`
+
+        }
+    }
 }
 
 export class NodeFunctionView {
@@ -227,6 +238,15 @@ export class NodeFunctionView {
             } : undefined,
             functionDefinition: this._functionDefinition,
             updatedAt: this._updatedAt,
+        }
+    }
+
+    jsonInput(): NodeFunctionInput {
+        return <NodeFunctionInput>{
+            nextNodeId: this._nextNodeId,
+            id: this._id,
+            parameters: this._parameters ? this._parameters.map(param => param.jsonInput()) : undefined,
+            runtimeFunctionId: this._functionDefinition?.runtimeFunctionDefinition?.id
         }
     }
 }
@@ -306,6 +326,19 @@ export class NodeParameterView {
             value: this._value instanceof NodeFunctionView ? this._value.json() : this._value,
         }
     }
+
+    jsonInput(): NodeParameterInput {
+        return <NodeParameterInput>{
+            value: this._value instanceof NodeFunctionView ? {
+                functionValue: this._value.jsonInput()
+            } : this._value?.__typename === "ReferenceValue" ? {
+                referenceValue: this._value as ReferenceValue
+            } : {
+                literalValue: this._value as LiteralValue
+            },
+            runtimeParameterDefinitionId: this.runtimeParameter?.id
+        }
+    }
 }
 
 export class FlowSettingView {
@@ -360,6 +393,13 @@ export class FlowSettingView {
             id: this._id,
             value: this._value,
             updatedAt: this._updatedAt
+        }
+    }
+
+    jsonInput(): FlowSettingInput {
+        return <FlowSettingInput>{
+            value: this.value,
+            flowSettingIdentifier: this.flowSettingIdentifier
         }
     }
 }

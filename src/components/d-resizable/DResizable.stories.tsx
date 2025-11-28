@@ -36,6 +36,7 @@ import {
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput, NamespacesProjectsFlowsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
+import {DFlowExport} from "../d-flow/export/DFlowExport";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -179,6 +180,7 @@ const FlowExample = () => {
         <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
         <DFlowControl/>
         <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
+        <DFlowExport flowId={"gid://sagittarius/Flow/1"}/>
         {/*<DFlowViewportMiniMap/>*/}
     </DFlow>
 }

@@ -2,17 +2,14 @@ import {Meta} from "@storybook/react-vite";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
-import {Button} from "../button/Button";
 import {
-    IconArrowsVertical,
-    IconDatabase,
-    IconHierarchy3, IconLayout,
-    IconLayoutDistributeHorizontal, IconLayoutDistributeVertical,
-    IconSettings,
-    IconTicket
+    IconAi, IconCopy,
+    IconDatabase, IconFile,
+    IconFolder,
+    IconLayout,
+    IconLayoutDistributeHorizontal,
+    IconLayoutDistributeVertical, IconMessageChatbot, IconTrash
 } from "@tabler/icons-react";
-import {Flex} from "../flex/Flex";
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
 import {useReactiveArrayService} from "../../utils/reactiveArrayService";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -41,10 +38,16 @@ import {DLayout} from "../d-layout/DLayout";
 import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
 import {
     NamespacesProjectsFlowsCreateInput,
-    NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput, NamespacesProjectsFlowsDeletePayload
+    NamespacesProjectsFlowsCreatePayload,
+    NamespacesProjectsFlowsDeleteInput,
+    NamespacesProjectsFlowsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
-import {DFlowMiniMap} from "../d-flow";
 import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
+import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
+import {Text} from "../text/Text";
+import {Tabs, TabsList, TabsTrigger} from "@radix-ui/react-tabs";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -69,7 +72,8 @@ class DFlowReactiveServiceExtend extends DFlowReactiveService {
     }
 }
 
-class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionService {}
+class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionService {
+}
 
 export const Dashboard = () => {
 
@@ -98,22 +102,51 @@ export const Dashboard = () => {
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
+    const [show, setShow] = React.useState(false);
+
     return <DFullScreen>
         <ContextStoreProvider
             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-            <DResizablePanelGroup direction={"horizontal"}>
-                <DResizablePanel p={0.7} defaultSize={15}>
-                    <DFlowFolder flowId={"gid://sagittarius/Flow/1"}/>
-                </DResizablePanel>
-                <DResizableHandle/>
-                <DResizablePanel>
-                    <FlowExample/>
-                </DResizablePanel>
-                <DResizableHandle/>
-                <DResizablePanel defaultSize={25}>
-                    <DFlowTabs/>
-                </DResizablePanel>
-            </DResizablePanelGroup>
+            <DLayout rightContent={
+                <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
+                        <IconFile size={16}/>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <IconDatabase size={16}/>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <IconMessageChatbot size={16}/>
+                    </Button>
+                </Flex>
+            } bottomContent={
+                <Flex p={0.35} style={{gap: "0.7rem"}}>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <Text>Logbook</Text>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <Text>Problems</Text>
+                    </Button>
+                </Flex>
+            }>
+                <DResizablePanelGroup direction={"horizontal"}>
+                    <DResizablePanel id={"1"} order={1} p={1} defaultSize={15}>
+                        <DFlowFolder flowId={"gid://sagittarius/Flow/1"}/>
+                    </DResizablePanel>
+                    <DResizableHandle/>
+                    <DResizablePanel id={"2"} order={2}>
+                        <FlowExample/>
+                    </DResizablePanel>
+                    {show && (
+                        <>
+                            <DResizableHandle/>
+                            <DResizablePanel id={"3"} order={3} defaultSize={25}>
+                                <DFlowTabs/>
+                            </DResizablePanel>
+                        </>
+                    )}
+                </DResizablePanelGroup>
+            </DLayout>
         </ContextStoreProvider>
     </DFullScreen>
 
@@ -144,6 +177,19 @@ const FlowExample = () => {
                     <IconLayout size={16}/>
                 </SegmentedControlItem>
             </SegmentedControl>
+        </Panel>
+        <Panel position={"bottom-center"}>
+            <ButtonGroup>
+                <Button color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
+                    Execute flow
+                </Button>
+                <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
+                    <IconTrash size={16}/>
+                </Button>
+                <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
+                    <IconCopy size={16}/>
+                </Button>
+            </ButtonGroup>
         </Panel>
         {/*<DFlowMiniMap/>*/}
     </DFlow>

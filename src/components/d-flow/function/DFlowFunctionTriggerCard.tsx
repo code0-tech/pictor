@@ -32,8 +32,8 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
     const viewportWidth = useStore(s => s.width)
     const viewportHeight = useStore(s => s.height)
 
-    return <Flex align={"center"} style={{flexDirection: "column", gap: "0.35rem"}}>
-        <Badge color={"info"}>Starting node</Badge>
+    return <Flex align={"center"} style={{flexDirection: "column"}}>
+        <Badge color={"info"} style={{borderTopRightRadius: "0.35rem", borderTopLeftRadius: "0.35rem", borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>Starting node</Badge>
         <Card variant={"normal"}
               color={"info"}
               paddingSize={"xs"}

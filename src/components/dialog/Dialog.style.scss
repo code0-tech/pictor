@@ -5,9 +5,6 @@
 @use "sass:color";
 
 .dialog {
-  @include box.box(variables.$primary, variables.$primary, variables.$secondary);
-  @include helpers.borderRadius();
-
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 
@@ -26,10 +23,13 @@
     bottom: 0;
     left: 0;
     z-index: 50;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(variables.$primary, 0.75);
   }
 
   &__content {
+    @include box.box(variables.$secondary);
+    @include helpers.borderRadius();
+
     position: fixed;
     top: 50%;
     left: 50%;
@@ -39,15 +39,10 @@
     max-width: calc(100% - 2rem);
     gap: 1rem;
     transform: translate(-50%, -50%);
-    border: 1px solid helpers.borderColor();
     padding: 1rem;
-    background: variables.$primary;
-    color: variables.$secondary;
-
-    @include helpers.borderRadius();
 
     @include media.respond-above(md) {
-      width: 420px;
+      width: 490px;
     }
   }
 
@@ -85,40 +80,6 @@
     @media (min-width: 640px) {
       flex-direction: row;
       justify-content: flex-end;
-    }
-  }
-
-  &__close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    border-radius: 0.125rem;
-    border: none;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-    background: none;
-    color: variables.$secondary;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    &:focus {
-      outline: none;
-    }
-
-    &:disabled {
-      pointer-events: none;
-    }
-
-    svg {
-      pointer-events: none;
-      flex-shrink: 0;
-    }
-
-    svg:not([class*="size-"]) {
-      width: 1rem;
-      height: 1rem;
     }
   }
 }

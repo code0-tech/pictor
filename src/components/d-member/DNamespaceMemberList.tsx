@@ -8,12 +8,13 @@ import {Card} from "../card/Card";
 import CardSection from "../card/CardSection";
 import {DNamespaceMemberView} from "./DNamespaceMember.view";
 import {DNamespaceMemberContent} from "./DNamespaceMemberContent";
+import {DNamespaceRoleView} from "../d-role";
 
 export interface DNamespaceMemberListProps extends Omit<Card, "children" | "onSelect"> {
     namespaceId: Namespace["id"]
     filter?: (runtime: DNamespaceMemberView, index: number) => boolean
     onRemove?: (member: DNamespaceMemberView) => void
-    onAssignRole?: (member: DNamespaceMemberView) => void
+    onAssignRole?: (member: DNamespaceMemberView, roles: DNamespaceRoleView[]) => void
 }
 
 export const DNamespaceMemberList: React.FC<DNamespaceMemberListProps> = (props) => {

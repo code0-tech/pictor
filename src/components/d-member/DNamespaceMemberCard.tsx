@@ -3,11 +3,12 @@ import {Card} from "../card/Card";
 import React from "react";
 import {DNamespaceMemberContent} from "./DNamespaceMemberContent";
 import {DNamespaceMemberView} from "./DNamespaceMember.view";
+import {DNamespaceRoleView} from "../d-role";
 
 export interface DNamespaceMemberCardProps {
     memberId: NamespaceMember["id"]
     onRemove?: (member: DNamespaceMemberView) => void
-    onAssignRole?: (member: DNamespaceMemberView) => void
+    onAssignRole?: (member: DNamespaceMemberView, roles: DNamespaceRoleView[]) => void
 }
 
 export const DNamespaceMemberCard: React.FC<DNamespaceMemberCardProps> = (props) => {

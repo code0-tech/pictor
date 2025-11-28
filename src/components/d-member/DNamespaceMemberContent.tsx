@@ -14,7 +14,7 @@ import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} fr
 import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions"
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu"
 import {DNamespaceMemberView} from "./DNamespaceMember.view"
-import {Dialog, DialogContent, DialogPortal} from "../dialog/Dialog"
+import {Dialog, DialogClose, DialogContent, DialogPortal} from "../dialog/Dialog"
 import {Card} from "../card/Card"
 import CardSection from "../card/CardSection"
 
@@ -57,7 +57,9 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         from the namespace members?
                     </Text>
                     <Flex justify={"space-between"} align={"center"}>
-                        <Button color={"secondary"}>No, go back!</Button>
+                        <DialogClose asChild>
+                            <Button color={"secondary"}>No, go back!</Button>
+                        </DialogClose>
                         <Button color={"error"} onClick={() => onRemove(member!!)}>Yes, remove!</Button>
                     </Flex>
                 </DialogContent>
@@ -104,7 +106,7 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                                                     <DNamespaceRolePermissions abilities={role?.abilities!!}/>
                                                 </Flex>
                                             </MenuItem>
-                                            {index < rolesToAssign.length - 1 && <MenuSeparator />}
+                                            {index < rolesToAssign.length - 1 && <MenuSeparator/>}
                                         </>
                                     })}
                                 </MenuContent>
@@ -112,7 +114,10 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         </Menu>
                     </Card>
                     <Flex justify={"space-between"} align={"center"}>
-                        <Button color={"secondary"}>No, go back!</Button>
+                        <DialogClose asChild>
+                            <Button color={"secondary"}>No, go back!</Button>
+                        </DialogClose>
+
                         <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])}
                                 color={"success"}>Yes, save!</Button>
                     </Flex>

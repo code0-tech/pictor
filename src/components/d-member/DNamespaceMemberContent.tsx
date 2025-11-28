@@ -60,7 +60,9 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         <DialogClose asChild>
                             <Button color={"secondary"}>No, go back!</Button>
                         </DialogClose>
-                        <Button color={"error"} onClick={() => onRemove(member!!)}>Yes, remove!</Button>
+                        <DialogClose asChild>
+                            <Button color={"error"} onClick={() => onRemove(member!!)}>Yes, remove!</Button>
+                        </DialogClose>
                     </Flex>
                 </DialogContent>
             </DialogPortal>
@@ -118,8 +120,10 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                             <Button color={"secondary"}>No, go back!</Button>
                         </DialogClose>
 
-                        <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])}
-                                color={"success"}>Yes, save!</Button>
+                        <DialogClose asChild>
+                            <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])}
+                                    color={"success"}>Yes, save!</Button>
+                        </DialogClose>
                     </Flex>
                 </DialogContent>
             </DialogPortal>

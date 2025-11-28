@@ -8,7 +8,7 @@ import CardSection from "../card/CardSection";
 import {DRuntimeContent} from "./DRuntimeContent";
 
 export interface DRuntimeListProps extends Omit<Card, "children" | "onSelect"> {
-    namespaceId: Namespace["id"]
+    namespaceId?: Namespace["id"]
     filter?: (runtime: DRuntimeView, index: number) => boolean
     onSelect?: (runtime: DRuntimeView) => void
     onSetting?: (runtime: DRuntimeView) => void

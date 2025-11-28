@@ -1,9 +1,12 @@
-import  * as DialogPrimitive from "@radix-ui/react-dialog"
-import {Code0Component, Code0ComponentProps} from "../../utils/types";
-import React, {useEffect} from "react";
-import {mergeCode0Props} from "../../utils/utils";
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import {Code0Component, Code0ComponentProps} from "../../utils";
+import React from "react";
+import {mergeCode0Props} from "../../utils";
 import {IconX} from "@tabler/icons-react"
 import "./Dialog.style.scss"
+import {Button} from "../button/Button";
+import {Flex} from "../flex/Flex";
+import {Text} from "../text/Text";
 
 export type DialogProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Root>
 export type DialogTriggerProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Trigger>
@@ -16,6 +19,7 @@ export type DialogHeaderProps = Code0ComponentProps & React.ComponentProps<"div"
 export type DialogFooterProps = Code0ComponentProps & React.ComponentProps<"div">
 export type DialogContentProps = Code0ComponentProps & React.ComponentProps<typeof DialogPrimitive.Content> & {
     showCloseButton?: boolean
+    title?: string
 }
 
 export type DialogStickyContentProps = Code0Component<HTMLDivElement> & {
@@ -48,9 +52,14 @@ export const DialogContent: React.FC<DialogContentProps> = (props) => {
             <DialogOverlay/>
             <DialogPrimitive.Content {...mergeCode0Props("dialog__content", props) as DialogContentProps}>
                 {props.showCloseButton && (
-                    <DialogClose>
-                        <IconX size={16}/>
-                    </DialogClose>
+                    <Flex align={"center"} justify={"space-between"}>
+                        <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
+                        <DialogClose asChild>
+                            <Button>
+                                <IconX size={16}/>
+                            </Button>
+                        </DialogClose>
+                    </Flex>
                 )}
                 {props.children}
             </DialogPrimitive.Content>

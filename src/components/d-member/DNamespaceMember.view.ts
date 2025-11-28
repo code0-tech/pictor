@@ -71,13 +71,15 @@ export class DNamespaceMemberView {
 
     json(): NamespaceMember {
         return {
+            __typename: "NamespaceMember",
             createdAt: this._createdAt,
             id: this._id,
             memberRoles: this._memberRoles,
             namespace: this._namespace,
             roles: this._roles,
             updatedAt: this._updatedAt,
-            user: this._user
+            user: this._user,
+            userAbilities: this._userAbilities,
         };
     }
 }

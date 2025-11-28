@@ -5,6 +5,7 @@ import {Button} from "../../button/Button";
 import {IconFocusCentered, IconMinus, IconPlus} from "@tabler/icons-react";
 import {Badge} from "../../badge/Badge";
 import {Flex} from "../../flex/Flex";
+import {Text} from "../../text/Text";
 
 export const DFlowControl: React.FC = () => {
 
@@ -29,13 +30,15 @@ export const DFlowControl: React.FC = () => {
 
     return <Panel position="bottom-left">
         <Flex style={{flexDirection: "column", gap: "1rem"}}>
-            <Flex align="stretch" style={{gap: ".7rem"}}>
+            <Flex align="center" style={{gap: ".7rem"}}>
                 <ButtonGroup>
-                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
-                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
-                    <Button paddingSize={"xxs"} color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
+                    <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"} onClick={() => zoomIn()}><IconPlus size={15}/></Button>
+                    <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"} onClick={() => zoomOut()}><IconMinus size={15}/></Button>
+                    <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"} onClick={() => center()}><IconFocusCentered size={15}/></Button>
                 </ButtonGroup>
-                <Badge color={"primary"} style={{border: "none"}}>{getCurrentZoomInPercent()}%</Badge>
+                <Badge color={"primary"} style={{border: "none"}}>
+                    <Text>{getCurrentZoomInPercent()}%</Text>
+                </Badge>
             </Flex>
         </Flex>
     </Panel>

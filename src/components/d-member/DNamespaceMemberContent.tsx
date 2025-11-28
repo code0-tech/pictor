@@ -1,22 +1,22 @@
-import React from "react";
-import {Flex} from "../flex/Flex";
-import {NamespaceMember} from "@code0-tech/sagittarius-graphql-types";
-import {useService, useStore} from "../../utils";
-import {DNamespaceMemberReactiveService} from "./DNamespaceMember.service";
-import {DUserReactiveService} from "../d-user";
-import {DNamespaceRoleReactiveService, DNamespaceRoleView} from "../d-role";
-import {Avatar} from "../avatar/Avatar";
-import {Text} from "../text/Text";
-import {Badge} from "../badge/Badge";
-import {IconDots, IconMailCheck, IconTrash, IconUserCog, IconUserOff} from "@tabler/icons-react";
-import {Button} from "../button/Button";
-import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../menu/Menu";
-import {DNamespaceMemberView} from "./DNamespaceMember.view";
-import {Dialog, DialogContent, DialogPortal} from "../dialog/Dialog";
-import {Card} from "../card/Card";
-import CardSection from "../card/CardSection";
+import React from "react"
+import {Flex} from "../flex/Flex"
+import {NamespaceMember} from "@code0-tech/sagittarius-graphql-types"
+import {useService, useStore} from "../../utils"
+import {DNamespaceMemberReactiveService} from "./DNamespaceMember.service"
+import {DUserReactiveService} from "../d-user"
+import {DNamespaceRoleReactiveService, DNamespaceRoleView} from "../d-role"
+import {Avatar} from "../avatar/Avatar"
+import {Text} from "../text/Text"
+import {Badge} from "../badge/Badge"
+import {IconDots, IconMailCheck, IconTrash, IconUserCog, IconUserOff} from "@tabler/icons-react"
+import {Button} from "../button/Button"
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip"
+import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions"
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu"
+import {DNamespaceMemberView} from "./DNamespaceMember.view"
+import {Dialog, DialogContent, DialogPortal} from "../dialog/Dialog"
+import {Card} from "../card/Card"
+import CardSection from "../card/CardSection"
 
 export interface DNamespaceMemberContentProps {
     memberId: NamespaceMember['id']
@@ -41,6 +41,9 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
     const [localAssignedRoles, setLocalAssignedRoles] = React.useState(assignedRoles)
     const [openRemovedMemberDialog, setOpenRemovedMemberDialog] = React.useState(false)
     const [openAssignRolesDialog, setOpenAssignRolesDialog] = React.useState(false)
+    const rolesToAssign = roleService
+        .values({namespaceId: member?.namespace?.id})
+        .filter(role => !localAssignedRoles.find(aRole => aRole?.id === role.id))
 
     return <Flex align={"center"} style={{gap: "1.3rem"}} justify={"space-between"}>
         <Dialog open={openRemovedMemberDialog} onOpenChange={open => setOpenRemovedMemberDialog(open)}>
@@ -69,7 +72,7 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                         {localAssignedRoles.map(role => {
                             return <CardSection border key={role?.id}>
                                 <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
-                                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                    <Flex align={"center"} style={{gap: "1.3rem"}}>
                                         <Text hierarchy={"primary"}>{role?.name}</Text>
                                         <DNamespaceRolePermissions abilities={role?.abilities!!}/>
                                     </Flex>
@@ -91,12 +94,18 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                             <MenuPortal>
                                 <MenuContent side={"bottom"} sideOffset={8} align={"center"}>
                                     <MenuLabel>Roles to add</MenuLabel>
-                                    {roleService.values({namespaceId: member?.namespace?.id}).filter(role => !localAssignedRoles.find(aRole => aRole?.id == role.id)).map(role => {
-                                        return <MenuItem onSelect={() => {
-                                            setLocalAssignedRoles(prevState => [...prevState, role])
-                                        }}>
-                                            {role.name}
-                                        </MenuItem>
+                                    {rolesToAssign.map((role, index) => {
+                                        return <>
+                                            <MenuItem onSelect={() => {
+                                                setLocalAssignedRoles(prevState => [...prevState, role])
+                                            }}>
+                                                <Flex align={"center"} style={{gap: "1.3rem"}}>
+                                                    <Text hierarchy={"primary"}>{role?.name}</Text>
+                                                    <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                                                </Flex>
+                                            </MenuItem>
+                                            {index < rolesToAssign.length - 1 && <MenuSeparator />}
+                                        </>
                                     })}
                                 </MenuContent>
                             </MenuPortal>
@@ -104,7 +113,8 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                     </Card>
                     <Flex justify={"space-between"} align={"center"}>
                         <Button color={"secondary"}>No, go back!</Button>
-                        <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])} color={"success"}>Yes, save!</Button>
+                        <Button onClick={() => onAssignRole(member!!, localAssignedRoles as DNamespaceRoleView[])}
+                                color={"success"}>Yes, save!</Button>
                     </Flex>
                 </DialogContent>
             </DialogPortal>

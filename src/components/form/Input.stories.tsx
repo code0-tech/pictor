@@ -13,6 +13,8 @@ import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
+import {Badge} from "../badge/Badge";
+import {InputSyntaxSegment} from "./Input";
 
 export default {
     title: "Form"
@@ -348,22 +350,87 @@ export const PinInputExample = () => {
 }
 
 export const InputSuggestionStory = () => {
-    return <Card maw={300}>
-        <TextInput transformSyntax={value => {
-            const textValue = value ?? ""
+    const suggestionValues = [
+        "Niklas van Schrick",
+        "Nico Sammito"
+    ]
+
+    const buildSegments = (value?: string | null): InputSyntaxSegment[] => {
+        const textValue = value ?? ""
+        const matches = suggestionValues.flatMap((badgeValue) => {
+            const occurrences: { start: number, end: number, value: string }[] = []
+            let searchIndex = textValue.indexOf(badgeValue)
+
+            while (searchIndex !== -1) {
+                occurrences.push({
+                    start: searchIndex,
+                    end: searchIndex + badgeValue.length,
+                    value: badgeValue
+                })
+
+                searchIndex = textValue.indexOf(badgeValue, searchIndex + badgeValue.length)
+            }
+
+            return occurrences
+        }).sort((a, b) => a.start - b.start)
+
+        if (!matches.length) {
             return [{
-                type: "block",
+                type: "text" as const,
                 start: 0,
                 end: textValue.length,
-                visualLength: 1,
+                visualLength: textValue.length,
                 content: textValue,
             }]
-        }} suggestions={[{
-            children: <>d</>,
+        }
+
+        const segments: InputSyntaxSegment[] = []
+        let cursor = 0
+
+        matches.forEach(match => {
+            if (match.start > cursor) {
+                const content = textValue.slice(cursor, match.start)
+                segments.push({
+                    type: "text" as const,
+                    start: cursor,
+                    end: match.start,
+                    visualLength: content.length,
+                    content,
+                })
+            }
+
+            segments.push({
+                type: "block" as const,
+                start: match.start,
+                end: match.end,
+                visualLength: 1,
+                content: <Badge border>{match.value}</Badge>,
+            })
+
+            cursor = match.end
+        })
+
+        if (cursor < textValue.length) {
+            const content = textValue.slice(cursor)
+            segments.push({
+                type: "text" as const,
+                start: cursor,
+                end: textValue.length,
+                visualLength: content.length,
+                content,
+            })
+        }
+
+        return segments
+    }
+
+    return <Card maw={300}>
+        <TextInput transformSyntax={buildSegments} suggestions={[{
+            children: <Badge border>Niklas van Schrick</Badge>,
             value: "Niklas van Schrick",
             insertMode: "append"
         }, {
-            children: <>s</>,
+            children: <Badge border>Nico Sammito</Badge>,
             value: "Nico Sammito",
             insertMode: "append"
         }]}/>

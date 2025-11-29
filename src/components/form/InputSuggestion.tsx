@@ -6,8 +6,9 @@ import {IconChevronDown, IconChevronUp} from "@tabler/icons-react";
 export interface InputSuggestion {
     children: React.ReactNode
     value: any
-    ref?: any
-    groupLabel?: string
+    valueData?: any
+    groupBy?: string
+    insertMode?: "replace" | "append"
 }
 
 export type InputSuggestionMenuContentProps = MenuContentProps & {inputRef?: RefObject<HTMLInputElement>}
@@ -74,11 +75,11 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
             const next: Record<string, boolean> = {}
 
             suggestions.forEach(suggestion => {
-                if (!suggestion.groupLabel) return
-                if (prev.hasOwnProperty(suggestion.groupLabel)) {
-                    next[suggestion.groupLabel] = prev[suggestion.groupLabel]
+                if (!suggestion.groupBy) return
+                if (prev.hasOwnProperty(suggestion.groupBy)) {
+                    next[suggestion.groupBy] = prev[suggestion.groupBy]
                 } else {
-                    next[suggestion.groupLabel] = false
+                    next[suggestion.groupBy] = false
                 }
             })
 
@@ -94,12 +95,12 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         const flatVisible: InputSuggestion[] = []
 
         suggestions.forEach((suggestion, index, array) => {
-            const prevGroup = index > 0 ? array[index - 1]?.groupLabel : undefined
-            if (suggestion.groupLabel && suggestion.groupLabel !== prevGroup) {
+            const prevGroup = index > 0 ? array[index - 1]?.groupBy : undefined
+            if (suggestion.groupBy && suggestion.groupBy !== prevGroup) {
                 labels += 1
             }
 
-            const isCollapsed = suggestion.groupLabel ? collapsedGroups[suggestion.groupLabel] : false
+            const isCollapsed = suggestion.groupBy ? collapsedGroups[suggestion.groupBy] : false
             if (!isCollapsed) {
                 visible += 1
                 flatVisible.push(suggestion)
@@ -179,24 +180,24 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         <ScrollAreaViewport>
             {suggestions?.map((suggestion, i, array) => {
                 // @ts-ignore
-                const prevGroup = i > 0 ? array[i - 1]?.groupLabel : undefined
-                const showGroupLabel = suggestion.groupLabel && suggestion.groupLabel !== prevGroup
-                const isCollapsed = suggestion.groupLabel ? collapsedGroups[suggestion.groupLabel] : false
+                const prevGroup = i > 0 ? array[i - 1]?.groupBy : undefined
+                const showGroupLabel = suggestion.groupBy && suggestion.groupBy !== prevGroup
+                const isCollapsed = suggestion.groupBy ? collapsedGroups[suggestion.groupBy] : false
 
                 const visibleIndex = isCollapsed ? null : ++visibleItemCounter
                 const isActive = visibleIndex !== null && activeIndex === visibleIndex
 
                 return <React.Fragment key={i}>
-                    {showGroupLabel && suggestion.groupLabel && <MenuLabel
+                    {showGroupLabel && suggestion.groupBy && <MenuLabel
                         onPointerDown={event => event.preventDefault()}
-                        onClick={() => toggleGroup(suggestion.groupLabel!)}
+                        onClick={() => toggleGroup(suggestion.groupBy!)}
                         style={{
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
                             cursor: "pointer"
                         }}>
-                        <span>{suggestion.groupLabel}</span>
+                        <span>{suggestion.groupBy}</span>
                         {isCollapsed
                             ? <IconChevronDown size={16}/>
                             : <IconChevronUp size={16}/>}

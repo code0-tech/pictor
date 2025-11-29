@@ -54,13 +54,21 @@ export type Code0Input = Omit<
 >
 
 // Input component props definition
+export type InputSyntaxSegment = {
+    type: "text" | "block"
+    start: number
+    end: number
+    visualLength: number
+    content?: string | React.ReactNode
+}
+
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
     suggestions?: InputSuggestion[] // Optional suggestions shown in dropdown
     suggestionsHeader?: React.ReactNode // Custom header above suggestions
     suggestionsFooter?: React.ReactNode // Custom footer below suggestions
     onSuggestionSelect?: (suggestion: InputSuggestion) => void // Callback when a suggestion is selected
-    transformValue?: (value: T) => React.ReactNode | T // Optional value transformation function
+    transformSyntax?: (value: T) => InputSyntaxSegment[] // Build a structured syntax model
     disableOnValue?: (value: T) => boolean
 
     wrapperComponent?: Code0Component<HTMLDivElement> // Props for the wrapping div
@@ -180,13 +188,57 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [focusInputCaretAtEnd, inputRef, value])
 
 
+        const buildDefaultSyntax = React.useCallback((): InputSyntaxSegment[] => {
+            const rawValue = value ?? ""
+            const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
+
+            return [{
+                type: "text",
+                start: 0,
+                end: textValue.length,
+                visualLength: textValue.length,
+                content: textValue,
+            }]
+        }, [value])
+
+        const syntaxSegments = React.useMemo(() => {
+            if (props.transformSyntax) {
+                const segments = props.transformSyntax(value)
+                if (segments?.length) return segments
+            }
+
+            return buildDefaultSyntax()
+        }, [buildDefaultSyntax, props.transformSyntax, value])
+
+        const renderSyntaxSegments = React.useCallback((segments: InputSyntaxSegment[]) => {
+            return segments.map((segment, index) => {
+                const key = `${segment.start}-${segment.end}-${index}`
+
+                const content = typeof segment.content === "string"
+                    ? segment.content
+                    : segment.content ?? null
+
+                const className = segment.type === "block" ? "input__syntax-block" : "input__syntax-text"
+
+                return (
+                    <span key={key} className={className} data-visual-length={segment.visualLength}>
+                        {content}
+                    </span>
+                )
+            })
+        }, [])
+
         const syntax = React.useMemo(() => {
-            return props.transformValue ? (
-                <div className={"input__syntax"}>
-                    {props.transformValue(value)} {/* Render transformed value */}
-                </div>
-            ) : null
-        }, [props.transformValue, value])
+            if (props.transformSyntax) {
+                return (
+                    <div className={"input__syntax"}>
+                        {renderSyntaxSegments(syntaxSegments)}
+                    </div>
+                )
+            }
+
+            return null
+        }, [props.transformSyntax, renderSyntaxSegments, syntaxSegments])
 
         // Render suggestion menu dropdown
         const suggestionMenu = useMemo(() => (
@@ -209,7 +261,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 <MenuTrigger asChild>
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
-                        {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)}
+                        {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
                         style={{opacity:0}}
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
@@ -285,7 +337,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
                             disabled={disabled}
-                            {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
+                            {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />
                     )}
 

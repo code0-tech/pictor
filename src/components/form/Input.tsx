@@ -140,6 +140,25 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [inputRef, disabledOnValue])
 
 
+        const focusInputCaretAtEnd = React.useCallback(() => {
+            setTimeout(() => {
+                const target = inputRef.current
+                if (!target) return
+
+                target.focus({preventScroll: true})
+                const caretPosition = target.value.length
+
+                try {
+                    target.setSelectionRange(caretPosition, caretPosition)
+                } catch {
+                    // Some input types (e.g., number) don't support selection ranges
+                }
+
+                target.scrollLeft = target.scrollWidth
+            }, 0)
+        }, [inputRef])
+
+
         const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
             if (!inputRef.current) return
 
@@ -156,7 +175,9 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 nextValue,
                 "change",
             )
-        }, [inputRef, value])
+
+            focusInputCaretAtEnd()
+        }, [focusInputCaretAtEnd, inputRef, value])
 
 
         const syntax = React.useMemo(() => {
@@ -189,6 +210,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
                         {...mergeCode0Props(`input__control ${props.transformValue ? "input__control--syntax" : ""}`, rest)}
+                        style={{opacity:0}}
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {
@@ -213,7 +235,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                                 const selected = menuRef.current?.selectActiveItem()
                                 if (selected) {
                                     setOpen(false)
-                                    setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0)
+                                    focusInputCaretAtEnd()
                                 }
                             }
                         }}
@@ -234,14 +256,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                                 }
                                 onSuggestionSelect?.(suggestion)
                                 setOpen(false)
-                                setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0)
+                                focusInputCaretAtEnd()
                             }}
                         />
                         {suggestionsFooter} {/* Custom content below suggestions */}
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
+        ), [applySuggestionValue, focusInputCaretAtEnd, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
 
         return (
             <>

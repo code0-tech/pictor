@@ -11,6 +11,7 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../function/DFlowFunction.view";
 import {Badge} from "../../badge/Badge";
+import {InputSyntaxSegment} from "../../form/Input";
 import type {
     LiteralValue,
     NodeFunction,
@@ -93,22 +94,48 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            description={description}
                            clearable
                            key={JSON.stringify(parameter.value)}
-                           transformValue={value => {
+                           transformSyntax={(value): InputSyntaxSegment[] => {
+                               const rawValue = value ?? ""
+                               const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
+
+                               const buildTextSegment = (text: string): InputSyntaxSegment[] => [{
+                                   type: "text",
+                                   start: 0,
+                                   end: text.length,
+                                   visualLength: text.length,
+                                   content: text,
+                               }]
+
+                               const buildBlockSegment = (node: React.ReactNode): InputSyntaxSegment[] => [{
+                                   type: "block",
+                                   start: 0,
+                                   end: textValue.length,
+                                   visualLength: 1,
+                                   content: node,
+                               }]
+
                                try {
-                                   if (!value) return value
-                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "NodeFunction") {
-                                       const def = functionService.getById((JSON.parse(value) as NodeFunction).functionDefinition?.id!!)
-                                       return <Badge
-                                           color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
+                                   if (!textValue) return buildTextSegment(textValue)
+
+                                   const parsed = JSON.parse(textValue) as NodeParameterValue
+                                   if (parsed?.__typename === "NodeFunction") {
+                                       const def = functionService.getById((parsed as NodeFunction).functionDefinition?.id!!)
+                                       return buildBlockSegment(
+                                           <Badge color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
+                                       )
                                    }
-                                   if ((JSON.parse(value) as NodeParameterValue).__typename === "ReferenceValue") {
-                                       const refObject = JSON.parse(value) as ReferenceValue
-                                       return <Badge
-                                           color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.dataTypeIdentifier)}</Badge>
+
+                                   if (parsed?.__typename === "ReferenceValue") {
+                                       const refObject = parsed as ReferenceValue
+                                       return buildBlockSegment(
+                                           <Badge color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.dataTypeIdentifier)}</Badge>
+                                       )
                                    }
                                } catch (e) {
+                                   // fall through to text rendering
                                }
-                               return value
+
+                               return buildTextSegment(textValue)
                            }}
                            defaultValue={defaultValue}
                            onSuggestionSelect={(suggestion) => {

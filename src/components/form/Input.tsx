@@ -94,6 +94,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const [open, setOpen] = useState(false) // Dropdown open state
         const shouldPreventCloseRef = useRef(true) // Controls if dropdown should stay open on click
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
+        const [visualSelectionRange, setVisualSelectionRange] = useState<{start: number, end: number} | null>(null)
 
         const {
             wrapperComponent = {}, // Default empty wrapper props
@@ -284,6 +285,45 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return Math.min(segment.visualStart + ratio * segment.visualLength, segment.visualEnd)
         }, [inputRef, visualizedSyntaxSegments])
 
+        const updateVisualSelectionRange = React.useCallback(() => {
+            if (!props.transformSyntax) return
+
+            const target = inputRef.current
+            if (!target) return
+
+            const selectionStart = target.selectionStart ?? 0
+            const selectionEnd = target.selectionEnd ?? selectionStart
+
+            const rawStart = Math.min(selectionStart, selectionEnd)
+            const rawEnd = Math.max(selectionStart, selectionEnd)
+
+            if (rawStart === rawEnd) {
+                setVisualSelectionRange(null)
+                return
+            }
+
+            let visualStart = mapRawIndexToVisualIndex(rawStart)
+            let visualEnd = mapRawIndexToVisualIndex(rawEnd)
+
+            visualizedSyntaxSegments.forEach((segment) => {
+                if (segment.type !== "block") return
+
+                const overlaps = rawStart < segment.end && rawEnd > segment.start
+                if (!overlaps) return
+
+                visualStart = Math.min(visualStart, segment.visualStart)
+                visualEnd = Math.max(visualEnd, segment.visualEnd)
+            })
+
+            const clampedStart = Math.min(visualStart, visualEnd)
+            const clampedEnd = Math.max(visualStart, visualEnd)
+
+            setVisualSelectionRange({
+                start: clampedStart,
+                end: clampedEnd,
+            })
+        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, visualizedSyntaxSegments])
+
         const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
             if (!inputRef.current) return
 
@@ -312,7 +352,9 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             } catch {
                 // Some input types (e.g., number) don't support selection ranges
             }
-        }, [inputRef, mapVisualIndexToRawIndex])
+
+            updateVisualSelectionRange()
+        }, [inputRef, mapVisualIndexToRawIndex, updateVisualSelectionRange])
 
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
@@ -371,7 +413,29 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
         }, [focusInputCaretAtEnd, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, suggestions, totalVisualLength])
 
+        useEffect(() => {
+            const target = inputRef.current
+            if (!target || !props.transformSyntax) return
+
+            const syncSelection = () => requestAnimationFrame(updateVisualSelectionRange)
+
+            syncSelection()
+
+            const events = ["select", "keyup", "mouseup", "input", "keydown"]
+            events.forEach((event) => target.addEventListener(event, syncSelection))
+
+            return () => {
+                events.forEach((event) => target.removeEventListener(event, syncSelection))
+            }
+        }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
+
         const renderSyntaxSegments = React.useCallback((segments: VisualizedInputSyntaxSegment[]) => {
+            const isVisualRangeSelected = (visualStart: number, visualEnd: number) => {
+                if (!visualSelectionRange) return false
+
+                return visualSelectionRange.start < visualEnd && visualSelectionRange.end > visualStart
+            }
+
             return segments.map((segment, index) => {
                 const key = `${segment.start}-${segment.end}-${index}`
 
@@ -379,7 +443,12 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     ? segment.content
                     : segment.content ?? null
 
-                const className = segment.type === "block" ? "input__syntax-block" : "input__syntax-text"
+                const className = [
+                    segment.type === "block" ? "input__syntax-block" : "input__syntax-text",
+                    segment.type === "block" && isVisualRangeSelected(segment.visualStart, segment.visualEnd)
+                        ? "input__syntax-block--selected"
+                        : "",
+                ].filter(Boolean).join(" ")
 
                 const commonDataAttributes = {
                     "data-visual-start": segment.visualStart,
@@ -395,11 +464,15 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             {content.split("").map((char, charIndex) => {
                                 const visualIndex = segment.visualStart + charIndex
                                 const rawIndex = segment.start + charIndex
+                                const isSelected = isVisualRangeSelected(visualIndex, visualIndex + 1)
 
                                 return (
                                     <span
                                         key={`${key}-${charIndex}`}
-                                        className={"input__syntax-char"}
+                                        className={[
+                                            "input__syntax-char",
+                                            isSelected ? "input__syntax-char--selected" : "",
+                                        ].filter(Boolean).join(" ")}
                                         data-visual-index={visualIndex}
                                         data-raw-index={rawIndex}
                                     >
@@ -417,7 +490,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </span>
                 )
             })
-        }, [])
+        }, [visualSelectionRange])
 
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {

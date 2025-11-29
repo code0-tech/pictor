@@ -52,6 +52,18 @@
   &__syntax-char {
     pointer-events: auto;
     user-select: none;
+
+    &--selected {
+      background: rgba(variables.$white, .1);
+      border-radius: variables.$borderRadius;
+    }
+  }
+
+  &__syntax-block {
+    &--selected {
+      background: rgba(variables.$white, .1);
+      border-radius: variables.$borderRadius;
+    }
   }
 
   &__left, &__right {

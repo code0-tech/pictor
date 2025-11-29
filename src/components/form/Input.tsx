@@ -7,25 +7,25 @@
  * this component provides robust interaction patterns and user guidance.
  */
 
-import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react";
+import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
 
-import {Code0Component} from "../../utils/types";
-import {ValidationProps} from "./useForm";
-import {mergeCode0Props} from "../../utils/utils";
+import {Code0Component} from "../../utils/types"
+import {ValidationProps} from "./useForm"
+import {mergeCode0Props} from "../../utils/utils"
 
-import "./Input.style.scss";
+import "./Input.style.scss"
 
-import {InputLabel} from "./InputLabel";
-import {InputDescription} from "./InputDescription";
-import {InputMessage} from "./InputMessage";
+import {InputLabel} from "./InputLabel"
+import {InputDescription} from "./InputDescription"
+import {InputMessage} from "./InputMessage"
 
-import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
+import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu"
 import {
     InputSuggestion,
     InputSuggestionMenuContent,
     InputSuggestionMenuContentItems,
     InputSuggestionMenuContentItemsHandle
-} from "./InputSuggestion";
+} from "./InputSuggestion"
 
 // Programmatically set a property (like 'value') and dispatch an event (like 'change')
 export const setElementKey = (
@@ -34,24 +34,24 @@ export const setElementKey = (
     value: any,
     event: string
 ) => {
-    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set; // Try direct setter
-    const prototype = Object.getPrototypeOf(element);
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set; // Fallback to prototype
+    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set // Try direct setter
+    const prototype = Object.getPrototypeOf(element)
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set // Fallback to prototype
 
     if (valueSetter && valueSetter !== prototypeValueSetter) {
-        prototypeValueSetter?.call(element, value); // Use prototype's setter if overridden
+        prototypeValueSetter?.call(element, value) // Use prototype's setter if overridden
     } else {
-        valueSetter?.call(element, value); // Use direct setter
+        valueSetter?.call(element, value) // Use direct setter
     }
 
-    element.dispatchEvent(new Event(event, {bubbles: true})); // Fire change/input event
-};
+    element.dispatchEvent(new Event(event, {bubbles: true})) // Fire change/input event
+}
 
 // Base input props without layout-specific keys
 export type Code0Input = Omit<
     Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
     "title"
->;
+>
 
 // Input component props definition
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
@@ -75,10 +75,10 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
 export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
-        const inputRef = ref || useRef<HTMLInputElement>(null); // External ref or fallback internal ref
-        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
-        const [open, setOpen] = useState(false); // Dropdown open state
-        const shouldPreventCloseRef = useRef(true); // Controls if dropdown should stay open on click
+        const inputRef = ref || useRef<HTMLInputElement>(null) // External ref or fallback internal ref
+        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null) // Ref to suggestion list
+        const [open, setOpen] = useState(false) // Dropdown open state
+        const shouldPreventCloseRef = useRef(true) // Controls if dropdown should stay open on click
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
 
         const {
@@ -97,35 +97,33 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             onSuggestionSelect, // Callback for suggestion selection,
             disableOnValue = () => false,
             ...rest // Remaining native input props
-        } = props;
-
-        const hasCustomSuggestionSelect = typeof onSuggestionSelect === "function";
+        } = props
 
         // Sync input value changes to external validation state
         useEffect(() => {
-            const el = inputRef.current;
-            if (!el || !formValidation?.setValue) return;
+            const el = inputRef.current
+            if (!el || !formValidation?.setValue) return
 
             const handleChange = (event: any) => {
-                const value = rest.type !== "checkbox" ? event.target.value : event.target.checked; // Support checkbox
-                formValidation.setValue?.(value); // Push value to form context
-            };
+                const value = rest.type !== "checkbox" ? event.target.value : event.target.checked // Support checkbox
+                formValidation.setValue?.(value) // Push value to form context
+            }
 
-            el.addEventListener("change", handleChange); // Native listener
-            return () => el.removeEventListener("change", handleChange); // Cleanup
-        }, [formValidation?.setValue]);
+            el.addEventListener("change", handleChange) // Native listener
+            return () => el.removeEventListener("change", handleChange) // Cleanup
+        }, [formValidation?.setValue])
 
         // Manage click-outside logic for dropdown
         useEffect(() => {
-            if (!suggestions) return;
+            if (!suggestions) return
 
             const handlePointerDown = (event: PointerEvent) => {
-                shouldPreventCloseRef.current = !!inputRef.current?.contains(event.target as Node); // Stay open if click is inside
-            };
+                shouldPreventCloseRef.current = !!inputRef.current?.contains(event.target as Node) // Stay open if click is inside
+            }
 
-            document.addEventListener("pointerdown", handlePointerDown, true);
-            return () => document.removeEventListener("pointerdown", handlePointerDown, true);
-        }, [suggestions]);
+            document.addEventListener("pointerdown", handlePointerDown, true)
+            return () => document.removeEventListener("pointerdown", handlePointerDown, true)
+        }, [suggestions])
 
         const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
 
@@ -157,14 +155,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 modal={false}
                 onOpenChange={(nextOpen) => {
                     if (!nextOpen && shouldPreventCloseRef.current) { // Prevent close if internal click
-                        shouldPreventCloseRef.current = false;
-                        return;
+                        shouldPreventCloseRef.current = false
+                        return
                     }
 
-                    setOpen(nextOpen);
+                    setOpen(nextOpen)
 
                     if (nextOpen) {
-                        setTimeout(() => inputRef.current?.focus(), 0); // Refocus input on open
+                        setTimeout(() => inputRef.current?.focus(), 0) // Refocus input on open
                     }
                 }}
             >
@@ -175,37 +173,37 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {
-                                e.preventDefault();
-                                const wasOpen = open;
-                                setOpen(true);
+                                e.preventDefault()
+                                const wasOpen = open
+                                setOpen(true)
                                 if (!wasOpen) {
-                                    setTimeout(() => menuRef.current?.focusFirstItem(), 0); // Open and preselect first item
+                                    setTimeout(() => menuRef.current?.focusFirstItem(), 0) // Open and preselect first item
                                 } else {
-                                    menuRef.current?.highlightNextItem(); // Navigate down while keeping input focus
+                                    menuRef.current?.highlightNextItem() // Navigate down while keeping input focus
                                 }
                             } else if (e.key === "ArrowUp") {
-                                e.preventDefault();
-                                const wasOpen = open;
-                                setOpen(true);
+                                e.preventDefault()
+                                const wasOpen = open
+                                setOpen(true)
                                 if (!wasOpen) {
-                                    setTimeout(() => menuRef.current?.focusLastItem(), 0); // Open and preselect last item
+                                    setTimeout(() => menuRef.current?.focusLastItem(), 0) // Open and preselect last item
                                 } else {
-                                    menuRef.current?.highlightPreviousItem(); // Navigate up while keeping input focus
+                                    menuRef.current?.highlightPreviousItem() // Navigate up while keeping input focus
                                 }
                             } else if (e.key === "Enter" && open) {
-                                const selected = menuRef.current?.selectActiveItem();
+                                const selected = menuRef.current?.selectActiveItem()
                                 if (selected) {
-                                    if (!hasCustomSuggestionSelect && inputRef.current) {
+                                    if (!onSuggestionSelect) {
                                         setElementKey(
                                             inputRef.current,
                                             "value",
                                             typeof value == "object" ? JSON.stringify(selected.value) : selected.value,
                                             "change"
-                                        );
+                                        )
                                     }
-                                    onSuggestionSelect?.(selected);
-                                    setOpen(false);
-                                    setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0);
+                                    onSuggestionSelect?.(selected)
+                                    setOpen(false)
+                                    setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0)
                                 }
                             }
                         }}
@@ -221,24 +219,24 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             inputRef={inputRef}
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
-                                if (!hasCustomSuggestionSelect && inputRef.current) {
+                                if (!onSuggestionSelect) {
                                     setElementKey(
                                         inputRef.current,
                                         "value",
                                         typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value,
                                         "change"
-                                    );
+                                    )
                                 }
-                                onSuggestionSelect?.(suggestion);
-                                setOpen(false);
-                                setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0);
+                                onSuggestionSelect?.(suggestion)
+                                setOpen(false)
+                                setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0)
                             }}
                         />
                         {suggestionsFooter} {/* Custom content below suggestions */}
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [hasCustomSuggestionSelect, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value]);
+        ), [onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
 
         return (
             <>
@@ -274,6 +272,6 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     <InputMessage>{formValidation.notValidMessage}</InputMessage> // Show validation error
                 )}
             </>
-        );
+        )
     }
-);
+)

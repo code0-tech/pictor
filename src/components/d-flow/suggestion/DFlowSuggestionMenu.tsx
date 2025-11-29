@@ -65,7 +65,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                     ref={menuRef}
                     suggestions={toInputSuggestions(stateSuggestions)}
                     onSuggestionSelect={(suggestion) => {
-                        onSuggestionSelect(suggestion.ref as DFlowSuggestion)
+                        onSuggestionSelect(suggestion.valueData as DFlowSuggestion)
                     }}
                 />
                 <MenuSeparator/>

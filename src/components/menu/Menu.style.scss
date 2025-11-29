@@ -48,7 +48,7 @@
       border: none;
     }
 
-    &:focus {
+    &:focus, &[data-focus=true] {
       @include box.box(variables.$white, variables.$white, variables.$white);
       border: none;
       width: 100%;

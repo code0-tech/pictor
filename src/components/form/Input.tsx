@@ -236,6 +236,11 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             })
         }, [syntaxSegments])
 
+        const totalVisualLength = React.useMemo(() => {
+            const lastSegment = visualizedSyntaxSegments[visualizedSyntaxSegments.length - 1]
+            return lastSegment ? lastSegment.visualEnd : 0
+        }, [visualizedSyntaxSegments])
+
         const mapVisualIndexToRawIndex = React.useCallback((visualIndex: number): number => {
             const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex < item.visualEnd)
             if (!segment) {
@@ -255,6 +260,28 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
             const ratio = clampedVisual / segment.visualLength
             return Math.round(segment.start + ratio * rawLength)
+        }, [inputRef, visualizedSyntaxSegments])
+
+        const mapRawIndexToVisualIndex = React.useCallback((rawIndex: number): number => {
+            const segment = visualizedSyntaxSegments.find((item) => rawIndex >= item.start && rawIndex <= item.end)
+
+            if (!segment) {
+                const inputLength = inputRef.current?.value.length ?? 0
+                return Math.max(0, Math.min(rawIndex, inputLength))
+            }
+
+            const rawLength = segment.end - segment.start
+            const clampedRaw = Math.min(Math.max(rawIndex - segment.start, 0), rawLength)
+
+            if (rawLength <= 0) return segment.visualStart
+            if (segment.type === "text") {
+                return Math.min(segment.visualStart + clampedRaw, segment.visualEnd)
+            }
+
+            if (segment.visualLength <= 0) return segment.visualStart
+
+            const ratio = clampedRaw / rawLength
+            return Math.min(segment.visualStart + ratio * segment.visualLength, segment.visualEnd)
         }, [inputRef, visualizedSyntaxSegments])
 
         const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
@@ -286,6 +313,63 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 // Some input types (e.g., number) don't support selection ranges
             }
         }, [inputRef, mapVisualIndexToRawIndex])
+
+        const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+                const target = event.target as HTMLInputElement
+                const selectionStart = target.selectionStart ?? 0
+                const selectionEnd = target.selectionEnd ?? selectionStart
+                const collapsePosition = event.key === "ArrowLeft"
+                    ? Math.min(selectionStart, selectionEnd)
+                    : Math.max(selectionStart, selectionEnd)
+
+                const currentVisualIndex = mapRawIndexToVisualIndex(collapsePosition)
+                const visualDelta = event.key === "ArrowLeft" ? -1 : 1
+                const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
+                const nextRawIndex = mapVisualIndexToRawIndex(nextVisualIndex)
+
+                if (!Number.isNaN(nextRawIndex)) {
+                    event.preventDefault()
+                    const clampedIndex = Math.min(Math.max(nextRawIndex, 0), target.value.length)
+
+                    try {
+                        target.setSelectionRange(clampedIndex, clampedIndex)
+                    } catch {
+                        // Some input types (e.g., number) don't support selection ranges
+                    }
+                }
+
+                if (event.defaultPrevented) return
+            }
+
+            if (!suggestions) return
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault()
+                const wasOpen = open
+                setOpen(true)
+                if (!wasOpen) {
+                    setTimeout(() => menuRef.current?.focusFirstItem(), 0) // Open and preselect first item
+                } else {
+                    menuRef.current?.highlightNextItem() // Navigate down while keeping input focus
+                }
+            } else if (event.key === "ArrowUp") {
+                event.preventDefault()
+                const wasOpen = open
+                setOpen(true)
+                if (!wasOpen) {
+                    setTimeout(() => menuRef.current?.focusLastItem(), 0) // Open and preselect last item
+                } else {
+                    menuRef.current?.highlightPreviousItem() // Navigate up while keeping input focus
+                }
+            } else if (event.key === "Enter" && open) {
+                const selected = menuRef.current?.selectActiveItem()
+                if (selected) {
+                    setOpen(false)
+                    focusInputCaretAtEnd()
+                }
+            }
+        }, [focusInputCaretAtEnd, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, suggestions, totalVisualLength])
 
         const renderSyntaxSegments = React.useCallback((segments: VisualizedInputSyntaxSegment[]) => {
             return segments.map((segment, index) => {
@@ -370,33 +454,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
                         {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
                         onFocus={() => !open && setOpen(true)} // Open on focus
-                        onKeyDown={(e) => {
-                            if (e.key === "ArrowDown") {
-                                e.preventDefault()
-                                const wasOpen = open
-                                setOpen(true)
-                                if (!wasOpen) {
-                                    setTimeout(() => menuRef.current?.focusFirstItem(), 0) // Open and preselect first item
-                                } else {
-                                    menuRef.current?.highlightNextItem() // Navigate down while keeping input focus
-                                }
-                            } else if (e.key === "ArrowUp") {
-                                e.preventDefault()
-                                const wasOpen = open
-                                setOpen(true)
-                                if (!wasOpen) {
-                                    setTimeout(() => menuRef.current?.focusLastItem(), 0) // Open and preselect last item
-                                } else {
-                                    menuRef.current?.highlightPreviousItem() // Navigate up while keeping input focus
-                                }
-                            } else if (e.key === "Enter" && open) {
-                                const selected = menuRef.current?.selectActiveItem()
-                                if (selected) {
-                                    setOpen(false)
-                                    focusInputCaretAtEnd()
-                                }
-                            }
-                        }}
+                        onKeyDown={handleKeyDown}
                         disabled={disabled || disabledOnValue}
                     />
                 </MenuTrigger>
@@ -421,7 +479,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, focusInputCaretAtEnd, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
+        ), [applySuggestionValue, focusInputCaretAtEnd, handleKeyDown, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
 
         return (
             <>
@@ -443,6 +501,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
                             disabled={disabled}
+                            onKeyDown={handleKeyDown}
                             {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />
                     )}

@@ -262,7 +262,6 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
                         {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
-                        style={{opacity:0}}
                         onFocus={() => !open && setOpen(true)} // Open on focus
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {

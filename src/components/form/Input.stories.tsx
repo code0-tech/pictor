@@ -351,10 +351,12 @@ export const InputSuggestionStory = () => {
     return <Card maw={300}>
         <TextInput suggestions={[{
             children: <>d</>,
-            value: "d",
+            value: "Niklas van Schrick",
+            insertMode: "append"
         }, {
             children: <>s</>,
-            value: "s",
+            value: "Nico Sammito",
+            insertMode: "append"
         }]}/>
     </Card>
 }

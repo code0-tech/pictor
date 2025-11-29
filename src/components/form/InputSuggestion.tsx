@@ -37,7 +37,7 @@ export const InputSuggestionMenuContent: React.FC<InputSuggestionMenuContentProp
                         onContextMenuCapture={(e) => e.stopPropagation()}
                         onInteractOutside={(event) => event.target instanceof HTMLInputElement && event.preventDefault()}
                         onCloseAutoFocus={(event) => event.preventDefault()}
-                        onOpenAutoFocus={(event) => {
+                        onOpenAutoFocus={(event: any) => {
                             event.preventDefault()
                             inputRef?.current?.focus({preventScroll: true})
                         }}
@@ -209,14 +209,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
                                                }}
                                                onPointerMove={() => visibleIndex !== null && setActiveIndex(visibleIndex)}
                                                onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)}
-                                               aria-selected={isActive}
-                                               data-active={isActive}
-                                               data-highlighted={isActive || undefined}
-                                               style={isActive ? {
-                                                   background: "rgba(255,255,255,0.06)",
-                                                   borderColor: "rgba(255,255,255,0.25)",
-                                                   color: "rgba(255,255,255,0.85)"
-                                               } : undefined}
+                                               data-focus={isActive}
                                                 /**@ts-ignore */
                                                ref={el => visibleIndex !== null && (itemRefs.current[visibleIndex] = el)}>
                         {suggestion.children}

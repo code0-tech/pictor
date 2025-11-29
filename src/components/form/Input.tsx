@@ -96,6 +96,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
         const [visualSelectionRange, setVisualSelectionRange] = useState<{start: number, end: number} | null>(null)
         const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
+        const [isFocused, setIsFocused] = useState(false)
 
         const {
             wrapperComponent = {}, // Default empty wrapper props
@@ -243,6 +244,12 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return lastSegment ? lastSegment.visualEnd : 0
         }, [visualizedSyntaxSegments])
 
+        const syncSyntaxScroll = React.useCallback(() => {
+            if (!inputRef.current || !syntaxRef.current) return
+
+            syntaxRef.current.scrollLeft = inputRef.current.scrollLeft
+        }, [inputRef, syntaxRef])
+
         const mapVisualIndexToRawIndex = React.useCallback((visualIndex: number): number => {
             const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex < item.visualEnd)
             if (!segment) {
@@ -298,11 +305,38 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const rawStart = Math.min(selectionStart, selectionEnd)
             const rawEnd = Math.max(selectionStart, selectionEnd)
 
+            const blockAtCaret = visualizedSyntaxSegments.find((segment) => {
+                if (segment.type !== "block") return false
+                return rawStart > segment.start && rawStart < segment.end
+            })
+
+            if (blockAtCaret && rawStart === rawEnd) {
+                const distanceToStart = rawStart - blockAtCaret.start
+                const distanceToEnd = blockAtCaret.end - rawStart
+                const snapRawIndex = distanceToStart <= distanceToEnd ? blockAtCaret.start : blockAtCaret.end
+
+                try {
+                    target.setSelectionRange(snapRawIndex, snapRawIndex)
+                } catch {
+                    // Some input types (e.g., number) don't support selection ranges
+                }
+
+                const caretVisualIndex = snapRawIndex === blockAtCaret.start
+                    ? blockAtCaret.visualStart
+                    : blockAtCaret.visualEnd
+
+                setVisualSelectionRange(null)
+                setVisualCaretIndex(caretVisualIndex)
+                requestAnimationFrame(syncSyntaxScroll)
+                return
+            }
+
             if (rawStart === rawEnd) {
-                const caretVisualIndex = mapRawIndexToVisualIndex(rawStart)
+                const caretVisualIndex = Math.round(mapRawIndexToVisualIndex(rawStart))
 
                 setVisualSelectionRange(null)
                 setVisualCaretIndex(Number.isFinite(caretVisualIndex) ? caretVisualIndex : null)
+                requestAnimationFrame(syncSyntaxScroll)
                 return
             }
 
@@ -327,7 +361,8 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 start: clampedStart,
                 end: clampedEnd,
             })
-        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, visualizedSyntaxSegments])
+            requestAnimationFrame(syncSyntaxScroll)
+        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
 
         const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
             if (!inputRef.current) return
@@ -361,6 +396,78 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             updateVisualSelectionRange()
         }, [inputRef, mapVisualIndexToRawIndex, updateVisualSelectionRange])
 
+        const handleAtomicDeletion = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>): boolean => {
+            if (!props.transformSyntax) return false
+
+            const target = event.target as HTMLInputElement
+            const selectionStart = target.selectionStart ?? 0
+            const selectionEnd = target.selectionEnd ?? selectionStart
+            const rawStart = Math.min(selectionStart, selectionEnd)
+            const rawEnd = Math.max(selectionStart, selectionEnd)
+
+            const removeRange = (start: number, end: number) => {
+                if (start === end) return false
+
+                event.preventDefault()
+                const nextValue = `${target.value.slice(0, start)}${target.value.slice(end)}`
+
+                setElementKey(target, "value", nextValue, "input")
+
+                requestAnimationFrame(() => {
+                    try {
+                        target.setSelectionRange(start, start)
+                    } catch {
+                        // Some input types (e.g., number) don't support selection ranges
+                    }
+
+                    updateVisualSelectionRange()
+                })
+
+                return true
+            }
+
+            if (rawStart !== rawEnd) {
+                let adjustedStart = rawStart
+                let adjustedEnd = rawEnd
+                let hasBlockOverlap = false
+
+                visualizedSyntaxSegments.forEach((segment) => {
+                    if (segment.type !== "block") return
+
+                    const overlaps = rawStart < segment.end && rawEnd > segment.start
+                    if (!overlaps) return
+
+                    adjustedStart = Math.min(adjustedStart, segment.start)
+                    adjustedEnd = Math.max(adjustedEnd, segment.end)
+                    hasBlockOverlap = true
+                })
+
+                if (!hasBlockOverlap) return false
+
+                return removeRange(adjustedStart, adjustedEnd)
+            }
+
+            const blockBeforeCaret = visualizedSyntaxSegments.find((segment) => {
+                if (segment.type !== "block") return false
+                return rawStart === segment.end || (rawStart > segment.start && rawStart < segment.end)
+            })
+
+            if (event.key === "Backspace" && blockBeforeCaret) {
+                return removeRange(blockBeforeCaret.start, blockBeforeCaret.end)
+            }
+
+            const blockAfterCaret = visualizedSyntaxSegments.find((segment) => {
+                if (segment.type !== "block") return false
+                return rawStart === segment.start || (rawStart > segment.start && rawStart < segment.end)
+            })
+
+            if (event.key === "Delete" && blockAfterCaret) {
+                return removeRange(blockAfterCaret.start, blockAfterCaret.end)
+            }
+
+            return false
+        }, [props.transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
+
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
                 const target = event.target as HTMLInputElement
@@ -370,23 +477,30 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     ? Math.min(selectionStart, selectionEnd)
                     : Math.max(selectionStart, selectionEnd)
 
-                const currentVisualIndex = mapRawIndexToVisualIndex(collapsePosition)
+                const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(collapsePosition))
                 const visualDelta = event.key === "ArrowLeft" ? -1 : 1
                 const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
                 const nextRawIndex = mapVisualIndexToRawIndex(nextVisualIndex)
 
                 if (!Number.isNaN(nextRawIndex)) {
                     event.preventDefault()
-                    const clampedIndex = Math.min(Math.max(nextRawIndex, 0), target.value.length)
+                    const clampedIndex = Math.min(Math.max(Math.round(nextRawIndex), 0), target.value.length)
 
                     try {
                         target.setSelectionRange(clampedIndex, clampedIndex)
                     } catch {
                         // Some input types (e.g., number) don't support selection ranges
                     }
+
+                    requestAnimationFrame(syncSyntaxScroll)
                 }
 
                 if (event.defaultPrevented) return
+            }
+
+            if (props.transformSyntax && (event.key === "Backspace" || event.key === "Delete")) {
+                const handled = handleAtomicDeletion(event)
+                if (handled) return
             }
 
             if (!suggestions) return
@@ -416,7 +530,25 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     focusInputCaretAtEnd()
                 }
             }
-        }, [focusInputCaretAtEnd, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, suggestions, totalVisualLength])
+        }, [focusInputCaretAtEnd, handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength])
+
+        const handleFocus = React.useCallback(() => {
+            setIsFocused(true)
+            requestAnimationFrame(() => {
+                updateVisualSelectionRange()
+                syncSyntaxScroll()
+            })
+
+            if (suggestions && !open) {
+                setOpen(true)
+            }
+        }, [open, suggestions, syncSyntaxScroll, updateVisualSelectionRange])
+
+        const handleBlur = React.useCallback(() => {
+            setIsFocused(false)
+            setVisualCaretIndex(null)
+            setVisualSelectionRange(null)
+        }, [])
 
         useEffect(() => {
             const target = inputRef.current
@@ -435,6 +567,21 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
 
         useEffect(() => {
+            const target = inputRef.current
+            if (!target) return
+
+            const handleScroll = () => syncSyntaxScroll()
+            handleScroll()
+
+            target.addEventListener("scroll", handleScroll)
+            return () => target.removeEventListener("scroll", handleScroll)
+        }, [inputRef, syncSyntaxScroll])
+
+        useEffect(() => {
+            syncSyntaxScroll()
+        }, [syncSyntaxScroll, value, visualCaretIndex, visualSelectionRange])
+
+        useEffect(() => {
             if (props.transformSyntax) return
 
             setVisualSelectionRange(null)
@@ -451,6 +598,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
 
             const shouldRenderCaret = (visualIndex: number) => {
+                if (!isFocused) return false
                 if (visualSelectionRange) return false
                 if (visualCaretIndex === null) return false
 
@@ -542,7 +690,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </span>
                 )
             })
-        }, [visualCaretIndex, visualSelectionRange])
+        }, [isFocused, visualCaretIndex, visualSelectionRange])
 
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {
@@ -578,7 +726,8 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
                         {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
-                        onFocus={() => !open && setOpen(true)} // Open on focus
+                        onFocus={handleFocus} // Open on focus
+                        onBlur={handleBlur}
                         onKeyDown={handleKeyDown}
                         disabled={disabled || disabledOnValue}
                     />
@@ -626,6 +775,8 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             tabIndex={2} // Ensure keyboard tab order
                             ref={inputRef as LegacyRef<HTMLInputElement>}
                             disabled={disabled}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
                             onKeyDown={handleKeyDown}
                             {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />

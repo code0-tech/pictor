@@ -62,6 +62,11 @@ export type InputSyntaxSegment = {
     content?: string | React.ReactNode
 }
 
+type VisualizedInputSyntaxSegment = InputSyntaxSegment & {
+    visualStart: number
+    visualEnd: number
+}
+
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
     suggestions?: InputSuggestion[] // Optional suggestions shown in dropdown
@@ -85,6 +90,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
         const inputRef = ref || useRef<HTMLInputElement>(null) // External ref or fallback internal ref
         const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null) // Ref to suggestion list
+        const syntaxRef = useRef<HTMLDivElement | null>(null) // Ref to syntax overlay
         const [open, setOpen] = useState(false) // Dropdown open state
         const shouldPreventCloseRef = useRef(true) // Controls if dropdown should stay open on click
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
@@ -126,7 +132,11 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             if (!suggestions) return
 
             const handlePointerDown = (event: PointerEvent) => {
-                shouldPreventCloseRef.current = !!inputRef.current?.contains(event.target as Node) // Stay open if click is inside
+                const target = event.target as Node
+                const insideInput = !!inputRef.current?.contains(target)
+                const insideSyntax = !!syntaxRef.current?.contains(target)
+
+                shouldPreventCloseRef.current = insideInput || insideSyntax // Stay open if click is inside
             }
 
             document.addEventListener("pointerdown", handlePointerDown, true)
@@ -210,7 +220,74 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return buildDefaultSyntax()
         }, [buildDefaultSyntax, props.transformSyntax, value])
 
-        const renderSyntaxSegments = React.useCallback((segments: InputSyntaxSegment[]) => {
+        const visualizedSyntaxSegments = React.useMemo((): VisualizedInputSyntaxSegment[] => {
+            let visualStart = 0
+
+            return syntaxSegments.map((segment) => {
+                const nextSegment: VisualizedInputSyntaxSegment = {
+                    ...segment,
+                    visualStart,
+                    visualEnd: visualStart + segment.visualLength,
+                }
+
+                visualStart = nextSegment.visualEnd
+
+                return nextSegment
+            })
+        }, [syntaxSegments])
+
+        const mapVisualIndexToRawIndex = React.useCallback((visualIndex: number): number => {
+            const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex < item.visualEnd)
+            if (!segment) {
+                const inputLength = inputRef.current?.value.length ?? 0
+                return Math.max(0, Math.min(visualIndex, inputLength))
+            }
+
+            const rawLength = segment.end - segment.start
+            const clampedVisual = Math.min(Math.max(visualIndex - segment.visualStart, 0), segment.visualLength)
+
+            if (rawLength <= 0) return segment.start
+            if (segment.type === "text") {
+                return Math.min(segment.start + Math.round(clampedVisual), segment.end)
+            }
+
+            if (segment.visualLength <= 0) return segment.start
+
+            const ratio = clampedVisual / segment.visualLength
+            return Math.round(segment.start + ratio * rawLength)
+        }, [inputRef, visualizedSyntaxSegments])
+
+        const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+            if (!inputRef.current) return
+
+            const target = event.target as HTMLElement
+
+            const rawIndexAttr = target.dataset.rawIndex
+            const visualIndexAttr = target.dataset.visualIndex || target.dataset.visualStart || target.dataset.visualEnd
+
+            const rawIndexFromData = rawIndexAttr ? Number(rawIndexAttr) : undefined
+            const visualIndexFromData = visualIndexAttr ? Number(visualIndexAttr) : undefined
+
+            const mappedRawIndex = !Number.isNaN(rawIndexFromData as number) && rawIndexFromData !== undefined
+                ? rawIndexFromData
+                : (visualIndexFromData !== undefined ? mapVisualIndexToRawIndex(visualIndexFromData) : null)
+
+            if (mappedRawIndex === null || Number.isNaN(mappedRawIndex)) return
+
+            event.preventDefault()
+            shouldPreventCloseRef.current = true
+
+            const clampedIndex = Math.min(Math.max(mappedRawIndex, 0), inputRef.current.value.length)
+
+            inputRef.current.focus({preventScroll: true})
+            try {
+                inputRef.current.setSelectionRange(clampedIndex, clampedIndex)
+            } catch {
+                // Some input types (e.g., number) don't support selection ranges
+            }
+        }, [inputRef, mapVisualIndexToRawIndex])
+
+        const renderSyntaxSegments = React.useCallback((segments: VisualizedInputSyntaxSegment[]) => {
             return segments.map((segment, index) => {
                 const key = `${segment.start}-${segment.end}-${index}`
 
@@ -220,8 +297,38 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
                 const className = segment.type === "block" ? "input__syntax-block" : "input__syntax-text"
 
+                const commonDataAttributes = {
+                    "data-visual-start": segment.visualStart,
+                    "data-visual-end": segment.visualEnd,
+                    "data-visual-length": segment.visualLength,
+                    "data-raw-start": segment.start,
+                    "data-raw-end": segment.end,
+                }
+
+                if (typeof content === "string" && segment.type === "text") {
+                    return (
+                        <span key={key} className={className} {...commonDataAttributes}>
+                            {content.split("").map((char, charIndex) => {
+                                const visualIndex = segment.visualStart + charIndex
+                                const rawIndex = segment.start + charIndex
+
+                                return (
+                                    <span
+                                        key={`${key}-${charIndex}`}
+                                        className={"input__syntax-char"}
+                                        data-visual-index={visualIndex}
+                                        data-raw-index={rawIndex}
+                                    >
+                                        {char}
+                                    </span>
+                                )
+                            })}
+                        </span>
+                    )
+                }
+
                 return (
-                    <span key={key} className={className} data-visual-length={segment.visualLength}>
+                    <span key={key} className={className} {...commonDataAttributes}>
                         {content}
                     </span>
                 )
@@ -231,14 +338,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {
                 return (
-                    <div className={"input__syntax"}>
-                        {renderSyntaxSegments(syntaxSegments)}
+                    <div className={"input__syntax"} ref={syntaxRef} onPointerDown={handleSyntaxPointerDown}>
+                        {renderSyntaxSegments(visualizedSyntaxSegments)}
                     </div>
                 )
             }
 
             return null
-        }, [props.transformSyntax, renderSyntaxSegments, syntaxSegments])
+        }, [handleSyntaxPointerDown, props.transformSyntax, renderSyntaxSegments, visualizedSyntaxSegments])
 
         // Render suggestion menu dropdown
         const suggestionMenu = useMemo(() => (

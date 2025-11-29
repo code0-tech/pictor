@@ -346,3 +346,12 @@ export const PinInputExample = () => {
     </>
 
 }
+
+export const InputSuggestionStory = () => {
+    return <Card maw={300}>
+        <TextInput suggestions={[{
+            children: <>d</>,
+            value: "d",
+        }]}/>
+    </Card>
+}

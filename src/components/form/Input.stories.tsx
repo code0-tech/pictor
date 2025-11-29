@@ -352,6 +352,9 @@ export const InputSuggestionStory = () => {
         <TextInput suggestions={[{
             children: <>d</>,
             value: "d",
+        }, {
+            children: <>s</>,
+            value: "s",
         }]}/>
     </Card>
 }

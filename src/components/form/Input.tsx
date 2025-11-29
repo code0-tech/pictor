@@ -95,6 +95,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const shouldPreventCloseRef = useRef(true) // Controls if dropdown should stay open on click
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
         const [visualSelectionRange, setVisualSelectionRange] = useState<{start: number, end: number} | null>(null)
+        const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
 
         const {
             wrapperComponent = {}, // Default empty wrapper props
@@ -298,7 +299,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const rawEnd = Math.max(selectionStart, selectionEnd)
 
             if (rawStart === rawEnd) {
+                const caretVisualIndex = mapRawIndexToVisualIndex(rawStart)
+
                 setVisualSelectionRange(null)
+                setVisualCaretIndex(Number.isFinite(caretVisualIndex) ? caretVisualIndex : null)
                 return
             }
 
@@ -318,6 +322,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const clampedStart = Math.min(visualStart, visualEnd)
             const clampedEnd = Math.max(visualStart, visualEnd)
 
+            setVisualCaretIndex(null)
             setVisualSelectionRange({
                 start: clampedStart,
                 end: clampedEnd,
@@ -429,12 +434,45 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
         }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
 
+        useEffect(() => {
+            if (props.transformSyntax) return
+
+            setVisualSelectionRange(null)
+            setVisualCaretIndex(null)
+        }, [props.transformSyntax])
+
         const renderSyntaxSegments = React.useCallback((segments: VisualizedInputSyntaxSegment[]) => {
+            let caretRendered = false
+
             const isVisualRangeSelected = (visualStart: number, visualEnd: number) => {
                 if (!visualSelectionRange) return false
 
                 return visualSelectionRange.start < visualEnd && visualSelectionRange.end > visualStart
             }
+
+            const shouldRenderCaret = (visualIndex: number) => {
+                if (visualSelectionRange) return false
+                if (visualCaretIndex === null) return false
+
+                if (caretRendered) return false
+
+                const matches = Math.round(visualCaretIndex) === Math.round(visualIndex)
+
+                if (matches) {
+                    caretRendered = true
+                }
+
+                return matches
+            }
+
+            const renderCaret = (visualIndex: number) => (
+                <span
+                    key={`caret-${visualIndex}`}
+                    className="input__syntax-caret"
+                    data-visual-index={visualIndex}
+                    aria-hidden
+                />
+            )
 
             return segments.map((segment, index) => {
                 const key = `${segment.start}-${segment.end}-${index}`
@@ -459,38 +497,52 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 }
 
                 if (typeof content === "string" && segment.type === "text") {
+                    const children: React.ReactNode[] = []
+
+                    content.split("").forEach((char, charIndex) => {
+                        const visualIndex = segment.visualStart + charIndex
+                        const rawIndex = segment.start + charIndex
+                        const isSelected = isVisualRangeSelected(visualIndex, visualIndex + 1)
+
+                        if (shouldRenderCaret(visualIndex)) {
+                            children.push(renderCaret(visualIndex))
+                        }
+
+                        children.push(
+                            <span
+                                key={`${key}-${charIndex}`}
+                                className={[
+                                    "input__syntax-char",
+                                    isSelected ? "input__syntax-char--selected" : "",
+                                ].filter(Boolean).join(" ")}
+                                data-visual-index={visualIndex}
+                                data-raw-index={rawIndex}
+                            >
+                                {char}
+                            </span>
+                        )
+                    })
+
+                    if (shouldRenderCaret(segment.visualEnd)) {
+                        children.push(renderCaret(segment.visualEnd))
+                    }
+
                     return (
                         <span key={key} className={className} {...commonDataAttributes}>
-                            {content.split("").map((char, charIndex) => {
-                                const visualIndex = segment.visualStart + charIndex
-                                const rawIndex = segment.start + charIndex
-                                const isSelected = isVisualRangeSelected(visualIndex, visualIndex + 1)
-
-                                return (
-                                    <span
-                                        key={`${key}-${charIndex}`}
-                                        className={[
-                                            "input__syntax-char",
-                                            isSelected ? "input__syntax-char--selected" : "",
-                                        ].filter(Boolean).join(" ")}
-                                        data-visual-index={visualIndex}
-                                        data-raw-index={rawIndex}
-                                    >
-                                        {char}
-                                    </span>
-                                )
-                            })}
+                            {children}
                         </span>
                     )
                 }
 
                 return (
                     <span key={key} className={className} {...commonDataAttributes}>
+                        {shouldRenderCaret(segment.visualStart) && renderCaret(segment.visualStart)}
                         {content}
+                        {shouldRenderCaret(segment.visualEnd) && renderCaret(segment.visualEnd)}
                     </span>
                 )
             })
-        }, [visualSelectionRange])
+        }, [visualCaretIndex, visualSelectionRange])
 
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {

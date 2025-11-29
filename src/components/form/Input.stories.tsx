@@ -349,7 +349,16 @@ export const PinInputExample = () => {
 
 export const InputSuggestionStory = () => {
     return <Card maw={300}>
-        <TextInput suggestions={[{
+        <TextInput transformSyntax={value => {
+            const textValue = value ?? ""
+            return [{
+                type: "block",
+                start: 0,
+                end: textValue.length,
+                visualLength: 1,
+                content: textValue,
+            }]
+        }} suggestions={[{
             children: <>d</>,
             value: "Niklas van Schrick",
             insertMode: "append"

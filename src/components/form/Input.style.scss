@@ -29,7 +29,7 @@
 
   &__syntax {
     position: absolute;
-    z-index: 1;
+    z-index: -1;
     overflow: hidden;
     font-size: variables.$sm;
     color: rgba(variables.$white, .5);
@@ -47,6 +47,26 @@
       pointer-events: auto;
     }
 
+  }
+
+  &__syntax-caret {
+    display: inline-block;
+    width: 1px;
+    height: 1.1em;
+    background: rgba(variables.$white, .7);
+    vertical-align: text-bottom;
+    animation: caret-blink 1s steps(1) infinite;
+    pointer-events: none;
+  }
+
+  @keyframes caret-blink {
+    0%, 50% {
+      opacity: 1;
+    }
+
+    50.01%, 100% {
+      opacity: 0;
+    }
   }
 
   &__syntax-char {
@@ -125,6 +145,7 @@
 
     &--syntax {
       color: transparent;
+      caret-color: transparent;
     }
   }
 

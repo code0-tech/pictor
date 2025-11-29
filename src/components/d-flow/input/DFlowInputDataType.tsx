@@ -540,7 +540,7 @@ const RuleHeader: React.FC<{
         const nextValue = suggestion.value
         if (!nextValue) return
         onDataTypeChange(nextValue)
-        const label = suggestion?.ref?.displayText?.join(" ") ?? dataTypeLabel ?? ""
+        const label = suggestion?.valueData?.displayText?.join(" ") ?? dataTypeLabel ?? ""
         setDataTypeValue(label)
     }, [dataTypeLabel, isBlocked, onDataTypeChange])
 

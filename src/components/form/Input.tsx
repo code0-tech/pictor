@@ -140,6 +140,25 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [inputRef, disabledOnValue])
 
 
+        const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
+            if (!inputRef.current) return
+
+            const suggestionValue = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
+            const insertMode = suggestion.insertMode ?? "replace"
+
+            const nextValue = insertMode === "append"
+                ? `${inputRef.current.value ?? ""}${suggestionValue ?? ""}`
+                : suggestionValue
+
+            setElementKey(
+                inputRef.current,
+                "value",
+                nextValue,
+                "change",
+            )
+        }, [inputRef, value])
+
+
         const syntax = React.useMemo(() => {
             return props.transformValue ? (
                 <div className={"input__syntax"}>
@@ -193,15 +212,6 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             } else if (e.key === "Enter" && open) {
                                 const selected = menuRef.current?.selectActiveItem()
                                 if (selected) {
-                                    if (!onSuggestionSelect) {
-                                        setElementKey(
-                                            inputRef.current,
-                                            "value",
-                                            typeof value == "object" ? JSON.stringify(selected.value) : selected.value,
-                                            "change"
-                                        )
-                                    }
-                                    onSuggestionSelect?.(selected)
                                     setOpen(false)
                                     setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0)
                                 }
@@ -220,12 +230,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
                                 if (!onSuggestionSelect) {
-                                    setElementKey(
-                                        inputRef.current,
-                                        "value",
-                                        typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value,
-                                        "change"
-                                    )
+                                    applySuggestionValue(suggestion)
                                 }
                                 onSuggestionSelect?.(suggestion)
                                 setOpen(false)

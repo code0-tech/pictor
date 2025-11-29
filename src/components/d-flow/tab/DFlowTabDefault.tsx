@@ -110,14 +110,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                }
                                return value
                            }}
-                           disableOnValue={value => {
-                               if (!value) return false
-                               try {
-                                   return (value as NodeParameterValue).__typename === "NodeFunction" || (value as NodeParameterValue).__typename === "ReferenceValue"
-                               } catch (e) {
-                               }
-                               return false
-                           }}
                            defaultValue={defaultValue}
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)

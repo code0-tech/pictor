@@ -94,11 +94,12 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             suggestions, // Optional suggestions array
             suggestionsHeader, // Optional header above suggestion list
             suggestionsFooter, // Optional footer below suggestion list
-            onSuggestionSelect = () => {
-            }, // Callback for suggestion selection,
+            onSuggestionSelect, // Callback for suggestion selection,
             disableOnValue = () => false,
             ...rest // Remaining native input props
         } = props;
+
+        const hasCustomSuggestionSelect = typeof onSuggestionSelect === "function";
 
         // Sync input value changes to external validation state
         useEffect(() => {
@@ -175,34 +176,69 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         onKeyDown={(e) => {
                             if (e.key === "ArrowDown") {
                                 e.preventDefault();
-                                menuRef.current?.focusFirstItem(); // Navigate down
+                                const wasOpen = open;
+                                setOpen(true);
+                                if (!wasOpen) {
+                                    setTimeout(() => menuRef.current?.focusFirstItem(), 0); // Open and preselect first item
+                                } else {
+                                    menuRef.current?.highlightNextItem(); // Navigate down while keeping input focus
+                                }
                             } else if (e.key === "ArrowUp") {
                                 e.preventDefault();
-                                menuRef.current?.focusLastItem(); // Navigate up
+                                const wasOpen = open;
+                                setOpen(true);
+                                if (!wasOpen) {
+                                    setTimeout(() => menuRef.current?.focusLastItem(), 0); // Open and preselect last item
+                                } else {
+                                    menuRef.current?.highlightPreviousItem(); // Navigate up while keeping input focus
+                                }
+                            } else if (e.key === "Enter" && open) {
+                                const selected = menuRef.current?.selectActiveItem();
+                                if (selected) {
+                                    if (!hasCustomSuggestionSelect && inputRef.current) {
+                                        setElementKey(
+                                            inputRef.current,
+                                            "value",
+                                            typeof value == "object" ? JSON.stringify(selected.value) : selected.value,
+                                            "change"
+                                        );
+                                    }
+                                    onSuggestionSelect?.(selected);
+                                    setOpen(false);
+                                    setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0);
+                                }
                             }
                         }}
                         disabled={disabled || disabledOnValue}
                     />
                 </MenuTrigger>
                 <MenuPortal>
-                    <InputSuggestionMenuContent>
+                    <InputSuggestionMenuContent inputRef={inputRef}>
                         {suggestionsHeader} {/* Custom content above suggestions */}
                         <InputSuggestionMenuContentItems
                             /* @ts-ignore */
                             ref={menuRef} // Handle keyboard focus control
+                            inputRef={inputRef}
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
-                                // Update value and dispatch event
-                                if (!onSuggestionSelect) setElementKey(ref.current, "value", typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value, "change");
-                                onSuggestionSelect(suggestion)
-                                setOpen(false)
+                                if (!hasCustomSuggestionSelect && inputRef.current) {
+                                    setElementKey(
+                                        inputRef.current,
+                                        "value",
+                                        typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value,
+                                        "change"
+                                    );
+                                }
+                                onSuggestionSelect?.(suggestion);
+                                setOpen(false);
+                                setTimeout(() => inputRef.current?.focus({preventScroll: true}), 0);
                             }}
                         />
                         {suggestionsFooter} {/* Custom content below suggestions */}
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [open, suggestions, suggestionsHeader, suggestionsFooter]);
+        ), [hasCustomSuggestionSelect, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value]);
 
         return (
             <>

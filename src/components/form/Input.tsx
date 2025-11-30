@@ -9,9 +9,9 @@
 
 import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
 
-import {Code0Component} from "../../utils/types"
+import {Code0Component} from "../../utils"
 import {ValidationProps} from "./useForm"
-import {mergeCode0Props} from "../../utils/utils"
+import {mergeCode0Props} from "../../utils"
 
 import "./Input.style.scss"
 

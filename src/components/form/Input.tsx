@@ -96,7 +96,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const activeSuggestionsRef = useRef<InputSuggestion[]>([])
 
         const [open, setOpen] = useState(false)
-        const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
+        const [value, setValue] = useState<any>(props.defaultValue || props.initialValue)
         const [activeSuggestionSpans, setActiveSuggestionSpans] = useState<InputActiveSuggestionSpan[]>([])
         const [activeSuggestions, setActiveSuggestions] = useState<InputSuggestion[]>([])
         const [visualSelectionRange, setVisualSelectionRange] = useState<{ start: number, end: number } | null>(null)

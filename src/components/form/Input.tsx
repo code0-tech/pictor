@@ -179,70 +179,6 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }, 0)
         }, [inputRef])
 
-
-        const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
-            if (!inputRef.current) return
-
-            const suggestionRaw = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
-            const suggestionValue = suggestionRaw === undefined || suggestionRaw === null ? "" : String(suggestionRaw)
-            const insertMode = suggestion.insertMode ?? "replace"
-            const currentValue = inputRef.current.value ?? ""
-
-            let nextValue = currentValue
-            let nextCaretPosition: number | null = null
-
-            switch (insertMode) {
-            case "append": {
-                nextValue = `${currentValue}${suggestionValue}`
-                nextCaretPosition = nextValue.length
-                break
-            }
-            case "prepend": {
-                nextValue = `${suggestionValue}${currentValue}`
-                nextCaretPosition = suggestionValue.length
-                break
-            }
-            case "insert": {
-                const selectionStart = inputRef.current.selectionStart ?? currentValue.length
-                const selectionEnd = inputRef.current.selectionEnd ?? selectionStart
-                const start = Math.min(selectionStart, selectionEnd)
-                const end = Math.max(selectionStart, selectionEnd)
-
-                nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
-                nextCaretPosition = start + suggestionValue.length
-                break
-            }
-            case "replace":
-            default: {
-                nextValue = suggestionValue
-                nextCaretPosition = suggestionValue.length
-                break
-            }
-            }
-
-            setElementKey(
-                inputRef.current,
-                "value",
-                nextValue,
-                "change",
-            )
-
-            if (nextCaretPosition !== null) {
-                requestAnimationFrame(() => {
-                    const target = inputRef.current
-                    if (!target) return
-
-                    target.focus({preventScroll: true})
-                    try {
-                        target.setSelectionRange(nextCaretPosition, nextCaretPosition)
-                    } catch {
-                        // Some input types (e.g., number) don't support selection ranges
-                    }
-                })
-            }
-        }, [inputRef, value])
-
-
         const buildDefaultSyntax = React.useCallback((): InputSyntaxSegment[] => {
             const rawValue = value ?? ""
             const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
@@ -280,6 +216,110 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 return nextSegment
             })
         }, [syntaxSegments])
+
+        const expandSelectionRangeToBlockBoundaries = React.useCallback((rawStart: number, rawEnd: number) => {
+            let adjustedStart = Math.min(rawStart, rawEnd)
+            let adjustedEnd = Math.max(rawStart, rawEnd)
+            let hasBlockOverlap = false
+
+            visualizedSyntaxSegments.forEach((segment) => {
+                if (segment.type !== "block") return
+
+                const overlaps = adjustedStart < segment.end && adjustedEnd > segment.start
+                if (!overlaps) return
+
+                adjustedStart = Math.min(adjustedStart, segment.start)
+                adjustedEnd = Math.max(adjustedEnd, segment.end)
+                hasBlockOverlap = true
+            })
+
+            return {start: adjustedStart, end: adjustedEnd, hasBlockOverlap}
+        }, [visualizedSyntaxSegments])
+
+        const normalizeSelectionForAtomicBlocks = React.useCallback((target: HTMLInputElement) => {
+            if (!props.transformSyntax) return
+
+            const selectionStart = target.selectionStart ?? 0
+            const selectionEnd = target.selectionEnd ?? selectionStart
+
+            if (selectionStart === selectionEnd) return
+
+            const {start, end, hasBlockOverlap} = expandSelectionRangeToBlockBoundaries(selectionStart, selectionEnd)
+
+            if (!hasBlockOverlap) return
+            if (start === selectionStart && end === selectionEnd) return
+
+            try {
+                target.setSelectionRange(start, end)
+            } catch {
+                // Some input types (e.g., number) don't support selection ranges
+            }
+        }, [expandSelectionRangeToBlockBoundaries, props.transformSyntax])
+
+
+        const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
+            if (!inputRef.current) return
+
+            const suggestionRaw = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
+            const suggestionValue = suggestionRaw === undefined || suggestionRaw === null ? "" : String(suggestionRaw)
+            const insertMode = suggestion.insertMode ?? "replace"
+            const currentValue = inputRef.current.value ?? ""
+
+            let nextValue = currentValue
+            let nextCaretPosition: number | null = null
+
+            switch (insertMode) {
+            case "append": {
+                nextValue = `${currentValue}${suggestionValue}`
+                nextCaretPosition = nextValue.length
+                break
+            }
+            case "prepend": {
+                nextValue = `${suggestionValue}${currentValue}`
+                nextCaretPosition = suggestionValue.length
+                break
+            }
+            case "insert": {
+                const selectionStart = inputRef.current.selectionStart ?? currentValue.length
+                const selectionEnd = inputRef.current.selectionEnd ?? selectionStart
+                const {start, end} = props.transformSyntax
+                    ? expandSelectionRangeToBlockBoundaries(selectionStart, selectionEnd)
+                    : {start: Math.min(selectionStart, selectionEnd), end: Math.max(selectionStart, selectionEnd)}
+
+                nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
+                nextCaretPosition = start + suggestionValue.length
+                break
+            }
+            case "replace":
+            default: {
+                nextValue = suggestionValue
+                nextCaretPosition = suggestionValue.length
+                break
+            }
+            }
+
+            setElementKey(
+                inputRef.current,
+                "value",
+                nextValue,
+                "change",
+            )
+
+            if (nextCaretPosition !== null) {
+                requestAnimationFrame(() => {
+                    const target = inputRef.current
+                    if (!target) return
+
+                    target.focus({preventScroll: true})
+                    try {
+                        target.setSelectionRange(nextCaretPosition, nextCaretPosition)
+                    } catch {
+                        // Some input types (e.g., number) don't support selection ranges
+                    }
+                })
+            }
+        }, [expandSelectionRangeToBlockBoundaries, inputRef, props.transformSyntax, value])
+
 
         const totalVisualLength = React.useMemo(() => {
             const lastSegment = visualizedSyntaxSegments[visualizedSyntaxSegments.length - 1]
@@ -671,6 +711,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [props.transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
 
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (props.transformSyntax) {
+                normalizeSelectionForAtomicBlocks(event.target as HTMLInputElement)
+            }
+
             if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
                 const target = event.target as HTMLInputElement
                 const selectionStart = target.selectionStart ?? 0
@@ -767,7 +811,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     setOpen(false)
                 }
             }
-        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
 
         const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === " " || event.code === "Space") {

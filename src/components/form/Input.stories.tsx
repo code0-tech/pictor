@@ -428,7 +428,7 @@ export const InputSuggestionStory = () => {
         <TextInput transformSyntax={buildSegments} suggestions={[{
             children: <Badge border>Niklas van Schrick</Badge>,
             value: "Niklas van Schrick",
-            insertMode: "append"
+            insertMode: "insert"
         }, {
             children: <Badge border>Nico Sammito</Badge>,
             value: "Nico Sammito",

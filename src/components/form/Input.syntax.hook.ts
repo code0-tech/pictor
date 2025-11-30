@@ -1,5 +1,7 @@
 import React from "react"
 
+import {InputSuggestion} from "./InputSuggestion"
+
 export type InputSyntaxSegment = {
     type: "text" | "block"
     start: number
@@ -48,7 +50,7 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 export const useSyntaxModel = (
     value: any,
-    transformSyntax: ((value: any) => InputSyntaxSegment[]) | undefined,
+    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => InputSyntaxSegment[]) | undefined,
     inputRef: React.RefObject<HTMLInputElement>,
 ) => {
     const syntaxSegments = React.useMemo(() => {

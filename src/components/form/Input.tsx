@@ -41,7 +41,8 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestionsHeader?: React.ReactNode
     suggestionsFooter?: React.ReactNode
     onSuggestionSelect?: (suggestion: InputSuggestion) => void
-    transformSyntax?: (value: T) => InputSyntaxSegment[]
+    transformSyntax?: (value: T, activeSuggestions?: InputSuggestion[]) => InputSyntaxSegment[]
+    validationUsesSuggestions?: boolean
     disableOnValue?: (value: T) => boolean
 
     wrapperComponent?: Code0Component<HTMLDivElement>
@@ -52,6 +53,14 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     title?: React.ReactNode
     description?: React.ReactNode
 
+}
+
+type ActiveSuggestionSpan = {
+    id: number
+    suggestion: InputSuggestion
+    text: string
+    start: number
+    end: number
 }
 
 const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
@@ -72,6 +81,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             onSuggestionSelect,
             disableOnValue = () => false,
             transformSyntax,
+            validationUsesSuggestions = false,
             ...rest
         } = props
 
@@ -80,14 +90,62 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const syntaxRef = useRef<HTMLDivElement>(null)
         const shouldPreventCloseRef = useRef(true)
         const selectionAnchorRef = useRef<number | null>(null)
+        const suggestionIdRef = useRef(0)
+        const activeSuggestionsRef = useRef<InputSuggestion[]>([])
 
         const [open, setOpen] = useState(false)
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
+        const [activeSuggestionSpans, setActiveSuggestionSpans] = useState<ActiveSuggestionSpan[]>([])
+        const [activeSuggestions, setActiveSuggestions] = useState<InputSuggestion[]>([])
         const [visualSelectionRange, setVisualSelectionRange] = useState<{ start: number, end: number } | null>(null)
         const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
         const [isFocused, setIsFocused] = useState(false)
 
         const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
+
+        const normalizeTextValue = React.useCallback((rawValue: any): string => {
+            const normalized = rawValue ?? ""
+            return typeof normalized === "string" ? normalized : String(normalized)
+        }, [])
+
+        const findClosestOccurrence = React.useCallback((text: string, targetIndex: number, currentValue: string): number | null => {
+            if (text.length === 0) return targetIndex <= currentValue.length ? targetIndex : null
+
+            let closestIndex = currentValue.indexOf(text)
+            if (closestIndex === -1) return null
+
+            let searchIndex = closestIndex
+            while (searchIndex !== -1) {
+                if (Math.abs(searchIndex - targetIndex) < Math.abs(closestIndex - targetIndex)) {
+                    closestIndex = searchIndex
+                }
+                searchIndex = currentValue.indexOf(text, searchIndex + 1)
+            }
+
+            return closestIndex
+        }, [])
+
+        const reconcileSuggestionSpans = React.useCallback((spans: ActiveSuggestionSpan[], currentValue: string) => {
+            const nextSpans: ActiveSuggestionSpan[] = []
+
+            spans.forEach((span) => {
+                const nextStart = findClosestOccurrence(span.text, span.start, currentValue)
+                if (nextStart === null) return
+
+                const nextEnd = nextStart + span.text.length
+                const candidateSlice = currentValue.slice(nextStart, nextEnd)
+
+                if (candidateSlice !== span.text) return
+
+                nextSpans.push({...span, start: nextStart, end: nextEnd})
+            })
+
+            return nextSpans
+        }, [findClosestOccurrence])
+
+        useEffect(() => {
+            activeSuggestionsRef.current = activeSuggestions
+        }, [activeSuggestions])
 
         useEffect(() => {
             const el = inputRef.current
@@ -95,12 +153,13 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
             const handleChange = (event: any) => {
                 const nextValue = rest.type !== "checkbox" ? event.target.value : event.target.checked
-                formValidation.setValue?.(nextValue)
+                const validationValue = validationUsesSuggestions ? activeSuggestionsRef.current : nextValue
+                formValidation.setValue?.(validationValue)
             }
 
             el.addEventListener("change", handleChange)
             return () => el.removeEventListener("change", handleChange)
-        }, [formValidation?.setValue, inputRef, rest.type])
+        }, [formValidation?.setValue, inputRef, rest.type, validationUsesSuggestions])
 
         useEffect(() => {
             if (!suggestions) return
@@ -135,6 +194,30 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             }
         }, [disabledOnValue, inputRef])
 
+        useEffect(() => {
+            const currentValue = normalizeTextValue(inputRef.current?.value ?? value)
+
+            setActiveSuggestionSpans((prev) => {
+                const nextSpans = reconcileSuggestionSpans(prev, currentValue)
+                setActiveSuggestions(nextSpans.map((item) => item.suggestion))
+                return nextSpans
+            })
+        }, [normalizeTextValue, reconcileSuggestionSpans, value])
+
+        useEffect(() => {
+            if (!formValidation?.setValue) return
+
+            const currentValue = rest.type !== "checkbox"
+                ? normalizeTextValue(inputRef.current?.value ?? value)
+                : value
+
+            const validationValue = validationUsesSuggestions
+                ? activeSuggestions
+                : currentValue
+
+            formValidation.setValue(validationValue)
+        }, [activeSuggestions, formValidation?.setValue, inputRef, normalizeTextValue, rest.type, validationUsesSuggestions, value])
+
         const focusInputCaretAtEnd = React.useCallback(() => {
             setTimeout(() => {
                 const target = inputRef.current
@@ -149,23 +232,30 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             }, 0)
         }, [inputRef])
 
+        const transformSyntaxWithSuggestions = React.useMemo(() => {
+            if (!transformSyntax) return undefined
+
+            return (nextValue: any, nextActiveSuggestions: InputSuggestion[] = activeSuggestions) =>
+                transformSyntax(nextValue, nextActiveSuggestions)
+        }, [activeSuggestions, transformSyntax])
+
         const {
             visualizedSyntaxSegments,
             expandSelectionRangeToBlockBoundaries,
             mapVisualIndexToRawIndex,
             mapRawIndexToVisualIndex,
             totalVisualLength,
-        } = useSyntaxModel(value, transformSyntax, inputRef)
+        } = useSyntaxModel(value, transformSyntaxWithSuggestions, inputRef)
 
         const {ensureVisualIndexVisible, syncSyntaxScroll} = useSelectionVisibility(inputRef, syntaxRef)
 
         const normalizeSelectionForAtomicBlocks = useSelectionNormalization(
-            transformSyntax,
+            transformSyntaxWithSuggestions,
             expandSelectionRangeToBlockBoundaries,
         )
 
         const updateVisualSelectionRange = React.useCallback(() => {
-            if (!transformSyntax) return
+            if (!transformSyntaxWithSuggestions) return
 
             const target = inputRef.current
             if (!target) return
@@ -237,10 +327,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 syncSyntaxScroll()
                 ensureVisualIndexVisible(activeBoundary)
             })
-        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, syncSyntaxScroll, transformSyntax, visualizedSyntaxSegments])
+        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, syncSyntaxScroll, transformSyntaxWithSuggestions, visualizedSyntaxSegments])
 
         const resolvedVisualSelectionRange: ResolvedVisualSelectionRange = useSelectionResolution(
-            transformSyntax,
+            transformSyntaxWithSuggestions,
             inputRef,
             visualSelectionRange,
             visualizedSyntaxSegments,
@@ -323,7 +413,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         }, [])
 
         const handleAtomicDeletion = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>): boolean => {
-            if (!transformSyntax) return false
+            if (!transformSyntaxWithSuggestions) return false
 
             const target = event.target as HTMLInputElement
             const {rawStart, rawEnd} = getSelectionMetrics(target)
@@ -372,14 +462,14 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             }
 
             return false
-        }, [expandSelectionRangeToBlockBoundaries, transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
+        }, [expandSelectionRangeToBlockBoundaries, transformSyntaxWithSuggestions, updateVisualSelectionRange, visualizedSyntaxSegments])
 
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (transformSyntax) {
+            if (transformSyntaxWithSuggestions) {
                 normalizeSelectionForAtomicBlocks(event.target as HTMLInputElement)
             }
 
-            if (transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+            if (transformSyntaxWithSuggestions && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
                 const target = event.target as HTMLInputElement
                 const {selectionStart, selectionEnd, rawStart, rawEnd, direction} = getSelectionMetrics(target)
                 const visualDelta = event.key === "ArrowLeft" ? -1 : 1
@@ -430,7 +520,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 if (event.defaultPrevented) return
             }
 
-            if (transformSyntax && (event.key === "Backspace" || event.key === "Delete")) {
+            if (transformSyntaxWithSuggestions && (event.key === "Backspace" || event.key === "Delete")) {
                 const handled = handleAtomicDeletion(event)
                 if (handled) return
             }
@@ -461,7 +551,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     setOpen(false)
                 }
             }
-        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, suggestions, syncSyntaxScroll, totalVisualLength, transformSyntax, updateVisualSelectionRange])
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, suggestions, syncSyntaxScroll, totalVisualLength, transformSyntaxWithSuggestions, updateVisualSelectionRange])
 
         const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === " " || event.code === "Space") {
@@ -493,7 +583,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
         useEffect(() => {
             const target = inputRef.current
-            if (!target || !transformSyntax) return
+            if (!target || !transformSyntaxWithSuggestions) return
 
             const syncSelection = () => requestAnimationFrame(updateVisualSelectionRange)
 
@@ -505,10 +595,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             return () => {
                 events.forEach((event) => target.removeEventListener(event, syncSelection))
             }
-        }, [inputRef, transformSyntax, updateVisualSelectionRange])
+        }, [inputRef, transformSyntaxWithSuggestions, updateVisualSelectionRange])
 
         useEffect(() => {
-            if (!transformSyntax) return
+            if (!transformSyntaxWithSuggestions) return
 
             const handleSelectionChange = () => {
                 if (document.activeElement !== inputRef.current) return
@@ -517,7 +607,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
             document.addEventListener("selectionchange", handleSelectionChange)
             return () => document.removeEventListener("selectionchange", handleSelectionChange)
-        }, [inputRef, transformSyntax, updateVisualSelectionRange])
+        }, [inputRef, transformSyntaxWithSuggestions, updateVisualSelectionRange])
 
         useEffect(() => {
             const target = inputRef.current
@@ -535,11 +625,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         }, [syncSyntaxScroll, value, visualCaretIndex, visualSelectionRange])
 
         useEffect(() => {
-            if (transformSyntax) return
+            if (transformSyntaxWithSuggestions) return
 
             setVisualSelectionRange(null)
             setVisualCaretIndex(null)
-        }, [transformSyntax])
+        }, [transformSyntaxWithSuggestions])
 
         const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
             if (!inputRef.current) return
@@ -551,32 +641,37 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
             let nextValue = currentValue
             let nextCaretPosition: number | null = null
+            let insertionStart = 0
 
             switch (insertMode) {
                 case "append": {
                     nextValue = `${currentValue}${suggestionValue}`
                     nextCaretPosition = nextValue.length
+                    insertionStart = currentValue.length
                     break
                 }
                 case "prepend": {
                     nextValue = `${suggestionValue}${currentValue}`
                     nextCaretPosition = suggestionValue.length
+                    insertionStart = 0
                     break
                 }
                 case "insert": {
                     const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
-                    const {start, end} = transformSyntax
+                    const {start, end} = transformSyntaxWithSuggestions
                         ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
                         : {start: rawStart, end: rawEnd}
 
                     nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
                     nextCaretPosition = start + suggestionValue.length
+                    insertionStart = start
                     break
                 }
                 case "replace":
                 default: {
                     nextValue = suggestionValue
                     nextCaretPosition = suggestionValue.length
+                    insertionStart = 0
                     break
                 }
             }
@@ -588,6 +683,24 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 "change",
             )
 
+            setActiveSuggestionSpans((prev) => {
+                const nextTextValue = normalizeTextValue(nextValue)
+                const reconciledSpans = reconcileSuggestionSpans(prev, nextTextValue)
+                const nextSpan: ActiveSuggestionSpan | null = suggestionValue.length
+                    ? {
+                        id: suggestionIdRef.current++,
+                        suggestion,
+                        text: suggestionValue,
+                        start: insertionStart,
+                        end: insertionStart + suggestionValue.length,
+                    }
+                    : null
+
+                const updatedSpans = nextSpan ? [...reconciledSpans, nextSpan] : reconciledSpans
+                setActiveSuggestions(updatedSpans.map((item) => item.suggestion))
+                return updatedSpans
+            })
+
             if (nextCaretPosition !== null) {
                 requestAnimationFrame(() => {
                     const target = inputRef.current
@@ -597,11 +710,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     setSelectionRangeSafe(target, nextCaretPosition, nextCaretPosition)
                 })
             }
-        }, [expandSelectionRangeToBlockBoundaries, inputRef, transformSyntax, value])
+        }, [expandSelectionRangeToBlockBoundaries, inputRef, normalizeTextValue, reconcileSuggestionSpans, transformSyntaxWithSuggestions, value])
 
         const syntax = useMemo(() => (
             <InputSyntax
-                transformSyntax={transformSyntax}
+                transformSyntax={transformSyntaxWithSuggestions}
                 syntaxRef={syntaxRef}
                 visualizedSyntaxSegments={visualizedSyntaxSegments}
                 resolvedVisualSelectionRange={resolvedVisualSelectionRange}
@@ -611,7 +724,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 onPointerMove={handleSyntaxPointerMove}
                 onPointerUp={handleSyntaxPointerUp}
             />
-        ), [handleSyntaxPointerDown, handleSyntaxPointerUp, handleSyntaxPointerMove, isFocused, resolvedVisualSelectionRange, transformSyntax, visualCaretIndex, visualizedSyntaxSegments])
+        ), [handleSyntaxPointerDown, handleSyntaxPointerUp, handleSyntaxPointerMove, isFocused, resolvedVisualSelectionRange, transformSyntaxWithSuggestions, visualCaretIndex, visualizedSyntaxSegments])
 
         const suggestionMenu = useMemo(() => (
             <Menu
@@ -633,7 +746,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 <MenuTrigger asChild>
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>}
-                        {...mergeCode0Props(`input__control ${transformSyntax ? "input__control--syntax" : ""}`, rest)}
+                        {...mergeCode0Props(`input__control ${transformSyntaxWithSuggestions ? "input__control--syntax" : ""}`, rest)}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDownCapture={handleKeyDownCapture}
@@ -666,7 +779,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestions, suggestionsFooter, suggestionsHeader, transformSyntax])
+        ), [applySuggestionValue, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestions, suggestionsFooter, suggestionsHeader, transformSyntaxWithSuggestions])
 
         return (
             <>
@@ -692,7 +805,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                             onBlur={handleBlur}
                             onKeyDownCapture={handleKeyDownCapture}
                             onKeyDown={handleKeyDown}
-                            {...mergeCode0Props(`input__control ${transformSyntax ? "input__control--syntax" : ""}`, rest)}
+                            {...mergeCode0Props(`input__control ${transformSyntaxWithSuggestions ? "input__control--syntax" : ""}`, rest)}
                         />
                     )}
 

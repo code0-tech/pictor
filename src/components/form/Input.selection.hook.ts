@@ -3,6 +3,7 @@ import React, {RefObject} from "react"
 import {getSelectionMetrics, setSelectionRangeSafe, useSyncSyntaxScroll} from "./Input.utils"
 import {ResolvedVisualSelectionRange} from "./InputSyntax"
 import {VisualizedInputSyntaxSegment} from "./Input.syntax.hook"
+import {InputSuggestion} from "./InputSuggestion"
 
 export const useSelectionVisibility = (
     inputRef: RefObject<HTMLInputElement | null>,
@@ -77,7 +78,7 @@ export const useSelectionVisibility = (
 }
 
 export const useSelectionNormalization = (
-    transformSyntax: ((value: any) => any) | undefined,
+    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => any) | undefined,
     expandSelectionRangeToBlockBoundaries: (rawStart: number, rawEnd: number) => {start: number, end: number, hasBlockOverlap: boolean},
 ) => React.useCallback((target: HTMLInputElement) => {
     if (!transformSyntax) return
@@ -94,7 +95,7 @@ export const useSelectionNormalization = (
 }, [expandSelectionRangeToBlockBoundaries, transformSyntax])
 
 export const useSelectionResolution = (
-    transformSyntax: ((value: any) => any) | undefined,
+    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => any) | undefined,
     inputRef: RefObject<HTMLInputElement>,
     visualSelectionRange: {start: number, end: number} | null,
     visualizedSyntaxSegments: VisualizedInputSyntaxSegment[],

@@ -392,7 +392,7 @@ export const InputSuggestionStory = () => {
     }
 
     return <Card maw={300}>
-        <TextInput placeholder={"Search for users"} transformSyntax={buildSegments} suggestions={[{
+        <TextInput placeholder={"Search for users"} filterSuggestionsByLastToken transformSyntax={buildSegments} suggestions={[{
             children: "Niklas van Schrick",
             value: "Niklas van Schrick",
             insertMode: "insert"

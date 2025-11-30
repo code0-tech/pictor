@@ -44,6 +44,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     transformSyntax?: (value: T, appliedSyntaxParts?: (InputSuggestion | any)[]) => InputSyntaxSegment[]
     validationUsesSuggestions?: boolean
     disableOnValue?: (value: T) => boolean
+    filterSuggestionsByLastToken?: boolean
 
     wrapperComponent?: Code0Component<HTMLDivElement>
     right?: React.ReactNode
@@ -82,6 +83,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             disableOnValue = () => false,
             transformSyntax,
             validationUsesSuggestions = false,
+            filterSuggestionsByLastToken = false,
             ...rest
         } = props
 
@@ -285,12 +287,62 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         }, [appliedSyntaxParts, transformSyntax])
 
         const {
+            syntaxSegments,
             visualizedSyntaxSegments,
             expandSelectionRangeToBlockBoundaries,
             mapVisualIndexToRawIndex,
             mapRawIndexToVisualIndex,
             totalVisualLength,
         } = useSyntaxModel(value, transformSyntaxWithAppliedParts, inputRef, appliedSyntaxParts)
+
+        const trailingTextTokenData = React.useMemo(() => {
+            const currentValue = normalizeTextValue(inputRef.current?.value ?? value)
+            if (!filterSuggestionsByLastToken) return null
+            if (!syntaxSegments?.length) return null
+
+            const trailingTextSegment = [...syntaxSegments]
+                .reverse()
+                .find((segment) => segment?.type === "text" && segment?.end === currentValue.length)
+
+            if (!trailingTextSegment) return null
+
+            const rawTrailingText = currentValue.slice(trailingTextSegment.start, trailingTextSegment.end)
+            const trimmed = rawTrailingText.trim()
+            if (!trimmed.length) return null
+
+            const trailingParts = trimmed.split(/\s+/)
+            const trailingToken = trailingParts[trailingParts.length - 1]?.trim()
+            if (!trailingToken) return null
+
+            const leadingWhitespace = rawTrailingText.search(/\S/)
+            const leadingOffset = leadingWhitespace === -1 ? 0 : leadingWhitespace
+            const lastTokenIndexInTrimmed = trimmed.lastIndexOf(trailingToken)
+            const tokenStart = trailingTextSegment.start + leadingOffset + lastTokenIndexInTrimmed
+            const tokenEnd = tokenStart + trailingToken.length
+
+            return {
+                token: trailingToken,
+                start: tokenStart,
+                end: tokenEnd,
+            }
+        }, [filterSuggestionsByLastToken, inputRef, normalizeTextValue, syntaxSegments, value])
+
+        const filteredSuggestions = React.useMemo(() => {
+            if (!filterSuggestionsByLastToken) return suggestions
+            if (!suggestions) return suggestions
+
+            const normalizedToken = trailingTextTokenData?.token?.trim()
+            if (!normalizedToken?.length) return suggestions
+
+            return suggestions.filter((suggestion) => {
+                const suggestionValue = suggestion?.value ?? ""
+                const suggestionText = suggestionValue === undefined || suggestionValue === null
+                    ? ""
+                    : String(suggestionValue)
+
+                return suggestionText.toLowerCase().startsWith(normalizedToken.toLowerCase())
+            })
+        }, [filterSuggestionsByLastToken, trailingTextTokenData?.token, suggestions])
 
         const {ensureVisualIndexVisible, syncSyntaxScroll} = useSelectionVisibility(inputRef, syntaxRef)
 
@@ -308,8 +360,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             const {rawStart, rawEnd} = getSelectionMetrics(target)
 
             const blockAtCaret = visualizedSyntaxSegments.find((segment) => {
-                if (segment.type !== "block") return false
-                return rawStart > segment.start && rawStart < segment.end
+                if (segment?.type !== "block") return false
+                return rawStart > segment?.start && rawStart < segment?.end
             })
 
             if (blockAtCaret && rawStart === rawEnd) {
@@ -348,13 +400,13 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             let visualEnd = mapRawIndexToVisualIndex(rawEnd)
 
             visualizedSyntaxSegments.forEach((segment) => {
-                if (segment.type !== "block") return
+                if (segment?.type !== "block") return
 
-                const overlaps = rawStart < segment.end && rawEnd > segment.start
+                const overlaps = rawStart < segment?.end && rawEnd > segment?.start
                 if (!overlaps) return
 
-                visualStart = Math.min(visualStart, segment.visualStart)
-                visualEnd = Math.max(visualEnd, segment.visualEnd)
+                visualStart = Math.min(visualStart, segment?.visualStart)
+                visualEnd = Math.max(visualEnd, segment?.visualEnd)
             })
 
             const clampedStart = Math.min(visualStart, visualEnd)
@@ -489,8 +541,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             }
 
             const blockBeforeCaret = visualizedSyntaxSegments.find((segment) => {
-                if (segment.type !== "block") return false
-                return rawStart === segment.end || (rawStart > segment.start && rawStart < segment.end)
+                if (segment?.type !== "block") return false
+                return rawStart === segment?.end || (rawStart > segment?.start && rawStart < segment?.end)
             })
 
             if (event.key === "Backspace" && blockBeforeCaret) {
@@ -498,8 +550,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             }
 
             const blockAfterCaret = visualizedSyntaxSegments.find((segment) => {
-                if (segment.type !== "block") return false
-                return rawStart === segment.start || (rawStart > segment.start && rawStart < segment.end)
+                if (segment?.type !== "block") return false
+                return rawStart === segment?.start || (rawStart > segment?.start && rawStart < segment?.end)
             })
 
             if (event.key === "Delete" && blockAfterCaret) {
@@ -688,36 +740,42 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             let nextCaretPosition: number | null = null
             let insertionStart = 0
 
-            switch (insertMode) {
-                case "append": {
-                    nextValue = `${currentValue}${suggestionValue}`
-                    nextCaretPosition = nextValue.length
-                    insertionStart = currentValue.length
-                    break
-                }
-                case "prepend": {
-                    nextValue = `${suggestionValue}${currentValue}`
-                    nextCaretPosition = suggestionValue.length
-                    insertionStart = 0
-                    break
-                }
-                case "insert": {
-                    const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
-                    const {start, end} = transformSyntaxWithAppliedParts
-                        ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
-                        : {start: rawStart, end: rawEnd}
+            if (filterSuggestionsByLastToken && trailingTextTokenData) {
+                nextValue = `${currentValue.slice(0, trailingTextTokenData.start)}${suggestionValue}${currentValue.slice(trailingTextTokenData.end)}`
+                nextCaretPosition = trailingTextTokenData.start + suggestionValue.length
+                insertionStart = trailingTextTokenData.start
+            } else {
+                switch (insertMode) {
+                    case "append": {
+                        nextValue = `${currentValue}${suggestionValue}`
+                        nextCaretPosition = nextValue.length
+                        insertionStart = currentValue.length
+                        break
+                    }
+                    case "prepend": {
+                        nextValue = `${suggestionValue}${currentValue}`
+                        nextCaretPosition = suggestionValue.length
+                        insertionStart = 0
+                        break
+                    }
+                    case "insert": {
+                        const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
+                        const {start, end} = transformSyntaxWithAppliedParts
+                            ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
+                            : {start: rawStart, end: rawEnd}
 
-                    nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
-                    nextCaretPosition = start + suggestionValue.length
-                    insertionStart = start
-                    break
-                }
-                case "replace":
-                default: {
-                    nextValue = suggestionValue
-                    nextCaretPosition = suggestionValue.length
-                    insertionStart = 0
-                    break
+                        nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
+                        nextCaretPosition = start + suggestionValue.length
+                        insertionStart = start
+                        break
+                    }
+                    case "replace":
+                    default: {
+                        nextValue = suggestionValue
+                        nextCaretPosition = suggestionValue.length
+                        insertionStart = 0
+                        break
+                    }
                 }
             }
 
@@ -755,7 +813,16 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     setSelectionRangeSafe(target, nextCaretPosition, nextCaretPosition)
                 })
             }
-        }, [expandSelectionRangeToBlockBoundaries, inputRef, normalizeTextValue, reconcileSuggestionSpans, transformSyntaxWithAppliedParts, value])
+        }, [
+            expandSelectionRangeToBlockBoundaries,
+            filterSuggestionsByLastToken,
+            inputRef,
+            normalizeTextValue,
+            reconcileSuggestionSpans,
+            trailingTextTokenData,
+            transformSyntaxWithAppliedParts,
+            value,
+        ])
 
         const syntax = useMemo(() => (
             <InputSyntax
@@ -807,7 +874,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                             /* @ts-ignore */
                             ref={menuRef}
                             inputRef={inputRef}
-                            suggestions={suggestions}
+                            suggestions={filteredSuggestions}
                             onSuggestionSelect={(suggestion) => {
                                 if (!onSuggestionSelect) {
                                     applySuggestionValue(suggestion)
@@ -824,7 +891,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestions, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
+        ), [applySuggestionValue, disabledOnValue, filteredSuggestions, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
 
         return (
             <>

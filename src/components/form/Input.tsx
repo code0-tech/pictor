@@ -356,6 +356,39 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return Math.min(segment.visualStart + ratio * segment.visualLength, segment.visualEnd)
         }, [inputRef, visualizedSyntaxSegments])
 
+        const resolvedVisualSelectionRange = React.useMemo(() => {
+            if (!props.transformSyntax) return null
+
+            const target = inputRef.current
+            if (!target) return visualSelectionRange
+
+            const selectionStart = target.selectionStart ?? 0
+            const selectionEnd = target.selectionEnd ?? selectionStart
+
+            const rawStart = Math.min(selectionStart, selectionEnd)
+            const rawEnd = Math.max(selectionStart, selectionEnd)
+
+            if (rawStart === rawEnd) return null
+
+            let visualStart = mapRawIndexToVisualIndex(rawStart)
+            let visualEnd = mapRawIndexToVisualIndex(rawEnd)
+
+            visualizedSyntaxSegments.forEach((segment) => {
+                if (segment.type !== "block") return
+
+                const overlaps = rawStart < segment.end && rawEnd > segment.start
+                if (!overlaps) return
+
+                visualStart = Math.min(visualStart, segment.visualStart)
+                visualEnd = Math.max(visualEnd, segment.visualEnd)
+            })
+
+            const clampedStart = Math.min(visualStart, visualEnd)
+            const clampedEnd = Math.max(visualStart, visualEnd)
+
+            return {start: clampedStart, end: clampedEnd}
+        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, visualSelectionRange, visualizedSyntaxSegments])
+
         const updateVisualSelectionRange = React.useCallback(() => {
             if (!props.transformSyntax) return
 
@@ -600,26 +633,62 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 const target = event.target as HTMLInputElement
                 const selectionStart = target.selectionStart ?? 0
                 const selectionEnd = target.selectionEnd ?? selectionStart
-                const collapsePosition = event.key === "ArrowLeft"
-                    ? Math.min(selectionStart, selectionEnd)
-                    : Math.max(selectionStart, selectionEnd)
-
-                const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(collapsePosition))
+                const selectionDirection = target.selectionDirection === "backward" ? "backward" : "forward"
                 const visualDelta = event.key === "ArrowLeft" ? -1 : 1
-                const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
-                const nextRawIndex = mapVisualIndexToRawIndex(nextVisualIndex)
 
-                if (!Number.isNaN(nextRawIndex)) {
-                    event.preventDefault()
-                    const clampedIndex = Math.min(Math.max(Math.round(nextRawIndex), 0), target.value.length)
+                if (!event.shiftKey) {
+                    selectionAnchorRef.current = null
+                    const collapsePosition = event.key === "ArrowLeft"
+                        ? Math.min(selectionStart, selectionEnd)
+                        : Math.max(selectionStart, selectionEnd)
 
-                    try {
-                        target.setSelectionRange(clampedIndex, clampedIndex)
-                    } catch {
-                        // Some input types (e.g., number) don't support selection ranges
+                    const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(collapsePosition))
+                    const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
+                    const nextRawIndex = mapVisualIndexToRawIndex(nextVisualIndex)
+
+                    if (!Number.isNaN(nextRawIndex)) {
+                        event.preventDefault()
+                        const clampedIndex = Math.min(Math.max(Math.round(nextRawIndex), 0), target.value.length)
+
+                        try {
+                            target.setSelectionRange(clampedIndex, clampedIndex)
+                        } catch {
+                            // Some input types (e.g., number) don't support selection ranges
+                        }
+
+                        requestAnimationFrame(() => {
+                            syncSyntaxScroll()
+                            updateVisualSelectionRange()
+                        })
                     }
+                } else {
+                    const anchorRawIndex = selectionAnchorRef.current ?? (
+                        selectionDirection === "backward" ? selectionEnd : selectionStart
+                    )
+                    selectionAnchorRef.current = anchorRawIndex
+                    const activeRawIndex = anchorRawIndex === selectionStart ? selectionEnd : selectionStart
+                    const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(activeRawIndex))
+                    const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
+                    const nextRawIndex = mapVisualIndexToRawIndex(nextVisualIndex)
 
-                    requestAnimationFrame(syncSyntaxScroll)
+                    if (!Number.isNaN(nextRawIndex)) {
+                        event.preventDefault()
+                        const clampedIndex = Math.min(Math.max(Math.round(nextRawIndex), 0), target.value.length)
+                        const nextDirection = clampedIndex < anchorRawIndex ? "backward" : "forward"
+                        const rangeStart = Math.min(anchorRawIndex, clampedIndex)
+                        const rangeEnd = Math.max(anchorRawIndex, clampedIndex)
+
+                        try {
+                            target.setSelectionRange(rangeStart, rangeEnd, nextDirection)
+                        } catch {
+                            // Some input types (e.g., number) don't support selection ranges
+                        }
+
+                        requestAnimationFrame(() => {
+                            syncSyntaxScroll()
+                            updateVisualSelectionRange()
+                        })
+                    }
                 }
 
                 if (event.defaultPrevented) return
@@ -657,7 +726,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     focusInputCaretAtEnd()
                 }
             }
-        }, [focusInputCaretAtEnd, handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength])
+        }, [focusInputCaretAtEnd, handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
 
         const handleFocus = React.useCallback(() => {
             setIsFocused(true)
@@ -694,6 +763,18 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
 
         useEffect(() => {
+            if (!props.transformSyntax) return
+
+            const handleSelectionChange = () => {
+                if (document.activeElement !== inputRef.current) return
+                updateVisualSelectionRange()
+            }
+
+            document.addEventListener("selectionchange", handleSelectionChange)
+            return () => document.removeEventListener("selectionchange", handleSelectionChange)
+        }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
+
+        useEffect(() => {
             const target = inputRef.current
             if (!target) return
 
@@ -719,14 +800,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             let caretRendered = false
 
             const isVisualRangeSelected = (visualStart: number, visualEnd: number) => {
-                if (!visualSelectionRange) return false
+                if (!resolvedVisualSelectionRange) return false
 
-                return visualSelectionRange.start < visualEnd && visualSelectionRange.end > visualStart
+                return resolvedVisualSelectionRange.start < visualEnd && resolvedVisualSelectionRange.end > visualStart
             }
 
             const shouldRenderCaret = (visualIndex: number) => {
                 if (!isFocused) return false
-                if (visualSelectionRange) return false
+                if (resolvedVisualSelectionRange) return false
                 if (visualCaretIndex === null) return false
 
                 if (caretRendered) return false
@@ -817,7 +898,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </span>
                 )
             })
-        }, [isFocused, visualCaretIndex, visualSelectionRange])
+        }, [isFocused, resolvedVisualSelectionRange, visualCaretIndex])
 
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {

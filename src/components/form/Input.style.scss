@@ -74,7 +74,7 @@
     user-select: none;
 
     &--selected {
-      background: rgba(variables.$white, .1);
+      background: rgba(variables.$white, 1);
       border-radius: variables.$borderRadius;
     }
   }

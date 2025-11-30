@@ -115,7 +115,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                }]
 
                                try {
-                                   if (!textValue) return buildTextSegment(textValue)
 
                                    const parsed = JSON.parse(textValue) as NodeParameterValue
                                    if (parsed?.__typename === "NodeFunction") {

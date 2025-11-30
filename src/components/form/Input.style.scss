@@ -42,17 +42,15 @@
     height: 100%;
     pointer-events: none;
     user-select: none;
-
-    > span {
-      pointer-events: auto;
-    }
+    -webkit-user-select: none;
+    -moz-user-select: none;
 
   }
 
   &__syntax-caret {
     display: inline-block;
     width: 1px;
-    height: 1.1em;
+    height: 1rem;
     background: rgba(variables.$white, .7);
     vertical-align: text-bottom;
     animation: caret-blink 1s steps(1) infinite;
@@ -70,21 +68,25 @@
   }
 
   &__syntax-char {
-    pointer-events: auto;
+    pointer-events: none;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 
     &--selected {
-      background: rgba(variables.$white, 1);
-      border-radius: variables.$borderRadius;
+      background: rgba(variables.$white, .1);
+      padding: 4px 0;
     }
   }
 
   &__syntax-block {
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 
     &--selected {
       background: rgba(variables.$white, .1);
-      border-radius: variables.$borderRadius;
+      padding: 4px 0;
     }
   }
 
@@ -148,6 +150,10 @@
     &--syntax {
       color: transparent;
       caret-color: transparent;
+
+      &::selection {
+        background: transparent;
+      }
     }
   }
 

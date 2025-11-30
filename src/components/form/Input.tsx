@@ -251,7 +251,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [inputRef, syntaxRef])
 
         const mapVisualIndexToRawIndex = React.useCallback((visualIndex: number): number => {
-            const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex < item.visualEnd)
+            const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex <= item.visualEnd)
             if (!segment) {
                 const inputLength = inputRef.current?.value.length ?? 0
                 return Math.max(0, Math.min(visualIndex, inputLength))

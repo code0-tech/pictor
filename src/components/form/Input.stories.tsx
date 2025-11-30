@@ -404,7 +404,7 @@ export const InputSuggestionStory = () => {
                 start: match.start,
                 end: match.end,
                 visualLength: 1,
-                content: <Badge border>{match.value}</Badge>,
+                content: <Badge color={"info"}>@{match.value}</Badge>,
             })
 
             cursor = match.end
@@ -425,12 +425,12 @@ export const InputSuggestionStory = () => {
     }
 
     return <Card maw={300}>
-        <TextInput transformSyntax={buildSegments} suggestions={[{
-            children: <Badge border>Niklas van Schrick</Badge>,
+        <TextInput placeholder={"Search for users"} transformSyntax={buildSegments} suggestions={[{
+            children: "Niklas van Schrick",
             value: "Niklas van Schrick",
             insertMode: "insert"
         }, {
-            children: <Badge border>Nico Sammito</Badge>,
+            children: "Nico Sammito",
             value: "Nico Sammito",
             insertMode: "append"
         }]}/>

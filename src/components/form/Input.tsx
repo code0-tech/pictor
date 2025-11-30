@@ -943,6 +943,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         onFocus={handleFocus} // Open on focus
                         onBlur={handleBlur}
                         onKeyDown={handleKeyDown}
+                        spellCheck={false}
                         disabled={disabled || disabledOnValue}
                     />
                 </MenuTrigger>

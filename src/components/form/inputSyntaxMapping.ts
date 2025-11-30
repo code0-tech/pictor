@@ -7,23 +7,23 @@ const sortSegments = (segments: InputSyntaxSegment[]): InputSyntaxSegment[] => {
 }
 
 const getTotalVisualLength = (segments: InputSyntaxSegment[]) =>
-    sortSegments(segments).reduce((total, segment) => total + segment.visualLength, 0)
+    sortSegments(segments).reduce((total, segment) => total + (segment?.visualLength ?? 0), 0)
 
 const getMaxRawIndex = (segments: InputSyntaxSegment[]) =>
-    sortSegments(segments).reduce((max, segment) => Math.max(max, segment.end), 0)
+    sortSegments(segments).reduce((max, segment) => Math.max(max, segment?.end), 0)
 
 const resolveBlockRawIndex = (segment: InputSyntaxSegment, visualCursor: number, targetVisual: number) => {
     const beforeDistance = Math.abs(targetVisual - visualCursor)
-    const afterDistance = Math.abs(targetVisual - (visualCursor + segment.visualLength))
+    const afterDistance = Math.abs(targetVisual - (visualCursor + (segment?.visualLength ?? 0)))
 
-    return beforeDistance <= afterDistance ? segment.start : segment.end
+    return beforeDistance <= afterDistance ? segment?.start : segment?.end
 }
 
 const resolveBlockVisualIndex = (segment: InputSyntaxSegment, visualCursor: number, targetRaw: number) => {
-    const beforeDistance = Math.abs(targetRaw - segment.start)
-    const afterDistance = Math.abs(segment.end - targetRaw)
+    const beforeDistance = Math.abs(targetRaw - segment?.start)
+    const afterDistance = Math.abs(segment?.end - targetRaw)
 
-    return beforeDistance <= afterDistance ? visualCursor : visualCursor + segment.visualLength
+    return beforeDistance <= afterDistance ? visualCursor : visualCursor + (segment?.visualLength ?? 0)
 }
 
 export const visualIndexToRawIndex = (visualIndex: number, segments: InputSyntaxSegment[]): number => {
@@ -37,19 +37,19 @@ export const visualIndexToRawIndex = (visualIndex: number, segments: InputSyntax
     let lastRawEnd = orderedSegments[0].start
 
     for (const segment of orderedSegments) {
-        const nextVisualCursor = visualCursor + segment.visualLength
+        const nextVisualCursor = visualCursor + (segment?.visualLength ?? 0)
 
         if (targetVisual <= nextVisualCursor) {
-            if (segment.type === "block") {
+            if (segment?.type === "block") {
                 return resolveBlockRawIndex(segment, visualCursor, targetVisual)
             }
 
-            const rawOffset = clamp(targetVisual - visualCursor, 0, segment.visualLength)
-            return clamp(segment.start + rawOffset, segment.start, segment.end)
+            const rawOffset = clamp(targetVisual - visualCursor, 0, (segment?.visualLength ?? 0))
+            return clamp(segment?.start + rawOffset, segment?.start, segment?.end)
         }
 
         visualCursor = nextVisualCursor
-        lastRawEnd = segment.end
+        lastRawEnd = segment?.end
     }
 
     return lastRawEnd
@@ -65,20 +65,20 @@ export const rawIndexToVisualIndex = (rawIndex: number, segments: InputSyntaxSeg
     let visualCursor = 0
 
     for (const segment of orderedSegments) {
-        if (targetRaw < segment.start) {
+        if (targetRaw < segment?.start) {
             return visualCursor
         }
 
-        if (targetRaw <= segment.end) {
-            if (segment.type === "block") {
+        if (targetRaw <= segment?.end) {
+            if (segment?.type === "block") {
                 return resolveBlockVisualIndex(segment, visualCursor, targetRaw)
             }
 
-            const rawOffset = clamp(targetRaw - segment.start, 0, segment.visualLength)
+            const rawOffset = clamp(targetRaw - segment?.start, 0, (segment?.visualLength ?? 0))
             return visualCursor + rawOffset
         }
 
-        visualCursor += segment.visualLength
+        visualCursor += (segment?.visualLength ?? 0)
     }
 
     return getTotalVisualLength(orderedSegments)

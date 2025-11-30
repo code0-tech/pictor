@@ -8,7 +8,7 @@ export interface InputSuggestion {
     value: any
     valueData?: any
     groupBy?: string
-    insertMode?: "replace" | "append"
+    insertMode?: "replace" | "append" | "prepend" | "insert"
 }
 
 export type InputSuggestionMenuContentProps = MenuContentProps & {inputRef?: RefObject<HTMLInputElement>}

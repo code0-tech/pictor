@@ -33,7 +33,7 @@
     overflow: hidden;
     font-size: variables.$sm;
     color: rgba(variables.$white, .5);
-    white-space: nowrap;
+    white-space: pre;
     padding: $padding $padding;
     box-sizing: border-box;
     top: 0;

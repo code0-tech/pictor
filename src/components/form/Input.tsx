@@ -23,103 +23,46 @@ import {
     InputSuggestion,
     InputSuggestionMenuContent,
     InputSuggestionMenuContentItems,
-    InputSuggestionMenuContentItemsHandle
+    InputSuggestionMenuContentItemsHandle,
 } from "./InputSuggestion"
+import {InputSyntax, ResolvedVisualSelectionRange} from "./InputSyntax"
+import {InputSyntaxSegment, useSyntaxModel} from "./Input.syntax.hook"
+import {useSelectionNormalization, useSelectionResolution, useSelectionVisibility} from "./Input.selection.hook"
+import {getSelectionMetrics, setElementKey, setSelectionRangeSafe} from "./Input.utils"
 
-// Programmatically set a property (like 'value') and dispatch an event (like 'change')
-export const setElementKey = (
-    element: HTMLElement,
-    key: string,
-    value: any,
-    event: string
-) => {
-    const valueSetter = Object.getOwnPropertyDescriptor(element, key)?.set // Try direct setter
-    const prototype = Object.getPrototypeOf(element)
-    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, key)?.set // Fallback to prototype
-
-    if (valueSetter && valueSetter !== prototypeValueSetter) {
-        prototypeValueSetter?.call(element, value) // Use prototype's setter if overridden
-    } else {
-        valueSetter?.call(element, value) // Use direct setter
-    }
-
-    element.dispatchEvent(new Event(event, {bubbles: true})) // Fire change/input event
-}
-
-// Base input props without layout-specific keys
 export type Code0Input = Omit<
     Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
     "title"
 >
 
-const setSelectionRangeSafe = (
-    target: HTMLInputElement,
-    start: number,
-    end: number,
-    direction?: "forward" | "backward" | "none"
-) => {
-    try {
-        target.setSelectionRange(start, end, direction)
-    } catch {
-        // Some input types (e.g., number) don't support selection ranges
-    }
-}
-
-const getSelectionMetrics = (target: HTMLInputElement) => {
-    const selectionStart = target.selectionStart ?? 0
-    const selectionEnd = target.selectionEnd ?? selectionStart
-
-    return {
-        selectionStart,
-        selectionEnd,
-        rawStart: Math.min(selectionStart, selectionEnd),
-        rawEnd: Math.max(selectionStart, selectionEnd),
-        direction: target.selectionDirection === "backward" ? "backward" : "forward",
-    }
-}
-
-// Input component props definition
-export type InputSyntaxSegment = {
-    type: "text" | "block"
-    start: number
-    end: number
-    visualLength: number
-    content?: string | React.ReactNode
-}
-
-type VisualizedInputSyntaxSegment = InputSyntaxSegment & {
-    visualStart: number
-    visualEnd: number
-}
-
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
-    suggestions?: InputSuggestion[] // Optional suggestions shown in dropdown
-    suggestionsHeader?: React.ReactNode // Custom header above suggestions
-    suggestionsFooter?: React.ReactNode // Custom footer below suggestions
-    onSuggestionSelect?: (suggestion: InputSuggestion) => void // Callback when a suggestion is selected
-    transformSyntax?: (value: T) => InputSyntaxSegment[] // Build a structured syntax model
+    suggestions?: InputSuggestion[]
+    suggestionsHeader?: React.ReactNode
+    suggestionsFooter?: React.ReactNode
+    onSuggestionSelect?: (suggestion: InputSuggestion) => void
+    transformSyntax?: (value: T) => InputSyntaxSegment[]
     disableOnValue?: (value: T) => boolean
 
-    wrapperComponent?: Code0Component<HTMLDivElement> // Props for the wrapping div
-    right?: React.ReactNode // Right-side icon or element
-    left?: React.ReactNode // Left-side icon or element
-    leftType?: "action" | "placeholder" | "icon" // Visual type for left slot
-    rightType?: "action" | "placeholder" | "icon" // Visual type for right slot
-    title?: React.ReactNode // Input label
-    description?: React.ReactNode // Label description below title
+    wrapperComponent?: Code0Component<HTMLDivElement>
+    right?: React.ReactNode
+    left?: React.ReactNode
+    leftType?: "action" | "placeholder" | "icon"
+    rightType?: "action" | "placeholder" | "icon"
+    title?: React.ReactNode
+    description?: React.ReactNode
 
 }
 
 export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
-        const inputRef = ref || useRef<HTMLInputElement>(null) // External ref or fallback internal ref
-        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null) // Ref to suggestion list
-        const syntaxRef = useRef<HTMLDivElement | null>(null) // Ref to syntax overlay
-        const [open, setOpen] = useState(false) // Dropdown open state
-        const shouldPreventCloseRef = useRef(true) // Controls if dropdown should stay open on click
+        const inputRef = ref || useRef<HTMLInputElement>(null)
+        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null)
+        const syntaxRef = useRef<HTMLDivElement>(null)
+        const [open, setOpen] = useState(false)
+        const shouldPreventCloseRef = useRef(true)
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
-        const [visualSelectionRange, setVisualSelectionRange] = useState<{start: number, end: number} | null>(null)
+        const [visualSelectionRange, setVisualSelectionRange] = useState<{ start: number, end: number } | null>(null)
         const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
         const [isFocused, setIsFocused] = useState(false)
 
@@ -138,24 +81,23 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             suggestionsFooter,
             onSuggestionSelect,
             disableOnValue = () => false,
+            transformSyntax,
             ...rest
         } = props
 
-        // Sync input value changes to external validation state
         useEffect(() => {
             const el = inputRef.current
             if (!el || !formValidation?.setValue) return
 
             const handleChange = (event: any) => {
-                const value = rest.type !== "checkbox" ? event.target.value : event.target.checked // Support checkbox
-                formValidation.setValue?.(value) // Push value to form context
+                const nextValue = rest.type !== "checkbox" ? event.target.value : event.target.checked
+                formValidation.setValue?.(nextValue)
             }
 
-            el.addEventListener("change", handleChange) // Native listener
-            return () => el.removeEventListener("change", handleChange) // Cleanup
+            el.addEventListener("change", handleChange)
+            return () => el.removeEventListener("change", handleChange)
         }, [formValidation?.setValue])
 
-        // Manage click-outside logic for dropdown
         useEffect(() => {
             if (!suggestions) return
 
@@ -164,7 +106,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 const insideInput = !!inputRef.current?.contains(target)
                 const insideSyntax = !!syntaxRef.current?.contains(target)
 
-                shouldPreventCloseRef.current = insideInput || insideSyntax // Stay open if click is inside
+                shouldPreventCloseRef.current = insideInput || insideSyntax
             }
 
             document.addEventListener("pointerdown", handlePointerDown, true)
@@ -191,7 +133,6 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
         }, [inputRef, disabledOnValue])
 
-
         const focusInputCaretAtEnd = React.useCallback(() => {
             setTimeout(() => {
                 const target = inputRef.current
@@ -206,285 +147,21 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }, 0)
         }, [inputRef])
 
-        const buildDefaultSyntax = React.useCallback((): InputSyntaxSegment[] => {
-            const rawValue = value ?? ""
-            const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
-
-            return [{
-                type: "text",
-                start: 0,
-                end: textValue.length,
-                visualLength: textValue.length,
-                content: textValue,
-            }]
-        }, [value])
-
-        const syntaxSegments = React.useMemo(() => {
-            if (props.transformSyntax) {
-                const segments = props.transformSyntax(value)
-                if (segments?.length) return segments
-            }
-
-            return buildDefaultSyntax()
-        }, [buildDefaultSyntax, props.transformSyntax, value])
-
-        const visualizedSyntaxSegments = React.useMemo((): VisualizedInputSyntaxSegment[] => {
-            let visualStart = 0
-
-            return syntaxSegments.map((segment) => {
-                const nextSegment: VisualizedInputSyntaxSegment = {
-                    ...segment,
-                    visualStart,
-                    visualEnd: visualStart + segment.visualLength,
-                }
-
-                visualStart = nextSegment.visualEnd
-
-                return nextSegment
-            })
-        }, [syntaxSegments])
-
-        const expandSelectionRangeToBlockBoundaries = React.useCallback((rawStart: number, rawEnd: number) => {
-            let adjustedStart = Math.min(rawStart, rawEnd)
-            let adjustedEnd = Math.max(rawStart, rawEnd)
-            let hasBlockOverlap = false
-
-            visualizedSyntaxSegments.forEach((segment) => {
-                if (segment.type !== "block") return
-
-                const overlaps = adjustedStart < segment.end && adjustedEnd > segment.start
-                if (!overlaps) return
-
-                adjustedStart = Math.min(adjustedStart, segment.start)
-                adjustedEnd = Math.max(adjustedEnd, segment.end)
-                hasBlockOverlap = true
-            })
-
-            return {start: adjustedStart, end: adjustedEnd, hasBlockOverlap}
-        }, [visualizedSyntaxSegments])
-
-        const normalizeSelectionForAtomicBlocks = React.useCallback((target: HTMLInputElement) => {
-            if (!props.transformSyntax) return
-
-            const {selectionStart, selectionEnd} = getSelectionMetrics(target)
-            if (selectionStart === selectionEnd) return
-
-            const {start, end, hasBlockOverlap} = expandSelectionRangeToBlockBoundaries(selectionStart, selectionEnd)
-
-            if (!hasBlockOverlap) return
-            if (start === selectionStart && end === selectionEnd) return
-
-            setSelectionRangeSafe(target, start, end)
-        }, [expandSelectionRangeToBlockBoundaries, props.transformSyntax])
-
-
-        const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
-            if (!inputRef.current) return
-
-            const suggestionRaw = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
-            const suggestionValue = suggestionRaw === undefined || suggestionRaw === null ? "" : String(suggestionRaw)
-            const insertMode = suggestion.insertMode ?? "replace"
-            const currentValue = inputRef.current.value ?? ""
-
-            let nextValue = currentValue
-            let nextCaretPosition: number | null = null
-
-            switch (insertMode) {
-            case "append": {
-                nextValue = `${currentValue}${suggestionValue}`
-                nextCaretPosition = nextValue.length
-                break
-            }
-            case "prepend": {
-                nextValue = `${suggestionValue}${currentValue}`
-                nextCaretPosition = suggestionValue.length
-                break
-            }
-            case "insert": {
-                const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
-                const {start, end} = props.transformSyntax
-                    ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
-                    : {start: rawStart, end: rawEnd}
-
-                nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
-                nextCaretPosition = start + suggestionValue.length
-                break
-            }
-            case "replace":
-            default: {
-                nextValue = suggestionValue
-                nextCaretPosition = suggestionValue.length
-                break
-            }
-            }
-
-            setElementKey(
-                inputRef.current,
-                "value",
-                nextValue,
-                "change",
-            )
-
-            if (nextCaretPosition !== null) {
-                requestAnimationFrame(() => {
-                    const target = inputRef.current
-                    if (!target) return
-
-                    target.focus({preventScroll: true})
-                    setSelectionRangeSafe(target, nextCaretPosition, nextCaretPosition)
-                })
-            }
-        }, [expandSelectionRangeToBlockBoundaries, inputRef, props.transformSyntax, value])
-
-
-        const totalVisualLength = React.useMemo(() => {
-            const lastSegment = visualizedSyntaxSegments[visualizedSyntaxSegments.length - 1]
-            return lastSegment ? lastSegment.visualEnd : 0
-        }, [visualizedSyntaxSegments])
-
-        const ensureVisualIndexVisible = React.useCallback((visualIndex: number | null) => {
-            if (visualIndex === null) return
-            if (!inputRef.current || !syntaxRef.current) return
-
-            const syntaxElement = syntaxRef.current
-            const roundedIndex = Math.round(visualIndex)
-
-            const caretElement = syntaxElement.querySelector<HTMLElement>(`[data-visual-index="${roundedIndex}"]`)
-
-            let offsetStart: number | null = null
-            let offsetEnd: number | null = null
-
-            if (caretElement) {
-                offsetStart = caretElement.offsetLeft
-                offsetEnd = caretElement.offsetLeft + caretElement.offsetWidth
-            } else {
-                const segments = Array.from(
-                    syntaxElement.querySelectorAll<HTMLElement>("[data-visual-start][data-visual-end]")
-                )
-
-                const matchingSegment = segments.find((segment) => {
-                    const segmentStart = Number(segment.dataset.visualStart)
-                    const segmentEnd = Number(segment.dataset.visualEnd)
-
-                    return Number.isFinite(segmentStart)
-                        && Number.isFinite(segmentEnd)
-                        && roundedIndex >= segmentStart
-                        && roundedIndex <= segmentEnd
-                })
-
-                if (matchingSegment) {
-                    const segmentStart = Number(matchingSegment.dataset.visualStart) || 0
-                    const segmentEnd = Number(matchingSegment.dataset.visualEnd) || segmentStart
-                    const segmentWidth = matchingSegment.offsetWidth
-                    const ratio = segmentEnd === segmentStart
-                        ? 0
-                        : (roundedIndex - segmentStart) / (segmentEnd - segmentStart)
-
-                    offsetStart = matchingSegment.offsetLeft + segmentWidth * ratio
-                    offsetEnd = offsetStart
-                }
-            }
-
-            if (offsetStart === null || offsetEnd === null) return
-
-            const viewStart = syntaxElement.scrollLeft
-            const viewEnd = viewStart + syntaxElement.clientWidth
-            const padding = 8
-
-            let nextScrollLeft = viewStart
-
-            if (offsetStart - padding < viewStart) {
-                nextScrollLeft = Math.max(offsetStart - padding, 0)
-            } else if (offsetEnd + padding > viewEnd) {
-                nextScrollLeft = Math.max(offsetEnd + padding - syntaxElement.clientWidth, 0)
-            }
-
-            if (nextScrollLeft === viewStart) return
-
-            inputRef.current.scrollLeft = nextScrollLeft
-            syntaxElement.scrollLeft = nextScrollLeft
-        }, [inputRef, syntaxRef])
-
-        const syncSyntaxScroll = React.useCallback(() => {
-            if (!inputRef.current || !syntaxRef.current) return
-
-            syntaxRef.current.scrollLeft = inputRef.current.scrollLeft
-        }, [inputRef, syntaxRef])
-
-        const mapVisualIndexToRawIndex = React.useCallback((visualIndex: number): number => {
-            const segment = visualizedSyntaxSegments.find((item) => visualIndex >= item.visualStart && visualIndex <= item.visualEnd)
-            if (!segment) {
-                const inputLength = inputRef.current?.value.length ?? 0
-                return Math.max(0, Math.min(visualIndex, inputLength))
-            }
-
-            const rawLength = segment.end - segment.start
-            const clampedVisual = Math.min(Math.max(visualIndex - segment.visualStart, 0), segment.visualLength)
-
-            if (rawLength <= 0) return segment.start
-            if (segment.type === "text") {
-                return Math.min(segment.start + Math.round(clampedVisual), segment.end)
-            }
-
-            if (segment.visualLength <= 0) return segment.start
-
-            const ratio = clampedVisual / segment.visualLength
-            return Math.round(segment.start + ratio * rawLength)
-        }, [inputRef, visualizedSyntaxSegments])
-
-        const mapRawIndexToVisualIndex = React.useCallback((rawIndex: number): number => {
-            const segment = visualizedSyntaxSegments.find((item) => rawIndex >= item.start && rawIndex <= item.end)
-
-            if (!segment) {
-                const inputLength = inputRef.current?.value.length ?? 0
-                return Math.max(0, Math.min(rawIndex, inputLength))
-            }
-
-            const rawLength = segment.end - segment.start
-            const clampedRaw = Math.min(Math.max(rawIndex - segment.start, 0), rawLength)
-
-            if (rawLength <= 0) return segment.visualStart
-            if (segment.type === "text") {
-                return Math.min(segment.visualStart + clampedRaw, segment.visualEnd)
-            }
-
-            if (segment.visualLength <= 0) return segment.visualStart
-
-            const ratio = clampedRaw / rawLength
-            return Math.min(segment.visualStart + ratio * segment.visualLength, segment.visualEnd)
-        }, [inputRef, visualizedSyntaxSegments])
-
-        const resolvedVisualSelectionRange = React.useMemo(() => {
-            if (!props.transformSyntax) return null
-
-            const target = inputRef.current
-            if (!target) return visualSelectionRange
-
-            const {rawStart, rawEnd} = getSelectionMetrics(target)
-
-            if (rawStart === rawEnd) return null
-
-            let visualStart = mapRawIndexToVisualIndex(rawStart)
-            let visualEnd = mapRawIndexToVisualIndex(rawEnd)
-
-            visualizedSyntaxSegments.forEach((segment) => {
-                if (segment.type !== "block") return
-
-                const overlaps = rawStart < segment.end && rawEnd > segment.start
-                if (!overlaps) return
-
-                visualStart = Math.min(visualStart, segment.visualStart)
-                visualEnd = Math.max(visualEnd, segment.visualEnd)
-            })
-
-            const clampedStart = Math.min(visualStart, visualEnd)
-            const clampedEnd = Math.max(visualStart, visualEnd)
-
-            return {start: clampedStart, end: clampedEnd}
-        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, visualSelectionRange, visualizedSyntaxSegments])
+        const {
+            visualizedSyntaxSegments,
+            expandSelectionRangeToBlockBoundaries,
+            mapVisualIndexToRawIndex,
+            mapRawIndexToVisualIndex,
+            totalVisualLength,
+        } = useSyntaxModel(value, transformSyntax, inputRef)
+
+        const {ensureVisualIndexVisible, syncSyntaxScroll} = useSelectionVisibility(inputRef, syntaxRef)
+
+        const normalizeSelectionForAtomicBlocks = useSelectionNormalization(transformSyntax, expandSelectionRangeToBlockBoundaries,)
+        const selectionAnchorRef = useRef<number | null>(null)
 
         const updateVisualSelectionRange = React.useCallback(() => {
-            if (!props.transformSyntax) return
+            if (!transformSyntax) return
 
             const target = inputRef.current
             if (!target) return
@@ -556,9 +233,15 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 syncSyntaxScroll()
                 ensureVisualIndexVisible(activeBoundary)
             })
-        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, props.transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
+        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
 
-        const selectionAnchorRef = useRef<number | null>(null)
+        const resolvedVisualSelectionRange: ResolvedVisualSelectionRange = useSelectionResolution(
+            transformSyntax,
+            inputRef,
+            visualSelectionRange,
+            visualizedSyntaxSegments,
+            mapRawIndexToVisualIndex,
+        )
 
         const resolveRawIndexFromElement = React.useCallback((element: HTMLElement | null): number | null => {
             if (!element) return null
@@ -636,7 +319,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [])
 
         const handleAtomicDeletion = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>): boolean => {
-            if (!props.transformSyntax) return false
+            if (!transformSyntax) return false
 
             const target = event.target as HTMLInputElement
             const {rawStart, rawEnd} = getSelectionMetrics(target)
@@ -685,14 +368,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
 
             return false
-        }, [expandSelectionRangeToBlockBoundaries, props.transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
+        }, [expandSelectionRangeToBlockBoundaries, transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
 
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (props.transformSyntax) {
+            if (transformSyntax) {
                 normalizeSelectionForAtomicBlocks(event.target as HTMLInputElement)
             }
 
-            if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+            if (transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
                 const target = event.target as HTMLInputElement
                 const {selectionStart, selectionEnd, rawStart, rawEnd, direction} = getSelectionMetrics(target)
                 const visualDelta = event.key === "ArrowLeft" ? -1 : 1
@@ -743,7 +426,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 if (event.defaultPrevented) return
             }
 
-            if (props.transformSyntax && (event.key === "Backspace" || event.key === "Delete")) {
+            if (transformSyntax && (event.key === "Backspace" || event.key === "Delete")) {
                 const handled = handleAtomicDeletion(event)
                 if (handled) return
             }
@@ -755,18 +438,18 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 const wasOpen = open
                 setOpen(true)
                 if (!wasOpen) {
-                    setTimeout(() => menuRef.current?.focusFirstItem(), 0) // Open and preselect first item
+                    setTimeout(() => menuRef.current?.focusFirstItem(), 0)
                 } else {
-                    menuRef.current?.highlightNextItem() // Navigate down while keeping input focus
+                    menuRef.current?.highlightNextItem()
                 }
             } else if (event.key === "ArrowUp") {
                 event.preventDefault()
                 const wasOpen = open
                 setOpen(true)
                 if (!wasOpen) {
-                    setTimeout(() => menuRef.current?.focusLastItem(), 0) // Open and preselect last item
+                    setTimeout(() => menuRef.current?.focusLastItem(), 0)
                 } else {
-                    menuRef.current?.highlightPreviousItem() // Navigate up while keeping input focus
+                    menuRef.current?.highlightPreviousItem()
                 }
             } else if (event.key === "Enter" && open) {
                 const selected = menuRef.current?.selectActiveItem()
@@ -774,7 +457,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     setOpen(false)
                 }
             }
-        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, syncSyntaxScroll, suggestions, totalVisualLength, transformSyntax, updateVisualSelectionRange])
 
         const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === " " || event.code === "Space") {
@@ -806,7 +489,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
         useEffect(() => {
             const target = inputRef.current
-            if (!target || !props.transformSyntax) return
+            if (!target || !transformSyntax) return
 
             const syncSelection = () => requestAnimationFrame(updateVisualSelectionRange)
 
@@ -818,10 +501,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return () => {
                 events.forEach((event) => target.removeEventListener(event, syncSelection))
             }
-        }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
+        }, [inputRef, transformSyntax, updateVisualSelectionRange])
 
         useEffect(() => {
-            if (!props.transformSyntax) return
+            if (!transformSyntax) return
 
             const handleSelectionChange = () => {
                 if (document.activeElement !== inputRef.current) return
@@ -830,7 +513,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
             document.addEventListener("selectionchange", handleSelectionChange)
             return () => document.removeEventListener("selectionchange", handleSelectionChange)
-        }, [inputRef, props.transformSyntax, updateVisualSelectionRange])
+        }, [inputRef, transformSyntax, updateVisualSelectionRange])
 
         useEffect(() => {
             const target = inputRef.current
@@ -848,133 +531,83 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         }, [syncSyntaxScroll, value, visualCaretIndex, visualSelectionRange])
 
         useEffect(() => {
-            if (props.transformSyntax) return
+            if (transformSyntax) return
 
             setVisualSelectionRange(null)
             setVisualCaretIndex(null)
-        }, [props.transformSyntax])
+        }, [transformSyntax])
 
-        const renderSyntaxSegments = React.useCallback((segments: VisualizedInputSyntaxSegment[]) => {
-            let caretRendered = false
+        const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
+            if (!inputRef.current) return
 
-            const isVisualRangeSelected = (visualStart: number, visualEnd: number) => {
-                if (!resolvedVisualSelectionRange) return false
+            const suggestionRaw = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
+            const suggestionValue = suggestionRaw === undefined || suggestionRaw === null ? "" : String(suggestionRaw)
+            const insertMode = suggestion.insertMode ?? "replace"
+            const currentValue = inputRef.current.value ?? ""
 
-                return resolvedVisualSelectionRange.start < visualEnd && resolvedVisualSelectionRange.end > visualStart
-            }
+            let nextValue = currentValue
+            let nextCaretPosition: number | null = null
 
-            const shouldRenderCaret = (visualIndex: number) => {
-                if (!isFocused) return false
-                if (resolvedVisualSelectionRange) return false
-                if (visualCaretIndex === null) return false
-
-                if (caretRendered) return false
-
-                const matches = Math.round(visualCaretIndex) === Math.round(visualIndex)
-
-                if (matches) {
-                    caretRendered = true
+            switch (insertMode) {
+                case "append": {
+                    nextValue = `${currentValue}${suggestionValue}`
+                    nextCaretPosition = nextValue.length
+                    break
                 }
+                case "prepend": {
+                    nextValue = `${suggestionValue}${currentValue}`
+                    nextCaretPosition = suggestionValue.length
+                    break
+                }
+                case "insert": {
+                    const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
+                    const {start, end} = transformSyntax
+                        ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
+                        : {start: rawStart, end: rawEnd}
 
-                return matches
+                    nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
+                    nextCaretPosition = start + suggestionValue.length
+                    break
+                }
+                case "replace":
+                default: {
+                    nextValue = suggestionValue
+                    nextCaretPosition = suggestionValue.length
+                    break
+                }
             }
 
-            const renderCaret = (visualIndex: number) => (
-                <span
-                    key={`caret-${visualIndex}`}
-                    className="input__syntax-caret"
-                    data-visual-index={visualIndex}
-                    aria-hidden
-                />
+            setElementKey(
+                inputRef.current,
+                "value",
+                nextValue,
+                "change",
             )
 
-            return segments.map((segment, index) => {
-                const key = `${segment.start}-${segment.end}-${index}`
+            if (nextCaretPosition !== null) {
+                requestAnimationFrame(() => {
+                    const target = inputRef.current
+                    if (!target) return
 
-                const content = typeof segment.content === "string"
-                    ? segment.content
-                    : segment.content ?? null
-
-                const className = [
-                    segment.type === "block" ? "input__syntax-block" : "input__syntax-text",
-                    segment.type === "block" && isVisualRangeSelected(segment.visualStart, segment.visualEnd)
-                        ? "input__syntax-block--selected"
-                        : "",
-                ].filter(Boolean).join(" ")
-
-                const commonDataAttributes = {
-                    "data-visual-start": segment.visualStart,
-                    "data-visual-end": segment.visualEnd,
-                    "data-visual-length": segment.visualLength,
-                    "data-raw-start": segment.start,
-                    "data-raw-end": segment.end,
-                }
-
-                if (typeof content === "string" && segment.type === "text") {
-                    const children: React.ReactNode[] = []
-
-                    content.split("").forEach((char, charIndex) => {
-                        const visualIndex = segment.visualStart + charIndex
-                        const rawIndex = segment.start + charIndex
-                        const isSelected = isVisualRangeSelected(visualIndex, visualIndex + 1)
-
-                        if (shouldRenderCaret(visualIndex)) {
-                            children.push(renderCaret(visualIndex))
-                        }
-
-                        children.push(
-                            <span
-                                key={`${key}-${charIndex}`}
-                                className={[
-                                    "input__syntax-char",
-                                    isSelected ? "input__syntax-char--selected" : "",
-                                ].filter(Boolean).join(" ")}
-                                data-visual-index={visualIndex}
-                                data-raw-index={rawIndex}
-                            >
-                                {char}
-                            </span>
-                        )
-                    })
-
-                    if (shouldRenderCaret(segment.visualEnd)) {
-                        children.push(renderCaret(segment.visualEnd))
-                    }
-
-                    return (
-                        <span key={key} className={className} {...commonDataAttributes}>
-                            {children}
-                        </span>
-                    )
-                }
-
-                return (
-                    <span key={key} className={className} {...commonDataAttributes}>
-                        {shouldRenderCaret(segment.visualStart) && renderCaret(segment.visualStart)}
-                        {content}
-                        {shouldRenderCaret(segment.visualEnd) && renderCaret(segment.visualEnd)}
-                    </span>
-                )
-            })
-        }, [isFocused, resolvedVisualSelectionRange, visualCaretIndex])
-
-        const syntax = React.useMemo(() => {
-            if (props.transformSyntax) {
-                return (
-                    <div
-                        className={"input__syntax"}
-                        ref={syntaxRef}
-                        onPointerDown={handleSyntaxPointerDown}
-                        onPointerMove={handleSyntaxPointerMove}
-                        onPointerUp={handleSyntaxPointerUp}
-                    >
-                        {renderSyntaxSegments(visualizedSyntaxSegments)}
-                    </div>
-                )
+                    target.focus({preventScroll: true})
+                    setSelectionRangeSafe(target, nextCaretPosition, nextCaretPosition)
+                })
             }
+        }, [expandSelectionRangeToBlockBoundaries, inputRef, transformSyntax, value])
 
-            return null
-        }, [handleSyntaxPointerDown, props.transformSyntax, renderSyntaxSegments, visualizedSyntaxSegments])
+        const syntax = useMemo(() => (
+            <InputSyntax
+                transformSyntax={transformSyntax}
+                syntaxRef={syntaxRef}
+                visualizedSyntaxSegments={visualizedSyntaxSegments}
+                resolvedVisualSelectionRange={resolvedVisualSelectionRange}
+                visualCaretIndex={visualCaretIndex}
+                isFocused={isFocused}
+                onPointerDown={handleSyntaxPointerDown}
+                onPointerMove={handleSyntaxPointerMove}
+                onPointerUp={handleSyntaxPointerUp}
+            />
+        ), [handleSyntaxPointerDown, handleSyntaxPointerUp, handleSyntaxPointerMove, isFocused, resolvedVisualSelectionRange, transformSyntax, visualCaretIndex, visualizedSyntaxSegments])
 
         const suggestionMenu = useMemo(() => (
             <Menu
@@ -993,18 +626,18 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     }
                 }}
             >
-                        <MenuTrigger asChild>
-                            <input
-                                ref={inputRef as LegacyRef<HTMLInputElement>}
-                                {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
-                                onFocus={handleFocus}
-                                onBlur={handleBlur}
-                                onKeyDownCapture={handleKeyDownCapture}
-                                onKeyDown={handleKeyDown}
-                                spellCheck={false}
-                                disabled={disabled || disabledOnValue}
-                            />
-                        </MenuTrigger>
+                <MenuTrigger asChild>
+                    <input
+                        ref={inputRef as LegacyRef<HTMLInputElement>}
+                        {...mergeCode0Props(`input__control ${transformSyntax ? "input__control--syntax" : ""}`, rest)}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        onKeyDownCapture={handleKeyDownCapture}
+                        onKeyDown={handleKeyDown}
+                        spellCheck={false}
+                        disabled={disabled || disabledOnValue}
+                    />
+                </MenuTrigger>
                 <MenuPortal>
                     <InputSuggestionMenuContent inputRef={inputRef}>
                         {suggestionsHeader}
@@ -1029,7 +662,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, focusInputCaretAtEnd, handleKeyDown, handleKeyDownCapture, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
+        ), [applySuggestionValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, transformSyntax, value])
 
         return (
             <>
@@ -1039,7 +672,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 <div
                     {...mergeCode0Props(
                         `input ${!formValidation?.valid ? "input--not-valid" : ""}`,
-                        wrapperComponent
+                        wrapperComponent,
                     )}
                 >
                     {left && <div className={`input__left input__left--${leftType}`}>{left}</div>}
@@ -1055,7 +688,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             onBlur={handleBlur}
                             onKeyDownCapture={handleKeyDownCapture}
                             onKeyDown={handleKeyDown}
-                            {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
+                            {...mergeCode0Props(`input__control ${transformSyntax ? "input__control--syntax" : ""}`, rest)}
                         />
                     )}
 
@@ -1070,5 +703,5 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 )}
             </>
         )
-    }
+    },
 )

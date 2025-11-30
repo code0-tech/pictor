@@ -14,7 +14,7 @@ import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
 import {Badge} from "../badge/Badge";
-import {InputSyntaxSegment} from "./Input";
+import {InputSyntaxSegment} from "./Input.syntax.hook";
 
 export default {
     title: "Form"

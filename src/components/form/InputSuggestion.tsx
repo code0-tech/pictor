@@ -110,13 +110,6 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         return {groupLabelCount: labels, visibleSuggestionCount: visible, visibleSuggestions: flatVisible}
     }, [collapsedGroups, suggestions])
 
-    const toggleGroup = (groupLabel: string) => {
-        setCollapsedGroups(prev => ({
-            ...prev,
-            [groupLabel]: !prev[groupLabel],
-        }))
-    }
-
     React.useEffect(() => {
         setActiveIndex(prev => {
             if (prev === null) return prev
@@ -168,6 +161,13 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         },
         clearActiveItem: () => setActiveIndex(null)
     }), [activeIndex, onSuggestionSelect, visibleSuggestions])
+
+    const toggleGroup = (groupLabel: string) => {
+        setCollapsedGroups(prev => ({
+            ...prev,
+            [groupLabel]: !prev[groupLabel],
+        }))
+    }
 
     // @ts-ignore
     itemRefs.current = []

@@ -133,17 +133,19 @@ const renderSyntaxSegments = (
     })
 }
 
-export const InputSyntax = ({
-                                transformSyntax,
-                                syntaxRef,
-                                visualizedSyntaxSegments,
-                                resolvedVisualSelectionRange,
-                                visualCaretIndex,
-                                isFocused,
-                                onPointerDown,
-                                onPointerMove,
-                                onPointerUp,
-                            }: InputSyntaxProps) => {
+export const InputSyntax: React.FC<InputSyntaxProps> = (props) => {
+    const {
+        transformSyntax,
+        syntaxRef,
+        visualizedSyntaxSegments,
+        resolvedVisualSelectionRange,
+        visualCaretIndex,
+        isFocused,
+        onPointerDown,
+        onPointerMove,
+        onPointerUp,
+    } = props
+
     if (!transformSyntax) return null
 
     return (

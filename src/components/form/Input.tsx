@@ -7,7 +7,7 @@
  * this component provides robust interaction patterns and user guidance.
  */
 
-import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
+import React, {LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
 
 import {Code0Component, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "./useForm"
@@ -54,18 +54,8 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
 
 }
 
-export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRef(
+const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
     (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
-        const inputRef = ref || useRef<HTMLInputElement>(null)
-        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null)
-        const syntaxRef = useRef<HTMLDivElement>(null)
-        const [open, setOpen] = useState(false)
-        const shouldPreventCloseRef = useRef(true)
-        const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
-        const [visualSelectionRange, setVisualSelectionRange] = useState<{ start: number, end: number } | null>(null)
-        const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
-        const [isFocused, setIsFocused] = useState(false)
-
         const {
             wrapperComponent = {},
             title,
@@ -85,6 +75,20 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             ...rest
         } = props
 
+        const inputRef = ref || useRef<HTMLInputElement>(null)
+        const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null)
+        const syntaxRef = useRef<HTMLDivElement>(null)
+        const shouldPreventCloseRef = useRef(true)
+        const selectionAnchorRef = useRef<number | null>(null)
+
+        const [open, setOpen] = useState(false)
+        const [value, setValue] = useState<any>(props.defaultValue || props.initialValue || props.placeholder)
+        const [visualSelectionRange, setVisualSelectionRange] = useState<{ start: number, end: number } | null>(null)
+        const [visualCaretIndex, setVisualCaretIndex] = useState<number | null>(null)
+        const [isFocused, setIsFocused] = useState(false)
+
+        const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
+
         useEffect(() => {
             const el = inputRef.current
             if (!el || !formValidation?.setValue) return
@@ -96,7 +100,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
             el.addEventListener("change", handleChange)
             return () => el.removeEventListener("change", handleChange)
-        }, [formValidation?.setValue])
+        }, [formValidation?.setValue, inputRef, rest.type])
 
         useEffect(() => {
             if (!suggestions) return
@@ -111,9 +115,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
             document.addEventListener("pointerdown", handlePointerDown, true)
             return () => document.removeEventListener("pointerdown", handlePointerDown, true)
-        }, [suggestions])
-
-        const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
+        }, [inputRef, suggestions])
 
         useEffect(() => {
             const target = inputRef.current
@@ -131,7 +133,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 target.removeEventListener("change", syncValue)
                 target.removeEventListener("input", syncValue)
             }
-        }, [inputRef, disabledOnValue])
+        }, [disabledOnValue, inputRef])
 
         const focusInputCaretAtEnd = React.useCallback(() => {
             setTimeout(() => {
@@ -157,8 +159,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
         const {ensureVisualIndexVisible, syncSyntaxScroll} = useSelectionVisibility(inputRef, syntaxRef)
 
-        const normalizeSelectionForAtomicBlocks = useSelectionNormalization(transformSyntax, expandSelectionRangeToBlockBoundaries,)
-        const selectionAnchorRef = useRef<number | null>(null)
+        const normalizeSelectionForAtomicBlocks = useSelectionNormalization(
+            transformSyntax,
+            expandSelectionRangeToBlockBoundaries,
+        )
 
         const updateVisualSelectionRange = React.useCallback(() => {
             if (!transformSyntax) return
@@ -233,7 +237,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 syncSyntaxScroll()
                 ensureVisualIndexVisible(activeBoundary)
             })
-        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
+        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, syncSyntaxScroll, transformSyntax, visualizedSyntaxSegments])
 
         const resolvedVisualSelectionRange: ResolvedVisualSelectionRange = useSelectionResolution(
             transformSyntax,
@@ -457,7 +461,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     setOpen(false)
                 }
             }
-        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, syncSyntaxScroll, suggestions, totalVisualLength, transformSyntax, updateVisualSelectionRange])
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, suggestions, syncSyntaxScroll, totalVisualLength, transformSyntax, updateVisualSelectionRange])
 
         const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === " " || event.code === "Space") {
@@ -662,7 +666,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, transformSyntax, value])
+        ), [applySuggestionValue, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestions, suggestionsFooter, suggestionsHeader, transformSyntax])
 
         return (
             <>
@@ -705,3 +709,5 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         )
     },
 )
+
+export const Input: React.FC<InputProps<any>> = InputComponent as React.FC<InputProps<any>>

@@ -363,7 +363,7 @@ export const InputSuggestionStory = () => {
 
         let cursor = 0
 
-        return appliedParts.length > 0 ? appliedParts.map((part: string | InputSuggestion) => {
+        return appliedParts.map((part: string | InputSuggestion) => {
             if (typeof part === "object") {
                 const segment = {
                     type: "block",
@@ -388,13 +388,7 @@ export const InputSuggestionStory = () => {
 
             cursor += textString.length
             return segment
-        }) as InputSyntaxSegment[] : [{
-            type: "text",
-            start: 0,
-            end: value ? value.length : 0,
-            visualLength: value ? value.length : 0,
-            content: value ?? "",
-        }]
+        }) as InputSyntaxSegment[]
     }
 
     return <Card maw={300}>

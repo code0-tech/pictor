@@ -9,9 +9,8 @@
 
 import React, {ForwardRefExoticComponent, LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
 
-import {Code0Component} from "../../utils"
+import {Code0Component, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "./useForm"
-import {mergeCode0Props} from "../../utils"
 
 import "./Input.style.scss"
 
@@ -52,6 +51,32 @@ export type Code0Input = Omit<
     Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
     "title"
 >
+
+const setSelectionRangeSafe = (
+    target: HTMLInputElement,
+    start: number,
+    end: number,
+    direction?: "forward" | "backward" | "none"
+) => {
+    try {
+        target.setSelectionRange(start, end, direction)
+    } catch {
+        // Some input types (e.g., number) don't support selection ranges
+    }
+}
+
+const getSelectionMetrics = (target: HTMLInputElement) => {
+    const selectionStart = target.selectionStart ?? 0
+    const selectionEnd = target.selectionEnd ?? selectionStart
+
+    return {
+        selectionStart,
+        selectionEnd,
+        rawStart: Math.min(selectionStart, selectionEnd),
+        rawEnd: Math.max(selectionStart, selectionEnd),
+        direction: target.selectionDirection === "backward" ? "backward" : "forward",
+    }
+}
 
 // Input component props definition
 export type InputSyntaxSegment = {
@@ -99,21 +124,21 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const [isFocused, setIsFocused] = useState(false)
 
         const {
-            wrapperComponent = {}, // Default empty wrapper props
-            title, // Optional input label
-            description, // Optional description below label
-            disabled = false, // Input disabled state
-            left, // Left element (icon/button)
-            right, // Right element (icon/button)
-            leftType = "icon", // Visual hint for left
-            rightType = "action", // Visual hint for right
-            formValidation = {valid: true, notValidMessage: null, setValue: null}, // Validation config
-            suggestions, // Optional suggestions array
-            suggestionsHeader, // Optional header above suggestion list
-            suggestionsFooter, // Optional footer below suggestion list
-            onSuggestionSelect, // Callback for suggestion selection,
+            wrapperComponent = {},
+            title,
+            description,
+            disabled = false,
+            left,
+            right,
+            leftType = "icon",
+            rightType = "action",
+            formValidation = {valid: true, notValidMessage: null, setValue: null},
+            suggestions,
+            suggestionsHeader,
+            suggestionsFooter,
+            onSuggestionSelect,
             disableOnValue = () => false,
-            ...rest // Remaining native input props
+            ...rest
         } = props
 
         // Sync input value changes to external validation state
@@ -149,15 +174,21 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
 
         useEffect(() => {
-            if (!inputRef.current) return
-            inputRef.current.addEventListener("change", (e: any) => {
+            const target = inputRef.current
+            if (!target) return
+
+            const syncValue = (e: any) => {
                 if (disabledOnValue) return
                 setValue(e.target.value)
-            })
-            inputRef.current.addEventListener("input", (e: any) => {
-                if (disabledOnValue) return
-                setValue(e.target.value)
-            })
+            }
+
+            target.addEventListener("change", syncValue)
+            target.addEventListener("input", syncValue)
+
+            return () => {
+                target.removeEventListener("change", syncValue)
+                target.removeEventListener("input", syncValue)
+            }
         }, [inputRef, disabledOnValue])
 
 
@@ -169,11 +200,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 target.focus({preventScroll: true})
                 const caretPosition = target.value.length
 
-                try {
-                    target.setSelectionRange(caretPosition, caretPosition)
-                } catch {
-                    // Some input types (e.g., number) don't support selection ranges
-                }
+                setSelectionRangeSafe(target, caretPosition, caretPosition)
 
                 target.scrollLeft = target.scrollWidth
             }, 0)
@@ -239,9 +266,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const normalizeSelectionForAtomicBlocks = React.useCallback((target: HTMLInputElement) => {
             if (!props.transformSyntax) return
 
-            const selectionStart = target.selectionStart ?? 0
-            const selectionEnd = target.selectionEnd ?? selectionStart
-
+            const {selectionStart, selectionEnd} = getSelectionMetrics(target)
             if (selectionStart === selectionEnd) return
 
             const {start, end, hasBlockOverlap} = expandSelectionRangeToBlockBoundaries(selectionStart, selectionEnd)
@@ -249,11 +274,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             if (!hasBlockOverlap) return
             if (start === selectionStart && end === selectionEnd) return
 
-            try {
-                target.setSelectionRange(start, end)
-            } catch {
-                // Some input types (e.g., number) don't support selection ranges
-            }
+            setSelectionRangeSafe(target, start, end)
         }, [expandSelectionRangeToBlockBoundaries, props.transformSyntax])
 
 
@@ -280,11 +301,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 break
             }
             case "insert": {
-                const selectionStart = inputRef.current.selectionStart ?? currentValue.length
-                const selectionEnd = inputRef.current.selectionEnd ?? selectionStart
+                const {rawStart, rawEnd} = getSelectionMetrics(inputRef.current)
                 const {start, end} = props.transformSyntax
-                    ? expandSelectionRangeToBlockBoundaries(selectionStart, selectionEnd)
-                    : {start: Math.min(selectionStart, selectionEnd), end: Math.max(selectionStart, selectionEnd)}
+                    ? expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
+                    : {start: rawStart, end: rawEnd}
 
                 nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
                 nextCaretPosition = start + suggestionValue.length
@@ -311,11 +331,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     if (!target) return
 
                     target.focus({preventScroll: true})
-                    try {
-                        target.setSelectionRange(nextCaretPosition, nextCaretPosition)
-                    } catch {
-                        // Some input types (e.g., number) don't support selection ranges
-                    }
+                    setSelectionRangeSafe(target, nextCaretPosition, nextCaretPosition)
                 })
             }
         }, [expandSelectionRangeToBlockBoundaries, inputRef, props.transformSyntax, value])
@@ -444,11 +460,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const target = inputRef.current
             if (!target) return visualSelectionRange
 
-            const selectionStart = target.selectionStart ?? 0
-            const selectionEnd = target.selectionEnd ?? selectionStart
-
-            const rawStart = Math.min(selectionStart, selectionEnd)
-            const rawEnd = Math.max(selectionStart, selectionEnd)
+            const {rawStart, rawEnd} = getSelectionMetrics(target)
 
             if (rawStart === rawEnd) return null
 
@@ -477,11 +489,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const target = inputRef.current
             if (!target) return
 
-            const selectionStart = target.selectionStart ?? 0
-            const selectionEnd = target.selectionEnd ?? selectionStart
-
-            const rawStart = Math.min(selectionStart, selectionEnd)
-            const rawEnd = Math.max(selectionStart, selectionEnd)
+            const {rawStart, rawEnd} = getSelectionMetrics(target)
 
             const blockAtCaret = visualizedSyntaxSegments.find((segment) => {
                 if (segment.type !== "block") return false
@@ -493,11 +501,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 const distanceToEnd = blockAtCaret.end - rawStart
                 const snapRawIndex = distanceToStart <= distanceToEnd ? blockAtCaret.start : blockAtCaret.end
 
-                try {
-                    target.setSelectionRange(snapRawIndex, snapRawIndex)
-                } catch {
-                    // Some input types (e.g., number) don't support selection ranges
-                }
+                setSelectionRangeSafe(target, snapRawIndex, snapRawIndex)
 
                 const caretVisualIndex = snapRawIndex === blockAtCaret.start
                     ? blockAtCaret.visualStart
@@ -592,18 +596,15 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             shouldPreventCloseRef.current = true
 
             const clampedIndex = Math.min(Math.max(mappedRawIndex, 0), inputRef.current.value.length)
+            const {selectionStart} = getSelectionMetrics(inputRef.current)
             const anchorIndex = event.shiftKey
-                ? (inputRef.current.selectionStart ?? clampedIndex)
+                ? (Number.isFinite(selectionStart) ? selectionStart : clampedIndex)
                 : clampedIndex
 
             selectionAnchorRef.current = anchorIndex
 
             inputRef.current.focus({preventScroll: true})
-            try {
-                inputRef.current.setSelectionRange(anchorIndex, clampedIndex)
-            } catch {
-                // Some input types (e.g., number) don't support selection ranges
-            }
+            setSelectionRangeSafe(inputRef.current, anchorIndex, clampedIndex)
 
             syntaxRef.current?.setPointerCapture(event.pointerId)
             updateVisualSelectionRange()
@@ -625,11 +626,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             const clampedIndex = Math.min(Math.max(mappedRawIndex, 0), inputRef.current.value.length)
 
             inputRef.current.focus({preventScroll: true})
-            try {
-                inputRef.current.setSelectionRange(anchorIndex, clampedIndex)
-            } catch {
-                // Some input types (e.g., number) don't support selection ranges
-            }
+            setSelectionRangeSafe(inputRef.current, anchorIndex, clampedIndex)
 
             updateVisualSelectionRange()
         }, [inputRef, resolveRawIndexFromPointerEvent, updateVisualSelectionRange])
@@ -642,10 +639,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             if (!props.transformSyntax) return false
 
             const target = event.target as HTMLInputElement
-            const selectionStart = target.selectionStart ?? 0
-            const selectionEnd = target.selectionEnd ?? selectionStart
-            const rawStart = Math.min(selectionStart, selectionEnd)
-            const rawEnd = Math.max(selectionStart, selectionEnd)
+            const {rawStart, rawEnd} = getSelectionMetrics(target)
 
             const removeRange = (start: number, end: number) => {
                 if (start === end) return false
@@ -656,11 +650,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 setElementKey(target, "value", nextValue, "input")
 
                 requestAnimationFrame(() => {
-                    try {
-                        target.setSelectionRange(start, start)
-                    } catch {
-                        // Some input types (e.g., number) don't support selection ranges
-                    }
+                    setSelectionRangeSafe(target, start, start)
 
                     updateVisualSelectionRange()
                 })
@@ -669,24 +659,11 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
 
             if (rawStart !== rawEnd) {
-                let adjustedStart = rawStart
-                let adjustedEnd = rawEnd
-                let hasBlockOverlap = false
-
-                visualizedSyntaxSegments.forEach((segment) => {
-                    if (segment.type !== "block") return
-
-                    const overlaps = rawStart < segment.end && rawEnd > segment.start
-                    if (!overlaps) return
-
-                    adjustedStart = Math.min(adjustedStart, segment.start)
-                    adjustedEnd = Math.max(adjustedEnd, segment.end)
-                    hasBlockOverlap = true
-                })
+                const {start, end, hasBlockOverlap} = expandSelectionRangeToBlockBoundaries(rawStart, rawEnd)
 
                 if (!hasBlockOverlap) return false
 
-                return removeRange(adjustedStart, adjustedEnd)
+                return removeRange(start, end)
             }
 
             const blockBeforeCaret = visualizedSyntaxSegments.find((segment) => {
@@ -708,7 +685,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             }
 
             return false
-        }, [props.transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
+        }, [expandSelectionRangeToBlockBoundaries, props.transformSyntax, updateVisualSelectionRange, visualizedSyntaxSegments])
 
         const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (props.transformSyntax) {
@@ -717,16 +694,12 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
             if (props.transformSyntax && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
                 const target = event.target as HTMLInputElement
-                const selectionStart = target.selectionStart ?? 0
-                const selectionEnd = target.selectionEnd ?? selectionStart
-                const selectionDirection = target.selectionDirection === "backward" ? "backward" : "forward"
+                const {selectionStart, selectionEnd, rawStart, rawEnd, direction} = getSelectionMetrics(target)
                 const visualDelta = event.key === "ArrowLeft" ? -1 : 1
 
                 if (!event.shiftKey) {
                     selectionAnchorRef.current = null
-                    const collapsePosition = event.key === "ArrowLeft"
-                        ? Math.min(selectionStart, selectionEnd)
-                        : Math.max(selectionStart, selectionEnd)
+                    const collapsePosition = event.key === "ArrowLeft" ? rawStart : rawEnd
 
                     const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(collapsePosition))
                     const nextVisualIndex = Math.max(0, Math.min(currentVisualIndex + visualDelta, totalVisualLength))
@@ -736,11 +709,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         event.preventDefault()
                         const clampedIndex = Math.min(Math.max(Math.round(nextRawIndex), 0), target.value.length)
 
-                        try {
-                            target.setSelectionRange(clampedIndex, clampedIndex)
-                        } catch {
-                            // Some input types (e.g., number) don't support selection ranges
-                        }
+                        setSelectionRangeSafe(target, clampedIndex, clampedIndex)
 
                         requestAnimationFrame(() => {
                             syncSyntaxScroll()
@@ -748,9 +717,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         })
                     }
                 } else {
-                    const anchorRawIndex = selectionAnchorRef.current ?? (
-                        selectionDirection === "backward" ? selectionEnd : selectionStart
-                    )
+                    const anchorRawIndex = selectionAnchorRef.current ?? (direction === "backward" ? selectionEnd : selectionStart)
                     selectionAnchorRef.current = anchorRawIndex
                     const activeRawIndex = anchorRawIndex === selectionStart ? selectionEnd : selectionStart
                     const currentVisualIndex = Math.round(mapRawIndexToVisualIndex(activeRawIndex))
@@ -764,11 +731,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         const rangeStart = Math.min(anchorRawIndex, clampedIndex)
                         const rangeEnd = Math.max(anchorRawIndex, clampedIndex)
 
-                        try {
-                            target.setSelectionRange(rangeStart, rangeEnd, nextDirection)
-                        } catch {
-                            // Some input types (e.g., number) don't support selection ranges
-                        }
+                        setSelectionRangeSafe(target, rangeStart, rangeEnd, nextDirection)
 
                         requestAnimationFrame(() => {
                             syncSyntaxScroll()
@@ -1013,13 +976,12 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return null
         }, [handleSyntaxPointerDown, props.transformSyntax, renderSyntaxSegments, visualizedSyntaxSegments])
 
-        // Render suggestion menu dropdown
         const suggestionMenu = useMemo(() => (
             <Menu
-                open={open} // Controlled open state
+                open={open}
                 modal={false}
                 onOpenChange={(nextOpen) => {
-                    if (!nextOpen && shouldPreventCloseRef.current) { // Prevent close if internal click
+                    if (!nextOpen && shouldPreventCloseRef.current) {
                         shouldPreventCloseRef.current = false
                         return
                     }
@@ -1027,15 +989,15 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     setOpen(nextOpen)
 
                     if (nextOpen) {
-                        setTimeout(() => inputRef.current?.focus(), 0) // Refocus input on open
+                        setTimeout(() => inputRef.current?.focus(), 0)
                     }
                 }}
             >
                         <MenuTrigger asChild>
                             <input
-                                ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
+                                ref={inputRef as LegacyRef<HTMLInputElement>}
                                 {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
-                                onFocus={handleFocus} // Open on focus
+                                onFocus={handleFocus}
                                 onBlur={handleBlur}
                                 onKeyDownCapture={handleKeyDownCapture}
                                 onKeyDown={handleKeyDown}
@@ -1045,10 +1007,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                         </MenuTrigger>
                 <MenuPortal>
                     <InputSuggestionMenuContent inputRef={inputRef}>
-                        {suggestionsHeader} {/* Custom content above suggestions */}
+                        {suggestionsHeader}
                         <InputSuggestionMenuContentItems
                             /* @ts-ignore */
-                            ref={menuRef} // Handle keyboard focus control
+                            ref={menuRef}
                             inputRef={inputRef}
                             suggestions={suggestions}
                             onSuggestionSelect={(suggestion) => {
@@ -1063,7 +1025,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                                 }
                             }}
                         />
-                        {suggestionsFooter} {/* Custom content below suggestions */}
+                        {suggestionsFooter}
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
@@ -1071,40 +1033,40 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
         return (
             <>
-                {title && <InputLabel>{title}</InputLabel>} {/* Optional label */}
-                {description && <InputDescription>{description}</InputDescription>} {/* Optional description */}
+                {title && <InputLabel>{title}</InputLabel>}
+                {description && <InputDescription>{description}</InputDescription>}
 
                 <div
                     {...mergeCode0Props(
-                        `input ${!formValidation?.valid ? "input--not-valid" : ""}`, // Add error class if invalid
+                        `input ${!formValidation?.valid ? "input--not-valid" : ""}`,
                         wrapperComponent
                     )}
                 >
-                    {left && <div className={`input__left input__left--${leftType}`}>{left}</div>} {/* Left element */}
+                    {left && <div className={`input__left input__left--${leftType}`}>{left}</div>}
 
                     {suggestions ? (
-                        suggestionMenu // If suggestions exist, render dropdown version
+                        suggestionMenu
                     ) : (
                         <input
-                            tabIndex={2} // Ensure keyboard tab order
+                            tabIndex={2}
                             ref={inputRef as LegacyRef<HTMLInputElement>}
                             disabled={disabled}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
                             onKeyDownCapture={handleKeyDownCapture}
                             onKeyDown={handleKeyDown}
-                            {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
+                            {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
                         />
                     )}
 
                     {syntax}
 
                     {right &&
-                        <div className={`input__right input__right--${rightType}`}>{right}</div>} {/* Right element */}
+                        <div className={`input__right input__right--${rightType}`}>{right}</div>}
                 </div>
 
                 {!formValidation?.valid && formValidation?.notValidMessage && (
-                    <InputMessage>{formValidation.notValidMessage}</InputMessage> // Show validation error
+                    <InputMessage>{formValidation.notValidMessage}</InputMessage>
                 )}
             </>
         )

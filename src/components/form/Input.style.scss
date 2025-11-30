@@ -80,6 +80,8 @@
   }
 
   &__syntax-block {
+    user-select: none;
+
     &--selected {
       background: rgba(variables.$white, .1);
       border-radius: variables.$borderRadius;

@@ -439,20 +439,37 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             })
         }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, props.transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
 
-        const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-            if (!inputRef.current) return
+        const selectionAnchorRef = useRef<number | null>(null)
 
-            const target = event.target as HTMLElement
+        const resolveRawIndexFromElement = React.useCallback((element: HTMLElement | null): number | null => {
+            if (!element) return null
 
-            const rawIndexAttr = target.dataset.rawIndex
-            const visualIndexAttr = target.dataset.visualIndex || target.dataset.visualStart || target.dataset.visualEnd
+            const rawIndexAttr = element.dataset.rawIndex
+            const visualIndexAttr = element.dataset.visualIndex || element.dataset.visualStart || element.dataset.visualEnd
 
             const rawIndexFromData = rawIndexAttr ? Number(rawIndexAttr) : undefined
             const visualIndexFromData = visualIndexAttr ? Number(visualIndexAttr) : undefined
 
-            const mappedRawIndex = !Number.isNaN(rawIndexFromData as number) && rawIndexFromData !== undefined
-                ? rawIndexFromData
-                : (visualIndexFromData !== undefined ? mapVisualIndexToRawIndex(visualIndexFromData) : null)
+            if (!Number.isNaN(rawIndexFromData as number) && rawIndexFromData !== undefined) {
+                return rawIndexFromData
+            }
+
+            if (visualIndexFromData !== undefined) {
+                return mapVisualIndexToRawIndex(visualIndexFromData)
+            }
+
+            return null
+        }, [mapVisualIndexToRawIndex])
+
+        const resolveRawIndexFromPointerEvent = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+            const element = document.elementFromPoint(event.clientX, event.clientY) as HTMLElement | null
+            return resolveRawIndexFromElement(element ?? (event.target as HTMLElement | null))
+        }, [resolveRawIndexFromElement])
+
+        const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+            if (!inputRef.current) return
+
+            const mappedRawIndex = resolveRawIndexFromPointerEvent(event)
 
             if (mappedRawIndex === null || Number.isNaN(mappedRawIndex)) return
 
@@ -460,16 +477,51 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             shouldPreventCloseRef.current = true
 
             const clampedIndex = Math.min(Math.max(mappedRawIndex, 0), inputRef.current.value.length)
+            const anchorIndex = event.shiftKey
+                ? (inputRef.current.selectionStart ?? clampedIndex)
+                : clampedIndex
+
+            selectionAnchorRef.current = anchorIndex
 
             inputRef.current.focus({preventScroll: true})
             try {
-                inputRef.current.setSelectionRange(clampedIndex, clampedIndex)
+                inputRef.current.setSelectionRange(anchorIndex, clampedIndex)
+            } catch {
+                // Some input types (e.g., number) don't support selection ranges
+            }
+
+            syntaxRef.current?.setPointerCapture(event.pointerId)
+            updateVisualSelectionRange()
+        }, [inputRef, resolveRawIndexFromPointerEvent, updateVisualSelectionRange])
+
+        const handleSyntaxPointerMove = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+            if (!inputRef.current) return
+            if (selectionAnchorRef.current === null) return
+            if (!(event.buttons & 1)) {
+                selectionAnchorRef.current = null
+                return
+            }
+
+            const mappedRawIndex = resolveRawIndexFromPointerEvent(event)
+            if (mappedRawIndex === null || Number.isNaN(mappedRawIndex)) return
+
+            event.preventDefault()
+            const anchorIndex = selectionAnchorRef.current
+            const clampedIndex = Math.min(Math.max(mappedRawIndex, 0), inputRef.current.value.length)
+
+            inputRef.current.focus({preventScroll: true})
+            try {
+                inputRef.current.setSelectionRange(anchorIndex, clampedIndex)
             } catch {
                 // Some input types (e.g., number) don't support selection ranges
             }
 
             updateVisualSelectionRange()
-        }, [inputRef, mapVisualIndexToRawIndex, updateVisualSelectionRange])
+        }, [inputRef, resolveRawIndexFromPointerEvent, updateVisualSelectionRange])
+
+        const handleSyntaxPointerUp = React.useCallback(() => {
+            selectionAnchorRef.current = null
+        }, [])
 
         const handleAtomicDeletion = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>): boolean => {
             if (!props.transformSyntax) return false
@@ -770,7 +822,13 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const syntax = React.useMemo(() => {
             if (props.transformSyntax) {
                 return (
-                    <div className={"input__syntax"} ref={syntaxRef} onPointerDown={handleSyntaxPointerDown}>
+                    <div
+                        className={"input__syntax"}
+                        ref={syntaxRef}
+                        onPointerDown={handleSyntaxPointerDown}
+                        onPointerMove={handleSyntaxPointerMove}
+                        onPointerUp={handleSyntaxPointerUp}
+                    >
                         {renderSyntaxSegments(visualizedSyntaxSegments)}
                     </div>
                 )

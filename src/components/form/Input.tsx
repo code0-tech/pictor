@@ -244,6 +244,69 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
             return lastSegment ? lastSegment.visualEnd : 0
         }, [visualizedSyntaxSegments])
 
+        const ensureVisualIndexVisible = React.useCallback((visualIndex: number | null) => {
+            if (visualIndex === null) return
+            if (!inputRef.current || !syntaxRef.current) return
+
+            const syntaxElement = syntaxRef.current
+            const roundedIndex = Math.round(visualIndex)
+
+            const caretElement = syntaxElement.querySelector<HTMLElement>(`[data-visual-index="${roundedIndex}"]`)
+
+            let offsetStart: number | null = null
+            let offsetEnd: number | null = null
+
+            if (caretElement) {
+                offsetStart = caretElement.offsetLeft
+                offsetEnd = caretElement.offsetLeft + caretElement.offsetWidth
+            } else {
+                const segments = Array.from(
+                    syntaxElement.querySelectorAll<HTMLElement>("[data-visual-start][data-visual-end]")
+                )
+
+                const matchingSegment = segments.find((segment) => {
+                    const segmentStart = Number(segment.dataset.visualStart)
+                    const segmentEnd = Number(segment.dataset.visualEnd)
+
+                    return Number.isFinite(segmentStart)
+                        && Number.isFinite(segmentEnd)
+                        && roundedIndex >= segmentStart
+                        && roundedIndex <= segmentEnd
+                })
+
+                if (matchingSegment) {
+                    const segmentStart = Number(matchingSegment.dataset.visualStart) || 0
+                    const segmentEnd = Number(matchingSegment.dataset.visualEnd) || segmentStart
+                    const segmentWidth = matchingSegment.offsetWidth
+                    const ratio = segmentEnd === segmentStart
+                        ? 0
+                        : (roundedIndex - segmentStart) / (segmentEnd - segmentStart)
+
+                    offsetStart = matchingSegment.offsetLeft + segmentWidth * ratio
+                    offsetEnd = offsetStart
+                }
+            }
+
+            if (offsetStart === null || offsetEnd === null) return
+
+            const viewStart = syntaxElement.scrollLeft
+            const viewEnd = viewStart + syntaxElement.clientWidth
+            const padding = 8
+
+            let nextScrollLeft = viewStart
+
+            if (offsetStart - padding < viewStart) {
+                nextScrollLeft = Math.max(offsetStart - padding, 0)
+            } else if (offsetEnd + padding > viewEnd) {
+                nextScrollLeft = Math.max(offsetEnd + padding - syntaxElement.clientWidth, 0)
+            }
+
+            if (nextScrollLeft === viewStart) return
+
+            inputRef.current.scrollLeft = nextScrollLeft
+            syntaxElement.scrollLeft = nextScrollLeft
+        }, [inputRef, syntaxRef])
+
         const syncSyntaxScroll = React.useCallback(() => {
             if (!inputRef.current || !syntaxRef.current) return
 
@@ -327,7 +390,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
                 setVisualSelectionRange(null)
                 setVisualCaretIndex(caretVisualIndex)
-                requestAnimationFrame(syncSyntaxScroll)
+                requestAnimationFrame(() => {
+                    syncSyntaxScroll()
+                    ensureVisualIndexVisible(caretVisualIndex)
+                })
                 return
             }
 
@@ -336,7 +402,10 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
 
                 setVisualSelectionRange(null)
                 setVisualCaretIndex(Number.isFinite(caretVisualIndex) ? caretVisualIndex : null)
-                requestAnimationFrame(syncSyntaxScroll)
+                requestAnimationFrame(() => {
+                    syncSyntaxScroll()
+                    ensureVisualIndexVisible(caretVisualIndex)
+                })
                 return
             }
 
@@ -361,8 +430,14 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 start: clampedStart,
                 end: clampedEnd,
             })
-            requestAnimationFrame(syncSyntaxScroll)
-        }, [inputRef, mapRawIndexToVisualIndex, props.transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
+            const selectionDirection = target.selectionDirection === "backward" ? "backward" : "forward"
+            const activeBoundary = selectionDirection === "backward" ? clampedStart : clampedEnd
+
+            requestAnimationFrame(() => {
+                syncSyntaxScroll()
+                ensureVisualIndexVisible(activeBoundary)
+            })
+        }, [ensureVisualIndexVisible, inputRef, mapRawIndexToVisualIndex, props.transformSyntax, syncSyntaxScroll, visualizedSyntaxSegments])
 
         const handleSyntaxPointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
             if (!inputRef.current) return

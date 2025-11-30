@@ -183,12 +183,42 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
         const applySuggestionValue = React.useCallback((suggestion: InputSuggestion) => {
             if (!inputRef.current) return
 
-            const suggestionValue = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
+            const suggestionRaw = typeof value == "object" ? JSON.stringify(suggestion.value) : suggestion.value
+            const suggestionValue = suggestionRaw === undefined || suggestionRaw === null ? "" : String(suggestionRaw)
             const insertMode = suggestion.insertMode ?? "replace"
+            const currentValue = inputRef.current.value ?? ""
 
-            const nextValue = insertMode === "append"
-                ? `${inputRef.current.value ?? ""}${suggestionValue ?? ""}`
-                : suggestionValue
+            let nextValue = currentValue
+            let nextCaretPosition: number | null = null
+
+            switch (insertMode) {
+            case "append": {
+                nextValue = `${currentValue}${suggestionValue}`
+                nextCaretPosition = nextValue.length
+                break
+            }
+            case "prepend": {
+                nextValue = `${suggestionValue}${currentValue}`
+                nextCaretPosition = suggestionValue.length
+                break
+            }
+            case "insert": {
+                const selectionStart = inputRef.current.selectionStart ?? currentValue.length
+                const selectionEnd = inputRef.current.selectionEnd ?? selectionStart
+                const start = Math.min(selectionStart, selectionEnd)
+                const end = Math.max(selectionStart, selectionEnd)
+
+                nextValue = `${currentValue.slice(0, start)}${suggestionValue}${currentValue.slice(end)}`
+                nextCaretPosition = start + suggestionValue.length
+                break
+            }
+            case "replace":
+            default: {
+                nextValue = suggestionValue
+                nextCaretPosition = suggestionValue.length
+                break
+            }
+            }
 
             setElementKey(
                 inputRef.current,
@@ -197,8 +227,20 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 "change",
             )
 
-            focusInputCaretAtEnd()
-        }, [focusInputCaretAtEnd, inputRef, value])
+            if (nextCaretPosition !== null) {
+                requestAnimationFrame(() => {
+                    const target = inputRef.current
+                    if (!target) return
+
+                    target.focus({preventScroll: true})
+                    try {
+                        target.setSelectionRange(nextCaretPosition, nextCaretPosition)
+                    } catch {
+                        // Some input types (e.g., number) don't support selection ranges
+                    }
+                })
+            }
+        }, [inputRef, value])
 
 
         const buildDefaultSyntax = React.useCallback((): InputSyntaxSegment[] => {
@@ -723,10 +765,19 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                 const selected = menuRef.current?.selectActiveItem()
                 if (selected) {
                     setOpen(false)
-                    focusInputCaretAtEnd()
                 }
             }
-        }, [focusInputCaretAtEnd, handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, open, props.transformSyntax, syncSyntaxScroll, suggestions, totalVisualLength, updateVisualSelectionRange])
+
+        const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === " " || event.code === "Space") {
+                event.stopPropagation()
+                // Prevent DropdownMenuTrigger from intercepting space after the first insert
+                // while preserving the default input behavior of adding whitespace.
+                // @ts-ignore -- nativeEvent may not exist in synthetic typing but is present at runtime
+                event.nativeEvent?.stopImmediatePropagation?.()
+            }
+        }, [])
 
         const handleFocus = React.useCallback(() => {
             setIsFocused(true)
@@ -936,17 +987,18 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                     }
                 }}
             >
-                <MenuTrigger asChild>
-                    <input
-                        ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
-                        {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
-                        onFocus={handleFocus} // Open on focus
-                        onBlur={handleBlur}
-                        onKeyDown={handleKeyDown}
-                        spellCheck={false}
-                        disabled={disabled || disabledOnValue}
-                    />
-                </MenuTrigger>
+                        <MenuTrigger asChild>
+                            <input
+                                ref={inputRef as LegacyRef<HTMLInputElement>} // Cast for TS compatibility
+                                {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)}
+                                onFocus={handleFocus} // Open on focus
+                                onBlur={handleBlur}
+                                onKeyDownCapture={handleKeyDownCapture}
+                                onKeyDown={handleKeyDown}
+                                spellCheck={false}
+                                disabled={disabled || disabledOnValue}
+                            />
+                        </MenuTrigger>
                 <MenuPortal>
                     <InputSuggestionMenuContent inputRef={inputRef}>
                         {suggestionsHeader} {/* Custom content above suggestions */}
@@ -958,17 +1010,20 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             onSuggestionSelect={(suggestion) => {
                                 if (!onSuggestionSelect) {
                                     applySuggestionValue(suggestion)
+                                } else {
+                                    onSuggestionSelect?.(suggestion)
                                 }
-                                onSuggestionSelect?.(suggestion)
                                 setOpen(false)
-                                focusInputCaretAtEnd()
+                                if (onSuggestionSelect) {
+                                    focusInputCaretAtEnd()
+                                }
                             }}
                         />
                         {suggestionsFooter} {/* Custom content below suggestions */}
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, focusInputCaretAtEnd, handleKeyDown, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
+        ), [applySuggestionValue, focusInputCaretAtEnd, handleKeyDown, handleKeyDownCapture, onSuggestionSelect, open, suggestions, suggestionsFooter, suggestionsHeader, value])
 
         return (
             <>
@@ -992,6 +1047,7 @@ export const Input: ForwardRefExoticComponent<InputProps<any>> = React.forwardRe
                             disabled={disabled}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
+                            onKeyDownCapture={handleKeyDownCapture}
                             onKeyDown={handleKeyDown}
                             {...mergeCode0Props(`input__control ${props.transformSyntax ? "input__control--syntax" : ""}`, rest)} // Basic input styling and props
                         />

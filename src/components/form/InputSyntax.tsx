@@ -6,7 +6,9 @@ import {InputSuggestion} from "./InputSuggestion"
 export type ResolvedVisualSelectionRange = { start: number, end: number } | null
 
 export interface InputSyntaxProps {
-    transformSyntax?: ((value: any, activeSuggestions?: InputSuggestion[]) => any)
+    transformSyntax?: (
+        (value: any, appliedSyntaxParts?: (InputSuggestion | any)[]) => any
+    )
     syntaxRef: React.RefObject<HTMLDivElement | null>
     visualizedSyntaxSegments: VisualizedInputSyntaxSegment[]
     resolvedVisualSelectionRange: ResolvedVisualSelectionRange

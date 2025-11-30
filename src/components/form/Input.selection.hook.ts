@@ -78,7 +78,9 @@ export const useSelectionVisibility = (
 }
 
 export const useSelectionNormalization = (
-    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => any) | undefined,
+    transformSyntax: (
+        (value: any, appliedSyntaxParts?: (InputSuggestion | any)[]) => any
+    ) | undefined,
     expandSelectionRangeToBlockBoundaries: (rawStart: number, rawEnd: number) => {start: number, end: number, hasBlockOverlap: boolean},
 ) => React.useCallback((target: HTMLInputElement) => {
     if (!transformSyntax) return
@@ -95,7 +97,9 @@ export const useSelectionNormalization = (
 }, [expandSelectionRangeToBlockBoundaries, transformSyntax])
 
 export const useSelectionResolution = (
-    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => any) | undefined,
+    transformSyntax: (
+        (value: any, appliedSyntaxParts?: (InputSuggestion | any)[]) => any
+    ) | undefined,
     inputRef: RefObject<HTMLInputElement>,
     visualSelectionRange: {start: number, end: number} | null,
     visualizedSyntaxSegments: VisualizedInputSyntaxSegment[],

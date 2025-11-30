@@ -15,6 +15,7 @@ import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
 import {Badge} from "../badge/Badge";
 import {InputSyntaxSegment} from "./Input.syntax.hook";
+import {InputSuggestion} from "./InputSuggestion";
 
 export default {
     title: "Form"
@@ -79,15 +80,15 @@ export const Login = () => {
             <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={() => {
                 const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
                     challenge: crypto.getRandomValues(new Uint8Array(32)),
-                    rp: { name: "Code0 Dev", id: "localhost" },
+                    rp: {name: "Code0 Dev", id: "localhost"},
                     user: {
                         id: Uint8Array.from("nico", c => c.charCodeAt(0)),
                         name: "nico@localhost",
                         displayName: "Nico Sammito",
                     },
                     pubKeyCredParams: [
-                        { type: "public-key", alg: -7 },
-                        { type: "public-key", alg: -257 }
+                        {type: "public-key", alg: -7},
+                        {type: "public-key", alg: -257}
                     ] as const,
                     authenticatorSelection: {
                         userVerification: "preferred" as UserVerificationRequirement,
@@ -355,73 +356,45 @@ export const InputSuggestionStory = () => {
         "Nico Sammito"
     ]
 
-    const buildSegments = (value?: string | null): InputSyntaxSegment[] => {
-        const textValue = value ?? ""
-        const matches = suggestionValues.flatMap((badgeValue) => {
-            const occurrences: { start: number, end: number, value: string }[] = []
-            let searchIndex = textValue.indexOf(badgeValue)
+    const buildSegments = (
+        value?: string | null,
+        appliedParts: (InputSuggestion | any)[] = [],
+    ): InputSyntaxSegment[] => {
 
-            while (searchIndex !== -1) {
-                occurrences.push({
-                    start: searchIndex,
-                    end: searchIndex + badgeValue.length,
-                    value: badgeValue
-                })
-
-                searchIndex = textValue.indexOf(badgeValue, searchIndex + badgeValue.length)
-            }
-
-            return occurrences
-        }).sort((a, b) => a.start - b.start)
-
-        if (!matches.length) {
-            return [{
-                type: "text" as const,
-                start: 0,
-                end: textValue.length,
-                visualLength: textValue.length,
-                content: textValue,
-            }]
-        }
-
-        const segments: InputSyntaxSegment[] = []
         let cursor = 0
 
-        matches.forEach(match => {
-            if (match.start > cursor) {
-                const content = textValue.slice(cursor, match.start)
-                segments.push({
-                    type: "text" as const,
+        return appliedParts.length > 0 ? appliedParts.map((part: string | InputSuggestion) => {
+            if (typeof part === "object") {
+                const segment = {
+                    type: "block",
                     start: cursor,
-                    end: match.start,
-                    visualLength: content.length,
-                    content,
-                })
+                    end: cursor + part.value.length,
+                    visualLength: 1,
+                    content: <Badge color={"info"}>@{part.value}</Badge>,
+                }
+                cursor += part.value.length
+                return segment
+            }
+            const textString = part ?? ""
+            if (!textString.length) return
+
+            const segment = {
+                type: "text",
+                start: cursor,
+                end: cursor + textString.length,
+                visualLength: textString.length,
+                content: textString,
             }
 
-            segments.push({
-                type: "block" as const,
-                start: match.start,
-                end: match.end,
-                visualLength: 1,
-                content: <Badge color={"info"}>@{match.value}</Badge>,
-            })
-
-            cursor = match.end
-        })
-
-        if (cursor < textValue.length) {
-            const content = textValue.slice(cursor)
-            segments.push({
-                type: "text" as const,
-                start: cursor,
-                end: textValue.length,
-                visualLength: content.length,
-                content,
-            })
-        }
-
-        return segments
+            cursor += textString.length
+            return segment
+        }) as InputSyntaxSegment[] : [{
+            type: "text",
+            start: 0,
+            end: value ? value.length : 0,
+            visualLength: value ? value.length : 0,
+            content: value ?? "",
+        }]
     }
 
     return <Card maw={300}>

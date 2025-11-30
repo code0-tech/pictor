@@ -6,7 +6,7 @@ export type InputSyntaxSegment = {
     type: "text" | "block"
     start: number
     end: number
-    visualLength: number
+    visualLength?: number
     content?: string | React.ReactNode
 }
 
@@ -37,7 +37,7 @@ export const visualizeSyntaxSegments = (
         const nextSegment: VisualizedInputSyntaxSegment = {
             ...segment,
             visualStart,
-            visualEnd: visualStart + segment.visualLength,
+            visualEnd: visualStart + (segment?.visualLength ?? 0),
         }
 
         visualStart = nextSegment.visualEnd
@@ -50,17 +50,20 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 export const useSyntaxModel = (
     value: any,
-    transformSyntax: ((value: any, activeSuggestions?: InputSuggestion[]) => InputSyntaxSegment[]) | undefined,
+    transformSyntax: (
+        (value: any, appliedSyntaxParts?: (InputSuggestion | any)[]) => InputSyntaxSegment[]
+    ) | undefined,
     inputRef: React.RefObject<HTMLInputElement>,
+    appliedSyntaxParts?: (InputSuggestion | any)[],
 ) => {
     const syntaxSegments = React.useMemo(() => {
         if (transformSyntax) {
-            const segments = transformSyntax(value)
+            const segments = transformSyntax(value, appliedSyntaxParts)
             if (segments?.length) return segments
         }
 
         return buildDefaultSyntax(value)
-    }, [transformSyntax, value])
+    }, [appliedSyntaxParts, transformSyntax, value])
 
     const visualizedSyntaxSegments = React.useMemo(
         () => visualizeSyntaxSegments(syntaxSegments),
@@ -94,16 +97,16 @@ export const useSyntaxModel = (
         }
 
         const rawLength = segment.end - segment.start
-        const clampedVisual = clamp(visualIndex - segment.visualStart, 0, segment.visualLength)
+        const clampedVisual = clamp(visualIndex - segment.visualStart, 0, (segment?.visualLength ?? 0))
 
         if (rawLength <= 0) return segment.start
         if (segment.type === "text") {
             return Math.min(segment.start + Math.round(clampedVisual), segment.end)
         }
 
-        if (segment.visualLength <= 0) return segment.start
+        if ((segment?.visualLength ?? 0) <= 0) return segment.start
 
-        const ratio = clampedVisual / segment.visualLength
+        const ratio = clampedVisual / (segment?.visualLength ?? 0)
         return Math.round(segment.start + ratio * rawLength)
     }, [inputRef, visualizedSyntaxSegments])
 
@@ -123,10 +126,10 @@ export const useSyntaxModel = (
             return Math.min(segment.visualStart + clampedRaw, segment.visualEnd)
         }
 
-        if (segment.visualLength <= 0) return segment.visualStart
+        if ((segment?.visualLength ?? 0) <= 0) return segment.visualStart
 
         const ratio = clampedRaw / rawLength
-        return Math.min(segment.visualStart + ratio * segment.visualLength, segment.visualEnd)
+        return Math.min(segment.visualStart + ratio * (segment?.visualLength ?? 0), segment.visualEnd)
     }, [inputRef, visualizedSyntaxSegments])
 
     const totalVisualLength = React.useMemo(() => {

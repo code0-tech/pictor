@@ -1,4 +1,4 @@
-import {InputSyntaxSegment} from "./Input"
+import {InputSyntaxSegment} from "./Input.syntax.hook";
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 

@@ -1,8 +1,9 @@
-import {InputProps, Input, setElementKey} from "../../form/Input";
+import {InputProps, Input} from "../../form";
 import React, {RefObject} from "react";
 import {Button} from "../../button/Button";
 import {IconX} from "@tabler/icons-react";
 import "./DFlowSuggestionSearchInput.style.scss"
+import {setElementKey} from "../../form/Input.utils";
 
 interface DFlowSuggestionSearchInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false

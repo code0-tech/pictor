@@ -11,7 +11,6 @@ import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
 import {ParameterDefinitionView} from "../function/DFlowFunction.view";
 import {Badge} from "../../badge/Badge";
-import {InputSyntaxSegment} from "../../form/Input";
 import type {
     LiteralValue,
     NodeFunction,
@@ -19,6 +18,7 @@ import type {
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {InputSyntaxSegment} from "../../form/Input.syntax.hook";
 
 export interface DFlowTabDefaultProps {
     functionInstance: NodeFunctionView

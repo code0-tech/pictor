@@ -1,7 +1,8 @@
 import React, {RefObject} from "react";
-import {Input, InputProps, setElementKey} from "./Input";
+import {Input, InputProps} from "./Input";
 import {IconEye, IconX} from "@tabler/icons-react";
 import {Button} from "../button/Button";
+import {setElementKey} from "./Input.utils";
 
 interface PasswordInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     clearable?: boolean,

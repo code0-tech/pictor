@@ -133,29 +133,6 @@ export const Input = () => {
 
     return <ContextStoreProvider services={[user]}>
         <DUserInput title={"Users to invite"} description={"Invite users to your workspace or organization"}/>
-        <Spacing spacing={"xs"}/>
-        <Text>
-            <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <div>
-                    <Badge border>
-                        <IconArrowUp size={16}/>
-                    </Badge>
-                    {" "}
-                    <Badge border>
-                        <IconArrowDown size={16}/>
-                    </Badge>
-                    {" "}
-                    to navigate
-                </div>
-                <div>
-                    <Badge border>
-                        <IconCornerDownLeft size={16}/>
-                    </Badge>
-                    {" "}
-                    to select
-                </div>
-            </Flex>
-        </Text>
     </ContextStoreProvider>
 
 }

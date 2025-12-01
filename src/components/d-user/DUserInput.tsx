@@ -25,7 +25,8 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
             value: user.username || "",
             children: user.username,
             insertMode: "insert",
-            valueData: user
+            valueData: user,
+            groupBy: "Users"
         }))
     }, [userStore])
 

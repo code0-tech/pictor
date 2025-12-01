@@ -68,5 +68,13 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
         }) as InputSyntaxSegment[]
     }
 
-    return <TextInput placeholder={"Enter users"} suggestionsEmptyState={<MenuItem><Text>No user found</Text></MenuItem>} filterSuggestionsByLastToken enforceUniqueSuggestions transformSyntax={transformSyntax} {...rest} suggestions={suggestions}/>
+    return <TextInput placeholder={"Enter users"}
+                      suggestionsEmptyState={<MenuItem><Text>No user found</Text></MenuItem>}
+                      onLastTokenChange={token => {
+                            userService.getByUsername(token)
+                      }}
+                      filterSuggestionsByLastToken
+                      enforceUniqueSuggestions
+                      transformSyntax={transformSyntax} {...rest}
+                      suggestions={suggestions}/>
 }

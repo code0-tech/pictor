@@ -350,17 +350,3 @@ export const PinInputExample = () => {
     </>
 
 }
-
-export const InputSuggestionStory = () => {
-    return <Card maw={300}>
-        <DUserInput suggestions={[{
-            children: "Niklas van Schrick",
-            value: "@nschrick",
-            insertMode: "insert"
-        }, {
-            children: "Nico Sammito",
-            value: "@nsammito",
-            insertMode: "append"
-        }]}/>
-    </Card>
-}

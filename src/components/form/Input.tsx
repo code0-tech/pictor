@@ -45,6 +45,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     validationUsesSuggestions?: boolean
     disableOnValue?: (value: T) => boolean
     filterSuggestionsByLastToken?: boolean
+    enforceUniqueSuggestions?: boolean
 
     wrapperComponent?: Code0Component<HTMLDivElement>
     right?: React.ReactNode
@@ -84,6 +85,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             transformSyntax,
             validationUsesSuggestions = false,
             filterSuggestionsByLastToken = false,
+            enforceUniqueSuggestions = false,
             ...rest
         } = props
 
@@ -347,6 +349,15 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 return suggestionText.toLowerCase().startsWith(normalizedToken.toLowerCase())
             })
         }, [filterSuggestionsByLastToken, trailingTextTokenData?.token, suggestions])
+
+        const availableSuggestions = React.useMemo(() => {
+            if (!enforceUniqueSuggestions) return filteredSuggestions
+            if (!filteredSuggestions) return filteredSuggestions
+
+            const activeSet = new Set(activeSuggestionSpans.map((span) => span.suggestion))
+
+            return filteredSuggestions.filter((suggestion) => !activeSet.has(suggestion))
+        }, [activeSuggestionSpans, enforceUniqueSuggestions, filteredSuggestions])
 
         const {ensureVisualIndexVisible, syncSyntaxScroll} = useSelectionVisibility(inputRef, syntaxRef)
 
@@ -878,7 +889,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                             /* @ts-ignore */
                             ref={menuRef}
                             inputRef={inputRef}
-                            suggestions={filteredSuggestions}
+                            suggestions={availableSuggestions}
                             onSuggestionSelect={(suggestion) => {
                                 if (!onSuggestionSelect) {
                                     applySuggestionValue(suggestion)
@@ -895,7 +906,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, disabledOnValue, filteredSuggestions, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
+        ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
 
         return (
             <>

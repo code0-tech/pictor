@@ -16,6 +16,7 @@ import {RadioInput} from "./RadioInput";
 import {Badge} from "../badge/Badge";
 import {InputSyntaxSegment} from "./Input.syntax.hook";
 import {InputSuggestion} from "./InputSuggestion";
+import {DUserInput} from "../d-user/DUserInput";
 
 export default {
     title: "Form"
@@ -351,54 +352,14 @@ export const PinInputExample = () => {
 }
 
 export const InputSuggestionStory = () => {
-    const suggestionValues = [
-        "Niklas van Schrick",
-        "Nico Sammito"
-    ]
-
-    const buildSegments = (
-        value?: string | null,
-        appliedParts: (InputSuggestion | any)[] = [],
-    ): InputSyntaxSegment[] => {
-
-        let cursor = 0
-
-        return appliedParts.map((part: string | InputSuggestion) => {
-            if (typeof part === "object") {
-                const segment = {
-                    type: "block",
-                    start: cursor,
-                    end: cursor + part.value.length,
-                    visualLength: 1,
-                    content: <Badge color={"info"}>@{part.value}</Badge>,
-                }
-                cursor += part.value.length
-                return segment
-            }
-            const textString = part ?? ""
-            if (!textString.length) return
-
-            const segment = {
-                type: "text",
-                start: cursor,
-                end: cursor + textString.length,
-                visualLength: textString.length,
-                content: textString,
-            }
-
-            cursor += textString.length
-            return segment
-        }) as InputSyntaxSegment[]
-    }
-
     return <Card maw={300}>
-        <TextInput placeholder={"Search for users"} filterSuggestionsByLastToken transformSyntax={buildSegments} suggestions={[{
+        <DUserInput suggestions={[{
             children: "Niklas van Schrick",
-            value: "Niklas van Schrick",
+            value: "@nschrick",
             insertMode: "insert"
         }, {
             children: "Nico Sammito",
-            value: "Nico Sammito",
+            value: "@nsammito",
             insertMode: "append"
         }]}/>
     </Card>

@@ -45,7 +45,9 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     validationUsesSuggestions?: boolean
     disableOnValue?: (value: T) => boolean
     filterSuggestionsByLastToken?: boolean
+    onLastTokenChange?: (token: string | null) => void
     enforceUniqueSuggestions?: boolean
+    suggestionsEmptyState?: React.ReactNode
 
     wrapperComponent?: Code0Component<HTMLDivElement>
     right?: React.ReactNode
@@ -86,6 +88,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             validationUsesSuggestions = false,
             filterSuggestionsByLastToken = false,
             enforceUniqueSuggestions = false,
+            onLastTokenChange,
+            suggestionsEmptyState,
             ...rest
         } = props
 
@@ -332,6 +336,14 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 end: tokenEnd,
             }
         }, [filterSuggestionsByLastToken, inputRef, normalizeTextValue, syntaxSegments, value])
+
+        useEffect(() => {
+            setOpen(true)
+            if (!filterSuggestionsByLastToken) return
+            if (!onLastTokenChange) return
+
+            onLastTokenChange(trailingTextTokenData?.token ?? null)
+        }, [filterSuggestionsByLastToken, onLastTokenChange, trailingTextTokenData?.token])
 
         const filteredSuggestions = React.useMemo(() => {
             if (!filterSuggestionsByLastToken) return suggestions
@@ -883,30 +895,33 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     />
                 </MenuTrigger>
                 <MenuPortal>
-                    <InputSuggestionMenuContent inputRef={inputRef}>
-                        {suggestionsHeader}
-                        <InputSuggestionMenuContentItems
-                            /* @ts-ignore */
-                            ref={menuRef}
-                            inputRef={inputRef}
-                            suggestions={availableSuggestions}
-                            onSuggestionSelect={(suggestion) => {
-                                if (!onSuggestionSelect) {
-                                    applySuggestionValue(suggestion)
-                                } else {
-                                    onSuggestionSelect?.(suggestion)
-                                }
-                                setOpen(false)
-                                if (onSuggestionSelect) {
-                                    focusInputCaretAtEnd()
-                                }
-                            }}
-                        />
-                        {suggestionsFooter}
-                    </InputSuggestionMenuContent>
-                </MenuPortal>
-            </Menu>
-        ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
+                        <InputSuggestionMenuContent inputRef={inputRef}>
+                            {suggestionsHeader}
+                            {availableSuggestions?.length === 0 && suggestionsEmptyState}
+                            {!!availableSuggestions?.length && (
+                                <InputSuggestionMenuContentItems
+                                    /* @ts-ignore */
+                                    ref={menuRef}
+                                    inputRef={inputRef}
+                                    suggestions={availableSuggestions}
+                                    onSuggestionSelect={(suggestion) => {
+                                        if (!onSuggestionSelect) {
+                                            applySuggestionValue(suggestion)
+                                        } else {
+                                            onSuggestionSelect?.(suggestion)
+                                        }
+                                        setOpen(false)
+                                        if (onSuggestionSelect) {
+                                            focusInputCaretAtEnd()
+                                        }
+                                    }}
+                                />
+                            )}
+                            {suggestionsFooter}
+                        </InputSuggestionMenuContent>
+                    </MenuPortal>
+                </Menu>
+        ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsEmptyState, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
 
         return (
             <>

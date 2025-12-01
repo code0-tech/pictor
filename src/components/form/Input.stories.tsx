@@ -13,6 +13,10 @@ import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
+import {Badge} from "../badge/Badge";
+import {InputSyntaxSegment} from "./Input.syntax.hook";
+import {InputSuggestion} from "./InputSuggestion";
+import {DUserInput} from "../d-user/DUserInput";
 
 export default {
     title: "Form"
@@ -77,15 +81,15 @@ export const Login = () => {
             <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={() => {
                 const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
                     challenge: crypto.getRandomValues(new Uint8Array(32)),
-                    rp: { name: "Code0 Dev", id: "localhost" },
+                    rp: {name: "Code0 Dev", id: "localhost"},
                     user: {
                         id: Uint8Array.from("nico", c => c.charCodeAt(0)),
                         name: "nico@localhost",
                         displayName: "Nico Sammito",
                     },
                     pubKeyCredParams: [
-                        { type: "public-key", alg: -7 },
-                        { type: "public-key", alg: -257 }
+                        {type: "public-key", alg: -7},
+                        {type: "public-key", alg: -257}
                     ] as const,
                     authenticatorSelection: {
                         userVerification: "preferred" as UserVerificationRequirement,

@@ -1,10 +1,8 @@
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils/reactiveArrayService";
 import {
-    Maybe,
     User,
     UsersEmailVerificationInput,
     UsersEmailVerificationPayload,
-    UserSession,
     UsersIdentityLinkInput,
     UsersIdentityLinkPayload,
     UsersIdentityLoginInput,
@@ -24,11 +22,11 @@ import {
     UsersMfaTotpValidateSecretInput,
     UsersMfaTotpValidateSecretPayload,
     UsersPasswordResetInput,
-    UsersPasswordResetPayload, UsersPasswordResetRequestInput,
+    UsersPasswordResetPayload,
+    UsersPasswordResetRequestInput,
     UsersPasswordResetRequestPayload,
     UsersRegisterInput,
-    UsersRegisterPayload,
-    UsersUpdateInput
+    UsersRegisterPayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {DUserView} from "./DUser.view";
 
@@ -39,6 +37,10 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
 
     getById(id: User['id']): DUserView | undefined {
         return this.values().find(user => user.id === id);
+    }
+
+    getByUsername(username: User['username']): DUserView | undefined {
+        return this.values().find(user => user.username === username);
     }
 
     abstract usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>;

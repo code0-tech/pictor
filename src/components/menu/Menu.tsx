@@ -1,7 +1,7 @@
 import React from "react";
 import "./Menu.style.scss"
 
-import {Code0ComponentProps} from "../../utils/types";
+import {Code0ComponentProps, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 import {
     DropdownMenu, DropdownMenuArrow,
@@ -22,18 +22,22 @@ import {
 export type MenuProps = Code0ComponentProps & DropdownMenuProps
 export type MenuTriggerProps = Code0ComponentProps & DropdownMenuTriggerProps
 export type MenuPortalProps = Code0ComponentProps & DropdownMenuPortalProps
-export type MenuContentProps = Code0ComponentProps & DropdownMenuContentProps
+export type MenuContentProps = Code0ComponentProps & DropdownMenuContentProps & {
+    color?: Color
+}
 export type MenuLabelProps = Code0ComponentProps & DropdownMenuLabelProps
 export type MenuItemProps = Code0ComponentProps & DropdownMenuItemProps
 export type MenuGroupProps = Code0ComponentProps & DropdownMenuGroupProps
 export type MenuSubProps = Code0ComponentProps & DropdownMenuSubProps
 export type MenuSubTriggerProps = Code0ComponentProps & DropdownMenuSubTriggerProps
-export type MenuSubContentProps = Code0ComponentProps & DropdownMenuSubContentProps
+export type MenuSubContentProps = Code0ComponentProps & DropdownMenuSubContentProps & {
+    color?: Color
+}
 export type MenuSeparatorProps = Code0ComponentProps & DropdownMenuSeparatorProps
 export type MenuArrowProps = Code0ComponentProps & DropdownMenuArrowProps
 
 export const Menu: React.FC<MenuProps> = (props) => {
-    return <DropdownMenu {...mergeCode0Props("menu", props) as MenuProps}/>
+    return <DropdownMenu {...mergeCode0Props(`menu`, props) as MenuProps}/>
 }
 
 export const MenuTrigger: React.FC<MenuTriggerProps> = (props) => {
@@ -45,7 +49,7 @@ export const MenuPortal: React.FC<MenuPortalProps> = (props) => {
 }
 
 export const MenuContent: React.FC<MenuContentProps> = (props) => {
-    return <DropdownMenuContent align={props.align} {...mergeCode0Props("menu__content", props) as MenuContentProps}/>
+    return <DropdownMenuContent align={props.align} {...mergeCode0Props(`menu__content menu__content--${props.color ?? "primary"}`, props) as MenuContentProps}/>
 }
 
 export const MenuLabel: React.FC<MenuLabelProps> = (props) => {
@@ -69,7 +73,7 @@ export const MenuSubTrigger: React.FC<MenuSubTriggerProps> = (props) => {
 }
 
 export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
-    return <DropdownMenuSubContent {...mergeCode0Props("menu__sub-content", props) as MenuSubContentProps}/>
+    return <DropdownMenuSubContent {...mergeCode0Props(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, props) as MenuSubContentProps}/>
 }
 
 export const MenuSeparator: React.FC<MenuSeparatorProps> = (props) => {

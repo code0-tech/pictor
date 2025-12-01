@@ -50,9 +50,9 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
 
         return {
             children,
-            ref: suggestion,
+            valueData: suggestion,
             value: suggestion.value,
-            groupLabel,
+            groupBy: groupLabel,
         };
     })
 }

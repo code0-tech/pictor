@@ -11,7 +11,6 @@
     z-index: 999;
 
     & {
-      @include box.box(variables.$primary);
       @include helpers.borderRadius();
     }
   }
@@ -48,7 +47,7 @@
       border: none;
     }
 
-    &:focus {
+    &:focus, &[data-focus=true] {
       @include box.box(variables.$white, variables.$white, variables.$white);
       border: none;
       width: 100%;
@@ -62,4 +61,10 @@
     height: 1px;
     background-color: rgba(white, .1);
   }
+}
+
+@each $name, $color in variables.$colors {
+    .menu__content--#{$name}, .menu__sub-content--#{$name} {
+        @include box.box($color);
+    }
 }

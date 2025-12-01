@@ -94,6 +94,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const selectionAnchorRef = useRef<number | null>(null)
         const suggestionIdRef = useRef(0)
         const activeSuggestionsRef = useRef<InputSuggestion[]>([])
+        const lastValidationValueRef = useRef<any>(null)
 
         const [open, setOpen] = useState(false)
         const [value, setValue] = useState<any>(props.defaultValue || props.initialValue)
@@ -257,6 +258,9 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 ? activeSuggestions
                 : currentValue
 
+            if (Object.is(lastValidationValueRef.current, validationValue)) return
+
+            lastValidationValueRef.current = validationValue
             formValidation.setValue(validationValue)
         }, [activeSuggestions, formValidation?.setValue, inputRef, normalizeTextValue, rest.type, validationUsesSuggestions, value])
 

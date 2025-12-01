@@ -23,7 +23,10 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
     const suggestions: InputSuggestion[] = React.useMemo(() => {
         return userService.values().map(user => ({
             value: user.username || "",
-            children: user.username,
+            children: <Flex align={"end"} style={{gap: "0.35rem"}}>
+                <Text>{user.username}</Text>
+                <Text size={"xs"} hierarchy={"tertiary"}>{user.email}</Text>
+            </Flex>,
             insertMode: "insert",
             valueData: user,
             groupBy: "Users"

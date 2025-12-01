@@ -339,10 +339,9 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         }, [filterSuggestionsByLastToken, inputRef, normalizeTextValue, syntaxSegments, value])
 
         useEffect(() => {
-            setOpen(true)
             if (!filterSuggestionsByLastToken) return
             if (!onLastTokenChange) return
-
+            trailingTextTokenData?.token && setOpen(true)
             onLastTokenChange(trailingTextTokenData?.token ?? null)
         }, [filterSuggestionsByLastToken, onLastTokenChange, trailingTextTokenData?.token])
 

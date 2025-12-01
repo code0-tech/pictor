@@ -5,7 +5,10 @@ import {Badge} from "../badge/Badge";
 import {Text} from "../text/Text";
 import {useService, useStore} from "../../utils";
 import {DUserReactiveService} from "./DUser.service";
-import {MenuItem} from "../menu/Menu";
+import {MenuItem, MenuLabel} from "../menu/Menu";
+import {Flex} from "../flex/Flex";
+import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
+import {Spacing} from "../spacing/Spacing";
 
 export interface DUserInputProps extends TextInputProps {
 
@@ -71,8 +74,24 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
     return <TextInput placeholder={"Enter users"}
                       suggestionsEmptyState={<MenuItem><Text>No user found</Text></MenuItem>}
                       onLastTokenChange={token => {
-                            userService.getByUsername(token)
+                          userService.getByUsername(token)
                       }}
+                      suggestionsFooter={<MenuLabel>
+                          <Flex style={{gap: ".35rem"}}>
+                              <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                  <Flex>
+                                      <Badge border><IconArrowUp size={12}/></Badge>
+                                      <Badge border><IconArrowDown size={12}/></Badge>
+                                  </Flex>
+                                  move
+                              </Flex>
+                              <Spacing spacing={"xxs"}/>
+                              <Flex align={"center"} style={{gap: ".35rem"}}>
+                                  <Badge border><IconCornerDownLeft size={12}/></Badge>
+                                  insert
+                              </Flex>
+                          </Flex>
+                      </MenuLabel>}
                       filterSuggestionsByLastToken
                       enforceUniqueSuggestions
                       transformSyntax={transformSyntax} {...rest}

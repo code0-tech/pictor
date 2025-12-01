@@ -29,6 +29,7 @@ import {InputSyntax, ResolvedVisualSelectionRange} from "./InputSyntax"
 import {InputSyntaxSegment, useSyntaxModel} from "./Input.syntax.hook"
 import {useSelectionNormalization, useSelectionResolution, useSelectionVisibility} from "./Input.selection.hook"
 import {getSelectionMetrics, setElementKey, setSelectionRangeSafe} from "./Input.utils"
+import {Card} from "../card/Card";
 
 export type Code0Input = Omit<
     Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
@@ -895,8 +896,9 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     />
                 </MenuTrigger>
                 <MenuPortal>
-                        <InputSuggestionMenuContent inputRef={inputRef}>
-                            {suggestionsHeader}
+                    <InputSuggestionMenuContent color={"secondary"} inputRef={inputRef}>
+                        {suggestionsHeader}
+                        <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
                             {availableSuggestions?.length === 0 && suggestionsEmptyState}
                             {!!availableSuggestions?.length && (
                                 <InputSuggestionMenuContentItems
@@ -917,10 +919,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                                     }}
                                 />
                             )}
-                            {suggestionsFooter}
-                        </InputSuggestionMenuContent>
-                    </MenuPortal>
-                </Menu>
+                        </Card>
+                        {suggestionsFooter}
+                    </InputSuggestionMenuContent>
+                </MenuPortal>
+            </Menu>
         ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsEmptyState, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
 
         return (

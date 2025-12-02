@@ -7,7 +7,7 @@ export interface ButtonProps extends Code0Component<HTMLButtonElement> {
     //defaults to primary
     color?: Color,
     //default to normal
-    variant?: "none" | "normal" | "outlined",
+    variant?: "none" | "normal" | "outlined" | "filled",
     //defaults to false
     active?: boolean
     //defaults to false

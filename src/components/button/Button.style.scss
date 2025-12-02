@@ -19,19 +19,45 @@
 
 @each $name, $color in variables.$colors {
   .button--#{$name} {
-      @include box.box($color, variables.$white, variables.$white);
-      @include box.boxHover($color, variables.$white, variables.$white);
-      @include box.boxActive($color, variables.$white, variables.$white);
+    @include box.box($color, variables.$white, $color);
+    @include box.boxHover($color, variables.$white, $color);
+    @include box.boxActive($color, variables.$white, $color);
 
     &.button--outlined {
       background: transparent;
-      //@include helpers.glassBox($color, variables.$white, $color);
+
+      &:hover {
+        @if ($color == variables.$primary) {
+          border-color: rgba(variables.$secondary, 0.15);
+        } @else {
+          border-color: rgba($color, .15);
+        }
+      }
+
+      &:active, &:focus, &[aria-selected=true] {
+        @if ($color == variables.$primary) {
+          border-color: rgba(variables.$secondary, 0.2);
+        } @else {
+          border-color: rgba($color, .2);
+        }
+      }
     }
 
     &.button--none {
       background: transparent;
-      border: none;
-      //@include helpers.glassBoxWithoutShadowAndBorder($color, variables.$white, $color);
+      border-color: transparent;
+
+      &:hover {
+        background: helpers.backgroundColor($color, 1.5);
+      }
+
+      &:active, &:focus, &[aria-selected=true] {
+        background: helpers.backgroundColor($color, 2);
+      }
+    }
+
+    &.button--filled {
+      border-color: transparent;
     }
   }
 }

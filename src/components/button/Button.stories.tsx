@@ -18,7 +18,7 @@ const meta = {
             default: false
         },
         variant: {
-            options: ['none', 'normal', 'outlined'],
+            options: ['none', 'normal', 'outlined', 'filled'],
             control: {type: 'radio'},
         },
         color: {table: {disable: true}}

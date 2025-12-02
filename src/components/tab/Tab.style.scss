@@ -29,31 +29,30 @@
       content: "";
       position: absolute;
       background: transparent;
-      border-radius: 50rem;
       background: helpers.backgroundColor(variables.$secondary);
     }
 
     &[data-orientation="vertical"] {
-      padding-left: variables.$xs * 2;
 
       &:after {
-        height: 50%;
+        border-bottom-right-radius: 50rem;
+        border-top-right-radius: 50rem;
+        height: 35%;
         width: 3px;
         top: 50%;
         transform: translateY(-50%);
-        left: variables.$xs;
+        left: 0;
       }
     }
 
     &[data-orientation="horizontal"] {
-
-      padding-bottom: variables.$xxs * 2;
-
       &:after {
+        border-top-left-radius: 50rem;
+        border-top-right-radius: 50rem;
         width: 10%;
         min-width: 28px;
         height: 3px;
-        bottom: variables.$xxs;
+        bottom: 0;
         left: 50%;
         transform: translateX(-50%);
       }

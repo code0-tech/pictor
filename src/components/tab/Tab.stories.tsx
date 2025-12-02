@@ -12,14 +12,14 @@ export default {
 export const TabExample = () => {
     return <Tab orientation={"horizontal"} defaultValue={"overview"}>
         <TabList>
-            <TabTrigger value={"overview"}>
-                <Button variant={"none"}>
+            <TabTrigger value={"overview"} asChild>
+                <Button paddingSize={"xxs"} variant={"none"}>
                     <IconHome size={16}/>
                     <Text size={"md"} hierarchy={"primary"}>Collaborative documents</Text>
                 </Button>
             </TabTrigger>
-            <TabTrigger value={"organizations"}>
-                <Button variant={"none"}>
+            <TabTrigger value={"organizations"} asChild>
+                <Button paddingSize={"xxs"} variant={"none"}>
                     <IconBuilding size={16}/>
                     <Text size={"md"} hierarchy={"primary"}>Inline comments</Text>
                 </Button>
@@ -31,17 +31,17 @@ export const TabExample = () => {
 export const TabExampleVertical = () => {
     return <Tab orientation={"vertical"} defaultValue={"overview"}>
         <TabList>
-            <TabTrigger value={"overview"}>
+            <TabTrigger value={"overview"} asChild>
                 <Button paddingSize={"xxs"} variant={"none"}>
                     <Text size={"md"} hierarchy={"primary"}>Collaborative documents</Text>
                 </Button>
             </TabTrigger>
-            <TabTrigger value={"organizations"}>
+            <TabTrigger value={"organizations"} asChild>
                 <Button paddingSize={"xxs"} variant={"none"}>
                     <Text size={"md"} hierarchy={"primary"}>Inline comments</Text>
                 </Button>
             </TabTrigger>
-            <TabTrigger value={"commands"}>
+            <TabTrigger value={"commands"} asChild>
                 <Button paddingSize={"xxs"} variant={"none"}>
                     <Text size={"md"} hierarchy={"primary"}>Text-to-issue commands</Text>
                 </Button>

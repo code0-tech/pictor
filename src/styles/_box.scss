@@ -24,11 +24,8 @@
   $color: variables.$secondary,
   $borderColor: variables.$secondary
 ) {
-  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
-  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
-
   &:hover {
-    border-color: rgba($mixedBorderWhite, .25);
+    background: helpers.backgroundColor($background, 1.5);
   }
 }
 
@@ -37,10 +34,7 @@
   $color: variables.$secondary,
   $borderColor: variables.$secondary
 ) {
-  $mixedBorderWhite: color.mix($borderColor, variables.$white, 25%);
-  $mixedBorderBlack: color.mix($borderColor, variables.$black, 25%);
-
-  border-color: rgba($mixedBorderWhite, .1);
+  background: helpers.backgroundColor($background, 2);
   outline: none;
 }
 
@@ -50,7 +44,7 @@
   $borderColor: variables.$secondary
 ) {
 
-  &:active, &:focus {
+  &:active, &:focus, &[aria-selected=true] {
     @include boxActiveStyle($background, $color, $borderColor);
   }
 }

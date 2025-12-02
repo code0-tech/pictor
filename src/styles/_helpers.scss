@@ -35,6 +35,12 @@
 }
 
 @function backgroundColor($color: variables.$secondary, $level: 1) {
+  @if($color == variables.$primary) {
+    @if($level == 1) {
+      @return variables.$primary
+    }
+    @return rgba(variables.$secondary, 10% * $level);
+  }
   @return color.mix($color, variables.$primary, 10% * $level);
 }
 

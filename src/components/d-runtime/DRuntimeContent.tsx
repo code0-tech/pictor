@@ -32,7 +32,6 @@ export const DRuntimeContent: React.FC<DRuntimeContentProps> = (props) => {
 
         {minimized ? (
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconServer size={16}/>
                 <Text size={"md"} hierarchy={"secondary"} display={"block"}>
                     {runtime?.name}
                 </Text>

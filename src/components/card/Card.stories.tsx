@@ -1,13 +1,17 @@
 import {Meta, StoryObj} from "@storybook/react-vite";
-import React, {useState} from "react";
+import React from "react";
 import {Card} from "./Card";
-import {Badge} from "../badge/Badge";
 import {Text} from "../text/Text";
 import {Colors} from "../../utils/types";
-import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconHeart, IconHeartFilled, IconShare} from "@tabler/icons-react";
-import CardSection from "./CardSection";
+import {IconBuilding, IconGitBranch, IconServer, IconUserCog} from "@tabler/icons-react";
+import {AuroraBackground} from "../aurora/Aurora";
+import {Spacing} from "../spacing/Spacing";
+import {Flex} from "../flex/Flex";
+import {Row} from "../row/Row";
+import {Col} from "../col/Col";
+import {Container} from "../container/Container";
+import {Badge} from "../badge/Badge";
 
 const meta: Meta = {
     title: "Card",
@@ -49,64 +53,92 @@ export default meta
 
 type CardStory = StoryObj<typeof Card>;
 
-export const CardNews: CardStory = {
-    render: (props) => {
-
-        const [heart, setHeart] = useState(false)
-
-        return <Card {...props} style={{
-            width: "50vw",
-            maxWidth: "350px"
-        }}>
-
-
-            <CardSection image border>
-                <img alt={""} width={"100%"}
-                     src={"https://repository-images.githubusercontent.com/725262039/8250ad12-4a52-4c89-9b16-6d4186dbb325"}></img>
-            </CardSection>
-            <CardSection>
-                <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                }}>
-                    <div>
-                        <Text size={"lg"} hierarchy={"primary"} style={{display: "block", marginBottom: ".25rem"}}>A
-                            great backend story</Text>
-                        <Badge>by Niklas van Schrick</Badge>
-                    </div>
-                    <ButtonGroup>
-                        <Button color={"error"} onClick={() => setHeart(prevState => !prevState)}>
-                            {heart ? <div style={{display: "flex", alignItems: "center"}}>
-                                <IconHeartFilled style={{display: "flex", marginRight: ".5rem"}} size={16}/>
-                                <Badge color={"info"}>500</Badge>
-                            </div> : <div style={{display: "flex", alignItems: "center"}}>
-                                <IconHeart style={{display: "flex", marginRight: ".5rem"}} size={16}/>
-                                <Badge color={"info"}>499</Badge>
-                            </div>}
-                        </Button>
-                        <Button color={"primary"}>
-                            <IconShare style={{display: "flex"}} size={16}/>
-                        </Button>
-                    </ButtonGroup>
-                </div>
-            </CardSection>
-            <CardSection border>
-                <Text hierarchy={"tertiary"} size={"md"}>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                    diam
-                    nonumy eirmod tempor invidunt ut</Text>
-            </CardSection>
-
-        </Card>
-    }
-    ,
-    args: {
-        variant: "normal",
-        color: "secondary",
-        borderColor: "secondary",
-        outline: false,
-        outlineColor: "secondary",
-        gradient: false,
-        dashed: false,
-    }
+export const CardNews = () => {
+    return <Container>
+        <Row>
+            <Col>
+                <Card color={"secondary"}>
+                    <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
+                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                            <Text size={"xl"} hierarchy={"tertiary"}>Team</Text>
+                            <Badge color={"error"} border style={{zIndex: 1}}>
+                                <Text size={"md"} hierarchy={"tertiary"} style={{color: "inherit"}}>-27%</Text>
+                            </Badge>
+                        </Flex>
+                        <Spacing spacing={"md"}/>
+                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>12,95€</Text>
+                            <Text size={"md"} hierarchy={"tertiary"}>per user / month billed annually</Text>
+                        </Flex>
+                        <Spacing spacing={"md"}/>
+                        <Button w={"100%"} color={"primary"}>Get started now</Button>
+                    </Card>
+                    <Spacing spacing={"md"}/>
+                    <Flex style={{gap: "0.7rem", flexDirection: "column"}}>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconBuilding size={16}/>
+                            Manage projects inside organizations
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconUserCog size={16}/>
+                            Advanced role management
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconGitBranch size={16}/>
+                            Unlimited flows
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconServer size={16}/>
+                            10.000 runtime minutes per month
+                        </Text>
+                        <Text size={"sm"} hierarchy={"tertiary"} display={"flex"} align={"center"}
+                              style={{gap: "0.7rem"}}>
+                            See all the features
+                        </Text>
+                    </Flex>
+                    <AuroraBackground/>
+                </Card>
+            </Col>
+            <Col>
+                <Card>
+                    <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
+                        <Text size={"xl"} hierarchy={"tertiary"}>Team</Text>
+                        <Spacing spacing={"md"}/>
+                        <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
+                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>17,95€</Text>
+                            <Text size={"md"} hierarchy={"tertiary"}>per user / month billed monthly</Text>
+                        </Flex>
+                        <Spacing spacing={"md"}/>
+                        <Button w={"100%"} color={"primary"}>Get started now</Button>
+                    </Card>
+                    <Spacing spacing={"md"}/>
+                    <Flex style={{gap: "0.7rem", flexDirection: "column"}}>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconBuilding size={16}/>
+                            Manage projects inside organizations
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconUserCog size={16}/>
+                            Advanced role management
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconGitBranch size={16}/>
+                            Unlimited flows
+                        </Text>
+                        <Text size={"md"} display={"flex"} align={"center"} style={{gap: "0.7rem"}}>
+                            <IconServer size={16}/>
+                            10.000 runtime minutes per month
+                        </Text>
+                        <Text size={"sm"} hierarchy={"tertiary"} display={"flex"} align={"center"}
+                              style={{gap: "0.7rem"}}>
+                            See all the features
+                        </Text>
+                    </Flex>
+                </Card>
+            </Col>
+            <Col>
+                {" "}
+            </Col>
+        </Row>
+    </Container>
 }

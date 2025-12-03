@@ -4,7 +4,7 @@ import {Card} from "./Card";
 import {Text} from "../text/Text";
 import {Colors} from "../../utils/types";
 import {Button} from "../button/Button";
-import {IconBuilding, IconGitBranch, IconServer, IconUserCog} from "@tabler/icons-react";
+import {IconArrowRight, IconBuilding, IconGitBranch, IconServer, IconUserCog} from "@tabler/icons-react";
 import {AuroraBackground} from "../aurora/Aurora";
 import {Spacing} from "../spacing/Spacing";
 import {Flex} from "../flex/Flex";
@@ -61,14 +61,16 @@ export const CardNews = () => {
                     <Card mt={-1.3} mx={-1.3} color={"primary"} style={{borderWidth: "3px"}}>
                         <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
                             <Text size={"xl"} hierarchy={"tertiary"}>Team</Text>
-                            <Badge color={"error"} border style={{zIndex: 1}}>
-                                <Text size={"md"} hierarchy={"tertiary"} style={{color: "inherit"}}>-27%</Text>
-                            </Badge>
                         </Flex>
                         <Spacing spacing={"md"}/>
                         <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                            <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>12,95€</Text>
-                            <Text size={"md"} hierarchy={"tertiary"}>per user / month billed annually</Text>
+                            <div style={{position: "relative"}}>
+                                <Text size={"xl"} style={{fontSize: "2rem"}} hierarchy={"primary"}>12,95€</Text>
+                                <Badge pos={"absolute"} style={{top: 0, right: 0, transform: "translateX(75%) translateY(-25%)"}} color={"error"} border>
+                                    <Text size={"xs"} hierarchy={"tertiary"} style={{color: "inherit"}}>-27%</Text>
+                                </Badge>
+                            </div>
+                            <Text size={"md"} hierarchy={"tertiary"} style={{textAlign: "right"}}>per user / month billed annually</Text>
                         </Flex>
                         <Spacing spacing={"md"}/>
                         <Button w={"100%"} color={"primary"}>Get started now</Button>
@@ -91,10 +93,10 @@ export const CardNews = () => {
                             <IconServer size={16}/>
                             10.000 runtime minutes per month
                         </Text>
-                        <Text size={"sm"} hierarchy={"tertiary"} display={"flex"} align={"center"}
-                              style={{gap: "0.7rem"}}>
+                        <Button paddingSize={"xxs"}>
                             See all the features
-                        </Text>
+                            <IconArrowRight size={16}/>
+                        </Button>
                     </Flex>
                     <AuroraBackground/>
                 </Card>
@@ -129,10 +131,10 @@ export const CardNews = () => {
                             <IconServer size={16}/>
                             10.000 runtime minutes per month
                         </Text>
-                        <Text size={"sm"} hierarchy={"tertiary"} display={"flex"} align={"center"}
-                              style={{gap: "0.7rem"}}>
+                        <Button paddingSize={"xxs"} color={"primary"}>
                             See all the features
-                        </Text>
+                            <IconArrowRight size={16}/>
+                        </Button>
                     </Flex>
                 </Card>
             </Col>

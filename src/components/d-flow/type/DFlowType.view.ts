@@ -19,7 +19,7 @@ export class FlowTypeView {
     /** Flow type settings of the flow type */
     private readonly _flowTypeSettings?: Maybe<Array<FlowTypeSetting>>;
     /** Global ID of this FlowType */
-    private readonly _id?: Maybe<Scalars['TypesFlowTypeID']['output']>;
+    private readonly _id?: Maybe<Scalars['FlowTypeID']['output']>;
     /** Identifier of the flow type */
     private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Input type of the flow type */
@@ -62,7 +62,7 @@ export class FlowTypeView {
         return this._flowTypeSettings;
     }
 
-    get id(): Maybe<Scalars["TypesFlowTypeID"]["output"]> | undefined {
+    get id(): Maybe<Scalars["FlowTypeID"]["output"]> | undefined {
         return this._id;
     }
 

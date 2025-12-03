@@ -1,4 +1,5 @@
 export * from "./components/alert/Alert"
+export * from "./components/aurora/Aurora"
 export * from "./components/avatar/Avatar"
 export * from "./components/badge/Badge"
 export * from "./components/breadcrumb/Breadcrumb"

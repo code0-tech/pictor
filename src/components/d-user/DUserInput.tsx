@@ -9,19 +9,20 @@ import {MenuItem, MenuLabel} from "../menu/Menu";
 import {Flex} from "../flex/Flex";
 import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
 import {Spacing} from "../spacing/Spacing";
+import {DUserView} from "./DUser.view";
 
 export interface DUserInputProps extends TextInputProps {
-
+    filter?: (user: DUserView, index: number) => boolean
 }
 
 export const DUserInput: React.FC<DUserInputProps> = (props) => {
 
-    const {...rest} = props
+    const {filter = () => true, ...rest} = props
 
     const userService = useService(DUserReactiveService)
     const userStore = useStore(DUserReactiveService)
     const suggestions: InputSuggestion[] = React.useMemo(() => {
-        return userService.values().map(user => ({
+        return userService.values().filter(filter).map(user => ({
             value: user.username || "",
             children: <Flex align={"end"} style={{gap: "0.35rem"}}>
                 <Text>{user.username}</Text>

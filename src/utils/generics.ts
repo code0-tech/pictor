@@ -446,7 +446,7 @@ function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolea
             if (sourceConfig.key !== targetConfig.key) return false;
             return identifiersMatch(sourceConfig.dataTypeIdentifier, targetConfig.dataTypeIdentifier);
         }
-        case "INPUT_TYPE": {
+        case "INPUT_TYPES": {
             const sourceConfig = sourceRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
             const targetConfig = targetRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
             const targetInputTypes = targetConfig.inputTypes ?? [];

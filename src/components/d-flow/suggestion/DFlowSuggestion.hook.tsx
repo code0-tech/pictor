@@ -253,7 +253,7 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                     if (!pType || pType.variant === "NODE") continue;
 
                     const inputTypeRules =
-                        pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPE") ?? [];
+                        pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? [];
 
                     if (inputTypeRules.length) {
                         const paramInstance = current.parameters.find((p) => p.id === pDef.id);

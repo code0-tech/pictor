@@ -106,7 +106,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
             }
 
             if (ruleThatIncludesGenericKey
-                && ruleThatIncludesGenericKey.variant == "INPUT_TYPE"
+                && ruleThatIncludesGenericKey.variant == "INPUT_TYPES"
                 && dataType.variant === "NODE") {
                 return {
                     sourceDataTypeIdentifiers: [{

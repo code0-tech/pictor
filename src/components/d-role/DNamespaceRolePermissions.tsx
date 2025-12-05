@@ -175,13 +175,8 @@ export const DNamespaceRolePermissions: React.FC<DNamespaceRolePermissionsProps>
     )
 
     return (
-        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-            <Text size="xs" hierarchy="tertiary">
-                Permissions
-            </Text>
-            <Text size="sm" hierarchy="secondary">
-                {renderPermissionSummary(categories)}
-            </Text>
-        </Flex>
+        <Text size="sm" hierarchy="secondary">
+            {renderPermissionSummary(categories)}
+        </Text>
     )
 }

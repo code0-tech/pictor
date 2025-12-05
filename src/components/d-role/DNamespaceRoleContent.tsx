@@ -71,7 +71,12 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                 <Text size="lg" hierarchy="primary" display="block">
                     {role?.name}
                 </Text>
-                <DNamespaceRolePermissions abilities={role?.abilities as string[] | undefined}/>
+                <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                    <Text size="xs" hierarchy="tertiary">
+                        Permissions
+                    </Text>
+                    <DNamespaceRolePermissions abilities={role?.abilities as string[] | undefined}/>
+                </Flex>
             </Flex>
 
             <Flex align="center" style={{gap: "1.3rem"}}>
@@ -117,7 +122,8 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                                                         <Button paddingSize={"xxs"} variant={"none"}
                                                                 onClick={() => onProjectsViewMore(role)}>
                                                             <Text size={"xs"}>View more</Text>
-                                                            <Badge border>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
+                                                            <Badge
+                                                                border>{assignedProjects.slice(1, assignedProjects.length).length}</Badge>
                                                         </Button>
                                                     </CardSection>
                                                 ) : null}

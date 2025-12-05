@@ -140,7 +140,6 @@
     padding: $padding $padding;
     flex: 1;
     width: 100%;
-    box-shadow: none;
     font-size: variables.$sm;
     box-sizing: border-box;
     color: rgba(variables.$white, .5);
@@ -238,7 +237,7 @@
 
 .radio-input {
   background: transparent !important;
-  box-shadow: none !important;
+  border: none !important;
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -294,7 +293,7 @@
   $size: 0.9rem;
 
   background: transparent !important;
-  box-shadow: none !important;
+  border: none !important;
   align-items: center;
   box-sizing: border-box;
   gap: variables.$xxs;
@@ -334,7 +333,7 @@
   $size: 0.9rem;
 
   background: transparent !important;
-  box-shadow: none !important;
+  border: none !important;
 
 
   .input__control {

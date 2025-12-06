@@ -18,7 +18,7 @@ export type DRuntimeDependencies = {
 export abstract class DRuntimeReactiveService extends ReactiveArrayService<DRuntimeView, DRuntimeDependencies> {
 
     getById(id: Runtime['id']): DRuntimeView | undefined {
-        return this.values().find(runtime => runtime.id === id);
+        return this.values().find(runtime => runtime && runtime.id === id);
     }
 
     abstract runtimeCreate(payload: RuntimesCreateInput): Promise<RuntimesCreatePayload | undefined>

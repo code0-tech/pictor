@@ -5,7 +5,7 @@ import {ReactiveArrayService} from "../../utils";
 export abstract class DNamespaceReactiveService extends ReactiveArrayService<DNamespaceView> {
 
     getById(id: Namespace['id']): DNamespaceView | undefined {
-        return this.values().find(namespace => namespace.id === id);
+        return this.values().find(namespace => namespace && namespace.id === id);
     }
 
 }

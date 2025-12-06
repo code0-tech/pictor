@@ -19,7 +19,7 @@ export type DMemberDependencies = {
 export abstract class DNamespaceMemberReactiveService extends ReactiveArrayService<DNamespaceMemberView, DMemberDependencies> {
 
     getById(id: NamespaceMember['id'], dependencies?: DMemberDependencies): DNamespaceMemberView | undefined {
-        return this.values(dependencies).find(member => member.id === id);
+        return this.values(dependencies).find(member => member && member.id === id);
     }
 
     getByNamespaceIdAndUserId(namespaceId: Namespace['id'], userId: User['id']): DNamespaceMemberView | undefined {

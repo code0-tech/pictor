@@ -11,7 +11,7 @@ import {
 export abstract class DOrganizationReactiveService extends ReactiveArrayService<DOrganizationView> {
 
     getById(id: Organization["id"]): DOrganizationView | undefined {
-        return this.values().find(organization => organization.id === id)
+        return this.values().find(organization => organization && organization.id === id)
     }
 
     abstract organizationCreate(payload: OrganizationsCreateInput): Promise<OrganizationsCreatePayload | undefined>

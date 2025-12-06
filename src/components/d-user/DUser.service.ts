@@ -1,4 +1,4 @@
-import {ReactiveArrayService} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 import {
     User,
     UsersEmailVerificationInput,
@@ -36,11 +36,11 @@ export abstract class DUserReactiveService extends ReactiveArrayService<DUserVie
     //no id's need to be injected here because the root query has a users field
 
     getById(id: User['id']): DUserView | undefined {
-        return this.values().find(user => user.id === id);
+        return this.values().find(user => user && user.id === id);
     }
 
     getByUsername(username: User['username']): DUserView | undefined {
-        return this.values().find(user => user.username === username);
+        return this.values().find(user => user && user.username === username);
     }
 
     abstract usersEmailVerification(payload: UsersEmailVerificationInput): Promise<UsersEmailVerificationPayload | undefined>;

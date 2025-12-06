@@ -20,7 +20,7 @@ export type DRoleDependencies = {
 export abstract class DNamespaceRoleReactiveService extends ReactiveArrayService<DNamespaceRoleView, DRoleDependencies> {
 
     getById(id: NamespaceRole['id'], dependencies?: DRoleDependencies): DNamespaceRoleView | undefined {
-        return this.values(dependencies).find(role => role.id === id);
+        return this.values(dependencies).find(role => role && role.id === id);
     }
 
     abstract roleAssignAbilities(payload: NamespacesRolesAssignAbilitiesInput): Promise<NamespacesRolesAssignAbilitiesPayload | undefined>

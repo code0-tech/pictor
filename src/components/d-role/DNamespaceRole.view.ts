@@ -76,7 +76,8 @@ export class DNamespaceRoleView {
             id: this._id,
             name: this._name,
             namespace: this._namespace,
-            updatedAt: this._updatedAt
+            updatedAt: this._updatedAt,
+            userAbilities: this._userAbilities
         };
     }
 }

@@ -85,6 +85,7 @@ class Validation<Values> implements IValidation<Values> {
         return {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
             defaultValue: currentValue,
+            initialValue: currentValue,
             formValidation: {
                 setValue: (value: any) => {
                     this.changeValue(currentName, value)

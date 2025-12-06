@@ -302,18 +302,23 @@
   &__button {
 
     aspect-ratio: 1/1;
-    width: 17px;
-    height: 17px;
+    width: variables.$xl;
+    height: variables.$xl;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: variables.$xxs;
+    cursor: pointer;
 
     & {
       @include helpers.fontStyle();
       @include box.boxActive();
       @include box.box();
       @include helpers.disabled();
-      @include helpers.borderRadius();
+    }
+
+    &[data-state="checked"] {
+      @include box.boxActiveStyle(variables.$info);
     }
 
   }

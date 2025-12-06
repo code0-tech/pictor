@@ -14,36 +14,33 @@ export type CheckboxInputProps =
 
 export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
 
-    const [checked, setChecked] = React.useState<CheckedState>(props.initialValue ?? "indeterminate");
-
     const {
         title,
         description,
         formValidation = {
             valid: true,
             notValidMessage: null,
-            setValue: (value: CheckedState) => {
-            },
+            setValue: (value: CheckedState) => undefined,
         },
         ...rest
     } = props
+
+    const [checked, setChecked] = React.useState<CheckedState>(props.initialValue ?? "indeterminate");
+
+    React.useEffect(() => {
+        formValidation.setValue(checked)
+    }, [checked])
 
     return <>
         {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
-        <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""} checkbox-input`, {})}>
+        <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""} checkbox-input`, {})} onClick={() => setChecked(prevState => !prevState)}>
 
-            <Checkbox defaultChecked={checked} {...mergeCode0Props("checkbox-input__button", {
-                ...rest, onCheckedChange: (value: CheckedState) => {
-                    if (rest.onCheckedChange) rest.onCheckedChange!!(value)
-                    setChecked(value)
-                    formValidation.setValue(value)
-                }
-            })}>
+            <Checkbox checked={checked} defaultChecked={checked} {...mergeCode0Props("checkbox-input__button", rest)}>
                 <CheckboxIndicator className={"checkbox-input__indicator"}>
-                    {checked === "indeterminate" && <IconMinus size={10}/>}
-                    {checked === true && <IconCheck size={10}/>}
+                    {checked === "indeterminate" && <IconMinus size={16}/>}
+                    {checked === true && <IconCheck size={16}/>}
                 </CheckboxIndicator>
             </Checkbox>
 

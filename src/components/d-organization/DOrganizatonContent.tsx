@@ -2,10 +2,10 @@
 
 import React from "react"
 import {Code0Component, useService, useStore} from "../../utils"
-import {Organization, Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {Organization} from "@code0-tech/sagittarius-graphql-types"
 import {Text} from "../text/Text"
 import {DOrganizationReactiveService} from "./DOrganization.service"
-import {IconFolder, IconLogout, IconServer, IconSettings, IconUser} from "@tabler/icons-react"
+import {IconEdit, IconFolders, IconLogout, IconServer, IconSettings, IconUsers} from "@tabler/icons-react"
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {Spacing} from "../spacing/Spacing";
@@ -60,21 +60,21 @@ export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
                     </Text>
                     <Spacing spacing={"xxs"}/>
                     <Flex align={"center"} style={{gap: "0.35rem", flexWrap: "wrap"}}>
-                        <Badge color={"secondary"}>
+                        <Badge border>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconFolder size={16}/>
+                                <IconFolders size={16}/>
                                 <Text size={"xs"}
                                       hierarchy={"tertiary"}>{`${projectCount ?? 0} project${(projectCount ?? 0) !== 1 ? "s" : ""}`}</Text>
                             </Flex>
                         </Badge>
-                        <Badge color={"secondary"}>
+                        <Badge border>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <IconUser size={16}/>
+                                <IconUsers size={16}/>
                                 <Text size={"xs"}
                                       hierarchy={"tertiary"}> {`${memberCount ?? 0} member${(memberCount ?? 0) !== 1 ? "s" : ""}`}</Text>
                             </Flex>
                         </Badge>
-                        <Badge color={"secondary"}>
+                        <Badge border>
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                 <IconServer size={16}/>
                                 <Text size={"xs"}
@@ -84,17 +84,17 @@ export const DOrganizationContent: React.FC<DOrganizationCardProps> = props => {
                     </Flex>
                 </Flex>
             </Flex>
-            <Flex align={"center"} style={{gap: "0.35rem"}}>
+            <Flex align={"center"} style={{gap: "0.7rem"}}>
                 {(organization?.userAbilities?.deleteOrganization || organization?.userAbilities?.updateOrganization) ? (
-                    <Button color={"secondary"} onClick={(event) => {
+                    <Button variant={"filled"} color={"secondary"} onClick={(event) => {
                         event.stopPropagation()
                         onSetting(organization)
                     }}>
-                        <IconSettings size={16}/>
+                        <IconEdit size={16}/>
                     </Button>
                 ) : null}
                 {namespaceMember && namespaceMember.userAbilities?.deleteMember ? (
-                    <Button color={"error"} onClick={(event) => {
+                    <Button variant={"filled"} color={"error"} onClick={(event) => {
                         event.stopPropagation()
                         if (organization) onLeave(organization)
                     }}>

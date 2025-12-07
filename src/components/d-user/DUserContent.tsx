@@ -43,7 +43,7 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
         </Flex>
         <Flex style={{gap: "1.3rem"}} align={"center"}>
             {user?.emailVerifiedAt ? (
-                <Badge color={"primary"}>
+                <Badge border>
                     <IconMailCheck size={16}/>
                     <Text size={"xs"} hierarchy={"tertiary"}>Email verified</Text>
                 </Badge>
@@ -54,13 +54,13 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
                     {
                         remove ? (
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                <Button color={"error"} onClick={(event) => {
+                                <Button variant={"filled"} color={"error"} onClick={(event) => {
                                     event.stopPropagation()
                                     onRemove(user)
                                 }}>
                                     Confirm remove
                                 </Button>
-                                <Button onClick={(event) => {
+                                <Button variant={"filled"} onClick={(event) => {
                                     event.stopPropagation()
                                     setRemove(false)
                                 }} color={"success"}>
@@ -68,7 +68,7 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
                                 </Button>
                             </Flex>
                         ) : (
-                            <Button onClick={() => setRemove(true)}>
+                            <Button variant={"filled"} onClick={() => setRemove(true)}>
                                 Remove
                             </Button>)
                     }

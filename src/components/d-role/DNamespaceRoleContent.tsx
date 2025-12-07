@@ -8,7 +8,7 @@ import {useService, useStore} from "../../utils";
 import {DNamespaceRoleReactiveService} from "./DNamespaceRole.service";
 import {Text} from "../text/Text";
 import {Button} from "../button/Button";
-import {IconFolders, IconSettings, IconUsers} from "@tabler/icons-react";
+import {IconEdit, IconFolders, IconSettings, IconUsers} from "@tabler/icons-react";
 import {DNamespaceRolePermissions} from "./DNamespaceRolePermissions";
 import {DNamespaceMemberReactiveService} from "../d-member";
 import {Badge} from "../badge/Badge";
@@ -186,12 +186,13 @@ export const DNamespaceRoleContent: React.FC<DNamespaceRoleContentProps> = (prop
                 {canEditRole && (
                     <Button
                         color="secondary"
+                        variant={"filled"}
                         onClick={event => {
                             event.stopPropagation()
                             onSetting(role as DNamespaceRoleView)
                         }}
                     >
-                        <IconSettings size={16}/>
+                        <IconEdit size={16}/>
                     </Button>
                 )}
             </Flex>

@@ -8,7 +8,16 @@ import {DNamespaceRoleReactiveService, DNamespaceRoleView} from "../d-role"
 import {Avatar} from "../avatar/Avatar"
 import {Text} from "../text/Text"
 import {Badge} from "../badge/Badge"
-import {IconDots, IconMailCheck, IconTrash, IconUserCog, IconUserOff} from "@tabler/icons-react"
+import {
+    IconArrowDown,
+    IconArrowUp,
+    IconCornerDownLeft,
+    IconDots,
+    IconMailCheck,
+    IconTrash,
+    IconUserCog,
+    IconUserOff
+} from "@tabler/icons-react"
 import {Button} from "../button/Button"
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip"
 import {DNamespaceRolePermissions} from "../d-role/DNamespaceRolePermissions"
@@ -17,6 +26,7 @@ import {DNamespaceMemberView} from "./DNamespaceMember.view"
 import {Dialog, DialogClose, DialogContent, DialogPortal} from "../dialog/Dialog"
 import {Card} from "../card/Card"
 import CardSection from "../card/CardSection"
+import {Spacing} from "../spacing/Spacing";
 
 export interface DNamespaceMemberContentProps {
     memberId: NamespaceMember['id']
@@ -80,7 +90,7 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                                         <Text hierarchy={"primary"}>{role?.name}</Text>
                                         <DNamespaceRolePermissions abilities={role?.abilities!!}/>
                                     </Flex>
-                                    <Button color={"error"} paddingSize={"xxs"} onClick={() => {
+                                    <Button color={"error"} variant={"filled"} paddingSize={"xxs"} onClick={() => {
                                         setLocalAssignedRoles(prevState => prevState.filter(aRole => aRole?.id != role?.id))
                                     }}>
                                         <IconTrash size={16}/>
@@ -96,21 +106,40 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
                                 </CardSection>
                             </MenuTrigger>
                             <MenuPortal>
-                                <MenuContent side={"bottom"} sideOffset={8} align={"center"}>
-                                    <MenuLabel>Roles to add</MenuLabel>
-                                    {rolesToAssign.map((role, index) => {
-                                        return <>
-                                            <MenuItem onSelect={() => {
-                                                setLocalAssignedRoles(prevState => [...prevState, role])
-                                            }}>
-                                                <Flex align={"center"} style={{gap: "1.3rem"}}>
-                                                    <Text hierarchy={"primary"}>{role?.name}</Text>
-                                                    <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                                <MenuContent side={"bottom"} sideOffset={8} align={"center"} color={"secondary"}
+                                             maw={"300px"}>
+                                    <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                        <MenuLabel>Roles to add</MenuLabel>
+                                        {rolesToAssign.map((role, index) => {
+                                            return <>
+                                                <MenuItem onSelect={() => {
+                                                    setLocalAssignedRoles(prevState => [...prevState, role])
+                                                }}>
+                                                    <Flex align={"center"} style={{gap: "1.3rem"}}>
+                                                        <Text hierarchy={"primary"}>{role?.name}</Text>
+                                                        <DNamespaceRolePermissions abilities={role?.abilities!!}/>
+                                                    </Flex>
+                                                </MenuItem>
+                                                {index < rolesToAssign.length - 1 && <MenuSeparator/>}
+                                            </>
+                                        })}
+                                    </Card>
+                                    <MenuLabel>
+                                        <Flex style={{gap: ".35rem"}}>
+                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                <Flex>
+                                                    <Badge border><IconArrowUp size={12}/></Badge>
+                                                    <Badge border><IconArrowDown size={12}/></Badge>
                                                 </Flex>
-                                            </MenuItem>
-                                            {index < rolesToAssign.length - 1 && <MenuSeparator/>}
-                                        </>
-                                    })}
+                                                move
+                                            </Flex>
+                                            <Spacing spacing={"xxs"}/>
+                                            <Flex align={"center"} style={{gap: ".35rem"}}>
+                                                <Badge border><IconCornerDownLeft size={12}/></Badge>
+                                                insert
+                                            </Flex>
+                                        </Flex>
+                                    </MenuLabel>
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
@@ -179,25 +208,43 @@ export const DNamespaceMemberContent: React.FC<DNamespaceMemberContentProps> = (
             {member?.userAbilities?.deleteMember || member?.userAbilities?.assignMemberRoles ? (
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color="secondary">
+                        <Button variant={"filled"} color="secondary">
                             <IconDots size={16}/>
                         </Button>
                     </MenuTrigger>
                     <MenuPortal>
-                        <MenuContent align={"end"} side={"bottom"} sideOffset={8}>
-                            <MenuLabel>Actions</MenuLabel>
-                            {member?.userAbilities?.deleteMember && (
-                                <MenuItem onSelect={() => setOpenRemovedMemberDialog(true)}>
-                                    <IconUserOff size={16}/>
-                                    <Text>Remove member</Text>
-                                </MenuItem>
-                            )}
-                            {member?.userAbilities?.assignMemberRoles && (
-                                <MenuItem onSelect={() => setOpenAssignRolesDialog(true)}>
-                                    <IconUserCog size={16}/>
-                                    <Text>Assign role</Text>
-                                </MenuItem>
-                            )}
+                        <MenuContent align={"end"} side={"bottom"} sideOffset={8} color={"secondary"}>
+                            <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                <MenuLabel>Actions</MenuLabel>
+                                {member?.userAbilities?.deleteMember && (
+                                    <MenuItem onSelect={() => setOpenRemovedMemberDialog(true)}>
+                                        <IconUserOff size={16}/>
+                                        <Text>Remove member</Text>
+                                    </MenuItem>
+                                )}
+                                {member?.userAbilities?.assignMemberRoles && (
+                                    <MenuItem onSelect={() => setOpenAssignRolesDialog(true)}>
+                                        <IconUserCog size={16}/>
+                                        <Text>Assign role</Text>
+                                    </MenuItem>
+                                )}
+                            </Card>
+                            <MenuLabel>
+                                <Flex style={{gap: ".35rem"}}>
+                                    <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                        <Flex>
+                                            <Badge border><IconArrowUp size={12}/></Badge>
+                                            <Badge border><IconArrowDown size={12}/></Badge>
+                                        </Flex>
+                                        move
+                                    </Flex>
+                                    <Spacing spacing={"xxs"}/>
+                                    <Flex align={"center"} style={{gap: ".35rem"}}>
+                                        <Badge border><IconCornerDownLeft size={12}/></Badge>
+                                        perform
+                                    </Flex>
+                                </Flex>
+                            </MenuLabel>
                         </MenuContent>
                     </MenuPortal>
                 </Menu>

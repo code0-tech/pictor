@@ -2,7 +2,7 @@ import {Runtime} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
-import {IconServer, IconSettings} from "@tabler/icons-react";
+import {IconEdit, IconServer, IconSettings} from "@tabler/icons-react";
 import {Button} from "../button/Button";
 import {useService, useStore} from "../../utils";
 import {DRuntimeReactiveService} from "./DRuntime.service";
@@ -55,11 +55,11 @@ export const DRuntimeContent: React.FC<DRuntimeContentProps> = (props) => {
                 )}
             </Flex>
             {!minimized && (runtime?.userAbilities?.deleteRuntime || runtime?.userAbilities?.updateRuntime || runtime?.userAbilities?.rotateRuntimeToken) ? (
-                <Button color={"secondary"} onClick={(event) => {
+                <Button color={"secondary"} variant={"filled"} onClick={(event) => {
                     event.stopPropagation()
                     onSetting(runtime)
                 }}>
-                    <IconSettings size={16}/>
+                    <IconEdit size={16}/>
                 </Button>
             ) : null}
         </Flex>

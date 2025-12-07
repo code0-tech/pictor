@@ -62,7 +62,7 @@ export const DProjectMenuExample: DNamespaceProjectMenuStory = {
                 createdAt: new Date().toString(),
                 updatedAt: new Date().toString(),
                 namespace: {
-                    id: "gid://sagittarius/Namespace/1"
+                    id: "gid://sagittarius/Namespace/2"
                 },
                 flow: undefined,
                 flows: undefined,
@@ -76,6 +76,7 @@ export const DProjectMenuExample: DNamespaceProjectMenuStory = {
                 {React.useMemo(() => {
                     return (
                         <DNamespaceProjectMenu
+                            namespaceId={"gid://sagittarius/Namespace/1"}
                             projectId={"gid://sagittarius/NamespaceProject/1"}
                             onProjectSelect={props.onProjectSelect}
                         />

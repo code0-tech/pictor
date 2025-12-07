@@ -1,40 +1,54 @@
 "use client"
 
 import React from "react"
-import {Menu, MenuContent, MenuItem, MenuPortal, MenuProps, MenuTrigger} from "../menu/Menu"
+import {Menu, MenuContent, MenuItem, MenuPortal, MenuProps, MenuSeparator, MenuTrigger} from "../menu/Menu"
 import {DNamespaceProjectReactiveService} from "./DNamespaceProject.service"
 import {useService} from "../../utils/contextStore"
-import {Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {Namespace, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {Button} from "../button/Button"
+import {DNamespaceProjectView} from "./DNamespaceProject.view";
+import {DNamespaceProjectContent} from "./DNamespaceProjectContent";
 
 export interface DNamespaceProjectMenuProps extends MenuProps {
-    projectId: Scalars['NamespaceProjectID']['output']
-    onProjectSelect: (id: Scalars['NamespaceProjectID']['output']) => void
+    onProjectSelect: (project: DNamespaceProjectView) => void
+    namespaceId: Namespace["id"]
+    filter?: (project: DNamespaceProjectView, index: number) => boolean
+    projectId?: Scalars['NamespaceProjectID']['output']
+    children?: React.ReactNode
 }
 
 const DNamespaceProjectMenu: React.FC<DNamespaceProjectMenuProps> = props => {
+
+    const {onProjectSelect, namespaceId, filter = () => true, projectId, children} = props
+
     const projectService = useService(DNamespaceProjectReactiveService)
     const projectStore = useService(DNamespaceProjectReactiveService)
-    const currentProject = projectService.getById(props.projectId)
+    const currentProject = projectService.getById(projectId)
+    const projects = React.useMemo(() => projectService.values({namespaceId: namespaceId}).filter(filter), [projectStore, namespaceId])
 
     return React.useMemo(() => {
         return (
             <Menu {...props}>
                 <MenuTrigger asChild>
-                    <Button variant={"none"} style={{background: "transparent"}}>
-                        {currentProject?.name}
-                    </Button>
+                    {children ? children : (
+                        <Button variant={"none"} paddingSize={"xxs"}>
+                            {currentProject?.name}
+                        </Button>
+                    )}
                 </MenuTrigger>
                 <MenuPortal>
-                    <MenuContent side={"bottom"} align={"start"} sideOffset={0}>
-                    {projectService.values().map((project) => (
-                        <MenuItem
-                            key={project.id}
-                            onSelect={() => props.onProjectSelect(project.id!!)}
-                        >
-                            {project.name}
-                        </MenuItem>
-                    ))}
+                    <MenuContent side={"bottom"} align={"center"} sideOffset={8} maw={"200px"}>
+                        {projects.map((project, index) => (
+                            <>
+                                <MenuItem
+                                    key={project.id}
+                                    onSelect={() => onProjectSelect(project)}
+                                >
+                                    <DNamespaceProjectContent minimized projectId={project.id}/>
+                                </MenuItem>
+                                {index < projects.length - 1 && <MenuSeparator/>}
+                            </>
+                        ))}
                     </MenuContent>
                 </MenuPortal>
             </Menu>

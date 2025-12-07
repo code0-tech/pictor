@@ -154,43 +154,6 @@ export const Dashboard = () => {
 
 
 const FlowExample = () => {
-    const initialNodes = useFlowNodes("gid://sagittarius/Flow/1")
-    const initialEdges = useFlowEdges("gid://sagittarius/Flow/1")
 
-    return <DFlow
-        nodes={initialNodes}
-        edges={initialEdges}
-        fitView
-    >
-        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-        <DFlowControl/>
-        <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
-        <Panel position={"top-center"}>
-            <SegmentedControl type={"single"} defaultValue={"horizontal"}>
-                <SegmentedControlItem value={"horizontal"} display={"flex"}>
-                    <IconLayoutDistributeHorizontal size={16}/>
-                </SegmentedControlItem>
-                <SegmentedControlItem disabled value={"vertical"} display={"flex"}>
-                    <IconLayoutDistributeVertical size={16}/>
-                </SegmentedControlItem>
-                <SegmentedControlItem disabled value={"manual"} display={"flex"}>
-                    <IconLayout size={16}/>
-                </SegmentedControlItem>
-            </SegmentedControl>
-        </Panel>
-        <Panel position={"bottom-center"}>
-            <ButtonGroup>
-                <Button color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
-                    Execute flow
-                </Button>
-                <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
-                    <IconTrash size={16}/>
-                </Button>
-                <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
-                    <IconCopy size={16}/>
-                </Button>
-            </ButtonGroup>
-        </Panel>
-        {/*<DFlowMiniMap/>*/}
-    </DFlow>
+    return <DFlow flowId={"gid://sagittarius/Flow/1"}/>
 }

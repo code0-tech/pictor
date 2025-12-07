@@ -1,16 +1,17 @@
-import {Code0ComponentProps} from "../../utils/types";
+import {Code0ComponentProps, mergeCode0Props} from "../../utils";
 import {
+    Background,
+    BackgroundVariant,
     Edge,
     Node,
+    Panel,
     ReactFlow,
-    ReactFlowProps,
     ReactFlowProvider,
     useEdgesState,
     useNodesState,
     useUpdateNodeInternals
 } from "@xyflow/react";
 import React from "react";
-import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
 import {DFlowFunctionDefaultCard} from "./function/DFlowFunctionDefaultCard";
@@ -18,6 +19,21 @@ import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
 import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
 import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
 import {DFlowEdge} from "./edge/DFlowEdge";
+import {DFlowControl} from "./control";
+import {DFlowValidation} from "./validation";
+import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
+import {
+    IconCopy,
+    IconLayout,
+    IconLayoutDistributeHorizontal,
+    IconLayoutDistributeVertical,
+    IconTrash
+} from "@tabler/icons-react";
+import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Button} from "../button/Button";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {useFlowNodes} from "./DFlow.nodes.hook";
+import {useFlowEdges} from "./DFlow.edges.hook";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -505,7 +521,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
 
-export type DFlowProps = Code0ComponentProps & ReactFlowProps
+export interface DFlowProps extends Code0ComponentProps {
+    flowId: Flow['id']
+}
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
     return <ReactFlowProvider>
@@ -514,8 +532,23 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 }
 
 const InternalDFlow: React.FC<DFlowProps> = (props) => {
-    const [nodes, setNodes] = useNodesState(props.nodes!!)
-    const [edges, setEdges, edgeChangeEvent] = useEdgesState(props.edges!!)
+
+    const {flowId} = props
+    const nodeTypes = {
+        default: DFlowFunctionDefaultCard,
+        group: DFlowFunctionGroupCard,
+        suggestion: DFlowFunctionSuggestionCard,
+        trigger: DFlowFunctionTriggerCard,
+    }
+
+    const edgeTypes = {
+        default: DFlowEdge,
+    }
+
+    const initialNodes = useFlowNodes(flowId)
+    const initialEdges = useFlowEdges(flowId)
+    const [nodes, setNodes] = useNodesState<Node>([])
+    const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
     const updateNodeInternals = useUpdateNodeInternals()
 
     const revalidateHandles = React.useCallback((ids: string[]) => {
@@ -523,19 +556,6 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             ids.forEach(id => updateNodeInternals(id));
         });
     }, [updateNodeInternals])
-
-    const nodeTypes = {
-        default: DFlowFunctionDefaultCard,
-        group: DFlowFunctionGroupCard,
-        suggestion: DFlowFunctionSuggestionCard,
-        trigger: DFlowFunctionTriggerCard,
-        ...props.nodeTypes
-    }
-
-    const edgeTypes = {
-        default: DFlowEdge,
-        ...props.edgeTypes
-    }
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
         const changedIds: string[] = Array.from(new Set(
@@ -570,7 +590,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
     }, [revalidateHandles]);
 
     React.useEffect(() => {
-        const localNodes = props.nodes!!.map(value => {
+        const localNodes = initialNodes.map(value => {
             const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
                 ...value,
@@ -583,11 +603,11 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
         const layouted = getCachedLayoutElements(localNodes, new Set(localNodes.map(n => n.id)))
         setNodes(layouted.nodes as Node[])
-        setEdges(props.edges as Edge[])
+        setEdges(initialEdges as Edge[])
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
-    }, [props.nodes, props.edges, revalidateHandles])
+    }, [initialNodes, initialEdges, revalidateHandles])
 
     return (
         <ReactFlow
@@ -598,9 +618,40 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
+            fitView
             {...mergeCode0Props("flow", props)}
             nodes={nodes}
             edges={edges}
-        />
+        >
+            <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
+            <DFlowControl/>
+            <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
+            <Panel position={"top-center"}>
+                <SegmentedControl type={"single"} defaultValue={"horizontal"}>
+                    <SegmentedControlItem value={"horizontal"} display={"flex"}>
+                        <IconLayoutDistributeHorizontal size={16}/>
+                    </SegmentedControlItem>
+                    <SegmentedControlItem disabled value={"vertical"} display={"flex"}>
+                        <IconLayoutDistributeVertical size={16}/>
+                    </SegmentedControlItem>
+                    <SegmentedControlItem disabled value={"manual"} display={"flex"}>
+                        <IconLayout size={16}/>
+                    </SegmentedControlItem>
+                </SegmentedControl>
+            </Panel>
+            <Panel position={"bottom-center"}>
+                <ButtonGroup>
+                    <Button color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
+                        Execute flow
+                    </Button>
+                    <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
+                        <IconTrash size={16}/>
+                    </Button>
+                    <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
+                        <IconCopy size={16}/>
+                    </Button>
+                </ButtonGroup>
+            </Panel>
+        </ReactFlow>
     )
 }

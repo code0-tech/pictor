@@ -50,7 +50,7 @@ export class ReactiveArrayService<T, D = Record<string, any>> implements ArraySe
 
     update() {
         startTransition(() => {
-            this.access.setState(prev => prev.slice());
+            this.access.setState(prev => [...prev]);
         })
     }
 

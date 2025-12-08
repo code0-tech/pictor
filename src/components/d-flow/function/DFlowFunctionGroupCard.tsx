@@ -1,10 +1,19 @@
 import React, {memo} from "react";
-import {Handle, NodeProps, Position, useStore} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
 import {FLOW_EDGE_RAINBOW} from "../DFlow.edges.hook";
 import {Card} from "../../card/Card";
+import {Code0Component} from "../../../utils";
 
-export interface DFlowFunctionGroupCardProps extends NodeProps {
+export interface DFlowFunctionGroupCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+    isParameter: boolean
+    linkingId: string
+    flowId: string
+    depth: number
+    scope: number[]
 }
+
+// @ts-ignore
+export type DFlowFunctionGroupCardProps = NodeProps<Node<DFlowFunctionGroupCardDataProps>>
 
 export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
     const {data, id} = props

@@ -17,7 +17,7 @@ export type DFlowFunctionGroupCardProps = NodeProps<Node<DFlowFunctionGroupCardD
 
 export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
     const {data, id} = props
-    const depth = (data as any)?.depth ?? 0;
+    const depth = data?.depth ?? 0;
     const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
 
     // Align handles with the first node inside this group

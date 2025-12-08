@@ -36,6 +36,7 @@ export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<H
     instance: NodeFunctionView
     flowId: Scalars["FlowID"]["output"]
     isParameter: boolean
+    linkingId?: string
     depth: number
     scope: number[]
     index: number

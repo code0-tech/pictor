@@ -1,0 +1,70 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.context-menu {
+
+  &__content, &__sub-content {
+    padding: variables.$xxs;
+    position: relative;
+    box-sizing: border-box;
+    z-index: 999;
+
+    & {
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__label {
+    text-transform: uppercase;
+    font-size: variables.$xs;
+    display: flex;
+    gap: variables.$xxs;
+    align-items: center;
+    padding: variables.$xxs variables.$xs;
+    color: helpers.color();
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__item, &__sub-trigger {
+    border-radius: variables.$borderRadius - variables.$xxs;
+    padding: variables.$xxs variables.$xs;
+    gap: variables.$xs;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: variables.$sm;
+
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+      border: none;
+    }
+
+    &:focus, &[data-focus=true] {
+      @include box.box(variables.$white, variables.$white, variables.$white);
+      border: none;
+      width: 100%;
+    }
+  }
+
+  &__separator {
+    border: none;
+    margin: variables.$xxs 0;
+    color: rgba(white, .1);
+    height: 1px;
+    background-color: rgba(white, .1);
+  }
+}
+
+@each $name, $color in variables.$colors {
+  .context-menu__content--#{$name}, .context-menu__sub-content--#{$name} {
+    @include box.box($color);
+  }
+}

@@ -131,7 +131,7 @@ export const Dashboard = () => {
             }>
                 <DResizablePanelGroup direction={"horizontal"}>
                     <DResizablePanel id={"1"} order={1} p={1} defaultSize={15}>
-                        <DFlowFolder flowId={"gid://sagittarius/Flow/1"}/>
+                        <DFlowFolder activeFlowId={"gid://sagittarius/Flow/1"}/>
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"} order={2}>

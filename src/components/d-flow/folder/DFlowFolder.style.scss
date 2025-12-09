@@ -29,6 +29,10 @@
     background: variables.$primary;
   }
 
+  &[data-state=open] {
+    @include box.box(variables.$secondary);
+    border: none;
+  }
 
   &__icon, &__status, &__item-icon {
     color: variables.$info;
@@ -55,7 +59,6 @@
       position: absolute;
       content: "";
       left: 5px;
-
     }
   }
 
@@ -76,6 +79,11 @@
       @include box.boxHover(variables.$secondary);
       @include box.boxActive(variables.$secondary);
       @include helpers.fontStyle();
+      border: none;
+    }
+
+    &[data-state=open] {
+      @include box.box(variables.$secondary);
       border: none;
     }
   }

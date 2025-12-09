@@ -118,5 +118,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@radix-ui/react-context-menu": "^2.2.16"
   }
 }

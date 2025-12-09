@@ -116,7 +116,6 @@ export const useSuggestions = (
             matchingFunctions.forEach(funcDefinition => {
                 const nodeFunctionSuggestion: NodeParameterValue = {
                     __typename: "NodeFunction",
-                    //TODO: generate unique id
                     id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.length ?? 0) + 1}`,
                     functionDefinition: {
                         id: funcDefinition.id,

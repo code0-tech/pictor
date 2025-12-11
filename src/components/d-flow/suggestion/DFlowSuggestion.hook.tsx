@@ -5,7 +5,6 @@ import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
-import {NodeFunctionView} from "../DFlow.view";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
 import {useInputType} from "../function/DFlowFunction.input.hook";
@@ -16,7 +15,7 @@ import type {
     DataTypeRulesNumberRangeConfig,
     DataTypeRulesVariant,
     DataTypeVariant, Flow,
-    Maybe,
+    Maybe, NodeFunction,
     NodeParameter,
     NodeParameterValue,
     ReferenceValue
@@ -116,7 +115,7 @@ export const useSuggestions = (
             matchingFunctions.forEach(funcDefinition => {
                 const nodeFunctionSuggestion: NodeParameterValue = {
                     __typename: "NodeFunction",
-                    id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.length ?? 0) + 1}`,
+                    id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.nodes?.length ?? 0) + 1}`,
                     functionDefinition: {
                         id: funcDefinition.id,
                         runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
@@ -230,13 +229,13 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
      * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
      */
     const traverse = (
-        fn: NodeFunctionView | undefined,
+        node: NodeFunction | undefined,
         depth: number,
         scopePath: number[]
     ) => {
-        if (!fn) return;
+        if (!node) return;
 
-        let current: NodeFunctionView | undefined = fn;
+        let current: NodeFunction | undefined = node;
 
         while (current) {
             const def = functionService.getById(current.functionDefinition?.id!!);
@@ -255,13 +254,13 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                         pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? [];
 
                     if (inputTypeRules.length) {
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
+                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
                         const rawValue = paramInstance?.value;
                         const valuesArray =
                             rawValue !== undefined
-                                ? rawValue instanceof NodeFunctionView
-                                    ? [rawValue.json()!!]
-                                    : [rawValue]
+                                ? rawValue?.__typename === "NodeFunction"
+                                    ? [rawValue!!]
+                                    : [rawValue!!]
                                 : [];
 
                         for (const rule of inputTypeRules) {
@@ -284,10 +283,10 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
             // 2) Return type (main output of the current node)
             {
                 const paramValues =
-                    current.parameters?.map((p) => p.value).filter((v) => v !== undefined) ?? [];
+                    current.parameters?.nodes?.map((p) => p?.value).filter((v) => v !== undefined) ?? [];
                 const resolvedReturnType = useReturnType(
                     def,
-                    paramValues.map((v) => (v instanceof NodeFunctionView ? v.json()!! : v)),
+                    paramValues as NodeParameterValue[],
                     dataTypeService
                 );
                 if (resolvedReturnType) {
@@ -306,9 +305,9 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                 for (const pDef of def.parameterDefinitions) {
                     const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
                     if (pType?.variant === "NODE") {
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
-                            const childFn = paramInstance.value as NodeFunctionView;
+                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunction") {
+                            const childFn = paramInstance.value as NodeFunction;
 
                             // New group: extend the scope path with a fresh id; increase depth by 1.
                             const childScopePath = [...scopePath, nextGroupId()];
@@ -316,21 +315,21 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                         }
                     } else {
                         // Functions passed as NON-NODE parameters: same depth and same scope path.
-                        const paramInstance = current.parameters.find((p) => p.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value instanceof NodeFunctionView) {
-                            traverse(paramInstance.value as NodeFunctionView, depth, scopePath);
+                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunction") {
+                            traverse(paramInstance.value as NodeFunction, depth, scopePath);
                         }
                     }
                 }
             }
 
             // 4) Continue the linear chain in the same lane/scope.
-            current = flow.getNodeById(current.nextNodeId!!);
+            current = flowService.getNodeById(flow.id, current.nextNodeId)
         }
     };
 
     // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
-    traverse(flow.getNodeById(flow.startingNodeId), 0, [0]);
+    traverse(flowService.getNodeById(flow.id, flow.startingNodeId), 0, [0]);
 
     return refObjects;
 };

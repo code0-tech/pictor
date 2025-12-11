@@ -1,7 +1,7 @@
 import React from "react";
 import {ButtonGroup} from "../../button-group/ButtonGroup";
 import {Button} from "../../button/Button";
-import {IconCopy, IconTrash} from "@tabler/icons-react";
+import {IconTrash} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
 import {useService, useStore} from "../../../utils";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
@@ -28,7 +28,8 @@ export const DFlowPanelControl: React.FC = () => {
             <Button disabled color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
                 Execute flow
             </Button>
-            <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"} color={"primary"}>
+            <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
+                    color={"primary"}>
                 <IconTrash size={16}/>
             </Button>
         </ButtonGroup>

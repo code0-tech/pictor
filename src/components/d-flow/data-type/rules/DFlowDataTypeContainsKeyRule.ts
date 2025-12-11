@@ -1,18 +1,17 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import type {
-    DataTypeRulesContainsKeyConfig,
+    DataTypeRulesContainsKeyConfig, Flow,
     GenericCombinationStrategyType,
     GenericMapper, LiteralValue,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValidateValue} from "../DFlowDataType.validation.value";
-import {FlowView} from "../../DFlow.view";
 
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsKeyRule {
-    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: FlowView): boolean {
+    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: Flow): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
         const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers

@@ -1,15 +1,14 @@
 import React from "react";
-import {NodeFunctionView} from "../DFlow.view";
-import {TextInput} from "../../form/TextInput";
+import {TextInput} from "../../form";
 import {Flex} from "../../flex/Flex";
-import {useService} from "../../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {useService} from "../../../utils";
+import {DFlowFunctionReactiveService} from "../function";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
 import {DFlowReactiveService} from "../DFlow.service";
-import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
-import {ParameterDefinitionView} from "../function/DFlowFunction.view";
+import {DFlowSuggestion} from "../suggestion";
+import {ParameterDefinitionView} from "../function";
 import {Badge} from "../../badge/Badge";
 import type {
     LiteralValue,
@@ -21,7 +20,7 @@ import type {
 import {InputSyntaxSegment} from "../../form/Input.syntax.hook";
 
 export interface DFlowTabDefaultProps {
-    functionInstance: NodeFunctionView
+    node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
     depthLevel?: number
     scopeLevel?: number[]
@@ -30,10 +29,10 @@ export interface DFlowTabDefaultProps {
 
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
-    const {functionInstance, flowId, depthLevel, scopeLevel, nodeLevel} = props
+    const {node, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
-    const definition = functionService.getById(functionInstance.functionDefinition?.id!!)
+    const definition = functionService.getById(node.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameterDefinitions?.forEach(pd => {
@@ -43,17 +42,19 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     }, [definition?.parameterDefinitions])
 
     const sortedParameters = React.useMemo(() => {
-        return [...(functionInstance.parameters || [])].sort((a, b) => a.id!!.localeCompare(b.id!!))
-    }, [functionInstance.parameters])
+        return [...(node.parameters?.nodes || [])].sort((a, b) => a!!.id!!.localeCompare(b?.id!!))
+    }, [node.parameters])
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     sortedParameters.forEach(parameter => {
-        const parameterDefinition = paramDefinitions[parameter.id!!]
-        suggestionsById[parameter.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
+        const parameterDefinition = paramDefinitions[parameter?.id!!]
+        suggestionsById[parameter?.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
+
+            if (!parameter) return null
 
             const submitValue = (value: NodeParameterValue | undefined) => {
                 parameter.value = value
@@ -84,10 +85,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue: string | undefined = parameter.value instanceof NodeFunctionView ? JSON.stringify({
-                ...parameter.value.json(),
-                __typename: "NodeFunction"
-            }) : parameter.value?.__typename === "ReferenceValue" ? JSON.stringify(parameter.value) : parameter.value?.__typename === "LiteralValue" ? typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value : ""
+            const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
 
             return <div>
                 <TextInput title={title}
@@ -140,10 +138,11 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)
                            }}
+                           //TODO: validation
                            formValidation={{
                                setValue: () => {},
-                               valid: parameter.validationResults.length <= 0,
-                               notValidMessage: parameter.validationResults.map(value => value.message.nodes!![0]?.content).join(", ")
+                               valid: true,
+                               notValidMessage: ""
                            }}
                            onBlur={submitValueEvent}
                            onClear={submitValueEvent}

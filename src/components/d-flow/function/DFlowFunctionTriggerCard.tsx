@@ -1,6 +1,5 @@
 import React, {memo} from "react";
 import {Code0Component} from "../../../utils/types";
-import {FlowView} from "../DFlow.view";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import {Text} from "../../text/Text";
 import {useService} from "../../../utils/contextStore";
@@ -10,11 +9,12 @@ import {Flex} from "../../flex/Flex";
 import {IconBolt, IconChevronDown} from "@tabler/icons-react";
 import {Button} from "../../button/Button";
 import {DFlowTabTrigger} from "../tab/DFlowTabTrigger";
-import {DFlowTypeReactiveService} from "../type/DFlowType.service";
+import {DFlowTypeReactiveService} from "../type";
 import {Badge} from "../../badge/Badge";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFunctionTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    instance: FlowView
+    instance: Flow
 }
 
 // @ts-ignore

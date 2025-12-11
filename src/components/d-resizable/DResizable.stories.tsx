@@ -2,52 +2,37 @@ import {Meta} from "@storybook/react-vite";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
-import {
-    IconAi, IconCopy,
-    IconDatabase, IconFile,
-    IconFolder,
-    IconLayout,
-    IconLayoutDistributeHorizontal,
-    IconLayoutDistributeVertical, IconMessageChatbot, IconTrash
-} from "@tabler/icons-react";
-import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
-import {useReactiveArrayService} from "../../utils/reactiveArrayService";
+import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
+import {FunctionDefinitionView} from "../d-flow";
+import {useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DataTypeView} from "../d-flow/data-type/DFlowDataType.view";
-import {DFlowDataTypeReactiveService} from "../d-flow/data-type/DFlowDataType.service";
-import {DFlowFunctionReactiveService} from "../d-flow/function/DFlowFunction.service";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
-import {DFlowSuggestion} from "../d-flow/suggestion/DFlowSuggestion.view";
-import {DFlowReactiveSuggestionService} from "../d-flow/suggestion/DFlowSuggestion.service";
-import {FlowView} from "../d-flow/DFlow.view";
-import {ContextStoreProvider} from "../../utils/contextStore";
+import {DataTypeView} from "../d-flow";
+import {DFlowDataTypeReactiveService} from "../d-flow";
+import {DFlowFunctionReactiveService} from "../d-flow";
+import {DFlowReactiveService} from "../d-flow";
+import {DFlowSuggestion} from "../d-flow";
+import {DFlowReactiveSuggestionService} from "../d-flow";
+import {ContextStoreProvider} from "../../utils";
 import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
-import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
-import {FlowTypeView} from "../d-flow/type/DFlowType.view";
+import {DFlowTypeReactiveService} from "../d-flow";
+import {FlowTypeView} from "../d-flow";
 import DataTypesData from "./data_types.json";
 import FunctionsData from "./runtime_functions.json";
 import FlowTypeData from "./flow_types.json";
-import {useFlowNodes} from "../d-flow/DFlow.nodes.hook";
-import {useFlowEdges} from "../d-flow/DFlow.edges.hook";
-import {DFlow} from "../d-flow/DFlow";
-import {Background, BackgroundVariant, Panel} from "@xyflow/react";
-import {DFlowControl} from "../d-flow/control/DFlowControl";
-import {DFlowValidation} from "../d-flow/validation/DFlowValidation";
+import {DFlow} from "../d-flow";
 import {DLayout} from "../d-layout/DLayout";
-import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
+import {DFlowFolder} from "../d-flow";
 import {
+    Flow,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload
 } from "@code0-tech/sagittarius-graphql-types";
-import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
-import {Tabs, TabsList, TabsTrigger} from "@radix-ui/react-tabs";
-import {ButtonGroup} from "../button-group/ButtonGroup";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -82,7 +67,7 @@ export const Dashboard = () => {
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, [...DataTypesData.map(data => new DataTypeView(data))]);
     // @ts-ignore
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, [...FunctionsData.map(data => new FunctionDefinitionView(data))]);
-    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveServiceExtend, [new FlowView({
+    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveServiceExtend, [{
         id: "gid://sagittarius/Flow/1",
         type: {
             id: "gid://sagittarius/FlowType/867",
@@ -96,8 +81,11 @@ export const Dashboard = () => {
             }, {
                 flowSettingIdentifier: "HTTP_HOST",
             }]
+        },
+        nodes: {
+            nodes: []
         }
-    })]);
+    }]);
     const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionServiceExtend);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);

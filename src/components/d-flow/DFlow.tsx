@@ -19,7 +19,7 @@ import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
 import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
 import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
 import {DFlowEdge} from "./edge/DFlowEdge";
-import {DFlowControl} from "./control";
+import {DFlowPanelSize} from "./panel";
 import {DFlowValidation} from "./validation";
 import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
 import {
@@ -34,6 +34,7 @@ import {Button} from "../button/Button";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
+import {DFlowPanelControl} from "./panel/DFlowPanelControl";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -625,7 +626,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             edges={edges}
         >
             <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-            <DFlowControl/>
+            <DFlowPanelSize/>
             <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
             <Panel position={"top-center"}>
                 <SegmentedControl type={"single"} defaultValue={"horizontal"}>
@@ -640,19 +641,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                     </SegmentedControlItem>
                 </SegmentedControl>
             </Panel>
-            <Panel position={"bottom-center"}>
-                <ButtonGroup>
-                    <Button color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
-                        Execute flow
-                    </Button>
-                    <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
-                        <IconTrash size={16}/>
-                    </Button>
-                    <Button paddingSize={"xxs"} variant={"none"} color={"primary"}>
-                        <IconCopy size={16}/>
-                    </Button>
-                </ButtonGroup>
-            </Panel>
+            <DFlowPanelControl/>
         </ReactFlow>
     )
 }

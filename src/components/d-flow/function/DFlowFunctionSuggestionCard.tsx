@@ -4,7 +4,6 @@ import React, {memo} from "react";
 import {Button} from "../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
-import {NodeFunctionView} from "../DFlow.view";
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
@@ -12,7 +11,7 @@ import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFunctionSuggestionCardDataProps extends Code0Component<HTMLDivElement> {
     flowId: Flow['id']
-    parentFunction?: NodeFunctionView
+    parentFunction?: NodeFunction
 }
 
 // @ts-ignore
@@ -25,14 +24,11 @@ export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardPr
     const flow = flowService.getById(props.data.flowId)
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-        const nodeFunction = new NodeFunctionView(suggestion.value as NodeFunction)
-        if (props.data.parentFunction) {
-            props.data.parentFunction.nextNodeId = nodeFunction.id!!
-        } else if (flow) {
-            flow.startingNodeId = nodeFunction.id!!
+        if (props.data.parentFunction && suggestion.value.__typename === "NodeFunction") {
+            flowService.addNextNodeById(flow?.id, props.data.parentFunction?.id, suggestion.value)
+        } else if (flow && suggestion.value.__typename === "NodeFunction") {
+            flowService.setStartingNodeById(flow?.id, suggestion.value)
         }
-        flow?.addNode(nodeFunction)
-        flowService.update()
     }} suggestions={result} triggerContent={
         <Button paddingSize={"xxs"} variant={"normal"} color={"secondary"}>
             <Handle

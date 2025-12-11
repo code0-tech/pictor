@@ -14,12 +14,12 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         return this.values().find(value => value.id === id);
     }
 
-    deleteById(flowId: Flow['id']): void {
+    async deleteById(flowId: Flow['id']): Promise<void> {
         const index = this.values().findIndex(f => f.id === flowId)
         this.delete(index)
     }
 
-    renameById(flowId: Flow['id'], newName: string): void {
+    async renameById(flowId: Flow['id'], newName: string): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -31,7 +31,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
-    deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): void {
+    async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
         const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
@@ -49,7 +49,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    addNextNodeById(flowId: Flow['id'], nodeId: NodeFunction['id'], nextNode: NodeFunction): void {
+    async addNextNodeById(flowId: Flow['id'], nodeId: NodeFunction['id'], nextNode: NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const node = this.getNodeById(flowId, nodeId)
@@ -59,7 +59,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    setStartingNodeById(flowId: Flow['id'], startingNode: NodeFunction): void {
+    async setStartingNodeById(flowId: Flow['id'], startingNode: NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         if (!flow) return
         const index = this.values().findIndex(f => f.id === flowId)
@@ -68,7 +68,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): void {
+    async setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -78,7 +78,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value: NodeParameter['value']): void {
+    async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value: NodeParameter['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return

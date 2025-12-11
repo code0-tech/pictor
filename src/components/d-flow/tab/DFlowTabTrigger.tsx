@@ -1,5 +1,4 @@
 import React from "react";
-import {FlowView} from "../DFlow.view";
 import {useService} from "../../../utils/contextStore";
 import {DFlowReactiveService} from "../DFlow.service";
 import {TextInput} from "../../form/TextInput";
@@ -9,11 +8,11 @@ import {DFlowSuggestion} from "../suggestion/DFlowSuggestion.view";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../suggestion/DFlowSuggestionMenu.util";
-import type {DataType, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataType, Flow, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataType} from "../input/DFlowInputDataType";
 
 export interface DFlowTabTriggerProps {
-    instance: FlowView
+    instance: Flow
 }
 
 export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
@@ -35,7 +34,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             flowService.update()
         }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {
-            const setting = instance.settings?.find(s => s.flowSettingIdentifier == settingDefinition.identifier)
+            const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
             const title = settingDefinition.names?.nodes!![0]?.content ?? ""
             const description = settingDefinition?.descriptions?.nodes!![0]?.content ?? ""
             const result = suggestionsById[settingDefinition.identifier!!]

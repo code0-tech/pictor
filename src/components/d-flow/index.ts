@@ -3,7 +3,7 @@ export * from "./DFlow.edges.hook"
 export * from "./DFlow.nodes.hook"
 export * from "./DFlow"
 
-export * from "./control/index"
+export * from "./panel/index"
 export * from "./data-type/index"
 export * from "./folder/index"
 export * from "./function/index"

@@ -5,7 +5,7 @@ import type {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesInputTypesConfig,
+    DataTypeRulesInputTypesConfig, Flow,
     GenericMapper,
     LiteralValue,
     Maybe,
@@ -13,7 +13,6 @@ import type {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValidateValue} from "./DFlowDataType.validation.value";
-import {FlowView} from "../DFlow.view";
 
 export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> {
 
@@ -28,7 +27,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
         });
     }
 
-    getDataTypeFromValue (value: NodeParameterValue, flow?: FlowView): DataTypeView | undefined {
+    getDataTypeFromValue (value: NodeParameterValue, flow?: Flow): DataTypeView | undefined {
 
         if (!value) return undefined
 
@@ -51,7 +50,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
     }
 
-    getTypeFromValue (value: NodeParameterValue, flow?: FlowView): Maybe<DataTypeIdentifier> | undefined {
+    getTypeFromValue (value: NodeParameterValue, flow?: Flow): Maybe<DataTypeIdentifier> | undefined {
 
         if (!value) return undefined
 

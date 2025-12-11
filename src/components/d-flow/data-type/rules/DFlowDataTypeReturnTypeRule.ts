@@ -1,7 +1,7 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import type {
-    DataTypeRulesReturnTypeConfig,
+    DataTypeRulesReturnTypeConfig, Flow,
     GenericCombinationStrategyType,
     GenericMapper,
     GenericType,
@@ -9,7 +9,6 @@ import type {
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {FlowView} from "../../DFlow.view";
 import {useValidateDataType} from "../DFlowDataType.validation.type";
 import {useValidateValue} from "../DFlowDataType.validation.value";
 
@@ -21,7 +20,7 @@ export class DFlowDataTypeReturnTypeRule {
         config: DataTypeRulesReturnTypeConfig,
         generics?: Map<string, GenericMapper>,
         service?: DFlowDataTypeReactiveService,
-        flow?: FlowView
+        flow?: Flow
     ): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
@@ -33,7 +32,6 @@ export class DFlowDataTypeReturnTypeRule {
         const foundReturnFunction = findReturnNode(value, flow!!)
         if (!foundReturnFunction) return false
 
-        //TODO: only if its really a generic key
         if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
 
         if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
@@ -99,12 +97,14 @@ export class DFlowDataTypeReturnTypeRule {
     }
 }
 
-const findReturnNode = (n: NodeFunction, flow: FlowView): NodeFunction | undefined => {
+const findReturnNode = (n: NodeFunction, flow: Flow): NodeFunction | undefined => {
 
     if (n.functionDefinition?.runtimeFunctionDefinition?.identifier === 'RETURN') return n
 
-    if (flow.getNodeById(n.nextNodeId!!)) {
-        const found = findReturnNode(flow.getNodeById(n.nextNodeId!!)!!.json()!!, flow)
+    const node = flow.nodes?.nodes?.find(node => node?.id === n.nextNodeId) as NodeFunction | undefined
+
+    if (node) {
+        const found = findReturnNode(node!!, flow)
         if (found) return found
     }
 

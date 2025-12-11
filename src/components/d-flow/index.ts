@@ -1,4 +1,3 @@
-export * from "./DFlow.view"
 export * from "./DFlow.service"
 export * from "./DFlow.edges.hook"
 export * from "./DFlow.nodes.hook"

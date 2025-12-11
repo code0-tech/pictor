@@ -14,12 +14,17 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         return this.values().find(value => value.id === id);
     }
 
-    deleteById(id: Flow['id']): void {
-
+    deleteById(flowId: Flow['id']): void {
+        const index = this.values().findIndex(f => f.id === flowId)
+        this.delete(index)
     }
 
-    renameById(id: Flow['id'], newName: string): void {
-
+    renameById(flowId: Flow['id'], newName: string): void {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        flow.name = newName
+        this.set(index, flow)
     }
 
     getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {

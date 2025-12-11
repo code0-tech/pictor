@@ -1,13 +1,11 @@
-import {useService, useStore} from "../../utils/contextStore";
+import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
-import {NodeFunctionView} from "./DFlow.view";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
+import {DFlowFunctionReactiveService} from "./function";
+import {DFlowDataTypeReactiveService} from "./data-type";
 import React from "react";
-import type {DataTypeIdentifier, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
-// Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
     '#70ffb2', // 0 – Primary (Grün)
     '#70e2ff', // 1 – Cyan
@@ -64,24 +62,21 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
             return cache.get(type);
         };
 
-        /* ------------------------------------------------------------------ */
         const traverse = (
-            fn: NodeFunctionView,
-            parentFnId?: string,        // Id der *Function-Card* des Aufrufers
-            level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array,
+            fn: NodeFunction,
+            parentFnId?: string,
+            level = 0,
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ): string => {
 
-            /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
             const fnId = `${fn.id}-${idCounter++}`;
 
             if (idCounter == 1) {
-                // erste Function-Card → Verbindung Trigger → Function
                 edges.push({
                     id: `trigger-${fnId}-next`,
-                    source: flow.id as string,    // Handle-Bottom des Trigger-Nodes
-                    target: fnId,       // Handle-Top der Function-Card
+                    source: flow.id as string,
+                    target: fnId,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                         isParameter: false
@@ -91,15 +86,14 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 });
             }
 
-            /* ------- vertikale Kante (nextNode) -------------------------- */
             if (parentFnId) {
                 const startGroups = groupsWithValue.get(parentFnId) ?? [];
 
                 if (startGroups.length > 0) {
                     startGroups.forEach((gId, idx) => edges.push({
                         id: `${gId}-${fnId}-next-${idx}`,
-                        source: gId,           // Handle-Bottom der Group-Card
-                        target: fnId,          // Handle-Top der Function-Card
+                        source: gId,
+                        target: fnId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                             isParameter: false
@@ -110,8 +104,8 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 } else {
                     edges.push({
                         id: `${parentFnId}-${fnId}-next`,
-                        source: parentFnId,    // Handle-Bottom der Function-Card
-                        target: fnId,          // Handle-Top der Function-Card
+                        source: parentFnId,
+                        target: fnId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                             isParameter: false
@@ -122,25 +116,22 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 }
             }
 
-            /* ------- horizontale Kanten für Parameter -------------------- */
-            fn.parameters?.forEach((param) => {
-                const val = param.value;
+            fn.parameters?.nodes?.forEach((param) => {
+                const val = param?.value;
                 const def = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache)
-                    ?.parameterDefinitions?.find(p => p.id === param.id);
+                    ?.parameterDefinitions?.find(p => p.id === param?.id);
                 const paramType = def?.dataTypeIdentifier;
                 const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
                 if (!val) return
 
-                /* --- NODE-Parameter → Group-Card ------------------------- */
                 if (paramDT?.variant === "NODE") {
                     const groupId = `${fnId}-group-${idCounter++}`;
 
-                    /* Verbindung Gruppe  → Function-Card (horizontal)       */
                     edges.push({
                         id: `${fnId}-${groupId}-param-${param.id}`,
-                        source: fnId,        // FunctionCard (Quelle)
-                        target: groupId,     // GroupCard (Ziel – hat Top: target)
+                        source: fnId,
+                        target: groupId,
                         deletable: false,
                         selectable: false,
                         label: def?.names?.nodes!![0]?.content ?? param.id,
@@ -150,26 +141,21 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         },
                     });
 
-                    /* existiert ein Funktions-Wert für dieses Param-Feld?   */
-                    if (val && val instanceof NodeFunctionView) {
-                        /* merken: diese Group-Card besitzt Content – das ist
-                           später Startpunkt der next-Kante                   */
+
+                    if (val && val.__typename === "NodeFunction") {
+
                         (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
                             groupsWithValue.get(fnId)!))
                             .push(groupId);
 
-                        /* rekursiv Funktions-Ast innerhalb der Gruppe       */
-                        traverse(param.value as NodeFunctionView,
+                        traverse(param.value as NodeFunction,
                             undefined,
                             level + 1,
                             fnCache,
                             dtCache);
                     }
-                }
-
-                /* --- anderer Parameter, der selbst eine Function hält ---- */
-                else if (val && val instanceof NodeFunctionView) {
-                    const subFnId = traverse(param.value as NodeFunctionView,
+                } else if (val && val.__typename === "NodeFunction") {
+                    const subFnId = traverse(param.value as NodeFunction,
                         undefined,
                         level + 1,
                         fnCache,
@@ -191,19 +177,17 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 }
             });
 
-            /* ------- Rekursion auf nextNode ------------------------------ */
             if (fn.nextNodeId) {
-                traverse(flow.getNodeById(fn.nextNodeId!!)!!, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
+                traverse(flowService.getNodeById(flow.id!!, fn.nextNodeId!!)!!, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
             } else {
-                // letzte Function-Card im Ast → Add-new-node wie *normale* nextNode behandeln
                 const suggestionNodeId = `${fnId}-suggestion`;
                 const startGroups = groupsWithValue.get(fnId) ?? [];
 
                 if (startGroups.length > 0) {
                     startGroups.forEach((gId, idx) => edges.push({
                         id: `${gId}-${suggestionNodeId}-next-${idx}`,
-                        source: gId,                  // wie bei echter nextNode von Group-Card starten
-                        target: suggestionNodeId,     // Ziel ist die Suggestion-Card
+                        source: gId,
+                        target: suggestionNodeId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                             isSuggestion: true,
@@ -214,8 +198,8 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 } else {
                     edges.push({
                         id: `${fnId}-${suggestionNodeId}-next`,
-                        source: fnId,                 // Handle-Bottom der Function-Card
-                        target: suggestionNodeId,     // Handle-Top der Suggestion-Card
+                        source: fnId,
+                        target: suggestionNodeId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
                             isSuggestion: true,
@@ -230,7 +214,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
         };
 
         if (flow.startingNodeId) {
-            traverse(flow.getNodeById(flow.startingNodeId)!!, undefined, 0, functionCache, dataTypeCache);
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, 0, functionCache, dataTypeCache);
         }
 
         return edges

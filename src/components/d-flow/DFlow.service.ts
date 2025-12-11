@@ -87,6 +87,9 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
         if (!parameter) return
         parameter.value = value
+        if (value?.__typename === "NodeFunction") {
+            flow.nodes?.nodes?.push(value)
+        }
         this.set(index, flow)
     }
 

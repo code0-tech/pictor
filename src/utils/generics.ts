@@ -7,13 +7,12 @@ import type {
     DataTypeRuleConnection,
     DataTypeRulesConfig,
     DataTypeRulesVariant,
-    DataTypeVariant,
+    DataTypeVariant, Flow,
     GenericCombinationStrategyType,
     GenericMapper,
     GenericType,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {FlowView} from "../components/d-flow/DFlow.view";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 
@@ -375,7 +374,7 @@ export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeReactiveService,
-    flow?: FlowView
+    flow?: Flow
 ): GenericMap => {
     const genericMap: GenericMap = new Map();
     const genericKeys = func.genericKeys ?? [];

@@ -50,11 +50,25 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
     }
 
     setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): void {
-
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        const setting = flow.settings?.nodes?.find(s => s?.id === settingId)
+        if (!setting) return
+        setting.value = value
+        this.set(index, flow)
     }
 
     setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value: NodeParameter['value']): void {
-
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        const node = this.getNodeById(flowId, nodeId)
+        if (!node) return
+        const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
+        if (!parameter) return
+        parameter.value = value
+        this.set(index, flow)
     }
 
     /** Creates a new flow. */

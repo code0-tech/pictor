@@ -46,11 +46,10 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
             const submitValue = (value: NodeParameterValue) => {
                 if (value.__typename == "LiteralValue") {
-                    setting.value = value.value
+                    flowService.setSettingValue(props.instance.id, setting.id, value.value)
                 } else {
-                    setting.value = value
+                    flowService.setSettingValue(props.instance.id, setting.id, value)
                 }
-                flowService.update()
             }
 
             const submitValueEvent = (event: any) => {

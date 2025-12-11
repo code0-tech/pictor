@@ -1,10 +1,9 @@
-import {useService, useStore} from "../../utils/contextStore";
+import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
-import {NodeFunctionView} from "./DFlow.view";
 import {Node} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
-import type {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {DFlowFunctionReactiveService} from "./function";
+import {DFlowDataTypeReactiveService} from "./data-type";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DFlowFunctionDefaultCardDataProps} from "./function/DFlowFunctionDefaultCard";
 import {DFlowFunctionSuggestionCardDataProps} from "./function/DFlowFunctionSuggestionCard";
@@ -96,7 +95,7 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
 };
 
 // @ts-ignore
-export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps  | DFlowFunctionGroupCardDataProps>[] => {
+export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
@@ -147,7 +146,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
         nodes.push({
             id: `${flow.id}`,
             type: "trigger",
-            position: { x: 0, y: 0 },
+            position: {x: 0, y: 0},
             draggable: false,
             data: {
                 instance: flow,
@@ -157,7 +156,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
 
 
         const traverse = (
-            fn: NodeFunctionView,
+            node: NodeFunction,
             isParameter = false,
             parentId?: string,
             depth: number = 0,
@@ -166,18 +165,18 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ) => {
-            const id = `${fn.id}-${idCounter++}`;
+            const id = `${node.id}-${idCounter++}`;
             const index = ++globalNodeIndex; // global node level
 
             nodes.push({
                 id,
-                type: bestMatchValue(packageNodes, fn.functionDefinition?.identifier!!),
-                position: { x: 0, y: 0 },
+                type: bestMatchValue(packageNodes, node.functionDefinition?.identifier!!),
+                position: {x: 0, y: 0},
                 draggable: false,
                 parentId: parentGroup,
                 extent: parentGroup ? "parent" : undefined,
                 data: {
-                    instance: fn,
+                    node: node,
                     isParameter,
                     flowId: flowId!!,
                     linkingId: isParameter ? parentId : undefined,
@@ -187,29 +186,29 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                 },
             });
 
-            if (!fn.nextNodeId && !isParameter) {
+            if (!node.nextNodeId && !isParameter) {
                 nodes.push({
                     id: `${id}-suggestion`,
                     type: "suggestion",
-                    position: { x: 0, y: 0 },
+                    position: {x: 0, y: 0},
                     draggable: false,
                     extent: parentGroup ? "parent" : undefined,
                     parentId: parentGroup,
                     data: {
                         flowId: flowId,
-                        parentFunction: fn,
+                        parentFunction: node,
                     },
                 });
             }
 
-            const definition = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache);
+            const definition = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache);
 
-            fn.parameters?.forEach((param) => {
-                const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.runtimeParameter?.id)?.dataTypeIdentifier;
+            node.parameters?.nodes?.forEach((param) => {
+                const paramType = definition?.parameterDefinitions!!.find(p => p.id == param?.runtimeParameter?.id)?.dataTypeIdentifier;
                 const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
                 if (paramDataType?.variant === "NODE") {
-                    if (param.value && param.value instanceof NodeFunctionView) {
+                    if (param?.value && param.value.__typename === "NodeFunction") {
                         const groupId = `${id}-group-${idCounter++}`;
 
                         // New group: extend scope PATH with a fresh segment and increase depth.
@@ -218,7 +217,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                         nodes.push({
                             id: groupId,
                             type: "group",
-                            position: { x: 0, y: 0 },
+                            position: {x: 0, y: 0},
                             draggable: false,
                             parentId: parentGroup,
                             extent: parentGroup ? "parent" : undefined,
@@ -232,28 +231,28 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                         });
 
                         // Child function inside the group uses the group's depth and scope PATH.
-                        traverse(param.value as NodeFunctionView, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
+                        traverse(param.value as NodeFunction, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
                     }
-                } else if (param.value && param.value instanceof NodeFunctionView) {
+                } else if (param?.value && param.value.__typename === "NodeFunction") {
                     // Functions passed as non-NODE parameters live in the same depth/scope PATH.
-                    traverse(param.value as NodeFunctionView, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
+                    traverse(param.value as NodeFunction, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
                 }
             });
 
-            if (fn.nextNodeId) {
+            if (node.nextNodeId) {
                 // Linear chain continues in the same depth/scope PATH.
-                traverse(flow.getNodeById(fn.nextNodeId!!)!!, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
+                traverse(flowService.getNodeById(flow.id, node.nextNodeId)!!, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
             }
         };
 
         // Root lane: depth 0, scope path [0]
         if (flow.startingNodeId) {
-            traverse(flow.getNodeById(flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
+            traverse(flowService.getNodeById(flow.id, flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
         } else {
             nodes.push({
                 id: `${flow.id}-suggestion`,
                 type: "suggestion",
-                position: { x: 0, y: 0 },
+                position: {x: 0, y: 0},
                 draggable: false,
                 extent: undefined,
                 data: {

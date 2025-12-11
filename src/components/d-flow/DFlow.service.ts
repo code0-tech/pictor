@@ -27,7 +27,21 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
     }
 
     deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): void {
+        const flow = this.getById(flowId)
+        const node = this.getNodeById(flowId, nodeId)
+        const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow || !node) return
 
+        flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== nodeId)
+
+        if (previousNodes) {
+            previousNodes.nextNodeId = node.nextNodeId
+        } else {
+            flow.startingNodeId = node.nextNodeId ?? undefined
+        }
+
+        this.set(index, flow)
     }
 
     addNextNodeById(flowId: Flow['id'], nodeId: NodeFunction['id'], nextNode: NodeFunction): void {

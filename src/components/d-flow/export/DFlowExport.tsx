@@ -23,11 +23,10 @@ export const DFlowExport: React.FC<DFlowExportProps> = (props) => {
         if (!flow) return
 
         // Hole JSON-Daten
-        const data = flow.jsonInput?.()
+        const data = flow
         if (!data) return
 
-        const json =
-            typeof data === "string" ? data : JSON.stringify(data, null, 2)
+        const json = JSON.stringify(data, null, 2)
 
         // Blob + Download-Link
         const blob = new Blob([json], { type: "application/json" })

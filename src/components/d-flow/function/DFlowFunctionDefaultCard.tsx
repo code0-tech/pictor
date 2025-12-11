@@ -1,6 +1,5 @@
 import {Code0Component} from "../../../utils/types";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
-import {NodeFunctionView, NodeParameterView} from "../DFlow.view";
 import React, {memo} from "react";
 import {Card} from "../../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
@@ -8,11 +7,12 @@ import CardSection from "../../card/CardSection";
 import {Flex} from "../../flex/Flex";
 import {
     IconAlertTriangle,
-    IconArrowRightCircle, IconChevronDown, IconChevronRight, IconCopy,
+    IconArrowRightCircle,
+    IconChevronDown,
+    IconCopy,
     IconDots,
     IconExclamationCircle,
     IconFileLambdaFilled,
-    IconLayoutNavbarCollapseFilled,
     IconMessageExclamation,
     IconTrash
 } from "@tabler/icons-react";
@@ -30,10 +30,10 @@ import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
-import type {DataTypeVariant, Maybe, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {Maybe, NodeFunction, NodeParameter, Scalars} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    instance: NodeFunctionView
+    node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
     isParameter: boolean
     linkingId?: string
@@ -55,16 +55,16 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const flowService = useService(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const definition = functionService.getById(data.instance.functionDefinition?.id!!)
+    const definition = functionService.getById(data.node.functionDefinition?.id!!)
     //TODO: some problems with react memorization here, need to investigate and also with hook calling
-    const validation = useFunctionValidation(definition!!, data.instance.parameters!!.map(p => p.value!! instanceof NodeFunctionView ? p.value.json()!! : p.value!!), dataTypeService!!, props.data.flowId)
+    const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
     const edges = useStore(s => s.edges);
     const width = props.width ?? 0
     const height = props.height ?? 0
 
-    data.instance.parameters?.forEach(parameter => {
+    data.node.parameters?.nodes?.forEach(parameter => {
         const parameterDefinition = definition?.parameterDefinitions!!.find(p => p.id == parameter?.id)
-        parameter.validationResults = validation ? validation.filter(v => v.parameterId === parameterDefinition?.id) : []
+        //parameter.validationResults = validation ? validation.filter(v => v.parameterId === parameterDefinition?.id) : []
     })
 
     // Helper, ob zu diesem Parameter eine Edge existiert:
@@ -109,7 +109,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     closeable: true,
                     children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
                     content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                              nodeLevel={data.index} functionInstance={data.instance}/>
+                                              nodeLevel={data.index} node={data.node}/>
                 })
             }} style={{position: "relative"}}>
 
@@ -138,8 +138,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                                 <MenuContent>
                                     <MenuLabel>Actions</MenuLabel>
                                     <MenuItem onClick={() => {
-                                        data.instance.deleteNextNode()
-                                        flowService.update()
+                                        flowService.deleteNodeById(data.flowId, data.node.id)
                                     }}><IconTrash size={16}/> Delete node</MenuItem>
                                     <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
                                 </MenuContent>
@@ -194,21 +193,21 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 </div>
             ) : null}
 
-            {data.instance.parameters?.some(param => {
-                const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
+            {data.node.parameters?.nodes?.some(param => {
+                const parameter = definition?.parameterDefinitions!!.find(p => p.id == param?.id)
                 const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
-                return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value)
+                return (param?.value?.__typename === "NodeFunction" && !isNodeDataType) || (!param?.value)
             }) ? (
                 <CardSection border>
                     {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-                    {data.instance.parameters?.map((param: NodeParameterView, index: number) => {
+                    {data.node?.parameters?.nodes?.map((param: NodeParameter, index: number) => {
 
 
                         const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
                         const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
                         const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], props.data.flowId, data.depth, data.scope, data.index)
 
-                        return (param.value instanceof NodeFunctionView && !isNodeDataType) || (!param.value) ?
+                        return (param.value?.__typename === "NodeFunction" && !isNodeDataType) || (!param.value) ?
                             <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
                                 <Text size={"xs"} hierarchy={"tertiary"}>
                                     {parameter?.names?.nodes!![0]?.content ?? param.id}

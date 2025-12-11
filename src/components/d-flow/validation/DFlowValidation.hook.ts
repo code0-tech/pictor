@@ -10,8 +10,9 @@ export const useDFlowValidations = (flowId: Scalars['FlowID']['output']): Valida
     const flowStore = useStore(DFlowReactiveService)
     const flow = flowService.getById(flowId)
 
+    //TODO: re-enable validations
     const validations = React.useMemo(() => {
-        return flow?.nodes?.map(node => node.parameters?.map(parameter => parameter.validationResults).flat() ?? []).flat() ?? []
+        return [] //flow?.nodes?.nodes?.map(node => node?.parameters?.nodes?.map(parameter => parameter?.validationResults).flat() ?? []).flat() ?? []
     }, [flowStore])
 
     return validations

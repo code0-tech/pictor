@@ -7,7 +7,7 @@ import {Badge} from "../../badge/Badge";
 import {Flex} from "../../flex/Flex";
 import {Text} from "../../text/Text";
 
-export const DFlowControl: React.FC = () => {
+export const DFlowPanelSize: React.FC = () => {
 
     const viewport = useViewport();
     const reactFlow = useReactFlow();

@@ -1,9 +1,8 @@
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
-import type {GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
-import {FlowView} from "../../DFlow.view";
+import type {Flow, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowDataTypeRule {
-    validate(value: NodeParameterValue, config: object, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: FlowView): boolean
+    validate(value: NodeParameterValue, config: object, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: Flow): boolean
 }
 
 export const staticImplements = <T>() => {

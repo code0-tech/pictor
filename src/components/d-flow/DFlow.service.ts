@@ -53,7 +53,8 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const node = this.getNodeById(flowId, nodeId)
-        if (!flow || !node) return
+        console.log(nextNode, nodeId)
+        if (!flow || !node || this.getNodeById(flowId, nextNode.id)) return
         flow.nodes?.nodes?.push(nextNode)
         node.nextNodeId = nextNode.id
         this.set(index, flow)
@@ -63,8 +64,12 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const flow = this.getById(flowId)
         if (!flow) return
         const index = this.values().findIndex(f => f.id === flowId)
-        flow.nodes?.nodes?.push(startingNode)
-        flow.startingNodeId = startingNode.id
+        const addingIdValue: NodeFunction = {
+            ...startingNode,
+            id: `gid://sagittarius/NodeFunction/${(flow.nodes?.nodes?.length ?? 0) + 1}`
+        }
+        flow.nodes?.nodes?.push(addingIdValue)
+        flow.startingNodeId = addingIdValue.id
         this.set(index, flow)
     }
 
@@ -86,9 +91,20 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         if (!node) return
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
         if (!parameter) return
+        if (parameter?.value?.__typename === "NodeFunction") {
+            // @ts-ignore
+            flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== parameter.value?.id)
+        }
         parameter.value = value
         if (value?.__typename === "NodeFunction") {
-            flow.nodes?.nodes?.push(value)
+            const addingIdValue: NodeFunction = {
+                ...value,
+                id: `gid://sagittarius/NodeFunction/${(flow.nodes?.nodes?.length ?? 0) + 1}`
+            }
+            flow.nodes?.nodes?.push(addingIdValue)
+            parameter.value = addingIdValue
+        } else {
+            parameter.value = value
         }
         this.set(index, flow)
     }

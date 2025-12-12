@@ -12,6 +12,12 @@
   height: fit-content;
   vertical-align: middle;
 
+  @if (var(--badge-color)) {
+    background-color: var(--badge-color-background);
+    border: 1px solid var(--badge-color-border);
+    color: var(--badge-color);
+  }
+
   & {
     @include helpers.fontStyle();
     @include helpers.borderRadius()

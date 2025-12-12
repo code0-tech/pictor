@@ -13,7 +13,9 @@ export const DFlowPanelControl: React.FC = () => {
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
     const flowService = useService(DFlowReactiveService)
-    const activeTab = React.useMemo(() => fileTabsService.getActiveTab(), [fileTabsStore])
+    const activeTab = React.useMemo(() => {
+        return fileTabsStore.find((t: any) => (t as any).active)
+    }, [fileTabsStore, fileTabsService]);
 
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return

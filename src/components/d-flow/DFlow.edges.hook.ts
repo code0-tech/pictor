@@ -5,16 +5,10 @@ import {DFlowFunctionReactiveService} from "./function";
 import {DFlowDataTypeReactiveService} from "./data-type";
 import React from "react";
 import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {md5} from "js-md5";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
-    '#70ffb2', // 0 – Primary (Grün)
-    '#70e2ff', // 1 – Cyan
-    '#709aff', // 2 – Blau
-    '#a170ff', // 3 – Violett
-    '#f170ff', // 4 – Magenta
-    '#ff70b5', // 5 – Pink/Rot
-    '#ff7070', // 6 – Orange-Rot
-    '#fff170', // 7 – Gelb
+    'rgba(255, 255, 255, 0.25)',    // rot
 ];
 
 export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
@@ -127,6 +121,12 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
 
                 if (paramDT?.variant === "NODE") {
                     const groupId = `${fnId}-group-${idCounter++}`;
+                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
+                    const hashToHue = (md5: string): number => {
+                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                        const int = parseInt(md5.slice(0, 8), 16)
+                        return int % 360
+                    }
 
                     edges.push({
                         id: `${fnId}-${groupId}-param-${param.id}`,
@@ -134,9 +134,10 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         target: groupId,
                         deletable: false,
                         selectable: false,
+                        animated: true,
                         label: def?.names?.nodes!![0]?.content ?? param.id,
                         data: {
-                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
                             isParameter: false,
                         },
                     });
@@ -161,6 +162,13 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         fnCache,
                         dtCache);
 
+                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
+                    const hashToHue = (md5: string): number => {
+                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                        const int = parseInt(md5.slice(0, 8), 16)
+                        return int % 360
+                    }
+
                     edges.push({
                         id: `${subFnId}-${fnId}-param-${param.id}`,
                         source: subFnId,
@@ -170,7 +178,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         deletable: false,
                         selectable: false,
                         data: {
-                            color: FLOW_EDGE_RAINBOW[(level + 1) % FLOW_EDGE_RAINBOW.length],
+                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
                             isParameter: true
                         },
                     });

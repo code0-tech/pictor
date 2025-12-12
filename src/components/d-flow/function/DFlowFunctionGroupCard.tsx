@@ -47,7 +47,7 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = mem
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                 isConnectable={false}
                 draggable={false}
-                style={{top: "2px", left: handleLeft}}
+                style={{top: "2px", left: "50%", transform: "translateX(-50%)"}}
             />
             <Handle
                 type="source"
@@ -55,7 +55,7 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = mem
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 isConnectable={false}
                 draggable={false}
-                style={{bottom: "2px", left: handleLeft}}
+                style={{bottom: "2px", left: "50%", transform: "translateX(-50%)"}}
             />
         </Card>
     );

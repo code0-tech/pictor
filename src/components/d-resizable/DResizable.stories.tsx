@@ -62,7 +62,7 @@ class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionServic
 
 export const Dashboard = () => {
 
-    const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
+    const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService, [])
     // @ts-ignore
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, [...DataTypesData.map(data => new DataTypeView(data))]);
     // @ts-ignore

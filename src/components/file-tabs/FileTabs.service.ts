@@ -46,11 +46,12 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         }
 
         super.delete(index);
+        this.update()
     }
 
     public add(value: FileTabsView) {
         //if tab with id already exists, do not add it again and just activate the existing one
-
+        console.log("Getting active tab 1", this.access.getState())
         if (this.values().some(value1 => value1.id == value.id)) {
             this.activateTab(value.id!!)
             return
@@ -62,11 +63,11 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
             })
         }
         super.add(value);
+        this.update()
     }
 
     public getActiveTab(): FileTabsView | undefined {
-        const values = [...this.values()]
-        return values.reverse().find((item: FileTabsView) => {
+        return this.values().find((item: FileTabsView) => {
             return item.active
         })
     }

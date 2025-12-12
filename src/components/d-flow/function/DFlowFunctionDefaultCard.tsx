@@ -147,19 +147,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
 
-            {node?.parameters?.nodes?.map(param => {
-                return <Handle
-                    key={param?.id}
-                    type="target"
-                    style={{top: "2px"}}
-                    position={Position.Top}
-                    id={`param-${param?.id}`}
-                    isConnectable={false}
-                    hidden={!isParamConnected(param?.id!!)}
-                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
-                />
-            })}
-
             <Handle
                 isConnectable={false}
                 draggable={false}
@@ -168,6 +155,20 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={data.isParameter ? Position.Right : Position.Top}
             />
+
+            {node?.parameters?.nodes?.map(param => {
+                const renderHandle = param?.value?.__typename === "NodeFunction" && isParamConnected(param?.id!!)
+                return renderHandle && <Handle
+                    key={param?.id}
+                    type="target"
+                    style={{top: "50%", transform: "translateY(-50%)"}}
+                    position={Position.Top}
+                    id={`param-${param?.id}`}
+                    isConnectable={false}
+                    hidden={!isParamConnected(param?.id!!)}
+                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                />
+            })}
 
             {/* Ausgang */}
             <Handle

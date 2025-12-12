@@ -40,6 +40,7 @@ export const DFlowTabs = () => {
             value={activeTabId}
             onValueChange={(value) => {
                 fileTabsService.activateTab(value); // mutieren reicht; kein .update() nötig, wenn setState benutzt wird
+                fileTabsService.update()
             }}
         >
             <FileTabsList

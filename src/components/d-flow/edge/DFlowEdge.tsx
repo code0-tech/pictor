@@ -41,7 +41,7 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
         targetY,
         targetPosition: data?.isParameter ? Position.Right : Position.Top,
         borderRadius: 16,
-        centerY: data?.isSuggestion ? targetY - 25 : targetY - 25
+        centerY: targetY - 25,
     })
 
     const color = data?.color ?? "#ffffff"
@@ -83,7 +83,7 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                             zIndex: 100,
                         }}
                     >
-                        <Badge color={"info"}>
+                        <Badge color={"primary"} border>
                             {label}
                         </Badge>
                     </div>

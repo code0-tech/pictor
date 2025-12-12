@@ -1,36 +1,21 @@
 import {Code0Component} from "../../../utils/types";
-import {Handle, Node, NodeProps, Position, useReactFlow, useStore, useStoreApi} from "@xyflow/react";
+import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {memo} from "react";
 import {Card} from "../../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
-import CardSection from "../../card/CardSection";
 import {Flex} from "../../flex/Flex";
-import {
-    IconAlertTriangle,
-    IconArrowRightCircle,
-    IconChevronDown,
-    IconCopy,
-    IconDots,
-    IconExclamationCircle,
-    IconFileLambdaFilled,
-    IconMessageExclamation,
-    IconTrash
-} from "@tabler/icons-react";
+import {IconFileLambdaFilled} from "@tabler/icons-react";
 import {Text} from "../../text/Text";
-import {Button} from "../../button/Button";
-import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuTrigger} from "../../menu/Menu";
-import {Badge} from "../../badge/Badge";
-import {useService} from "../../../utils/contextStore";
+import {useService, useStore as usePictorStore} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {InspectionSeverity} from "../../../utils/inspection";
 import {DFlowReactiveService} from "../DFlow.service";
-import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
-import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
-import type {Maybe, NodeFunction, NodeParameter, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {NodeFunction, NodeParameter, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {Badge} from "../../badge/Badge";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     node: NodeFunction
@@ -46,29 +31,25 @@ export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<H
 export type DFlowFunctionDefaultCardProps = NodeProps<Node<DFlowFunctionDefaultCardDataProps>>
 
 export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> = memo((props) => {
-    const {data, id} = props;
+    const {data, id, width = 0, height = 0} = props
+
     const viewportWidth = useStore(s => s.width);
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
-    const flowStoreApi = useStoreApi()
     const fileTabsService = useService(FileTabsService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = usePictorStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
+    const functionStore = usePictorStore(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const definition = functionService.getById(data.node.functionDefinition?.id!!)
-    //TODO: some problems with react memorization here, need to investigate and also with hook calling
-    const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
     const edges = useStore(s => s.edges);
-    const width = props.width ?? 0
-    const height = props.height ?? 0
 
-    data.node.parameters?.nodes?.forEach(parameter => {
-        const parameterDefinition = definition?.parameterDefinitions!!.find(p => p.id == parameter?.id)
-        //parameter.validationResults = validation ? validation.filter(v => v.parameterId === parameterDefinition?.id) : []
-    })
+    const definition = React.useMemo(() => functionService.getById(data.node.functionDefinition?.id!!), [functionStore, data])
+    const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
+    const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.node.id), [flowStore, data])
 
-    // Helper, ob zu diesem Parameter eine Edge existiert:
-    function isParamConnected(paramId: Maybe<Scalars["NodeParameterID"]["output"]>): boolean {
+
+    function isParamConnected(paramId: NodeParameter['id']): boolean {
         return edges.some(e =>
             e.target === id &&
             e.targetHandle === `param-${paramId}`
@@ -87,6 +68,54 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         });
         return start;
     })
+
+    const splitTemplate = (str: string) =>
+        str
+            .split(/(\$\{[^}]+\})/)
+            .filter(Boolean)
+            .flatMap(part =>
+                part.startsWith("${")
+                    ? [part.slice(2, -1)]          // variable name ohne ${}
+                    : part.split(/(\s*,\s*)/)      // Kommas einzeln extrahieren
+                        .filter(Boolean)
+                        .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
+            );
+
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content!!).map(item => {
+        const param = node?.parameters?.nodes?.find(p => {
+            const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
+            return parameterDefinition?.identifier == item
+        })
+
+        if (param) {
+            switch (param?.value?.__typename) {
+                case "LiteralValue":
+                    return <Badge style={{verticalAlign: "middle"}} color={"secondary"}>
+                        <Text size={"sm"}>
+                            {String(param?.value?.value)}
+                        </Text>
+                    </Badge>
+                case "ReferenceValue":
+                    return <Badge style={{verticalAlign: "middle"}}>
+                        <Text size={"sm"}>
+                            {String(param?.value.node)}-{String(param?.value.depth)}-{String(param?.value.scope)}
+                        </Text>
+                    </Badge>
+                case "NodeFunction":
+                    return <Badge style={{verticalAlign: "middle"}} color={"info"} border>
+                        <Text size={"sm"}>
+                            {String(functionService.getById(param?.value?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
+                        </Text>
+                    </Badge>
+            }
+            return <Badge style={{verticalAlign: "middle"}} border>
+                <Text size={"sm"}>
+                    {item}
+                </Text>
+            </Badge>
+        }
+        return " " + String(item) + " "
+    }), [flowStore, functionStore, data])
 
     return (
         <Card
@@ -113,43 +142,23 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 })
             }} style={{position: "relative"}}>
 
-            <CardSection border>
-                <Flex align={"center"} justify={"space-between"} style={{gap: "1.3rem"}}>
-                    <Flex align={"center"} style={{gap: "0.7rem"}}>
-                        <IconFileLambdaFilled size={16}/>
-                        <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>
-                    </Flex>
-                    <Flex align={"center"} style={{gap: "0.7rem"}}>
-                        <Menu onOpenChange={event => {
-                            setTimeout(() => {
-                                flowStoreApi.setState({
-                                    nodesDraggable: !event,
-                                    nodesConnectable: !event,
-                                    elementsSelectable: !event,
-                                });
-                            }, 250) // Timeout to ensure the menu is fully opened before changing the state
-                        }}>
-                            <MenuTrigger asChild>
-                                <Button p={"0"} variant={"none"}>
-                                    <IconDots size={16}/>
-                                </Button>
-                            </MenuTrigger>
-                            <MenuPortal>
-                                <MenuContent>
-                                    <MenuLabel>Actions</MenuLabel>
-                                    <MenuItem onClick={() => {
-                                        flowService.deleteNodeById(data.flowId, data.node.id)
-                                    }}><IconTrash size={16}/> Delete node</MenuItem>
-                                    <MenuItem disabled><IconCopy size={16}/> Copy node</MenuItem>
-                                </MenuContent>
-                            </MenuPortal>
-                        </Menu>
-                        <Button p={"0"} variant={"none"} disabled>
-                            <IconChevronDown size={16}/>
-                        </Button>
-                    </Flex>
-                </Flex>
-            </CardSection>
+            <Flex align={"center"} style={{gap: "0.7rem"}}>
+                <IconFileLambdaFilled size={16}/>
+                <Text size={"md"}>{displayMessage}</Text>
+            </Flex>
+
+            {node?.parameters?.nodes?.map(param => {
+                return <Handle
+                    key={param?.id}
+                    type="target"
+                    style={{top: "2px"}}
+                    position={Position.Top}
+                    id={`param-${param?.id}`}
+                    isConnectable={false}
+                    hidden={!isParamConnected(param?.id!!)}
+                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                />
+            })}
 
             <Handle
                 isConnectable={false}
@@ -159,87 +168,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={data.isParameter ? Position.Right : Position.Top}
             />
-
-            {(validation?.length ?? 0) > 0 ? (
-                <div className={"d-flow-viewport-default-card__inspection"}>
-                    <Flex style={{gap: "0.35rem"}}>
-                        {(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? (
-                            <Badge color={"error"}>
-                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                    <IconExclamationCircle size={12}/>
-                                    {validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length}
-                                </Flex>
-                            </Badge>
-                        ) : null}
-
-                        {(validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length ?? 0) > 0 ? (
-                            <Badge color={"warning"}>
-                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                    <IconAlertTriangle size={12}/>
-                                    {validation?.filter(v => v.type === InspectionSeverity.WARNING)?.length}
-                                </Flex>
-                            </Badge>
-                        ) : null}
-
-                        {(validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length ?? 0) > 0 ? (
-                            <Badge>
-                                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                    <IconMessageExclamation size={12}/>
-                                    {validation?.filter(v => v.type === InspectionSeverity.GRAMMAR)?.length}
-                                </Flex>
-                            </Badge>
-                        ) : null}
-                    </Flex>
-                </div>
-            ) : null}
-
-            {data.node.parameters?.nodes?.some(param => {
-                const parameter = definition?.parameterDefinitions!!.find(p => p.id == param?.id)
-                const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
-                return (param?.value?.__typename === "NodeFunction" && !isNodeDataType) || (!param?.value)
-            }) ? (
-                <CardSection border>
-                    {/* Dynamische Parameter-Eingänge (rechts), nur wenn wirklich verbunden */}
-                    {data.node?.parameters?.nodes?.map((param: NodeParameter, index: number) => {
-
-
-                        const parameter = definition?.parameterDefinitions!!.find(p => p.id == param.id)
-                        const isNodeDataType = dataTypeService.getDataType(parameter?.dataTypeIdentifier!!)?.variant === "NODE";
-                        const result = useSuggestions(parameter?.dataTypeIdentifier ?? undefined, [], props.data.flowId, data.depth, data.scope, data.index)
-
-                        return (param.value?.__typename === "NodeFunction" && !isNodeDataType) || (!param.value) ?
-                            <Flex key={index} pos={"relative"} justify={"space-between"} align={"center"}>
-                                <Text size={"xs"} hierarchy={"tertiary"}>
-                                    {parameter?.names?.nodes!![0]?.content ?? param.id}
-                                </Text>
-                                {!param.value ? (
-                                    <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-                                        param.value = suggestion.value
-                                        flowService.update()
-                                    }} suggestions={result} triggerContent={
-                                        <Button p={"0"} variant={"none"}>
-                                            <IconArrowRightCircle size={16}/>
-                                        </Button>}/>
-                                ) : null}
-                                <Handle
-                                    key={param.id}
-                                    type="target"
-                                    position={Position.Right}
-                                    style={{
-                                        position: "absolute",
-                                        transform: isNodeDataType ? "translate(-50%, -50%)" : "translate(50%, -50%)",
-                                        top: "50%",
-                                        right: isNodeDataType ? "50%" : "0"
-                                    }}
-                                    id={`param-${param.id}`}
-                                    isConnectable={false}
-                                    hidden={!isParamConnected(param.id!!)}
-                                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
-                                />
-                            </Flex> : null
-                    })}
-                </CardSection>
-            ) : null}
 
             {/* Ausgang */}
             <Handle

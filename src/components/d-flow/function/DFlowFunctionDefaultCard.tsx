@@ -16,6 +16,7 @@ import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
 import type {NodeFunction, NodeParameter, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../../badge/Badge";
+import {md5} from "js-md5";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     node: NodeFunction
@@ -37,6 +38,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const viewportHeight = useStore(s => s.height);
     const flowInstance = useReactFlow()
     const fileTabsService = useService(FileTabsService)
+    const fileTabsStore = usePictorStore(FileTabsService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = usePictorStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
@@ -47,7 +49,9 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const definition = React.useMemo(() => functionService.getById(data.node.functionDefinition?.id!!), [functionStore, data])
     const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
     const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.node.id), [flowStore, data])
-
+    const activeTabId = React.useMemo(() => {
+        return fileTabsStore.find((t: any) => (t as any).active)?.id
+    }, [fileTabsStore, fileTabsService]);
 
     function isParamConnected(paramId: NodeParameter['id']): boolean {
         return edges.some(e =>
@@ -102,8 +106,14 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         </Text>
                     </Badge>
                 case "NodeFunction":
-                    return <Badge style={{verticalAlign: "middle"}} color={"info"} border>
-                        <Text size={"sm"}>
+                    const hash = md5(`${id}-param-${JSON.stringify(param)}`)
+                    const hashToHue = (md5: string): number => {
+                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                        const int = parseInt(md5.slice(0, 8), 16)
+                        return int % 360
+                    }
+                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border>
+                        <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(param?.value?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>
                     </Badge>
@@ -121,8 +131,8 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         <Card
             paddingSize={"xs"}
             outline={firstItem.id === id}
-            borderColor={fileTabsService.getActiveTab()?.id == id ? "info" : undefined}
-            className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
+            borderColor={activeTabId == id ? "info" : undefined}
+            className={activeTabId == id ? "d-flow-viewport-default-card--active" : undefined}
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "primary"}
             onClick={() => {
                 flowInstance.setViewport({

@@ -1,4 +1,4 @@
-import {useService} from "../../../utils/contextStore";
+import {useService, useStore} from "../../../utils/contextStore";
 import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
 import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
 import {md5} from 'js-md5';
@@ -20,6 +20,7 @@ import type {
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
+import React from "react";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -37,8 +38,9 @@ export const useSuggestions = (
     const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-    const flow = flowService.getById(flowId)
+    const flow = React.useMemo(() => flowService?.getById(flowId), [flowStore, flowId])
     const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
     if (!suggestionService || !dataTypeService) return []
@@ -85,57 +87,57 @@ export const useSuggestions = (
             })
         }
 
-        if (suggestionTypes.includes(DFlowSuggestionType.FUNCTION_COMBINATION)) {
-            //calculate FUNCTION
-            //generics to be replaced with GENERIC todo is written on top
-            const matchingFunctions = functionService.values().filter(funcDefinition => {
-                if (!type || !resolvedType || !hashedType) return true
-                if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
-                if (dataType?.variant === "NODE") return true
-                if (!funcDefinition.returnType) return false
-                if (!funcDefinition.genericKeys) return false
-                const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
-                return isMatchingType(resolvedType, resolvedReturnType)
-            }).sort((a, b) => {
-                const [rA, pA, fA] = a.runtimeFunctionDefinition!!.identifier!!.split("::");
-                const [rB, pB, fB] = b.runtimeFunctionDefinition!!.identifier!!.split("::");
+    }
 
-                // Erst runtime vergleichen
-                const runtimeCmp = rA.localeCompare(rB);
-                if (runtimeCmp !== 0) return runtimeCmp;
+    if (suggestionTypes.includes(DFlowSuggestionType.FUNCTION_COMBINATION)) {
+        //calculate FUNCTION
+        //generics to be replaced with GENERIC todo is written on top
+        const matchingFunctions = functionService.values().filter(funcDefinition => {
+            if (!type || !resolvedType || !hashedType) return true
+            if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
+            if (dataType?.variant === "NODE") return true
+            if (!funcDefinition.returnType) return false
+            if (!funcDefinition.genericKeys) return false
+            const resolvedReturnType = replaceGenericsAndSortType(resolveType(funcDefinition.returnType, dataTypeService), funcDefinition.genericKeys)
+            return isMatchingType(resolvedType, resolvedReturnType)
+        }).sort((a, b) => {
+            const [rA, pA, fA] = a.runtimeFunctionDefinition!!.identifier!!.split("::");
+            const [rB, pB, fB] = b.runtimeFunctionDefinition!!.identifier!!.split("::");
 
-                // Dann package vergleichen
-                const packageCmp = pA.localeCompare(pB);
-                if (packageCmp !== 0) return packageCmp;
+            // Erst runtime vergleichen
+            const runtimeCmp = rA.localeCompare(rB);
+            if (runtimeCmp !== 0) return runtimeCmp;
 
-                // Dann function name
-                return fA.localeCompare(fB);
-            })
+            // Dann package vergleichen
+            const packageCmp = pA.localeCompare(pB);
+            if (packageCmp !== 0) return packageCmp;
 
-            matchingFunctions.forEach(funcDefinition => {
-                const nodeFunctionSuggestion: NodeParameterValue = {
-                    __typename: "NodeFunction",
-                    id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.nodes?.length ?? 0) + 1}`,
-                    functionDefinition: {
-                        id: funcDefinition.id,
-                        runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
-                    },
-                    parameters: {
-                        nodes: (funcDefinition.parameterDefinitions?.map(definition => {
-                            return {
-                                id: definition.id,
-                                runtimeParameter: {
-                                    id: definition.id
-                                }
+            // Dann function name
+            return fA.localeCompare(fB);
+        })
+
+        matchingFunctions.forEach(funcDefinition => {
+            const nodeFunctionSuggestion: NodeParameterValue = {
+                __typename: "NodeFunction",
+                id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.nodes?.length ?? 0) + 1}`,
+                functionDefinition: {
+                    id: funcDefinition.id,
+                    runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
+                },
+                parameters: {
+                    nodes: (funcDefinition.parameterDefinitions?.map(definition => {
+                        return {
+                            id: definition.id,
+                            runtimeParameter: {
+                                id: definition.id
                             }
-                        }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
-                    }
+                        }
+                    }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
                 }
-                const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
-                state.push(suggestion)
-            })
-        }
-
+            }
+            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
+            state.push(suggestion)
+        })
     }
 
     if (suggestionTypes.includes(DFlowSuggestionType.REF_OBJECT)) {

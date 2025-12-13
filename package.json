@@ -48,7 +48,7 @@
     "@tabler/icons-react": "3.35.0",
     "@types/jest-image-snapshot": "^6.4.0",
     "@types/react": "^19.2.7",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^5.1.2",
     "@vitest/browser-playwright": "^4.0.14",
     "@vitest/coverage-v8": "^4.0.14",
     "@xyflow/react": "^12.10.0",

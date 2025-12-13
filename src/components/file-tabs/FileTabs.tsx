@@ -12,7 +12,7 @@ import {
 import {mergeCode0Props} from "../../utils/utils";
 import {Code0ComponentProps} from "../../utils/types";
 import "./FileTabs.style.scss"
-import {IconX} from "@tabler/icons-react";
+import {IconFile, IconX} from "@tabler/icons-react";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 
 type FileTabsProps = Code0ComponentProps & TabsProps
@@ -38,14 +38,14 @@ export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
                     data-value={props.value} {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
         {props.children}
         {props.closable ? <div className={"file-tabs__trigger-icon"} onClick={props.onClose}>
-            <IconX size={16}/>
+            <IconX size={12}/>
         </div> : null}
     </Trigger>
 }
 
 export const FileTabsContent: React.FC<FileTabsContentProps> = ({children, ...props}) => {
     return <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}>
-        <ScrollArea h={"700px"}>
+        <ScrollArea h={"100%"}>
             <ScrollAreaViewport>
                 {children}
             </ScrollAreaViewport>

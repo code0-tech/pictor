@@ -22,7 +22,7 @@
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@code0-tech/definition-reader": "^0.0.18",
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-c63274fdd34593b8aa24f9f977659fd3d6270150",
-    "@dagrejs/dagre": "^2.0.0",
+    "@dagrejs/dagre": "^2.0.1",
     "@mdx-js/react": "^3.1.1",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.15",

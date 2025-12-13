@@ -4,8 +4,11 @@ import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../../fi
 import React from "react";
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../menu/Menu";
 import {Button} from "../../button/Button";
-import {IconChevronDown, IconDotsVertical} from "@tabler/icons-react";
+import {IconChevronDown, IconDotsVertical, IconPlus} from "@tabler/icons-react";
 import {FileTabsView} from "../../file-tabs/FileTabs.view";
+import {Text} from "../../text/Text";
+import {DLayout} from "../../d-layout/DLayout";
+import {ButtonGroup} from "../../button-group/ButtonGroup";
 
 export const DFlowTabs = () => {
 
@@ -43,17 +46,17 @@ export const DFlowTabs = () => {
                 fileTabsService.update()
             }}
         >
-            <FileTabsList
+            <DLayout topContent={<FileTabsList
                 controls={
-                    <>
+                    <ButtonGroup>
                         <Menu>
                             <MenuTrigger asChild>
-                                <Button variant="none" color="primary" style={{aspectRatio: "1/1"}}>
-                                    <IconChevronDown size={12}/>
+                                <Button variant="none" paddingSize={"xxs"} color="primary">
+                                    <IconPlus size={12}/>
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
-                                <MenuContent align="end" sideOffset={8}>
+                                <MenuContent align="center" sideOffset={8}>
                                     {fileTabsStore.map((tab: FileTabsView) => (
                                         <MenuItem key={`menu-${tab.id}`}
                                                   onClick={() => {
@@ -62,13 +65,14 @@ export const DFlowTabs = () => {
                                             {tab.children}
                                         </MenuItem>
                                     ))}
+                                    {/*TODO: Add all available nodes*/}
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
 
                         <Menu>
                             <MenuTrigger asChild>
-                                <Button variant="none" color="primary" style={{aspectRatio: "1/1"}}>
+                                <Button variant="none" paddingSize={"xxs"} color="primary">
                                     <IconDotsVertical size={12}/>
                                 </Button>
                             </MenuTrigger>
@@ -85,7 +89,7 @@ export const DFlowTabs = () => {
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
-                    </>
+                    </ButtonGroup>
                 }
             >
                 {fileTabsStore.map((tab: FileTabsView, index: number) => (
@@ -98,13 +102,13 @@ export const DFlowTabs = () => {
                         {tab.children}
                     </FileTabsTrigger>
                 ))}
-            </FileTabsList>
-
-            {fileTabsStore.map((tab: FileTabsView) => (
-                <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
-                    {tab.content}
-                </FileTabsContent>
-            ))}
+            </FileTabsList>}>
+                {fileTabsStore.map((tab: FileTabsView) => (
+                    <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
+                        {tab.content}
+                    </FileTabsContent>
+                ))}
+            </DLayout>
         </FileTabs>
     );
 

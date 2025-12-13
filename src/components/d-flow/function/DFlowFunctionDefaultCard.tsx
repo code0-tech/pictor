@@ -4,7 +4,7 @@ import React, {memo} from "react";
 import {Card} from "../../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../../flex/Flex";
-import {IconFileLambdaFilled} from "@tabler/icons-react";
+import {IconFile, IconFileLambdaFilled} from "@tabler/icons-react";
 import {Text} from "../../text/Text";
 import {useService, useStore as usePictorStore} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
@@ -85,6 +85,13 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
+    const colorHash = md5(id)
+    const hashToHue = (md5: string): number => {
+        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+        const int = parseInt(md5.slice(0, 8), 16)
+        return int % 360
+    }
+
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content!!).map(item => {
         const param = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
@@ -107,11 +114,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     </Badge>
                 case "NodeFunction":
                     const hash = md5(`${id}-param-${JSON.stringify(param)}`)
-                    const hashToHue = (md5: string): number => {
-                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                        const int = parseInt(md5.slice(0, 8), 16)
-                        return int % 360
-                    }
                     return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border>
                         <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(param?.value?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
@@ -146,14 +148,17 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     id: id,
                     active: true,
                     closeable: true,
-                    children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
+                    children: <>
+                        <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+                        <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+                    </>,
                     content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
                                               nodeLevel={data.index} node={data.node}/>
                 })
             }} style={{position: "relative"}}>
 
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconFileLambdaFilled size={16}/>
+                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
 

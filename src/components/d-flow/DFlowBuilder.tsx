@@ -47,7 +47,7 @@ export const DFlowBuilder: React.FC<DFlowBuilderProps> = (props) => {
             </DResizablePanel>
             <DResizableHandle/>
             <DResizablePanel id={"3"} order={3} defaultSize={25}>
-                <DFlowTabs/>
+                <DFlowTabs flowId={"gid://sagittarius/Flow/1"}/>
             </DResizablePanel>
         </DResizablePanelGroup>
     </DLayout>

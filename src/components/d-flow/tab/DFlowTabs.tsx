@@ -2,9 +2,16 @@ import {useService, useStore} from "../../../utils";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../../file-tabs/FileTabs";
 import React from "react";
-import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../../menu/Menu";
+import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator, MenuTrigger} from "../../menu/Menu";
 import {Button} from "../../button/Button";
-import {IconBolt, IconDotsVertical, IconFile, IconPlus} from "@tabler/icons-react";
+import {
+    IconArrowDown,
+    IconArrowUp,
+    IconBolt,
+    IconCornerDownLeft,
+    IconDotsVertical,
+    IconPlus
+} from "@tabler/icons-react";
 import {FileTabsView} from "../../file-tabs/FileTabs.view";
 import {DLayout} from "../../d-layout/DLayout";
 import {ButtonGroup} from "../../button-group/ButtonGroup";
@@ -14,6 +21,11 @@ import {DFlowTypeReactiveService} from "../type";
 import {Text} from "../../text/Text";
 import {DFlowFunctionReactiveService} from "../function";
 import {md5} from "js-md5";
+import {Card} from "../../card/Card";
+import {Flex} from "../../flex/Flex";
+import {Badge} from "../../badge/Badge";
+import {Spacing} from "../../spacing/Spacing";
+import {ContextMenuLabel} from "../../context-menu/ContextMenu";
 
 export interface DFlowTabsProps {
     flowId: Flow['id']
@@ -38,6 +50,19 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
     const activeTabId = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)?.id ?? fileTabsService.getActiveTab()?.id;
     }, [fileTabsStore, fileTabsService])
+
+    const triggerTab = React.useMemo(() => {
+        if (!flowType?.id) return undefined
+        return fileTabsStore.find((tab: FileTabsView) => tab.id === flowType.id)
+    }, [fileTabsStore, flowType])
+
+    const visibleTabs = React.useMemo(() => {
+        return fileTabsStore.filter((tab: FileTabsView) => tab.show)
+    }, [fileTabsStore, triggerTab])
+
+    const hiddenTabs = React.useMemo(() => {
+        return fileTabsStore.filter((tab: FileTabsView) => !tab.show && tab.id !== triggerTab?.id)
+    }, [fileTabsStore, triggerTab])
 
     React.useEffect(() => {
         setTimeout(() => {
@@ -75,29 +100,49 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
-                                <MenuContent align="center" sideOffset={8}>
-                                    <MenuItem onSelect={() => fileTabsService.activateTab(flowType?.id!!)}>
-                                        <IconBolt size={12}/>
-                                        <Text size={"sm"}>{flowType?.names?.nodes!![0]?.content}</Text>
-                                    </MenuItem>
-                                    <MenuSeparator/>
-                                    {fileTabsStore.map((tab: FileTabsView) => {
-                                        return tab.show && <MenuItem key={`menu-${tab.id}`}
-                                                                     onSelect={() => {
-                                                                         fileTabsService.activateTab(tab.id!)
-                                                                     }}>
-                                            {tab.children}
-                                        </MenuItem>
-                                    })}
-                                    <MenuSeparator/>
-                                    {fileTabsStore.map((tab: FileTabsView) => {
-                                        return !tab.show && <MenuItem key={`menu-${tab.id}`}
-                                                                     onSelect={() => {
-                                                                         fileTabsService.activateTab(tab.id!)
-                                                                     }}>
-                                            {tab.children}
-                                        </MenuItem>
-                                    })}
+                                <MenuContent align="center" sideOffset={8} color={"secondary"}>
+                                    <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                        <MenuLabel>Starting Node</MenuLabel>
+                                        {triggerTab && <MenuItem onSelect={() => fileTabsService.activateTab(triggerTab.id!!)}>
+                                            {triggerTab.children}
+                                        </MenuItem>}
+                                        <MenuSeparator/>
+                                        <MenuLabel>Opened Nodes</MenuLabel>
+                                        {visibleTabs.map((tab: FileTabsView) => (
+                                            <MenuItem key={`menu-${tab.id}`}
+                                                      onSelect={() => {
+                                                          fileTabsService.activateTab(tab.id!)
+                                                      }}>
+                                                {tab.children}
+                                            </MenuItem>
+                                        ))}
+                                        <MenuSeparator/>
+                                        <MenuLabel>Available Node</MenuLabel>
+                                        {hiddenTabs.map((tab: FileTabsView) => (
+                                            <MenuItem key={`menu-${tab.id}`}
+                                                      onSelect={() => {
+                                                          fileTabsService.activateTab(tab.id!)
+                                                      }}>
+                                                {tab.children}
+                                            </MenuItem>
+                                        ))}
+                                    </Card>
+                                    <ContextMenuLabel>
+                                        <Flex style={{gap: ".35rem"}}>
+                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
+                                                <Flex>
+                                                    <Badge border><IconArrowUp size={12}/></Badge>
+                                                    <Badge border><IconArrowDown size={12}/></Badge>
+                                                </Flex>
+                                                move
+                                            </Flex>
+                                            <Spacing spacing={"xxs"}/>
+                                            <Flex align={"center"} style={{gap: ".35rem"}}>
+                                                <Badge border><IconCornerDownLeft size={12}/></Badge>
+                                                select
+                                            </Flex>
+                                        </Flex>
+                                    </ContextMenuLabel>
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
@@ -124,12 +169,14 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                     </ButtonGroup>
                 }
             >
-                {fileTabsStore.map((tab: FileTabsView, index: number) => {
+                {visibleTabs.map((tab: FileTabsView, index: number) => {
                     return tab.show && <FileTabsTrigger
                         key={`trigger-${tab.id}`}
                         closable={tab.closeable}
                         value={tab.id!}
-                        onClose={() => fileTabsService.delete(index)}
+                        onClose={() => {
+                            fileTabsService.removeTabById(tab.id!!)
+                        }}
                     >
                         {tab.children}
                     </FileTabsTrigger>

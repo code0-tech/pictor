@@ -1,21 +1,8 @@
 import {Code0Component} from "../../../utils/types";
-import {
-    BaseEdge,
-    Edge,
-    EdgeLabelRenderer,
-    EdgeProps,
-    getSmoothStepPath, Handle,
-    Position
-} from "@xyflow/react";
+import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import {Badge} from "../../badge/Badge";
-import {Button} from "../../button/Button";
-import {IconPlus} from "@tabler/icons-react";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
-import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
-import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
-import {useService} from "../../../utils";
-import {DFlowReactiveService} from "../DFlow.service";
 
 export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
@@ -40,9 +27,6 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
         style,
         ...rest
     } = props
-
-    const flowService = useService(DFlowReactiveService)
-    const result = useSuggestions(undefined, [], data?.flowId, 0, [0], 0)
 
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
@@ -82,29 +66,6 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                 {...rest}
                 style={{stroke: `url(#${gradientId})`, strokeWidth: "2px", strokeLinecap: "round"}}
             />
-
-            {data?.type === "default" ? (
-                <EdgeLabelRenderer>
-                    <div
-                        style={{
-                            position: "absolute",
-                            transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-                            pointerEvents: "all",
-                            zIndex: 100,
-                        }}
-                    >
-                        <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-                            if (data?.flowId && suggestion.value.__typename === "NodeFunction") {
-                                flowService.addNextNodeById(data.flowId, data.parentNodeId ?? null, suggestion.value)
-                            }
-                        }} suggestions={result} triggerContent={
-                        <Button paddingSize={"xxs"}>
-                            <IconPlus size={12}/>
-                        </Button>
-                        }/>
-                    </div>
-                </EdgeLabelRenderer>
-            ) : null}
 
             {label ? (
                 <EdgeLabelRenderer>

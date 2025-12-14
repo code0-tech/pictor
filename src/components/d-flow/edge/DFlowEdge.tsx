@@ -4,17 +4,25 @@ import {
     Edge,
     EdgeLabelRenderer,
     EdgeProps,
-    getSmoothStepPath,
+    getSmoothStepPath, Handle,
     Position
 } from "@xyflow/react";
 import React, {memo} from "react";
 import {Badge} from "../../badge/Badge";
+import {Button} from "../../button/Button";
+import {IconPlus} from "@tabler/icons-react";
+import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
+import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
+import {useService} from "../../../utils";
+import {DFlowReactiveService} from "../DFlow.service";
 
 export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
     color?: string
-    isParameter?: boolean
-    isSuggestion?: boolean
+    type: 'parameter' | 'suggestion' | 'group' | 'default'
+    parentNodeId: NodeFunction['id']
+    flowId: Flow['id']
 }
 
 // @ts-ignore
@@ -33,17 +41,19 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
         ...rest
     } = props
 
+    const flowService = useService(DFlowReactiveService)
+    const result = useSuggestions(undefined, [], data?.flowId, 0, [0], 0)
+
     const [edgePath, labelX, labelY] = getSmoothStepPath({
         sourceX,
         sourceY,
-        sourcePosition: data?.isParameter ? Position.Left : Position.Bottom,
+        sourcePosition: data?.type === "parameter" ? Position.Left : Position.Bottom,
         targetX,
         targetY,
-        targetPosition: data?.isParameter ? Position.Right : Position.Top,
+        targetPosition: data?.type === "parameter" ? Position.Right : Position.Top,
         borderRadius: 16,
         stepPosition: 0.5,
     })
-
     const color = data?.color ?? "#ffffff"
     const gradientId = `dflow-edge-gradient-${id}`
 
@@ -72,6 +82,31 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                 {...rest}
                 style={{stroke: `url(#${gradientId})`, strokeWidth: "2px", strokeLinecap: "round"}}
             />
+
+            {data?.type === "default" ? (
+                <EdgeLabelRenderer>
+                    <div
+                        style={{
+                            position: "absolute",
+                            transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+                            pointerEvents: "all",
+                            zIndex: 100,
+                        }}
+                    >
+                        <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
+                            if (data.flowId && data.parentNodeId && suggestion.value.__typename === "NodeFunction") {
+                                flowService.addNextNodeById(data.flowId, data.parentNodeId, suggestion.value)
+                            } else if (data.flowId && suggestion.value.__typename === "NodeFunction") {
+                                flowService.setStartingNodeById(data.flowId, suggestion.value)
+                            }
+                        }} suggestions={result} triggerContent={
+                        <Button paddingSize={"xxs"}>
+                            <IconPlus size={12}/>
+                        </Button>
+                        }/>
+                    </div>
+                </EdgeLabelRenderer>
+            ) : null}
 
             {label ? (
                 <EdgeLabelRenderer>

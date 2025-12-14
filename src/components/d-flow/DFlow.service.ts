@@ -53,7 +53,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const node = this.getNodeById(flowId, nodeId)
-        console.log(nextNode, nodeId)
         if (!flow || !node || this.getNodeById(flowId, nextNode.id)) return
         flow.nodes?.nodes?.push(nextNode)
         node.nextNodeId = nextNode.id

@@ -10,6 +10,7 @@ export interface DFlowFunctionGroupCardDataProps extends Omit<Code0Component<HTM
     flowId: string
     depth: number
     scope: number[]
+    color?: string
 }
 
 // @ts-ignore
@@ -17,37 +18,17 @@ export type DFlowFunctionGroupCardProps = NodeProps<Node<DFlowFunctionGroupCardD
 
 export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
     const {data, id} = props
-    const depth = data?.depth ?? 0;
-    const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
-
-    // Align handles with the first node inside this group
-    const handleLeft = useStore((s) => {
-        const children = s.nodes.filter((n) => n.parentId === id);
-        let start: any | undefined = undefined;
-        children.forEach((n) => {
-            const idx = (n.data as any)?.index ?? Infinity;
-            const startIdx = (start?.data as any)?.index ?? Infinity;
-            if (!start || idx < startIdx) {
-                start = n;
-            }
-        });
-        if (start) {
-            const width = start.measured.width ?? 0;
-            return start.position.x + width / 2;
-        }
-        return undefined;
-    })
 
     return (
         <Card w={"100%"} h={"100%"}
-              style={{background: withAlpha(color, 0.025), boxShadow: "none", border: "2px dashed " + withAlpha(color, 0.125)}}>
+              style={{background: withAlpha(data.color!!, 0.1), border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
             <Handle
                 type="target"
                 position={Position.Top}
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                 isConnectable={false}
                 draggable={false}
-                style={{top: "2px", left: "50%", transform: "translateX(-50%)"}}
+                style={{top: "0px", left: "50%", transform: "translateX(-50%)"}}
             />
             <Handle
                 type="source"
@@ -55,16 +36,59 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = mem
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 isConnectable={false}
                 draggable={false}
-                style={{bottom: "2px", left: "50%", transform: "translateX(-50%)"}}
+                style={{bottom: "0px", left: "50%", transform: "translateX(-50%)"}}
             />
         </Card>
     );
 });
 
-const withAlpha = (hex: string, alpha: number) => {
-    const h = hex.replace('#', '');
-    const r = parseInt(h.length === 3 ? h[0] + h[0] : h.slice(0, 2), 16);
-    const g = parseInt(h.length === 3 ? h[1] + h[1] : h.slice(2, 4), 16);
-    const b = parseInt(h.length === 3 ? h[2] + h[2] : h.slice(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-};
+/* ===========================
+   Color utilities
+   =========================== */
+
+const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1)
+
+const parseCssColorToRgba = (color: string): any => {
+    if (typeof document === "undefined") {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    const el = document.createElement("span")
+    el.style.color = color
+    document.body.appendChild(el)
+
+    const computed = getComputedStyle(el).color
+    document.body.removeChild(el)
+
+    const match = computed.match(
+        /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
+    )
+
+    if (!match) {
+        return {r: 0, g: 0, b: 0, a: 1}
+    }
+
+    return {
+        r: Math.round(Number(match[1])),
+        g: Math.round(Number(match[2])),
+        b: Math.round(Number(match[3])),
+        a: match[4] !== undefined ? Number(match[4]) : 1,
+    }
+}
+
+const mixColorRgb = (color: string, level: number) => {
+    const w = clamp01(level * 0.1)
+
+    const c1 = parseCssColorToRgba(color)
+    const c2 = parseCssColorToRgba("#030014")
+
+    const mix = (a: number, b: number) =>
+        Math.round(a * (1 - w) + b * w)
+
+    return `rgb(${mix(c1.r, c2.r)}, ${mix(c1.g, c2.g)}, ${mix(c1.b, c2.b)})`
+}
+
+const withAlpha = (color: string, alpha: number) => {
+    const c = parseCssColorToRgba(color)
+    return `rgba(${c.r}, ${c.g}, ${c.b}, ${clamp01(alpha)})`
+}

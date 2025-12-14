@@ -13,6 +13,9 @@ import type {
 
 export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
 
+    //TODO: use last element id from the array + 1
+    protected i = 0
+
     getById(id: Flow['id']): Flow | undefined {
         return this.values().find(value => value.id === id);
     }
@@ -59,8 +62,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
 
         if (!flow || (parentNodeId && !parentNode)) return
 
-        const nodes = flow.nodes?.nodes ?? []
-        const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nodes.length + 1}`
+        const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${this.i++}`
         const addingNode: NodeFunction = {
             ...nextNode,
             id: nextNodeId,
@@ -108,7 +110,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         if (value?.__typename === "NodeFunction") {
             const addingIdValue: NodeFunction = {
                 ...value,
-                id: `gid://sagittarius/NodeFunction/${(flow.nodes?.nodes?.length ?? 0) + 1}`
+                id: `gid://sagittarius/NodeFunction/${this.i++}`
             }
             flow.nodes?.nodes?.push(addingIdValue)
             parameter.value = addingIdValue

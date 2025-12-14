@@ -39,7 +39,7 @@ export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardPr
                 style={{top: "2px"}}
                 position={Position.Top}
             />
-            <IconPlus size={16}/>
+            <IconPlus size={12}/>
         </Button>
     }/>
 

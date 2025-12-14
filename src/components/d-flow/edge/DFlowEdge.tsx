@@ -41,7 +41,7 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
         targetY,
         targetPosition: data?.isParameter ? Position.Right : Position.Top,
         borderRadius: 16,
-        centerY: targetY - 25,
+        stepPosition: 0.5,
     })
 
     const color = data?.color ?? "#ffffff"

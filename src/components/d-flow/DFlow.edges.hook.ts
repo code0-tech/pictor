@@ -6,12 +6,14 @@ import {DFlowDataTypeReactiveService} from "./data-type";
 import React from "react";
 import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
+import {DFlowEdgeDataProps} from "./edge/DFlowEdge";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
     'rgba(255, 255, 255, 0.25)',    // rot
 ];
 
-export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
+// @ts-ignore
+export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService);
@@ -24,8 +26,8 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
     return React.useMemo(() => {
         if (!flow) return [];
 
-        /* ------------------------------------------------------------------ */
-        const edges: Edge[] = [];
+        // @ts-ignore
+        const edges: Edge<DFlowEdgeDataProps>[] = [];
 
         /** merkt sich für jede Function-Card die Gruppen-IDs,
          *  **für die wirklich ein Funktions-Wert existiert**      */
@@ -57,14 +59,15 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
         };
 
         const traverse = (
-            fn: NodeFunction,
-            parentFnId?: string,
+            node: NodeFunction,
+            parentNode?: NodeFunction,
+            parentNodeId?: string,
             level = 0,
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ): string => {
 
-            const fnId = `${fn.id}-${idCounter++}`;
+            const fnId = `${node.id}-${idCounter++}`;
 
             if (idCounter == 1) {
                 edges.push({
@@ -73,15 +76,17 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                     target: fnId,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isParameter: false
+                        type: 'default',
+                        flowId: flowId,
+                        parentNodeId: parentNode?.id
                     },
                     deletable: false,
                     selectable: false,
                 });
             }
 
-            if (parentFnId) {
-                const startGroups = groupsWithValue.get(parentFnId) ?? [];
+            if (parentNodeId) {
+                const startGroups = groupsWithValue.get(parentNodeId) ?? [];
 
                 if (startGroups.length > 0) {
                     startGroups.forEach((gId, idx) => edges.push({
@@ -90,19 +95,23 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         target: fnId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            isParameter: false
+                            type: 'default',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                         deletable: false,
                         selectable: false,
                     }));
                 } else {
                     edges.push({
-                        id: `${parentFnId}-${fnId}-next`,
-                        source: parentFnId,
+                        id: `${parentNodeId}-${fnId}-next`,
+                        source: parentNodeId,
                         target: fnId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            isParameter: false
+                            type: 'default',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                         deletable: false,
                         selectable: false,
@@ -110,9 +119,9 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                 }
             }
 
-            fn.parameters?.nodes?.forEach((param) => {
+            node.parameters?.nodes?.forEach((param) => {
                 const val = param?.value;
-                const def = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache)
+                const def = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache)
                     ?.parameterDefinitions?.find(p => p.id === param?.id);
                 const paramType = def?.dataTypeIdentifier;
                 const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
@@ -139,7 +148,9 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         label: def?.names?.nodes!![0]?.content ?? param.id,
                         data: {
                             color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
-                            isParameter: false,
+                            type: 'group',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                     });
 
@@ -151,6 +162,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                             .push(groupId);
 
                         traverse(param.value as NodeFunction,
+                            node,
                             undefined,
                             level + 1,
                             fnCache,
@@ -158,6 +170,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                     }
                 } else if (val && val.__typename === "NodeFunction") {
                     const subFnId = traverse(param.value as NodeFunction,
+                        node,
                         undefined,
                         level + 1,
                         fnCache,
@@ -180,14 +193,16 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         selectable: false,
                         data: {
                             color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
-                            isParameter: true
+                            type: 'parameter',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                     });
                 }
             });
 
-            if (fn.nextNodeId) {
-                traverse(flowService.getNodeById(flow.id!!, fn.nextNodeId!!)!!, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
+            if (node.nextNodeId) {
+                traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
             } else {
                 const suggestionNodeId = `${fnId}-suggestion`;
                 const startGroups = groupsWithValue.get(fnId) ?? [];
@@ -199,7 +214,9 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         target: suggestionNodeId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            isSuggestion: true,
+                            type: 'suggestion',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                         deletable: false,
                         selectable: false,
@@ -211,7 +228,9 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                         target: suggestionNodeId,
                         data: {
                             color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            isSuggestion: true,
+                            type: 'suggestion',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
                         },
                         deletable: false,
                         selectable: false,
@@ -223,7 +242,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
         };
 
         if (flow.startingNodeId) {
-            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, 0, functionCache, dataTypeCache);
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, undefined, 0, functionCache, dataTypeCache);
         }
 
         return edges

@@ -1,5 +1,6 @@
 import {FileTabsView} from "./FileTabs.view";
 import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
+import {startTransition} from "react";
 
 export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
@@ -43,6 +44,22 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         this.update()
     }
 
+    removeTabById(id: string) {
+        const tab = this.getById(id)
+        const index = this.values().findIndex((item: FileTabsView) => item.id === id)
+        if (!tab) return
+        if (tab.active && this.has(index - 1)) {
+            const previousTab = this.get(index - 1)
+            if (previousTab.show) this.activateTab(previousTab.id!!)
+        } else if (tab.active && this.has(index + 1)) {
+            const nextTab = this.get(index + 1)
+            if (nextTab.show) this.activateTab(nextTab.id!!)
+        }
+        tab.show = false
+        tab.active = false
+        this.update()
+    }
+
     public delete(index: number) {
         const tab = this.get(index)
 
@@ -56,28 +73,49 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         this.update()
     }
 
+    deleteById(id: string) {
+        const index = this.values().findIndex((item: FileTabsView) => item.id === id)
+
+        if (index !== -1) {
+            this.delete(index)
+        }
+    }
+
     registerTab(value: FileTabsView) {
-        if (this.getById(value.id!!)) return
+        const nextValue = {...value, show: value.show ?? false}
 
-        super.add({...value, show: value.show ?? false});
-        this.update()
+        startTransition(() => {
+            this.access.setState((prevState) => {
+                const existingIndex = prevState.findIndex((tab) => tab.id === nextValue.id)
 
+                if (existingIndex !== -1) return prevState
+
+                return [...prevState, nextValue]
+            })
+        })
     }
 
     public add(value: FileTabsView) {
+        const nextValue = {...value, show: value.show ?? true}
 
-        if (this.values().some(value1 => value1.id == value.id)) {
-            this.activateTab(value.id!!)
-            return
-        }
+        startTransition(() => {
+            this.access.setState((prevState) => {
+                const existingIndex = prevState.findIndex((tab) => tab.id === nextValue.id)
+                const nextState = prevState.map((tab) => ({...tab, active: nextValue.active ? false : tab.active}))
 
-        if (value.active) {
-            this.values().forEach((item: FileTabsView) => {
-                item.active = false
+                if (existingIndex !== -1) {
+                    nextState[existingIndex] = {
+                        ...nextState[existingIndex],
+                        ...nextValue,
+                        active: nextValue.active ?? nextState[existingIndex].active,
+                        show: nextValue.show ?? nextState[existingIndex].show,
+                    }
+                    return nextState
+                }
+
+                return [...nextState, nextValue]
             })
-        }
-        super.add({...value, show: value.show ?? true});
-        this.update()
+        })
     }
 
     public getActiveTab(): FileTabsView | undefined {

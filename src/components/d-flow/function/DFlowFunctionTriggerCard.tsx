@@ -35,18 +35,18 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
     React.useEffect(() => {
         fileTabsService.registerTab({
             id: definition?.id!!,
-            active: false,
+            active: true,
             closeable: true,
             children: <>
                 <IconBolt size={12}/>
                 <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
             </>,
-            show: false,
-            content: <DFlowTabTrigger instance={data.instance}/>
+            content: <DFlowTabTrigger instance={data.instance}/>,
+            show: true
         })
-    }, [definition, data])
+    }, [definition?.id, data.instance, fileTabsService, definition?.names?.nodes])
 
-    return <Flex align={"center"} style={{flexDirection: "column"}}>
+    return <Flex align={"center"} style={{flexDirection: "column"}} key={id} data-flow-refernce={id}>
         <Badge color={"info"} style={{borderTopRightRadius: "0.35rem", borderTopLeftRadius: "0.35rem", borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>Starting node</Badge>
         <Card variant={"normal"}
               color={"info"}

@@ -13,7 +13,7 @@ import {DFlowDataTypeReactiveService} from "../data-type";
 import {DFlowReactiveService} from "../DFlow.service";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
-import type {NodeFunction, NodeParameter, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../../badge/Badge";
 import {md5} from "js-md5";
 
@@ -43,8 +43,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const functionService = useService(DFlowFunctionReactiveService)
     const functionStore = usePictorStore(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const dataTypeStore = usePictorStore(DFlowDataTypeReactiveService)
-    const edges = useStore(s => s.edges);
 
     const definition = React.useMemo(() => functionService.getById(data.node.functionDefinition?.id!!), [functionStore, data])
     const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
@@ -52,13 +50,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const activeTabId = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)?.id
     }, [fileTabsStore, fileTabsService]);
-
-    function isParamConnected(paramId: NodeParameter['id']): boolean {
-        return edges.some(e =>
-            e.target === id &&
-            e.targetHandle === `param-${paramId}`
-        );
-    }
 
     const firstItem = useStore((s) => {
         const children = s.nodes.filter((n) => n.parentId === props.parentId);
@@ -97,7 +88,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
             return parameterDefinition?.identifier == item
         })
-        const paramDefinition = definition?.parameterDefinitions?.find(pd => pd.id == param?.id)
 
         if (param) {
             switch (param?.value?.__typename) {
@@ -121,7 +111,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         </Text>
                         <Handle
                             key={param?.id}
-                            type={dataTypeService.getDataType(paramDefinition?.dataTypeIdentifier!!)?.variant === "NODE" ? "source" : "target"}
+                            type={"target"}
                             position={Position.Bottom}
                             id={`param-${param?.id}`}
                             isConnectable={false}

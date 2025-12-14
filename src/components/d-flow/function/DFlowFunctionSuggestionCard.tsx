@@ -1,10 +1,10 @@
-import {Code0Component} from "../../../utils/types";
+import {Code0Component} from "../../../utils";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import {Button} from "../../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
-import {useService} from "../../../utils/contextStore";
+import {useService} from "../../../utils";
 import {DFlowReactiveService} from "../DFlow.service";
 import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
 import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";

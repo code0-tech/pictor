@@ -85,7 +85,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const colorHash = md5(id)
+    const colorHash = md5(node?.id!!)
     const hashToHue = (md5: string): number => {
         // nimm z.B. 8 Hex-Zeichen = 32 Bit
         const int = parseInt(md5.slice(0, 8), 16)
@@ -129,12 +129,26 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         return " " + String(item) + " "
     }), [flowStore, functionStore, data])
 
+    React.useEffect(() => {
+        fileTabsService.registerTab({
+            id: node?.id!!,
+            active: false,
+            closeable: true,
+            children: <>
+                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+                <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+            </>,
+            content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
+                                      nodeLevel={data.index} node={data.node}/>
+        })
+    }, [node, data, fileTabsStore])
+
     return (
         <Card
             paddingSize={"xs"}
             outline={firstItem.id === id}
-            borderColor={activeTabId == id ? "info" : undefined}
-            className={activeTabId == id ? "d-flow-viewport-default-card--active" : undefined}
+            borderColor={activeTabId == node?.id ? "info" : undefined}
+            className={activeTabId == node?.id ? "d-flow-viewport-default-card--active" : undefined}
             color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "primary"}
             onClick={() => {
                 flowInstance.setViewport({
@@ -144,17 +158,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 }, {
                     duration: 250,
                 })
-                fileTabsService.add({
-                    id: id,
-                    active: true,
-                    closeable: true,
-                    children: <>
-                        <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
-                        <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
-                    </>,
-                    content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                              nodeLevel={data.index} node={data.node}/>
-                })
+                fileTabsService.activateTab(node?.id!!)
             }} style={{position: "relative"}}>
 
             <Flex align={"center"} style={{gap: "0.7rem"}}>

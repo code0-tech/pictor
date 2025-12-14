@@ -1,39 +1,92 @@
 import React from "react";
 import {ButtonGroup} from "../../button-group/ButtonGroup";
 import {Button} from "../../button/Button";
-import {IconTrash} from "@tabler/icons-react";
+import {IconPlus, IconTrash} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
 import {useService, useStore} from "../../../utils";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowReactiveService} from "../DFlow.service";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../../tooltip/Tooltip";
+import {Text} from "../../text/Text";
+import {Badge} from "../../badge/Badge";
+import {DFlowSuggestionMenu} from "../suggestion/DFlowSuggestionMenu";
+import {useSuggestions} from "../suggestion/DFlowSuggestion.hook";
 
-export const DFlowPanelControl: React.FC = () => {
+export interface DFlowPanelControlProps {
+    flowId: Flow['id']
+}
 
+export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
+
+    //props
+    const {flowId} = props
+
+    //services and stores
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
     const flowService = useService(DFlowReactiveService)
+
+    //memoized values
     const activeTab = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)
-    }, [fileTabsStore, fileTabsService]);
+    }, [fileTabsStore, fileTabsService])
+    const result = useSuggestions(undefined, [], flowId, 0, [0], 0)
 
+    //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return
         // @ts-ignore
         flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
     }, [activeTab, flowService])
 
+    const addNodeToFlow = React.useCallback((suggestion: any) => {
+        console.log(activeTab)
+        if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {
+            flowService.addNextNodeById(flowId, (activeTab.content.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
+        } else {
+            console.log(flowId, null, suggestion.value)
+            flowService.addNextNodeById(flowId, null, suggestion.value)
+        }
+    }, [flowId, flowService, activeTab])
+
     //TODO: Add execute flow button functionality
     //TODO: disable button if active tab is the trigger node
     return <Panel position={"bottom-center"}>
         <ButtonGroup>
-            <Button disabled color={"info"} paddingSize={"xxs"} style={{border: "none"}}>
-                Execute flow
-            </Button>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button color={"info"} paddingSize={"xxs"} variant={"none"} aria-selected={true}>
+                        Execute flow
+                    </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                    <TooltipContent maw={"300px"}>
+                        <Text>
+                            To execute this flow you can call the following endpoint {" "} <br/>
+                            <Badge>
+                                <Text>POST</Text>
+                            </Badge>
+                            <Badge color={"info"} border>
+                                <Text style={{color: "inherit"}}>localhost:6212/72hsa13/users/get</Text>
+                            </Badge>
+                        </Text>
+                        <TooltipArrow/>
+                    </TooltipContent>
+                </TooltipPortal>
+            </Tooltip>
             <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
                     color={"primary"}>
                 <IconTrash size={16}/>
             </Button>
+            <DFlowSuggestionMenu suggestions={result}
+                                 onSuggestionSelect={addNodeToFlow}
+                                 triggerContent={
+                                     <Button disabled={!activeTab} paddingSize={"xxs"} variant={"none"}
+                                             color={"primary"}>
+                                         <IconPlus size={16}/>
+                                     </Button>
+                                 }/>
         </ButtonGroup>
     </Panel>
 

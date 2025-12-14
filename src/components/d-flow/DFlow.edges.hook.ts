@@ -140,7 +140,6 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
                     edges.push({
                         id: `${fnId}-${groupId}-param-${param.id}`,
                         source: fnId,
-                        sourceHandle: `param-${param.id}`,
                         target: groupId,
                         deletable: false,
                         selectable: false,
@@ -203,39 +202,6 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
 
             if (node.nextNodeId) {
                 traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
-            } else {
-                const suggestionNodeId = `${fnId}-suggestion`;
-                const startGroups = groupsWithValue.get(fnId) ?? [];
-
-                if (startGroups.length > 0) {
-                    startGroups.forEach((gId, idx) => edges.push({
-                        id: `${gId}-${suggestionNodeId}-next-${idx}`,
-                        source: gId,
-                        target: suggestionNodeId,
-                        data: {
-                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            type: 'suggestion',
-                            flowId: flowId,
-                            parentNodeId: parentNode?.id
-                        },
-                        deletable: false,
-                        selectable: false,
-                    }));
-                } else {
-                    edges.push({
-                        id: `${fnId}-${suggestionNodeId}-next`,
-                        source: fnId,
-                        target: suggestionNodeId,
-                        data: {
-                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                            type: 'suggestion',
-                            flowId: flowId,
-                            parentNodeId: parentNode?.id
-                        },
-                        deletable: false,
-                        selectable: false,
-                    });
-                }
             }
 
             return fnId;

@@ -51,7 +51,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         return {nodes}
     }
     /* Konstanten */
-    const V = 75;          // vertical gap Node ↕ Node
+    const V = 50;          // vertical gap Node ↕ Node
     const H = 50;          // horizontal gap Parent → Param
     const PAD = 16;         // inner padding einer Group (links+rechts / oben+unten)
     const EPS = 0.25;       // Toleranz gegen Rundungsdrift
@@ -641,7 +641,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                     </SegmentedControlItem>
                 </SegmentedControl>
             </Panel>
-            <DFlowPanelControl/>
+            <DFlowPanelControl flowId={flowId}/>
         </ReactFlow>
     )
 }

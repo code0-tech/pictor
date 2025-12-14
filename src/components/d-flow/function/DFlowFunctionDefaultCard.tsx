@@ -1,4 +1,4 @@
-import {Code0Component} from "../../../utils";
+import {Code0Component, InspectionSeverity} from "../../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {memo} from "react";
 import {Card} from "../../card/Card";
@@ -10,7 +10,6 @@ import {useService, useStore as usePictorStore} from "../../../utils/contextStor
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
 import {DFlowDataTypeReactiveService} from "../data-type";
-import {InspectionSeverity} from "../../../utils";
 import {DFlowReactiveService} from "../DFlow.service";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
@@ -44,6 +43,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const functionService = useService(DFlowFunctionReactiveService)
     const functionStore = usePictorStore(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const dataTypeStore = usePictorStore(DFlowDataTypeReactiveService)
     const edges = useStore(s => s.edges);
 
     const definition = React.useMemo(() => functionService.getById(data.node.functionDefinition?.id!!), [functionStore, data])
@@ -97,6 +97,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
             return parameterDefinition?.identifier == item
         })
+        const paramDefinition = definition?.parameterDefinitions?.find(pd => pd.id == param?.id)
 
         if (param) {
             switch (param?.value?.__typename) {
@@ -114,10 +115,18 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     </Badge>
                 case "NodeFunction":
                     const hash = md5(`${id}-param-${JSON.stringify(param)}`)
-                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border>
+                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border pos={"relative"}>
                         <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(param?.value?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>
+                        <Handle
+                            key={param?.id}
+                            type={dataTypeService.getDataType(paramDefinition?.dataTypeIdentifier!!)?.variant === "NODE" ? "source" : "target"}
+                            position={Position.Bottom}
+                            id={`param-${param?.id}`}
+                            isConnectable={false}
+                            className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                        />
                     </Badge>
             }
             return <Badge style={{verticalAlign: "middle"}} border>
@@ -163,11 +172,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 fileTabsService.activateTab(node?.id!!)
             }} style={{position: "relative"}}>
 
-            <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
-                <Text size={"md"}>{displayMessage}</Text>
-            </Flex>
-
             <Handle
                 isConnectable={false}
                 draggable={false}
@@ -177,20 +181,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 position={data.isParameter ? Position.Right : Position.Top}
             />
 
-            {node?.parameters?.nodes?.map(param => {
-                const renderHandle = param?.value?.__typename === "NodeFunction" && isParamConnected(param?.id!!)
-                return renderHandle && <Handle
-                    key={param?.id}
-                    type="target"
-                    style={{top: "50%", transform: "translateY(-50%)"}}
-                    position={Position.Top}
-                    id={`param-${param?.id}`}
-                    isConnectable={false}
-                    hidden={!isParamConnected(param?.id!!)}
-                    className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
-                />
-            })}
-
             {/* Ausgang */}
             <Handle
                 isConnectable={false}
@@ -199,6 +189,10 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
+            <Flex align={"center"} style={{gap: "0.7rem"}}>
+                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
+                <Text size={"md"}>{displayMessage}</Text>
+            </Flex>
         </Card>
     );
 })

@@ -1,16 +1,16 @@
-import {Code0Component} from "../../../utils/types";
+import {Code0Component} from "../../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {memo} from "react";
 import {Card} from "../../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../../flex/Flex";
-import {IconFile, IconFileLambdaFilled} from "@tabler/icons-react";
+import {IconFile} from "@tabler/icons-react";
 import {Text} from "../../text/Text";
 import {useService, useStore as usePictorStore} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
 import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
-import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {InspectionSeverity} from "../../../utils/inspection";
+import {DFlowDataTypeReactiveService} from "../data-type";
+import {InspectionSeverity} from "../../../utils";
 import {DFlowReactiveService} from "../DFlow.service";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
@@ -85,7 +85,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const colorHash = md5(node?.id!!)
+    const colorHash = md5(id)
     const hashToHue = (md5: string): number => {
         // nimm z.B. 8 Hex-Zeichen = 32 Bit
         const int = parseInt(md5.slice(0, 8), 16)
@@ -141,10 +141,12 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
                                       nodeLevel={data.index} node={data.node}/>
         })
-    }, [node, data, fileTabsStore])
+    }, [node?.id, definition, data, fileTabsService])
 
     return (
         <Card
+            key={id}
+            data-flow-refernce={id}
             paddingSize={"xs"}
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}

@@ -6,7 +6,7 @@ import {useService} from "../../../utils/contextStore";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {Card} from "../../card/Card";
 import {Flex} from "../../flex/Flex";
-import {IconBolt, IconChevronDown} from "@tabler/icons-react";
+import {IconBolt, IconChevronDown, IconFile} from "@tabler/icons-react";
 import {Button} from "../../button/Button";
 import {DFlowTabTrigger} from "../tab/DFlowTabTrigger";
 import {DFlowTypeReactiveService} from "../type";
@@ -32,12 +32,26 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
     const viewportWidth = useStore(s => s.width)
     const viewportHeight = useStore(s => s.height)
 
+    React.useEffect(() => {
+        fileTabsService.registerTab({
+            id: definition?.id!!,
+            active: false,
+            closeable: true,
+            children: <>
+                <IconBolt size={12}/>
+                <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+            </>,
+            show: false,
+            content: <DFlowTabTrigger instance={data.instance}/>
+        })
+    }, [definition, data])
+
     return <Flex align={"center"} style={{flexDirection: "column"}}>
         <Badge color={"info"} style={{borderTopRightRadius: "0.35rem", borderTopLeftRadius: "0.35rem", borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>Starting node</Badge>
         <Card variant={"normal"}
               color={"info"}
               paddingSize={"xs"}
-              className={fileTabsService.getActiveTab()?.id == id ? "d-flow-viewport-default-card--active" : undefined}
+              className={fileTabsService.getActiveTab()?.id == definition?.id ? "d-flow-viewport-default-card--active" : undefined}
               onClick={() => {
                   flowInstance.setViewport({
                       x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
@@ -46,13 +60,7 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
                   }, {
                       duration: 250,
                   })
-                  fileTabsService.add({
-                      id: id,
-                      active: true,
-                      closeable: true,
-                      children: <Text size={"md"}>{definition?.names?.nodes!![0]?.content}</Text>,
-                      content: <DFlowTabTrigger instance={data.instance}/>
-                  })
+                  fileTabsService.activateTab(definition?.id!!)
               }}>
 
             <Flex style={{gap: "1.3rem"}} align={"center"} justify={"space-between"}>

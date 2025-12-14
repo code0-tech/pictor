@@ -187,21 +187,6 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                 },
             });
 
-            if (!node.nextNodeId && !isParameter) {
-                nodes.push({
-                    id: `${id}-suggestion`,
-                    type: "suggestion",
-                    position: {x: 0, y: 0},
-                    draggable: false,
-                    extent: parentGroup ? "parent" : undefined,
-                    parentId: parentGroup,
-                    data: {
-                        flowId: flowId,
-                        parentFunction: node,
-                    },
-                });
-            }
-
             const definition = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache);
 
             node.parameters?.nodes?.forEach((param) => {
@@ -257,18 +242,6 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
         // Root lane: depth 0, scope path [0]
         if (flow.startingNodeId) {
             traverse(flowService.getNodeById(flow.id, flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
-        } else {
-            nodes.push({
-                id: `${flow.id}-suggestion`,
-                type: "suggestion",
-                position: {x: 0, y: 0},
-                draggable: false,
-                extent: undefined,
-                data: {
-                    flowId: flowId,
-                    parentFunction: undefined,
-                },
-            });
         }
         return nodes;
     }, [flow, flowStore, functionStore, dataTypeStore])

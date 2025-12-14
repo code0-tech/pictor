@@ -1,10 +1,13 @@
-
 import {ReactiveArrayService} from "../../utils";
 import type {
-    Flow, FlowSetting,
+    Flow,
+    FlowSetting,
     NamespacesProjectsFlowsCreateInput,
-    NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload, NodeFunction, NodeParameter
+    NamespacesProjectsFlowsCreatePayload,
+    NamespacesProjectsFlowsDeleteInput,
+    NamespacesProjectsFlowsDeletePayload,
+    NodeFunction,
+    NodeParameter
 } from "@code0-tech/sagittarius-graphql-types";
 
 
@@ -61,7 +64,12 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const addingNode: NodeFunction = {
             ...nextNode,
             id: nextNodeId,
-            nextNodeId: parentNode?.nextNodeId ?? flow.startingNodeId ?? undefined,
+        }
+
+        if (parentNode && parentNode.nextNodeId) {
+            addingNode.nextNodeId = parentNode.nextNodeId
+        } else if (!parentNode && flow.startingNodeId) {
+            addingNode.nextNodeId = flow.startingNodeId
         }
 
         flow.nodes?.nodes?.push(addingNode)
@@ -71,7 +79,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         } else {
             flow.startingNodeId = addingNode.id
         }
-
         this.set(index, flow)
     }
 
@@ -113,6 +120,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
 
     /** Creates a new flow. */
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>
+
     /** Deletes a namespace project. */
     abstract flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined>
 }

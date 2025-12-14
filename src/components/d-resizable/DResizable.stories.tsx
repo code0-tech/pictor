@@ -12,7 +12,6 @@ import {DFlowDataTypeReactiveService} from "../d-flow";
 import {DFlowFunctionReactiveService} from "../d-flow";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow";
-import {DFlowReactiveSuggestionService} from "../d-flow";
 import {ContextStoreProvider} from "../../utils";
 import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
 import {DFlowTypeReactiveService} from "../d-flow";
@@ -57,9 +56,6 @@ class DFlowReactiveServiceExtend extends DFlowReactiveService {
     }
 }
 
-class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionService {
-}
-
 export const Dashboard = () => {
 
     const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService, [])
@@ -86,7 +82,6 @@ export const Dashboard = () => {
             nodes: []
         }
     }]);
-    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionServiceExtend);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
@@ -94,7 +89,7 @@ export const Dashboard = () => {
 
     return <DFullScreen>
         <ContextStoreProvider
-            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
+            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
             <DLayout rightContent={
                 <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                     <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>

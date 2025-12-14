@@ -131,6 +131,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
                     edges.push({
                         id: `${fnId}-${groupId}-param-${param.id}`,
                         source: fnId,
+                        sourceHandle: `param-${param.id}`,
                         target: groupId,
                         deletable: false,
                         selectable: false,

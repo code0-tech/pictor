@@ -1,9 +1,8 @@
-import {useService, useStore} from "../../../utils/contextStore";
-import {DFlowReactiveSuggestionService} from "./DFlowSuggestion.service";
-import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
+import {useService, useStore} from "../../../utils";
+import {DFlowDataTypeReactiveService} from "../data-type";
 import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {DFlowFunctionReactiveService} from "../function/DFlowFunction.service";
+import {DFlowFunctionReactiveService} from "../function";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
 import {DFlowReactiveService} from "../DFlow.service";
 import {useReturnType} from "../function/DFlowFunction.return.hook";
@@ -13,9 +12,9 @@ import type {
     DataTypeRulesInputTypeConfig,
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig,
-    DataTypeRulesVariant,
-    DataTypeVariant, Flow,
-    Maybe, NodeFunction,
+    Flow,
+    Maybe,
+    NodeFunction,
     NodeParameter,
     NodeParameterValue,
     ReferenceValue
@@ -35,7 +34,6 @@ export const useSuggestions = (
     suggestionTypes: DFlowSuggestionType[] = [DFlowSuggestionType.REF_OBJECT, DFlowSuggestionType.VALUE, DFlowSuggestionType.FUNCTION, DFlowSuggestionType.FUNCTION_COMBINATION, DFlowSuggestionType.DATA_TYPE]
 ): DFlowSuggestion[] => {
 
-    const suggestionService = useService(DFlowReactiveSuggestionService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
@@ -43,57 +41,48 @@ export const useSuggestions = (
     const flow = React.useMemo(() => flowService?.getById(flowId), [flowStore, flowId])
     const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
-    if (!suggestionService || !dataTypeService) return []
-
-    const hashedType = type ? useTypeHash(type) : undefined
     const resolvedType = type ? replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys) : undefined
     const state: DFlowSuggestion[] = []
-    const cached = suggestionService.getSuggestionsByHash(hashedType || "")
 
-    if (cached.length <= 0) {
 
-        if (hashedType && dataType && suggestionTypes.includes(DFlowSuggestionType.VALUE)) {
-            //calculate VALUE
-            dataType.rules?.nodes?.forEach(rule => {
-                if (rule?.variant === "ITEM_OF_COLLECTION") {
-                    (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
-                        const suggestion = new DFlowSuggestion(hashedType, [], {
-                            __typename: "LiteralValue",
-                            value: value
-                        }, DFlowSuggestionType.VALUE, [value.toString()])
-                        suggestionService.add(suggestion)
-                        state.push(suggestion)
-                    })
-                } else if (rule?.variant === "NUMBER_RANGE") {
-                    const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
-                    const suggestion = new DFlowSuggestion(hashedType, [], {
+    if (dataType && suggestionTypes.includes(DFlowSuggestionType.VALUE)) {
+        //calculate VALUE
+        dataType.rules?.nodes?.forEach(rule => {
+            if (rule?.variant === "ITEM_OF_COLLECTION") {
+                (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
+                    const suggestion = new DFlowSuggestion([], {
                         __typename: "LiteralValue",
-                        value: config.from
-                    }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
-                    suggestionService.add(suggestion)
+                        value: value
+                    }, DFlowSuggestionType.VALUE, [value.toString()])
                     state.push(suggestion)
-                }
-            })
-        }
-
-        //TODO: need to validate given type
-        if (hashedType && dataType && dataType.variant === "DATA_TYPE" && suggestionTypes.includes(DFlowSuggestionType.DATA_TYPE)) {
-            dataTypeService.values().forEach(dataType => {
-                //TODO: need to wait for sagittarius update to support DataTypes as values
-                // @ts-ignore
-                const suggestion = new DFlowSuggestion(hashedType, [], dataType.json, DFlowSuggestionType.DATA_TYPE, [dataType.name?.nodes!![0]?.content])
-                suggestionService.add(suggestion)
+                })
+            } else if (rule?.variant === "NUMBER_RANGE") {
+                const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
+                const suggestion = new DFlowSuggestion([], {
+                    __typename: "LiteralValue",
+                    value: config.from
+                }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
                 state.push(suggestion)
-            })
-        }
-
+            }
+        })
     }
+
+    //TODO: need to validate given type
+    if (dataType && dataType.variant === "DATA_TYPE" && suggestionTypes.includes(DFlowSuggestionType.DATA_TYPE)) {
+        dataTypeService.values().forEach(dataType => {
+            //TODO: need to wait for sagittarius update to support DataTypes as values
+            // @ts-ignore
+            const suggestion = new DFlowSuggestion(hashedType, [], dataType.json, DFlowSuggestionType.DATA_TYPE, [dataType.name?.nodes!![0]?.content])
+            state.push(suggestion)
+        })
+    }
+
 
     if (suggestionTypes.includes(DFlowSuggestionType.FUNCTION_COMBINATION)) {
         //calculate FUNCTION
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
-            if (!type || !resolvedType || !hashedType) return true
+            if (!type || !resolvedType) return true
             if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
             if (dataType?.variant === "NODE") return true
             if (!funcDefinition.returnType) return false
@@ -135,7 +124,7 @@ export const useSuggestions = (
                     }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
                 }
             }
-            const suggestion = new DFlowSuggestion(hashedType || "", [], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
+            const suggestion = new DFlowSuggestion([], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
             state.push(suggestion)
         })
     }
@@ -153,43 +142,13 @@ export const useSuggestions = (
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
-            const suggestion = new DFlowSuggestion(hashedType || "", [], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`])
+            const suggestion = new DFlowSuggestion([], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`])
             state.push(suggestion)
         })
     }
 
-    return [...state, ...suggestionService.getSuggestionsByHash(hashedType || "")].sort()
+    return state.sort()
 
-}
-
-/**
- * React hook that produces a stable MD5 hash for a given Type, deeply resolving:
- * - All type aliases (via DFlowDataTypeReactiveService) at any level of nesting
- * - All occurrences of any provided generic_keys (can be any string) as "GENERIC"
- * - All generic_mapper/type fields, rules/config.type fields, and parent fields, recursively
- * - All object keys sorted for stable, order-independent hashing
- *
- * This ensures semantically equivalent types—regardless of alias, generic key naming, or structural nesting—
- * always produce the same hash, making this suitable for caching, deduplication, and fast comparison.
- *
- * @param type          The Type to hash (either a string or a GenericType object)
- * @param generic_keys  (optional) Array of string keys that should be normalized as generics (can be any string)
- * @returns             MD5 hash string if type/service available, otherwise undefined
- */
-export const useTypeHash = (type: DataTypeIdentifier, generic_keys?: string[]): string | undefined => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
-    if (!type || !dataTypeService) return undefined
-
-
-    // 1. Expand all aliases and deeply unify generics
-    const expandedType = resolveType(type, dataTypeService)
-    // 2. Replace generics and sort keys for canonicalization
-    const canonical = replaceGenericsAndSortType(expandedType, generic_keys)
-    // 3. Stable stringification for MD5
-    const stableString = JSON.stringify(canonical)
-
-    // 4. MD5 hash
-    return md5(stableString)
 }
 
 /**

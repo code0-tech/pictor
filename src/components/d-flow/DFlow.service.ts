@@ -49,26 +49,29 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    async addNextNodeById(flowId: Flow['id'], nodeId: NodeFunction['id'] | undefined, nextNode: NodeFunction): Promise<void> {
+    async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
-        const node = this.getNodeById(flowId, nodeId)
-        if (!flow || !node || this.getNodeById(flowId, nextNode.id)) return
-        flow.nodes?.nodes?.push(nextNode)
-        node.nextNodeId = nextNode.id
-        this.set(index, flow)
-    }
+        const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined
 
-    async setStartingNodeById(flowId: Flow['id'], startingNode: NodeFunction): Promise<void> {
-        const flow = this.getById(flowId)
-        if (!flow) return
-        const index = this.values().findIndex(f => f.id === flowId)
-        const addingIdValue: NodeFunction = {
-            ...startingNode,
-            id: `gid://sagittarius/NodeFunction/${(flow.nodes?.nodes?.length ?? 0) + 1}`
+        if (!flow || (parentNodeId && !parentNode)) return
+
+        const nodes = flow.nodes?.nodes ?? []
+        const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nodes.length + 1}`
+        const addingNode: NodeFunction = {
+            ...nextNode,
+            id: nextNodeId,
+            nextNodeId: parentNode?.nextNodeId ?? flow.startingNodeId ?? undefined,
         }
-        flow.nodes?.nodes?.push(addingIdValue)
-        flow.startingNodeId = addingIdValue.id
+
+        flow.nodes?.nodes?.push(addingNode)
+
+        if (parentNode) {
+            parentNode.nextNodeId = addingNode.id
+        } else {
+            flow.startingNodeId = addingNode.id
+        }
+
         this.set(index, flow)
     }
 

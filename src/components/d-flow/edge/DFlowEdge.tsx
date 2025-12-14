@@ -21,7 +21,7 @@ export interface DFlowEdgeDataProps extends Code0Component<HTMLDivElement> {
     //some data we will use
     color?: string
     type: 'parameter' | 'suggestion' | 'group' | 'default'
-    parentNodeId: NodeFunction['id']
+    parentNodeId?: NodeFunction['id'] | null
     flowId: Flow['id']
 }
 
@@ -94,10 +94,8 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                         }}
                     >
                         <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-                            if (data.flowId && data.parentNodeId && suggestion.value.__typename === "NodeFunction") {
-                                flowService.addNextNodeById(data.flowId, data.parentNodeId, suggestion.value)
-                            } else if (data.flowId && suggestion.value.__typename === "NodeFunction") {
-                                flowService.setStartingNodeById(data.flowId, suggestion.value)
+                            if (data?.flowId && suggestion.value.__typename === "NodeFunction") {
+                                flowService.addNextNodeById(data.flowId, data.parentNodeId ?? null, suggestion.value)
                             }
                         }} suggestions={result} triggerContent={
                         <Button paddingSize={"xxs"}>

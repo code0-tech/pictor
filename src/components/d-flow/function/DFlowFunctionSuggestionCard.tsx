@@ -24,10 +24,8 @@ export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardPr
     const flow = flowService.getById(props.data.flowId)
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-        if (props.data.parentFunction && suggestion.value.__typename === "NodeFunction") {
-            flowService.addNextNodeById(flow?.id, props.data.parentFunction?.id, suggestion.value)
-        } else if (flow && suggestion.value.__typename === "NodeFunction") {
-            flowService.setStartingNodeById(flow?.id, suggestion.value)
+        if (suggestion.value.__typename === "NodeFunction") {
+            flowService.addNextNodeById(flow?.id, props.data.parentFunction?.id ?? null, suggestion.value)
         }
     }} suggestions={result} triggerContent={
         <Button paddingSize={"xxs"} variant={"normal"} color={"secondary"}>

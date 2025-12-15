@@ -21,7 +21,7 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = mem
 
     return (
         <Card w={"100%"} h={"100%"}
-              style={{background: withAlpha(data.color!!, 0.1), border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
+              style={{background: mixColorRgb(data.color!!, 9), border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
             <Handle
                 type="target"
                 position={Position.Top}

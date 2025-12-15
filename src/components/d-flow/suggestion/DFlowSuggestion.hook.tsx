@@ -45,18 +45,28 @@ export const useSuggestions = (
         dataType.rules?.nodes?.forEach(rule => {
             if (rule?.variant === "ITEM_OF_COLLECTION") {
                 (rule.config as DataTypeRulesItemOfCollectionConfig)!!.items?.forEach(value => {
-                    const suggestion = new DFlowSuggestion([], {
-                        __typename: "LiteralValue",
-                        value: value
-                    }, DFlowSuggestionType.VALUE, [value.toString()])
+                    const suggestion: DFlowSuggestion = {
+                        path: [],
+                        type: DFlowSuggestionType.VALUE,
+                        displayText: [value.toString()],
+                        value: {
+                            __typename: "LiteralValue",
+                            value: value
+                        },
+                    }
                     state.push(suggestion)
                 })
             } else if (rule?.variant === "NUMBER_RANGE") {
                 const config: DataTypeRulesNumberRangeConfig = rule.config as DataTypeRulesNumberRangeConfig
-                const suggestion = new DFlowSuggestion([], {
-                    __typename: "LiteralValue",
-                    value: config.from
-                }, DFlowSuggestionType.VALUE, [config.from?.toString() ?? ""])
+                const suggestion: DFlowSuggestion = {
+                    path: [],
+                    type: DFlowSuggestionType.VALUE,
+                    displayText: [config.from?.toString() ?? ""],
+                    value: {
+                        __typename: "LiteralValue",
+                        value: config.from
+                    },
+                }
                 state.push(suggestion)
             }
         })
@@ -66,8 +76,13 @@ export const useSuggestions = (
     if (dataType && dataType.variant === "DATA_TYPE" && suggestionTypes.includes(DFlowSuggestionType.DATA_TYPE)) {
         dataTypeService.values().forEach(dataType => {
             //TODO: need to wait for sagittarius update to support DataTypes as values
-            // @ts-ignore
-            const suggestion = new DFlowSuggestion(hashedType, [], dataType.json, DFlowSuggestionType.DATA_TYPE, [dataType.name?.nodes!![0]?.content])
+            const suggestion: DFlowSuggestion = {
+                path: [],
+                type: DFlowSuggestionType.DATA_TYPE,
+                displayText: [dataType.name?.nodes!![0]?.content!],
+                /*@ts-ignore*/
+                value: dataType.json,
+            }
             state.push(suggestion)
         })
     }
@@ -119,7 +134,12 @@ export const useSuggestions = (
                     }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
                 }
             }
-            const suggestion = new DFlowSuggestion([], nodeFunctionSuggestion, DFlowSuggestionType.FUNCTION, [funcDefinition.names?.nodes!![0]?.content as string])
+            const suggestion: DFlowSuggestion = {
+                path: [],
+                type: DFlowSuggestionType.FUNCTION,
+                displayText: [funcDefinition.names?.nodes!![0]?.content as string],
+                value: nodeFunctionSuggestion,
+            }
             state.push(suggestion)
         })
     }
@@ -137,7 +157,12 @@ export const useSuggestions = (
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return
 
-            const suggestion = new DFlowSuggestion([], value as ReferenceValue, DFlowSuggestionType.REF_OBJECT, [`${value.depth}-${value.scope}-${value.node || ''}`])
+            const suggestion: DFlowSuggestion = {
+                path: [],
+                type: DFlowSuggestionType.REF_OBJECT,
+                displayText: [`${value.depth}-${value.scope}-${value.node || ''}`],
+                value: value as ReferenceValue,
+            }
             state.push(suggestion)
         })
     }

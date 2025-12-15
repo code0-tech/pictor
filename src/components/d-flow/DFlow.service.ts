@@ -34,6 +34,28 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
+    protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {
+        if (parameter?.value?.__typename === "NodeFunction") {
+            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (parameter.value as NodeFunction)?.id)
+            if (parameterNode) {
+                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (parameter.value as NodeFunction)?.id)
+                let nextNodeId = parameterNode.nextNodeId
+                while (nextNodeId) {
+                    const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
+                    if (nextNode) {
+                        flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== nextNodeId)
+                        nextNodeId = nextNode.nextNodeId
+                    } else {
+                        nextNodeId = null
+                    }
+                }
+                parameterNode.parameters?.nodes?.forEach(p => {
+                    this.removeParameterNode(flow, p!!)
+                })
+            }
+        }
+    }
+
     async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
@@ -42,12 +64,15 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         if (!flow || !node) return
 
         flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== nodeId)
+        node.parameters?.nodes?.forEach(p => this.removeParameterNode(flow, p!!))
 
         if (previousNodes) {
             previousNodes.nextNodeId = node.nextNodeId
         } else {
             flow.startingNodeId = node.nextNodeId ?? undefined
         }
+
+        console.log(flow.nodes?.nodes?.length)
 
         this.set(index, flow)
     }
@@ -79,6 +104,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         } else {
             flow.startingNodeId = addingNode.id
         }
+        console.log(flow.nodes?.nodes)
         this.set(index, flow)
     }
 
@@ -100,10 +126,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         if (!node) return
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
         if (!parameter) return
-        if (parameter?.value?.__typename === "NodeFunction") {
-            // @ts-ignore
-            flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== parameter.value?.id)
-        }
+        this.removeParameterNode(flow, parameter)
         parameter.value = value
         if (value?.__typename === "NodeFunction") {
             const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])

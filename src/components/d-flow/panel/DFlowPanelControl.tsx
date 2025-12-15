@@ -42,7 +42,6 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     }, [activeTab, flowService])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {
-        console.log(suggestion)
         if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {
             flowService.addNextNodeById(flowId, (activeTab.content.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
         } else {

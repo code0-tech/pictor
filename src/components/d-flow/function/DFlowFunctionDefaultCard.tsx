@@ -18,7 +18,7 @@ import {Badge} from "../../badge/Badge";
 import {md5} from "js-md5";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    node: NodeFunction
+    nodeId: NodeFunction['id']
     flowId: Scalars["FlowID"]["output"]
     isParameter: boolean
     linkingId?: string
@@ -44,9 +44,9 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const functionStore = usePictorStore(DFlowFunctionReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
 
-    const definition = React.useMemo(() => functionService.getById(data.node.functionDefinition?.id!!), [functionStore, data])
-    const validation = useFunctionValidation(definition!!, data.node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
-    const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.node.id), [flowStore, data])
+    const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
+    const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
+    const validation = definition && node && useFunctionValidation(definition, node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
     const activeTabId = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)?.id
     }, [fileTabsStore, fileTabsService]);
@@ -83,7 +83,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         return int % 360
     }
 
-    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content!!).map(item => {
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content ?? "").map(item => {
         const param = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
             return parameterDefinition?.identifier == item
@@ -103,11 +103,12 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                             {String(param?.value.node)}-{String(param?.value.depth)}-{String(param?.value.scope)}
                         </Text>
                     </Badge>
-                case "NodeFunction":
+                case "NodeFunctionIdWrapper":
                     const hash = md5(`${id}-param-${JSON.stringify(param)}`)
+                    const node = flowService.getNodeById(props.data.flowId, param.value.id)
                     return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border pos={"relative"}>
                         <Text size={"sm"} style={{color: "inherit"}}>
-                            {String(functionService.getById(param?.value?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
+                            {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>
                         <Handle
                             key={param?.id}
@@ -126,12 +127,12 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             </Badge>
         }
         return " " + String(item) + " "
-    }), [flowStore, functionStore, data])
+    }), [flowStore, functionStore, data, definition])
 
     React.useEffect(() => {
         if (!node?.id) return
         fileTabsService.registerTab({
-            id: node?.id,
+            id: node.id,
             active: false,
             closeable: true,
             children: <>
@@ -139,7 +140,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
             </>,
             content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                      nodeLevel={data.index} node={data.node}/>
+                                      nodeLevel={data.index} node={node}/>
         })
     }, [node?.id, definition, data])
 

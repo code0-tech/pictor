@@ -1,6 +1,5 @@
-import {useService, useStore} from "../../../utils";
+import {useService} from "../../../utils";
 import {DFlowDataTypeReactiveService} from "../data-type";
-import {md5} from 'js-md5';
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowFunctionReactiveService} from "../function";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../../utils/generics";
@@ -19,7 +18,6 @@ import type {
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
-import React from "react";
 
 //TODO: deep type search
 //TODO: calculate FUNCTION_COMBINATION deepness max 2
@@ -35,10 +33,7 @@ export const useSuggestions = (
 ): DFlowSuggestion[] => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
-    const flow = React.useMemo(() => flowService?.getById(flowId), [flowStore, flowId])
     const dataType = type ? dataTypeService?.getDataType(type) : undefined
 
     const resolvedType = type ? replaceGenericsAndSortType(resolveType(type, dataTypeService), genericKeys) : undefined
@@ -108,7 +103,7 @@ export const useSuggestions = (
         matchingFunctions.forEach(funcDefinition => {
             const nodeFunctionSuggestion: NodeParameterValue = {
                 __typename: "NodeFunction",
-                id: `gid://sagittarius/NodeFunction/${(flow?.nodes?.nodes?.length ?? 0) + 1}`,
+                id: `gid://sagittarius/NodeFunction/1`,
                 functionDefinition: {
                     id: funcDefinition.id,
                     runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition

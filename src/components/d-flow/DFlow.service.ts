@@ -72,12 +72,11 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
             flow.startingNodeId = node.nextNodeId ?? undefined
         }
 
-        console.log(flow.nodes?.nodes?.length)
-
         this.set(index, flow)
     }
 
     async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
+        console.log(nextNode)
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined
@@ -104,7 +103,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         } else {
             flow.startingNodeId = addingNode.id
         }
-        console.log(flow.nodes?.nodes)
         this.set(index, flow)
     }
 

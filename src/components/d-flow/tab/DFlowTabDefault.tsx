@@ -12,7 +12,7 @@ import {ParameterDefinitionView} from "../function";
 import {Badge} from "../../badge/Badge";
 import type {
     LiteralValue,
-    NodeFunction,
+    NodeFunction, NodeFunctionIdWrapper,
     NodeParameterValue,
     ReferenceValue,
     Scalars
@@ -56,13 +56,13 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
             if (!parameter) return null
 
-            const submitValue = (value: NodeParameterValue | undefined) => {
-                flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
+            const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
+                value && flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
             }
 
             const submitValueEvent = (event: any) => {
                 try {
-                    const value = JSON.parse(event.target.value) as NodeParameterValue
+                    const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
                     if (!value.__typename) {
                         submitValue(value ? {
                             __typename: "LiteralValue",
@@ -114,10 +114,11 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                try {
 
                                    const parsed = JSON.parse(textValue) as NodeParameterValue
-                                   if (parsed?.__typename === "NodeFunction") {
-                                       const def = functionService.getById((parsed as NodeFunction).functionDefinition?.id!!)
+                                   if (parsed?.__typename === "NodeFunctionIdWrapper") {
+                                       const node = flowService.getNodeById(flowId, parsed.id)
+                                       const functionDefinition = functionService.getById(node?.functionDefinition?.id)
                                        return buildBlockSegment(
-                                           <Badge color={"info"}>{def?.names?.nodes!![0]?.content}</Badge>
+                                           <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
                                        )
                                    }
 

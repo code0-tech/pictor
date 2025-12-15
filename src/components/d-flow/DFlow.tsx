@@ -35,6 +35,7 @@ import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
 import {DFlowPanelControl} from "./panel/DFlowPanelControl";
+import {DFlowPanelLayout} from "./panel/DFlowPanelLayout";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -627,20 +628,8 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         >
             <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
             <DFlowPanelSize/>
+            <DFlowPanelLayout/>
             <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
-            <Panel position={"top-center"}>
-                <SegmentedControl type={"single"} defaultValue={"horizontal"}>
-                    <SegmentedControlItem value={"horizontal"} display={"flex"}>
-                        <IconLayoutDistributeHorizontal size={16}/>
-                    </SegmentedControlItem>
-                    <SegmentedControlItem disabled value={"vertical"} display={"flex"}>
-                        <IconLayoutDistributeVertical size={16}/>
-                    </SegmentedControlItem>
-                    <SegmentedControlItem disabled value={"manual"} display={"flex"}>
-                        <IconLayout size={16}/>
-                    </SegmentedControlItem>
-                </SegmentedControl>
-            </Panel>
             <DFlowPanelControl flowId={flowId}/>
         </ReactFlow>
     )

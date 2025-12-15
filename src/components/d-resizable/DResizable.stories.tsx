@@ -11,7 +11,6 @@ import {DataTypeView} from "../d-flow";
 import {DFlowDataTypeReactiveService} from "../d-flow";
 import {DFlowFunctionReactiveService} from "../d-flow";
 import {DFlowReactiveService} from "../d-flow";
-import {DFlowSuggestion} from "../d-flow";
 import {ContextStoreProvider} from "../../utils";
 import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
 import {DFlowTypeReactiveService} from "../d-flow";

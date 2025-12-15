@@ -73,16 +73,27 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
-                    color={"primary"}>
-                <IconTrash size={16}/>
-            </Button>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
+                            color={"primary"}>
+                        <IconTrash size={16}/>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                    <TooltipContent>
+                        <Text>Select a node to delete it</Text>
+                        <TooltipArrow/>
+                    </TooltipContent>
+                </TooltipPortal>
+            </Tooltip>
             <DFlowSuggestionMenu suggestions={result}
                                  onSuggestionSelect={addNodeToFlow}
                                  triggerContent={
                                      <Button disabled={!activeTab} paddingSize={"xxs"} variant={"none"}
                                              color={"primary"}>
                                          <IconPlus size={16}/>
+                                         Next node
                                      </Button>
                                  }/>
         </ButtonGroup>

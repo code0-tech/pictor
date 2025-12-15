@@ -177,7 +177,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                 parentId: parentGroup,
                 extent: parentGroup ? "parent" : undefined,
                 data: {
-                    node: node,
+                    nodeId: node.id,
                     isParameter,
                     flowId: flowId!!,
                     linkingId: isParameter ? parentId : undefined,
@@ -194,7 +194,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                 const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
                 if (paramDataType?.variant === "NODE") {
-                    if (param?.value && param.value.__typename === "NodeFunction") {
+                    if (param?.value && param.value.__typename === "NodeFunctionIdWrapper") {
                         const groupId = `${id}-group-${idCounter++}`;
 
                         // New group: extend scope PATH with a fresh segment and increase depth.
@@ -227,7 +227,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                         // Child function inside the group uses the group's depth and scope PATH.
                         traverse(param.value as NodeFunction, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
                     }
-                } else if (param?.value && param.value.__typename === "NodeFunction") {
+                } else if (param?.value && param.value.__typename === "NodeFunctionIdWrapper") {
                     // Functions passed as non-NODE parameters live in the same depth/scope PATH.
                     traverse(param.value as NodeFunction, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
                 }

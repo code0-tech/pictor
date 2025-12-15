@@ -38,7 +38,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
             {triggerContent}
         </MenuTrigger>
         <MenuPortal>
-            <InputSuggestionMenuContent>
+            <InputSuggestionMenuContent align={"center"}>
                 <DFlowSuggestionMenuSearchBar onType={event => {
 
                     if (event.key === "ArrowDown") {

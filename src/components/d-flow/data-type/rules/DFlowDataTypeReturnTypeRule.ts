@@ -72,7 +72,7 @@ export class DFlowDataTypeReturnTypeRule {
             if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
 
                 const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                    return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(genericType)!!, service, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                    return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                 })
 
                 return checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -85,10 +85,10 @@ export class DFlowDataTypeReturnTypeRule {
             }
 
             if (config?.dataTypeIdentifier?.dataType) {
-                return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, service)
+                return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!)
             }
 
-            return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, service, flow, genericMapping(config.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
+            return useValidateValue(foundReturnFunction?.parameters?.nodes!![0]?.value!!, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!, flow, genericMapping(config.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
 
         }
 

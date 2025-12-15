@@ -22,7 +22,7 @@ type GenericMappingResult = Record<string, DataTypeIdentifier>;
 
 type GenericReplacement = DataTypeIdentifier | GenericMapper;
 
-type GenericMap = Map<string, GenericReplacement>;
+export type GenericMap = Map<string, GenericReplacement>;
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === "object" && value !== null && !Array.isArray(value);

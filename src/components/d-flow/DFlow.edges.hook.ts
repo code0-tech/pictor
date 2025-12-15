@@ -154,7 +154,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
                     });
 
 
-                    if (val && val.__typename === "NodeFunction") {
+                    if (val && val.__typename === "NodeFunctionIdWrapper") {
 
                         (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
                             groupsWithValue.get(fnId)!))
@@ -167,7 +167,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
                             fnCache,
                             dtCache);
                     }
-                } else if (val && val.__typename === "NodeFunction") {
+                } else if (val && val.__typename === "NodeFunctionIdWrapper") {
                     const subFnId = traverse(param.value as NodeFunction,
                         node,
                         undefined,

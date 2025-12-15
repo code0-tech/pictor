@@ -5,7 +5,7 @@ import type {
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload,
+    NamespacesProjectsFlowsDeletePayload, NamespacesProjectsFlowsUpdateInput, NamespacesProjectsFlowsUpdatePayload,
     NodeFunction, NodeFunctionIdWrapper,
     NodeParameter, ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
@@ -15,23 +15,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
 
     getById(id: Flow['id']): Flow | undefined {
         return this.values().find(value => value.id === id);
-    }
-
-    async deleteById(flowId: Flow['id']): Promise<void> {
-        const index = this.values().findIndex(f => f.id === flowId)
-        this.delete(index)
-    }
-
-    async renameById(flowId: Flow['id'], newName: string): Promise<void> {
-        const flow = this.getById(flowId)
-        const index = this.values().findIndex(f => f.id === flowId)
-        if (!flow) return
-        flow.name = newName
-        this.set(index, flow)
-    }
-
-    getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
-        return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
     protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {
@@ -55,6 +38,24 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
             }
         }
     }
+
+    async deleteById(flowId: Flow['id']): Promise<void> {
+        const index = this.values().findIndex(f => f.id === flowId)
+        this.delete(index)
+    }
+
+    async renameById(flowId: Flow['id'], newName: string): Promise<void> {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        flow.name = newName
+        this.set(index, flow)
+    }
+
+    getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
+        return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
+    }
+
 
     async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
@@ -143,10 +144,8 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    /** Creates a new flow. */
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>
-
-    /** Deletes a namespace project. */
     abstract flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined>
+    abstract flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined>
 }
 

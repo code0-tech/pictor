@@ -4,7 +4,13 @@ import {Edge} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "./function";
 import {DFlowDataTypeReactiveService} from "./data-type";
 import React from "react";
-import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {
+    DataTypeIdentifier,
+    Flow,
+    NodeFunction,
+    NodeFunctionIdWrapper,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
 import {DFlowEdgeDataProps} from "./edge/DFlowEdge";
 
@@ -160,20 +166,24 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
                             groupsWithValue.get(fnId)!))
                             .push(groupId);
 
-                        traverse(param.value as NodeFunction,
+                        traverse(
+                            flowService.getNodeById(flowId, val.id)!,
                             node,
                             undefined,
                             level + 1,
                             fnCache,
-                            dtCache);
+                            dtCache
+                        );
                     }
                 } else if (val && val.__typename === "NodeFunctionIdWrapper") {
-                    const subFnId = traverse(param.value as NodeFunction,
+                    const subFnId = traverse(
+                        flowService.getNodeById(flowId, val.id)!,
                         node,
                         undefined,
                         level + 1,
                         fnCache,
-                        dtCache);
+                        dtCache
+                    );
 
                     const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
                     const hashToHue = (md5: string): number => {

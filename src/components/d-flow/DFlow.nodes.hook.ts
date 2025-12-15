@@ -3,7 +3,13 @@ import {DFlowReactiveService} from "./DFlow.service";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "./function";
 import {DFlowDataTypeReactiveService} from "./data-type";
-import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {
+    DataTypeIdentifier,
+    Flow,
+    NodeFunction,
+    NodeFunctionIdWrapper,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DFlowFunctionDefaultCardDataProps} from "./function/DFlowFunctionDefaultCard";
 import {DFlowFunctionSuggestionCardDataProps} from "./function/DFlowFunctionSuggestionCard";
@@ -225,11 +231,11 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
                         });
 
                         // Child function inside the group uses the group's depth and scope PATH.
-                        traverse(param.value as NodeFunction, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
+                        traverse(flowService.getNodeById(flowId, param.value.id)!, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
                     }
                 } else if (param?.value && param.value.__typename === "NodeFunctionIdWrapper") {
                     // Functions passed as non-NODE parameters live in the same depth/scope PATH.
-                    traverse(param.value as NodeFunction, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
+                    traverse(flowService.getNodeById(flowId, param.value.id)!, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
                 }
             });
 

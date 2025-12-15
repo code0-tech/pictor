@@ -43,7 +43,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
         const matchingDataTypes = this.values().filter(type => {
             if (type.identifier === "OBJECT") return false
             if (value.__typename === "NodeFunction" && (type.variant != "NODE" || !flow)) return false
-            return useValidateValue(value, type, flow)
+            return useValidateValue(value, type, this, flow)
         })
 
         return matchingDataTypes[matchingDataTypes.length - 1]

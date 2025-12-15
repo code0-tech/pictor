@@ -40,7 +40,7 @@ export const useFunctionValidation = (
         if (!value) return;
         const parameterType = parameter.dataTypeIdentifier
         const parameterDataType = dataTypeService.getDataType(parameterType!!)
-        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != "NODE" ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!) : dataTypeService.getTypeFromValue(value, flow);
+        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != "NODE" ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!, dataTypeService) : dataTypeService.getTypeFromValue(value, flow);
         const valueDataType = dataTypeService.getDataType(valueType!!)
 
         // Check if the parameter is generic (by key or by structure)
@@ -65,7 +65,7 @@ export const useFunctionValidation = (
                 } else {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
 
-                    isValid = useValidateValue(value, parameterDataType, flow, replacedGenericType?.genericType?.genericMappers!!)
+                    isValid = useValidateValue(value, parameterDataType, dataTypeService, flow, replacedGenericType?.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
@@ -75,7 +75,7 @@ export const useFunctionValidation = (
             if (parameterType?.genericKey && genericKeys.includes(parameterType?.genericKey)) {
                 if (value.__typename != "ReferenceValue") {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
-                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, flow, replacedGenericType.genericType?.genericMappers!!)
+                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, dataTypeService, flow, replacedGenericType.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
@@ -93,7 +93,7 @@ export const useFunctionValidation = (
                     }
                 } else {
                     const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap);
-                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, flow, replacedGenericType.genericType?.genericMappers!!)
+                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, dataTypeService, flow, replacedGenericType.genericType?.genericMappers!!)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
@@ -114,7 +114,7 @@ export const useFunctionValidation = (
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
                 } else {
-                    isValid = useValidateValue(value, parameterDataType)
+                    isValid = useValidateValue(value, parameterDataType, dataTypeService)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
@@ -129,7 +129,7 @@ export const useFunctionValidation = (
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }
                 } else {
-                    isValid = useValidateValue(value, parameterDataType)
+                    isValid = useValidateValue(value, parameterDataType, dataTypeService)
                     if (!isValid) {
                         errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
                     }

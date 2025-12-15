@@ -15,7 +15,7 @@ export class DFlowDataTypeParentRule {
         const replacedType = generics ? replaceGenericKeysInType(config.type, generics) : config.type
 
         if (!service) return false
-        return useValidateValue(value, service.getDataType(replacedType)!!, flow, Array.from(generics!!, ([_, value]) => value))
+        return useValidateValue(value, service.getDataType(replacedType)!!, service, flow, Array.from(generics!!, ([_, value]) => value))
 
     }
 }

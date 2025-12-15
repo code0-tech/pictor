@@ -38,6 +38,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
         if (!activeTab) return
         // @ts-ignore
         flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
+        fileTabsService.deleteById(activeTab.id)
     }, [activeTab, flowService])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {

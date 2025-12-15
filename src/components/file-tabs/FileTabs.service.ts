@@ -79,6 +79,7 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         if (index !== -1) {
             this.delete(index)
         }
+        this.update()
     }
 
     registerTab(value: FileTabsView) {

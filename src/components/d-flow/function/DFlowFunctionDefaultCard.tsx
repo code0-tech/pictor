@@ -129,8 +129,9 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     }), [flowStore, functionStore, data])
 
     React.useEffect(() => {
+        if (!node?.id) return
         fileTabsService.registerTab({
-            id: node?.id!!,
+            id: node?.id,
             active: false,
             closeable: true,
             children: <>
@@ -140,7 +141,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
                                       nodeLevel={data.index} node={data.node}/>
         })
-    }, [node?.id, definition, data, fileTabsService])
+    }, [node?.id, definition, data])
 
     return (
         <Card

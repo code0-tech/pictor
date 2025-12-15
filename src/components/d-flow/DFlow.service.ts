@@ -1,13 +1,13 @@
 import {ReactiveArrayService} from "../../utils";
 import type {
     Flow,
-    FlowSetting,
+    FlowSetting, LiteralValue,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
     NamespacesProjectsFlowsDeletePayload,
-    NodeFunction,
-    NodeParameter
+    NodeFunction, NodeFunctionIdWrapper,
+    NodeParameter, ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
 
@@ -35,7 +35,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
     }
 
     protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {
-        if (parameter?.value?.__typename === "NodeFunction") {
+        if (parameter?.value?.__typename === "NodeFunctionIdWrapper") {
             const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (parameter.value as NodeFunction)?.id)
             if (parameterNode) {
                 flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (parameter.value as NodeFunction)?.id)
@@ -76,7 +76,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
     }
 
     async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
-        console.log(nextNode)
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined
@@ -116,7 +115,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         this.set(index, flow)
     }
 
-    async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value: NodeParameter['value']): Promise<void> {
+    async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
@@ -125,7 +124,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
         if (!parameter) return
         this.removeParameterNode(flow, parameter)
-        parameter.value = value
         if (value?.__typename === "NodeFunction") {
             const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
             const addingIdValue: NodeFunction = {
@@ -133,9 +131,12 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
                 id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
             }
             flow.nodes?.nodes?.push(addingIdValue)
-            parameter.value = addingIdValue
+            parameter.value = {
+                id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
+                __typename: "NodeFunctionIdWrapper"
+            } as NodeFunctionIdWrapper
         } else {
-            parameter.value = value
+            parameter.value = value as LiteralValue | ReferenceValue
         }
         this.set(index, flow)
     }

@@ -11,9 +11,9 @@ import type {
     DataTypeRulesInputTypeConfig,
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig,
-    Flow,
+    Flow, LiteralValue,
     Maybe,
-    NodeFunction,
+    NodeFunction, NodeFunctionIdWrapper,
     NodeParameter,
     NodeParameterValue,
     ReferenceValue
@@ -116,7 +116,7 @@ export const useSuggestions = (
         })
 
         matchingFunctions.forEach(funcDefinition => {
-            const nodeFunctionSuggestion: NodeParameterValue = {
+            const nodeFunctionSuggestion: LiteralValue | ReferenceValue | NodeFunction = {
                 __typename: "NodeFunction",
                 id: `gid://sagittarius/NodeFunction/1`,
                 functionDefinition: {
@@ -210,13 +210,13 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
      * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
      */
     const traverse = (
-        node: NodeFunction | undefined,
+        node: NodeFunctionIdWrapper | NodeFunction | undefined,
         depth: number,
         scopePath: number[]
     ) => {
         if (!node) return;
 
-        let current: NodeFunction | undefined = node;
+        let current: NodeFunction | undefined = node.__typename === "NodeFunctionIdWrapper" ? flowService.getNodeById(flowId, node.id) : node as NodeFunction;
 
         while (current) {
             const def = functionService.getById(current.functionDefinition?.id!!);
@@ -239,7 +239,7 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                         const rawValue = paramInstance?.value;
                         const valuesArray =
                             rawValue !== undefined
-                                ? rawValue?.__typename === "NodeFunction"
+                                ? rawValue?.__typename === "NodeFunctionIdWrapper"
                                     ? [rawValue!!]
                                     : [rawValue!!]
                                 : [];
@@ -287,8 +287,8 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                     const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
                     if (pType?.variant === "NODE") {
                         const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunction") {
-                            const childFn = paramInstance.value as NodeFunction;
+                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+                            const childFn = paramInstance.value as NodeFunctionIdWrapper;
 
                             // New group: extend the scope path with a fresh id; increase depth by 1.
                             const childScopePath = [...scopePath, nextGroupId()];
@@ -297,8 +297,8 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                     } else {
                         // Functions passed as NON-NODE parameters: same depth and same scope path.
                         const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunction") {
-                            traverse(paramInstance.value as NodeFunction, depth, scopePath);
+                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+                            traverse(paramInstance.value as NodeFunctionIdWrapper, depth, scopePath);
                         }
                     }
                 }

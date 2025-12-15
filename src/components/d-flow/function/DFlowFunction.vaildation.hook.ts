@@ -1,160 +1,131 @@
-import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {DataTypeView} from "../data-type/DFlowDataType.view";
-import {DFlowDataTypeReactiveService} from "../data-type/DFlowDataType.service";
-import {InspectionSeverity, ValidationResult} from "../../../utils/inspection";
+import React from "react"
+import type {Maybe, NodeFunctionIdWrapper, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types"
+import {FunctionDefinitionView} from "./DFlowFunction.view"
+import {DataTypeView, DFlowDataTypeReactiveService} from "../data-type"
+import {InspectionSeverity, useService, useStore, ValidationResult} from "../../../utils"
 import {
+    GenericMap,
     replaceGenericKeysInDataTypeObject,
     replaceGenericKeysInType,
     resolveGenericKeys
-} from "../../../utils/generics";
-import {useReturnType} from "./DFlowFunction.return.hook";
-import {useService} from "../../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
-import type {DataTypeVariant, Maybe, NodeFunction, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {useValidateDataType} from "../data-type/DFlowDataType.validation.type";
-import {useValidateValue} from "../data-type/DFlowDataType.validation.value";
-import {DFlowReactiveService} from "../DFlow.service";
+} from "../../../utils/generics"
+import {useReturnType} from "./DFlowFunction.return.hook"
+import {DFlowFunctionReactiveService} from "./DFlowFunction.service"
+import {useValidateDataType} from "../data-type/DFlowDataType.validation.type"
+import {useValidateValue} from "../data-type/DFlowDataType.validation.value"
+import {DFlowReactiveService} from "../DFlow.service"
 
+const isReferenceOrNode = (value: NodeParameterValue) =>
+    value.__typename === "ReferenceValue" || value.__typename === "NodeFunctionIdWrapper"
 
-/**
- * Validates function parameter values against a function definition, resolving all generics.
- * For each parameter, determines if the provided value is a valid match for the parameter's (possibly generic) type.
- * Returns an array of ValidationResults (errors for each parameter, null entry for valid).
- */
-export const useFunctionValidation = (
-    func: FunctionDefinitionView,
-    values: NodeParameterValue[],
-    dataTypeService: DFlowDataTypeReactiveService,
-    flowId: Scalars['FlowID']['output']
-): ValidationResult[] | null => {
-    const functionService = useService(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flow = flowService.getById(flowId)
-    const genericTypeMap = resolveGenericKeys(func, values, dataTypeService, flow)
-    const parameters = func.parameterDefinitions ?? []
-    const genericKeys = func.genericKeys ?? []
-    const errors: ValidationResult[] = [];
+const isNode = (value: NodeParameterValue) =>
+    value.__typename === "NodeFunctionIdWrapper"
 
-    parameters.forEach((parameter, index) => {
-        const value = values[index]
-        if (!value) return;
-        const parameterType = parameter.dataTypeIdentifier
-        const parameterDataType = dataTypeService.getDataType(parameterType!!)
-        const valueType = value.__typename === "NodeFunction" && parameterDataType?.variant != "NODE" ? useReturnType(functionService.getById((value as NodeFunction).functionDefinition?.id!!)!!, (value as NodeFunction).parameters?.nodes?.map(p => p?.value!!)!!, dataTypeService) : dataTypeService.getTypeFromValue(value, flow);
-        const valueDataType = dataTypeService.getDataType(valueType!!)
-
-        // Check if the parameter is generic (by key or by structure)
-        const isParameterGeneric = (parameterDataType && parameterType?.genericType) || (parameterType?.genericKey && genericKeys.includes(parameterType.genericKey))
-
-        let isValid = true
-
-        if (isParameterGeneric) {
-            if (valueType?.genericType && parameterDataType) {
-                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
-                    const resolvedParameterDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(parameterDataType.json!!, genericTypeMap)
-                    );
-                    const resolvedValueDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
-                    );
-                    
-                    isValid = useValidateDataType(resolvedParameterDT, resolvedValueDT)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                } else {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
-
-                    isValid = useValidateValue(value, parameterDataType, dataTypeService, flow, replacedGenericType?.genericType?.genericMappers!!)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                }
-                return;
-            }
-            if (parameterType?.genericKey && genericKeys.includes(parameterType?.genericKey)) {
-                if (value.__typename != "ReferenceValue") {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap)
-                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, dataTypeService, flow, replacedGenericType.genericType?.genericMappers!!)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                }
-                return;
-            }
-            if (valueDataType && parameterDataType && valueDataType.json && parameterDataType.json) {
-                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
-                    const resolvedParameterDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(parameterDataType.json, genericTypeMap)
-                    );
-                    isValid = useValidateDataType(resolvedParameterDT, valueDataType)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                } else {
-                    const replacedGenericType = replaceGenericKeysInType(parameterType, genericTypeMap);
-                    isValid = useValidateValue(value, dataTypeService.getDataType(replacedGenericType)!!, dataTypeService, flow, replacedGenericType.genericType?.genericMappers!!)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                }
-                return;
-            }
-        }
-
-        // Non-generic parameter validation
-        if (parameterDataType) {
-            if (valueType?.genericType && parameterDataType) {
-                if (value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") {
-                    const resolvedValueDT = new DataTypeView(
-                        replaceGenericKeysInDataTypeObject(valueDataType?.json!, genericTypeMap)
-                    );
-                    isValid = useValidateDataType(parameterDataType, resolvedValueDT)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                } else {
-                    isValid = useValidateValue(value, parameterDataType, dataTypeService)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                }
-                return;
-            }
-
-            if (valueDataType) {
-                if ((value.__typename === "ReferenceValue" || value.__typename === "NodeFunction") && parameterDataType.variant !== "NODE") {
-                    isValid = useValidateDataType(parameterDataType, valueDataType)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                } else {
-                    isValid = useValidateValue(value, parameterDataType, dataTypeService)
-                    if (!isValid) {
-                        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-                    }
-                }
-                return;
-            }
-        }
-        // If nothing matches, treat as invalid
-        errors.push(errorResult(parameter.id!!, parameterDataType, valueDataType));
-    });
-
-    return errors.length > 0 ? errors : null;
-};
+const resolveDataTypeWithGenerics = (
+    dataType: DataTypeView,
+    genericMap: GenericMap
+) =>
+    new DataTypeView(
+        replaceGenericKeysInDataTypeObject(dataType.json!, genericMap)
+    )
 
 const errorResult = (
     parameterId: Maybe<Scalars["ParameterDefinitionID"]["output"]>,
-    expectedType?: DataTypeView,
-    actualType?: DataTypeView,
+    expected?: DataTypeView,
+    actual?: DataTypeView
 ): ValidationResult => ({
     parameterId,
     type: InspectionSeverity.ERROR,
     message: {
         nodes: [{
             code: "en-US",
-            content: `Argument of type ${actualType?.name?.nodes!![0]?.content} is not assignable to parameter of type ${expectedType?.name?.nodes!![0]?.content}`
+            content: `Argument of type ${actual?.name?.nodes!![0]?.content} is not assignable to parameter of type ${expected?.name?.nodes!![0]?.content}`
         }]
     }
 })
+
+export const useFunctionValidation = (
+    functionDefinition: FunctionDefinitionView,
+    values: NodeParameterValue[],
+    dataTypeService: DFlowDataTypeReactiveService,
+    flowId: Scalars["FlowID"]["output"]
+): ValidationResult[] | null => {
+
+    const functionService = useService(DFlowFunctionReactiveService)
+    const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
+
+    const flow = React.useMemo(() => flowService.getById(flowId), [flowService, flowId, flowStore])
+    const parameters = React.useMemo(() => functionDefinition.parameterDefinitions ?? [], [functionDefinition])
+    const genericKeys = React.useMemo(() => functionDefinition.genericKeys ?? [], [functionDefinition])
+    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition, values, dataTypeService, flow), [functionDefinition, values, dataTypeService, flow])
+
+    const resolveValueType = React.useCallback(
+        (value: NodeParameterValue, expectedDT?: DataTypeView) => {
+            if (isNode(value) && expectedDT?.variant !== "NODE") {
+                const node = flowService.getNodeById(flowId, (value as NodeFunctionIdWrapper).id)
+                const fn = functionService.getById(node?.functionDefinition?.id!!)!!
+                const params = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+                return useReturnType(fn, params, dataTypeService)
+            }
+            return dataTypeService.getTypeFromValue(value, flow)
+        },
+        [functionService, dataTypeService, flow]
+    )
+
+    return React.useMemo(() => {
+        const errors: ValidationResult[] = []
+
+        for (let i = 0; i < parameters.length; i++) {
+            const parameter = parameters[i]
+            const value = values[i]
+            if (!value) continue
+
+            const expectedType = parameter.dataTypeIdentifier
+            const expectedDT = dataTypeService.getDataType(expectedType!!)
+            const valueType = resolveValueType(value, expectedDT)
+            const valueDT = dataTypeService.getDataType(valueType!!)
+
+            if (!expectedDT || !valueDT) {
+                errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
+                continue
+            }
+
+            const isGeneric =
+                !!expectedType?.genericType ||
+                (!!expectedType?.genericKey && genericKeys.includes(expectedType.genericKey))
+
+            let isValid = true
+
+            if (isGeneric) {
+                const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)
+
+                if (isReferenceOrNode(value)) {
+                    const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
+                    isValid = useValidateDataType(resolvedExpectedDT, resolvedValueDT)
+                } else {
+                    const resolvedType = replaceGenericKeysInType(expectedType, genericMap)
+                    isValid = useValidateValue(
+                        value,
+                        resolvedExpectedDT,
+                        dataTypeService,
+                        flow,
+                        resolvedType?.genericType?.genericMappers!
+                    )
+                }
+            } else {
+                if (isReferenceOrNode(value) && expectedDT.variant !== "NODE") {
+                    isValid = useValidateDataType(expectedDT, valueDT)
+                } else {
+                    isValid = useValidateValue(value, expectedDT, dataTypeService, flow)
+                }
+            }
+
+            if (!isValid) {
+                errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
+            }
+        }
+
+        return errors.length > 0 ? errors : null
+    }, [parameters, values, dataTypeService, flow, genericMap, genericKeys, resolveValueType])
+}

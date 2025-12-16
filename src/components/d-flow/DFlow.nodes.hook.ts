@@ -1,8 +1,8 @@
 import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Node} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "./function";
-import {DFlowDataTypeReactiveService} from "./data-type";
+import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import type {
     DataTypeIdentifier,
     Flow,
@@ -11,10 +11,10 @@ import type {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {DFlowFunctionDefaultCardDataProps} from "./function/DFlowFunctionDefaultCard";
-import {DFlowFunctionSuggestionCardDataProps} from "./function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCardDataProps} from "./function/DFlowFunctionTriggerCard";
-import {DFlowFunctionGroupCardDataProps} from "./function/DFlowFunctionGroupCard";
+import {DFlowFunctionDefaultCardDataProps} from "../d-flow-function/DFlowFunctionDefaultCard";
+import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunctionSuggestionCard";
+import {DFlowFunctionTriggerCardDataProps} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowFunctionGroupCardDataProps} from "../d-flow-function/DFlowFunctionGroupCard";
 import {md5} from "js-md5";
 
 const packageNodes = new Map<string, string>([

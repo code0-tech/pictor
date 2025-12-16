@@ -1,0 +1,21 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.d-flow-viewport-mini-map {
+
+  & {
+    @include box.box(variables.$primary);
+    @include helpers.borderRadius();
+    margin: 0;
+    width: fit-content;
+  }
+
+  > svg {
+    @include helpers.borderRadius();
+  }
+
+  * .react-flow__minimap-mask {
+    fill: rgba(variables.$secondary, 0.1);
+  }
+}

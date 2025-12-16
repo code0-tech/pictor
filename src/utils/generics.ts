@@ -1,5 +1,5 @@
-import {FunctionDefinitionView} from "../components/d-flow/function/DFlowFunction.view";
-import {DFlowDataTypeReactiveService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {FunctionDefinitionView} from "../components/d-flow-function/DFlowFunction.view";
+import {DFlowDataTypeReactiveService} from "../components/d-flow-data-type/DFlowDataType.service";
 import type {
     DataType,
     DataTypeIdentifier,

@@ -14,13 +14,13 @@ import {
 import React from "react";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import {DFlowFunctionDefaultCard} from "./function/DFlowFunctionDefaultCard";
-import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
-import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
-import {DFlowEdge} from "./edge/DFlowEdge";
-import {DFlowPanelSize} from "./panel";
-import {DFlowValidation} from "./validation";
+import {DFlowFunctionDefaultCard} from "../d-flow-function/DFlowFunctionDefaultCard";
+import {DFlowFunctionGroupCard} from "../d-flow-function/DFlowFunctionGroupCard";
+import {DFlowFunctionSuggestionCard} from "../d-flow-function/DFlowFunctionSuggestionCard";
+import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowEdge} from "./DFlowEdge";
+import {DFlowPanelSize} from "../d-flow-panel";
+import {DFlowValidation} from "../d-flow-validation";
 import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
 import {
     IconCopy,
@@ -34,8 +34,8 @@ import {Button} from "../button/Button";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
-import {DFlowPanelControl} from "./panel/DFlowPanelControl";
-import {DFlowPanelLayout} from "./panel/DFlowPanelLayout";
+import {DFlowPanelControl} from "../d-flow-panel/DFlowPanelControl";
+import {DFlowPanelLayout} from "../d-flow-panel/DFlowPanelLayout";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.

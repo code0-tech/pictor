@@ -1,8 +1,8 @@
 import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "./function";
-import {DFlowDataTypeReactiveService} from "./data-type";
+import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import React from "react";
 import type {
     DataTypeIdentifier,
@@ -12,7 +12,7 @@ import type {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
-import {DFlowEdgeDataProps} from "./edge/DFlowEdge";
+import {DFlowEdgeDataProps} from "./DFlowEdge";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
     'rgba(255, 255, 255, 0.25)',    // rot

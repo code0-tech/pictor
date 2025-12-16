@@ -16,10 +16,10 @@ import {
     resolveGenericKeys
 } from "../../utils/generics"
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook"
-import {DFlowFunctionReactiveService} from "../d-flow-function/DFlowFunction.service"
+import {DFlowFunctionReactiveService} from "../d-flow-function"
 import {useDataTypeValidation} from "./DDataTypeValidation.hook"
 import {useValueValidation} from "./DValueValidation.hook"
-import {DFlowReactiveService} from "../d-flow/DFlow.service"
+import {DFlowReactiveService} from "../d-flow"
 
 const isReferenceOrNode = (value: NodeParameterValue) =>
     value.__typename === "ReferenceValue" || value.__typename === "NodeFunctionIdWrapper"

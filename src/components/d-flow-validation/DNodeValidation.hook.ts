@@ -62,13 +62,16 @@ export const useNodeValidation = (
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowService, flowId, flowStore])
-    const node = React.useMemo(() => flowService.getNodeById(flowId, nodeId), [flowId, nodeId, flowStore])
-    const values = React.useMemo(() => node?.parameters?.nodes?.map(p => p?.value!!) ?? [], [node])
-    const functionDefinition = React.useMemo(() => functionService.getById(node?.functionDefinition?.id), [node, functionStore, flowStore])
-    const parameters = React.useMemo(() => functionDefinition?.parameterDefinitions ?? [], [functionDefinition])
-    const genericKeys = React.useMemo(() => functionDefinition?.genericKeys ?? [], [functionDefinition])
-    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow), [functionDefinition, values, dataTypeStore, flow, flowStore])
+    const flow = flowService.getById(flowId)
+    const node = flowService.getNodeById(flowId, nodeId)
+    const values = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+    const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+    const parameters = functionDefinition?.parameterDefinitions ?? []
+    const genericKeys = functionDefinition?.genericKeys ?? []
+    const genericMap = React.useMemo(
+        () => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow),
+        [functionDefinition, values, dataTypeService, dataTypeStore, flow, flowStore]
+    )
 
     const resolveValueType = React.useCallback(
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
@@ -80,7 +83,7 @@ export const useNodeValidation = (
             }
             return dataTypeService.getTypeFromValue(value, flow)
         },
-        [flowStore, functionStore, dataTypeStore, flow]
+        [dataTypeService, flow, flowId, flowService, functionService]
     )
 
     return React.useMemo(() => {
@@ -137,5 +140,5 @@ export const useNodeValidation = (
         }
 
         return errors.length > 0 ? errors : null
-    }, [flow, node, values, functionDefinition, parameters, genericKeys, genericMap, resolveValueType, nodeId, flowId, functionStore, flowStore, dataTypeStore])
+    }, [flow, node, values, functionDefinition, parameters, genericKeys, genericMap, resolveValueType, nodeId, flowId, functionStore, flowStore, dataTypeStore, dataTypeService])
 }

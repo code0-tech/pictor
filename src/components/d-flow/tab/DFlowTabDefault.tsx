@@ -57,7 +57,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             if (!parameter) return null
 
             const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
-                value && flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
+                flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
             }
 
             const submitValueEvent = (event: any) => {

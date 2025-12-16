@@ -68,7 +68,7 @@ export const useNodeValidation = (
     const functionDefinition = React.useMemo(() => functionService.getById(node?.functionDefinition?.id), [node, functionStore, flowStore])
     const parameters = React.useMemo(() => functionDefinition?.parameterDefinitions ?? [], [functionDefinition])
     const genericKeys = React.useMemo(() => functionDefinition?.genericKeys ?? [], [functionDefinition])
-    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow), [functionDefinition, values, dataTypeStore, flow])
+    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow), [functionDefinition, values, dataTypeStore, flow, flowStore])
 
     const resolveValueType = React.useCallback(
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
@@ -80,7 +80,7 @@ export const useNodeValidation = (
             }
             return dataTypeService.getTypeFromValue(value, flow)
         },
-        [functionService, dataTypeService, flow, dataTypeStore]
+        [flowStore, functionStore, dataTypeStore, flow]
     )
 
     return React.useMemo(() => {
@@ -137,5 +137,5 @@ export const useNodeValidation = (
         }
 
         return errors.length > 0 ? errors : null
-    }, [parameters, values, dataTypeStore, flow, genericMap, genericKeys, resolveValueType])
+    }, [flow, node, values, functionDefinition, parameters, genericKeys, genericMap, resolveValueType, nodeId, flowId, functionStore, flowStore, dataTypeStore])
 }

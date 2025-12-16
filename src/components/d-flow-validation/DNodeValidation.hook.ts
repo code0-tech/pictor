@@ -65,7 +65,7 @@ export const useNodeValidation = (
     const flow = React.useMemo(() => flowService.getById(flowId), [flowService, flowId, flowStore])
     const node = React.useMemo(() => flowService.getNodeById(flowId, nodeId), [flowId, nodeId, flowStore])
     const values = React.useMemo(() => node?.parameters?.nodes?.map(p => p?.value!!) ?? [], [node])
-    const functionDefinition = React.useMemo(() => functionService.getById(node?.functionDefinition?.id), [node, functionStore])
+    const functionDefinition = React.useMemo(() => functionService.getById(node?.functionDefinition?.id), [node, functionStore, flowStore])
     const parameters = React.useMemo(() => functionDefinition?.parameterDefinitions ?? [], [functionDefinition])
     const genericKeys = React.useMemo(() => functionDefinition?.genericKeys ?? [], [functionDefinition])
     const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow), [functionDefinition, values, dataTypeStore, flow])

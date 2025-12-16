@@ -14,21 +14,32 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
     public clearLeft(): void {
         const index = this.getActiveIndex()
-        this.access.setState(prevState => [...prevState.filter((_, index1) => {
-            return index1 >= index
-        })])
+        this.access.getState().forEach((tab, indexTab) => {
+            if (indexTab >= index) return
+            this.removeTabById(tab.id!)
+        })
     }
 
     public clearRight(): void {
         const index = this.getActiveIndex()
-        this.access.setState(prevState => [...prevState.filter((_, index1) => {
-            return index1 <= index
-        })])
+        this.access.getState().forEach((tab, indexTab) => {
+            if (indexTab <= index) return
+            this.removeTabById(tab.id!)
+        })
     }
 
     public clearWithoutActive(): void {
-        const tab = this.getActiveTab()
-        if (tab) this.access.setState(prevState => [tab])
+        const index = this.getActiveIndex()
+        this.access.getState().forEach((tab, indexTab) => {
+            if (indexTab == index) return
+            this.removeTabById(tab.id!)
+        })
+    }
+
+    public clearAll(): void {
+        this.access.getState().forEach((tab) => {
+            this.removeTabById(tab.id!)
+        })
     }
 
     public activateTab(id: string) {

@@ -147,7 +147,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                             <MenuPortal>
                                 <MenuContent align="end" sideOffset={8} color={"secondary"}>
                                     <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
-                                        <MenuItem onClick={() => fileTabsService.clear()}>Close all tabs</MenuItem>
+                                        <MenuItem onClick={() => fileTabsService.clearAll()}>Close all tabs</MenuItem>
                                         <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
                                             tabs</MenuItem>
                                         <MenuSeparator/>

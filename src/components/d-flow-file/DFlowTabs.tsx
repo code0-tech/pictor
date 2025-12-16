@@ -9,9 +9,8 @@ import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {DLayout} from "../d-layout/DLayout";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {DFlowReactiveService} from "../d-flow";
 import {DFlowTypeReactiveService} from "../d-flow-type";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {Card} from "../card/Card";
 import {Flex} from "../flex/Flex";
 import {Badge} from "../badge/Badge";
@@ -31,8 +30,6 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
     const flowStore = useStore(DFlowReactiveService)
     const flowTypeService = useService(DFlowTypeReactiveService)
     const flowTypeStore = useStore(DFlowTypeReactiveService)
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
     const id = React.useId()
 
     const flow = React.useMemo(() => flowService.getById(flowId), [flowStore])
@@ -178,7 +175,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                     </ButtonGroup>
                 }
             >
-                {visibleTabs.map((tab: FileTabsView, index: number) => {
+                {visibleTabs.map((tab: FileTabsView, _: number) => {
                     return tab.show && <FileTabsTrigger
                         key={`trigger-${tab.id}`}
                         closable={tab.closeable}

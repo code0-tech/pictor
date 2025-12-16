@@ -3,23 +3,16 @@ import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResiza
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
-import {DFlowReactiveService, FunctionDefinitionView} from "../d-flow";
 import {useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DataTypeView} from "../d-flow";
-import {DFlowDataTypeReactiveService} from "../d-flow";
-import {DFlowFunctionReactiveService} from "../d-flow";
 import {ContextStoreProvider} from "../../utils";
-import {DFlowTabs} from "../d-flow-file/DFlowTabs";
-import {DFlowTypeReactiveService} from "../d-flow";
-import {FlowTypeView} from "../d-flow";
+import {DFlowTabs} from "../d-flow-file";
 import DataTypesData from "./data_types.json";
 import FunctionsData from "./runtime_functions.json";
 import FlowTypeData from "./flow_types.json";
-import {DFlow} from "../d-flow";
+import {DFlow, DFlowReactiveService} from "../d-flow";
 import {DLayout} from "../d-layout/DLayout";
-import {DFlowFolder} from "../d-flow";
 import {
     Flow,
     NamespacesProjectsFlowsCreateInput,
@@ -30,6 +23,7 @@ import {
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
+import {DFlowFolder} from "../d-flow-folder";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -120,7 +114,7 @@ export const Dashboard = () => {
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"} order={2}>
-                        <FlowExample/>
+                        <DFlow flowId={"gid://sagittarius/Flow/1"}/>
                     </DResizablePanel>
                     {show && (
                         <>
@@ -135,10 +129,4 @@ export const Dashboard = () => {
         </ContextStoreProvider>
     </DFullScreen>
 
-}
-
-
-const FlowExample = () => {
-
-    return <DFlow flowId={"gid://sagittarius/Flow/1"}/>
 }

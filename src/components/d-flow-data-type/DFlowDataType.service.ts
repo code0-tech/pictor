@@ -16,7 +16,6 @@ import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
 
 export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> {
 
-    //TODO: remove string because of sagittarius types update
     getDataType (type: DataTypeIdentifier): DataTypeView | undefined {
         if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined

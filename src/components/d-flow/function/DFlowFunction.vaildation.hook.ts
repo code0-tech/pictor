@@ -1,6 +1,12 @@
 import React from "react"
-import type {Maybe, NodeFunctionIdWrapper, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types"
-import {FunctionDefinitionView} from "./DFlowFunction.view"
+import type {
+    Flow,
+    Maybe,
+    NodeFunction,
+    NodeFunctionIdWrapper,
+    NodeParameterValue,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types"
 import {DataTypeView, DFlowDataTypeReactiveService} from "../data-type"
 import {InspectionSeverity, useService, useStore, ValidationResult} from "../../../utils"
 import {
@@ -44,21 +50,25 @@ const errorResult = (
     }
 })
 
-export const useFunctionValidation = (
-    functionDefinition: FunctionDefinitionView,
-    values: NodeParameterValue[],
-    dataTypeService: DFlowDataTypeReactiveService,
-    flowId: Scalars["FlowID"]["output"]
+export const useNodeValidation = (
+    nodeId: NodeFunction['id'],
+    flowId: Flow['id']
 ): ValidationResult[] | null => {
 
     const functionService = useService(DFlowFunctionReactiveService)
+    const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
     const flow = React.useMemo(() => flowService.getById(flowId), [flowService, flowId, flowStore])
-    const parameters = React.useMemo(() => functionDefinition.parameterDefinitions ?? [], [functionDefinition])
-    const genericKeys = React.useMemo(() => functionDefinition.genericKeys ?? [], [functionDefinition])
-    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition, values, dataTypeService, flow), [functionDefinition, values, dataTypeService, flow])
+    const node = React.useMemo(() => flowService.getNodeById(flowId, nodeId), [flowId, nodeId, flowStore])
+    const values = React.useMemo(() => node?.parameters?.nodes?.map(p => p?.value!!) ?? [], [node])
+    const functionDefinition = React.useMemo(() => functionService.getById(node?.functionDefinition?.id), [node, functionStore])
+    const parameters = React.useMemo(() => functionDefinition?.parameterDefinitions ?? [], [functionDefinition])
+    const genericKeys = React.useMemo(() => functionDefinition?.genericKeys ?? [], [functionDefinition])
+    const genericMap = React.useMemo(() => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow), [functionDefinition, values, dataTypeStore, flow])
 
     const resolveValueType = React.useCallback(
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
@@ -70,7 +80,7 @@ export const useFunctionValidation = (
             }
             return dataTypeService.getTypeFromValue(value, flow)
         },
-        [functionService, dataTypeService, flow]
+        [functionService, dataTypeService, flow, dataTypeStore]
     )
 
     return React.useMemo(() => {
@@ -127,5 +137,5 @@ export const useFunctionValidation = (
         }
 
         return errors.length > 0 ? errors : null
-    }, [parameters, values, dataTypeService, flow, genericMap, genericKeys, resolveValueType])
+    }, [parameters, values, dataTypeStore, flow, genericMap, genericKeys, resolveValueType])
 }

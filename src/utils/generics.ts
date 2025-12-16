@@ -377,9 +377,9 @@ export const resolveGenericKeys = (
     flow?: Flow
 ): GenericMap => {
     const genericMap: GenericMap = new Map();
-    const genericKeys = func.genericKeys ?? [];
+    const genericKeys = func?.genericKeys ?? [];
 
-    if (!func.parameterDefinitions || genericKeys.length <= 0) return genericMap;
+    if (!func?.parameterDefinitions || genericKeys.length <= 0) return genericMap;
 
     const genericKeySet = new Set(genericKeys);
 

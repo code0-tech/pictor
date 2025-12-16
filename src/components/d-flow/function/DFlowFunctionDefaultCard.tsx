@@ -8,8 +8,7 @@ import {IconFile} from "@tabler/icons-react";
 import {Text} from "../../text/Text";
 import {useService, useStore as usePictorStore} from "../../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
-import {useFunctionValidation} from "./DFlowFunction.vaildation.hook";
-import {DFlowDataTypeReactiveService} from "../data-type";
+import {useNodeValidation} from "./DFlowFunction.vaildation.hook";
 import {DFlowReactiveService} from "../DFlow.service";
 import {FileTabsService} from "../../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../tab/DFlowTabDefault";
@@ -42,11 +41,10 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
     const flowStore = usePictorStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const functionStore = usePictorStore(DFlowFunctionReactiveService)
-    const dataTypeService = useService(DFlowDataTypeReactiveService)
 
     const node = React.useMemo(() => flowService.getNodeById(data.flowId, data.nodeId), [flowStore, data])
     const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
-    const validation = definition && node && useFunctionValidation(definition, node.parameters!.nodes!.map(p => p?.value!!), dataTypeService!!, props.data.flowId)
+    const validation = useNodeValidation(data.nodeId, data.flowId)
     const activeTabId = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)?.id
     }, [fileTabsStore, fileTabsService]);
@@ -106,7 +104,8 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 case "NodeFunctionIdWrapper":
                     const hash = md5(`${id}-param-${JSON.stringify(param)}`)
                     const node = flowService.getNodeById(props.data.flowId, param.value.id)
-                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border pos={"relative"}>
+                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border
+                                  pos={"relative"}>
                         <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>

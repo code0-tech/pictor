@@ -6,14 +6,13 @@ import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {ParameterDefinitionView} from "../d-flow-function";
 import {Badge} from "../badge/Badge";
 import type {
     LiteralValue,
-    NodeFunction, NodeFunctionIdWrapper,
-    NodeParameterValue,
+    NodeFunction, NodeParameterValue,
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";

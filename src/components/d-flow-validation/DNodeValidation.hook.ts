@@ -15,8 +15,8 @@ import {
     replaceGenericKeysInType,
     resolveGenericKeys
 } from "../../utils/generics"
-import {useReturnType} from "./DFlowFunction.return.hook"
-import {DFlowFunctionReactiveService} from "./DFlowFunction.service"
+import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook"
+import {DFlowFunctionReactiveService} from "../d-flow-function/DFlowFunction.service"
 import {useValidateDataType} from "../d-flow-data-type/DFlowDataType.validation.type"
 import {useValidateValue} from "../d-flow-data-type/DFlowDataType.validation.value"
 import {DFlowReactiveService} from "../d-flow/DFlow.service"

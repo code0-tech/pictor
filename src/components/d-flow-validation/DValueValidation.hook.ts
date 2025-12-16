@@ -1,9 +1,9 @@
 import type {Flow, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
-import {RuleMap} from "./rules/DFlowDataTypeRules";
-import {DataTypeView} from "./DFlowDataType.view";
-import {DFlowDataTypeReactiveService} from "./DFlowDataType.service";
+import {RuleMap} from "../d-flow-data-type/rules/DFlowDataTypeRules";
+import {DataTypeView} from "../d-flow-data-type/DFlowDataType.view";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type/DFlowDataType.service";
 
-export const useValidateValue = (
+export const useValueValidation = (
     value: NodeParameterValue,
     dataType: DataTypeView,
     dataTypeService: DFlowDataTypeReactiveService,

@@ -2,7 +2,7 @@ import {DFlowDataTypeRule, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import {replaceGenericKeysInType} from "../../../utils/generics";
 import type {DataTypeIdentifier, Flow, GenericMapper, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
-import {useValidateValue} from "../DFlowDataType.validation.value";
+import {useValueValidation} from "../../d-flow-validation/DValueValidation.hook";
 
 export interface DFlowDataTypeParentRuleConfig {
     type: DataTypeIdentifier
@@ -15,7 +15,7 @@ export class DFlowDataTypeParentRule {
         const replacedType = generics ? replaceGenericKeysInType(config.type, generics) : config.type
 
         if (!service) return false
-        return useValidateValue(value, service.getDataType(replacedType)!!, service, flow, Array.from(generics!!, ([_, value]) => value))
+        return useValueValidation(value, service.getDataType(replacedType)!!, service, flow, Array.from(generics!!, ([_, value]) => value))
 
     }
 }

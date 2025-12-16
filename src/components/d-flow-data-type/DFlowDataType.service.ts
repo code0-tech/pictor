@@ -1,4 +1,4 @@
-import {ReactiveArrayService} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 import {DataTypeView} from "./DFlowDataType.view";
 import {resolveType} from "../../utils/generics";
 import type {
@@ -12,7 +12,7 @@ import type {
     NodeParameterValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
-import {useValidateValue} from "./DFlowDataType.validation.value";
+import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
 
 export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView> {
 
@@ -43,7 +43,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
         const matchingDataTypes = this.values().filter(type => {
             if (type.identifier === "OBJECT") return false
             if (value.__typename === "NodeFunctionIdWrapper" && (type.variant != "NODE" || !flow)) return false
-            return useValidateValue(value, type, this, flow)
+            return useValueValidation(value, type, this, flow)
         })
 
         return matchingDataTypes[matchingDataTypes.length - 1]

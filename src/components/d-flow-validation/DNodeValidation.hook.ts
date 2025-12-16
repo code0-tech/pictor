@@ -17,8 +17,8 @@ import {
 } from "../../utils/generics"
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook"
 import {DFlowFunctionReactiveService} from "../d-flow-function/DFlowFunction.service"
-import {useValidateDataType} from "../d-flow-data-type/DFlowDataType.validation.type"
-import {useValidateValue} from "../d-flow-data-type/DFlowDataType.validation.value"
+import {useDataTypeValidation} from "./DDataTypeValidation.hook"
+import {useValueValidation} from "./DValueValidation.hook"
 import {DFlowReactiveService} from "../d-flow/DFlow.service"
 
 const isReferenceOrNode = (value: NodeParameterValue) =>
@@ -112,10 +112,10 @@ export const useNodeValidation = (
 
                 if (isReferenceOrNode(value)) {
                     const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
-                    isValid = useValidateDataType(resolvedExpectedDT, resolvedValueDT)
+                    isValid = useDataTypeValidation(resolvedExpectedDT, resolvedValueDT)
                 } else {
                     const resolvedType = replaceGenericKeysInType(expectedType, genericMap)
-                    isValid = useValidateValue(
+                    isValid = useValueValidation(
                         value,
                         resolvedExpectedDT,
                         dataTypeService,
@@ -125,9 +125,9 @@ export const useNodeValidation = (
                 }
             } else {
                 if (isReferenceOrNode(value) && expectedDT.variant !== "NODE") {
-                    isValid = useValidateDataType(expectedDT, valueDT)
+                    isValid = useDataTypeValidation(expectedDT, valueDT)
                 } else {
-                    isValid = useValidateValue(value, expectedDT, dataTypeService, flow)
+                    isValid = useValueValidation(value, expectedDT, dataTypeService, flow)
                 }
             }
 

@@ -1,8 +1,8 @@
-import {DataTypeView} from "./DFlowDataType.view";
+import {DataTypeView} from "../d-flow-data-type/DFlowDataType.view";
 
 const IGNORE_ID_KEYS = ["id", "__typename", "createdAt", "updatedAt", "aliases", "displayMessages", "name", "runtime"];
 
-export const useValidateDataType = (
+export const useDataTypeValidation = (
     firstDataType: DataTypeView,
     secondDataType: DataTypeView
 ) => {

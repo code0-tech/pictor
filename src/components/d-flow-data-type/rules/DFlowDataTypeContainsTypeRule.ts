@@ -8,7 +8,7 @@ import type {
     LiteralValue,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {useValidateValue} from "../DFlowDataType.validation.value";
+import {useValueValidation} from "../../d-flow-validation/DValueValidation.hook";
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsTypeRule {
@@ -36,9 +36,9 @@ export class DFlowDataTypeContainsTypeRule {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
                 return (value as LiteralValue).value.every((value1: any) => {
                     if (genericType.genericType) {
-                        return useValidateValue({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                        return useValueValidation({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                     }
-                    return useValidateValue({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow)
+                    return useValueValidation({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow)
                 })
             })
 
@@ -53,10 +53,10 @@ export class DFlowDataTypeContainsTypeRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return (value as LiteralValue).value.every((value1: any) => useValidateValue(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!))
+            return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!))
         }
 
-        return (value as LiteralValue).value.every((value1: any) => useValidateValue(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
+        return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
 
     }
 }

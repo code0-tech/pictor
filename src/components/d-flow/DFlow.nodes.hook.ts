@@ -3,13 +3,7 @@ import {DFlowReactiveService} from "./DFlow.service";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import type {
-    DataTypeIdentifier,
-    Flow,
-    NodeFunction,
-    NodeFunctionIdWrapper,
-    Scalars
-} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DFlowFunctionDefaultCardDataProps} from "../d-flow-function/DFlowFunctionDefaultCard";
 import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunctionSuggestionCard";

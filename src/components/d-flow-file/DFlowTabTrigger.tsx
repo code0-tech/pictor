@@ -18,9 +18,13 @@ export interface DFlowTabTriggerProps {
 export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const {instance} = props
+
     const flowTypeService = useService(DFlowTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const [,startTransition] = React.useTransition()
+
     const definition = flowTypeService.getById(instance.type?.id!!)
+
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
@@ -45,11 +49,14 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
 
             const submitValue = (value: NodeParameterValue) => {
-                if (value.__typename == "LiteralValue") {
-                    flowService.setSettingValue(props.instance.id, setting.id, value.value)
-                } else {
-                    flowService.setSettingValue(props.instance.id, setting.id, value)
-                }
+                startTransition(async () => {
+                    if (value.__typename == "LiteralValue") {
+                        await flowService.setSettingValue(props.instance.id, setting.id, value.value)
+                    } else {
+                        await flowService.setSettingValue(props.instance.id, setting.id, value)
+                    }
+                })
+
             }
 
             const submitValueEvent = (event: any) => {

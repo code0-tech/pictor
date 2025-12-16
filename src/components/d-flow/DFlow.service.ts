@@ -39,19 +39,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         }
     }
 
-    async deleteById(flowId: Flow['id']): Promise<void> {
-        const index = this.values().findIndex(f => f.id === flowId)
-        this.delete(index)
-    }
-
-    async renameById(flowId: Flow['id'], newName: string): Promise<void> {
-        const flow = this.getById(flowId)
-        const index = this.values().findIndex(f => f.id === flowId)
-        if (!flow) return
-        flow.name = newName
-        this.set(index, flow)
-    }
-
     getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }

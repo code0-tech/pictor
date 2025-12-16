@@ -31,6 +31,8 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const {node, flowId, depthLevel, scopeLevel, nodeLevel} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const [, startTransition] = React.useTransition()
+
     const definition = functionService.getById(node.functionDefinition?.id!!)
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
@@ -56,7 +58,10 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             if (!parameter) return null
 
             const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
-                flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
+                startTransition(async () => {
+                    await flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
+                })
+
             }
 
             const submitValueEvent = (event: any) => {

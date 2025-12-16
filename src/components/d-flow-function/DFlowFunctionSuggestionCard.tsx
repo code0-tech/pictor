@@ -1,10 +1,9 @@
-import {Code0Component} from "../../utils";
+import {Code0Component, useService} from "../../utils";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import {Button} from "../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
-import {useService} from "../../utils";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestionMenu} from "../d-flow-suggestion/DFlowSuggestionMenu";
 import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
@@ -19,14 +18,17 @@ export type DFlowFunctionSuggestionCardProps = NodeProps<Node<DFlowFunctionSugge
 
 export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardProps> = memo((props) => {
 
+    const [, startTransition] = React.useTransition()
     const result = useSuggestions(undefined, [], props.data.flowId, 0, [0], 0)
     const flowService = useService(DFlowReactiveService)
     const flow = flowService.getById(props.data.flowId)
 
     return <DFlowSuggestionMenu onSuggestionSelect={suggestion => {
-        if (suggestion.value.__typename === "NodeFunction") {
-            flowService.addNextNodeById(flow?.id, props.data.parentFunction?.id ?? null, suggestion.value)
-        }
+        startTransition(async () => {
+            if (suggestion.value.__typename === "NodeFunction") {
+                await flowService.addNextNodeById(flow?.id, props.data.parentFunction?.id ?? null, suggestion.value)
+            }
+        })
     }} suggestions={result} triggerContent={
         <Button paddingSize={"xxs"} variant={"normal"} color={"secondary"}>
             <Handle

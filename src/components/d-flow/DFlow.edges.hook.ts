@@ -4,13 +4,7 @@ import {Edge} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import React from "react";
-import type {
-    DataTypeIdentifier,
-    Flow,
-    NodeFunction,
-    NodeFunctionIdWrapper,
-    Scalars
-} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
 import {DFlowEdgeDataProps} from "./DFlowEdge";
 

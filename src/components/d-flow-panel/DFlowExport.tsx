@@ -4,7 +4,7 @@ import React from "react"
 import {Panel} from "@xyflow/react"
 import {Flow} from "@code0-tech/sagittarius-graphql-types"
 import {useService, useStore} from "../../utils"
-import {DFlowReactiveService} from "../d-flow/DFlow.service"
+import {DFlowReactiveService} from "../d-flow"
 import {Button} from "../button/Button"
 
 export interface DFlowExportProps {

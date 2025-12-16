@@ -5,9 +5,7 @@ import type {
     TranslationConnection
 } from "@code0-tech/sagittarius-graphql-types";
 
-/*
-    @todo is DataType castable to another DataType
- */
+
 export class DataTypeView {
 
     /** Name of the function */

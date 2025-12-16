@@ -1,4 +1,4 @@
-import {ReactiveArrayService} from "../../utils/reactiveArrayService";
+import {ReactiveArrayService} from "../../utils";
 import {FlowTypeView} from "./DFlowType.view";
 import type {FlowType} from "@code0-tech/sagittarius-graphql-types";
 

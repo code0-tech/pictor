@@ -4,7 +4,6 @@ import {
     BackgroundVariant,
     Edge,
     Node,
-    Panel,
     ReactFlow,
     ReactFlowProvider,
     useEdgesState,
@@ -21,21 +20,11 @@ import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerC
 import {DFlowEdge} from "./DFlowEdge";
 import {DFlowPanelSize} from "../d-flow-panel";
 import {DFlowValidation} from "../d-flow-validation";
-import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
-import {
-    IconCopy,
-    IconLayout,
-    IconLayoutDistributeHorizontal,
-    IconLayoutDistributeVertical,
-    IconTrash
-} from "@tabler/icons-react";
-import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Button} from "../button/Button";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
-import {DFlowPanelControl} from "../d-flow-panel/DFlowPanelControl";
-import {DFlowPanelLayout} from "../d-flow-panel/DFlowPanelLayout";
+import {DFlowPanelControl} from "../d-flow-panel";
+import {DFlowPanelLayout} from "../d-flow-panel";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.

@@ -1,5 +1,5 @@
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {InputSuggestion} from "../form/InputSuggestion";
+import {InputSuggestion} from "../form";
 import React from "react";
 import {IconCircleDot, IconCirclesRelation, IconFileFunctionFilled} from "@tabler/icons-react";
 import {Text} from "../text/Text";

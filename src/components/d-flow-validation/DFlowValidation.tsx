@@ -2,7 +2,7 @@ import {Panel} from "@xyflow/react";
 import React from "react";
 import type {Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Flex} from "../flex/Flex";
-import {InspectionSeverity, ValidationResult} from "../../utils/inspection";
+import {InspectionSeverity, ValidationResult} from "../../utils";
 import {Badge} from "../badge/Badge";
 import {IconAlertTriangle, IconExclamationCircle, IconMessageExclamation} from "@tabler/icons-react";
 import "./DFlowValidation.style.scss"

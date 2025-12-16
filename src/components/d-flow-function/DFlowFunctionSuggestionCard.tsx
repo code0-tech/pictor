@@ -5,7 +5,7 @@ import {Button} from "../button/Button";
 import {IconPlus} from "@tabler/icons-react";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {useService} from "../../utils";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestionMenu} from "../d-flow-suggestion/DFlowSuggestionMenu";
 import type {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 

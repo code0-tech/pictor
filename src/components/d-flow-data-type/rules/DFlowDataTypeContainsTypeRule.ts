@@ -1,8 +1,8 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import type {
-    DataTypeRulesContainsKeyConfig, Flow,
-    GenericCombinationStrategyType,
+    DataTypeRulesContainsKeyConfig,
+    Flow,
     GenericMapper,
     GenericType,
     LiteralValue,
@@ -36,9 +36,15 @@ export class DFlowDataTypeContainsTypeRule {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
                 return (value as LiteralValue).value.every((value1: any) => {
                     if (genericType.genericType) {
-                        return useValueValidation({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                        return useValueValidation({
+                            __typename: "LiteralValue",
+                            value: value1
+                        }, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                     }
-                    return useValueValidation({__typename: "LiteralValue", value: value1}, service?.getDataType(genericType)!!, service!!, flow)
+                    return useValueValidation({
+                        __typename: "LiteralValue",
+                        value: value1
+                    }, service?.getDataType(genericType)!!, service!!, flow)
                 })
             })
 

@@ -3,7 +3,7 @@ import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../utils/generics";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {DFlowReactiveService} from "../d-flow";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
 import {useInputType} from "../d-flow-function/DFlowFunction.input.hook";
 import type {

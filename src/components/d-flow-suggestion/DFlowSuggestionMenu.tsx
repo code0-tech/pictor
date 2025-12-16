@@ -6,7 +6,7 @@ import {
     InputSuggestionMenuContent,
     InputSuggestionMenuContentItems,
     InputSuggestionMenuContentItemsHandle
-} from "../form/InputSuggestion";
+} from "../form";
 import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
 import {DFlowSuggestionMenuSearchBar} from "./DFlowSuggestionMenuSearchBar";
 import {useStoreApi} from "@xyflow/react";

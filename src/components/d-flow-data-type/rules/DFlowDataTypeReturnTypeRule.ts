@@ -1,11 +1,12 @@
 import {DFlowDataTypeRule, genericMapping, staticImplements} from "./DFlowDataTypeRule";
 import {DFlowDataTypeReactiveService} from "../DFlowDataType.service";
 import type {
-    DataTypeRulesReturnTypeConfig, Flow,
-    GenericCombinationStrategyType,
+    DataTypeRulesReturnTypeConfig,
+    Flow,
     GenericMapper,
     GenericType,
-    NodeFunction, NodeFunctionIdWrapper,
+    NodeFunction,
+    NodeFunctionIdWrapper,
     NodeParameterValue,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";

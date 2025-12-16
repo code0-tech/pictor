@@ -1,7 +1,7 @@
 import React from "react";
 import {DFlowSuggestionSearchInput} from "./DFlowSuggestionSearchInput";
 import {IconSearch} from "@tabler/icons-react";
-import {Code0Component} from "../../utils/types";
+import {Code0Component} from "../../utils";
 
 export interface DFlowSuggestionMenuSearchBarProps extends Code0Component<HTMLDivElement> {
     onType: (event: React.KeyboardEvent<HTMLInputElement>) => void

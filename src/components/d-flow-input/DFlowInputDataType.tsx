@@ -1,5 +1,5 @@
 import React from "react";
-import {ValidationProps} from "../form/useForm";
+import {ValidationProps} from "../form";
 import type {
     DataType,
     DataTypeIdentifier,
@@ -13,25 +13,25 @@ import type {
     GenericMapper,
     GenericType
 } from "@code0-tech/sagittarius-graphql-types";
-import {InputMessage} from "../form/InputMessage";
+import {InputMessage} from "../form";
 import "./DFlowInputDataType.style.scss";
-import {TextInput} from "../form/TextInput";
+import {TextInput} from "../form";
 import {Button} from "../button/Button";
 import {IconSettings, IconTrash} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Badge} from "../badge/Badge";
-import {InputLabel} from "../form/InputLabel";
+import {InputLabel} from "../form";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import {DFlowSuggestionType} from "../d-flow-suggestion/DFlowSuggestion.view";
+import {DFlowSuggestionType} from "../d-flow-suggestion";
 import {Menu, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {
     InputSuggestion,
     InputSuggestionMenuContent,
     InputSuggestionMenuContentItems
-} from "../form/InputSuggestion";
+} from "../form";
 
 const NON_TYPE_RULE_VARIANTS = new Set<DataTypeRulesVariant>([
     "ITEM_OF_COLLECTION" as DataTypeRulesVariant.ItemOfCollection,

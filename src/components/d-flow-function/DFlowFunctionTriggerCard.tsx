@@ -1,8 +1,8 @@
 import React, {memo} from "react";
-import {Code0Component} from "../../utils/types";
+import {Code0Component} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import {Text} from "../text/Text";
-import {useService} from "../../utils/contextStore";
+import {useService} from "../../utils";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
 import {Card} from "../card/Card";
 import {Flex} from "../flex/Flex";

@@ -1,6 +1,5 @@
 import React, {memo} from "react";
-import {Handle, Node, NodeProps, Position, useStore} from "@xyflow/react";
-import {FLOW_EDGE_RAINBOW} from "../d-flow/DFlow.edges.hook";
+import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Card} from "../card/Card";
 import {Code0Component} from "../../utils";
 

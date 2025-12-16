@@ -24,6 +24,9 @@ import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
 import {DFlowFolder} from "../d-flow-folder";
+import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
+import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
+import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
 
 const meta: Meta = {
     title: "Dashboard Resizable",

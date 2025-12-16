@@ -1,5 +1,5 @@
 import {FunctionDefinitionView} from "./DFlowFunction.view";
-import {DFlowDataTypeReactiveService} from "../d-flow-data-type/DFlowDataType.service";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {replaceGenericKeysInType, resolveGenericKeys} from "../../utils/generics";
 import type {DataTypeIdentifier, NodeParameterValue} from "@code0-tech/sagittarius-graphql-types";
 

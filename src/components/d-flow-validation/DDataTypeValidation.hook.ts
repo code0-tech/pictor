@@ -1,4 +1,4 @@
-import {DataTypeView} from "../d-flow-data-type/DFlowDataType.view";
+import {DataTypeView} from "../d-flow-data-type";
 
 const IGNORE_ID_KEYS = ["id", "__typename", "createdAt", "updatedAt", "aliases", "displayMessages", "name", "runtime"];
 

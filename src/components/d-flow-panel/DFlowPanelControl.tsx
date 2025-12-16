@@ -5,7 +5,7 @@ import {IconPlus, IconTrash} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
 import {useService, useStore} from "../../utils";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {DFlowReactiveService} from "../d-flow";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {Text} from "../text/Text";

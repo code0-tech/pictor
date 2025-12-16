@@ -18,7 +18,6 @@ export interface DFlowFolderProps {
     onRename?: (flow: Flow, newName: string) => void
     onDelete?: (flow: Flow) => void
     onCreate?: (name: string, type: FlowType['id']) => void
-    onMove?: (flow: Flow, newPath: string) => void
 }
 
 export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "controls"> {

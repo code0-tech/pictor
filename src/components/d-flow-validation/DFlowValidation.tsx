@@ -7,7 +7,7 @@ import {Badge} from "../badge/Badge";
 import {IconAlertTriangle, IconExclamationCircle, IconMessageExclamation} from "@tabler/icons-react";
 import "./DFlowValidation.style.scss"
 import {Text} from "../text/Text";
-import {useDFlowValidations} from "./DFlowValidation.hook";
+import {useFlowValidation} from "./DFlowValidation.hook";
 
 export interface DFlowValidationProps {
     flowId: Scalars['FlowID']['output']
@@ -16,7 +16,7 @@ export interface DFlowValidationProps {
 export const DFlowValidation: React.FC<DFlowValidationProps> = (props) => {
 
     const {flowId} = props
-    const validations: ValidationResult[] = useDFlowValidations(flowId)
+    const validations: ValidationResult[] = useFlowValidation(flowId)
 
     return <Panel position="top-right">
         {(validations?.length ?? 0) > 0 ? (

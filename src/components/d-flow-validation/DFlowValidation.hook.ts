@@ -1,10 +1,10 @@
-import {ValidationResult} from "../../utils/inspection";
-import type {Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {useService, useStore} from "../../utils/contextStore";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
+import {ValidationResult} from "../../utils";
+import type {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {useService, useStore} from "../../utils";
+import {DFlowReactiveService} from "../d-flow";
 import React from "react";
 
-export const useDFlowValidations = (flowId: Scalars['FlowID']['output']): ValidationResult[] => {
+export const useFlowValidation = (flowId: Flow['id']): ValidationResult[] => {
 
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)

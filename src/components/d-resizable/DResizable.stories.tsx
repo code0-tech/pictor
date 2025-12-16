@@ -3,14 +3,13 @@ import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResiza
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
 import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
-import {FunctionDefinitionView} from "../d-flow";
+import {DFlowReactiveService, FunctionDefinitionView} from "../d-flow";
 import {useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
 import {DataTypeView} from "../d-flow";
 import {DFlowDataTypeReactiveService} from "../d-flow";
 import {DFlowFunctionReactiveService} from "../d-flow";
-import {DFlowReactiveService} from "../d-flow";
 import {ContextStoreProvider} from "../../utils";
 import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
 import {DFlowTypeReactiveService} from "../d-flow";
@@ -26,7 +25,7 @@ import {
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload
+    NamespacesProjectsFlowsDeletePayload, NamespacesProjectsFlowsUpdateInput, NamespacesProjectsFlowsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
@@ -51,6 +50,10 @@ class DFlowReactiveServiceExtend extends DFlowReactiveService {
     }
 
     flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+
+    flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
         return Promise.resolve(undefined);
     }
 }

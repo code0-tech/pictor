@@ -20,7 +20,9 @@ import {Button} from "../button/Button";
 import {useService, useStore} from "../../utils";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 import {DFlowFolderItemPathInput} from "./DFlowFolderItemPathInput";
-import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
+import {DFlowFolderRenameDialog} from "./DFlowFolderRenameDialog";
+import {DFlowFolderCreateDialog} from "./DFlowFolderCreateDialog";
 
 export interface DFlowFolderContextMenuGroupData {
     name: string
@@ -49,6 +51,8 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
     const flowTypes = React.useMemo(() => flowTypeService.values(), [flowTypeStore])
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false)
+    const [createDialogOpen, setCreateDialogOpen] = React.useState(false)
+    const [flowTypeId, setFlowTypeId] = React.useState<FlowType['id']>(null)
 
     return <>
         <Dialog open={deleteDialogOpen} onOpenChange={(open) => setDeleteDialogOpen(open)}>
@@ -83,35 +87,9 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
             </DialogPortal>
         </Dialog>
 
-        <Dialog open={renameDialogOpen} onOpenChange={(open) => setRenameDialogOpen(open)}>
-            <DialogPortal>
-                <DialogContent autoFocus showCloseButton
-                               title={props.contextData.type == "item" ? "Rename flow" : "Rename folder"}>
-                    <div>
-                        <DFlowFolderItemPathInput
-                            description={"You can choose a new name here and only use alphanumeric names."}
-                            title={props.contextData.type == "item" ? "Name of the flow" : "Name of the folder"}
-                            defaultValue={props.contextData.name}/>
-                    </div>
-                    <Flex justify={"space-between"} align={"center"}>
-                        <DialogClose asChild>
-                            <Button color={"secondary"}>No, go back!</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                            <Button color={"success"} onClick={() => {
-                                if (props.contextData.type === "item") {
-                                    props.onDelete?.(props.contextData.flow)
-                                } else if (props.contextData.type === "group") {
-                                    props.contextData.flows.forEach(flow => {
-                                        props.onDelete?.(flow)
-                                    })
-                                }
-                            }}>Yes, save!</Button>
-                        </DialogClose>
-                    </Flex>
-                </DialogContent>
-            </DialogPortal>
-        </Dialog>
+        <DFlowFolderRenameDialog onOpenChange={open => setRenameDialogOpen(open)} open={renameDialogOpen} {...props}/>
+
+        <DFlowFolderCreateDialog flowTypeId={flowTypeId} onOpenChange={open => setCreateDialogOpen(open)} open={createDialogOpen} {...props}/>
 
         <ContextMenu>
             <ContextMenuTrigger asChild>
@@ -128,7 +106,10 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
                         </ContextMenuSubTrigger>
                         <ContextMenuSubContent>
                             {flowTypes.map(flowType => {
-                                return <ContextMenuItem key={flowType.id}>
+                                return <ContextMenuItem key={flowType.id} onSelect={() => {
+                                    setFlowTypeId(flowType.id)
+                                    setCreateDialogOpen(true)
+                                }}>
                                     {flowType.names?.nodes!![0]?.content ?? flowType.id}
                                 </ContextMenuItem>
                             })}

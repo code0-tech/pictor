@@ -1,4 +1,4 @@
-import {Code0Component} from "../../utils/types";
+import {Code0Component} from "../../utils";
 import {BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath, Position} from "@xyflow/react";
 import React, {memo} from "react";
 import {Badge} from "../badge/Badge";

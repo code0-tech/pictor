@@ -2,7 +2,14 @@ import {Meta} from "@storybook/react-vite";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
-import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
+import {
+    IconArrowsMaximize,
+    IconArrowsMinimize,
+    IconCircleDot,
+    IconDatabase,
+    IconFile,
+    IconMessageChatbot
+} from "@tabler/icons-react";
 import {useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
@@ -23,10 +30,11 @@ import {
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
-import {DFlowFolder} from "../d-flow-folder";
+import {DFlowFolder, DFlowFolderHandle} from "../d-flow-folder";
 import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
 import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -80,6 +88,42 @@ export const Dashboard = () => {
         nodes: {
             nodes: []
         }
+    }, {
+        id: "gid://sagittarius/Flow/2",
+        type: {
+            id: "gid://sagittarius/FlowType/867",
+        },
+        name: "de/codezero/examples-2/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
+    }, {
+        id: "gid://sagittarius/Flow/3",
+        type: {
+            id: "gid://sagittarius/FlowType/867",
+        },
+        name: "en/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
     }]);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
@@ -112,8 +156,8 @@ export const Dashboard = () => {
                 </Flex>
             }>
                 <DResizablePanelGroup direction={"horizontal"}>
-                    <DResizablePanel id={"1"} order={1} p={1} defaultSize={15}>
-                        <DFlowFolder activeFlowId={"gid://sagittarius/Flow/1"}/>
+                    <DResizablePanel id={"1"} order={1} defaultSize={15}>
+                        <Folder/>
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"} order={2}>
@@ -132,4 +176,62 @@ export const Dashboard = () => {
         </ContextStoreProvider>
     </DFullScreen>
 
+}
+
+const Folder = () => {
+
+    const ref = React.useRef<DFlowFolderHandle>(null)
+
+    return <DLayout topContent={
+        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
+            <Button paddingSize={"xxs"} variant={"filled"} color={"success"}>
+                <Text>Create new flow</Text>
+            </Button>
+            <Flex style={{gap: "0.35rem"}}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
+                            <IconCircleDot size={16}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent>
+                            <Text>Open active flow</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
+                            <IconArrowsMinimize size={16}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent>
+                            <Text>Close all</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
+                            <IconArrowsMaximize size={16}/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                        <TooltipContent>
+                            <Text>Open all</Text>
+                            <TooltipArrow/>
+                        </TooltipContent>
+                    </TooltipPortal>
+                </Tooltip>
+            </Flex>
+        </Flex>
+    }>
+        <div style={{padding: "0.75rem"}}>
+            <DFlowFolder ref={ref} activeFlowId={"gid://sagittarius/Flow/1"}/>
+        </div>
+    </DLayout>
 }

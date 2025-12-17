@@ -3,22 +3,35 @@
 import "./DFlowFolder.style.scss"
 import React from "react"
 import {Code0Component, mergeCode0Props, useService, useStore} from "../../utils"
-import {IconChevronDown, IconChevronRight, IconDots, IconFile, IconFolder, IconFolderOpen} from "@tabler/icons-react"
+import {
+    IconChevronDown,
+    IconChevronRight,
+    IconDots,
+    IconFile,
+    IconFolder,
+    IconFolderFilled,
+    IconFolderOpen
+} from "@tabler/icons-react"
 import type {Flow, FlowType, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {DFlowReactiveService} from "../d-flow"
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
 import {Flex} from "../flex/Flex"
 import {Text} from "../text/Text"
 import {Button} from "../button/Button"
-import {DFlowFolderContextMenu} from "./DFlowFolderContextMenu";
+import {
+    DFlowFolderContextMenu,
+    DFlowFolderContextMenuGroupData,
+    DFlowFolderContextMenuItemData
+} from "./DFlowFolderContextMenu";
 import {md5} from "js-md5";
 
 
 export interface DFlowFolderProps {
     activeFlowId: Scalars["FlowID"]["output"]
-    onRename?: (flow: Flow, newName: string) => void
-    onDelete?: (flow: Flow) => void
-    onCreate?: (name: string, type: FlowType['id']) => void
+    onRename?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
+    onDelete?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
+    onCreate?: (type: FlowType['id']) => void
+    onSelect?: (flow: Flow) => void
 }
 
 export type DFlowFolderHandle = {
@@ -29,14 +42,14 @@ export type DFlowFolderHandle = {
 
 type OpenMode = "default" | "allOpen" | "allClosed" | "activePath"
 
-export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "controls"> {
+export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
     name: string
     children: React.ReactElement<DFlowFolderItemProps> | React.ReactElement<DFlowFolderItemProps>[] | React.ReactElement<DFlowFolderGroupProps> | React.ReactElement<DFlowFolderGroupProps>[]
     defaultOpen?: boolean
     flows: Flow[]
 }
 
-export interface DFlowFolderItemProps extends DFlowFolderProps, Code0Component<HTMLDivElement> {
+export interface DFlowFolderItemProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "onSelect"> {
     name: string
     path: string
     active?: boolean
@@ -208,14 +221,12 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
     return <>
         <DFlowFolderContextMenu contextData={{
             name: name,
-            flows: flows,
-            type: "group"
+            flow: flows,
+            type: "folder"
         }} {...rest}>
             <div onClick={() => setOpen(prevState => !prevState)} {...mergeCode0Props(`d-folder`, rest)}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <span className={"d-folder__icon"}>
-                        {open ? <IconFolderOpen size={12}/> : <IconFolder size={12}/>}
-                    </span>
+                    {open ? <IconFolderOpen size={12}/> : <IconFolderFilled size={12}/>}
                     <Text>{name}</Text>
                 </Flex>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
@@ -236,7 +247,7 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
 
 export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
 
-    const {name, path, flow, active, ...rest} = props
+    const {name, path, flow, onSelect, active, ...rest} = props
 
     const colorHash = md5(path + name)
     const hashToHue = (md5: string): number => {
@@ -250,7 +261,7 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
         flow: flow,
         type: "item"
     }} {...rest}>
-        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)}>
+        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)} onClick={() => onSelect?.(flow)}>
             <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
             <Text>{name}</Text>
         </div>

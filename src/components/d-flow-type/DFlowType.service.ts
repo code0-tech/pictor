@@ -1,11 +1,17 @@
 import {ReactiveArrayService} from "../../utils";
 import {FlowTypeView} from "./DFlowType.view";
-import type {FlowType} from "@code0-tech/sagittarius-graphql-types";
+import {FlowType, Namespace, NamespaceProject, Runtime} from "@code0-tech/sagittarius-graphql-types";
 
-export abstract class DFlowTypeReactiveService extends ReactiveArrayService<FlowTypeView> {
+export type DFlowTypeDependencies = {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
+    runtimeId: Runtime['id']
+}
 
-    getById(id: FlowType['id']): FlowTypeView | undefined {
-        return this.values().find(value => value.id === id);
+export abstract class DFlowTypeReactiveService extends ReactiveArrayService<FlowTypeView, DFlowTypeDependencies> {
+
+    getById(id: FlowType['id'], dependencies?: DFlowTypeDependencies): FlowTypeView | undefined {
+        return this.values(dependencies).find(value => value.id === id);
     }
 
 }

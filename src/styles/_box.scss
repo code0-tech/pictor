@@ -44,7 +44,7 @@
   $borderColor: variables.$secondary
 ) {
 
-  &:active, &:focus, &[aria-selected=true] {
+  &:active, &:focus, &[aria-selected=true], &[data-state=open] {
     @include boxActiveStyle($background, $color, $borderColor);
   }
 }

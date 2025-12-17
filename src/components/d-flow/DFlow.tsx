@@ -1,23 +1,30 @@
-import {Code0ComponentProps} from "../../utils/types";
+import {Code0ComponentProps, mergeCode0Props} from "../../utils";
 import {
+    Background,
+    BackgroundVariant,
     Edge,
     Node,
     ReactFlow,
-    ReactFlowProps,
     ReactFlowProvider,
     useEdgesState,
     useNodesState,
     useUpdateNodeInternals
 } from "@xyflow/react";
 import React from "react";
-import {mergeCode0Props} from "../../utils/utils";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import {DFlowFunctionDefaultCard} from "./function/DFlowFunctionDefaultCard";
-import {DFlowFunctionGroupCard} from "./function/DFlowFunctionGroupCard";
-import {DFlowFunctionSuggestionCard} from "./function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCard} from "./function/DFlowFunctionTriggerCard";
-import {DFlowEdge} from "./edge/DFlowEdge";
+import {DFlowFunctionDefaultCard} from "../d-flow-function/DFlowFunctionDefaultCard";
+import {DFlowFunctionGroupCard} from "../d-flow-function/DFlowFunctionGroupCard";
+import {DFlowFunctionSuggestionCard} from "../d-flow-function/DFlowFunctionSuggestionCard";
+import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowEdge} from "./DFlowEdge";
+import {DFlowPanelSize} from "../d-flow-panel";
+import {DFlowValidation} from "../d-flow-validation";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {useFlowNodes} from "./DFlow.nodes.hook";
+import {useFlowEdges} from "./DFlow.edges.hook";
+import {DFlowPanelControl} from "../d-flow-panel";
+import {DFlowPanelLayout} from "../d-flow-panel";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -31,11 +38,11 @@ import {DFlowEdge} from "./edge/DFlowEdge";
  */
 const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) {
-        return {nodes};
+        return {nodes}
     }
     /* Konstanten */
-    const V = 75;          // vertical gap Node ↕ Node
-    const H = 75;          // horizontal gap Parent → Param
+    const V = 50;          // vertical gap Node ↕ Node
+    const H = 50;          // horizontal gap Parent → Param
     const PAD = 16;         // inner padding einer Group (links+rechts / oben+unten)
     const EPS = 0.25;       // Toleranz gegen Rundungsdrift
 
@@ -44,72 +51,72 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     let changed = false;
 
     // Aktueller Arbeitsstand der Nodes (Styles werden in den Pässen fortgeschrieben)
-    const work = nodes.map(n => ({...n}));
+    const work = nodes.map(n => ({...n}))
 
     // Relationen einmalig ermitteln (IDs behalten) --------------------------------
-    const rfKidIds = new Map<string, string[]>();
-    const paramIds = new Map<string, string[]>();
+    const rfKidIds = new Map<string, string[]>()
+    const paramIds = new Map<string, string[]>()
     for (const n of work) {
         const link = (n.data as any)?.linkingId;
         if (link) {
-            let arr = paramIds.get(link);
+            let arr = paramIds.get(link)
             if (!arr) {
                 arr = [];
-                paramIds.set(link, arr);
+                paramIds.set(link, arr)
             }
-            arr.push(n.id);
+            arr.push(n.id)
         }
         if (n.parentId && !link) {
-            let arr = rfKidIds.get(n.parentId);
+            let arr = rfKidIds.get(n.parentId)
             if (!arr) {
                 arr = [];
-                rfKidIds.set(n.parentId, arr);
+                rfKidIds.set(n.parentId, arr)
             }
-            arr.push(n.id);
+            arr.push(n.id)
         }
     }
 
-    const rfKids = new Map<string, Node[]>();
-    const params = new Map<string, Node[]>();
+    const rfKids = new Map<string, Node[]>()
+    const params = new Map<string, Node[]>()
 
-    const byId = new Map(work.map(n => [n.id, n]));
+    const byId = new Map(work.map(n => [n.id, n]))
 
     for (const [k, ids] of rfKidIds) {
-        const arr: Node[] = new Array(ids.length);
+        const arr: Node[] = new Array(ids.length)
         for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
-        rfKids.set(k, arr);
+        rfKids.set(k, arr)
     }
     for (const [k, ids] of paramIds) {
-        const arr: Node[] = new Array(ids.length);
+        const arr: Node[] = new Array(ids.length)
         for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
-        params.set(k, arr);
+        params.set(k, arr)
     }
 
-    type Size = { w: number; h: number };
-    const baseSizes = new Map<string, Size>();
+    type Size = { w: number; h: number }
+    const baseSizes = new Map<string, Size>()
     for (const n of work) {
         const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
         const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
         const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined;
         const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined;
-        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80});
+        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80})
     }
 
-    const sizeCache = new Map<string, Size>();
+    const sizeCache = new Map<string, Size>()
     const size = (n: Node): Size => {
         if (sizeCache.has(n.id)) return sizeCache.get(n.id)!;
 
         if (n.type !== 'group') {
             const s = baseSizes.get(n.id)!;
-            sizeCache.set(n.id, s);
+            sizeCache.set(n.id, s)
             return s;
         }
 
         const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
         const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
         if (styleW !== undefined && styleH !== undefined) {
-            const s = {w: styleW, h: styleH};
-            sizeCache.set(n.id, s);
+            const s = {w: styleW, h: styleH}
+            sizeCache.set(n.id, s)
             return s;
         }
 
@@ -118,36 +125,36 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         let wMax = 0;
         let count = 0;
         for (const k of kids) {
-            const ks = size(k);
+            const ks = size(k)
             stackH += ks.h;
             if (ks.w > wMax) wMax = ks.w;
             count++;
         }
-        stackH += V * Math.max(0, count - 1);
+        stackH += V * Math.max(0, count - 1)
 
         const g = {
             w: wMax + 2 * PAD,
             h: (count ? stackH : 0) + 2 * PAD,
-        };
-        sizeCache.set(n.id, g);
+        }
+        sizeCache.set(n.id, g)
         return g;
-    };
+    }
 
     do {
         changed = false;
         pass++;
-        sizeCache.clear();
-        for (const n of work) size(n);
+        sizeCache.clear()
+        for (const n of work) size(n)
 
         /* ---------- relatives Layout (Zentren in globalen Koordinaten) -------- */
 
-        type Pos = { x: number; y: number };
-        const rel = new Map<string, Pos>();
+        type Pos = { x: number; y: number }
+        const rel = new Map<string, Pos>()
 
         // Merker: Unterkante je rechter Spalten-"Band", damit Parameter unterschiedlicher Parents
         // in derselben Spalte nicht kollidieren.
-        const columnBottom = new Map<number, number>();
-        const colKey = (x: number) => Math.round(x / 10); // 10px-Buckets gegen Floating-Drift
+        const columnBottom = new Map<number, number>()
+        const colKey = (x: number) => Math.round(x / 10) // 10px-Buckets gegen Floating-Drift
 
         const layoutIter = (root: Node, cx: number, cy: number): number => {
             type Frame = {
@@ -174,7 +181,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 kidIndex?: number;
                 curY?: number;
                 bottom?: number;
-            };
+            }
             const stack: Frame[] = [{node: root, cx, cy, phase: 0}];
             let returnBottom = 0;
 
@@ -182,8 +189,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 const f = stack[stack.length - 1];
                 switch (f.phase) {
                     case 0: {
-                        rel.set(f.node.id, {x: f.cx, y: f.cy});
-                        const {w, h} = size(f.node);
+                        rel.set(f.node.id, {x: f.cx, y: f.cy})
+                        const {w, h} = size(f.node)
                         f.w = w;
                         f.h = h;
 
@@ -191,16 +198,17 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         const right: Node[] = [];
                         const gParams: Node[] = [];
                         for (const p of paramsOf) {
-                            if (p.type === 'group') gParams.push(p); else right.push(p);
+                            if (p.type === 'group') gParams.push(p)
+                            else right.push(p)
                         }
-                        right.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
-                        gParams.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex));
+                        right.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
+                        gParams.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
                         f.right = right;
                         f.gParams = gParams;
 
                         let total = 0;
                         for (const p of right) total += size(p).h;
-                        total += V * Math.max(0, right.length - 1);
+                        total += V * Math.max(0, right.length - 1)
                         f.py = f.cy - total / 2;
                         f.rightBottom = f.cy + h / 2;
                         f.rightIndex = 0;
@@ -210,10 +218,10 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     case 1: {
                         if (f.rightIndex! < f.right!.length) {
                             const p = f.right![f.rightIndex!];
-                            const ps = size(p);
+                            const ps = size(p)
                             const px = f.cx + f.w! / 2 + H + ps.w / 2;
                             let pcy = f.py! + ps.h / 2;
-                            const key = colKey(px);
+                            const key = colKey(px)
                             const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
                             const minTop = occ + V;
                             const desiredTop = pcy - ps.h / 2;
@@ -223,19 +231,19 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             }
                             f.childKey = key;
                             f.childPs = ps;
-                            stack.push({node: p, cx: px, cy: pcy, phase: 0});
+                            stack.push({node: p, cx: px, cy: pcy, phase: 0})
                             f.phase = 10;
                         } else {
-                            f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!);
+                            f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
                             f.phase = 2;
                         }
                         break;
                     }
                     case 10: {
                         const subBottom = f.lastChildBottom!;
-                        columnBottom.set(f.childKey!, Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom));
-                        f.rightBottom = Math.max(f.rightBottom!, subBottom);
-                        f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V);
+                        columnBottom.set(f.childKey!, Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom))
+                        f.rightBottom = Math.max(f.rightBottom!, subBottom)
+                        f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V)
                         f.rightIndex!++;
                         f.phase = 1;
                         break;
@@ -245,11 +253,11 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const gSizes: Size[] = [];
                             let rowW = 0;
                             for (const g of f.gParams) {
-                                const gs = size(g);
-                                gSizes.push(gs);
+                                const gs = size(g)
+                                gSizes.push(gs)
                                 rowW += gs.w;
                             }
-                            rowW += H * (f.gParams.length - 1);
+                            rowW += H * (f.gParams.length - 1)
                             f.gSizes = gSizes;
                             f.gx = f.cx - rowW / 2;
                             f.gy = f.bottom! + V;
@@ -268,7 +276,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const gcx = f.gx! + gs.w / 2;
                             const gcy = f.gy! + gs.h / 2;
                             f.gx! += gs.w + H;
-                            stack.push({node: g, cx: gcx, cy: gcy, phase: 0});
+                            stack.push({node: g, cx: gcx, cy: gcy, phase: 0})
                             f.childPs = gs;
                             f.phase = 30;
                         } else {
@@ -279,7 +287,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     }
                     case 30: {
                         const subBottom = f.lastChildBottom!;
-                        f.rowBottom = Math.max(f.rowBottom!, subBottom);
+                        f.rowBottom = Math.max(f.rowBottom!, subBottom)
                         f.gIndex!++;
                         f.phase = 3;
                         break;
@@ -289,7 +297,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const kidsAll = rfKids.get(f.node.id) ?? [];
                             const kids: Node[] = [];
                             for (const k of kidsAll) {
-                                if (!(k.data as any)?.linkingId) kids.push(k);
+                                if (!(k.data as any)?.linkingId) kids.push(k)
                             }
                             f.kids = kids;
                             f.kidIndex = 0;
@@ -303,14 +311,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     case 5: {
                         if (f.kidIndex! < f.kids!.length) {
                             const k = f.kids![f.kidIndex!];
-                            const ks = size(k);
+                            const ks = size(k)
                             const ky = f.curY! + ks.h / 2;
-                            stack.push({node: k, cx: f.cx, cy: ky, phase: 0});
+                            stack.push({node: k, cx: f.cx, cy: ky, phase: 0})
                             f.childPs = ks;
                             f.phase = 50;
                         } else {
                             const contentBottom = f.curY! - V;
-                            f.bottom = Math.max(f.bottom!, contentBottom + PAD);
+                            f.bottom = Math.max(f.bottom!, contentBottom + PAD)
                             f.phase = 6;
                         }
                         break;
@@ -335,26 +343,26 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             }
 
             return returnBottom;
-        };
+        }
 
         /* Root-Nodes untereinander stapeln (nur echte Roots, keine Param-Nodes) */
         let yCursor = 0;
         for (const r of work) {
             if (!(r.data as any)?.linkingId && !r.parentId) {
-                const b = layoutIter(r, 0, yCursor + size(r).h / 2);
+                const b = layoutIter(r, 0, yCursor + size(r).h / 2)
                 yCursor = b + V;
             }
         }
 
         /* ---------- rel (Center) → abs (Top-Left) ----------------------------- */
-        const absCenter = new Map<string, Pos>();
-        for (const n of work) absCenter.set(n.id, rel.get(n.id)!);
+        const absCenter = new Map<string, Pos>()
+        for (const n of work) absCenter.set(n.id, rel.get(n.id)!)
 
-        const absTL_initial = new Map<string, Pos>();
+        const absTL_initial = new Map<string, Pos>()
         for (const n of work) {
-            const {w, h} = size(n);
+            const {w, h} = size(n)
             const {x, y} = absCenter.get(n.id)!;
-            absTL_initial.set(n.id, {x: x - w / 2, y: y - h / 2});
+            absTL_initial.set(n.id, {x: x - w / 2, y: y - h / 2})
         }
 
         /* ---------- positions in RF-Koordinaten (Top-Left), ggf. relativ zu Parent */
@@ -367,39 +375,39 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 px -= pTL.x;
                 py -= pTL.y;
             }
-            n.position = {x: px, y: py};
+            n.position = {x: px, y: py}
         }
 
-        const posById = new Map<string, Node>();
-        for (const n of work) posById.set(n.id, n);
+        const posById = new Map<string, Node>()
+        for (const n of work) posById.set(n.id, n)
 
         /* ---------- Bounding-Korrektur jeder Group ----------------------------- */
         const depth = (g: Node) => {
             let d = 0, p: Node | undefined = g;
             while (p?.parentId) {
                 d++;
-                p = posById.get(p.parentId);
+                p = posById.get(p.parentId)
                 if (!p) break;
             }
             return d;
-        };
+        }
 
         const groups: Node[] = [];
         for (const n of work) {
-            if (n.type === 'group') groups.push(n);
+            if (n.type === 'group') groups.push(n)
         }
-        groups.sort((a, b) => depth(b) - depth(a));
+        groups.sort((a, b) => depth(b) - depth(a))
 
         for (const g of groups) {
             const direct: Node[] = [];
             for (const k of work) {
-                if (k.parentId === g.id) direct.push(k);
+                if (k.parentId === g.id) direct.push(k)
             }
 
             if (!direct.length) {
                 const gw = typeof g.style?.width === 'number' ? g.style.width : 2 * PAD;
                 const gh = typeof g.style?.height === 'number' ? g.style.height : 2 * PAD;
-                g.style = {...(g.style as React.CSSProperties), width: gw, height: gh};
+                g.style = {...(g.style as React.CSSProperties), width: gw, height: gh}
                 continue;
             }
 
@@ -407,8 +415,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 const sw = typeof n.style?.width === 'number' ? n.style.width : undefined;
                 const sh = typeof n.style?.height === 'number' ? n.style.height : undefined;
                 const s = baseSizes.get(n.id)!;
-                return {w: sw ?? s.w, h: sh ?? s.h};
-            };
+                return {w: sw ?? s.w, h: sh ?? s.h}
+            }
 
             let minX = Number.POSITIVE_INFINITY,
                 minY = Number.POSITIVE_INFINITY,
@@ -416,7 +424,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 maxY = Number.NEGATIVE_INFINITY;
 
             for (const k of direct) {
-                const ks = childSize(k);
+                const ks = childSize(k)
                 if (k.position.x < minX) minX = k.position.x;
                 if (k.position.y < minY) minY = k.position.y;
                 if (k.position.x + ks.w > maxX) maxX = k.position.x + ks.w;
@@ -444,47 +452,47 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 changed = true;
             }
 
-            g.measured = {width: newW, height: newH};
-            g.style = {...(g.style as React.CSSProperties), width: newW, height: newH};
-            baseSizes.set(g.id, {w: newW, h: newH});
+            g.measured = {width: newW, height: newH}
+            g.style = {...(g.style as React.CSSProperties), width: newW, height: newH}
+            baseSizes.set(g.id, {w: newW, h: newH})
         }
 
         /* ---------- Param-Group-Row nach Bounding sauber zentrieren ----------- */
         // WICHTIG: Größen-Cache invalidieren, da Group-Styles sich geändert haben
-        sizeCache.clear();
-        for (const n of work) size(n);
+        sizeCache.clear()
+        for (const n of work) size(n)
 
         // Globale Center bleiben in rel; aber Top-Left muss mit NEUEN Größen berechnet werden
-        const absTL = new Map<string, Pos>();
-        const absCenterAfter = new Map<string, Pos>();
+        const absTL = new Map<string, Pos>()
+        const absCenterAfter = new Map<string, Pos>()
         for (const n of work) {
-            const s = size(n);
+            const s = size(n)
             const c = rel.get(n.id)!; // globales Center aus dem Layout-Durchlauf
-            absCenterAfter.set(n.id, c);
-            absTL.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2});
+            absCenterAfter.set(n.id, c)
+            absTL.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2})
         }
 
         for (const parent of work) {
             const pGroups: Node[] = [];
             const paramList = params.get(parent.id) ?? [];
             for (const p of paramList) {
-                if (p.type === 'group') pGroups.push(p);
+                if (p.type === 'group') pGroups.push(p)
             }
             if (!pGroups.length) continue;
 
             const ordered = pGroups.slice().sort((a, b) =>
                 (+((a.data as any)?.paramIndex) || 0) - (+((b.data as any)?.paramIndex) || 0)
-            );
+            )
 
             const widths: number[] = [];
             for (const g of ordered) {
                 const gn = posById.get(g.id)!;
                 const sw = typeof gn.style?.width === 'number' ? gn.style.width : undefined;
-                widths.push(sw ?? size(gn).w);
+                widths.push(sw ?? size(gn).w)
             }
             let rowW = 0;
             for (const w of widths) rowW += w;
-            rowW += H * (ordered.length - 1);
+            rowW += H * (ordered.length - 1)
 
             const pCenterX = absCenterAfter.get(parent.id)!.x;
             let gx = pCenterX - rowW / 2;
@@ -492,20 +500,22 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             for (let i = 0; i < ordered.length; i++) {
                 const g = ordered[i];
                 const gn = posById.get(g.id)!;
-                const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0};
+                const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0}
                 gn.position.x = gx - containerTL.x;
                 gx += widths[i] + H;
             }
         }
 
-    } while (changed && pass < 5);
+    } while (changed && pass < 5)
 
-    return {nodes: work};
+    return {nodes: work}
 }
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
 
-export type DFlowProps = Code0ComponentProps & ReactFlowProps
+export interface DFlowProps extends Code0ComponentProps {
+    flowId: Flow['id']
+}
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
     return <ReactFlowProvider>
@@ -514,45 +524,47 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 }
 
 const InternalDFlow: React.FC<DFlowProps> = (props) => {
-    const [nodes, setNodes] = useNodesState(props.nodes!!)
-    const [edges, setEdges, edgeChangeEvent] = useEdgesState(props.edges!!)
-    const updateNodeInternals = useUpdateNodeInternals()
 
-    const revalidateHandles = React.useCallback((ids: string[]) => {
-        requestAnimationFrame(() => {
-            ids.forEach(id => updateNodeInternals(id));
-        });
-    }, [updateNodeInternals])
-
+    const {flowId} = props
     const nodeTypes = {
         default: DFlowFunctionDefaultCard,
         group: DFlowFunctionGroupCard,
         suggestion: DFlowFunctionSuggestionCard,
         trigger: DFlowFunctionTriggerCard,
-        ...props.nodeTypes
     }
 
     const edgeTypes = {
         default: DFlowEdge,
-        ...props.edgeTypes
     }
+
+    const initialNodes = useFlowNodes(flowId)
+    const initialEdges = useFlowEdges(flowId)
+    const [nodes, setNodes] = useNodesState<Node>([])
+    const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
+    const updateNodeInternals = useUpdateNodeInternals()
+
+    const revalidateHandles = React.useCallback((ids: string[]) => {
+        requestAnimationFrame(() => {
+            ids.forEach(id => updateNodeInternals(id))
+        })
+    }, [updateNodeInternals])
 
     const nodeChangeEvent = React.useCallback((changes: any) => {
         const changedIds: string[] = Array.from(new Set(
             changes
                 .filter((c: any) => c.type === 'dimensions' || c.type === 'position')
                 .map((c: any) => c.id)
-        ));
+        ))
 
-        const dimensionMap = new Map<string, { width?: number; height?: number }>();
+        const dimensionMap = new Map<string, { width?: number; height?: number }>()
         changes
             .filter((c: any) => c.type === 'dimensions')
-            .forEach((c: any) => dimensionMap.set(c.id, c.dimensions));
+            .forEach((c: any) => dimensionMap.set(c.id, c.dimensions))
 
         setNodes(prevNodes => {
             const localNodes = prevNodes.map(node => {
                 if (!dimensionMap.has(node.id)) return node;
-                const dims = dimensionMap.get(node.id) || {};
+                const dims = dimensionMap.get(node.id) || {}
                 return {
                     ...node,
                     measured: {
@@ -560,17 +572,17 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                         height: dims.height ?? node.measured?.height ?? 0,
                     }
                 } as Node;
-            });
+            })
 
-            const layouted = getCachedLayoutElements(localNodes, new Set(changedIds));
+            const layouted = getCachedLayoutElements(localNodes, new Set(changedIds))
             return layouted.nodes as Node[];
-        });
+        })
 
-        revalidateHandles(changedIds);
-    }, [revalidateHandles]);
+        revalidateHandles(changedIds)
+    }, [revalidateHandles])
 
     React.useEffect(() => {
-        const localNodes = props.nodes!!.map(value => {
+        const localNodes = initialNodes.map(value => {
             const nodeEls = !value.measured ? document.querySelectorAll("[data-id='" + value.id + "']") : [];
             return {
                 ...value,
@@ -578,16 +590,16 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
                     width: value.measured?.width ?? (nodeEls[0] as any)?.clientWidth ?? 0,
                     height: value.measured?.height ?? (nodeEls[0] as any)?.clientHeight ?? 0,
                 }
-            } as Node;
-        });
+            } as unknown as Node
+        })
 
         const layouted = getCachedLayoutElements(localNodes, new Set(localNodes.map(n => n.id)))
         setNodes(layouted.nodes as Node[])
-        setEdges(props.edges as Edge[])
+        setEdges(initialEdges as Edge[])
 
         revalidateHandles((layouted.nodes as Node[]).map(n => n.id))
 
-    }, [props.nodes, props.edges, revalidateHandles])
+    }, [initialNodes, initialEdges, revalidateHandles])
 
     return (
         <ReactFlow
@@ -598,9 +610,16 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
+            fitView
             {...mergeCode0Props("flow", props)}
             nodes={nodes}
             edges={edges}
-        />
+        >
+            <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
+            <DFlowPanelSize/>
+            <DFlowPanelLayout/>
+            <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
+            <DFlowPanelControl flowId={flowId}/>
+        </ReactFlow>
     )
 }

@@ -19,15 +19,16 @@
     cursor: pointer;
     padding: variables.$xxs variables.$xs;
 
-    & {
-      @include box.box();
-      border-radius: variables.$borderRadius - variables.$xxs;
-      border: none;
-    }
-
     &[data-state="off"] {
       background: transparent;
       opacity: .6666666666;
+    }
+
+    & {
+      @include box.box();
+      @include helpers.disabled();
+      border-radius: variables.$borderRadius - variables.$xxs;
+      border: none;
     }
 
   }

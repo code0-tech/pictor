@@ -7,4 +7,5 @@ export interface FileTabsView {
     content: React.ReactNode
     active: boolean,
     lastActive?: Date
+    show?: boolean
 }

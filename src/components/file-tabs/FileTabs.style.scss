@@ -16,25 +16,19 @@
     align-items: center;
     justify-content: space-between;
     position: relative;
-    gap: variables.$xs;
     padding: variables.$xs;
 
     &-content {
       display: flex;
+      width: 100%;
       overflow-x: scroll;
       flex-wrap: nowrap;
-      gap: variables.$xxs;
+      gap: variables.$xs;
       -ms-overflow-style: none; /* Internet Explorer 10+ */
       scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
       &::-webkit-scrollbar {
         display: none; /* Older Safari and Chromium */
       }
-    }
-
-    &-controls {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: variables.$xxs;
     }
   }
 
@@ -42,12 +36,11 @@
 
     padding: variables.$xxs variables.$xs;
     display: flex;
-    gap: variables.$xs;
+    gap: variables.$xxs;
     align-items: center;
     text-wrap: nowrap;
     margin-bottom: 1px;
     cursor: pointer;
-    font-size: variables.$sm;
 
     & {
       @include box.box(variables.$primary);
@@ -55,22 +48,25 @@
       @include helpers.borderRadius();
       @include helpers.fontStyle();
       background: transparent;
-      box-shadow: none;
+      border: none;
+      &:after {
+        position: absolute;
+        content: "";
+        height: 75%;
+        width: 100%;
+        left: variables.$xxs;
+        top: 50%;
+        transform: translateY(-50%);
+        border-right: 1px solid helpers.borderColor();
+        z-index: -1;
+      }
     }
 
     &[data-state="active"] {
-      @include box.box(variables.$secondary);
-
-      .file-tabs__trigger-icon {
-        opacity: 1;
-      }
+      @include box.boxActiveStyle(variables.$secondary);
+      border: none;
     }
 
-    &:hover, &:active {
-      .file-tabs__trigger-icon {
-        opacity: 1;
-      }
-    }
   }
 
   &__trigger-icon {
@@ -78,19 +74,17 @@
     align-items: center;
     justify-content: center;
     padding: .1rem;
-    opacity: 0;
     cursor: pointer;
     font-size: unset;
 
     & {
-
       @include box.boxHover(variables.$primary);
       @include helpers.borderRadius();
     }
   }
 
   &__content {
-    padding: variables.$xs + variables.$xs;
+    padding: variables.$xs;
     position: relative;
   }
 

@@ -15,7 +15,6 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  gap: variables.$xl;
 }
 
 .d-layout__top,
@@ -28,18 +27,24 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  gap: variables.$xl;
 }
 
 .d-layout__left {
-  padding-right: variables.$xl;
   border-right: 1px solid helpers.borderColor();
 }
 
 .d-layout__right {
-  padding-left: variables.$xl;
   border-left: 1px solid helpers.borderColor();
 }
+
+.d-layout__top {
+  border-bottom: 1px solid helpers.borderColor();
+}
+
+.d-layout__bottom {
+  border-top: 1px solid helpers.borderColor();
+}
+
 
 .d-layout__left,
 .d-layout__right {

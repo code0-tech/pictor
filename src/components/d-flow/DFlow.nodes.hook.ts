@@ -1,10 +1,15 @@
-import {useService} from "../../utils/contextStore";
+import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
-import {NodeFunctionView} from "./DFlow.view";
 import {Node} from "@xyflow/react";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
-import type {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import React from "react";
+import {DFlowFunctionDefaultCardDataProps} from "../d-flow-function/DFlowFunctionDefaultCard";
+import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunctionSuggestionCard";
+import {DFlowFunctionTriggerCardDataProps} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowFunctionGroupCardDataProps} from "../d-flow-function/DFlowFunctionGroupCard";
+import {md5} from "js-md5";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -90,165 +95,154 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
     return bestKey !== null ? map.get(bestKey)! : "";
 };
 
-export const useFlowNodes = (flowId: Flow['id']): Node[] => {
+// @ts-ignore
+export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
+    const flowStore = useStore(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
+    const functionStore = useStore(DFlowFunctionReactiveService);
     const dataTypeService = useService(DFlowDataTypeReactiveService);
-    const flow = flowService.getById(flowId);
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService);
 
-    if (!flow) return [];
+    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
 
-    const nodes: Node[] = [];
-    let idCounter = 0;
+    return React.useMemo(() => {
+        if (!flow) return [];
 
-    const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
-    const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
+        // @ts-ignore
+        const nodes: Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] = [];
+        let idCounter = 0;
 
-    const getFunctionDefinitionCached = (
-        id: Scalars['FunctionDefinitionID']['output'],
-        cache = functionCache,
-    ) => {
-        if (!cache.has(id)) {
-            cache.set(id, functionService.getById(id));
-        }
-        return cache.get(id);
-    };
+        const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
+        const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
-    const getDataTypeCached = (
-        type: DataTypeIdentifier,
-        cache = dataTypeCache,
-    ) => {
-        if (!cache.has(type)) {
-            cache.set(type, dataTypeService.getDataType(type));
-        }
-        return cache.get(type);
-    };
+        const getFunctionDefinitionCached = (
+            id: Scalars['FunctionDefinitionID']['output'],
+            cache = functionCache,
+        ) => {
+            if (!cache.has(id)) {
+                cache.set(id, functionService.getById(id));
+            }
+            return cache.get(id);
+        };
 
-    // Global, strictly increasing group-id used to build the scope PATH ([0], [0,1], [0,2], [0,2,3], ...)
-    let globalScopeId = 0;
-    const nextScopeId = () => ++globalScopeId;
+        const getDataTypeCached = (
+            type: DataTypeIdentifier,
+            cache = dataTypeCache,
+        ) => {
+            if (!cache.has(type)) {
+                cache.set(type, dataTypeService.getDataType(type));
+            }
+            return cache.get(type);
+        };
 
-    // Global, strictly increasing node index across the entire flow (only real nodes)
-    let globalNodeIndex = 0;
+        // Global, strictly increasing group-id used to build the scope PATH ([0], [0,1], [0,2], [0,2,3], ...)
+        let globalScopeId = 0;
+        const nextScopeId = () => ++globalScopeId;
 
-    //trigger node
-    nodes.push({
-        id: `${flow.id}`,
-        type: "trigger",
-        position: { x: 0, y: 0 },
-        draggable: false,
-        data: {
-            instance: flow,
-            flowId,
-        }
-    })
+        // Global, strictly increasing node index across the entire flow (only real nodes)
+        let globalNodeIndex = 0;
 
-
-    const traverse = (
-        fn: NodeFunctionView,
-        isParameter = false,
-        parentId?: string,
-        depth: number = 0,
-        scopePath: number[] = [0],
-        parentGroup?: string,
-        fnCache = functionCache,
-        dtCache = dataTypeCache,
-    ) => {
-        const id = `${fn.id}-${idCounter++}`;
-        const index = ++globalNodeIndex; // global node level
-
+        //trigger node
         nodes.push({
-            id,
-            type: bestMatchValue(packageNodes, fn.functionDefinition?.identifier!!),
-            position: { x: 0, y: 0 },
+            id: `${flow.id}`,
+            type: "trigger",
+            position: {x: 0, y: 0},
             draggable: false,
-            parentId: parentGroup,
-            extent: parentGroup ? "parent" : undefined,
             data: {
-                instance: fn,
-                isParameter,
+                instance: flow,
                 flowId,
-                linkingId: isParameter ? parentId : undefined,
-                scope: scopePath,   // scope is now a PATH (number[])
-                depth,              // structural depth (0 at root, +1 per group)
-                index,              // global node level
-            },
-        });
+            }
+        })
 
-        if (!fn.nextNodeId && !isParameter) {
+
+        const traverse = (
+            node: NodeFunction,
+            isParameter = false,
+            parentId?: string,
+            depth: number = 0,
+            scopePath: number[] = [0],
+            parentGroup?: string,
+            fnCache = functionCache,
+            dtCache = dataTypeCache,
+        ) => {
+            const id = `${node.id}-${idCounter++}`;
+            const index = ++globalNodeIndex; // global node level
+
             nodes.push({
-                id: `${id}-suggestion`,
-                type: "suggestion",
-                position: { x: 0, y: 0 },
+                id,
+                type: bestMatchValue(packageNodes, node.functionDefinition?.identifier!!),
+                position: {x: 0, y: 0},
                 draggable: false,
-                extent: parentGroup ? "parent" : undefined,
                 parentId: parentGroup,
+                extent: parentGroup ? "parent" : undefined,
                 data: {
-                    flowId: flowId,
-                    parentFunction: fn,
+                    nodeId: node.id,
+                    isParameter,
+                    flowId: flowId!!,
+                    linkingId: isParameter ? parentId : undefined,
+                    scope: scopePath,   // scope is now a PATH (number[])
+                    depth,              // structural depth (0 at root, +1 per group)
+                    index,              // global node level
                 },
             });
-        }
 
-        const definition = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache);
+            const definition = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache);
 
-        fn.parameters?.forEach((param) => {
-            const paramType = definition?.parameterDefinitions!!.find(p => p.id == param.runtimeParameter?.id)?.dataTypeIdentifier;
-            const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
+            node.parameters?.nodes?.forEach((param) => {
+                const paramType = definition?.parameterDefinitions!!.find(p => p.id == param?.runtimeParameter?.id)?.dataTypeIdentifier;
+                const paramDataType = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
-            if (paramDataType?.variant === "NODE") {
-                if (param.value && param.value instanceof NodeFunctionView) {
-                    const groupId = `${id}-group-${idCounter++}`;
+                if (paramDataType?.variant === "NODE") {
+                    if (param?.value && param.value.__typename === "NodeFunctionIdWrapper") {
+                        const groupId = `${id}-group-${idCounter++}`;
 
-                    // New group: extend scope PATH with a fresh segment and increase depth.
-                    const childScopePath = [...scopePath, nextScopeId()];
+                        // New group: extend scope PATH with a fresh segment and increase depth.
+                        const childScopePath = [...scopePath, nextScopeId()];
 
-                    nodes.push({
-                        id: groupId,
-                        type: "group",
-                        position: { x: 0, y: 0 },
-                        draggable: false,
-                        parentId: parentGroup,
-                        extent: parentGroup ? "parent" : undefined,
-                        data: {
-                            isParameter: true,
-                            linkingId: id,
-                            flowId,
-                            depth: depth + 1,
-                            scope: childScopePath,
-                        },
-                    });
+                        const hash = md5(`${id}-param-${JSON.stringify(param)}`)
+                        const hashToHue = (md5: string): number => {
+                            // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                            const int = parseInt(md5.slice(0, 8), 16)
+                            return int % 360
+                        }
 
-                    // Child function inside the group uses the group's depth and scope PATH.
-                    traverse(param.value as NodeFunctionView, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
+                        nodes.push({
+                            id: groupId,
+                            type: "group",
+                            position: {x: 0, y: 0},
+                            draggable: false,
+                            parentId: parentGroup,
+                            extent: parentGroup ? "parent" : undefined,
+                            data: {
+                                isParameter: true,
+                                linkingId: id,
+                                flowId: flowId!!,
+                                depth: depth + 1,
+                                scope: childScopePath,
+                                color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                            },
+                        });
+
+                        // Child function inside the group uses the group's depth and scope PATH.
+                        traverse(flowService.getNodeById(flowId, param.value.id)!, false, undefined, depth + 1, childScopePath, groupId, fnCache, dtCache);
+                    }
+                } else if (param?.value && param.value.__typename === "NodeFunctionIdWrapper") {
+                    // Functions passed as non-NODE parameters live in the same depth/scope PATH.
+                    traverse(flowService.getNodeById(flowId, param.value.id)!, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
                 }
-            } else if (param.value && param.value instanceof NodeFunctionView) {
-                // Functions passed as non-NODE parameters live in the same depth/scope PATH.
-                traverse(param.value as NodeFunctionView, true, id, depth, scopePath, parentGroup, fnCache, dtCache);
+            });
+
+            if (node.nextNodeId) {
+                // Linear chain continues in the same depth/scope PATH.
+                traverse(flowService.getNodeById(flow.id, node.nextNodeId)!!, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
             }
-        });
+        };
 
-        if (fn.nextNodeId) {
-            // Linear chain continues in the same depth/scope PATH.
-            traverse(flow.getNodeById(fn.nextNodeId!!)!!, false, undefined, depth, scopePath, parentGroup, fnCache, dtCache);
+        // Root lane: depth 0, scope path [0]
+        if (flow.startingNodeId) {
+            traverse(flowService.getNodeById(flow.id, flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
         }
-    };
-
-    // Root lane: depth 0, scope path [0]
-    if (flow.startingNodeId) {
-        traverse(flow.getNodeById(flow.startingNodeId)!!, false, undefined, 0, [0], undefined, functionCache, dataTypeCache);
-    } else {
-        nodes.push({
-            id: `${flow.id}-suggestion`,
-            type: "suggestion",
-            position: { x: 0, y: 0 },
-            draggable: false,
-            extent: undefined,
-            data: {
-                flowId: flowId,
-                parentFunction: undefined,
-            },
-        });
-    }
-    return nodes;
+        return nodes;
+    }, [flow, flowStore, functionStore, dataTypeStore])
 };

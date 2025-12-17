@@ -1,235 +1,220 @@
-import {useService, useStore} from "../../utils/contextStore";
+import {useService, useStore} from "../../utils";
 import {DFlowReactiveService} from "./DFlow.service";
 import {Edge} from "@xyflow/react";
-import {NodeFunctionView} from "./DFlow.view";
-import {DFlowFunctionReactiveService} from "./function/DFlowFunction.service";
-import {DFlowDataTypeReactiveService} from "./data-type/DFlowDataType.service";
+import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import React from "react";
-import type {DataTypeIdentifier, DataTypeVariant, Flow, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {md5} from "js-md5";
+import {DFlowEdgeDataProps} from "./DFlowEdge";
 
-// Deine Primärfarbe als Start, danach harmonisch verteilt
 export const FLOW_EDGE_RAINBOW: string[] = [
-    '#70ffb2', // 0 – Primary (Grün)
-    '#70e2ff', // 1 – Cyan
-    '#709aff', // 2 – Blau
-    '#a170ff', // 3 – Violett
-    '#f170ff', // 4 – Magenta
-    '#ff70b5', // 5 – Pink/Rot
-    '#ff7070', // 6 – Orange-Rot
-    '#fff170', // 7 – Gelb
+    'rgba(255, 255, 255, 0.25)',    // rot
 ];
 
-export const useFlowEdges = (flowId: Flow['id']): Edge[] => {
+// @ts-ignore
+export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
-    const functionService = useService(DFlowFunctionReactiveService);
-    const dataTypeService = useService(DFlowDataTypeReactiveService);
-    const flow = flowService.getById(flowId);
     const flowStore = useStore(DFlowReactiveService)
+    const functionService = useService(DFlowFunctionReactiveService);
     const functionStore = useStore(DFlowFunctionReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService);
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
-    if (!flow) return [];
+    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
 
-    /* ------------------------------------------------------------------ */
-    const edges: Edge[] = [];
+    return React.useMemo(() => {
+        if (!flow) return [];
 
-    /** merkt sich für jede Function-Card die Gruppen-IDs,
-     *  **für die wirklich ein Funktions-Wert existiert**      */
-    const groupsWithValue = new Map<string, string[]>();
+        // @ts-ignore
+        const edges: Edge<DFlowEdgeDataProps>[] = [];
 
-    let idCounter = 0;              // globale, fortlaufende Id-Vergabe
+        /** merkt sich für jede Function-Card die Gruppen-IDs,
+         *  **für die wirklich ein Funktions-Wert existiert**      */
+        const groupsWithValue = new Map<string, string[]>();
 
-    const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
-    const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
+        let idCounter = 0;              // globale, fortlaufende Id-Vergabe
 
-    const getFunctionDefinitionCached = (
-        id: Scalars['FunctionDefinitionID']['output'],
-        cache = functionCache,
-    ) => {
-        if (!cache.has(id)) {
-            cache.set(id, functionService.getById(id));
-        }
-        return cache.get(id);
-    };
+        const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
+        const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
 
-    const getDataTypeCached = (
-        type: DataTypeIdentifier,
-        cache = dataTypeCache,
-    ) => {
-        if (!cache.has(type)) {
-            cache.set(type, dataTypeService.getDataType(type));
-        }
-        return cache.get(type);
-    };
+        const getFunctionDefinitionCached = (
+            id: Scalars['FunctionDefinitionID']['output'],
+            cache = functionCache,
+        ) => {
+            if (!cache.has(id)) {
+                cache.set(id, functionService.getById(id));
+            }
+            return cache.get(id);
+        };
 
-    /* ------------------------------------------------------------------ */
-    const traverse = (
-        fn: NodeFunctionView,
-        parentFnId?: string,        // Id der *Function-Card* des Aufrufers
-        level = 0,                  // Tiefe ⇒ Farbe aus dem Rainbow-Array,
-        fnCache = functionCache,
-        dtCache = dataTypeCache,
-    ): string => {
+        const getDataTypeCached = (
+            type: DataTypeIdentifier,
+            cache = dataTypeCache,
+        ) => {
+            if (!cache.has(type)) {
+                cache.set(type, dataTypeService.getDataType(type));
+            }
+            return cache.get(type);
+        };
 
-        /* ------- Id der aktuellen Function-Card im Diagramm ---------- */
-        const fnId = `${fn.id}-${idCounter++}`;
+        const traverse = (
+            node: NodeFunction,
+            parentNode?: NodeFunction,
+            parentNodeId?: string,
+            level = 0,
+            fnCache = functionCache,
+            dtCache = dataTypeCache,
+        ): string => {
 
-        if (idCounter == 1) {
-            // erste Function-Card → Verbindung Trigger → Function
-            edges.push({
-                id: `trigger-${fnId}-next`,
-                source: flow.id as string,    // Handle-Bottom des Trigger-Nodes
-                target: fnId,       // Handle-Top der Function-Card
-                data: {
-                    color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                    isParameter: false
-                },
-                deletable: false,
-                selectable: false,
-            });
-        }
+            const fnId = `${node.id}-${idCounter++}`;
 
-        /* ------- vertikale Kante (nextNode) -------------------------- */
-        if (parentFnId) {
-            const startGroups = groupsWithValue.get(parentFnId) ?? [];
-
-            if (startGroups.length > 0) {
-                startGroups.forEach((gId, idx) => edges.push({
-                    id: `${gId}-${fnId}-next-${idx}`,
-                    source: gId,           // Handle-Bottom der Group-Card
-                    target: fnId,          // Handle-Top der Function-Card
-                    data: {
-                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isParameter: false
-                    },
-                    deletable: false,
-                    selectable: false,
-                }));
-            } else {
+            if (idCounter == 1) {
                 edges.push({
-                    id: `${parentFnId}-${fnId}-next`,
-                    source: parentFnId,    // Handle-Bottom der Function-Card
-                    target: fnId,          // Handle-Top der Function-Card
+                    id: `trigger-${fnId}-next`,
+                    source: flow.id as string,
+                    target: fnId,
                     data: {
                         color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isParameter: false
+                        type: 'default',
+                        flowId: flowId,
+                        parentNodeId: parentNode?.id
                     },
                     deletable: false,
                     selectable: false,
                 });
             }
-        }
 
-        /* ------- horizontale Kanten für Parameter -------------------- */
-        fn.parameters?.forEach((param) => {
-            const val = param.value;
-            const def = getFunctionDefinitionCached(fn.functionDefinition?.id!!, fnCache)
-                ?.parameterDefinitions?.find(p => p.id === param.id);
-            const paramType = def?.dataTypeIdentifier;
-            const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
+            if (parentNodeId) {
+                const startGroups = groupsWithValue.get(parentNodeId) ?? [];
 
-            if (!val) return
-
-            /* --- NODE-Parameter → Group-Card ------------------------- */
-            if (paramDT?.variant === "NODE") {
-                const groupId = `${fnId}-group-${idCounter++}`;
-
-                /* Verbindung Gruppe  → Function-Card (horizontal)       */
-                edges.push({
-                    id: `${fnId}-${groupId}-param-${param.id}`,
-                    source: fnId,        // FunctionCard (Quelle)
-                    target: groupId,     // GroupCard (Ziel – hat Top: target)
-                    deletable: false,
-                    selectable: false,
-                    label: def?.names?.nodes!![0]?.content ?? param.id,
-                    data: {
-                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isParameter: false,
-                    },
-                });
-
-                /* existiert ein Funktions-Wert für dieses Param-Feld?   */
-                if (val && val instanceof NodeFunctionView) {
-                    /* merken: diese Group-Card besitzt Content – das ist
-                       später Startpunkt der next-Kante                   */
-                    (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
-                        groupsWithValue.get(fnId)!))
-                        .push(groupId);
-
-                    /* rekursiv Funktions-Ast innerhalb der Gruppe       */
-                    traverse(param.value as NodeFunctionView,
-                        undefined,
-                        level + 1,
-                        fnCache,
-                        dtCache);
+                if (startGroups.length > 0) {
+                    startGroups.forEach((gId, idx) => edges.push({
+                        id: `${gId}-${fnId}-next-${idx}`,
+                        source: gId,
+                        target: fnId,
+                        data: {
+                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                            type: 'default',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
+                        },
+                        deletable: false,
+                        selectable: false,
+                    }));
+                } else {
+                    edges.push({
+                        id: `${parentNodeId}-${fnId}-next`,
+                        source: parentNodeId,
+                        target: fnId,
+                        data: {
+                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                            type: 'default',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
+                        },
+                        deletable: false,
+                        selectable: false,
+                    });
                 }
             }
 
-            /* --- anderer Parameter, der selbst eine Function hält ---- */
-            else if (val && val instanceof NodeFunctionView) {
-                const subFnId = traverse(param.value as NodeFunctionView,
-                    undefined,
-                    level + 1,
-                    fnCache,
-                    dtCache);
+            node.parameters?.nodes?.forEach((param) => {
+                const val = param?.value;
+                const def = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache)
+                    ?.parameterDefinitions?.find(p => p.id === param?.id);
+                const paramType = def?.dataTypeIdentifier;
+                const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
 
-                edges.push({
-                    id: `${subFnId}-${fnId}-param-${param.id}`,
-                    source: subFnId,
-                    target: fnId,
-                    targetHandle: `param-${param.id}`,
-                    animated: true,
-                    deletable: false,
-                    selectable: false,
-                    data: {
-                        color: FLOW_EDGE_RAINBOW[(level + 1) % FLOW_EDGE_RAINBOW.length],
-                        isParameter: true
-                    },
-                });
+                if (!val) return
+
+                if (paramDT?.variant === "NODE") {
+                    const groupId = `${fnId}-group-${idCounter++}`;
+                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
+                    const hashToHue = (md5: string): number => {
+                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                        const int = parseInt(md5.slice(0, 8), 16)
+                        return int % 360
+                    }
+
+                    edges.push({
+                        id: `${fnId}-${groupId}-param-${param.id}`,
+                        source: fnId,
+                        target: groupId,
+                        deletable: false,
+                        selectable: false,
+                        animated: true,
+                        label: def?.names?.nodes!![0]?.content ?? param.id,
+                        data: {
+                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                            type: 'group',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
+                        },
+                    });
+
+
+                    if (val && val.__typename === "NodeFunctionIdWrapper") {
+
+                        (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
+                            groupsWithValue.get(fnId)!))
+                            .push(groupId);
+
+                        traverse(
+                            flowService.getNodeById(flowId, val.id)!,
+                            node,
+                            undefined,
+                            level + 1,
+                            fnCache,
+                            dtCache
+                        );
+                    }
+                } else if (val && val.__typename === "NodeFunctionIdWrapper") {
+                    const subFnId = traverse(
+                        flowService.getNodeById(flowId, val.id)!,
+                        node,
+                        undefined,
+                        level + 1,
+                        fnCache,
+                        dtCache
+                    );
+
+                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
+                    const hashToHue = (md5: string): number => {
+                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                        const int = parseInt(md5.slice(0, 8), 16)
+                        return int % 360
+                    }
+
+                    edges.push({
+                        id: `${subFnId}-${fnId}-param-${param.id}`,
+                        source: subFnId,
+                        target: fnId,
+                        targetHandle: `param-${param.id}`,
+                        animated: true,
+                        deletable: false,
+                        selectable: false,
+                        data: {
+                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                            type: 'parameter',
+                            flowId: flowId,
+                            parentNodeId: parentNode?.id
+                        },
+                    });
+                }
+            });
+
+            if (node.nextNodeId) {
+                traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
             }
-        });
 
-        /* ------- Rekursion auf nextNode ------------------------------ */
-        if (fn.nextNodeId) {
-            traverse(flow.getNodeById(fn.nextNodeId!!)!!, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
-        } else {
-            // letzte Function-Card im Ast → Add-new-node wie *normale* nextNode behandeln
-            const suggestionNodeId = `${fnId}-suggestion`;
-            const startGroups = groupsWithValue.get(fnId) ?? [];
+            return fnId;
+        };
 
-            if (startGroups.length > 0) {
-                startGroups.forEach((gId, idx) => edges.push({
-                    id: `${gId}-${suggestionNodeId}-next-${idx}`,
-                    source: gId,                  // wie bei echter nextNode von Group-Card starten
-                    target: suggestionNodeId,     // Ziel ist die Suggestion-Card
-                    data: {
-                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isSuggestion: true,
-                    },
-                    deletable: false,
-                    selectable: false,
-                }));
-            } else {
-                edges.push({
-                    id: `${fnId}-${suggestionNodeId}-next`,
-                    source: fnId,                 // Handle-Bottom der Function-Card
-                    target: suggestionNodeId,     // Handle-Top der Suggestion-Card
-                    data: {
-                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
-                        isSuggestion: true,
-                    },
-                    deletable: false,
-                    selectable: false,
-                });
-            }
+        if (flow.startingNodeId) {
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, undefined, 0, functionCache, dataTypeCache);
         }
 
-        return fnId;
-    };
-
-    if (flow.startingNodeId) {
-        traverse(flow.getNodeById(flow.startingNodeId)!!, undefined, 0, functionCache, dataTypeCache);
-    }
-
-    return React.useMemo(() => edges, [flowStore, functionStore, dataTypeStore, edges]);
+        return edges
+    }, [flow, flowStore, functionStore, dataTypeStore]);
 };

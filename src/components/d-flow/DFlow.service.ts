@@ -1,25 +1,209 @@
-import {FlowView} from "./DFlow.view";
-import {ReactiveArrayService} from "../../utils/reactiveArrayService";
-import type {
+import {ReactiveArrayService} from "../../utils";
+import {
+    DataTypeIdentifier,
+    DataTypeIdentifierInput,
     Flow,
+    FlowInput,
+    FlowSetting,
+    LiteralValue,
     NamespacesProjectsFlowsCreateInput,
-    NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload
+    NamespacesProjectsFlowsCreatePayload,
+    NamespacesProjectsFlowsDeleteInput,
+    NamespacesProjectsFlowsDeletePayload,
+    NamespacesProjectsFlowsUpdateInput,
+    NamespacesProjectsFlowsUpdatePayload,
+    NodeFunction,
+    NodeFunctionIdWrapper,
+    NodeParameter,
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
 
-export abstract class DFlowReactiveService extends ReactiveArrayService<FlowView> {
+export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
 
-    //TODO: inject UI error handler for toasts
-    //inject: namespaceId and projectId because the runtimes query needs it
-
-    getById(id: Flow['id']): FlowView | undefined {
+    getById(id: Flow['id']): Flow | undefined {
         return this.values().find(value => value.id === id);
     }
 
-    /** Creates a new flow. */
+    protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {
+        if (parameter?.value?.__typename === "NodeFunctionIdWrapper") {
+            const parameterNode = flow?.nodes?.nodes?.find(n => n?.id === (parameter.value as NodeFunction)?.id)
+            if (parameterNode) {
+                flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== (parameter.value as NodeFunction)?.id)
+                let nextNodeId = parameterNode.nextNodeId
+                while (nextNodeId) {
+                    const nextNode = flow!.nodes!.nodes!.find(n => n?.id === nextNodeId)
+                    if (nextNode) {
+                        flow!.nodes!.nodes = flow!.nodes!.nodes!.filter(n => n?.id !== nextNodeId)
+                        nextNodeId = nextNode.nextNodeId
+                    } else {
+                        nextNodeId = null
+                    }
+                }
+                parameterNode.parameters?.nodes?.forEach(p => {
+                    this.removeParameterNode(flow, p!!)
+                })
+            }
+        }
+    }
+
+    getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
+        return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
+    }
+
+    getPayloadById(flowId: Flow['id']): FlowInput | undefined {
+        const flow = this.getById(flowId)
+
+        const getDataTypeIdentifierPayload = (identifier: DataTypeIdentifier): DataTypeIdentifierInput => {
+            return {
+                ...(identifier?.dataType ? {
+                    dataTypeId: identifier?.dataType?.id
+                } : {}),
+                ...(identifier?.genericKey ? {
+                    genericKey: identifier?.genericKey
+                } : {}),
+                ...(identifier?.genericType ? {
+                    genericType: {
+                        dataTypeId: identifier?.genericType?.dataType?.id!,
+                        genericMappers: identifier?.genericType?.genericMappers?.map(genericMap => ({
+                            target: genericMap.target!,
+                            sourceDataTypeIdentifiers: genericMap.sourceDataTypeIdentifiers?.map(getDataTypeIdentifierPayload) ?? []
+                        })) ?? []
+                    }
+                } : {})
+            }
+        }
+
+        return {
+            name: flow?.name!,
+            type: flow?.type?.id!,
+            settings: flow?.settings?.nodes?.map(setting => {
+                return {
+                    flowSettingIdentifier: setting?.flowSettingIdentifier!,
+                    value: setting?.value!,
+                }
+            }),
+            nodes: flow?.nodes?.nodes?.map(node => {
+                return {
+                    id: node?.id!,
+                    nextNodeId: node?.nextNodeId!,
+                    parameters: node?.parameters?.nodes?.map(parameter => {
+                        return {
+                            runtimeParameterDefinitionId: parameter?.runtimeParameter?.id!,
+                            value: parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
+                                nodeFunctionId: parameter.value.id!
+                            } : parameter?.value?.__typename === "LiteralValue" ? {
+                                literalValue: parameter.value.value!
+                            } : {
+                                referenceValue: {
+                                    dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
+                                    depth: (parameter?.value as ReferenceValue).depth!,
+                                    node: (parameter?.value as ReferenceValue).node!,
+                                    nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
+                                    referencePath: (parameter?.value as ReferenceValue).referencePath!,
+                                    scope: (parameter?.value as ReferenceValue).scope!,
+                                }
+                            },
+                        }
+                    }) ?? [],
+                    runtimeFunctionId: node?.functionDefinition?.runtimeFunctionDefinition?.id!
+                }
+            }) ?? [],
+            startingNodeId: flow?.startingNodeId!,
+        }
+    }
+
+    async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
+        const flow = this.getById(flowId)
+        const node = this.getNodeById(flowId, nodeId)
+        const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow || !node) return
+
+        flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== nodeId)
+        node.parameters?.nodes?.forEach(p => this.removeParameterNode(flow, p!!))
+
+        if (previousNodes) {
+            previousNodes.nextNodeId = node.nextNodeId
+        } else {
+            flow.startingNodeId = node.nextNodeId ?? undefined
+        }
+
+        this.set(index, flow)
+    }
+
+    async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
+
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined
+
+        if (!flow || (parentNodeId && !parentNode)) return
+
+        const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+        const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+        const addingNode: NodeFunction = {
+            ...nextNode,
+            id: nextNodeId,
+        }
+
+        if (parentNode && parentNode.nextNodeId) {
+            addingNode.nextNodeId = parentNode.nextNodeId
+        } else if (!parentNode && flow.startingNodeId) {
+            addingNode.nextNodeId = flow.startingNodeId
+        }
+
+        flow.nodes?.nodes?.push(addingNode)
+
+        if (parentNode) {
+            parentNode.nextNodeId = addingNode.id
+        } else {
+            flow.startingNodeId = addingNode.id
+        }
+
+        this.set(index, flow)
+    }
+
+    async setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): Promise<void> {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        const setting = flow.settings?.nodes?.find(s => s?.id === settingId)
+        if (!setting) return
+        setting.value = value
+        this.set(index, flow)
+    }
+
+    async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
+        const flow = this.getById(flowId)
+        const index = this.values().findIndex(f => f.id === flowId)
+        if (!flow) return
+        const node = this.getNodeById(flowId, nodeId)
+        if (!node) return
+        const parameter = node.parameters?.nodes?.find(p => p?.id === parameterId)
+        if (!parameter) return
+        this.removeParameterNode(flow, parameter)
+        if (value?.__typename === "NodeFunction") {
+            const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
+            const addingIdValue: NodeFunction = {
+                ...value,
+                id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
+            }
+            flow.nodes?.nodes?.push(addingIdValue)
+            parameter.value = {
+                id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`,
+                __typename: "NodeFunctionIdWrapper"
+            } as NodeFunctionIdWrapper
+        } else {
+            parameter.value = value as LiteralValue | ReferenceValue
+        }
+        this.set(index, flow)
+    }
+
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>
-    /** Deletes a namespace project. */
+
     abstract flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined>
+
+    abstract flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined>
 }
 

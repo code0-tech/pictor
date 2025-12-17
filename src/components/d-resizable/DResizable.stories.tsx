@@ -2,41 +2,31 @@ import {Meta} from "@storybook/react-vite";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResizable";
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
-import {Button} from "../button/Button";
-import {IconDatabase, IconHierarchy3, IconSettings, IconTicket} from "@tabler/icons-react";
-import {Flex} from "../flex/Flex";
-import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
-import {FunctionDefinitionView} from "../d-flow/function/DFlowFunction.view";
-import {useReactiveArrayService} from "../../utils/reactiveArrayService";
+import {IconDatabase, IconFile, IconMessageChatbot} from "@tabler/icons-react";
+import {useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DataTypeView} from "../d-flow/data-type/DFlowDataType.view";
-import {DFlowDataTypeReactiveService} from "../d-flow/data-type/DFlowDataType.service";
-import {DFlowFunctionReactiveService} from "../d-flow/function/DFlowFunction.service";
-import {DFlowReactiveService} from "../d-flow/DFlow.service";
-import {DFlowSuggestion} from "../d-flow/suggestion/DFlowSuggestion.view";
-import {DFlowReactiveSuggestionService} from "../d-flow/suggestion/DFlowSuggestion.service";
-import {FlowView} from "../d-flow/DFlow.view";
-import {ContextStoreProvider} from "../../utils/contextStore";
-import {DFlowTabs} from "../d-flow/tab/DFlowTabs";
-import {DFlowTypeReactiveService} from "../d-flow/type/DFlowType.service";
-import {FlowTypeView} from "../d-flow/type/DFlowType.view";
+import {ContextStoreProvider} from "../../utils";
+import {DFlowTabs} from "../d-flow-file";
 import DataTypesData from "./data_types.json";
 import FunctionsData from "./runtime_functions.json";
 import FlowTypeData from "./flow_types.json";
-import {useFlowNodes} from "../d-flow/DFlow.nodes.hook";
-import {useFlowEdges} from "../d-flow/DFlow.edges.hook";
-import {DFlow} from "../d-flow/DFlow";
-import {Background, BackgroundVariant} from "@xyflow/react";
-import {DFlowControl} from "../d-flow/control/DFlowControl";
-import {DFlowValidation} from "../d-flow/validation/DFlowValidation";
+import {DFlow, DFlowReactiveService} from "../d-flow";
 import {DLayout} from "../d-layout/DLayout";
-import {DFlowFolder} from "../d-flow/folder/DFlowFolder";
 import {
+    Flow,
     NamespacesProjectsFlowsCreateInput,
-    NamespacesProjectsFlowsCreatePayload, NamespacesProjectsFlowsDeleteInput, NamespacesProjectsFlowsDeletePayload
+    NamespacesProjectsFlowsCreatePayload,
+    NamespacesProjectsFlowsDeleteInput,
+    NamespacesProjectsFlowsDeletePayload, NamespacesProjectsFlowsUpdateInput, NamespacesProjectsFlowsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
-import {DFlowExport} from "../d-flow/export/DFlowExport";
+import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
+import {Text} from "../text/Text";
+import {DFlowFolder} from "../d-flow-folder";
+import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
+import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
+import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -59,18 +49,20 @@ class DFlowReactiveServiceExtend extends DFlowReactiveService {
     flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined> {
         return Promise.resolve(undefined);
     }
-}
 
-class DFlowReactiveSuggestionServiceExtend extends DFlowReactiveSuggestionService {}
+    flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined> {
+        return Promise.resolve(undefined);
+    }
+}
 
 export const Dashboard = () => {
 
-    const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService)
+    const [fileTabsStore, fileTabsService] = useReactiveArrayService<FileTabsView, FileTabsService>(FileTabsService, [])
     // @ts-ignore
     const [dataTypeStore, dataTypeService] = useReactiveArrayService<DataTypeView, DFlowDataTypeReactiveService>(DFlowDataTypeReactiveService, [...DataTypesData.map(data => new DataTypeView(data))]);
     // @ts-ignore
     const [functionStore, functionService] = useReactiveArrayService<FunctionDefinitionView, DFlowFunctionReactiveService>(DFlowFunctionReactiveService, [...FunctionsData.map(data => new FunctionDefinitionView(data))]);
-    const [flowStore, flowService] = useReactiveArrayService<FlowView, DFlowReactiveService>(DFlowReactiveServiceExtend, [new FlowView({
+    const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveServiceExtend, [{
         id: "gid://sagittarius/Flow/1",
         type: {
             id: "gid://sagittarius/FlowType/867",
@@ -84,103 +76,60 @@ export const Dashboard = () => {
             }, {
                 flowSettingIdentifier: "HTTP_HOST",
             }]
+        },
+        nodes: {
+            nodes: []
         }
-    })]);
-    const [suggestionStore, suggestionService] = useReactiveArrayService<DFlowSuggestion, DFlowReactiveSuggestionService>(DFlowReactiveSuggestionServiceExtend);
+    }]);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
-    return <DFullScreen p={1}>
+    const [show, setShow] = React.useState(false);
+
+    return <DFullScreen>
         <ContextStoreProvider
-            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService], [suggestionStore, suggestionService]]}>
-            <DLayout leftContent={<Flex justify={"space-between"} style={{flexDirection: "column"}} h={"100%"}>
-                <Flex style={{flexDirection: "column", gap: ".5rem"}} h={"100%"}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"secondary"}>
-                                <IconHierarchy3 size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                All Flows
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"warning"}>
-                                <IconTicket size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Issue Management
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"} color={"info"}>
-                                <IconDatabase size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Database
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
+            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
+            <DLayout rightContent={
+                <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
+                        <IconFile size={16}/>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <IconDatabase size={16}/>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <IconMessageChatbot size={16}/>
+                    </Button>
                 </Flex>
-                <div>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button style={{aspectRatio: "50/50", width: "40px"}} variant={"outlined"}
-                                    color={"primary"}>
-                                <IconSettings size={12}/>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipPortal>
-                            <TooltipContent sideOffset={5.6} side={"left"}>
-                                Settings
-                            </TooltipContent>
-                        </TooltipPortal>
-                    </Tooltip>
-                </div>
-            </Flex>}>
-                <DLayout leftContent={<DFlowFolder flowId={"gid://sagittarius/Flow/1"}/>}>
-                    <DResizablePanelGroup direction={"horizontal"} autoSaveId={"1"}>
-                        <DResizablePanel>
-                            <FlowExample/>
-                        </DResizablePanel>
-                        <DResizableHandle/>
-                        <DResizablePanel>
-                            <DFlowTabs/>
-                        </DResizablePanel>
-                    </DResizablePanelGroup>
-                </DLayout>
+            } bottomContent={
+                <Flex p={0.35} style={{gap: "0.7rem"}}>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <Text>Logbook</Text>
+                    </Button>
+                    <Button variant={"none"} paddingSize={"xs"}>
+                        <Text>Problems</Text>
+                    </Button>
+                </Flex>
+            }>
+                <DResizablePanelGroup direction={"horizontal"}>
+                    <DResizablePanel id={"1"} order={1} p={1} defaultSize={15}>
+                        <DFlowFolder activeFlowId={"gid://sagittarius/Flow/1"}/>
+                    </DResizablePanel>
+                    <DResizableHandle/>
+                    <DResizablePanel id={"2"} order={2}>
+                        <DFlow flowId={"gid://sagittarius/Flow/1"}/>
+                    </DResizablePanel>
+                    {show && (
+                        <>
+                            <DResizableHandle/>
+                            <DResizablePanel id={"3"} order={3} defaultSize={25}>
+                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"}/>
+                            </DResizablePanel>
+                        </>
+                    )}
+                </DResizablePanelGroup>
             </DLayout>
         </ContextStoreProvider>
     </DFullScreen>
 
-}
-
-
-const FlowExample = () => {
-    const initialNodes = useFlowNodes("gid://sagittarius/Flow/1")
-    const initialEdges = useFlowEdges("gid://sagittarius/Flow/1")
-
-    return <DFlow
-        nodes={initialNodes}
-        edges={initialEdges}
-        fitView
-    >
-        <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-        <DFlowControl/>
-        <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
-        <DFlowExport flowId={"gid://sagittarius/Flow/1"}/>
-        {/*<DFlowViewportMiniMap/>*/}
-    </DFlow>
 }

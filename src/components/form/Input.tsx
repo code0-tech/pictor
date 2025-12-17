@@ -94,6 +94,16 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             ...rest
         } = props
 
+        const {
+            onFocus: userOnFocus,
+            onBlur: userOnBlur,
+            onKeyDown: userOnKeyDown,
+            onKeyDownCapture: userOnKeyDownCapture,
+            onChange: userOnChange,
+            onInput: userOnInput,
+            ...inputProps
+        } = rest
+
         const inputRef = ref || useRef<HTMLInputElement>(null)
         const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null)
         const syntaxRef = useRef<HTMLDivElement>(null)
@@ -112,6 +122,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const [isFocused, setIsFocused] = useState(false)
 
         const disabledOnValue = React.useMemo(() => disableOnValue(value), [value, disableOnValue])
+
+        const mergedInputProps = React.useMemo(
+            () => ({...inputProps, onChange: userOnChange, onInput: userOnInput}),
+            [inputProps, userOnChange, userOnInput],
+        )
 
         const normalizeTextValue = React.useCallback((rawValue: any): string => {
             const normalized = rawValue ?? ""
@@ -162,14 +177,14 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             if (!el || !formValidation?.setValue) return
 
             const handleChange = (event: any) => {
-                const nextValue = rest.type !== "checkbox" ? event.target.value : event.target.checked
+                const nextValue = inputProps.type !== "checkbox" ? event.target.value : event.target.checked
                 const validationValue = validationUsesSuggestions ? activeSuggestionsRef.current : nextValue
                 formValidation.setValue?.(validationValue)
             }
 
             el.addEventListener("change", handleChange)
             return () => el.removeEventListener("change", handleChange)
-        }, [formValidation?.setValue, inputRef, rest.type, validationUsesSuggestions])
+        }, [formValidation?.setValue, inputProps.type, inputRef, validationUsesSuggestions])
 
         useEffect(() => {
             if (!suggestions) return
@@ -257,7 +272,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         useEffect(() => {
             if (!formValidation?.setValue) return
 
-            const currentValue = rest.type !== "checkbox"
+            const currentValue = inputProps.type !== "checkbox"
                 ? normalizeTextValue(inputRef.current?.value ?? value)
                 : value
 
@@ -269,7 +284,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
             lastValidationValueRef.current = validationValue
             formValidation.setValue(validationValue)
-        }, [activeSuggestions, formValidation?.setValue, inputRef, normalizeTextValue, rest.type, validationUsesSuggestions, value])
+        }, [activeSuggestions, formValidation?.setValue, inputProps.type, inputRef, normalizeTextValue, validationUsesSuggestions, value])
 
         const focusInputCaretAtEnd = React.useCallback(() => {
             setTimeout(() => {
@@ -675,7 +690,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     setOpen(false)
                 }
             }
-        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, suggestions, syncSyntaxScroll, totalVisualLength, transformSyntaxWithAppliedParts, updateVisualSelectionRange])
+            userOnKeyDown?.(event)
+        }, [handleAtomicDeletion, mapRawIndexToVisualIndex, mapVisualIndexToRawIndex, normalizeSelectionForAtomicBlocks, open, suggestions, syncSyntaxScroll, totalVisualLength, transformSyntaxWithAppliedParts, updateVisualSelectionRange, userOnKeyDown])
 
         const handleKeyDownCapture = React.useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === " " || event.code === "Space") {
@@ -685,9 +701,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 // @ts-ignore -- nativeEvent may not exist in synthetic typing but is present at runtime
                 event.nativeEvent?.stopImmediatePropagation?.()
             }
-        }, [])
+            userOnKeyDownCapture?.(event)
+        }, [userOnKeyDownCapture])
 
-        const handleFocus = React.useCallback(() => {
+        const handleFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
             setIsFocused(true)
             requestAnimationFrame(() => {
                 updateVisualSelectionRange()
@@ -697,13 +714,15 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             if (suggestions && !open) {
                 setOpen(true)
             }
-        }, [open, suggestions, syncSyntaxScroll, updateVisualSelectionRange])
+            userOnFocus?.(event)
+        }, [open, suggestions, syncSyntaxScroll, updateVisualSelectionRange, userOnFocus])
 
-        const handleBlur = React.useCallback(() => {
+        const handleBlur = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
             setIsFocused(false)
             setVisualCaretIndex(null)
             setVisualSelectionRange(null)
-        }, [])
+            userOnBlur?.(event)
+        }, [userOnBlur])
 
         useEffect(() => {
             const target = inputRef.current
@@ -885,7 +904,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 <MenuTrigger asChild>
                     <input
                         ref={inputRef as LegacyRef<HTMLInputElement>}
-                        {...mergeCode0Props(`input__control ${transformSyntaxWithAppliedParts ? "input__control--syntax" : ""}`, rest)}
+                        {...mergeCode0Props(`input__control ${transformSyntaxWithAppliedParts ? "input__control--syntax" : ""}`, mergedInputProps)}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
                         onKeyDownCapture={handleKeyDownCapture}
@@ -923,7 +942,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     </InputSuggestionMenuContent>
                 </MenuPortal>
             </Menu>
-        ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, onSuggestionSelect, open, rest, suggestionsEmptyState, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
+        ), [applySuggestionValue, availableSuggestions, disabledOnValue, focusInputCaretAtEnd, handleBlur, handleFocus, handleKeyDown, handleKeyDownCapture, inputRef, mergedInputProps, onSuggestionSelect, open, suggestionsEmptyState, suggestionsFooter, suggestionsHeader, transformSyntaxWithAppliedParts])
 
         return (
             <>
@@ -949,7 +968,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                             onBlur={handleBlur}
                             onKeyDownCapture={handleKeyDownCapture}
                             onKeyDown={handleKeyDown}
-                            {...mergeCode0Props(`input__control ${transformSyntaxWithAppliedParts ? "input__control--syntax" : ""}`, rest)}
+                            {...mergeCode0Props(`input__control ${transformSyntaxWithAppliedParts ? "input__control--syntax" : ""}`, mergedInputProps)}
                         />
                     )}
 

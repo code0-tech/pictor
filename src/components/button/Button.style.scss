@@ -34,7 +34,7 @@
         }
       }
 
-      &:active, &:focus, &[aria-selected=true] {
+      &:active, &:focus, &[aria-selected=true], &[data-state=open] {
         @if ($color == variables.$primary) {
           border-color: rgba(variables.$secondary, 0.2);
         } @else {
@@ -51,7 +51,7 @@
         background: helpers.backgroundColor($color, 1.5);
       }
 
-      &:active, &:focus, &[aria-selected=true] {
+      &:active, &:focus, &[aria-selected=true], &[data-state=open] {
         background: helpers.backgroundColor($color, 2);
       }
     }

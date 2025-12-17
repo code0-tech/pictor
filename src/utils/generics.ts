@@ -1,5 +1,5 @@
-import {FunctionDefinitionView} from "../components/d-flow/function/DFlowFunction.view";
-import {DFlowDataTypeReactiveService} from "../components/d-flow/data-type/DFlowDataType.service";
+import {FunctionDefinitionView} from "../components/d-flow-function/DFlowFunction.view";
+import {DFlowDataTypeReactiveService} from "../components/d-flow-data-type/DFlowDataType.service";
 import type {
     DataType,
     DataTypeIdentifier,
@@ -7,13 +7,12 @@ import type {
     DataTypeRuleConnection,
     DataTypeRulesConfig,
     DataTypeRulesVariant,
-    DataTypeVariant,
+    DataTypeVariant, Flow,
     GenericCombinationStrategyType,
     GenericMapper,
     GenericType,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
-import {FlowView} from "../components/d-flow/DFlow.view";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 
@@ -23,7 +22,7 @@ type GenericMappingResult = Record<string, DataTypeIdentifier>;
 
 type GenericReplacement = DataTypeIdentifier | GenericMapper;
 
-type GenericMap = Map<string, GenericReplacement>;
+export type GenericMap = Map<string, GenericReplacement>;
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -375,12 +374,12 @@ export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeReactiveService,
-    flow?: FlowView
+    flow?: Flow
 ): GenericMap => {
     const genericMap: GenericMap = new Map();
-    const genericKeys = func.genericKeys ?? [];
+    const genericKeys = func?.genericKeys ?? [];
 
-    if (!func.parameterDefinitions || genericKeys.length <= 0) return genericMap;
+    if (!func?.parameterDefinitions || genericKeys.length <= 0) return genericMap;
 
     const genericKeySet = new Set(genericKeys);
 

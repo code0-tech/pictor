@@ -3,7 +3,7 @@
 import "./DFlowFolder.style.scss"
 import React from "react"
 import {Code0Component, mergeCode0Props, useService, useStore} from "../../utils"
-import {IconChevronDown, IconChevronRight, IconDots, IconFolder, IconFolderOpen} from "@tabler/icons-react"
+import {IconChevronDown, IconChevronRight, IconDots, IconFile, IconFolder, IconFolderOpen} from "@tabler/icons-react"
 import type {Flow, FlowType, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {DFlowReactiveService} from "../d-flow"
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
@@ -11,6 +11,7 @@ import {Flex} from "../flex/Flex"
 import {Text} from "../text/Text"
 import {Button} from "../button/Button"
 import {DFlowFolderContextMenu} from "./DFlowFolderContextMenu";
+import {md5} from "js-md5";
 
 
 export interface DFlowFolderProps {
@@ -19,6 +20,14 @@ export interface DFlowFolderProps {
     onDelete?: (flow: Flow) => void
     onCreate?: (name: string, type: FlowType['id']) => void
 }
+
+export type DFlowFolderHandle = {
+    openAll: () => void
+    closeAll: () => void
+    openActivePath: () => void
+}
+
+type OpenMode = "default" | "allOpen" | "allClosed" | "activePath"
 
 export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Component<HTMLDivElement>, "controls"> {
     name: string
@@ -30,12 +39,11 @@ export interface DFlowFolderGroupProps extends DFlowFolderProps, Omit<Code0Compo
 export interface DFlowFolderItemProps extends DFlowFolderProps, Code0Component<HTMLDivElement> {
     name: string
     path: string
-    icon?: React.ReactNode
     active?: boolean
     flow: Flow
 }
 
-export const DFlowFolder: React.FC<DFlowFolderProps> = (props) => {
+export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>((props, ref) => {
 
     const {activeFlowId} = props
 
@@ -110,6 +118,36 @@ export const DFlowFolder: React.FC<DFlowFolderProps> = (props) => {
         return segs.every((s, i) => activePathSegments[i] === s)
     }, [activePathSegments])
 
+    const [openMode, setOpenMode] = React.useState<OpenMode>("default")
+    const [resetEpoch, setResetEpoch] = React.useState(0)
+
+    const openAll = React.useCallback(() => {
+        setOpenMode("allOpen")
+        setResetEpoch(v => v + 1)
+    }, [])
+
+    const closeAll = React.useCallback(() => {
+        setOpenMode("allClosed")
+        setResetEpoch(v => v + 1)
+    }, [])
+
+    const openActivePath = React.useCallback(() => {
+        setOpenMode("activePath")
+        setResetEpoch(v => v + 1)
+    }, [])
+
+    React.useImperativeHandle(ref, () => ({
+        openAll,
+        closeAll,
+        openActivePath
+    }), [openAll, closeAll, openActivePath])
+
+    const computeDefaultOpen = React.useCallback((folderPath: string) => {
+        if (openMode === "allOpen") return true
+        if (openMode === "allClosed") return false
+        return isPrefixOfActive(folderPath)
+    }, [isPrefixOfActive, openMode])
+
     const renderChildren = React.useCallback((childrenMap: Record<string, TreeNode>) => {
         const nodes = Object.values(childrenMap)
 
@@ -123,10 +161,10 @@ export const DFlowFolder: React.FC<DFlowFolderProps> = (props) => {
             <>
                 {folders.map(folder => (
                     <DFlowFolderGroup
-                        key={folder.path}
+                        key={`${folder.path}-${resetEpoch}`}
                         name={folder.name}
                         flows={Object.values(folder.children).map(value => value.flow!!)}
-                        defaultOpen={isPrefixOfActive(folder.path)}
+                        defaultOpen={computeDefaultOpen(folder.path)}
                         {...props}
                     >
                         {renderChildren(folder.children)}
@@ -145,7 +183,7 @@ export const DFlowFolder: React.FC<DFlowFolderProps> = (props) => {
                 ))}
             </>
         )
-    }, [activeFlowId, isPrefixOfActive])
+    }, [activeFlowId, computeDefaultOpen, resetEpoch])
 
     return (
         <ScrollArea h={"100%"}>
@@ -160,7 +198,7 @@ export const DFlowFolder: React.FC<DFlowFolderProps> = (props) => {
         </ScrollArea>
     )
 
-}
+})
 
 export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
 
@@ -198,7 +236,14 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
 
 export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
 
-    const {name, path, flow, icon, active, ...rest} = props
+    const {name, path, flow, active, ...rest} = props
+
+    const colorHash = md5(path + name)
+    const hashToHue = (md5: string): number => {
+        // nimm z.B. 8 Hex-Zeichen = 32 Bit
+        const int = parseInt(md5.slice(0, 8), 16)
+        return int % 360
+    }
 
     return <DFlowFolderContextMenu contextData={{
         name: path,
@@ -206,7 +251,7 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
         type: "item"
     }} {...rest}>
         <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)}>
-            {icon ? <span className={"d-folder__item-icon"}>{icon}</span> : null}
+            <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
             <Text>{name}</Text>
         </div>
     </DFlowFolderContextMenu>

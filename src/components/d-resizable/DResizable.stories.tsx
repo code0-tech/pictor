@@ -184,7 +184,7 @@ const Folder = () => {
 
     return <DLayout topContent={
         <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
-            <Button paddingSize={"xxs"} variant={"filled"} color={"success"}>
+            <Button paddingSize={"xxs"} color={"success"}>
                 <Text>Create new flow</Text>
             </Button>
             <Flex style={{gap: "0.35rem"}}>
@@ -231,7 +231,12 @@ const Folder = () => {
         </Flex>
     }>
         <div style={{padding: "0.75rem"}}>
-            <DFlowFolder ref={ref} activeFlowId={"gid://sagittarius/Flow/1"}/>
+            <DFlowFolder onDelete={contextData => console.log(contextData)}
+                         onRename={contextData => console.log(contextData)}
+                         onCreate={type => console.log(type)}
+                         onSelect={(flow) => console.log("select", flow)}
+                         ref={ref}
+                         activeFlowId={"gid://sagittarius/Flow/1"}/>
         </div>
     </DLayout>
 }

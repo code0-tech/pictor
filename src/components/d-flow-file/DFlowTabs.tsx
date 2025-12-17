@@ -8,7 +8,7 @@ import {IconArrowDown, IconArrowUp, IconCornerDownLeft, IconDotsVertical, IconPl
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {DLayout} from "../d-layout/DLayout";
 import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 import {Card} from "../card/Card";
@@ -18,11 +18,13 @@ import {Spacing} from "../spacing/Spacing";
 
 export interface DFlowTabsProps {
     flowId: Flow['id']
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
 }
 
 export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
 
-    const {flowId} = props
+    const {flowId, namespaceId, projectId} = props
 
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
@@ -32,7 +34,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
     const flowTypeStore = useStore(DFlowTypeReactiveService)
     const id = React.useId()
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowStore])
+    const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowStore])
     const flowType = React.useMemo(() => flowTypeService.getById(flow?.type?.id!!), [flowTypeStore, flow])
     const activeTabId = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)?.id ?? fileTabsService.getActiveTab()?.id;

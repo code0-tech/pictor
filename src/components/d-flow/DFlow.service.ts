@@ -6,6 +6,8 @@ import {
     FlowInput,
     FlowSetting,
     LiteralValue,
+    Namespace,
+    NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
@@ -18,11 +20,15 @@ import {
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
+export type DFlowDependencies = {
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
+}
 
-export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
+export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DFlowDependencies> {
 
-    getById(id: Flow['id']): Flow | undefined {
-        return this.values().find(value => value.id === id);
+    getById(id: Flow['id'], dependencies?: DFlowDependencies): Flow | undefined {
+        return this.values(dependencies).find(value => value.id === id);
     }
 
     protected removeParameterNode(flow: Flow, parameter: NodeParameter): void {

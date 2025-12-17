@@ -4,16 +4,23 @@ import {Edge} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import React from "react";
-import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {
+    DataTypeIdentifier,
+    Flow,
+    Namespace,
+    NamespaceProject,
+    NodeFunction,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
 import {DFlowEdgeDataProps} from "./DFlowEdge";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
-    'rgba(255, 255, 255, 0.25)',    // rot
+    'rgba(255, 255, 255, 0.25)',
 ];
 
 // @ts-ignore
-export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => {
+export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService);
@@ -21,7 +28,7 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
+    const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore])
 
     return React.useMemo(() => {
         if (!flow) return [];
@@ -29,11 +36,9 @@ export const useFlowEdges = (flowId: Flow['id']): Edge<DFlowEdgeDataProps>[] => 
         // @ts-ignore
         const edges: Edge<DFlowEdgeDataProps>[] = [];
 
-        /** merkt sich für jede Function-Card die Gruppen-IDs,
-         *  **für die wirklich ein Funktions-Wert existiert**      */
         const groupsWithValue = new Map<string, string[]>();
 
-        let idCounter = 0;              // globale, fortlaufende Id-Vergabe
+        let idCounter = 0;
 
         const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
         const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();

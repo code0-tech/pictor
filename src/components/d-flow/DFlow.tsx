@@ -20,7 +20,7 @@ import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerC
 import {DFlowEdge} from "./DFlowEdge";
 import {DFlowPanelSize} from "../d-flow-panel";
 import {DFlowValidation} from "../d-flow-validation";
-import {Flow} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
 import {DFlowPanelControl} from "../d-flow-panel";
@@ -515,6 +515,8 @@ const getCachedLayoutElements = React.cache(getLayoutElements)
 
 export interface DFlowProps extends Code0ComponentProps {
     flowId: Flow['id']
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
 }
 
 export const DFlow: React.FC<DFlowProps> = (props) => {
@@ -525,7 +527,7 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 
 const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
-    const {flowId} = props
+    const {flowId, namespaceId, projectId} = props
     const nodeTypes = {
         default: DFlowFunctionDefaultCard,
         group: DFlowFunctionGroupCard,
@@ -537,8 +539,8 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
         default: DFlowEdge,
     }
 
-    const initialNodes = useFlowNodes(flowId)
-    const initialEdges = useFlowEdges(flowId)
+    const initialNodes = useFlowNodes(flowId, namespaceId, projectId)
+    const initialEdges = useFlowEdges(flowId, namespaceId, projectId)
     const [nodes, setNodes] = useNodesState<Node>([])
     const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
     const updateNodeInternals = useUpdateNodeInternals()

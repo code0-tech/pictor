@@ -3,7 +3,14 @@ import {DFlowReactiveService} from "./DFlow.service";
 import {Node} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import type {DataTypeIdentifier, Flow, NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {
+    DataTypeIdentifier,
+    Flow,
+    Namespace,
+    NamespaceProject,
+    NodeFunction,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {DFlowFunctionDefaultCardDataProps} from "../d-flow-function/DFlowFunctionDefaultCard";
 import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunctionSuggestionCard";
@@ -96,7 +103,7 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
 };
 
 // @ts-ignore
-export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] => {
+export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] => {
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
@@ -104,7 +111,7 @@ export const useFlowNodes = (flowId: Flow['id']): Node<DFlowFunctionDefaultCardD
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const dataTypeStore = useStore(DFlowDataTypeReactiveService);
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
+    const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore])
 
     return React.useMemo(() => {
         if (!flow) return [];

@@ -8,11 +8,10 @@ import {
     IconChevronRight,
     IconDots,
     IconFile,
-    IconFolder,
     IconFolderFilled,
     IconFolderOpen
 } from "@tabler/icons-react"
-import type {Flow, FlowType, Scalars} from "@code0-tech/sagittarius-graphql-types"
+import type {Flow, FlowType, Namespace, NamespaceProject, Scalars} from "@code0-tech/sagittarius-graphql-types"
 import {DFlowReactiveService} from "../d-flow"
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
 import {Flex} from "../flex/Flex"
@@ -28,6 +27,8 @@ import {md5} from "js-md5";
 
 export interface DFlowFolderProps {
     activeFlowId: Scalars["FlowID"]["output"]
+    namespaceId: Namespace['id']
+    projectId: NamespaceProject['id']
     onRename?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
     onDelete?: (contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData) => void
     onCreate?: (type: FlowType['id']) => void
@@ -58,7 +59,7 @@ export interface DFlowFolderItemProps extends DFlowFolderProps, Omit<Code0Compon
 
 export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>((props, ref) => {
 
-    const {activeFlowId} = props
+    const {activeFlowId, namespaceId, projectId} = props
 
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
@@ -74,7 +75,7 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
         p.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean)
 
     const flows = React.useMemo<Flow[]>(() => {
-        const raw = (flowService.values?.() ?? []) as Flow[]
+        const raw = (flowService.values?.({namespaceId, projectId}) ?? []) as Flow[]
         return raw.filter(f => !!f?.name)
     }, [flowStore])
 
@@ -261,7 +262,8 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
         flow: flow,
         type: "item"
     }} {...rest}>
-        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)} onClick={() => onSelect?.(flow)}>
+        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)}
+             onClick={() => onSelect?.(flow)}>
             <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
             <Text>{name}</Text>
         </div>

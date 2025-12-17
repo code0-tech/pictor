@@ -4,13 +4,14 @@ import {DFlowFolderItemPathInput} from "./DFlowFolderItemPathInput";
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 import {DFlowFolderContextMenuGroupData, DFlowFolderContextMenuItemData} from "./DFlowFolderContextMenu";
-import {DFlowFolderProps} from "./DFlowFolder";
 import {useForm} from "../form";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
 
-export interface DFlowFolderRenameDialogProps extends DFlowFolderProps {
+export interface DFlowFolderRenameDialogProps {
     contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData
     open?: boolean
     onOpenChange?: (open: boolean) => void
+    onRename?: (flow: Flow, newName: string) => void
 }
 
 export const DFlowFolderRenameDialog: React.FC<DFlowFolderRenameDialogProps> = (props) => {
@@ -35,8 +36,8 @@ export const DFlowFolderRenameDialog: React.FC<DFlowFolderRenameDialogProps> = (
         onSubmit: (values) => {
             if (props.contextData.type === "item") {
                 props.onRename?.(props.contextData.flow, values.path)
-            } else if (props.contextData.type === "group") {
-                props.contextData.flows.forEach(flow => {
+            } else if (props.contextData.type === "folder") {
+                props.contextData.flow.forEach(flow => {
                     const newName = flow.name?.replace(props.contextData.name, values.path) ?? flow.name
                     props.onRename?.(flow, newName!)
                 })
@@ -46,7 +47,6 @@ export const DFlowFolderRenameDialog: React.FC<DFlowFolderRenameDialogProps> = (
 
     return <Dialog open={renameDialogOpen} onOpenChange={(open) => {
         props.onOpenChange?.(open)
-        setRenameDialogOpen(open)
     }}>
         <DialogPortal>
             <DialogContent autoFocus showCloseButton

@@ -22,7 +22,7 @@ export const DFlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
                     </SegmentedControlItem>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent side={"bottom"}>
                         <TooltipArrow/>
                         <Text>Vertical layout</Text>
                     </TooltipContent>
@@ -35,7 +35,7 @@ export const DFlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
                     </SegmentedControlItem>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent side={"bottom"}>
                         <TooltipArrow/>
                         <Text>Horizontal layout</Text>
                     </TooltipContent>
@@ -48,7 +48,7 @@ export const DFlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
                     </SegmentedControlItem>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent side={"bottom"}>
                         <TooltipArrow/>
                         <Text>Manual layout</Text>
                     </TooltipContent>

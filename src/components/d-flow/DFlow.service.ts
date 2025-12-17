@@ -1,13 +1,21 @@
 import {ReactiveArrayService} from "../../utils";
-import type {
+import {
+    DataTypeIdentifier,
+    DataTypeIdentifierInput,
     Flow,
-    FlowSetting, LiteralValue,
+    FlowInput,
+    FlowSetting,
+    LiteralValue,
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload, NamespacesProjectsFlowsUpdateInput, NamespacesProjectsFlowsUpdatePayload,
-    NodeFunction, NodeFunctionIdWrapper,
-    NodeParameter, ReferenceValue
+    NamespacesProjectsFlowsDeletePayload,
+    NamespacesProjectsFlowsUpdateInput,
+    NamespacesProjectsFlowsUpdatePayload,
+    NodeFunction,
+    NodeFunctionIdWrapper,
+    NodeParameter,
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
 
@@ -43,6 +51,67 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
+    getPayloadById(flowId: Flow['id']): FlowInput | undefined {
+        const flow = this.getById(flowId)
+
+        const getDataTypeIdentifierPayload = (identifier: DataTypeIdentifier): DataTypeIdentifierInput => {
+            return {
+                ...(identifier?.dataType ? {
+                    dataTypeId: identifier?.dataType?.id
+                } : {}),
+                ...(identifier?.genericKey ? {
+                    genericKey: identifier?.genericKey
+                } : {}),
+                ...(identifier?.genericType ? {
+                    genericType: {
+                        dataTypeId: identifier?.genericType?.dataType?.id!,
+                        genericMappers: identifier?.genericType?.genericMappers?.map(genericMap => ({
+                            target: genericMap.target!,
+                            sourceDataTypeIdentifiers: genericMap.sourceDataTypeIdentifiers?.map(getDataTypeIdentifierPayload) ?? []
+                        })) ?? []
+                    }
+                } : {})
+            }
+        }
+
+        return {
+            name: flow?.name!,
+            type: flow?.type?.id!,
+            settings: flow?.settings?.nodes?.map(setting => {
+                return {
+                    flowSettingIdentifier: setting?.flowSettingIdentifier!,
+                    value: setting?.value!,
+                }
+            }),
+            nodes: flow?.nodes?.nodes?.map(node => {
+                return {
+                    id: node?.id!,
+                    nextNodeId: node?.nextNodeId!,
+                    parameters: node?.parameters?.nodes?.map(parameter => {
+                        return {
+                            runtimeParameterDefinitionId: parameter?.runtimeParameter?.id!,
+                            value: parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
+                                nodeFunctionId: parameter.value.id!
+                            } : parameter?.value?.__typename === "LiteralValue" ? {
+                                literalValue: parameter.value.value!
+                            } : {
+                                referenceValue: {
+                                    dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
+                                    depth: (parameter?.value as ReferenceValue).depth!,
+                                    node: (parameter?.value as ReferenceValue).node!,
+                                    nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
+                                    referencePath: (parameter?.value as ReferenceValue).referencePath!,
+                                    scope: (parameter?.value as ReferenceValue).scope!,
+                                }
+                            },
+                        }
+                    }) ?? [],
+                    runtimeFunctionId: node?.functionDefinition?.runtimeFunctionDefinition?.id!
+                }
+            }) ?? [],
+            startingNodeId: flow?.startingNodeId!,
+        }
+    }
 
     async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
@@ -132,7 +201,9 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow> {
     }
 
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>
+
     abstract flowDelete(payload: NamespacesProjectsFlowsDeleteInput): Promise<NamespacesProjectsFlowsDeletePayload | undefined>
+
     abstract flowUpdate(payload: NamespacesProjectsFlowsUpdateInput): Promise<NamespacesProjectsFlowsUpdatePayload | undefined>
 }
 

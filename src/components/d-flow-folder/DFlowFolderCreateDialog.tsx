@@ -7,10 +7,11 @@ import {Button} from "../button/Button";
 import {FlowType} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFolderItemPathInput} from "./DFlowFolderItemPathInput";
 
-export interface DFlowFolderCreateDialogProps extends DFlowFolderProps {
+export interface DFlowFolderCreateDialogProps {
     open?: boolean
     onOpenChange?: (open: boolean) => void
     flowTypeId: FlowType['id']
+    onCreate?: (name: string, type: FlowType['id']) => void
 }
 
 export const DFlowFolderCreateDialog: React.FC<DFlowFolderCreateDialogProps> = (props) => {

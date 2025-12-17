@@ -30,7 +30,7 @@
   }
 
   &[data-state=open] {
-    @include box.box(variables.$secondary);
+    @include box.boxActiveStyle(variables.$secondary);
     border: none;
   }
 
@@ -39,10 +39,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  &__status, &__item-icon {
-    color: variables.$white;
   }
 
   &__content {
@@ -82,8 +78,8 @@
       border: none;
     }
 
-    &[data-state=open] {
-      @include box.box(variables.$secondary);
+    &[data-state=open], &--active {
+      @include box.boxActiveStyle(variables.$secondary);
       border: none;
     }
   }

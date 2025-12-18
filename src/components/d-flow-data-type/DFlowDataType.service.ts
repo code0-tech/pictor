@@ -38,7 +38,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
         if (value.__typename == "LiteralValue") {
             //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
-            if (Array.isArray(value.value) && Array.from(value.value).length > 0) return this.getDataType({dataType: {identifier: "ARRAY"}})
+            if (Array.isArray(value.value) && Array.from(value.value).length > 0) return this.getDataType({dataType: {identifier: "LIST"}})
             if (typeof value.value === "string") return this.getDataType({dataType: {identifier: "TEXT"}}, dependencies)
             if (typeof value.value === "number") return this.getDataType({dataType: {identifier: "NUMBER"}}, dependencies)
             if (typeof value.value === "boolean") return this.getDataType({dataType: {identifier: "BOOLEAN"}}, dependencies)
@@ -62,7 +62,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
         if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
         const dataType = this.getDataTypeFromValue(value, flow, dependencies)
-        if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {dataType: {id: dataType?.id}}
+        if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {dataType: {id: dataType?.id, identifier: dataType?.identifier}}
 
         //TODO: missing generic combinations
         const genericMapper: GenericMapper[] = dataType.genericKeys.map(genericKey => {
@@ -125,12 +125,13 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
         const resolvedType: DataTypeIdentifier = genericMapper.length > 0 ? {
             genericType: {
-                dataType: {id: dataType.id as Maybe<Scalars['DataTypeID']['output']>},
+                dataType: {id: dataType.id as Maybe<Scalars['DataTypeID']['output']>, identifier: dataType.identifier},
                 genericMappers: genericMapper
             }
         } : {
             dataType: {
-                id: dataType.id as Maybe<Scalars['DataTypeID']['output']>
+                id: dataType.id as Maybe<Scalars['DataTypeID']['output']>,
+                identifier: dataType.identifier
             }
         }
 

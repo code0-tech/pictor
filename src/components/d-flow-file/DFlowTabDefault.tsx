@@ -129,7 +129,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                    if (parsed?.__typename === "ReferenceValue") {
                                        const refObject = parsed as ReferenceValue
                                        return buildBlockSegment(
-                                           <Badge color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}-{JSON.stringify(refObject.dataTypeIdentifier)}</Badge>
+                                           <Badge color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}</Badge>
                                        )
                                    }
                                } catch (e) {

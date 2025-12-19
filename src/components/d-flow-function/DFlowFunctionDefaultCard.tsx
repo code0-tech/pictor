@@ -141,8 +141,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
                 <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
             </>,
-            content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                      nodeLevel={data.index} node={node}/>
+            content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
         })
     }, [node?.id, definition, data])
 

@@ -507,7 +507,7 @@ const RuleHeader: React.FC<{
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
     const suggestions = isTypeRule ? useDataTypeSuggestions({
         dataType: {
-            id: "gid://sagittarius/DataType/878634678"
+            id: "gid://sagittarius/DataType/-1"
         }
     }) : []
     const rulesCount = (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get((rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0

@@ -95,12 +95,14 @@ export const useNodeValidation = (
             if (!value) continue
 
             const expectedType = parameter.dataTypeIdentifier
-            const expectedDT = dataTypeService.getDataType(expectedType!!)
+            const expectedResolvedType = replaceGenericKeysInType(expectedType!, genericMap)
+            const expectedDT = dataTypeService.getDataType(expectedResolvedType)
             const valueType = resolveValueType(value, expectedDT)
             const valueDT = dataTypeService.getDataType(valueType!!)
 
             if (!expectedDT || !valueDT) {
                 errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
+                console.log(valueDT, parameter)
                 continue
             }
 
@@ -110,20 +112,19 @@ export const useNodeValidation = (
 
             let isValid = true
 
+
             if (isGeneric) {
                 const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)
-
                 if (isReferenceOrNode(value)) {
                     const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
                     isValid = useDataTypeValidation(resolvedExpectedDT, resolvedValueDT)
                 } else {
-                    const resolvedType = replaceGenericKeysInType(expectedType, genericMap)
                     isValid = useValueValidation(
                         value,
                         resolvedExpectedDT,
                         dataTypeService,
                         flow,
-                        resolvedType?.genericType?.genericMappers!
+                        expectedResolvedType?.genericType?.genericMappers!
                     )
                 }
             } else {

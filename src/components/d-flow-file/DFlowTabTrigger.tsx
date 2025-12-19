@@ -5,11 +5,15 @@ import {TextInput} from "../form";
 import {Flex} from "../flex/Flex";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 import {DFlowSuggestion} from "../d-flow-suggestion";
-import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
+import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
+import {useFunctionSuggestions} from "../d-flow-suggestion/DFlowFunctionSuggestions.hook";
+import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import type {DataType, Flow, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
+import {Text} from "../text/Text";
+import {MenuItem} from "../menu/Menu";
 
 export interface DFlowTabTriggerProps {
     instance: Flow
@@ -28,7 +32,13 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
-        suggestionsById[settingDefinition.identifier!!] = useSuggestions({dataType: settingDefinition.dataType}, [], instance.id, 0, [0], 0)
+        const dataTypeIdentifier = {dataType: settingDefinition.dataType}
+        const valueSuggestions = useValueSuggestions(dataTypeIdentifier)
+        const dataTypeSuggestions = useDataTypeSuggestions(dataTypeIdentifier)
+        suggestionsById[settingDefinition.identifier!!] = [
+            ...valueSuggestions,
+            ...dataTypeSuggestions,
+        ].sort()
     })
 
 
@@ -77,6 +87,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                 <TextInput title={title}
                            description={description}
                            clearable
+                           suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
                            key={JSON.stringify(setting.value)}
                            defaultValue={defaultValue}
                            onClear={submitValueEvent}

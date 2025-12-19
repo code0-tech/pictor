@@ -15,7 +15,7 @@ export const useValueValidation = (
 
     return dataType.rules?.nodes?.every(rule => {
         if (!rule || !rule.variant || !rule.config) return false
-        if (!RuleMap.get(rule.variant)) return true
+        if (!RuleMap.get(rule.variant)) return true //TODO; missing parent type rule
         return RuleMap.get(rule.variant)?.validate(value, rule.config, map, dataTypeService, flow)
     }) ?? true
 }

@@ -1,14 +1,13 @@
-import {useService} from "../../utils";
+import {useService, useStore} from "../../utils";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../utils/generics";
 import {DFlowReactiveService} from "../d-flow";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
-import {useInputType} from "../d-flow-function/DFlowFunction.input.hook";
+import React from "react";
 import type {
     DataTypeIdentifier,
-    DataTypeRulesInputTypeConfig,
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig,
     Flow,
@@ -174,6 +173,85 @@ export const useSuggestions = (
 
 }
 
+type NodeContext = {
+    node: number
+    depth: number
+    scope: number[]
+}
+
+export const useNodeContext = (
+    flowId: Flow['id'],
+    nodeFunctionId: NodeFunction['id']
+): NodeContext | undefined => {
+    const dataTypeService = useService(DFlowDataTypeReactiveService);
+    const flowService = useService(DFlowReactiveService);
+    const functionService = useService(DFlowFunctionReactiveService);
+
+    const flowStore = useStore(DFlowReactiveService);
+    const functionStore = useStore(DFlowFunctionReactiveService);
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService);
+
+    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
+
+    const nodeContextMap = React.useMemo(() => {
+        if (!dataTypeService || !flowService || !functionService) return undefined;
+        if (!flow?.startingNodeId) return undefined;
+
+        let globalGroupId = 0;
+        const nextGroupId = () => ++globalGroupId;
+
+        let globalNodeId = 0;
+        const nextNodeId = () => ++globalNodeId;
+
+        const contexts = new Map<NodeFunction['id'], NodeContext>();
+
+        const traverse = (
+            node: NodeFunctionIdWrapper | NodeFunction | undefined,
+            depth: number,
+            scopePath: number[]
+        ) => {
+            if (!node) return;
+
+            let current: NodeFunction | undefined =
+                node.__typename === "NodeFunctionIdWrapper"
+                    ? flowService.getNodeById(flowId, node.id)
+                    : (node as NodeFunction);
+
+            while (current) {
+                const def = functionService.getById(current.functionDefinition?.id!!);
+                if (!def) break;
+
+                const nodeIndex = nextNodeId();
+                contexts.set(current.id, {node: nodeIndex, depth, scope: scopePath});
+
+                if (current.parameters && def.parameterDefinitions) {
+                    for (const pDef of def.parameterDefinitions) {
+                        const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
+                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+
+                        if (pType?.variant === "NODE") {
+                            if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+                                const childScopePath = [...scopePath, nextGroupId()];
+                                traverse(paramInstance.value as NodeFunctionIdWrapper, depth + 1, childScopePath);
+                            }
+                        } else if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+                            traverse(paramInstance.value as NodeFunctionIdWrapper, depth, scopePath);
+                        }
+                    }
+                }
+
+                current = flowService.getNodeById(flow.id, current.nextNodeId);
+            }
+        };
+
+        traverse(flowService.getNodeById(flow.id, flow.startingNodeId), 0, [0]);
+
+        return contexts;
+    }, [dataTypeService, flow, flowId, flowService, functionService, dataTypeStore, flowStore, functionStore]);
+
+    return React.useMemo(() => nodeContextMap?.get(nodeFunctionId), [nodeContextMap, nodeFunctionId]);
+};
+
 /**
  * Walks the flow starting at its startingNode (depth-first, left-to-right) and collects
  * all RefObjects (variables/outputs) with contextual metadata:
@@ -189,131 +267,151 @@ export const useSuggestions = (
  *    RefObjects (inputs from rules and the return value) produced by that node.
  */
 export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
-    const dataTypeService = useService(DFlowDataTypeReactiveService);
-    const flowService = useService(DFlowReactiveService);
-    const functionService = useService(DFlowFunctionReactiveService);
 
-    const refObjects: Array<ReferenceValue> = [];
-    if (!dataTypeService || !flowService || !functionService) return refObjects;
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const functionService = useService(DFlowFunctionReactiveService)
+    const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
 
-    const flow = flowService.values().find((f) => f.id === flowId);
-    if (!flow?.startingNodeId) return refObjects;
+    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
 
-    // Global, strictly increasing group id used to extend the scope PATH.
-    // Root scope path is [0]; first created group gets id 1, then 2, ...
-    let globalGroupId = 0;
-    const nextGroupId = () => ++globalGroupId;
+    return flow?.nodes?.nodes?.map(node => {
 
-    // Global, strictly increasing node id across the ENTIRE flow (1-based).
-    let globalNodeId = 0;
-    const nextNodeId = () => ++globalNodeId;
+        const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+        const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+        const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService)
+        const nodeContext = useNodeContext(flowId, node?.id!!)
 
-    /**
-     * DFS across a lane: visit node, recurse into NODE-parameter groups, then follow nextNode.
-     * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
-     */
-    const traverse = (
-        node: NodeFunctionIdWrapper | NodeFunction | undefined,
-        depth: number,
-        scopePath: number[]
-    ) => {
-        if (!node) return;
-
-        let current: NodeFunction | undefined = node.__typename === "NodeFunctionIdWrapper" ? flowService.getNodeById(flowId, node.id) : node as NodeFunction;
-
-        while (current) {
-            const def = functionService.getById(current.functionDefinition?.id!!);
-            if (!def) break;
-
-            // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
-            const nodeIndex = nextNodeId();
-
-            // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
-            if (current.parameters && def.parameterDefinitions) {
-                for (const pDef of def.parameterDefinitions) {
-                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
-                    if (!pType || pType.variant === "NODE") continue;
-
-                    const inputTypeRules =
-                        pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? [];
-
-                    if (inputTypeRules.length) {
-                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
-                        const rawValue = paramInstance?.value;
-                        const valuesArray =
-                            rawValue !== undefined
-                                ? rawValue?.__typename === "NodeFunctionIdWrapper"
-                                    ? [rawValue!!]
-                                    : [rawValue!!]
-                                : [];
-
-                        for (const rule of inputTypeRules) {
-                            const cfg = rule?.config as DataTypeRulesInputTypeConfig;
-                            const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
-                            if (resolved) {
-                                refObjects.push({
-                                    __typename: "ReferenceValue",
-                                    dataTypeIdentifier: resolved,
-                                    depth,
-                                    scope: scopePath,
-                                    node: nodeIndex,
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 2) Return type (main output of the current node)
-            {
-                const paramValues =
-                    current.parameters?.nodes?.map((p) => p?.value).filter((v) => v !== undefined) ?? [];
-                const resolvedReturnType = useReturnType(
-                    def,
-                    paramValues as NodeParameterValue[],
-                    dataTypeService
-                );
-                if (resolvedReturnType) {
-                    refObjects.push({
-                        __typename: "ReferenceValue",
-                        dataTypeIdentifier: resolvedReturnType,
-                        depth,
-                        scope: scopePath,
-                        node: nodeIndex,
-                    });
-                }
-            }
-
-            // 3) For each NODE-typed parameter: create a NEW group/lane
-            if (current.parameters && def.parameterDefinitions) {
-                for (const pDef of def.parameterDefinitions) {
-                    const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
-                    if (pType?.variant === "NODE") {
-                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
-                            const childFn = paramInstance.value as NodeFunctionIdWrapper;
-
-                            // New group: extend the scope path with a fresh id; increase depth by 1.
-                            const childScopePath = [...scopePath, nextGroupId()];
-                            traverse(childFn, depth + 1, childScopePath);
-                        }
-                    } else {
-                        // Functions passed as NON-NODE parameters: same depth and same scope path.
-                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
-                        if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
-                            traverse(paramInstance.value as NodeFunctionIdWrapper, depth, scopePath);
-                        }
-                    }
-                }
-            }
-
-            // 4) Continue the linear chain in the same lane/scope.
-            current = flowService.getNodeById(flow.id, current.nextNodeId)
+        if (resolvedReturnType) {
+            return {
+                __typename: "ReferenceValue",
+                dataTypeIdentifier: resolvedReturnType,
+                ...nodeContext
+            } as ReferenceValue
         }
-    };
 
-    // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
-    traverse(flowService.getNodeById(flow.id, flow.startingNodeId), 0, [0]);
+        return {} as ReferenceValue
 
-    return refObjects;
+    }) ?? []
+
+    // if (!dataTypeService || !flowService || !functionService) return refObjects;
+    //
+    // const flow = flowService.values().find((f) => f.id === flowId);
+    // if (!flow?.startingNodeId) return refObjects;
+    //
+    // // Global, strictly increasing group id used to extend the scope PATH.
+    // // Root scope path is [0]; first created group gets id 1, then 2, ...
+    // let globalGroupId = 0;
+    // const nextGroupId = () => ++globalGroupId;
+    //
+    // // Global, strictly increasing node id across the ENTIRE flow (1-based).
+    // let globalNodeId = 0;
+    // const nextNodeId = () => ++globalNodeId;
+    //
+    // /**
+    //  * DFS across a lane: visit node, recurse into NODE-parameter groups, then follow nextNode.
+    //  * `scopePath` is the full scope path (e.g., [0], [0,2], [0,2,4], ...).
+    //  */
+    // const traverse = (
+    //     node: NodeFunctionIdWrapper | NodeFunction | undefined,
+    //     depth: number,
+    //     scopePath: number[]
+    // ) => {
+    //     if (!node) return;
+    //
+    //     let current: NodeFunction | undefined = node.__typename === "NodeFunctionIdWrapper" ? flowService.getNodeById(flowId, node.id) : node as NodeFunction;
+    //
+    //     while (current) {
+    //         const def = functionService.getById(current.functionDefinition?.id!!);
+    //         if (!def) break;
+    //
+    //         // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
+    //         const nodeIndex = nextNodeId();
+    //
+    //         // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
+    //         if (current.parameters && def.parameterDefinitions) {
+    //             for (const pDef of def.parameterDefinitions) {
+    //                 const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
+    //                 if (!pType || pType.variant === "NODE") continue;
+    //
+    //                 const inputTypeRules =
+    //                     pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? [];
+    //
+    //                 if (inputTypeRules.length) {
+    //                     const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+    //                     const rawValue = paramInstance?.value;
+    //                     const valuesArray =
+    //                         rawValue !== undefined
+    //                             ? rawValue?.__typename === "NodeFunctionIdWrapper"
+    //                                 ? [rawValue!!]
+    //                                 : [rawValue!!]
+    //                             : [];
+    //
+    //                     for (const rule of inputTypeRules) {
+    //                         const cfg = rule?.config as DataTypeRulesInputTypeConfig;
+    //                         const resolved = useInputType(cfg.dataTypeIdentifier!!, def, valuesArray, dataTypeService);
+    //                         if (resolved) {
+    //                             refObjects.push({
+    //                                 __typename: "ReferenceValue",
+    //                                 dataTypeIdentifier: resolved,
+    //                                 depth,
+    //                                 scope: scopePath,
+    //                                 node: nodeIndex,
+    //                             });
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //
+    //         // 2) Return type (main output of the current node)
+    //         {
+    //             const paramValues =
+    //                 current.parameters?.nodes?.map((p) => p?.value).filter((v) => v !== undefined) ?? [];
+    //             const resolvedReturnType = useReturnType(
+    //                 def,
+    //                 paramValues as NodeParameterValue[],
+    //                 dataTypeService
+    //             );
+    //             if (resolvedReturnType) {
+    //                 refObjects.push({
+    //                     __typename: "ReferenceValue",
+    //                     dataTypeIdentifier: resolvedReturnType,
+    //                     depth,
+    //                     scope: scopePath,
+    //                     node: nodeIndex,
+    //                 });
+    //             }
+    //         }
+    //
+    //         // 3) For each NODE-typed parameter: create a NEW group/lane
+    //         if (current.parameters && def.parameterDefinitions) {
+    //             for (const pDef of def.parameterDefinitions) {
+    //                 const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
+    //                 if (pType?.variant === "NODE") {
+    //                     const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+    //                     if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+    //                         const childFn = paramInstance.value as NodeFunctionIdWrapper;
+    //
+    //                         // New group: extend the scope path with a fresh id; increase depth by 1.
+    //                         const childScopePath = [...scopePath, nextGroupId()];
+    //                         traverse(childFn, depth + 1, childScopePath);
+    //                     }
+    //                 } else {
+    //                     // Functions passed as NON-NODE parameters: same depth and same scope path.
+    //                     const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+    //                     if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {
+    //                         traverse(paramInstance.value as NodeFunctionIdWrapper, depth, scopePath);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //
+    //         // 4) Continue the linear chain in the same lane/scope.
+    //         current = flowService.getNodeById(flow.id, current.nextNodeId)
+    //     }
+    // };
+    //
+    // // Root lane: depth 0, scope path [0]; node starts at 1 on the first visited node.
+    // traverse(flowService.getNodeById(flow.id, flow.startingNodeId), 0, [0]);
 };

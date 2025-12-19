@@ -96,11 +96,11 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         </Text>
                     </Badge>
                 case "ReferenceValue":
-                    const hashRef = md5(md5(param.value.nodeFunctionId!))
+                    const hashRef = md5(md5(param.value.nodeFunctionId || ""))
                     return <Badge color={`hsl(${hashToHue(hashRef)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
                         <IconCirclesRelation size={12}/>
                         <Text size={"sm"} style={{color: "inherit"}}>
-                            {String(param?.value.depth)}-{String(param?.value.scope)}-{String(param?.value.node)}
+                            {String(param?.value.depth)}-{String(param?.value.scope)}-{String(param?.value.node)}-{param?.value.referencePath?.map(path => path.path).join(".") ?? ""}
                         </Text>
                     </Badge>
                 case "NodeFunctionIdWrapper":

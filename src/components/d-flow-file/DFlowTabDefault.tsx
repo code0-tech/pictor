@@ -20,18 +20,17 @@ import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {md5} from "js-md5";
 import {IconCirclesRelation} from "@tabler/icons-react";
+import {MenuItem} from "../menu/Menu";
+import {Text} from "../text/Text";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
-    depthLevel?: number
-    scopeLevel?: number[]
-    nodeLevel?: number
 }
 
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
-    const {node, flowId, depthLevel, scopeLevel, nodeLevel} = props
+    const {node, flowId} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const [, startTransition] = React.useTransition()
@@ -52,7 +51,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     sortedParameters.forEach(parameter => {
         const parameterDefinition = paramDefinitions[parameter?.id!!]
-        suggestionsById[parameter?.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
+        suggestionsById[parameter?.id!!] = useSuggestions(flowId, node.id, parameter?.id)
     })
 
     const validation = useNodeValidation(node.id, flowId)
@@ -156,7 +155,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)
                            }}
-                           //TODO: validation
+                           suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
                            formValidation={{
                                setValue: () => {},
                                valid: !validationForParameter,

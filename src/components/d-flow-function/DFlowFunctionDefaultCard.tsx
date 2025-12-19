@@ -4,7 +4,7 @@ import React, {memo} from "react";
 import {Card} from "../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../flex/Flex";
-import {IconFile} from "@tabler/icons-react";
+import {IconCirclesRelation, IconFile} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore as usePictorStore} from "../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
@@ -74,7 +74,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const colorHash = md5(id)
+    const colorHash = md5(md5(data.nodeId!))
     const hashToHue = (md5: string): number => {
         // nimm z.B. 8 Hex-Zeichen = 32 Bit
         const int = parseInt(md5.slice(0, 8), 16)
@@ -96,9 +96,11 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         </Text>
                     </Badge>
                 case "ReferenceValue":
-                    return <Badge style={{verticalAlign: "middle"}}>
-                        <Text size={"sm"}>
-                            {String(param?.value.node)}-{String(param?.value.depth)}-{String(param?.value.scope)}
+                    const hashRef = md5(md5(param.value.nodeFunctionId!))
+                    return <Badge color={`hsl(${hashToHue(hashRef)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
+                        <IconCirclesRelation size={12}/>
+                        <Text size={"sm"} style={{color: "inherit"}}>
+                            {String(param?.value.depth)}-{String(param?.value.scope)}-{String(param?.value.node)}
                         </Text>
                     </Badge>
                 case "NodeFunctionIdWrapper":
@@ -106,6 +108,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     const node = flowService.getNodeById(props.data.flowId, param.value.id)
                     return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border
                                   pos={"relative"}>
+                        <IconFile size={12}/>
                         <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>

@@ -102,7 +102,6 @@ export const useNodeValidation = (
 
             if (!expectedDT || !valueDT) {
                 errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
-                console.log(valueDT, parameter)
                 continue
             }
 
@@ -111,7 +110,6 @@ export const useNodeValidation = (
                 (!!expectedType?.genericKey && genericKeys.includes(expectedType.genericKey))
 
             let isValid = true
-
 
             if (isGeneric) {
                 const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)

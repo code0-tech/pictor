@@ -161,13 +161,14 @@ export const Dashboard = () => {
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"} order={2}>
-                        <DFlow flowId={"gid://sagittarius/Flow/1"}/>
+                        <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
                     </DResizablePanel>
                     {show && (
                         <>
                             <DResizableHandle/>
                             <DResizablePanel id={"3"} order={3} defaultSize={25}>
-                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"}/>
+                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                           projectId={undefined}/>
                             </DResizablePanel>
                         </>
                     )}
@@ -236,7 +237,7 @@ const Folder = () => {
                          onCreate={type => console.log(type)}
                          onSelect={(flow) => console.log("select", flow)}
                          ref={ref}
-                         activeFlowId={"gid://sagittarius/Flow/1"}/>
+                         activeFlowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
         </div>
     </DLayout>
 }

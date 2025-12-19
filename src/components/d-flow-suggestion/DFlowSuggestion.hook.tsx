@@ -11,9 +11,11 @@ import type {
     DataTypeRulesInputTypeConfig,
     DataTypeRulesItemOfCollectionConfig,
     DataTypeRulesNumberRangeConfig,
-    Flow, LiteralValue,
+    Flow,
+    LiteralValue,
     Maybe,
-    NodeFunction, NodeFunctionIdWrapper,
+    NodeFunction,
+    NodeFunctionIdWrapper,
     NodeParameter,
     NodeParameterValue,
     ReferenceValue
@@ -147,6 +149,7 @@ export const useSuggestions = (
     if (suggestionTypes.includes(DFlowSuggestionType.REF_OBJECT)) {
         //calculate REF_OBJECTS && FUNCTION_COMBINATION
         const refObjects = type ? useRefObjects(flowId) : []
+        console.log("refObjects", node, refObjects)
 
         refObjects.forEach(value => {
             if ((value?.node ?? 0) >= node) return

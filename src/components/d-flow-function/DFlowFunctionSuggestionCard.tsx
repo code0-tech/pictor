@@ -19,7 +19,7 @@ export type DFlowFunctionSuggestionCardProps = NodeProps<Node<DFlowFunctionSugge
 export const DFlowFunctionSuggestionCard: React.FC<DFlowFunctionSuggestionCardProps> = memo((props) => {
 
     const [, startTransition] = React.useTransition()
-    const result = useSuggestions(undefined, [], props.data.flowId, 0, [0], 0)
+    const result = useSuggestions(props.data.flowId, props.data.parentFunction?.id)
     const flowService = useService(DFlowReactiveService)
     const flow = flowService.getById(props.data.flowId)
 

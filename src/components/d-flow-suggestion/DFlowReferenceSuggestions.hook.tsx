@@ -3,12 +3,18 @@ import {useService, useStore} from "../../utils";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
 import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../utils/generics";
-import type {
+import {
+    DataType,
     DataTypeIdentifier,
+    DataTypeRulesContainsKeyConfig,
     Flow,
-    NodeFunction, NodeFunctionIdWrapper,
+    Maybe,
+    NodeFunction,
+    NodeFunctionIdWrapper,
     NodeParameterValue,
-    ReferenceValue
+    ReferencePath,
+    ReferenceValue,
+    Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
@@ -77,6 +83,7 @@ export const useReferenceSuggestions = (
 const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
@@ -84,32 +91,79 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
     const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
     const nodeContexts = useNodeContext(flowId)
 
-    return flow?.nodes?.nodes?.map(node => {
+    const nodeSuggestions = React.useMemo(() => {
+        return flow?.nodes?.nodes?.map(node => {
 
-        const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
-        const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-        const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService)
-        const nodeContext = nodeContexts?.find(context => context.nodeId === node?.id)
+            const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+            const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+            const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService)
+            const nodeContext = nodeContexts?.find(context => context.nodeId === node?.id)
 
-        if (resolvedReturnType) {
-            return {
-                __typename: "ReferenceValue",
-                dataTypeIdentifier: resolvedReturnType,
-                nodeFunctionId: node?.id,
-                ...(nodeContext ?? {})
-            } as ReferenceValue
+            if (resolvedReturnType && nodeContext) {
+                return referenceExtraction(nodeContext, resolvedReturnType)
+            }
+
+            return {} as ReferenceValue
+
+        }) ?? []
+    }, [flow])
+
+    const flowInputSuggestions = React.useMemo(() => {
+        return referenceExtraction({
+            node: 0,
+            depth: 0,
+            nodeId: "gid://sagittarius/NodeFunction/-1",
+            scope: [0]
+        }, {
+            dataType: flow?.inputType
+        })
+    }, [flow])
+
+    return [
+        ...flowInputSuggestions,
+        ...nodeSuggestions
+    ].flat()
+}
+
+const referenceExtraction = (nodeContext: NodeContext, dataTypeIdentifier: DataTypeIdentifier): ReferenceValue[] => {
+
+    const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
+    if (!dataType) return []
+
+    const references = dataType.rules?.nodes?.map(rule => {
+        if (rule?.variant === "CONTAINS_KEY") {
+            return referenceExtraction({
+                ...nodeContext,
+                referencePath: [
+                    ...(nodeContext.referencePath ?? []),
+                    {
+                        path: (rule.config as DataTypeRulesContainsKeyConfig).key!!
+                    }
+                ]
+            }, (rule.config as DataTypeRulesContainsKeyConfig).dataTypeIdentifier!!)
         }
 
-        return {} as ReferenceValue
+        return undefined
 
-    }) ?? []
+    }).flat().filter(ref => !!ref) ?? []
+
+    return [
+        ...references,
+        {
+            __typename: "ReferenceValue",
+            dataTypeIdentifier,
+            nodeFunctionId: nodeContext.nodeId,
+            ...nodeContext
+        }]
+
 }
 
 export type NodeContext = {
-    node: number
-    depth: number
-    scope: number[]
+    node: Scalars['Int']['output']
+    depth: Scalars['Int']['output']
+    scope: Array<Scalars['Int']['output']>
     nodeId: NodeFunction['id']
+    referencePath?: Array<ReferencePath>
 }
 
 const useNodeContext = (

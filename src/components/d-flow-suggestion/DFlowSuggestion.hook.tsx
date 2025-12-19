@@ -93,7 +93,7 @@ export const useSuggestions = (
         //generics to be replaced with GENERIC todo is written on top
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!type || !resolvedType) return true
-            if (funcDefinition.runtimeFunctionDefinition?.identifier == "RETURN" && type) return false
+            if (funcDefinition.runtimeFunctionDefinition?.identifier == "std::control::return" && type) return false
             if (dataType?.variant === "NODE") return true
             if (!funcDefinition.returnType) return false
             if (!funcDefinition.genericKeys) return false
@@ -223,7 +223,7 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
             if (!def) break;
 
             // Assign a single GLOBAL node id for this node (shared by all outputs/inputs it yields).
-            const node = nextNodeId();
+            const nodeIndex = nextNodeId();
 
             // 1) INPUT_TYPE rules (variables per input parameter; skip NODE-typed params)
             if (current.parameters && def.parameterDefinitions) {
@@ -253,7 +253,7 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                                     dataTypeIdentifier: resolved,
                                     depth,
                                     scope: scopePath,
-                                    node,
+                                    node: nodeIndex,
                                 });
                             }
                         }
@@ -276,7 +276,7 @@ export const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
                         dataTypeIdentifier: resolvedReturnType,
                         depth,
                         scope: scopePath,
-                        node,
+                        node: nodeIndex,
                     });
                 }
             }

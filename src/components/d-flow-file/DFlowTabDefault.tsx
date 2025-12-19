@@ -17,6 +17,9 @@ import type {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
+import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
+import {md5} from "js-md5";
+import {IconCirclesRelation} from "@tabler/icons-react";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
@@ -52,6 +55,8 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         suggestionsById[parameter?.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
     })
 
+    const validation = useNodeValidation(node.id, flowId)
+
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
@@ -63,7 +68,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                 })
 
             }
-
             const submitValueEvent = (event: any) => {
                 try {
                     const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
@@ -83,12 +87,13 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                     } as LiteralValue)
                 }
             }
-
             const parameterDefinition = paramDefinitions[parameter.id!!]
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
             const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
+
+            const validationForParameter = validation?.find(v => v.parameterId === parameter.id)
 
             return <div>
                 <TextInput title={title}
@@ -128,8 +133,17 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
                                    if (parsed?.__typename === "ReferenceValue") {
                                        const refObject = parsed as ReferenceValue
+                                       const colorHash = md5(md5(refObject.nodeFunctionId!))
+                                       const hashToHue = (md5: string): number => {
+                                           // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                                           const int = parseInt(md5.slice(0, 8), 16)
+                                           return int % 360
+                                       }
                                        return buildBlockSegment(
-                                           <Badge color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}</Badge>
+                                           <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
+                                               <IconCirclesRelation size={12}/>
+                                               {refObject.depth}-{refObject.scope}-{refObject.node}
+                                           </Badge>
                                        )
                                    }
                                } catch (e) {
@@ -145,8 +159,8 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            //TODO: validation
                            formValidation={{
                                setValue: () => {},
-                               valid: true,
-                               notValidMessage: ""
+                               valid: !validationForParameter,
+                               notValidMessage: validationForParameter?.message.nodes!![0]?.content || ""
                            }}
                            onBlur={submitValueEvent}
                            onClear={submitValueEvent}

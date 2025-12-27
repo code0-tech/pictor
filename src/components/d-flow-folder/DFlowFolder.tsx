@@ -6,7 +6,6 @@ import {Code0Component, mergeCode0Props, useService, useStore} from "../../utils
 import {
     IconChevronDown,
     IconChevronRight,
-    IconDots,
     IconFile,
     IconFolderFilled,
     IconFolderOpen
@@ -232,9 +231,6 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
                 </Flex>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
                     <Button p={"0"} variant={"none"}>
-                        <IconDots size={12}/>
-                    </Button>
-                    <Button p={"0"} variant={"none"}>
                         {open ? <IconChevronDown size={12}/> : <IconChevronRight size={12}/>}
                     </Button>
                 </Flex>
@@ -252,7 +248,6 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
 
     const colorHash = md5(path + name)
     const hashToHue = (md5: string): number => {
-        // nimm z.B. 8 Hex-Zeichen = 32 Bit
         const int = parseInt(md5.slice(0, 8), 16)
         return int % 360
     }

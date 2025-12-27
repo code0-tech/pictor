@@ -8,7 +8,7 @@
   $padding: variables.$xs;
   display: flex;
   z-index: 1;
-  align-items: stretch;
+  align-items: center;
   box-sizing: border-box;
 
   & {
@@ -19,77 +19,13 @@
     @include helpers.borderRadius();
   }
 
-  &:has(&__control:focus) {
+  &:has(&__control:focus),
+  &:has(&__control[contenteditable="true"]:focus) {
     @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
   }
 
   &--not-valid {
     @include box.box(variables.$error, variables.$white, variables.$error);
-  }
-
-  &__syntax {
-    position: absolute;
-    z-index: -1;
-    overflow: hidden;
-    font-size: variables.$sm;
-    color: rgba(variables.$white, .5);
-    white-space: pre;
-    padding: $padding $padding;
-    box-sizing: border-box;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-
-  }
-
-  &__syntax-caret {
-    display: inline-block;
-    width: 1px;
-    height: 1rem;
-    background: rgba(variables.$white, .7);
-    vertical-align: text-bottom;
-    animation: caret-blink 1s steps(1) infinite;
-    pointer-events: none;
-  }
-
-  @keyframes caret-blink {
-    0%, 50% {
-      opacity: 1;
-    }
-
-    50.01%, 100% {
-      opacity: 0;
-    }
-  }
-
-  &__syntax-char {
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-
-    &--selected {
-      background: rgba(variables.$white, .1);
-      padding: 4px 0;
-    }
-  }
-
-  &__syntax-block {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-
-    &--selected {
-      background: rgba(variables.$white, .1);
-      padding: 4px 0;
-    }
   }
 
   &__left, &__right {
@@ -104,9 +40,7 @@
       padding-right: 0;
     }
 
-    &--action {
-      padding: 0;
-    }
+    &--action { padding: 0; }
 
     &--placeholder {
       @include box.box(variables.$primary);
@@ -114,7 +48,6 @@
       border-radius: variables.$borderRadius - ($padding / 4);
       padding: $padding;
     }
-
   }
 
   &__left {
@@ -137,7 +70,8 @@
     background: none;
     border: none;
     outline: none;
-    padding: $padding $padding;
+    margin: $padding $padding;
+    vertical-align: middle;
     flex: 1;
     width: 100%;
     font-size: variables.$sm;
@@ -147,28 +81,25 @@
     & {
       @include helpers.fontStyle();
     }
-
-    &--syntax {
-      color: transparent;
-      caret-color: transparent;
-
-      &::selection {
-        background: transparent;
-      }
-    }
   }
 
+  // Token spans inside the ContentEditable
+  &__token {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+  }
 
   &__label {
     text-transform: uppercase;
     color: rgba(variables.$white, .5);
     font-size: variables.$xs;
-    //margin: $padding 0;
     display: block;
 
-    & {
-      @include helpers.fontStyle();
-    }
+    & { @include helpers.fontStyle(); }
   }
 
   &__description {
@@ -177,9 +108,7 @@
     margin: calc($padding / 2) 0 $padding;
     display: block;
 
-    & {
-      @include helpers.fontStyle();
-    }
+    & { @include helpers.fontStyle(); }
   }
 
   &__message {
@@ -231,9 +160,7 @@
   }
 }
 
-.radio-group {
-
-}
+.radio-group { }
 
 .radio-input {
   background: transparent !important;
@@ -261,7 +188,6 @@
     &[data-state="checked"] {
       @include box.boxActiveStyle();
     }
-
   }
 
   &__indicator {
@@ -273,13 +199,9 @@
     &[data-state="checked"] {
       background-color: variables.$info;
 
-      & {
-        @include helpers.borderRadius();
-      }
+      & { @include helpers.borderRadius(); }
     }
-
   }
-
 }
 
 .radio-button {
@@ -300,7 +222,6 @@
   padding: $padding 0;
 
   &__button {
-
     aspect-ratio: 1/1;
     width: variables.$xl;
     height: variables.$xl;
@@ -320,7 +241,6 @@
     &[data-state="checked"] {
       @include box.boxActiveStyle(variables.$info);
     }
-
   }
 
   &__indicator {
@@ -339,7 +259,6 @@
 
   background: transparent !important;
   border: none !important;
-
 
   .input__control {
 
@@ -367,7 +286,6 @@
       }
 
       &:before {
-
         & {
           @include box.box(variables.$info);
           position: absolute;
@@ -375,7 +293,6 @@
           height: $size + $padding;
         }
       }
-
     }
 
     &:after {
@@ -406,8 +323,5 @@
         height: $size + $padding;
       }
     }
-
-
   }
-
 }

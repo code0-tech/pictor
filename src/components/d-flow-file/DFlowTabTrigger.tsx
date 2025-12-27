@@ -6,7 +6,6 @@ import {Flex} from "../flex/Flex";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
-import {useFunctionSuggestions} from "../d-flow-suggestion/DFlowFunctionSuggestions.hook";
 import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
@@ -25,7 +24,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const flowTypeService = useService(DFlowTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
-    const [,startTransition] = React.useTransition()
+    const [, startTransition] = React.useTransition()
 
     const definition = flowTypeService.getById(instance.type?.id!!)
 

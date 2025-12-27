@@ -1,5 +1,3 @@
-import React, {useCallback} from "react"
-
 // Programmatically set a property (like 'value') and dispatch an event (like 'change')
 export const setElementKey = (
     element: HTMLElement,
@@ -45,12 +43,3 @@ export const getSelectionMetrics = (target: HTMLInputElement) => {
         direction: target.selectionDirection === "backward" ? "backward" : "forward",
     }
 }
-
-export const useSyncSyntaxScroll = (
-    inputRef: React.RefObject<HTMLInputElement | null>,
-    syntaxRef: React.RefObject<HTMLDivElement | null>,
-) => useCallback(() => {
-    if (!inputRef.current || !syntaxRef.current) return
-
-    syntaxRef.current.scrollLeft = inputRef.current.scrollLeft
-}, [inputRef, syntaxRef])

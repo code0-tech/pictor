@@ -32,11 +32,6 @@ import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {DUserView} from "./DUser.view";
 import React from "react";
 import {DUserInput} from "./DUserInput";
-import {Text} from "../text/Text";
-import {Badge} from "../badge/Badge";
-import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
-import {Spacing} from "../spacing/Spacing";
-import {Flex} from "../flex/Flex";
 
 const meta: Meta = {
     title: "DUser",
@@ -132,7 +127,10 @@ export const Input = () => {
     ])
 
     return <ContextStoreProvider services={[user]}>
-        <DUserInput title={"Users to invite"} description={"Invite users to your workspace or organization"}/>
+        <DUserInput maw={"300px"}
+                    title={"Users to invite"}
+                    defaultValue={"nsammito"}
+                    description={"Invite users to your workspace or organization"}/>
     </ContextStoreProvider>
 
 }

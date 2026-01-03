@@ -58,7 +58,6 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
 
             const submitValue = (value: NodeParameterValue) => {
-                console.log(props.instance, setting)
                 startTransition(async () => {
                     if (value?.__typename == "LiteralValue") {
                         await flowService.setSettingValue(props.instance.id, setting.flowSettingIdentifier!, value.value)
@@ -90,6 +89,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                            suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
                            key={JSON.stringify(setting.value)}
                            defaultValue={defaultValue}
+                           onBlur={submitValueEvent}
                            onClear={submitValueEvent}
                            onSuggestionSelect={(suggestion) => {
                                submitValue(suggestion.value)

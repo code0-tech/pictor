@@ -5,7 +5,7 @@ import {
     Flow,
     FlowInput,
     FlowSetting,
-    LiteralValue,
+    LiteralValue, Maybe,
     Namespace,
     NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
@@ -17,7 +17,7 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    ReferenceValue
+    ReferenceValue, Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
 export type DFlowDependencies = {
@@ -170,11 +170,11 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         this.set(index, flow)
     }
 
-    async setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): Promise<void> {
+    async setSettingValue(flowId: Flow['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
-        const setting = flow.settings?.nodes?.find(s => s?.id === settingId)
+        const setting = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
         if (!setting) return
         setting.value = value
         this.set(index, flow)

@@ -58,11 +58,12 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
 
             const submitValue = (value: NodeParameterValue) => {
+                console.log(props.instance, setting)
                 startTransition(async () => {
-                    if (value.__typename == "LiteralValue") {
-                        await flowService.setSettingValue(props.instance.id, setting.id, value.value)
+                    if (value?.__typename == "LiteralValue") {
+                        await flowService.setSettingValue(props.instance.id, setting.flowSettingIdentifier!, value.value)
                     } else {
-                        await flowService.setSettingValue(props.instance.id, setting.id, value)
+                        await flowService.setSettingValue(props.instance.id, setting.flowSettingIdentifier!, value)
                     }
                 })
 

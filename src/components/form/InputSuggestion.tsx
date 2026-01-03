@@ -28,8 +28,63 @@ export interface InputSuggestionMenuContentItemsHandle {
     clearActiveItem: () => void
 }
 
-export const InputSuggestionMenuContent: React.FC<InputSuggestionMenuContentProps> = React.forwardRef((props, ref) => {
+type SuggestionMenuItemProps = {
+    suggestion: InputSuggestion
+    visibleIndex: number | null
+    isActive: boolean
+    inputRef?: RefObject<HTMLInputElement>
+    onSelect: (suggestion: InputSuggestion) => void
+    onActivate: (index: number) => void
+    itemRef?: (el: HTMLDivElement | null) => void
+}
 
+const SuggestionMenuItem: React.FC<SuggestionMenuItemProps> = React.memo(
+    ({suggestion, visibleIndex, isActive, inputRef, onSelect, onActivate, itemRef}) => {
+        if (visibleIndex === null) return null
+
+        const focusAndActivate = () => {
+            onActivate(visibleIndex)
+            inputRef?.current?.focus({preventScroll: true})
+        }
+
+        const handlePointerDown = (event: React.PointerEvent) => {
+            event.preventDefault()
+            focusAndActivate()
+        }
+
+        const handlePointerMove = (event: React.PointerEvent) => {
+            event.preventDefault()
+            event.stopPropagation()
+            onActivate(visibleIndex)
+        }
+
+        return (
+            <MenuItem
+                textValue={""}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onSelect={() => setTimeout(() => onSelect(suggestion), 0)}
+                data-focus={isActive}
+                /**@ts-ignore */
+                ref={itemRef}
+            >
+                {suggestion.children}
+            </MenuItem>
+        )
+    },
+    (prev, next) =>
+        prev.suggestion === next.suggestion &&
+        prev.visibleIndex === next.visibleIndex &&
+        prev.isActive === next.isActive &&
+        prev.inputRef === next.inputRef &&
+        prev.onSelect === next.onSelect &&
+        prev.onActivate === next.onActivate &&
+        prev.itemRef === next.itemRef,
+)
+
+SuggestionMenuItem.displayName = "SuggestionMenuItem"
+
+const InputSuggestionMenuContentComponent: React.FC<InputSuggestionMenuContentProps> = React.forwardRef((props, ref) => {
     const {children, inputRef, ...rest} = props
     const localRef = React.useRef<HTMLDivElement>(null)
 
@@ -48,11 +103,14 @@ export const InputSuggestionMenuContent: React.FC<InputSuggestionMenuContentProp
                         {...rest} >
         {children}
     </MenuContent>
-
 })
 
+InputSuggestionMenuContentComponent.displayName = "InputSuggestionMenuContent"
 
-export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuContentItemsProps> = React.forwardRef<InputSuggestionMenuContentItemsHandle, InputSuggestionMenuContentItemsProps>((props, ref) => {
+export const InputSuggestionMenuContent = React.memo(InputSuggestionMenuContentComponent)
+
+
+const InputSuggestionMenuContentItemsComponent: React.FC<InputSuggestionMenuContentItemsProps> = React.forwardRef<InputSuggestionMenuContentItemsHandle, InputSuggestionMenuContentItemsProps>((props, ref) => {
 
     const {
         suggestions,
@@ -62,8 +120,31 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         ...rest
     } = props
     const itemRefs = React.useRef<(HTMLDivElement | null)[]>([])
+    const itemRefCache = React.useRef<Map<number, (el: HTMLDivElement | null) => void>>(new Map())
     const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({})
-    const [activeIndex, setActiveIndex] = React.useState<number | null>(null)
+    const activeIndexRef = React.useRef<number | null>(null)
+
+    const setActiveIndex = React.useCallback(
+        (nextIndex: number | null, options?: {scrollIntoView?: boolean; force?: boolean}) => {
+            const current = activeIndexRef.current
+            if (!options?.force && current === nextIndex) return
+
+            if (current !== null) {
+                itemRefs.current[current]?.removeAttribute("data-focus")
+            }
+
+            activeIndexRef.current = nextIndex
+
+            if (nextIndex !== null) {
+                const nextEl = itemRefs.current[nextIndex]
+                if (nextEl) {
+                    nextEl.setAttribute("data-focus", "true")
+                    if (options?.scrollIntoView) nextEl.scrollIntoView({block: "nearest"})
+                }
+            }
+        },
+        [],
+    )
 
     React.useEffect(() => {
         if (!suggestions) {
@@ -111,56 +192,50 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
     }, [collapsedGroups, suggestions])
 
     React.useEffect(() => {
-        setActiveIndex(prev => {
-            if (prev === null) return prev
-            if (prev > visibleSuggestions.length - 1) return visibleSuggestions.length ? visibleSuggestions.length - 1 : null
-            return prev
-        })
-    }, [visibleSuggestions])
-
-    React.useEffect(() => {
-        if (activeIndex === null) return
-        itemRefs.current[activeIndex]?.scrollIntoView({block: "nearest"})
-    }, [activeIndex])
+        const current = activeIndexRef.current
+        if (current === null) return
+        if (current > visibleSuggestions.length - 1) {
+            setActiveIndex(visibleSuggestions.length ? visibleSuggestions.length - 1 : null, {force: true})
+            return
+        }
+        setActiveIndex(current, {force: true})
+    }, [setActiveIndex, visibleSuggestions])
 
     React.useImperativeHandle(ref, () => ({
         focusFirstItem: () => {
             if (!visibleSuggestions.length) return undefined
-            setActiveIndex(0)
+            setActiveIndex(0, {scrollIntoView: true})
             return visibleSuggestions[0]
         },
         focusLastItem: () => {
             if (!visibleSuggestions.length) return undefined
             const lastIndex = visibleSuggestions.length - 1
-            setActiveIndex(lastIndex)
+            setActiveIndex(lastIndex, {scrollIntoView: true})
             return visibleSuggestions[lastIndex]
         },
         highlightNextItem: () => {
             if (!visibleSuggestions.length) return undefined
-            setActiveIndex(prev => {
-                if (prev === null) return 0
-                return Math.min(prev + 1, visibleSuggestions.length - 1)
-            })
-            const nextIndex = activeIndex === null ? 0 : Math.min(activeIndex + 1, visibleSuggestions.length - 1)
+            const current = activeIndexRef.current
+            const nextIndex = current === null ? 0 : Math.min(current + 1, visibleSuggestions.length - 1)
+            setActiveIndex(nextIndex, {scrollIntoView: true})
             return visibleSuggestions[nextIndex]
         },
         highlightPreviousItem: () => {
             if (!visibleSuggestions.length) return undefined
-            setActiveIndex(prev => {
-                if (prev === null) return visibleSuggestions.length - 1
-                return Math.max(prev - 1, 0)
-            })
-            const nextIndex = activeIndex === null ? visibleSuggestions.length - 1 : Math.max(activeIndex - 1, 0)
+            const current = activeIndexRef.current
+            const nextIndex = current === null ? visibleSuggestions.length - 1 : Math.max(current - 1, 0)
+            setActiveIndex(nextIndex, {scrollIntoView: true})
             return visibleSuggestions[nextIndex]
         },
         selectActiveItem: () => {
-            if (activeIndex === null || !visibleSuggestions[activeIndex]) return undefined
-            const selected = visibleSuggestions[activeIndex]
+            const idx = activeIndexRef.current
+            if (idx === null || !visibleSuggestions[idx]) return undefined
+            const selected = visibleSuggestions[idx]
             setTimeout(() => onSuggestionSelect(selected), 0)
             return selected
         },
         clearActiveItem: () => setActiveIndex(null)
-    }), [activeIndex, onSuggestionSelect, visibleSuggestions])
+    }), [onSuggestionSelect, setActiveIndex, visibleSuggestions])
 
     const toggleGroup = (groupLabel: string) => {
         setCollapsedGroups(prev => ({
@@ -169,8 +244,16 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
         }))
     }
 
-    // @ts-ignore
-    itemRefs.current = []
+    const getItemRef = React.useCallback((index: number) => {
+        let cached = itemRefCache.current.get(index)
+        if (!cached) {
+            cached = (el: HTMLDivElement | null) => {
+                itemRefs.current[index] = el
+            }
+            itemRefCache.current.set(index, cached)
+        }
+        return cached
+    }, [])
 
     let visibleItemCounter = -1
 
@@ -185,7 +268,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
                 const isCollapsed = suggestion.groupBy ? collapsedGroups[suggestion.groupBy] : false
 
                 const visibleIndex = isCollapsed ? null : ++visibleItemCounter
-                const isActive = visibleIndex !== null && activeIndex === visibleIndex
+                const isActive = visibleIndex !== null && activeIndexRef.current === visibleIndex
 
                 return <React.Fragment key={i}>
                     {showGroupLabel && suggestion.groupBy && <MenuLabel
@@ -202,19 +285,18 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
                             ? <IconChevronDown size={16}/>
                             : <IconChevronUp size={16}/>}
                     </MenuLabel>}
-                    {!isCollapsed && <MenuItem textValue={""}
-                                               onPointerDown={(event) => {
-                                                   event.preventDefault()
-                                                   inputRef?.current?.focus({preventScroll: true})
-                                                   visibleIndex !== null && setActiveIndex(visibleIndex)
-                                               }}
-                                               onPointerMove={() => visibleIndex !== null && setActiveIndex(visibleIndex)}
-                                               onSelect={() => setTimeout(() => onSuggestionSelect(suggestion), 0)}
-                                               data-focus={isActive}
-                                                /**@ts-ignore */
-                                               ref={el => visibleIndex !== null && (itemRefs.current[visibleIndex] = el)}>
-                        {suggestion.children}
-                    </MenuItem>}
+                    {!isCollapsed && (
+                        <SuggestionMenuItem
+                            suggestion={suggestion}
+                            visibleIndex={visibleIndex}
+                            isActive={isActive}
+                            inputRef={inputRef}
+                            onSelect={onSuggestionSelect}
+                            onActivate={setActiveIndex}
+                            /**@ts-ignore */
+                            itemRef={visibleIndex !== null ? getItemRef(visibleIndex) : undefined}
+                        />
+                    )}
                 </React.Fragment>
             })}
         </ScrollAreaViewport>
@@ -224,3 +306,7 @@ export const InputSuggestionMenuContentItems: React.FC<InputSuggestionMenuConten
     </ScrollArea>
 
 })
+
+InputSuggestionMenuContentItemsComponent.displayName = "InputSuggestionMenuContentItems"
+
+export const InputSuggestionMenuContentItems = React.memo(InputSuggestionMenuContentItemsComponent)

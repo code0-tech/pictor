@@ -159,6 +159,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
         const isSyntaxMode = Boolean(transformSyntax)
         const disabledOnValue = useMemo(() => disableOnValue(value), [disableOnValue, value])
+        const activeControlRef = useMemo(
+            () => (isSyntaxMode ? (editorRef as any) : inputRef) as RefObject<HTMLInputElement>,
+            [isSyntaxMode],
+        )
 
         const mergedInputProps = useMemo(
             () => ({...inputProps, onChange: userOnChange, onInput: userOnInput}),
@@ -169,6 +173,12 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             const {value: _value, defaultValue: _defaultValue, ...restProps} = inputProps as Record<string, any>
             return mergeCode0Props("input__control", restProps)
         }, [inputProps])
+
+        const focusControl = React.useCallback(() => {
+            const target = activeControlRef.current
+            if (!target || disabled || disabledOnValue) return
+            target.focus({preventScroll: true})
+        }, [activeControlRef, disabled, disabledOnValue])
 
         const openIfSuggestions = React.useCallback(() => {
             if (suggestions) setOpenSafe(true)
@@ -243,8 +253,9 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 const insideEditor = !!editorRef.current?.contains(target)
                 const insideInput = !!inputRef.current?.contains(target)
                 const insideMenu = !!menuContentRef.current?.contains(target)
+                const insideWrapper = !!wrapperRef.current?.contains(target)
 
-                const inside = insideEditor || insideInput || insideMenu
+                const inside = insideEditor || insideInput || insideMenu || insideWrapper
                 shouldPreventCloseRef.current = inside
 
                 // ✅ THIS is the important part: if click is outside, close NOW (not via blur)
@@ -254,6 +265,16 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             document.addEventListener("pointerdown", onPointerDownCapture, true)
             return () => document.removeEventListener("pointerdown", onPointerDownCapture, true)
         }, [suggestions, setOpenSafe])
+
+        useEffect(() => {
+            const wrapperEl = wrapperRef.current
+            if (!wrapperEl) return
+
+            const handleFocusIn = () => openIfSuggestions()
+            wrapperEl.addEventListener("focusin", handleFocusIn)
+
+            return () => wrapperEl.removeEventListener("focusin", handleFocusIn)
+        }, [openIfSuggestions])
 
         /**
          * =========================
@@ -426,6 +447,25 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             [filterSuggestionsByLastToken, reconcileSuggestionSpans, value],
         )
 
+        const handleSuggestionSelect = React.useCallback(
+            (suggestion: InputSuggestion) => {
+                if (!onSuggestionSelect) {
+                    if (isSyntaxMode) contentEditable.applySuggestionValueSyntax(suggestion)
+                    else applySuggestionValuePlain(suggestion)
+                } else {
+                    onSuggestionSelect?.(suggestion)
+                }
+
+                setOpenSafe(false)
+                shouldPreventCloseRef.current = false
+
+                requestAnimationFrame(() => {
+                    focusControl()
+                })
+            },
+            [applySuggestionValuePlain, contentEditable, focusControl, isSyntaxMode, onSuggestionSelect, setOpenSafe],
+        )
+
         /**
          * =========================
          * Events
@@ -570,6 +610,18 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             />
         )
 
+        const handleWrapperPointerDown = React.useCallback(
+            (event: React.PointerEvent<HTMLDivElement>) => {
+                if (disabled || disabledOnValue) return
+                const target = event.target as HTMLElement
+                if (menuContentRef.current?.contains(target)) return
+                shouldPreventCloseRef.current = true
+                focusControl()
+                openIfSuggestions()
+            },
+            [disabled, disabledOnValue, focusControl, openIfSuggestions],
+        )
+
         const suggestionMenu = useMemo(
             () => (
                 <Menu
@@ -605,7 +657,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                         >
                             <InputSuggestionMenuContent
                                 color={"secondary"}
-                                inputRef={(isSyntaxMode ? (editorRef as any) : inputRef) as RefObject<HTMLInputElement>}
+                                inputRef={activeControlRef}
                             >
                                 {suggestionsHeader}
                                 <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
@@ -614,24 +666,9 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                                         <InputSuggestionMenuContentItems
                                             /* @ts-ignore */
                                             ref={menuRef}
-                                            inputRef={(isSyntaxMode ? (editorRef as any) : inputRef) as RefObject<HTMLInputElement>}
+                                            inputRef={activeControlRef}
                                             suggestions={availableSuggestions}
-                                            onSuggestionSelect={(suggestion) => {
-                                                if (!onSuggestionSelect) {
-                                                    if (isSyntaxMode) contentEditable.applySuggestionValueSyntax(suggestion)
-                                                    else applySuggestionValuePlain(suggestion)
-                                                } else {
-                                                    onSuggestionSelect?.(suggestion)
-                                                }
-
-                                                setOpenSafe(false)
-                                                shouldPreventCloseRef.current = false
-
-                                                requestAnimationFrame(() => {
-                                                    if (isSyntaxMode) editorRef.current?.focus()
-                                                    else inputRef.current?.focus()
-                                                })
-                                            }}
+                                            onSuggestionSelect={handleSuggestionSelect}
                                         />
                                     )}
                                 </Card>
@@ -649,9 +686,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 suggestionsHeader,
                 suggestionsFooter,
                 suggestionsEmptyState,
-                onSuggestionSelect,
-                applySuggestionValuePlain,
-                contentEditable,
+                handleSuggestionSelect,
+                activeControlRef,
                 setOpenSafe,
             ],
         )
@@ -664,6 +700,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 <div
                     ref={wrapperRef}
                     {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}
+                    onPointerDown={handleWrapperPointerDown}
                 >
                     {left && <div className={`input__left input__left--${leftType}`}>{left}</div>}
                     {suggestions ? suggestionMenu : control}

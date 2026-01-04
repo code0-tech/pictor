@@ -37,6 +37,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return
+        if (!(activeTab.content.props.flowId as Flow['id'])) return
         // @ts-ignore
         startTransition(async () => {
             await flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
@@ -56,8 +57,6 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
         }
     }, [flowId, flowService, activeTab])
 
-    //TODO: Add execute flow button functionality
-    //TODO: disable button if active tab is the trigger node
     return <Panel position={"bottom-center"}>
         <ButtonGroup>
             <Tooltip>
@@ -83,7 +82,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
+                    <Button disabled={!activeTab || !(activeTab.content.props.flowId as Flow['id'])} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
                             color={"primary"}>
                         <IconTrash size={16}/>
                     </Button>

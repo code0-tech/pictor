@@ -9,7 +9,7 @@ import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util"
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {Badge} from "../badge/Badge";
-import {NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {LiteralValue, NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {md5} from "js-md5";
@@ -225,35 +225,34 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         })
     }
 
-    const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment>>({
+    const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
         initialValues: initialValues,
         validate: validations,
         onSubmit: (values) => {
             startTransition(async () => {
-                sortedParameters.forEach(paramDefinitions => {
-                    const rawValue = values[paramDefinitions?.id!]
-                    if (!rawValue) return
-                    console.log(values[paramDefinitions?.id!])
-                    console.log(rawValue.value)
+                for (const paramDefinitions1 of sortedParameters) {
+                    const syntaxSegment = values[paramDefinitions1?.id!];
+                    const syntaxValue = syntaxSegment[0]?.value;
 
-                    // try {
-                    //     const value = JSON.parse(rawValue) as NodeFunction | LiteralValue | ReferenceValue
-                    //     if (!value.__typename) {
-                    //         flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, value ? {
-                    //             __typename: "LiteralValue",
-                    //             value: value
-                    //         } : undefined)
-                    //         return
-                    //     }
-                    //     flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
-                    // } catch (e) {
-                    //     // @ts-ignore
-                    //     flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, rawValue == "" || !rawValue ? undefined : {
-                    //         __typename: "LiteralValue",
-                    //         value: rawValue
-                    //     } as LiteralValue)
-                    // }
-                })
+                    try {
+                        const value = JSON.parse(syntaxValue) as NodeFunction | LiteralValue | ReferenceValue;
+                        console.log(value);
+                        if (!value.__typename) {
+                            await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, value ? {
+                                __typename: "LiteralValue",
+                                value: value
+                            } : undefined);
+                            continue;
+                        }
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value);
+                    } catch (e) {
+                        // @ts-ignore
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue == "" || !syntaxValue ? undefined : {
+                            __typename: "LiteralValue",
+                            value: syntaxValue
+                        } as LiteralValue);
+                    }
+                }
                 return
             })
         }
@@ -310,7 +309,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            validationUsesSyntax
                            transformSyntax={transformSyntax}
                            suggestions={toInputSuggestions(result)}
-                           onSuggestionSelect={validate}
                            onChange={validate}
                            {...inputs.getInputProps(parameter.id!!)}
 

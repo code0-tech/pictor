@@ -184,7 +184,7 @@ const Folder = () => {
     const ref = React.useRef<DFlowFolderHandle>(null)
 
     return <DLayout topContent={
-        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
+        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.7}>
             <Button paddingSize={"xxs"} color={"success"}>
                 <Text>Create new flow</Text>
             </Button>
@@ -192,7 +192,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
-                            <IconCircleDot size={16}/>
+                            <IconCircleDot size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -205,7 +205,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
-                            <IconArrowsMinimize size={16}/>
+                            <IconArrowsMinimize size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -218,7 +218,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
-                            <IconArrowsMaximize size={16}/>
+                            <IconArrowsMaximize size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>

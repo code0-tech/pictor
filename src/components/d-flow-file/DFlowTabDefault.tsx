@@ -104,10 +104,17 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
         try {
 
-            const parsed = JSON.parse(textValue) as NodeParameterValue
-            if (parsed?.__typename === "NodeFunctionIdWrapper" || parsed?.__typename === "NodeFunction") {
+            const parsed = JSON.parse(textValue) as NodeParameterValue | NodeFunction
+            if (parsed?.__typename === "NodeFunctionIdWrapper") {
                 const node = flowService.getNodeById(flowId, parsed.id)
                 const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+                return buildBlockSegment(
+                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
+                )
+            }
+
+            if (parsed?.__typename === "NodeFunction") {
+                const functionDefinition = functionService.getById(parsed?.functionDefinition?.id)
                 return buildBlockSegment(
                     <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
                 )

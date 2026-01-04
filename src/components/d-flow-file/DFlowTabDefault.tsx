@@ -1,5 +1,5 @@
 import React from "react";
-import {TextInput} from "../form";
+import {InputSuggestion, TextInput, useForm} from "../form";
 import {Flex} from "../flex/Flex";
 import {useService} from "../../utils";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
@@ -56,114 +56,142 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
     const validation = useNodeValidation(node.id, flowId)
 
+    const initialValues = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        sortedParameters.forEach(parameter => {
+            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter?.value)
+        })
+        return values
+    }, [sortedParameters])
+
+    const validations = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        sortedParameters.forEach(parameter => {
+            values[parameter?.id!!] = (value: any) => {
+                const validationForParameter = validation?.find(v => v.parameterId === parameter?.id)
+                if (validationForParameter) {
+                    return validationForParameter.message.nodes!![0]?.content || "Invalid value"
+                }
+                return null
+            }
+        })
+        return values
+    }, [sortedParameters])
+
+
+    const transformSyntax = (value: string, appliedParts): InputSyntaxSegment[] => {
+
+        const rawValue = value ?? ""
+        const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
+
+        console.log(textValue, appliedParts)
+
+        const buildTextSegment = (text: string): InputSyntaxSegment[] => [{
+            type: "text",
+            start: 0,
+            end: text.length,
+            visualLength: text.length,
+            content: text,
+        }]
+
+        const buildBlockSegment = (node: React.ReactNode): InputSyntaxSegment[] => [{
+            type: "block",
+            start: 0,
+            end: textValue.length,
+            visualLength: 1,
+            content: node,
+        }]
+
+        try {
+
+            const parsed = JSON.parse(textValue) as NodeParameterValue
+            if (parsed?.__typename === "NodeFunctionIdWrapper" || parsed?.__typename === "NodeFunction") {
+                const node = flowService.getNodeById(flowId, parsed.id)
+                const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+                return buildBlockSegment(
+                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
+                )
+            }
+
+            if (parsed?.__typename === "ReferenceValue") {
+                const refObject = parsed as ReferenceValue
+                const colorHash = md5(md5(refObject.nodeFunctionId!))
+                const hashToHue = (md5: string): number => {
+                    // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                    const int = parseInt(md5.slice(0, 8), 16)
+                    return int % 360
+                }
+                return buildBlockSegment(
+                    <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
+                        <IconCirclesRelation size={12}/>
+                        {refObject.depth}-{refObject.scope}-{refObject.node}
+                    </Badge>
+                )
+            }
+        } catch (e) {
+            // fall through to text rendering
+        }
+
+        return buildTextSegment(textValue)
+    }
+
+    // const [inputs, validate] = useForm({
+    //     initialValues: initialValues,
+    //     validate: validations,
+    //     onSubmit: (values) => {
+    //         console.log(values)
+    //     }
+    // })
+
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
 
             if (!parameter) return null
 
-            const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
-                startTransition(async () => {
-                    await flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
-                })
-
-            }
-            const submitValueEvent = (event: any) => {
-                try {
-                    const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
-                    if (!value.__typename) {
-                        submitValue(value ? {
-                            __typename: "LiteralValue",
-                            value: value
-                        } : undefined)
-                        return
-                    }
-                    submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
-                } catch (e) {
-                    // @ts-ignore
-                    submitValue(event.target.value == "" || !event.target.value ? undefined : {
-                        __typename: "LiteralValue",
-                        value: event.target.value
-                    } as LiteralValue)
-                }
-            }
+            // const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
+            //     startTransition(async () => {
+            //         await flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
+            //     })
+            //
+            // }
+            // const submitValueEvent = (event: any) => {
+            //     console.log(event.currentTarget.textContent)
+            //     try {
+            //         const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
+            //         if (!value.__typename) {
+            //             submitValue(value ? {
+            //                 __typename: "LiteralValue",
+            //                 value: value
+            //             } : undefined)
+            //             return
+            //         }
+            //         submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
+            //     } catch (e) {
+            //         // @ts-ignore
+            //         submitValue(event.target.value == "" || !event.target.value ? undefined : {
+            //             __typename: "LiteralValue",
+            //             value: event.target.value
+            //         } as LiteralValue)
+            //     }
+            // }
             const parameterDefinition = paramDefinitions[parameter.id!!]
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
-
-            const validationForParameter = validation?.find(v => v.parameterId === parameter.id)
+            // const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
+            //
+            // const validationForParameter = validation?.find(v => v.parameterId === parameter.id)
 
             return <div>
                 <TextInput title={title}
                            description={description}
                            clearable
-                           key={JSON.stringify(parameter.value)}
-                           transformSyntax={(value): InputSyntaxSegment[] => {
-                               const rawValue = value ?? ""
-                               const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
-
-                               const buildTextSegment = (text: string): InputSyntaxSegment[] => [{
-                                   type: "text",
-                                   start: 0,
-                                   end: text.length,
-                                   visualLength: text.length,
-                                   content: text,
-                               }]
-
-                               const buildBlockSegment = (node: React.ReactNode): InputSyntaxSegment[] => [{
-                                   type: "block",
-                                   start: 0,
-                                   end: textValue.length,
-                                   visualLength: 1,
-                                   content: node,
-                               }]
-
-                               try {
-
-                                   const parsed = JSON.parse(textValue) as NodeParameterValue
-                                   if (parsed?.__typename === "NodeFunctionIdWrapper") {
-                                       const node = flowService.getNodeById(flowId, parsed.id)
-                                       const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-                                       return buildBlockSegment(
-                                           <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
-                                       )
-                                   }
-
-                                   if (parsed?.__typename === "ReferenceValue") {
-                                       const refObject = parsed as ReferenceValue
-                                       const colorHash = md5(md5(refObject.nodeFunctionId!))
-                                       const hashToHue = (md5: string): number => {
-                                           // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                                           const int = parseInt(md5.slice(0, 8), 16)
-                                           return int % 360
-                                       }
-                                       return buildBlockSegment(
-                                           <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
-                                               <IconCirclesRelation size={12}/>
-                                               {refObject.depth}-{refObject.scope}-{refObject.node}
-                                           </Badge>
-                                       )
-                                   }
-                               } catch (e) {
-                                   // fall through to text rendering
-                               }
-
-                               return buildTextSegment(textValue)
-                           }}
-                           defaultValue={defaultValue}
-                           onSuggestionSelect={(suggestion) => {
-                               submitValue(suggestion.value)
-                           }}
                            suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
-                           formValidation={{
-                               setValue: () => {},
-                               valid: !validationForParameter,
-                               notValidMessage: validationForParameter?.message.nodes!![0]?.content || ""
-                           }}
-                           onBlur={submitValueEvent}
-                           onClear={submitValueEvent}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
+                           validationUsesSuggestions
+                           filterSuggestionsByLastToken
+                           enforceUniqueSuggestions
+                           transformSyntax={transformSyntax}
                            suggestions={toInputSuggestions(result)}
 
                 />

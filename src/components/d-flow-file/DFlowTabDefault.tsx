@@ -1,21 +1,15 @@
 import React from "react";
-import {InputSuggestion, TextInput, useForm} from "../form";
+import {TextInput, useForm} from "../form";
 import {Flex} from "../flex/Flex";
 import {useService} from "../../utils";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowFunctionReactiveService, ParameterDefinitionView} from "../d-flow-function";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow-suggestion";
-import {ParameterDefinitionView} from "../d-flow-function";
 import {Badge} from "../badge/Badge";
-import type {
-    LiteralValue,
-    NodeFunction, NodeParameterValue,
-    ReferenceValue,
-    Scalars
-} from "@code0-tech/sagittarius-graphql-types";
+import type {NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {md5} from "js-md5";
@@ -26,6 +20,85 @@ import {Text} from "../text/Text";
 export interface DFlowTabDefaultProps {
     node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
+}
+
+export const splitTextAndObjects = (input: string) => {
+    const result: (string | Record<string, any>)[] = []
+
+    let currentText = ""
+    let currentObject = ""
+    let braceLevel = 0
+    let inString: '"' | "'" | "" = ""
+    let escaped = false
+
+    const pushText = () => {
+        if (currentText) result.push(currentText)
+        currentText = ""
+    }
+
+    const parseObject = (value: string) => {
+        try {
+            return JSON.parse(value)
+        } catch {
+            try {
+                return JSON.parse(
+                    value
+                        .replace(/'/g, `"`)
+                        .replace(/([{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g, `$1"$2"$3`)
+                )
+            } catch {
+                return {}
+            }
+        }
+    }
+
+    input.split("").forEach(char => {
+        if (braceLevel > 0) {
+            currentObject += char
+
+            if (escaped) {
+                escaped = false
+                return
+            }
+
+            if (char === "\\") {
+                escaped = true
+                return
+            }
+
+            if (inString) {
+                if (char === inString) inString = ""
+                return
+            }
+
+            if (char === `"` || char === `'`) {
+                inString = char as any
+                return
+            }
+
+            if (char === "{") braceLevel++
+            if (char === "}") braceLevel--
+
+            if (braceLevel === 0) {
+                result.push(parseObject(currentObject))
+                currentObject = ""
+            }
+
+            return
+        }
+
+        if (char === "{") {
+            pushText()
+            braceLevel = 1
+            currentObject = "{"
+            return
+        }
+
+        currentText += char
+    })
+
+    pushText()
+    return result
 }
 
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
@@ -67,7 +140,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const validations = React.useMemo(() => {
         const values: Record<string, any> = {}
         sortedParameters.forEach(parameter => {
-            values[parameter?.id!!] = (value: any) => {
+            values[parameter?.id!!] = (_: any) => {
                 const validationForParameter = validation?.find(v => v.parameterId === parameter?.id)
                 if (validationForParameter) {
                     return validationForParameter.message.nodes!![0]?.content || "Invalid value"
@@ -79,52 +152,64 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     }, [sortedParameters])
 
 
-    const transformSyntax = (value: string, appliedParts): InputSyntaxSegment[] => {
+    const transformSyntax = (value: string): InputSyntaxSegment[] => {
 
         const rawValue = value ?? ""
         const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
 
-        console.log(textValue, appliedParts)
+        let cursor = 0
 
-        const buildTextSegment = (text: string): InputSyntaxSegment[] => [{
-            type: "text",
-            start: 0,
-            end: text.length,
-            visualLength: text.length,
-            content: text,
-        }]
+        const buildTextSegment = (text: string): InputSyntaxSegment => {
+            const segment = {
+                type: "text",
+                start: cursor,
+                end: cursor + text.length,
+                visualLength: text.length,
+                content: text,
+            } as InputSyntaxSegment
+            cursor += text.length
+            return segment
+        }
 
-        const buildBlockSegment = (node: React.ReactNode): InputSyntaxSegment[] => [{
-            type: "block",
-            start: 0,
-            end: textValue.length,
-            visualLength: 1,
-            content: node,
-        }]
+        const buildBlockSegment = (node: React.ReactNode, value: Record<string, any>): InputSyntaxSegment => {
+            const segment = {
+                type: "block",
+                start: cursor,
+                end: cursor + JSON.stringify(value).length,
+                visualLength: 1,
+                content: node,
+            } as InputSyntaxSegment
+            cursor += JSON.stringify(value).length
+            return segment
+        }
 
-        try {
+        return splitTextAndObjects(textValue).map(value => {
 
-            const parsed = JSON.parse(textValue) as NodeParameterValue | NodeFunction
-            if (parsed?.__typename === "NodeFunctionIdWrapper") {
-                const node = flowService.getNodeById(flowId, parsed.id)
+            if (typeof value !== "object") {
+                return buildTextSegment(value)
+            }
+
+            if (value?.__typename === "NodeFunctionIdWrapper") {
+                const node = flowService.getNodeById(flowId, value.id)
                 const functionDefinition = functionService.getById(node?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
+                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
+                    value
                 )
             }
 
-            if (parsed?.__typename === "NodeFunction") {
-                const functionDefinition = functionService.getById(parsed?.functionDefinition?.id)
+            if (value?.__typename === "NodeFunction") {
+                const functionDefinition = functionService.getById(value?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
+                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
+                    value
                 )
             }
 
-            if (parsed?.__typename === "ReferenceValue") {
-                const refObject = parsed as ReferenceValue
+            if (value?.__typename === "ReferenceValue") {
+                const refObject = value as ReferenceValue
                 const colorHash = md5(md5(refObject.nodeFunctionId!))
                 const hashToHue = (md5: string): number => {
-                    // nimm z.B. 8 Hex-Zeichen = 32 Bit
                     const int = parseInt(md5.slice(0, 8), 16)
                     return int % 360
                 }
@@ -132,23 +217,25 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                     <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
                         <IconCirclesRelation size={12}/>
                         {refObject.depth}-{refObject.scope}-{refObject.node}
-                    </Badge>
+                    </Badge>,
+                    value
                 )
             }
-        } catch (e) {
-            // fall through to text rendering
-        }
-
-        return buildTextSegment(textValue)
+            return buildTextSegment(value as any as string)
+        })
     }
 
-    // const [inputs, validate] = useForm({
-    //     initialValues: initialValues,
-    //     validate: validations,
-    //     onSubmit: (values) => {
-    //         console.log(values)
-    //     }
-    // })
+    const [inputs, validate] = useForm({
+        initialValues: initialValues,
+        validate: validations,
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    React.useEffect(() => {
+        validate()
+    })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {sortedParameters.map(parameter => {
@@ -195,11 +282,11 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            clearable
                            suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                           validationUsesSuggestions
                            filterSuggestionsByLastToken
                            enforceUniqueSuggestions
                            transformSyntax={transformSyntax}
                            suggestions={toInputSuggestions(result)}
+                           {...inputs.getInputProps(parameter.id!!)}
 
                 />
             </div>

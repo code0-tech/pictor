@@ -4,7 +4,7 @@ import React, {memo} from "react";
 import {Card} from "../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../flex/Flex";
-import {IconCirclesRelation, IconFile} from "@tabler/icons-react";
+import {IconCirclesRelation, IconFile, IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore as usePictorStore} from "../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
@@ -108,7 +108,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     const node = flowService.getNodeById(props.data.flowId, param.value.id)
                     return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border
                                   pos={"relative"}>
-                        <IconFile size={12}/>
+                        <IconNote size={12}/>
                         <Text size={"sm"} style={{color: "inherit"}}>
                             {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
                         </Text>
@@ -138,7 +138,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             active: false,
             closeable: true,
             children: <>
-                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+                <IconNote color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
                 <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
             </>,
             content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
@@ -183,7 +183,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
+                <IconNote color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
         </Card>

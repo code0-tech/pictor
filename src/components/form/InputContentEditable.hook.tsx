@@ -732,11 +732,33 @@ export const useContentEditableController = (
 
             normalizeEmptyRoot(root)
             root.focus({preventScroll: true})
-            const range = ensureEditorRange(root)
 
+            const insertMode = suggestion.insertMode ?? "replace"
+
+            const resolveInsertionRange = (): Range => {
+                const r = document.createRange()
+                switch (insertMode) {
+                    case "append":
+                        r.selectNodeContents(root)
+                        r.collapse(false)
+                        return r
+                    case "prepend":
+                        r.selectNodeContents(root)
+                        r.collapse(true)
+                        return r
+                    case "replace":
+                        r.selectNodeContents(root)
+                        return r
+                    case "insert":
+                    default:
+                        return ensureEditorRange(root)
+                }
+            }
+
+            const range = resolveInsertionRange()
             const tokenData = buildSuggestionTokenData(suggestion)
 
-            if (filterSuggestionsByLastToken) {
+            if (filterSuggestionsByLastToken && insertMode !== "replace") {
                 const match = getLastTokenBeforeCaret(root)
                 if (match) match.range.deleteContents()
                 else range.deleteContents()

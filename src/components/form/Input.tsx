@@ -44,7 +44,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestionsFooter?: React.ReactNode
     onSuggestionSelect?: (suggestion: InputSuggestion) => void
     transformSyntax?: (value: T, appliedSyntaxParts?: (InputSuggestion | any)[]) => InputSyntaxSegment[]
-    validationUsesSuggestions?: boolean
+    validationUsesSyntax?: boolean
     disableOnValue?: (value: T) => boolean
     filterSuggestionsByLastToken?: boolean
     onLastTokenChange?: (token: string | null) => void
@@ -114,7 +114,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             onSuggestionSelect,
             disableOnValue = () => false,
             transformSyntax,
-            validationUsesSuggestions = false,
+            validationUsesSyntax = false,
             filterSuggestionsByLastToken = false,
             enforceUniqueSuggestions = false,
             onLastTokenChange,
@@ -156,6 +156,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const [activeSuggestionSpans, setActiveSuggestionSpans] = useState<InputActiveSuggestionSpan[]>([])
         const [activeSuggestions, setActiveSuggestions] = useState<InputSuggestion[]>([])
         const [lastTokenBeforeCaret, setLastTokenBeforeCaret] = useState<string | null>(null)
+        const [syntaxSegments, setSyntaxSegments] = useState<InputSyntaxSegment[] | null>(null)
 
         const isSyntaxMode = Boolean(transformSyntax)
         const disabledOnValue = useMemo(() => disableOnValue(value), [disableOnValue, value])
@@ -199,9 +200,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             transformSyntax: transformSyntax as any,
             filterSuggestionsByLastToken,
             onLastTokenChange: updateLastTokenState,
-            onStateChange: ({value: nextValue, tokens}) => {
+            onStateChange: ({value: nextValue, tokens, segments}) => {
                 setValue(nextValue)
                 setActiveSuggestions(tokens)
+                setSyntaxSegments(segments ?? null)
             },
         })
 
@@ -217,9 +219,12 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             const nextValue = normalizeTextValue(externalValue)
             setValue(nextValue)
             contentEditable.initializeFromExternalValue(nextValue)
+            if (validationUsesSyntax && transformSyntax) {
+                setSyntaxSegments(transformSyntax(nextValue as any, []))
+            }
 
             didInitSyntaxRef.current = true
-        }, [isSyntaxMode])
+        }, [isSyntaxMode, transformSyntax, externalValue, validationUsesSyntax, contentEditable])
 
         /**
          * Controlled sync for plain input only
@@ -237,12 +242,12 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             if (!formValidation?.setValue) return
 
             const currentValue = inputProps.type !== "checkbox" ? normalizeTextValue(value) : value
-            const validationValue = validationUsesSuggestions ? activeSuggestions : currentValue
+            const validationValue = validationUsesSyntax ? syntaxSegments : currentValue
 
             if (Object.is(lastValidationValueRef.current, validationValue)) return
             lastValidationValueRef.current = validationValue
             formValidation.setValue(validationValue)
-        }, [activeSuggestions, formValidation?.setValue, inputProps.type, validationUsesSuggestions, value])
+        }, [formValidation?.setValue, inputProps.type, syntaxSegments, validationUsesSyntax, value])
 
         // GLOBAL pointerdown capture: keep open when clicking inside, otherwise close immediately
         useEffect(() => {

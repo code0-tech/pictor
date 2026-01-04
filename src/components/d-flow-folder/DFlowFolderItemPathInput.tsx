@@ -33,6 +33,7 @@ export const DFlowFolderItemPathInput: React.FC<DFlowFolderItemPathInputProps> =
         return splitValue.map((value, index) => {
             const segment = {
                 type: splitValue.length - 1 !== index ? "block" : "text",
+                value: value,
                 start: cursor,
                 end: cursor + value.length,
                 visualLength: splitValue.length - 1 !== index ? 1 : value.length,

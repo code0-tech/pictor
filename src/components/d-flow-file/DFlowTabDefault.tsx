@@ -9,7 +9,7 @@ import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util"
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {Badge} from "../badge/Badge";
-import type {NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {md5} from "js-md5";
@@ -154,14 +154,13 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
     const transformSyntax = (value: string): InputSyntaxSegment[] => {
 
-        const rawValue = value ?? ""
-        const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
-
+        const textValue = String(value ?? "")
         let cursor = 0
 
         const buildTextSegment = (text: string): InputSyntaxSegment => {
             const segment = {
                 type: "text",
+                value: text,
                 start: cursor,
                 end: cursor + text.length,
                 visualLength: text.length,
@@ -174,6 +173,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         const buildBlockSegment = (node: React.ReactNode, value: Record<string, any>): InputSyntaxSegment => {
             const segment = {
                 type: "block",
+                value: value,
                 start: cursor,
                 end: cursor + JSON.stringify(value).length,
                 visualLength: 1,
@@ -225,16 +225,38 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         })
     }
 
-    const [inputs, validate] = useForm({
+    const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment>>({
         initialValues: initialValues,
         validate: validations,
         onSubmit: (values) => {
-            console.log(values)
-        }
-    })
+            startTransition(async () => {
+                sortedParameters.forEach(paramDefinitions => {
+                    const rawValue = values[paramDefinitions?.id!]
+                    if (!rawValue) return
+                    console.log(values[paramDefinitions?.id!])
+                    console.log(rawValue.value)
 
-    React.useEffect(() => {
-        validate()
+                    // try {
+                    //     const value = JSON.parse(rawValue) as NodeFunction | LiteralValue | ReferenceValue
+                    //     if (!value.__typename) {
+                    //         flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, value ? {
+                    //             __typename: "LiteralValue",
+                    //             value: value
+                    //         } : undefined)
+                    //         return
+                    //     }
+                    //     flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
+                    // } catch (e) {
+                    //     // @ts-ignore
+                    //     flowService.setParameterValue(flowId, node.id!!, paramDefinitions!!.id!!, rawValue == "" || !rawValue ? undefined : {
+                    //         __typename: "LiteralValue",
+                    //         value: rawValue
+                    //     } as LiteralValue)
+                    // }
+                })
+                return
+            })
+        }
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
@@ -277,6 +299,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             // const validationForParameter = validation?.find(v => v.parameterId === parameter.id)
 
             return <div>
+                {/*@ts-ignore*/}
                 <TextInput title={title}
                            description={description}
                            clearable
@@ -284,8 +307,11 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            suggestionsFooter={<DFlowSuggestionMenuFooter/>}
                            filterSuggestionsByLastToken
                            enforceUniqueSuggestions
+                           validationUsesSyntax
                            transformSyntax={transformSyntax}
                            suggestions={toInputSuggestions(result)}
+                           onSuggestionSelect={validate}
+                           onChange={validate}
                            {...inputs.getInputProps(parameter.id!!)}
 
                 />

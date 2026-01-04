@@ -2,6 +2,7 @@ import React from "react"
 
 export type InputSyntaxSegment = {
     type: "text" | "block"
+    value?: any
     start: number
     end: number
     visualLength?: number
@@ -14,6 +15,7 @@ export const buildDefaultSyntax = (value: any): InputSyntaxSegment[] => {
 
     return [{
         type: "text",
+        value: textValue,
         start: 0,
         end: textValue.length,
         visualLength: textValue.length,

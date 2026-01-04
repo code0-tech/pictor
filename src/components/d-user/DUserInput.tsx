@@ -45,6 +45,7 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
             if (typeof part === "object") {
                 const segment = {
                     type: "block",
+                    value: part.valueData,
                     start: cursor,
                     end: cursor + part.value.length,
                     visualLength: 1,
@@ -63,6 +64,7 @@ export const DUserInput: React.FC<DUserInputProps> = (props) => {
             if (index == appliedParts.length - 1) {
                 const segment = {
                     type: "text",
+                    value: textString,
                     start: cursor,
                     end: cursor + textString.length,
                     visualLength: textString.length,

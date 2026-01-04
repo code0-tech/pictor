@@ -23,7 +23,7 @@ export type UseContentEditableControllerProps = {
     onLastTokenChange?: (token: string | null) => void
 
     // push state back to Input.tsx (value + tokens)
-    onStateChange?: (payload: {value: string; tokens: InputSuggestion[]}) => void
+    onStateChange?: (payload: {value: string; tokens: InputSuggestion[]; segments?: InputSyntaxSegment[] | null}) => void
 }
 
 export type UseContentEditableControllerReturn = {
@@ -630,24 +630,31 @@ const renderEditorFromSegments = (
     resolved.forEach((seg: any) => {
         if (!seg || !seg.type) return
 
+        const segmentValue = seg.value ?? value.slice(seg.start, seg.end)
+
         if (seg.type === "text") {
-            const text = typeof seg.content === "string" ? seg.content : value.slice(seg.start, seg.end)
+            const text =
+                typeof seg.content === "string"
+                    ? seg.content
+                    : typeof segmentValue === "string"
+                        ? segmentValue
+                        : value.slice(seg.start, seg.end)
             if (text?.length) frag.appendChild(document.createTextNode(text))
             return
         }
 
-        const raw = value.slice(seg.start, seg.end)
+        const normalizedSegmentValue = normalizeTokenValue(segmentValue)
 
         let tokenData: any | undefined
         if (tokenQueue.length) {
             const next = tokenQueue[0]
             const nextValue = normalizeTokenValue((next as any)?.value ?? next)
-            if (!raw || nextValue === raw) {
+            if (normalizedSegmentValue === "" || nextValue === normalizedSegmentValue) {
                 tokenData = next
                 tokenQueue.shift()
             }
         }
-        if (!tokenData) tokenData = {value: raw}
+        if (!tokenData) tokenData = {value: segmentValue}
 
         const contentHtml =
             seg.content && typeof seg.content !== "string"
@@ -692,8 +699,9 @@ export const useContentEditableController = (
                 onLastTokenChange?.(getLastTokenBeforeCaret(rootEl)?.token ?? null)
             }
 
+            let segments: InputSyntaxSegment[] | null = null
             if (transformSyntax) {
-                const segments = transformSyntax(nextValue as any, parts)
+                segments = transformSyntax(nextValue as any, parts)
                 renderEditorFromSegments(rootEl, nextValue, segments, parts)
             }
 
@@ -707,7 +715,7 @@ export const useContentEditableController = (
             // 🔥 critical: keep ContentEditable "html" in sync with DOM
             setEditorHtml((prev) => (prev === nextHtml ? prev : nextHtml))
 
-            onStateChange?.({value: nextValue, tokens})
+            onStateChange?.({value: nextValue, tokens, segments})
         },
         [filterSuggestionsByLastToken, onLastTokenChange, onStateChange, transformSyntax],
     )

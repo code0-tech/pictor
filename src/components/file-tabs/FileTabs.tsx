@@ -12,7 +12,7 @@ import {
 import {mergeCode0Props} from "../../utils/utils";
 import {Code0ComponentProps} from "../../utils/types";
 import "./FileTabs.style.scss"
-import {IconFile, IconX} from "@tabler/icons-react";
+import {IconX} from "@tabler/icons-react";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 
 type FileTabsProps = Code0ComponentProps & TabsProps

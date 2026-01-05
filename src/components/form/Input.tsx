@@ -195,6 +195,20 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             [filterSuggestionsByLastToken, onLastTokenChange, setOpenSafe],
         )
 
+        const syncValidationValue = React.useCallback(
+            (currentValue: any, currentSegments: InputSyntaxSegment[] | null) => {
+                if (!formValidation?.setValue) return
+
+                const currentValueNormalized = inputProps.type !== "checkbox" ? normalizeTextValue(currentValue) : currentValue
+                const validationValue = validationUsesSyntax ? currentSegments : currentValueNormalized
+
+                if (Object.is(lastValidationValueRef.current, validationValue)) return
+                lastValidationValueRef.current = validationValue
+                formValidation.setValue(validationValue)
+            },
+            [formValidation?.setValue, inputProps.type, validationUsesSyntax],
+        )
+
         const contentEditable = useContentEditableController({
             editorRef,
             transformSyntax: transformSyntax as any,
@@ -204,6 +218,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                 setValue(nextValue)
                 setActiveSuggestions(tokens)
                 setSyntaxSegments(segments ?? null)
+                syncValidationValue(nextValue, segments ?? null)
             },
         })
 
@@ -239,15 +254,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
          * Validation sync
          */
         useEffect(() => {
-            if (!formValidation?.setValue) return
-
-            const currentValue = inputProps.type !== "checkbox" ? normalizeTextValue(value) : value
-            const validationValue = validationUsesSyntax ? syntaxSegments : currentValue
-
-            if (Object.is(lastValidationValueRef.current, validationValue)) return
-            lastValidationValueRef.current = validationValue
-            formValidation.setValue(validationValue)
-        }, [formValidation?.setValue, inputProps.type, syntaxSegments, validationUsesSyntax, value])
+            syncValidationValue(value, syntaxSegments)
+        }, [syncValidationValue, syntaxSegments, value])
 
         // GLOBAL pointerdown capture: keep open when clicking inside, otherwise close immediately
         useEffect(() => {
@@ -454,12 +462,10 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
         const handleSuggestionSelect = React.useCallback(
             (suggestion: InputSuggestion) => {
-                if (!onSuggestionSelect) {
-                    if (isSyntaxMode) contentEditable.applySuggestionValueSyntax(suggestion)
-                    else applySuggestionValuePlain(suggestion)
-                } else {
-                    onSuggestionSelect?.(suggestion)
-                }
+                if (isSyntaxMode) contentEditable.applySuggestionValueSyntax(suggestion)
+                else applySuggestionValuePlain(suggestion)
+
+                onSuggestionSelect?.(suggestion)
 
                 setOpenSafe(false)
                 shouldPreventCloseRef.current = false
@@ -626,6 +632,20 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
             },
             [disabled, disabledOnValue, focusControl, openIfSuggestions],
         )
+
+        useEffect(() => {
+            const wrapper = wrapperRef.current
+            if (!wrapper) return
+
+            const handleFocusOut = (event: FocusEvent) => {
+                const nextTarget = event.relatedTarget as Node | null
+                if (nextTarget && wrapper.contains(nextTarget)) return
+                handleBlur(event as any)
+            }
+
+            wrapper.addEventListener("focusout", handleFocusOut)
+            return () => wrapper.removeEventListener("focusout", handleFocusOut)
+        }, [handleBlur])
 
         const suggestionMenu = useMemo(
             () => (

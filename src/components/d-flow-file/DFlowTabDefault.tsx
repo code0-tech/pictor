@@ -241,7 +241,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                     const syntaxValue = syntaxSegment[0]?.value as NodeFunction | LiteralValue | ReferenceValue
                     const previousValue = paramDefinitions1?.value as NodeParameterValue
 
-                    if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id && !syntaxValue) {
+                    if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                         fileTabsService.deleteById(previousValue.id)
                     }
 

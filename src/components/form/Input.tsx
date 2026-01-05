@@ -467,6 +467,18 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
 
                 onSuggestionSelect?.(suggestion)
 
+                if (isSyntaxMode) {
+                    const target = activeControlRef.current
+                    // React won't fire onChange/onInput for contentEditable tokens; emulate it
+                    requestAnimationFrame(() => {
+                        if (!target) return
+                        const synthetic = {type: "change", target, currentTarget: target} as any
+                        target.dispatchEvent(new Event("input", {bubbles: true}))
+                        userOnInput?.(synthetic)
+                        userOnChange?.(synthetic)
+                    })
+                }
+
                 setOpenSafe(false)
                 shouldPreventCloseRef.current = false
 
@@ -474,7 +486,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
                     focusControl()
                 })
             },
-            [applySuggestionValuePlain, contentEditable, focusControl, isSyntaxMode, onSuggestionSelect, setOpenSafe],
+            [activeControlRef, applySuggestionValuePlain, contentEditable, focusControl, isSyntaxMode, onSuggestionSelect, setOpenSafe, userOnChange, userOnInput],
         )
 
         /**

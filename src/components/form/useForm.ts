@@ -9,6 +9,7 @@ export type Validations<Values> = Partial<{
 export interface FormValidationProps<Values> {
     initialValues: Values
     validate?: Validations<Values>,
+    truthyValidationBeforeSubmit?: boolean
     onSubmit?: (values: Values) => void
 }
 
@@ -110,7 +111,7 @@ export const useForm = <
     Values extends Record<string, any> = Record<string, any>
 >(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
-    const {initialValues, validate = {}, onSubmit} = props
+    const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, onSubmit} = props
 
     const [values, setValues] = useState<Values>(initialValues)
     const [hasValidated, setHasValidated] = useState(false)
@@ -142,7 +143,7 @@ export const useForm = <
             false
         )
 
-        if (onSubmit && currentValidation.isValid()) {
+        if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
             onSubmit(values as Values)
         }
     }, [changeValue, values, validate, onSubmit])

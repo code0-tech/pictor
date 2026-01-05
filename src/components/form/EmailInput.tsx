@@ -2,7 +2,7 @@ import React, {RefObject} from "react";
 import {Input, InputProps} from "./Input";
 import {IconX} from "@tabler/icons-react";
 import {Button} from "../button/Button";
-import {setElementKey} from "./Input.utils";
+import {clearInputElement} from "./Input.utils";
 
 /**
  * This regex is based on the validation behind the type="email" validation of html.
@@ -17,9 +17,9 @@ interface EmailInputProps extends Omit<InputProps<string | null>, "wrapperCompon
 
 export const emailValidation = (email: string) => EMAIL_REGEX.test(email)
 
-export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
+export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
 
-    ref = ref || React.useRef(null)
+    ref = ref || React.useRef<HTMLElement>(null)
 
     const {
         clearable = false,
@@ -28,7 +28,7 @@ export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = Reac
     } = props
 
     const toClearable = () => {
-        if (ref.current) setElementKey(ref.current, "value", "", "change")
+        clearInputElement(ref.current)
     }
 
     const rightAction = [right]

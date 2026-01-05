@@ -18,6 +18,21 @@ export const setElementKey = (
     element.dispatchEvent(new Event(event, {bubbles: true})) // Fire change/input event
 }
 
+export const clearInputElement = (element: HTMLElement | null) => {
+    if (!element) return
+
+    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+        setElementKey(element, "value", "", "change")
+        return
+    }
+
+    if (element.isContentEditable) {
+        element.innerHTML = ""
+        element.dispatchEvent(new Event("input", {bubbles: true}))
+        element.dispatchEvent(new Event("change", {bubbles: true}))
+    }
+}
+
 export const setSelectionRangeSafe = (
     target: HTMLInputElement,
     start: number,

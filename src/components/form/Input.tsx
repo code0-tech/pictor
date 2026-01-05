@@ -60,6 +60,8 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     description?: React.ReactNode
 }
 
+export type InputElement = HTMLInputElement | HTMLDivElement
+
 export type InputActiveSuggestionSpan = {
     id: number
     suggestion: InputSuggestion
@@ -96,8 +98,8 @@ const getLastTokenBeforeCaretInInput = (inputEl: HTMLInputElement | null) => {
     return {token, start, end}
 }
 
-const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
-    (props: InputProps<any>, ref: RefObject<HTMLInputElement>) => {
+const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
+    (props: InputProps<any>, ref: React.Ref<InputElement>) => {
         const {
             wrapperComponent = {},
             title,
@@ -133,7 +135,7 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         } = rest
 
         const wrapperRef = useRef<HTMLDivElement>(null)
-        const inputRef = (ref || useRef<HTMLInputElement>(null)) as RefObject<HTMLInputElement>
+        const inputRef = useRef<HTMLInputElement>(null)
         const editorRef = useRef<HTMLElement>(null as any)
 
         const menuRef = useRef<InputSuggestionMenuContentItemsHandle | null>(null)
@@ -161,9 +163,11 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps<any>>(
         const isSyntaxMode = Boolean(transformSyntax)
         const disabledOnValue = useMemo(() => disableOnValue(value), [disableOnValue, value])
         const activeControlRef = useMemo(
-            () => (isSyntaxMode ? (editorRef as any) : inputRef) as RefObject<HTMLInputElement>,
+            () => (isSyntaxMode ? (editorRef as any) : inputRef) as RefObject<InputElement>,
             [isSyntaxMode],
         )
+
+        React.useImperativeHandle(ref, () => activeControlRef.current ?? null, [activeControlRef])
 
         const mergedInputProps = useMemo(
             () => ({...inputProps, onChange: userOnChange, onInput: userOnInput}),

@@ -203,6 +203,10 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                 )
             }
 
+            if (value?.__typename === "LiteralValue") {
+                return buildTextSegment(value.value)
+            }
+
             if (value?.__typename === "NodeFunction") {
                 const functionDefinition = functionService.getById(value?.functionDefinition?.id)
                 return buildBlockSegment(
@@ -238,7 +242,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             startTransition(async () => {
                 for (const paramDefinitions1 of sortedParameters) {
                     const syntaxSegment = values[paramDefinitions1?.id!]
-                    const syntaxValue = syntaxSegment[0]?.value as NodeFunction | LiteralValue | ReferenceValue
+                    const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
                     const previousValue = paramDefinitions1?.value as NodeParameterValue
 
                     if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {

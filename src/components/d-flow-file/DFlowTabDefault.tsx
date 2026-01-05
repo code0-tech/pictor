@@ -9,13 +9,20 @@ import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util"
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {Badge} from "../badge/Badge";
-import {LiteralValue, NodeFunction, ReferenceValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import {
+    LiteralValue,
+    NodeFunction,
+    NodeParameterValue,
+    ReferenceValue,
+    Scalars
+} from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {md5} from "js-md5";
 import {IconCirclesRelation} from "@tabler/icons-react";
 import {MenuItem} from "../menu/Menu";
 import {Text} from "../text/Text";
+import {FileTabsService} from "../file-tabs/FileTabs.service";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
@@ -106,6 +113,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const {node, flowId} = props
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const fileTabsService = useService(FileTabsService)
     const [, startTransition] = React.useTransition()
 
     const definition = functionService.getById(node.functionDefinition?.id!!)
@@ -229,8 +237,13 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         onSubmit: (values) => {
             startTransition(async () => {
                 for (const paramDefinitions1 of sortedParameters) {
-                    const syntaxSegment = values[paramDefinitions1?.id!];
-                    const syntaxValue = syntaxSegment[0]?.value as NodeFunction | LiteralValue | ReferenceValue;
+                    const syntaxSegment = values[paramDefinitions1?.id!]
+                    const syntaxValue = syntaxSegment[0]?.value as NodeFunction | LiteralValue | ReferenceValue
+                    const previousValue = paramDefinitions1?.value as NodeParameterValue
+
+                    if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id && !syntaxValue) {
+                        fileTabsService.deleteById(previousValue.id)
+                    }
 
                     if (!syntaxValue || !syntaxSegment) {
                         await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);

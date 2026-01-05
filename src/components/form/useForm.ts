@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 export type Validations<Values> = Partial<{
     [Key in keyof Values]: (value: Values[Key], values?: Values) => string | null;
@@ -114,18 +114,24 @@ export const useForm = <
     const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, onSubmit} = props
 
     const [values, setValues] = useState<Values>(initialValues)
+    const valuesRef = useRef<Values>(initialValues)
     const [hasValidated, setHasValidated] = useState(false)
 
     useEffect(() => {
         setValues(initialValues)
+        valuesRef.current = initialValues
         setHasValidated(false)
     }, [initialValues])
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
-        setValues(prevState => ({
-            ...prevState,
-            [key]: value,
-        }))
+        setValues(prevState => {
+            const nextState = {
+                ...prevState,
+                [key]: value,
+            }
+            valuesRef.current = nextState
+            return nextState
+        })
     }, [])
 
     const validation = useMemo(
@@ -138,15 +144,15 @@ export const useForm = <
 
         const currentValidation = new Validation<Values>(
             changeValue,
-            values,
+            valuesRef.current,
             validate,
             false
         )
 
         if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
-            onSubmit(values as Values)
+            onSubmit(valuesRef.current as Values)
         }
-    }, [changeValue, values, validate, onSubmit])
+    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit])
 
     return [
         validation,

@@ -12,6 +12,6 @@ export const useReturnType = (
     if (!func.returnType) return null
 
     const genericTypeMap = resolveGenericKeys(func, values, dataTypeService)
-    return replaceGenericKeysInType(func.returnType, genericTypeMap)
+    return replaceGenericKeysInType(func?.returnType, genericTypeMap)
 
 }

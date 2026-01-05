@@ -253,12 +253,23 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                         await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
                     }
 
-                    if (!syntaxValue?.__typename) {
-                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
-                            __typename: "LiteralValue",
-                            value: syntaxValue
-                        } : undefined);
-                        continue;
+                    try {
+                        const parsedSyntaxValue = JSON.parse(String(syntaxValue))
+                        if (!syntaxValue?.__typename) {
+                            await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                                __typename: "LiteralValue",
+                                value: parsedSyntaxValue
+                            } : undefined);
+                            continue;
+                        }
+                    } catch (e) {
+                        if (!syntaxValue?.__typename) {
+                            await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                                __typename: "LiteralValue",
+                                value: syntaxValue
+                            } : undefined);
+                            continue;
+                        }
                     }
 
                     await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);

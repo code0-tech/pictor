@@ -122,10 +122,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     }, [node.parameters])
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
-    sortedParameters.forEach(parameter => {
-        const parameterDefinition = paramDefinitions[parameter?.id!!]
-        suggestionsById[parameter?.id!!] = useSuggestions(flowId, node.id, parameter?.id)
-    })
+    sortedParameters.forEach(parameter => suggestionsById[parameter?.id!!] = useSuggestions(flowId, node.id, parameter?.id))
 
     const validation = useNodeValidation(node.id, flowId)
 
@@ -149,10 +146,10 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             }
         })
         return values
-    }, [sortedParameters])
+    }, [sortedParameters, validation])
 
 
-    const transformSyntax = (value: string): InputSyntaxSegment[] => {
+    const transformSyntax = React.useCallback((value: string): InputSyntaxSegment[] => {
 
         const textValue = String(value ?? "")
         let cursor = 0
@@ -223,7 +220,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             }
             return buildTextSegment(value as any as string)
         })
-    }
+    }, [])
 
     const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
         initialValues: initialValues,
@@ -234,8 +231,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                 for (const paramDefinitions1 of sortedParameters) {
                     const syntaxSegment = values[paramDefinitions1?.id!];
                     const syntaxValue = syntaxSegment[0]?.value as NodeFunction | LiteralValue | ReferenceValue;
-
-                    console.log(values, syntaxSegment, syntaxValue)
 
                     if (!syntaxValue || !syntaxSegment) {
                         await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
@@ -251,7 +246,6 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
                     await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
                 }
-                return
             })
         }
     })
@@ -261,39 +255,10 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
             if (!parameter) return null
 
-            // const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
-            //     startTransition(async () => {
-            //         await flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
-            //     })
-            //
-            // }
-            // const submitValueEvent = (event: any) => {
-            //     console.log(event.currentTarget.textContent)
-            //     try {
-            //         const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
-            //         if (!value.__typename) {
-            //             submitValue(value ? {
-            //                 __typename: "LiteralValue",
-            //                 value: value
-            //             } : undefined)
-            //             return
-            //         }
-            //         submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
-            //     } catch (e) {
-            //         // @ts-ignore
-            //         submitValue(event.target.value == "" || !event.target.value ? undefined : {
-            //             __typename: "LiteralValue",
-            //             value: event.target.value
-            //         } as LiteralValue)
-            //     }
-            // }
             const parameterDefinition = paramDefinitions[parameter.id!!]
             const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            // const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
-            //
-            // const validationForParameter = validation?.find(v => v.parameterId === parameter.id)
 
             return <div>
                 {/*@ts-ignore*/}
@@ -307,11 +272,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                            validationUsesSyntax
                            transformSyntax={transformSyntax}
                            suggestions={toInputSuggestions(result)}
-                           onChange={() => {
-                               console.log("changed")
-                               validate()
-                           }}
-                           onSuggestionSelect={validate}
+                           onChange={validate}
                            {...inputs.getInputProps(parameter.id!!)}
 
                 />

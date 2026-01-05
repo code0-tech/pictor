@@ -37,7 +37,6 @@ export interface IValidation<Values> {
 class Validation<Values> implements IValidation<Values> {
 
     private readonly changeValue: (key: string, value: any) => void
-    private readonly initialRender: boolean
     private readonly currentValues: Values
     private readonly currentValidations?: Validations<Values>
 
@@ -45,12 +44,10 @@ class Validation<Values> implements IValidation<Values> {
         changeValue: (key: string, value: any) => void,
         values: Values,
         validations: Validations<Values>,
-        initial: boolean
     ) {
         this.changeValue = changeValue
         this.currentValues = values
         this.currentValidations = validations
-        this.initialRender = initial
     }
 
     isValid(): boolean {
@@ -79,9 +76,7 @@ class Validation<Values> implements IValidation<Values> {
                 ? this.currentValidations[key]!
                 : (_value: Values[Key]) => null
 
-        const message = !this.initialRender
-            ? currentFc(rawValue, this.currentValues)
-            : null
+        const message = currentFc(rawValue, this.currentValues)
 
         return {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
@@ -91,13 +86,9 @@ class Validation<Values> implements IValidation<Values> {
                 setValue: (value: any) => {
                     this.changeValue(currentName, value)
                 },
-                ...(!this.initialRender
-                    ? {
+                ...({
                         notValidMessage: message,
                         valid: message === null,
-                    }
-                    : {
-                        valid: true,
                     })
             },
             ...(this.currentValidations && this.currentValidations[key]
@@ -115,12 +106,10 @@ export const useForm = <
 
     const [values, setValues] = useState<Values>(initialValues)
     const valuesRef = useRef<Values>(initialValues)
-    const [hasValidated, setHasValidated] = useState(false)
 
     useEffect(() => {
         setValues(initialValues)
         valuesRef.current = initialValues
-        setHasValidated(false)
     }, [initialValues])
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
@@ -135,18 +124,16 @@ export const useForm = <
     }, [])
 
     const validation = useMemo(
-        () => new Validation<Values>(changeValue, values, validate, !hasValidated),
-        [changeValue, values, validate, hasValidated]
+        () => new Validation<Values>(changeValue, values, validate),
+        [changeValue, values, validate]
     )
 
     const validateFunction = useCallback(() => {
-        setHasValidated(true)
 
         const currentValidation = new Validation<Values>(
             changeValue,
             valuesRef.current,
-            validate,
-            false
+            validate
         )
 
         if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {

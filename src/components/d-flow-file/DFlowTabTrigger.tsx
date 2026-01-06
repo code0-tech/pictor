@@ -1,18 +1,15 @@
 import React from "react";
 import {useService} from "../../utils";
 import {DFlowReactiveService} from "../d-flow";
-import {TextInput} from "../form";
 import {Flex} from "../flex/Flex";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
 import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
-import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import type {DataType, Flow, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
-import {Text} from "../text/Text";
-import {MenuItem} from "../menu/Menu";
+import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
 
 export interface DFlowTabTriggerProps {
     instance: Flow
@@ -27,7 +24,6 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
     const [, startTransition] = React.useTransition()
 
     const definition = flowTypeService.getById(instance.type?.id!!)
-
 
     const suggestionsById: Record<string, DFlowSuggestion[]> = {}
     definition?.flowTypeSettings?.forEach(settingDefinition => {
@@ -83,19 +79,20 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             }
 
             return <div>
-                <TextInput title={title}
-                           description={description}
-                           clearable
-                           suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
-                           key={JSON.stringify(setting.value)}
-                           defaultValue={defaultValue}
-                           onBlur={submitValueEvent}
-                           onClear={submitValueEvent}
-                           onSuggestionSelect={(suggestion) => {
-                               submitValue(suggestion.value)
-                           }}
-                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                           suggestions={toInputSuggestions(result)}
+                <DFlowInputDefault flowId={undefined}
+                                   nodeId={undefined}
+                                   parameterId={undefined}
+                                   title={title}
+                                   description={description}
+                                   clearable
+                                   key={JSON.stringify(setting.value)}
+                                   defaultValue={defaultValue}
+                                   onBlur={submitValueEvent}
+                                   onClear={submitValueEvent}
+                                   onSuggestionSelect={(suggestion) => {
+                                       submitValue(suggestion.value)
+                                   }}
+                                   suggestions={toInputSuggestions(result)}
                 />
             </div>
         })}

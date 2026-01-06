@@ -6,7 +6,7 @@ import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../uti
 import {
     DataType,
     DataTypeIdentifier,
-    DataTypeRulesContainsKeyConfig,
+    DataTypeRulesContainsKeyConfig, DataTypeRulesInputTypesConfig,
     Flow,
     Maybe,
     NodeFunction,
@@ -19,6 +19,7 @@ import {
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
+import {useInputType} from "../d-flow-function/DFlowFunction.input.hook";
 
 export const useReferenceSuggestions = (
     flowId: Flow['id'],
@@ -118,6 +119,38 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
             dataType: flow?.inputType
         })
     }, [flow])
+
+    const inputSuggestions: ReferenceValue[] = React.useMemo(() => {
+        flow?.nodes?.nodes?.map(node => {
+
+            const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+            const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+            const nodeContext = nodeContexts?.find(context => context.nodeId === node?.id)
+
+            return functionDefinition?.parameterDefinitions?.map(paramDef => {
+                const pType = dataTypeService.getDataType(paramDef.dataTypeIdentifier!)
+                if (!pType || pType.variant !== "NODE") return
+
+                const inputTypeRules = pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? []
+
+                return inputTypeRules.map(rule => {
+                    const config = rule?.config as DataTypeRulesInputTypesConfig
+                    return config.inputTypes?.map(inputType => {
+                        const resolved = useInputType(inputType.dataTypeIdentifier!!, functionDefinition, nodeValues, dataTypeService)
+                        //console.log(inputType, resolved)
+                        if (resolved && nodeContext) {
+                            return referenceExtraction(nodeContext, resolved)
+                        }
+                        return {} as ReferenceValue
+                    })
+                })
+
+            })
+        })
+        return []
+    }, [flow])
+
+    //console.log(inputSuggestions)
 
     return [
         ...flowInputSuggestions,

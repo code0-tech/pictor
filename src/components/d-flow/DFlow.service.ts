@@ -174,7 +174,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
         const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
         const addingNode: NodeFunction = {
-            ...nextNode,
+            ...JSON.parse(JSON.stringify(nextNode)),
             id: nextNodeId,
         }
 

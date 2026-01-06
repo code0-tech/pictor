@@ -2,32 +2,33 @@ import {Badge, BadgeType} from "../badge/Badge";
 import {Flow, NodeFunction, NodeFunctionIdWrapper} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
 import {md5} from "js-md5";
-import {IconCirclesRelation, IconNote} from "@tabler/icons-react";
+import {IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore} from "../../utils";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
+import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 
 export interface DFlowInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
     flowId: Flow['id']
+    definition?: FunctionDefinitionView
 }
 
 export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) => {
 
-    const {value, flowId, ...rest} = props
+    const {value, flowId, definition, ...rest} = props
 
-    const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+    const functionService = definition || useService(DFlowFunctionReactiveService)
+    const functionStore = definition || useStore(DFlowFunctionReactiveService)
+    const flowService = definition || useService(DFlowReactiveService)
+    const flowStore = definition || useStore(DFlowReactiveService)
 
     const node = React.useMemo(() => {
-        return flowService.getNodeById(flowId, value.id)
+        return value.__typename === "NodeFunction" || definition ? value : (flowService as DFlowReactiveService).getNodeById(flowId, value.id)
     }, [flowStore])
 
     const name = React.useMemo(() => {
-        return functionService.getById(node?.functionDefinition?.id)?.names?.nodes?.[0]?.content
+        return definition ? definition.names?.nodes?.[0]?.content : (functionService as DFlowFunctionReactiveService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.nodes?.[0]?.content
     }, [functionStore, node])
 
     const hashRef = md5(md5(value.id || ""))

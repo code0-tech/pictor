@@ -1,19 +1,18 @@
 import React from "react";
 import {TextInput, TextInputProps} from "../form";
-import {Flow, NodeFunction, NodeParameter, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, NodeFunction, NodeParameter} from "@code0-tech/sagittarius-graphql-types";
 import {MenuItem} from "../menu/Menu";
 import {Text} from "../text/Text";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
-import {Badge} from "../badge/Badge";
-import {md5} from "js-md5";
-import {IconCirclesRelation} from "@tabler/icons-react";
-import {useService, useStore} from "../../utils";
+import {useService} from "../../utils";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestion} from "../d-flow-suggestion";
+import {DFlowInputNodeBadge} from "./DFlowInputNodeBadge";
+import {DFlowInputReferenceBadge} from "./DFlowInputReferenceBadge";
 
 export interface DFlowInputDefaultProps extends TextInputProps {
     flowId: Flow['id']
@@ -105,9 +104,8 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
     const {flowId, nodeId, parameterId, ...rest} = props
 
     const functionService = useService(DFlowFunctionReactiveService)
-    const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
-    const flowStore = useStore(DFlowReactiveService)
+
     const suggestions = rest.suggestions || useSuggestions(flowId, nodeId, parameterId)
 
     const transformSyntax = React.useCallback((value: string): InputSyntaxSegment[] => {
@@ -147,11 +145,18 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
                 return buildTextSegment(value)
             }
 
-            if (value?.__typename === "NodeFunctionIdWrapper") {
-                const node = flowService.getNodeById(flowId, value.id)
-                const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+            if (value?.__typename === "NodeFunctionIdWrapper" || value?.__typename === "NodeFunction") {
+                const node = value?.__typename === "NodeFunction" ? value : flowService.getNodeById(flowId, value.id)
                 return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
+                    <DFlowInputNodeBadge value={value} flowId={flowId}
+                                         definition={functionService.getById(node?.functionDefinition.id)}/>,
+                    value
+                )
+            }
+
+            if (value?.__typename === "ReferenceValue") {
+                return buildBlockSegment(
+                    <DFlowInputReferenceBadge value={value}/>,
                     value
                 )
             }
@@ -160,32 +165,9 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
                 return buildTextSegment(value.value)
             }
 
-            if (value?.__typename === "NodeFunction") {
-                const functionDefinition = functionService.getById(value?.functionDefinition?.id)
-                return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
-                    value
-                )
-            }
-
-            if (value?.__typename === "ReferenceValue") {
-                const refObject = value as ReferenceValue
-                const colorHash = md5(md5(refObject.nodeFunctionId!))
-                const hashToHue = (md5: string): number => {
-                    const int = parseInt(md5.slice(0, 8), 16)
-                    return int % 360
-                }
-                return buildBlockSegment(
-                    <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
-                        <IconCirclesRelation size={12}/>
-                        {refObject.depth}-{refObject.scope}-{refObject.node}
-                    </Badge>,
-                    value
-                )
-            }
             return buildTextSegment(value as any as string)
         })
-    }, [functionStore, flowStore])
+    }, [functionService, flowService])
 
     return <TextInput suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
                       suggestionsFooter={<DFlowSuggestionMenuFooter/>}

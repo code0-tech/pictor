@@ -31,6 +31,8 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const flowStore = useStore(DFlowReactiveService)
     const fileTabsService = useService(FileTabsService)
     const validation = useNodeValidation(node.id, flowId)
+
+    const changedParameters = React.useRef<Set<string>>(new Set())
     const [, startTransition] = React.useTransition()
 
     const definition = React.useMemo(() => {
@@ -74,6 +76,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const onSubmit = React.useCallback((values: any) => {
         startTransition(async () => {
             for (const paramDefinitions1 of sortedParameters) {
+                if (!changedParameters.current.has(paramDefinitions1?.id!!)) continue;
                 const syntaxSegment = values[paramDefinitions1?.id!]
                 const previousValue = paramDefinitions1?.value as NodeParameterValue
                 const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
@@ -110,8 +113,9 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
                 await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
             }
+            changedParameters.current.clear()
         })
-    }, [flowStore])
+    }, [flowStore, sortedParameters])
 
     const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
         initialValues: initialValues,
@@ -137,7 +141,10 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                                    title={title}
                                    description={description}
                                    clearable
-                                   onChange={validate}
+                                   onChange={() => {
+                                       changedParameters.current.add(parameter.id!!)
+                                       validate()
+                                   }}
                                    {...inputs.getInputProps(parameter.id!!)}
                 />
             </div>

@@ -16,6 +16,7 @@ export const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
 
         {children.map((child, i) => {
             return <div
+                key={child.key ?? `button-group-${i}`}
                 className={`${i == 0 || i == children.length - 1 ? i == 0 ? "button-group__first" : "button-group__last" : "button-group__item"}`}>
                 {child}
             </div>

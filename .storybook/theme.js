@@ -10,7 +10,7 @@ export default create({
 
     brandTitle: 'Code0 Pictor',
     brandUrl: 'https://code0.tech',
-    brandImage: 'https://cdn.discordapp.com/attachments/1187919509298888746/1187921987868299388/Logo.png',
+    brandImage: 'https://code0.tech/code0_logo.png',
     brandTarget: '_self',
 
     // UI

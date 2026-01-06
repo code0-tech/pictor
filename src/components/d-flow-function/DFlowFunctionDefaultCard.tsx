@@ -15,6 +15,9 @@ import {DFlowTabDefault} from "../d-flow-file/DFlowTabDefault";
 import type {NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../badge/Badge";
 import {md5} from "js-md5";
+import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
+import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
+import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     nodeId: NodeFunction['id']
@@ -90,37 +93,21 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         if (param) {
             switch (param?.value?.__typename) {
                 case "LiteralValue":
-                    return <Badge style={{verticalAlign: "middle"}} color={"secondary"}>
-                        <Text size={"sm"}>
-                            {String(param?.value?.value)}
-                        </Text>
-                    </Badge>
+                    return <DFlowInputLiteralBadge value={param.value}/>
                 case "ReferenceValue":
-                    const hashRef = md5(md5(param.value.nodeFunctionId || ""))
-                    return <Badge color={`hsl(${hashToHue(hashRef)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
-                        <IconCirclesRelation size={12}/>
-                        <Text size={"sm"} style={{color: "inherit"}}>
-                            {String(param?.value.depth)}-{String(param?.value.scope)}-{String(param?.value.node)}-{param?.value.referencePath?.map(path => path.path).join(".") ?? ""}
-                        </Text>
-                    </Badge>
+                    return <DFlowInputReferenceBadge value={param.value}/>
                 case "NodeFunctionIdWrapper":
-                    const hash = md5(`${id}-param-${JSON.stringify(param)}`)
-                    const node = flowService.getNodeById(props.data.flowId, param.value.id)
-                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border
-                                  pos={"relative"}>
-                        <IconNote size={12}/>
-                        <Text size={"sm"} style={{color: "inherit"}}>
-                            {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
-                        </Text>
+                    return <span>
+                        <DFlowInputNodeBadge value={param.value} flowId={props.data.flowId}/>
                         <Handle
                             key={param?.id}
                             type={"target"}
-                            position={Position.Bottom}
+                            position={Position.Right}
                             id={`param-${param?.id}`}
                             isConnectable={false}
                             className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                         />
-                    </Badge>
+                    </span>
             }
             return <Badge style={{verticalAlign: "middle"}} border>
                 <Text size={"sm"}>

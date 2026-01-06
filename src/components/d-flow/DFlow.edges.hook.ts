@@ -71,7 +71,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ): string => {
-
+            if (!node) return ""
             const fnId = `${node.id}-${idCounter++}`;
 
             if (idCounter == 1) {

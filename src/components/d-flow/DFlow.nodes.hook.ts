@@ -173,6 +173,7 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ) => {
+            if (!node) return
             const id = `${node?.id}-${idCounter++}`;
             const index = ++globalNodeIndex; // global node level
 

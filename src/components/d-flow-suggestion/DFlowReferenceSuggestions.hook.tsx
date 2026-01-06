@@ -58,7 +58,7 @@ export const useReferenceSuggestions = (
             return [{
                 path: [],
                 type: DFlowSuggestionType.REF_OBJECT,
-                displayText: [`${value.depth}-${value.scope}-${value.node || ''}`],
+                displayText: [`${value.depth}-${value.scope}-${value.node || ''}-${value.referencePath?.map(path => path.path).join(".") ?? ""}`],
                 value: value as ReferenceValue,
             }]
         })

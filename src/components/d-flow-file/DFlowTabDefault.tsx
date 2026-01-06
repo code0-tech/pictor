@@ -1,14 +1,9 @@
 import React from "react";
-import {TextInput, useForm} from "../form";
+import {useForm} from "../form";
 import {Flex} from "../flex/Flex";
-import {useService} from "../../utils";
+import {useService, useStore} from "../../utils";
 import {DFlowFunctionReactiveService, ParameterDefinitionView} from "../d-flow-function";
-import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import {DFlowReactiveService} from "../d-flow";
-import {DFlowSuggestion} from "../d-flow-suggestion";
-import {Badge} from "../badge/Badge";
 import {
     LiteralValue,
     NodeFunction,
@@ -18,121 +13,41 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
-import {md5} from "js-md5";
-import {IconCirclesRelation} from "@tabler/icons-react";
-import {MenuItem} from "../menu/Menu";
-import {Text} from "../text/Text";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
+import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
 }
 
-export const splitTextAndObjects = (input: string) => {
-    const result: (string | Record<string, any>)[] = []
-
-    let currentText = ""
-    let currentObject = ""
-    let braceLevel = 0
-    let inString: '"' | "'" | "" = ""
-    let escaped = false
-
-    const pushText = () => {
-        if (currentText) result.push(currentText)
-        currentText = ""
-    }
-
-    const parseObject = (value: string) => {
-        try {
-            return JSON.parse(value)
-        } catch {
-            try {
-                return JSON.parse(
-                    value
-                        .replace(/'/g, `"`)
-                        .replace(/([{,]\s*)([A-Za-z_$][\w$]*)(\s*:)/g, `$1"$2"$3`)
-                )
-            } catch {
-                return {}
-            }
-        }
-    }
-
-    input.split("").forEach(char => {
-        if (braceLevel > 0) {
-            currentObject += char
-
-            if (escaped) {
-                escaped = false
-                return
-            }
-
-            if (char === "\\") {
-                escaped = true
-                return
-            }
-
-            if (inString) {
-                if (char === inString) inString = ""
-                return
-            }
-
-            if (char === `"` || char === `'`) {
-                inString = char as any
-                return
-            }
-
-            if (char === "{") braceLevel++
-            if (char === "}") braceLevel--
-
-            if (braceLevel === 0) {
-                result.push(parseObject(currentObject))
-                currentObject = ""
-            }
-
-            return
-        }
-
-        if (char === "{") {
-            pushText()
-            braceLevel = 1
-            currentObject = "{"
-            return
-        }
-
-        currentText += char
-    })
-
-    pushText()
-    return result
-}
-
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
     const {node, flowId} = props
+
     const functionService = useService(DFlowFunctionReactiveService)
+    const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
     const fileTabsService = useService(FileTabsService)
+    const validation = useNodeValidation(node.id, flowId)
     const [, startTransition] = React.useTransition()
 
-    const definition = functionService.getById(node.functionDefinition?.id!!)
+    const definition = React.useMemo(() => {
+        return functionService.getById(node.functionDefinition?.id!!)
+    }, [functionStore])
+
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameterDefinitions?.forEach(pd => {
             map[pd.id!!] = pd
         })
         return map
-    }, [definition?.parameterDefinitions])
+    }, [definition])
 
     const sortedParameters = React.useMemo(() => {
         return [...(node.parameters?.nodes || [])].sort((a, b) => a!!.id!!.localeCompare(b?.id!!))
-    }, [node.parameters])
-
-    const suggestionsById: Record<string, DFlowSuggestion[]> = {}
-    sortedParameters.forEach(parameter => suggestionsById[parameter?.id!!] = useSuggestions(flowId, node.id, parameter?.id))
-
-    const validation = useNodeValidation(node.id, flowId)
+    }, [node])
 
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
@@ -156,129 +71,53 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
         return values
     }, [sortedParameters, validation])
 
+    const onSubmit = React.useCallback((values: any) => {
+        startTransition(async () => {
+            for (const paramDefinitions1 of sortedParameters) {
+                const syntaxSegment = values[paramDefinitions1?.id!]
+                const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
+                const previousValue = paramDefinitions1?.value as NodeParameterValue
 
-    const transformSyntax = React.useCallback((value: string): InputSyntaxSegment[] => {
-
-        const textValue = String(value ?? "")
-        let cursor = 0
-
-        const buildTextSegment = (text: string): InputSyntaxSegment => {
-            const segment = {
-                type: "text",
-                value: text,
-                start: cursor,
-                end: cursor + text.length,
-                visualLength: text.length,
-                content: text,
-            } as InputSyntaxSegment
-            cursor += text.length
-            return segment
-        }
-
-        const buildBlockSegment = (node: React.ReactNode, value: Record<string, any>): InputSyntaxSegment => {
-            const segment = {
-                type: "block",
-                value: value,
-                start: cursor,
-                end: cursor + JSON.stringify(value).length,
-                visualLength: 1,
-                content: node,
-            } as InputSyntaxSegment
-            cursor += JSON.stringify(value).length
-            return segment
-        }
-
-        return splitTextAndObjects(textValue).map(value => {
-
-            if (typeof value !== "object") {
-                return buildTextSegment(value)
-            }
-
-            if (value?.__typename === "NodeFunctionIdWrapper") {
-                const node = flowService.getNodeById(flowId, value.id)
-                const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-                return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
-                    value
-                )
-            }
-
-            if (value?.__typename === "LiteralValue") {
-                return buildTextSegment(value.value)
-            }
-
-            if (value?.__typename === "NodeFunction") {
-                const functionDefinition = functionService.getById(value?.functionDefinition?.id)
-                return buildBlockSegment(
-                    <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>,
-                    value
-                )
-            }
-
-            if (value?.__typename === "ReferenceValue") {
-                const refObject = value as ReferenceValue
-                const colorHash = md5(md5(refObject.nodeFunctionId!))
-                const hashToHue = (md5: string): number => {
-                    const int = parseInt(md5.slice(0, 8), 16)
-                    return int % 360
+                if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
+                    const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
+                    linkedNodes.reverse().forEach(node => {
+                        if (node.id) fileTabsService.deleteById(node.id)
+                    })
                 }
-                return buildBlockSegment(
-                    <Badge color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} border style={{verticalAlign: "middle"}}>
-                        <IconCirclesRelation size={12}/>
-                        {refObject.depth}-{refObject.scope}-{refObject.node}
-                    </Badge>,
-                    value
-                )
+
+                if (!syntaxValue || !syntaxSegment) {
+                    await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
+                }
+
+                try {
+                    const parsedSyntaxValue = JSON.parse(String(syntaxValue))
+                    if (!syntaxValue?.__typename) {
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                            __typename: "LiteralValue",
+                            value: parsedSyntaxValue
+                        } : undefined);
+                        continue;
+                    }
+                } catch (e) {
+                    if (!syntaxValue?.__typename) {
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                            __typename: "LiteralValue",
+                            value: syntaxValue
+                        } : undefined);
+                        continue;
+                    }
+                }
+
+                await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
             }
-            return buildTextSegment(value as any as string)
         })
-    }, [])
+    }, [flowStore])
 
     const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
         initialValues: initialValues,
         validate: validations,
         truthyValidationBeforeSubmit: false,
-        onSubmit: (values) => {
-            startTransition(async () => {
-                for (const paramDefinitions1 of sortedParameters) {
-                    const syntaxSegment = values[paramDefinitions1?.id!]
-                    const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
-                    const previousValue = paramDefinitions1?.value as NodeParameterValue
-
-                    if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
-                        const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
-                        linkedNodes.reverse().forEach(node => {
-                            if (node.id) fileTabsService.deleteById(node.id)
-                        })
-                    }
-
-                    if (!syntaxValue || !syntaxSegment) {
-                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
-                    }
-
-                    try {
-                        const parsedSyntaxValue = JSON.parse(String(syntaxValue))
-                        if (!syntaxValue?.__typename) {
-                            await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
-                                __typename: "LiteralValue",
-                                value: parsedSyntaxValue
-                            } : undefined);
-                            continue;
-                        }
-                    } catch (e) {
-                        if (!syntaxValue?.__typename) {
-                            await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
-                                __typename: "LiteralValue",
-                                value: syntaxValue
-                            } : undefined);
-                            continue;
-                        }
-                    }
-
-                    await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
-                }
-            })
-        }
+        onSubmit: onSubmit
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
@@ -287,28 +126,21 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             if (!parameter) return null
 
             const parameterDefinition = paramDefinitions[parameter.id!!]
-            const result = suggestionsById[parameter.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 
             return <div>
                 {/*@ts-ignore*/}
-                <TextInput title={title}
-                           description={description}
-                           clearable
-                           suggestionsEmptyState={<MenuItem><Text>No suggestion found</Text></MenuItem>}
-                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                           filterSuggestionsByLastToken
-                           enforceUniqueSuggestions
-                           validationUsesSyntax
-                           transformSyntax={transformSyntax}
-                           suggestions={toInputSuggestions(result)}
-                           onChange={validate}
-                           {...inputs.getInputProps(parameter.id!!)}
-
+                <DFlowInputDefault flowId={flowId}
+                                   nodeId={node.id}
+                                   parameterId={parameter.id}
+                                   title={title}
+                                   description={description}
+                                   clearable
+                                   onChange={validate}
+                                   {...inputs.getInputProps(parameter.id!!)}
                 />
             </div>
         })}
     </Flex>
-
 }

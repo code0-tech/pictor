@@ -2,11 +2,19 @@ import React from "react";
 import {useService, useStore} from "../../utils";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowSuggestion, DFlowSuggestionType} from "./DFlowSuggestion.view";
-import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../utils/generics";
+import {
+    isMatchingType,
+    replaceGenericKeysInType,
+    replaceGenericsAndSortType,
+    resolveGenericKeys,
+    resolveType,
+    targetForGenericKey
+} from "../../utils/generics";
 import {
     DataType,
     DataTypeIdentifier,
-    DataTypeRulesContainsKeyConfig, DataTypeRulesInputTypesConfig,
+    DataTypeRulesContainsKeyConfig,
+    DataTypeRulesInputTypesConfig,
     Flow,
     Maybe,
     NodeFunction,
@@ -19,7 +27,6 @@ import {
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
-import {useInputType} from "../d-flow-function/DFlowFunction.input.hook";
 
 export const useReferenceSuggestions = (
     flowId: Flow['id'],
@@ -121,38 +128,63 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
     }, [flow])
 
     const inputSuggestions: ReferenceValue[] = React.useMemo(() => {
-        flow?.nodes?.nodes?.map(node => {
+        if (!flow?.nodes?.nodes?.length) return []
 
+        return flow.nodes.nodes.flatMap((node) => {
             const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-            const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
-            const nodeContext = nodeContexts?.find(context => context.nodeId === node?.id)
+            if (!functionDefinition) return []
 
-            return functionDefinition?.parameterDefinitions?.map(paramDef => {
-                const pType = dataTypeService.getDataType(paramDef.dataTypeIdentifier!)
-                if (!pType || pType.variant !== "NODE") return
+            const nodeValues =
+                node?.parameters?.nodes?.map((p) => p?.value!).filter(Boolean) ?? []
 
-                const inputTypeRules = pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? []
+            const nodeContext = nodeContexts?.find((c) => c.nodeId === node?.id)
+            if (!nodeContext) return []
 
-                return inputTypeRules.map(rule => {
-                    const config = rule?.config as DataTypeRulesInputTypesConfig
-                    return config.inputTypes?.map(inputType => {
-                        const resolved = useInputType(inputType.dataTypeIdentifier!!, functionDefinition, nodeValues, dataTypeService)
-                        //console.log(inputType, resolved)
-                        if (resolved && nodeContext) {
-                            return referenceExtraction(nodeContext, resolved)
-                        }
-                        return {} as ReferenceValue
+            return (functionDefinition.parameterDefinitions ?? []).flatMap((paramDef, index) => {
+                const dataTypeIdentifier = paramDef?.dataTypeIdentifier
+                if (!dataTypeIdentifier) return []
+
+                const pType = dataTypeService.getDataType(dataTypeIdentifier)
+                if (!pType || pType.variant !== "NODE") return []
+
+                const inputTypeRules =
+                    pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? []
+
+                const genericTypeMap = resolveGenericKeys(functionDefinition, nodeValues, dataTypeService)
+                const genericTargetMap = targetForGenericKey(functionDefinition, dataTypeIdentifier)
+                const resolvedGenericMap = new Map(
+                    [...genericTypeMap].map(([key, value]) => [genericTargetMap.get(key) ?? key, value])
+                )
+
+                return inputTypeRules.flatMap((rule) => {
+                    const config = rule?.config as DataTypeRulesInputTypesConfig | undefined
+                    const inputTypes = config?.inputTypes ?? []
+
+                    return inputTypes.flatMap((inputType, inputIndex) => {
+                        const resolved = replaceGenericKeysInType(
+                            inputType.dataTypeIdentifier!,
+                            resolvedGenericMap
+                        )
+                        if (!resolved) return []
+
+                        return referenceExtraction({
+                            ...nodeContext,
+                            referencePath: [{
+                                path: String(index)
+                            }, {
+                                path: String(inputIndex)
+                            }]
+                        }, resolved)
                     })
                 })
-
             })
         })
-        return []
-    }, [flow])
+    }, [flow, nodeContexts, functionService, dataTypeService])
 
-    //console.log(inputSuggestions)
+    console.log(inputSuggestions)
 
     return [
+        ...inputSuggestions,
         ...flowInputSuggestions,
         ...nodeSuggestions
     ].flat()
@@ -262,6 +294,7 @@ const useNodeContext = (
                 current = flowService.getNodeById(flow.id, current.nextNodeId);
             }
         };
+
 
         traverse(flowService.getNodeById(flow.id, flow.startingNodeId), 0, [0]);
 

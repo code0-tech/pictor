@@ -75,8 +75,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
             data-id={id}
             value={activeTabId}
             onValueChange={(value) => {
-                fileTabsService.activateTab(value); // mutieren reicht; kein .update() nötig, wenn setState benutzt wird
-                fileTabsService.update()
+                fileTabsService.activateTab(value);
             }}
         >
             <DLayout topContent={<FileTabsList

@@ -26,6 +26,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
     const [, startTransition] = React.useTransition()
 
     //memoized values
@@ -40,10 +41,14 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
         if (!(activeTab.content.props.flowId as Flow['id'])) return
         // @ts-ignore
         startTransition(async () => {
+            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab.content.props.node.id)
+            linkedNodes.forEach(node => {
+                if (node.id) fileTabsService.deleteById(node.id)
+            })
+
             await flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
         })
-        fileTabsService.deleteById(activeTab.id)
-    }, [activeTab, flowService])
+    }, [activeTab, flowService, flowStore])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {
         if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {

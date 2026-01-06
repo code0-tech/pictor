@@ -13,6 +13,7 @@ import {useService, useStore} from "../../utils";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
+import {DFlowSuggestion} from "../d-flow-suggestion";
 
 export interface DFlowInputDefaultProps extends TextInputProps {
     flowId: Flow['id']
@@ -107,7 +108,7 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
     const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
-    const suggestions = useSuggestions(flowId, nodeId, parameterId)
+    const suggestions = rest.suggestions || useSuggestions(flowId, nodeId, parameterId)
 
     const transformSyntax = React.useCallback((value: string): InputSyntaxSegment[] => {
 
@@ -192,7 +193,7 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
                       enforceUniqueSuggestions
                       validationUsesSyntax
                       transformSyntax={transformSyntax}
-                      suggestions={toInputSuggestions(suggestions)}
+                      suggestions={rest.suggestions ? rest.suggestions : toInputSuggestions(suggestions as DFlowSuggestion[])}
                       {...rest}
 
     />

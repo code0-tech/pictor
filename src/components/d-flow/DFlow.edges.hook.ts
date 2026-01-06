@@ -134,32 +134,31 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                 if (!val) return
 
                 if (paramDT?.variant === "NODE") {
-                    const groupId = `${fnId}-group-${idCounter++}`;
-                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
-                    const hashToHue = (md5: string): number => {
-                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                        const int = parseInt(md5.slice(0, 8), 16)
-                        return int % 360
-                    }
-
-                    edges.push({
-                        id: `${fnId}-${groupId}-param-${param.id}`,
-                        source: fnId,
-                        target: groupId,
-                        deletable: false,
-                        selectable: false,
-                        animated: true,
-                        label: def?.names?.nodes!![0]?.content ?? param.id,
-                        data: {
-                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
-                            type: 'group',
-                            flowId: flowId,
-                            parentNodeId: parentNode?.id
-                        },
-                    });
-
-
                     if (val && val.__typename === "NodeFunctionIdWrapper") {
+
+                        const groupId = `${fnId}-group-${idCounter++}`;
+                        const hash = md5(md5(val?.id || ""))
+                        const hashToHue = (md5: string): number => {
+                            // nimm z.B. 8 Hex-Zeichen = 32 Bit
+                            const int = parseInt(md5.slice(0, 8), 16)
+                            return int % 360
+                        }
+
+                        edges.push({
+                            id: `${fnId}-${groupId}-param-${param.id}`,
+                            source: fnId,
+                            target: groupId,
+                            deletable: false,
+                            selectable: false,
+                            animated: true,
+                            label: def?.names?.nodes!![0]?.content ?? param.id,
+                            data: {
+                                color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                                type: 'group',
+                                flowId: flowId,
+                                parentNodeId: parentNode?.id
+                            },
+                        });
 
                         (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
                             groupsWithValue.get(fnId)!))
@@ -184,9 +183,8 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         dtCache
                     );
 
-                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
+                    const hash = md5(md5(val?.id || ""))
                     const hashToHue = (md5: string): number => {
-                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
                         const int = parseInt(md5.slice(0, 8), 16)
                         return int % 360
                     }

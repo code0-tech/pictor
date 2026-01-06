@@ -165,8 +165,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
 
     async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
 
-        //TODO: if its just a replacement rather than deleting and adding, we should keep the id
-
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         const parentNode = parentNodeId ? this.getNodeById(flowId, parentNodeId) : undefined

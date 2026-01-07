@@ -13,6 +13,7 @@ import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 import {DFlowSuggestion} from "../d-flow-suggestion";
 import {DFlowInputNodeBadge} from "./DFlowInputNodeBadge";
 import {DFlowInputReferenceBadge} from "./DFlowInputReferenceBadge";
+import {DFlowTypeReactiveService} from "../d-flow-type";
 
 export interface DFlowInputDefaultProps extends TextInputProps {
     flowId: Flow['id']
@@ -105,6 +106,11 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
 
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const flowTypeService = useService(DFlowTypeReactiveService)
+
+    const flow = React.useMemo(() => {
+        return flowService.getById(flowId)
+    }, [flowService, flowId])
 
     const suggestions = rest.suggestions || useSuggestions(flowId, nodeId, parameterId)
 
@@ -155,9 +161,9 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
             }
 
             if (value?.__typename === "ReferenceValue") {
-                const node = flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)
+                const node = (value as ReferenceValue).nodeFunctionId === "gid://sagittarius/NodeFunction/-1" ? flowTypeService.getById(flow?.type?.id) : functionService.getById(flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)?.functionDefinition?.id)
                 return buildBlockSegment(
-                    <DFlowInputReferenceBadge flowId={flowId} definition={functionService.getById(node?.functionDefinition?.id)} value={value}/>,
+                    <DFlowInputReferenceBadge flowId={flowId} definition={node} value={value}/>,
                     value
                 )
             }

@@ -333,14 +333,14 @@ const RuleItem: React.FC<{
             const mapper = genericMap.get(identifier.genericKey)
             const source = mapper?.sourceDataTypeIdentifiers?.[0]
             return (
-                source?.dataType?.name?.nodes?.[0]?.content ??
-                source?.genericType?.dataType?.name?.nodes?.[0]?.content
+                source?.dataType?.name?.[0]?.content ??
+                source?.genericType?.dataType?.name?.[0]?.content
             )
         }
 
         return (
-            identifier.dataType?.name?.nodes?.[0]?.content ??
-            identifier.genericType?.dataType?.name?.nodes?.[0]?.content
+            identifier.dataType?.name?.[0]?.content ??
+            identifier.genericType?.dataType?.name?.[0]?.content
         )
     }, [genericMap, identifier, isTypeRule])
 

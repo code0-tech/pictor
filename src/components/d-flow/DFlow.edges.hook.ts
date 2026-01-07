@@ -151,7 +151,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                             deletable: false,
                             selectable: false,
                             animated: true,
-                            label: def?.names?.nodes!![0]?.content ?? param.id,
+                            label: def?.names!![0]?.content ?? param.id,
                             data: {
                                 color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
                                 type: 'group',

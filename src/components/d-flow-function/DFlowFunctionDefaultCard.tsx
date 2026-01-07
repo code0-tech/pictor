@@ -84,7 +84,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
         return int % 360
     }
 
-    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content ?? "").map(item => {
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const param = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
             return parameterDefinition?.identifier == item
@@ -136,7 +136,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             closeable: true,
             children: <>
                 <IconNote color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
-                <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+                <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
         })

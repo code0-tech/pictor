@@ -42,12 +42,10 @@ const errorResult = (
 ): ValidationResult => ({
     parameterId,
     type: InspectionSeverity.ERROR,
-    message: {
-        nodes: [{
-            code: "en-US",
-            content: `Argument of type ${actual?.name?.nodes!![0]?.content} is not assignable to parameter of type ${expected?.name?.nodes!![0]?.content}`
-        }]
-    }
+    message: [{
+        code: "en-US",
+        content: `Argument of type ${actual?.name!![0]?.content} is not assignable to parameter of type ${expected?.name!![0]?.content}`
+    }]
 })
 
 export const useNodeValidation = (

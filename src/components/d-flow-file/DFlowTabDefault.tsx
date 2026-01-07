@@ -65,7 +65,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             values[parameter?.id!!] = (_: any) => {
                 const validationForParameter = validation?.find(v => v.parameterId === parameter?.id)
                 if (validationForParameter) {
-                    return validationForParameter.message.nodes!![0]?.content || "Invalid value"
+                    return validationForParameter.message!![0]?.content || "Invalid value"
                 }
                 return null
             }
@@ -130,8 +130,8 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
             if (!parameter) return null
 
             const parameterDefinition = paramDefinitions[parameter.id!!]
-            const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
-            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
+            const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
+            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 
             return <div>
                 {/*@ts-ignore*/}

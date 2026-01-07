@@ -39,12 +39,12 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
             closeable: true,
             children: <>
                 <IconBolt size={12}/>
-                <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+                <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <DFlowTabTrigger instance={data.instance}/>,
             show: true
         })
-    }, [definition?.id, data.instance, fileTabsService, definition?.names?.nodes])
+    }, [definition?.id, data.instance, fileTabsService, definition?.names])
 
     return <Flex align={"center"} style={{flexDirection: "column"}} key={id} data-flow-refernce={id}>
         <Badge color={"info"} style={{borderTopRightRadius: "0.35rem", borderTopLeftRadius: "0.35rem", borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>Starting node</Badge>
@@ -67,7 +67,7 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
                 <Flex style={{gap: "0.7rem"}} align={"center"}>
                     <IconBolt size={16}/>
                     <Text display={"block"} size={"md"}>
-                        {definition?.names?.nodes!![0]?.content ?? definition?.id}
+                        {definition?.names!![0]?.content ?? definition?.id}
                     </Text>
                 </Flex>
                 <Flex align={"center"} style={{gap: "0.7rem"}}>

@@ -1,19 +1,18 @@
 import type {
     DataType,
     DataTypeRuleConnection,
-    DataTypeVariant, Maybe, Runtime, Scalars,
-    TranslationConnection
+    DataTypeVariant, Maybe, Runtime, Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
 
 
 export class DataTypeView {
 
     /** Name of the function */
-    private readonly _aliases?: Maybe<TranslationConnection>;
+    private readonly _aliases?: Maybe<Array<Translation>>;
     /** Time when this DataType was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Display message of the function */
-    private readonly _displayMessages?: Maybe<TranslationConnection>;
+    private readonly _displayMessages?: Maybe<Array<Translation>>;
     /** Generic keys of the datatype */
     private readonly _genericKeys?: Maybe<Array<Scalars['String']['output']>>;
     /** Global ID of this DataType */
@@ -21,7 +20,7 @@ export class DataTypeView {
     /** The identifier scoped to the namespace */
     private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Names of the flow type setting */
-    private readonly _name?: Maybe<TranslationConnection>;
+    private readonly _name?: Maybe<Array<Translation>>;
     /** Rules of the datatype */
     private readonly _rules?: Maybe<DataTypeRuleConnection>;
     /** The namespace where this datatype belongs to */
@@ -45,7 +44,7 @@ export class DataTypeView {
         this._variant = dataType.variant;
     }
 
-    get aliases(): Maybe<TranslationConnection> | undefined {
+    get aliases(): Maybe<Array<Translation>> | undefined {
         return this._aliases;
     }
 
@@ -53,7 +52,7 @@ export class DataTypeView {
         return this._createdAt;
     }
 
-    get displayMessages(): Maybe<TranslationConnection> | undefined {
+    get displayMessages(): Maybe<Array<Translation>> | undefined {
         return this._displayMessages;
     }
 
@@ -69,7 +68,7 @@ export class DataTypeView {
         return this._identifier;
     }
 
-    get name(): Maybe<TranslationConnection> | undefined {
+    get name(): Maybe<Array<Translation>> | undefined {
         return this._name;
     }
 

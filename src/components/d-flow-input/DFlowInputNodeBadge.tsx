@@ -28,7 +28,7 @@ export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) =
     }, [flowStore])
 
     const name = React.useMemo(() => {
-        return definition ? definition.names?.nodes?.[0]?.content : (functionService as DFlowFunctionReactiveService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.nodes?.[0]?.content
+        return definition ? definition.names?.[0]?.content : (functionService as DFlowFunctionReactiveService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content
     }, [functionStore, node])
 
     const hashRef = md5(md5(value.id || ""))

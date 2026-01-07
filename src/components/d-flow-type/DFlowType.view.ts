@@ -3,21 +3,20 @@ import type {
     FlowType,
     FlowTypeSetting,
     Maybe,
-    Scalars,
-    TranslationConnection
+    Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
 
 
 export class FlowTypeView {
 
     /** Name of the function */
-    private readonly _aliases?: Maybe<TranslationConnection>;
+    private readonly _aliases?: Maybe<Array<Translation>>;
     /** Time when this FlowType was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Descriptions of the flow type */
-    private readonly _descriptions?: Maybe<TranslationConnection>;
+    private readonly _descriptions?: Maybe<Array<Translation>>;
     /** Display message of the function */
-    private readonly _displayMessages?: Maybe<TranslationConnection>;
+    private readonly _displayMessages?: Maybe<Array<Translation>>;
     /** Editable status of the flow type */
     private readonly _editable?: Maybe<Scalars['Boolean']['output']>;
     /** Flow type settings of the flow type */
@@ -29,7 +28,7 @@ export class FlowTypeView {
     /** Input type of the flow type */
     private readonly _inputType?: Maybe<DataType>;
     /** Names of the flow type */
-    private readonly _names?: Maybe<TranslationConnection>;
+    private readonly _names?: Maybe<Array<Translation>>;
     /** Return type of the flow type */
     private readonly _returnType?: Maybe<DataType>;
     /** Time when this FlowType was last updated */
@@ -51,7 +50,7 @@ export class FlowTypeView {
         this._updatedAt = flowType.updatedAt;
     }
 
-    get aliases(): Maybe<TranslationConnection> | undefined {
+    get aliases(): Maybe<Array<Translation>> | undefined {
         return this._aliases;
     }
 
@@ -59,11 +58,11 @@ export class FlowTypeView {
         return this._createdAt;
     }
 
-    get descriptions(): Maybe<TranslationConnection> | undefined {
+    get descriptions(): Maybe<Array<Translation>> | undefined {
         return this._descriptions;
     }
 
-    get displayMessages(): Maybe<TranslationConnection> | undefined {
+    get displayMessages(): Maybe<Array<Translation>> | undefined {
         return this._displayMessages;
     }
 
@@ -87,7 +86,7 @@ export class FlowTypeView {
         return this._inputType;
     }
 
-    get names(): Maybe<TranslationConnection> | undefined {
+    get names(): Maybe<Array<Translation>> | undefined {
         return this._names;
     }
 

@@ -75,7 +75,7 @@ export const useFunctionSuggestions = (
             return {
                 path: [],
                 type: DFlowSuggestionType.FUNCTION,
-                displayText: [funcDefinition.names?.nodes!![0]?.content as string],
+                displayText: [funcDefinition.names!![0]?.content as string],
                 value: nodeFunctionSuggestion,
             }
         })

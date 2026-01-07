@@ -1,4 +1,4 @@
-import {Maybe, Scalars, TranslationConnection} from "@code0-tech/sagittarius-graphql-types";
+import {Maybe, Scalars, Translation} from "@code0-tech/sagittarius-graphql-types";
 import {CSSProperties} from "react";
 
 export enum InspectionSeverity {
@@ -12,7 +12,7 @@ export enum InspectionSeverity {
 export interface ValidationResult {
     parameterId: Maybe<Scalars["ParameterDefinitionID"]["output"]>
     type: InspectionSeverity
-    message: TranslationConnection
+    message: Array<Translation>
 }
 
 const createWavyUnderline = (color: string, size = "5px 4px"): CSSProperties => ({

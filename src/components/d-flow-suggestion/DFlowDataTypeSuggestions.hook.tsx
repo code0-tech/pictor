@@ -19,7 +19,7 @@ export const useDataTypeSuggestions = (dataTypeIdentifier?: DataTypeIdentifier):
         return dataTypeService.values().map(nextDataType => ({
             path: [],
             type: DFlowSuggestionType.DATA_TYPE,
-            displayText: [nextDataType.name?.nodes!![0]?.content!],
+            displayText: [nextDataType.name!![0]?.content!],
             /*@ts-ignore*/
             value: nextDataType.json,
         }))

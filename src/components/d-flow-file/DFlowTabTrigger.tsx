@@ -44,8 +44,8 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
         }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {
             const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
-            const title = settingDefinition.names?.nodes!![0]?.content ?? ""
-            const description = settingDefinition?.descriptions?.nodes!![0]?.content ?? ""
+            const title = settingDefinition.names!![0]?.content ?? ""
+            const description = settingDefinition?.descriptions!![0]?.content ?? ""
             const result = suggestionsById[settingDefinition.identifier!!]
 
             if (!setting) return null

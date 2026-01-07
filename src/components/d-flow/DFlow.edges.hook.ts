@@ -187,7 +187,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         deletable: false,
                         selectable: false,
                         data: {
-                            color: `hsl(${hashToColor(val?.id || "")}, 100%, 72%)`,
+                            color: hashToColor(val?.id || ""),
                             type: 'parameter',
                             flowId: flowId,
                             parentNodeId: parentNode?.id

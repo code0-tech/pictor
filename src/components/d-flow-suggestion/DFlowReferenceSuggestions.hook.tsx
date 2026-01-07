@@ -263,9 +263,6 @@ const useNodeContext = (
                 const def = functionService.getById(current.functionDefinition?.id!!);
                 if (!def) break;
 
-                const nodeIndex = nextNodeId();
-                contexts.push({node: nodeIndex, depth, scope: scopePath, nodeFunctionId: current.id});
-
                 if (current.parameters && def.parameterDefinitions) {
                     for (const pDef of def.parameterDefinitions) {
                         const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
@@ -281,6 +278,9 @@ const useNodeContext = (
                         }
                     }
                 }
+
+                const nodeIndex = nextNodeId();
+                contexts.push({node: nodeIndex, depth, scope: scopePath, nodeFunctionId: current.id});
 
                 current = flowService.getNodeById(flow.id, current.nextNodeId);
             }

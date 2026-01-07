@@ -20,13 +20,16 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameterValue,
-    ReferencePath,
-    ReferenceValue,
-    Scalars
+    ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
+
+interface ExtendedReferenceValue extends ReferenceValue {
+    parameterIndex?: number
+    inputTypeIndex?: number
+}
 
 export const useReferenceSuggestions = (
     flowId: Flow['id'],
@@ -39,7 +42,7 @@ export const useReferenceSuggestions = (
 
     const nodeContexts = useNodeContext(flowId)
     const nodeContext = React.useMemo(() => (
-        nodeId ? nodeContexts?.find(context => context.nodeId === nodeId) : undefined
+        nodeId ? nodeContexts?.find(context => context.nodeFunctionId === nodeId) : undefined
     ), [nodeContexts, nodeId])
 
     const resolvedType = React.useMemo(() => (
@@ -56,9 +59,10 @@ export const useReferenceSuggestions = (
             if (value.node === null || value.node === undefined) return []
             if (value.depth === null || value.depth === undefined) return []
             if (value.scope === null || value.scope === undefined) return []
-            if (value.node >= node) return []
-            if (value.depth > depth) return []
-            if (value.scope.some(r => !scope.includes(r))) return []
+
+            if (value.node >= node!) return []
+            if (value.depth > depth!) return []
+            if (value.scope.some(r => !scope!.includes(r))) return []
 
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
@@ -88,7 +92,7 @@ export const useReferenceSuggestions = (
  *  - The `node` id is incremented globally for every visited node and shared by all
  *    RefObjects (inputs from rules and the return value) produced by that node.
  */
-const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
+const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
@@ -105,7 +109,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
             const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
             const functionDefinition = functionService.getById(node?.functionDefinition?.id)
             const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService)
-            const nodeContext = nodeContexts?.find(context => context.nodeId === node?.id)
+            const nodeContext = nodeContexts?.find(context => context.nodeFunctionId === node?.id)
 
             if (resolvedReturnType && nodeContext) {
                 return referenceExtraction(nodeContext, resolvedReturnType)
@@ -120,7 +124,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
         return referenceExtraction({
             node: 0,
             depth: 0,
-            nodeId: "gid://sagittarius/NodeFunction/-1",
+            nodeFunctionId: "gid://sagittarius/NodeFunction/-1",
             scope: [0]
         }, {
             dataType: flow?.inputType
@@ -137,7 +141,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
             const nodeValues =
                 node?.parameters?.nodes?.map((p) => p?.value!).filter(Boolean) ?? []
 
-            const nodeContext = nodeContexts?.find((c) => c.nodeId === node?.id)
+            const nodeContext = nodeContexts?.find((c) => c.nodeFunctionId === node?.id)
             if (!nodeContext) return []
 
             return (functionDefinition.parameterDefinitions ?? []).flatMap((paramDef, index) => {
@@ -169,19 +173,14 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
 
                         return referenceExtraction({
                             ...nodeContext,
-                            referencePath: [{
-                                path: String(index)
-                            }, {
-                                path: String(inputIndex)
-                            }]
+                            parameterIndex: index,
+                            inputTypeIndex: inputIndex,
                         }, resolved)
                     })
                 })
             })
         })
     }, [flow, nodeContexts, functionService, dataTypeService])
-
-    console.log(inputSuggestions)
 
     return [
         ...inputSuggestions,
@@ -190,7 +189,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: NodeContext, dataTypeIdentifier: DataTypeIdentifier): ReferenceValue[] => {
+const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier): ReferenceValue[] => {
 
     const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
@@ -217,23 +216,15 @@ const referenceExtraction = (nodeContext: NodeContext, dataTypeIdentifier: DataT
         {
             __typename: "ReferenceValue",
             dataTypeIdentifier,
-            nodeFunctionId: nodeContext.nodeId,
+            nodeFunctionId: nodeContext.nodeFunctionId,
             ...nodeContext
         }]
 
 }
 
-export type NodeContext = {
-    node: Scalars['Int']['output']
-    depth: Scalars['Int']['output']
-    scope: Array<Scalars['Int']['output']>
-    nodeId: NodeFunction['id']
-    referencePath?: Array<ReferencePath>
-}
-
 const useNodeContext = (
     flowId: Flow['id']
-): NodeContext[] => {
+): ExtendedReferenceValue[] => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
@@ -254,7 +245,7 @@ const useNodeContext = (
         let globalNodeId = 0;
         const nextNodeId = () => ++globalNodeId;
 
-        const contexts: NodeContext[] = [];
+        const contexts: ExtendedReferenceValue[] = [];
 
         const traverse = (
             node: NodeFunctionIdWrapper | NodeFunction | undefined,
@@ -273,7 +264,7 @@ const useNodeContext = (
                 if (!def) break;
 
                 const nodeIndex = nextNodeId();
-                contexts.push({node: nodeIndex, depth, scope: scopePath, nodeId: current.id});
+                contexts.push({node: nodeIndex, depth, scope: scopePath, nodeFunctionId: current.id});
 
                 if (current.parameters && def.parameterDefinitions) {
                     for (const pDef of def.parameterDefinitions) {

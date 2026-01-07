@@ -7,11 +7,12 @@ import {Text} from "../text/Text";
 import {useService, useStore} from "../../utils";
 import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
+import {FlowTypeView} from "../d-flow-type";
 
 export interface DFlowInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
     flowId: Flow['id']
-    definition?: FunctionDefinitionView
+    definition?: FunctionDefinitionView | FlowTypeView
 }
 
 export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) => {

@@ -37,478 +37,562 @@ import {DFlowPanelLayout} from "../d-flow-panel";
  * @returns An object containing the new positioned nodes and the unchanged edges.
  */
 const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
-    if (!dirtyIds || dirtyIds.size === 0) {
-        return {nodes}
-    }
+    if (!dirtyIds || dirtyIds.size === 0) return { nodes }
+
     /* Konstanten */
     const V = 50;          // vertical gap Node ↕ Node
     const H = 50;          // horizontal gap Parent → Param
-    const PAD = 16;         // inner padding einer Group (links+rechts / oben+unten)
-    const EPS = 0.25;       // Toleranz gegen Rundungsdrift
+    const PAD = 16;        // inner padding einer Group (links+rechts / oben+unten)
+    const EPS = 0.25;      // Toleranz gegen Rundungsdrift
 
     // Wir iterieren, bis Group-Maße stabil sind
-    let pass = 0;
-    let changed = false;
+    let pass = 0
+    let changed = false
 
-    // Aktueller Arbeitsstand der Nodes (Styles werden in den Pässen fortgeschrieben)
-    const work = nodes.map(n => ({...n}))
-
-    // Relationen einmalig ermitteln (IDs behalten) --------------------------------
+    // ----------------------------
+    // 1) Relationen einmalig ermitteln
+    // ----------------------------
     const rfKidIds = new Map<string, string[]>()
     const paramIds = new Map<string, string[]>()
-    for (const n of work) {
-        const link = (n.data as any)?.linkingId;
+
+    for (const n of nodes) {
+        const link = (n.data as any)?.linkingId
         if (link) {
-            let arr = paramIds.get(link)
-            if (!arr) {
-                arr = [];
-                paramIds.set(link, arr)
-            }
+            const arr = paramIds.get(link) ?? []
             arr.push(n.id)
+            paramIds.set(link, arr)
         }
         if (n.parentId && !link) {
-            let arr = rfKidIds.get(n.parentId)
-            if (!arr) {
-                arr = [];
-                rfKidIds.set(n.parentId, arr)
-            }
+            const arr = rfKidIds.get(n.parentId) ?? []
             arr.push(n.id)
+            rfKidIds.set(n.parentId, arr)
         }
     }
 
+    const byId = new Map(nodes.map(n => [n.id, n] as const))
+
     const rfKids = new Map<string, Node[]>()
-    const params = new Map<string, Node[]>()
-
-    const byId = new Map(work.map(n => [n.id, n]))
-
     for (const [k, ids] of rfKidIds) {
         const arr: Node[] = new Array(ids.length)
-        for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
+        for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!
         rfKids.set(k, arr)
     }
+
+    const params = new Map<string, Node[]>()
     for (const [k, ids] of paramIds) {
         const arr: Node[] = new Array(ids.length)
-        for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!;
+        for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!
         params.set(k, arr)
     }
 
     type Size = { w: number; h: number }
+    type Pos = { x: number; y: number }
+
+    // ----------------------------
+    // 2) Working state (nur Daten, KEINE Node-Mutationen)
+    // ----------------------------
+    // Positionen (Top-Left, RF-Koordinaten, relativ zu Parent falls parentId)
+    const posTL = new Map<string, Pos>()
+
+    // Group-Measured/Style (width/height) werden im Bounding geändert
+    // -> diese Maps repräsentieren den "aktuellen" Stand über Passes hinweg
+    const styleWH = new Map<string, { width: number; height: number }>()
+    const measuredWH = new Map<string, { width: number; height: number }>()
+
+    // baseSizes als Startpunkt (non-group) + wird für groups nach Bounding aktualisiert
     const baseSizes = new Map<string, Size>()
-    for (const n of work) {
-        const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
-        const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
-        const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined;
-        const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined;
-        baseSizes.set(n.id, {w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80})
+    for (const n of nodes) {
+        const styleW = typeof n.style?.width === "number" ? (n.style.width as number) : undefined
+        const styleH = typeof n.style?.height === "number" ? (n.style.height as number) : undefined
+        const mw = n.measured?.width && n.measured.width > 0 ? n.measured.width : undefined
+        const mh = n.measured?.height && n.measured.height > 0 ? n.measured.height : undefined
+        baseSizes.set(n.id, { w: styleW ?? mw ?? 200, h: styleH ?? mh ?? 80 })
     }
+
+    const getStyleW = (n: Node) => styleWH.get(n.id)?.width
+    const getStyleH = (n: Node) => styleWH.get(n.id)?.height
 
     const sizeCache = new Map<string, Size>()
     const size = (n: Node): Size => {
-        if (sizeCache.has(n.id)) return sizeCache.get(n.id)!;
+        const cached = sizeCache.get(n.id)
+        if (cached) return cached
 
-        if (n.type !== 'group') {
-            const s = baseSizes.get(n.id)!;
+        // non-group: aus baseSizes
+        if (n.type !== "group") {
+            const s = baseSizes.get(n.id)!
             sizeCache.set(n.id, s)
-            return s;
+            return s
         }
 
-        const styleW = typeof n.style?.width === 'number' ? n.style.width : undefined;
-        const styleH = typeof n.style?.height === 'number' ? n.style.height : undefined;
-        if (styleW !== undefined && styleH !== undefined) {
-            const s = {w: styleW, h: styleH}
+        // group: wenn width/height explizit gesetzt (aus styleWH), dann das nehmen
+        const sw = getStyleW(n)
+        const sh = getStyleH(n)
+        if (sw !== undefined && sh !== undefined) {
+            const s = { w: sw, h: sh }
             sizeCache.set(n.id, s)
-            return s;
+            return s
         }
 
-        const kids = rfKids.get(n.id) ?? [];
-        let stackH = 0;
-        let wMax = 0;
-        let count = 0;
+        // sonst aus Kindern ableiten
+        const kids = rfKids.get(n.id) ?? []
+        let stackH = 0
+        let wMax = 0
+        let count = 0
+
         for (const k of kids) {
             const ks = size(k)
-            stackH += ks.h;
-            if (ks.w > wMax) wMax = ks.w;
-            count++;
+            stackH += ks.h
+            if (ks.w > wMax) wMax = ks.w
+            count++
         }
         stackH += V * Math.max(0, count - 1)
 
-        const g = {
-            w: wMax + 2 * PAD,
-            h: (count ? stackH : 0) + 2 * PAD,
-        }
+        const g = { w: wMax + 2 * PAD, h: (count ? stackH : 0) + 2 * PAD }
         sizeCache.set(n.id, g)
-        return g;
+        return g
     }
 
+    // ----------------------------
+    // 3) Layout-Iteration (wie bisher), nur dass wir am Ende posTL/styleWH/measuredWH updaten
+    // ----------------------------
     do {
-        changed = false;
-        pass++;
+        changed = false
+        pass++
+
         sizeCache.clear()
-        for (const n of work) size(n)
+        for (const n of nodes) size(n)
 
-        /* ---------- relatives Layout (Zentren in globalen Koordinaten) -------- */
+        // relatives Layout (Center in globalen Koordinaten)
+        const relCenter = new Map<string, Pos>()
 
-        type Pos = { x: number; y: number }
-        const rel = new Map<string, Pos>()
-
-        // Merker: Unterkante je rechter Spalten-"Band", damit Parameter unterschiedlicher Parents
-        // in derselben Spalte nicht kollidieren.
+        // Unterkante je rechter Spalten-"Band", damit Parameter nicht kollidieren
         const columnBottom = new Map<number, number>()
-        const colKey = (x: number) => Math.round(x / 10) // 10px-Buckets gegen Floating-Drift
+        const colKey = (x: number) => Math.round(x / 10)
 
         const layoutIter = (root: Node, cx: number, cy: number): number => {
             type Frame = {
-                node: Node;
-                cx: number;
-                cy: number;
-                phase: number;
-                w?: number;
-                h?: number;
-                right?: Node[];
-                rightIndex?: number;
-                py?: number;
-                rightBottom?: number;
-                childKey?: number;
-                childPs?: Size;
-                lastChildBottom?: number;
-                gParams?: Node[];
-                gSizes?: Size[];
-                gIndex?: number;
-                gx?: number;
-                gy?: number;
-                rowBottom?: number;
-                kids?: Node[];
-                kidIndex?: number;
-                curY?: number;
-                bottom?: number;
+                node: Node
+                cx: number
+                cy: number
+                phase: number
+                w?: number
+                h?: number
+                right?: Node[]
+                rightIndex?: number
+                py?: number
+                rightBottom?: number
+                childKey?: number
+                childPs?: Size
+                lastChildBottom?: number
+
+                gParams?: Node[]
+                gSizes?: Size[]
+                gIndex?: number
+                gx?: number
+                gy?: number
+                rowBottom?: number
+
+                kids?: Node[]
+                kidIndex?: number
+                curY?: number
+                bottom?: number
             }
-            const stack: Frame[] = [{node: root, cx, cy, phase: 0}];
-            let returnBottom = 0;
+
+            const stack: Frame[] = [{ node: root, cx, cy, phase: 0 }]
+            let returnBottom = 0
 
             while (stack.length) {
-                const f = stack[stack.length - 1];
+                const f = stack[stack.length - 1]
                 switch (f.phase) {
                     case 0: {
-                        rel.set(f.node.id, {x: f.cx, y: f.cy})
-                        const {w, h} = size(f.node)
-                        f.w = w;
-                        f.h = h;
+                        relCenter.set(f.node.id, { x: f.cx, y: f.cy })
+                        const { w, h } = size(f.node)
+                        f.w = w
+                        f.h = h
 
-                        const paramsOf = params.get(f.node.id) ?? [];
-                        const right: Node[] = [];
-                        const gParams: Node[] = [];
+                        const paramsOf = params.get(f.node.id) ?? []
+                        const right: Node[] = []
+                        const gParams: Node[] = []
                         for (const p of paramsOf) {
-                            if (p.type === 'group') gParams.push(p)
+                            if (p.type === "group") gParams.push(p)
                             else right.push(p)
                         }
                         right.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
                         gParams.sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
-                        f.right = right;
-                        f.gParams = gParams;
 
-                        let total = 0;
-                        for (const p of right) total += size(p).h;
+                        f.right = right
+                        f.gParams = gParams
+
+                        let total = 0
+                        for (const p of right) total += size(p).h
                         total += V * Math.max(0, right.length - 1)
-                        f.py = f.cy - total / 2;
-                        f.rightBottom = f.cy + h / 2;
-                        f.rightIndex = 0;
-                        f.phase = 1;
-                        break;
+
+                        f.py = f.cy - total / 2
+                        f.rightBottom = f.cy + h / 2
+                        f.rightIndex = 0
+                        f.phase = 1
+                        break
                     }
+
                     case 1: {
                         if (f.rightIndex! < f.right!.length) {
-                            const p = f.right![f.rightIndex!];
+                            const p = f.right![f.rightIndex!]
                             const ps = size(p)
-                            const px = f.cx + f.w! / 2 + H + ps.w / 2;
-                            let pcy = f.py! + ps.h / 2;
+                            const px = f.cx + f.w! / 2 + H + ps.w / 2
+                            let pcy = f.py! + ps.h / 2
+
                             const key = colKey(px)
-                            const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY;
-                            const minTop = occ + V;
-                            const desiredTop = pcy - ps.h / 2;
+                            const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY
+                            const minTop = occ + V
+                            const desiredTop = pcy - ps.h / 2
+
                             if (desiredTop < minTop) {
-                                pcy = minTop + ps.h / 2;
-                                f.py = pcy - ps.h / 2;
+                                pcy = minTop + ps.h / 2
+                                f.py = pcy - ps.h / 2
                             }
-                            f.childKey = key;
-                            f.childPs = ps;
-                            stack.push({node: p, cx: px, cy: pcy, phase: 0})
-                            f.phase = 10;
+
+                            f.childKey = key
+                            f.childPs = ps
+                            stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
+                            f.phase = 10
                         } else {
                             f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
-                            f.phase = 2;
+                            f.phase = 2
                         }
-                        break;
+                        break
                     }
+
                     case 10: {
-                        const subBottom = f.lastChildBottom!;
-                        columnBottom.set(f.childKey!, Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom))
+                        const subBottom = f.lastChildBottom!
+                        columnBottom.set(
+                            f.childKey!,
+                            Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom)
+                        )
                         f.rightBottom = Math.max(f.rightBottom!, subBottom)
                         f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V)
-                        f.rightIndex!++;
-                        f.phase = 1;
-                        break;
+                        f.rightIndex!++
+                        f.phase = 1
+                        break
                     }
+
                     case 2: {
                         if (f.gParams && f.gParams.length) {
-                            const gSizes: Size[] = [];
-                            let rowW = 0;
+                            const gSizes: Size[] = []
+                            let rowW = 0
                             for (const g of f.gParams) {
                                 const gs = size(g)
                                 gSizes.push(gs)
-                                rowW += gs.w;
+                                rowW += gs.w
                             }
                             rowW += H * (f.gParams.length - 1)
-                            f.gSizes = gSizes;
-                            f.gx = f.cx - rowW / 2;
-                            f.gy = f.bottom! + V;
-                            f.rowBottom = f.bottom;
-                            f.gIndex = 0;
-                            f.phase = 3;
+
+                            f.gSizes = gSizes
+                            f.gx = f.cx - rowW / 2
+                            f.gy = f.bottom! + V
+                            f.rowBottom = f.bottom
+                            f.gIndex = 0
+                            f.phase = 3
                         } else {
-                            f.phase = 4;
+                            f.phase = 4
                         }
-                        break;
+                        break
                     }
+
                     case 3: {
                         if (f.gIndex! < f.gParams!.length) {
-                            const g = f.gParams![f.gIndex!];
-                            const gs = f.gSizes![f.gIndex!];
-                            const gcx = f.gx! + gs.w / 2;
-                            const gcy = f.gy! + gs.h / 2;
-                            f.gx! += gs.w + H;
-                            stack.push({node: g, cx: gcx, cy: gcy, phase: 0})
-                            f.childPs = gs;
-                            f.phase = 30;
+                            const g = f.gParams![f.gIndex!]
+                            const gs = f.gSizes![f.gIndex!]
+                            const gcx = f.gx! + gs.w / 2
+                            const gcy = f.gy! + gs.h / 2
+                            f.gx! += gs.w + H
+
+                            stack.push({ node: g, cx: gcx, cy: gcy, phase: 0 })
+                            f.childPs = gs
+                            f.phase = 30
                         } else {
-                            f.bottom = f.rowBottom;
-                            f.phase = 4;
+                            f.bottom = f.rowBottom
+                            f.phase = 4
                         }
-                        break;
+                        break
                     }
+
                     case 30: {
-                        const subBottom = f.lastChildBottom!;
+                        const subBottom = f.lastChildBottom!
                         f.rowBottom = Math.max(f.rowBottom!, subBottom)
-                        f.gIndex!++;
-                        f.phase = 3;
-                        break;
+                        f.gIndex!++
+                        f.phase = 3
+                        break
                     }
+
                     case 4: {
-                        if (f.node.type === 'group') {
-                            const kidsAll = rfKids.get(f.node.id) ?? [];
-                            const kids: Node[] = [];
+                        if (f.node.type === "group") {
+                            const kidsAll = rfKids.get(f.node.id) ?? []
+                            const kids: Node[] = []
                             for (const k of kidsAll) {
                                 if (!(k.data as any)?.linkingId) kids.push(k)
                             }
-                            f.kids = kids;
-                            f.kidIndex = 0;
-                            f.curY = f.cy - f.h! / 2 + PAD;
-                            f.phase = 5;
+                            f.kids = kids
+                            f.kidIndex = 0
+                            f.curY = f.cy - f.h! / 2 + PAD
+                            f.phase = 5
                         } else {
-                            f.phase = 6;
+                            f.phase = 6
                         }
-                        break;
+                        break
                     }
+
                     case 5: {
                         if (f.kidIndex! < f.kids!.length) {
-                            const k = f.kids![f.kidIndex!];
+                            const k = f.kids![f.kidIndex!]
                             const ks = size(k)
-                            const ky = f.curY! + ks.h / 2;
-                            stack.push({node: k, cx: f.cx, cy: ky, phase: 0})
-                            f.childPs = ks;
-                            f.phase = 50;
+                            const ky = f.curY! + ks.h / 2
+
+                            stack.push({ node: k, cx: f.cx, cy: ky, phase: 0 })
+                            f.childPs = ks
+                            f.phase = 50
                         } else {
-                            const contentBottom = f.curY! - V;
+                            const contentBottom = f.curY! - V
                             f.bottom = Math.max(f.bottom!, contentBottom + PAD)
-                            f.phase = 6;
+                            f.phase = 6
                         }
-                        break;
+                        break
                     }
+
                     case 50: {
-                        const subBottom = f.lastChildBottom!;
-                        f.curY = subBottom + V;
-                        f.kidIndex!++;
-                        f.phase = 5;
-                        break;
+                        const subBottom = f.lastChildBottom!
+                        f.curY = subBottom + V
+                        f.kidIndex!++
+                        f.phase = 5
+                        break
                     }
+
                     case 6: {
-                        const finished = stack.pop()!;
+                        const finished = stack.pop()!
                         if (stack.length) {
-                            stack[stack.length - 1].lastChildBottom = finished.bottom;
+                            stack[stack.length - 1].lastChildBottom = finished.bottom
                         } else {
-                            returnBottom = finished.bottom!;
+                            returnBottom = finished.bottom!
                         }
-                        break;
+                        break
                     }
                 }
             }
 
-            return returnBottom;
+            return returnBottom
         }
 
-        /* Root-Nodes untereinander stapeln (nur echte Roots, keine Param-Nodes) */
-        let yCursor = 0;
-        for (const r of work) {
+        // Root-Nodes stapeln
+        let yCursor = 0
+        for (const r of nodes) {
             if (!(r.data as any)?.linkingId && !r.parentId) {
                 const b = layoutIter(r, 0, yCursor + size(r).h / 2)
-                yCursor = b + V;
+                yCursor = b + V
             }
         }
 
-        /* ---------- rel (Center) → abs (Top-Left) ----------------------------- */
-        const absCenter = new Map<string, Pos>()
-        for (const n of work) absCenter.set(n.id, rel.get(n.id)!)
-
+        // rel (Center) → absTL_initial (global Top-Left)
         const absTL_initial = new Map<string, Pos>()
-        for (const n of work) {
-            const {w, h} = size(n)
-            const {x, y} = absCenter.get(n.id)!;
-            absTL_initial.set(n.id, {x: x - w / 2, y: y - h / 2})
+        for (const n of nodes) {
+            const { w, h } = size(n)
+            const c = relCenter.get(n.id)!
+            absTL_initial.set(n.id, { x: c.x - w / 2, y: c.y - h / 2 })
         }
 
-        /* ---------- positions in RF-Koordinaten (Top-Left), ggf. relativ zu Parent */
-        for (const n of work) {
-            const tl = absTL_initial.get(n.id)!;
-            let px = tl.x;
-            let py = tl.y;
+        // initial posTL setzen (in RF-Koordinaten, relativ zu Parent)
+        for (const n of nodes) {
+            const tl = absTL_initial.get(n.id)!
+            let px = tl.x
+            let py = tl.y
+
             if (n.parentId) {
-                const pTL = absTL_initial.get(n.parentId)!;
-                px -= pTL.x;
-                py -= pTL.y;
+                const pTL = absTL_initial.get(n.parentId)!
+                px -= pTL.x
+                py -= pTL.y
             }
-            n.position = {x: px, y: py}
+
+            const prev = posTL.get(n.id)
+            if (!prev || Math.abs(prev.x - px) > EPS || Math.abs(prev.y - py) > EPS) {
+                posTL.set(n.id, { x: px, y: py })
+                changed = true
+            }
         }
 
-        const posById = new Map<string, Node>()
-        for (const n of work) posById.set(n.id, n)
-
-        /* ---------- Bounding-Korrektur jeder Group ----------------------------- */
+        // Bounding-Korrektur jeder Group
         const depth = (g: Node) => {
-            let d = 0, p: Node | undefined = g;
+            let d = 0
+            let p: Node | undefined = g
             while (p?.parentId) {
-                d++;
-                p = posById.get(p.parentId)
-                if (!p) break;
+                d++
+                p = byId.get(p.parentId)
+                if (!p) break
             }
-            return d;
+            return d
         }
 
-        const groups: Node[] = [];
-        for (const n of work) {
-            if (n.type === 'group') groups.push(n)
-        }
+        const groups: Node[] = []
+        for (const n of nodes) if (n.type === "group") groups.push(n)
         groups.sort((a, b) => depth(b) - depth(a))
 
+        const childSize = (n: Node): Size => {
+            const sw = typeof n.style?.width === "number" ? (n.style.width as number) : undefined
+            const sh = typeof n.style?.height === "number" ? (n.style.height as number) : undefined
+            const s = baseSizes.get(n.id)!
+            return { w: sw ?? s.w, h: sh ?? s.h }
+        }
+
         for (const g of groups) {
-            const direct: Node[] = [];
-            for (const k of work) {
+            const direct: Node[] = []
+            for (const k of nodes) {
                 if (k.parentId === g.id) direct.push(k)
             }
 
             if (!direct.length) {
-                const gw = typeof g.style?.width === 'number' ? g.style.width : 2 * PAD;
-                const gh = typeof g.style?.height === 'number' ? g.style.height : 2 * PAD;
-                g.style = {...(g.style as React.CSSProperties), width: gw, height: gh}
-                continue;
+                // minimal group size
+                const gw = getStyleW(g) ?? (typeof g.style?.width === "number" ? (g.style.width as number) : 2 * PAD)
+                const gh = getStyleH(g) ?? (typeof g.style?.height === "number" ? (g.style.height as number) : 2 * PAD)
+                styleWH.set(g.id, { width: gw, height: gh })
+                measuredWH.set(g.id, { width: gw, height: gh })
+                baseSizes.set(g.id, { w: gw, h: gh })
+                continue
             }
 
-            const childSize = (n: Node): Size => {
-                const sw = typeof n.style?.width === 'number' ? n.style.width : undefined;
-                const sh = typeof n.style?.height === 'number' ? n.style.height : undefined;
-                const s = baseSizes.get(n.id)!;
-                return {w: sw ?? s.w, h: sh ?? s.h}
-            }
-
-            let minX = Number.POSITIVE_INFINITY,
-                minY = Number.POSITIVE_INFINITY,
-                maxX = Number.NEGATIVE_INFINITY,
-                maxY = Number.NEGATIVE_INFINITY;
+            let minX = Number.POSITIVE_INFINITY
+            let minY = Number.POSITIVE_INFINITY
+            let maxX = Number.NEGATIVE_INFINITY
+            let maxY = Number.NEGATIVE_INFINITY
 
             for (const k of direct) {
                 const ks = childSize(k)
-                if (k.position.x < minX) minX = k.position.x;
-                if (k.position.y < minY) minY = k.position.y;
-                if (k.position.x + ks.w > maxX) maxX = k.position.x + ks.w;
-                if (k.position.y + ks.h > maxY) maxY = k.position.y + ks.h;
+                const p = posTL.get(k.id)!
+                if (p.x < minX) minX = p.x
+                if (p.y < minY) minY = p.y
+                if (p.x + ks.w > maxX) maxX = p.x + ks.w
+                if (p.y + ks.h > maxY) maxY = p.y + ks.h
             }
 
-            const dx = minX - PAD;
-            const dy = minY - PAD;
+            const dx = minX - PAD
+            const dy = minY - PAD
 
             if (Math.abs(dx) > EPS || Math.abs(dy) > EPS) {
                 for (const k of direct) {
-                    k.position.x -= dx;
-                    k.position.y -= dy;
+                    const p = posTL.get(k.id)!
+                    const nx = p.x - dx
+                    const ny = p.y - dy
+
+                    if (Math.abs(p.x - nx) > EPS || Math.abs(p.y - ny) > EPS) {
+                        posTL.set(k.id, { x: nx, y: ny })
+                        changed = true
+                    }
                 }
-                changed = true;
             }
 
-            const newW = (maxX - minX) + 2 * PAD;
-            const newH = (maxY - minY) + 2 * PAD;
+            const newW = (maxX - minX) + 2 * PAD
+            const newH = (maxY - minY) + 2 * PAD
 
-            const oldW = typeof g.style?.width === 'number' ? g.style.width : size(g).w;
-            const oldH = typeof g.style?.height === 'number' ? g.style.height : size(g).h;
+            const oldW = getStyleW(g) ?? (typeof g.style?.width === "number" ? (g.style.width as number) : size(g).w)
+            const oldH = getStyleH(g) ?? (typeof g.style?.height === "number" ? (g.style.height as number) : size(g).h)
 
-            if (Math.abs(newW - oldW) > EPS || Math.abs(newH - oldH) > EPS) {
-                changed = true;
-            }
+            if (Math.abs(newW - oldW) > EPS || Math.abs(newH - oldH) > EPS) changed = true
 
-            g.measured = {width: newW, height: newH}
-            g.style = {...(g.style as React.CSSProperties), width: newW, height: newH}
-            baseSizes.set(g.id, {w: newW, h: newH})
+            styleWH.set(g.id, { width: newW, height: newH })
+            measuredWH.set(g.id, { width: newW, height: newH })
+            baseSizes.set(g.id, { w: newW, h: newH })
         }
 
-        /* ---------- Param-Group-Row nach Bounding sauber zentrieren ----------- */
-        // WICHTIG: Größen-Cache invalidieren, da Group-Styles sich geändert haben
+        // Größen-Cache invalidieren (Group-Styles haben sich ggf. geändert)
         sizeCache.clear()
-        for (const n of work) size(n)
+        for (const n of nodes) size(n)
 
-        // Globale Center bleiben in rel; aber Top-Left muss mit NEUEN Größen berechnet werden
-        const absTL = new Map<string, Pos>()
+        // absTL nach Bounding mit NEUEN Größen
+        const absTL_after = new Map<string, Pos>()
         const absCenterAfter = new Map<string, Pos>()
-        for (const n of work) {
+        for (const n of nodes) {
             const s = size(n)
-            const c = rel.get(n.id)!; // globales Center aus dem Layout-Durchlauf
+            const c = relCenter.get(n.id)!
             absCenterAfter.set(n.id, c)
-            absTL.set(n.id, {x: c.x - s.w / 2, y: c.y - s.h / 2})
+            absTL_after.set(n.id, { x: c.x - s.w / 2, y: c.y - s.h / 2 })
         }
 
-        for (const parent of work) {
-            const pGroups: Node[] = [];
-            const paramList = params.get(parent.id) ?? [];
-            for (const p of paramList) {
-                if (p.type === 'group') pGroups.push(p)
-            }
-            if (!pGroups.length) continue;
+        // Param-Group-Row nach Bounding sauber zentrieren
+        for (const parent of nodes) {
+            const pGroups: Node[] = []
+            const paramList = params.get(parent.id) ?? []
+            for (const p of paramList) if (p.type === "group") pGroups.push(p)
+            if (!pGroups.length) continue
 
             const ordered = pGroups.slice().sort((a, b) =>
                 (+((a.data as any)?.paramIndex) || 0) - (+((b.data as any)?.paramIndex) || 0)
             )
 
-            const widths: number[] = [];
+            const widths: number[] = []
             for (const g of ordered) {
-                const gn = posById.get(g.id)!;
-                const sw = typeof gn.style?.width === 'number' ? gn.style.width : undefined;
-                widths.push(sw ?? size(gn).w)
+                const sw = getStyleW(g) ?? (typeof g.style?.width === "number" ? (g.style.width as number) : undefined)
+                widths.push(sw ?? size(g).w)
             }
-            let rowW = 0;
-            for (const w of widths) rowW += w;
+
+            let rowW = 0
+            for (const w of widths) rowW += w
             rowW += H * (ordered.length - 1)
 
-            const pCenterX = absCenterAfter.get(parent.id)!.x;
-            let gx = pCenterX - rowW / 2;
+            const pCenterX = absCenterAfter.get(parent.id)!.x
+            let gx = pCenterX - rowW / 2
 
             for (let i = 0; i < ordered.length; i++) {
-                const g = ordered[i];
-                const gn = posById.get(g.id)!;
-                const containerTL = gn.parentId ? absTL.get(gn.parentId)! : {x: 0, y: 0}
-                gn.position.x = gx - containerTL.x;
-                gx += widths[i] + H;
+                const g = ordered[i]
+                const containerTL = g.parentId ? absTL_after.get(g.parentId)! : { x: 0, y: 0 }
+                const cur = posTL.get(g.id)!
+                const nx = gx - containerTL.x
+                const ny = cur.y
+
+                if (Math.abs(cur.x - nx) > EPS || Math.abs(cur.y - ny) > EPS) {
+                    posTL.set(g.id, { x: nx, y: ny })
+                    changed = true
+                }
+                gx += widths[i] + H
             }
         }
 
     } while (changed && pass < 5)
 
-    return {nodes: work}
+    // ----------------------------
+    // 4) Output: Structural Sharing (nur wirklich geänderte Nodes neu bauen)
+    // ----------------------------
+    const out = nodes.map((n) => {
+        const nextP = posTL.get(n.id)
+        const nextM = measuredWH.get(n.id)
+        const nextS = styleWH.get(n.id)
+
+        let isChanged = false
+
+        if (nextP) {
+            const op = n.position ?? { x: 0, y: 0 }
+            if (Math.abs(op.x - nextP.x) > EPS || Math.abs(op.y - nextP.y) > EPS) isChanged = true
+        }
+
+        if (nextM) {
+            const om = n.measured ?? ({ width: 0, height: 0 } as any)
+            if (Math.abs((om as any).width - nextM.width) > EPS || Math.abs((om as any).height - nextM.height) > EPS) isChanged = true
+        }
+
+        if (nextS) {
+            const ow = typeof (n.style as any)?.width === "number" ? (n.style as any).width : undefined
+            const oh = typeof (n.style as any)?.height === "number" ? (n.style as any).height : undefined
+            if (ow !== nextS.width || oh !== nextS.height) isChanged = true
+        }
+
+        if (!isChanged) return n
+
+        return {
+            ...n,
+            position: nextP ?? n.position,
+            measured: nextM ? ({ ...(n.measured as any), width: nextM.width, height: nextM.height } as any) : n.measured,
+            style: nextS
+                ? ({ ...(n.style as any), width: nextS.width, height: nextS.height } as any)
+                : n.style,
+        } as Node
+    })
+
+    return { nodes: out }
 }
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
@@ -528,16 +612,16 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     const {flowId, namespaceId, projectId} = props
-    const nodeTypes = {
+    const nodeTypes = React.useMemo(() => ({
         default: DFlowFunctionDefaultCard,
         group: DFlowFunctionGroupCard,
         suggestion: DFlowFunctionSuggestionCard,
         trigger: DFlowFunctionTriggerCard,
-    }
+    }), [])
 
-    const edgeTypes = {
+    const edgeTypes = React.useMemo(() => ({
         default: DFlowEdge,
-    }
+    }), [])
 
     const initialNodes = useFlowNodes(flowId, namespaceId, projectId)
     const initialEdges = useFlowEdges(flowId, namespaceId, projectId)
@@ -612,7 +696,6 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
-            fitView
             {...mergeCode0Props("flow", props)}
             nodes={nodes}
             edges={edges}

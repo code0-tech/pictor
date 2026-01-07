@@ -216,7 +216,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         this.removeParameterNode(flow, parameter)
         if (value?.__typename === "NodeFunction") {
             const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
-            console.log(nextNodeIndex)
             const addingIdValue: NodeFunction = {
                 ...value,
                 id: `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`

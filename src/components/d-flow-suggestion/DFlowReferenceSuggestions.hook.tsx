@@ -29,6 +29,7 @@ import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
 interface ExtendedReferenceValue extends ReferenceValue {
     parameterIndex?: number
     inputTypeIndex?: number
+    inputTypeIdentifier?: string
 }
 
 export const useReferenceSuggestions = (
@@ -194,6 +195,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                             nodeFunctionId: node?.id!,
                             parameterIndex: index,
                             inputTypeIndex: inputIndex,
+                            inputTypeIdentifier: inputType.inputIdentifier!
                         }, resolved)
                     })
                 })

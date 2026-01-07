@@ -18,6 +18,7 @@ import {md5} from "js-md5";
 import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
 import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
 import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     nodeId: NodeFunction['id']
@@ -77,13 +78,6 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const colorHash = md5(md5(data.nodeId!))
-    const hashToHue = (md5: string): number => {
-        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-        const int = parseInt(md5.slice(0, 8), 16)
-        return int % 360
-    }
-
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const param = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
@@ -135,7 +129,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             active: false,
             closeable: true,
             children: <>
-                <IconNote color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+                <IconNote color={hashToColor(data.nodeId!)} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
@@ -180,7 +174,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconNote color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
+                <IconNote color={hashToColor(data.nodeId!)} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
         </Card>

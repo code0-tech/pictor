@@ -8,6 +8,7 @@ import {useService, useStore} from "../../utils";
 import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 export interface DFlowInputNodeBadgeProps extends Omit<BadgeType, 'value' | 'children'> {
     value: NodeFunction | NodeFunctionIdWrapper
@@ -45,15 +46,8 @@ export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) =
         return (functionService as DFlowFunctionReactiveService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content
     }, [functionStore, node])
 
-    const hashRef = md5(md5(value.id || ""))
-
-    const hashToHue = (md5: string): number => {
-        const int = parseInt(md5.slice(0, 8), 16)
-        return int % 360
-    }
-
     return <Badge style={{verticalAlign: "middle"}}
-                  color={isTrigger ? "info" : `hsl(${hashToHue(hashRef)}, 100%, 72%)`}
+                  color={isTrigger ? "info" : hashToColor(value.id || "")}
                   border
                   {...rest}>
         {

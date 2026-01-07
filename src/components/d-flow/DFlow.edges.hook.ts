@@ -14,6 +14,7 @@ import type {
 } from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
 import {DFlowEdgeDataProps} from "./DFlowEdge";
+import {hashToColor} from "./DFlow.util";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
     'rgba(255, 255, 255, 0.25)',
@@ -137,12 +138,6 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                     if (val && val.__typename === "NodeFunctionIdWrapper") {
 
                         const groupId = `${fnId}-group-${idCounter++}`;
-                        const hash = md5(md5(val?.id || ""))
-                        const hashToHue = (md5: string): number => {
-                            // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                            const int = parseInt(md5.slice(0, 8), 16)
-                            return int % 360
-                        }
 
                         edges.push({
                             id: `${fnId}-${groupId}-param-${param.id}`,
@@ -153,7 +148,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                             animated: true,
                             label: def?.names!![0]?.content ?? param.id,
                             data: {
-                                color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                                color: hashToColor(val?.id || ""),
                                 type: 'group',
                                 flowId: flowId,
                                 parentNodeId: parentNode?.id
@@ -183,12 +178,6 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         dtCache
                     );
 
-                    const hash = md5(md5(val?.id || ""))
-                    const hashToHue = (md5: string): number => {
-                        const int = parseInt(md5.slice(0, 8), 16)
-                        return int % 360
-                    }
-
                     edges.push({
                         id: `${subFnId}-${fnId}-param-${param.id}`,
                         source: subFnId,
@@ -198,7 +187,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         deletable: false,
                         selectable: false,
                         data: {
-                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                            color: `hsl(${hashToColor(val?.id || "")}, 100%, 72%)`,
                             type: 'parameter',
                             flowId: flowId,
                             parentNodeId: parentNode?.id

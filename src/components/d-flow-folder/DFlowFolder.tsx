@@ -22,6 +22,7 @@ import {
     DFlowFolderContextMenuItemData
 } from "./DFlowFolderContextMenu";
 import {md5} from "js-md5";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 
 export interface DFlowFolderProps {
@@ -272,12 +273,6 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
         ...code0Props
     } = props
 
-    const colorHash = md5(path + name)
-    const hashToHue = (md5: string): number => {
-        const int = parseInt(md5.slice(0, 8), 16)
-        return int % 360
-    }
-
     const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
 
     return <DFlowFolderContextMenu contextData={{
@@ -287,7 +282,7 @@ export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
     }} {...contextMenuProps}>
         <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
              onClick={() => onSelect?.(flow)}>
-            <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+            <IconFile color={hashToColor(path + name)} size={12}/>
             <Text>{name}</Text>
         </div>
     </DFlowFolderContextMenu>

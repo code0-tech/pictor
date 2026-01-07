@@ -17,6 +17,7 @@ import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunc
 import {DFlowFunctionTriggerCardDataProps} from "../d-flow-function/DFlowFunctionTriggerCard";
 import {DFlowFunctionGroupCardDataProps} from "../d-flow-function/DFlowFunctionGroupCard";
 import {md5} from "js-md5";
+import {hashToColor} from "./DFlow.util";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -208,13 +209,6 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         // New group: extend scope PATH with a fresh segment and increase depth.
                         const childScopePath = [...scopePath, nextScopeId()];
 
-                        const hash = md5(md5(param.value?.id ?? ""))
-                        const hashToHue = (md5: string): number => {
-                            // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                            const int = parseInt(md5.slice(0, 8), 16)
-                            return int % 360
-                        }
-
                         nodes.push({
                             id: groupId,
                             type: "group",
@@ -228,7 +222,7 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                                 flowId: flowId!!,
                                 depth: depth + 1,
                                 scope: childScopePath,
-                                color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                                color: hashToColor(param.value?.id ?? ""),
                             },
                         });
 

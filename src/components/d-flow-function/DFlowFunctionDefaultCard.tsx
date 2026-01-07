@@ -1,4 +1,4 @@
-import {Code0Component, InspectionSeverity, underlineBySeverity} from "../../utils";
+import {Code0Component, underlineBySeverity} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import {Card} from "../card/Card";
@@ -104,7 +104,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                     </div>
                 case "ReferenceValue":
                     return <div style={{...decorationStyle, display: "inline-block"}}>
-                        <DFlowInputReferenceBadge value={param.value}/>
+                        <DFlowInputReferenceBadge flowId={props.data.flowId} value={param.value}/>
                     </div>
                 case "NodeFunctionIdWrapper":
                     return <div style={{...decorationStyle, display: "inline-block"}}>

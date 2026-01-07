@@ -39,11 +39,18 @@ export const useReferenceSuggestions = (
 ): DFlowSuggestion[] => {
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
+    const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
 
     const nodeContexts = useNodeContext(flowId)
     const nodeContext = React.useMemo(() => (
         nodeId ? nodeContexts?.find(context => context.nodeFunctionId === nodeId) : undefined
     ), [nodeContexts, nodeId])
+    const nodeParameters = React.useMemo(() => {
+        if (!nodeId) return []
+        const node = flowService.getNodeById(flowId, nodeId)
+        return node?.parameters?.nodes?.map(p => p?.value).filter((value): value is NodeFunctionIdWrapper => value?.__typename === "NodeFunctionIdWrapper") ?? []
+    }, [flowId, nodeId, flowService, flowStore])
 
     const resolvedType = React.useMemo(() => (
         dataTypeIdentifier ? replaceGenericsAndSortType(resolveType(dataTypeIdentifier, dataTypeService), genericKeys) : undefined
@@ -60,7 +67,10 @@ export const useReferenceSuggestions = (
             if (value.depth === null || value.depth === undefined) return []
             if (value.scope === null || value.scope === undefined) return []
 
-            if (value.node >= node!) return []
+            const isInputTypeRef = value.parameterIndex !== undefined && value.inputTypeIndex !== undefined
+            if (isInputTypeRef && scope!.length <= value.scope.length) return []
+            if (nodeParameters.some(param => param.id === value.nodeFunctionId)) return []
+            if (!isInputTypeRef && value.node >= node!) return []
             if (value.depth > depth!) return []
             if (value.scope.some(r => !scope!.includes(r))) return []
 
@@ -74,7 +84,7 @@ export const useReferenceSuggestions = (
                 value: value as ReferenceValue,
             }]
         })
-    }, [dataTypeService, nodeContext, refObjects, resolvedType])
+    }, [dataTypeService, nodeContext, nodeParameters, refObjects, resolvedType])
 }
 
 

@@ -150,7 +150,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
             className={activeTabId == node?.id ? "d-flow-viewport-default-card--active" : undefined}
-            color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "primary"}
+            color={"primary"}
             onClick={() => {
                 flowInstance.setViewport({
                     x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),

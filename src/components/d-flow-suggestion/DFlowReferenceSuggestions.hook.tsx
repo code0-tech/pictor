@@ -68,7 +68,10 @@ export const useReferenceSuggestions = (
             if (value.scope === null || value.scope === undefined) return []
 
             const isInputTypeRef = value.parameterIndex !== undefined && value.inputTypeIndex !== undefined
-            if (isInputTypeRef && scope!.length <= value.scope.length) return []
+            const isInputTypeScopeMatch = isInputTypeRef
+                ? value.scope?.every((scopeId, index) => scope?.[index] === scopeId)
+                : true
+            if (isInputTypeRef && !isInputTypeScopeMatch) return []
             if (nodeParameters.some(param => param.id === value.nodeFunctionId)) return []
             if (!isInputTypeRef && value.node >= node!) return []
             if (value.depth > depth!) return []
@@ -151,15 +154,20 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             const nodeValues =
                 node?.parameters?.nodes?.map((p) => p?.value!).filter(Boolean) ?? []
 
-            const nodeContext = nodeContexts?.find((c) => c.nodeFunctionId === node?.id)
-            if (!nodeContext) return []
-
             return (functionDefinition.parameterDefinitions ?? []).flatMap((paramDef, index) => {
                 const dataTypeIdentifier = paramDef?.dataTypeIdentifier
                 if (!dataTypeIdentifier) return []
 
                 const pType = dataTypeService.getDataType(dataTypeIdentifier)
                 if (!pType || pType.variant !== "NODE") return []
+
+                const paramInstance = node?.parameters?.nodes?.find((p) => p?.id === paramDef?.id)
+                if (!paramInstance?.value || paramInstance.value.__typename !== "NodeFunctionIdWrapper") return []
+
+                const paramNodeContext = nodeContexts?.find(
+                    (context) => paramInstance?.value?.__typename === "NodeFunctionIdWrapper" && context.nodeFunctionId === paramInstance.value?.id
+                )
+                if (!paramNodeContext) return []
 
                 const inputTypeRules =
                     pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? []
@@ -182,7 +190,8 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                         if (!resolved) return []
 
                         return referenceExtraction({
-                            ...nodeContext,
+                            ...paramNodeContext,
+                            nodeFunctionId: node?.id!,
                             parameterIndex: index,
                             inputTypeIndex: inputIndex,
                         }, resolved)

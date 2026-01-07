@@ -1,10 +1,10 @@
-import {Code0Component, InspectionSeverity} from "../../utils";
+import {Code0Component, InspectionSeverity, underlineBySeverity} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import React, {memo} from "react";
+import React, {CSSProperties, memo} from "react";
 import {Card} from "../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../flex/Flex";
-import {IconCirclesRelation, IconFile, IconNote} from "@tabler/icons-react";
+import {IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore as usePictorStore} from "../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
@@ -90,14 +90,24 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             return parameterDefinition?.identifier == item
         })
 
+        const parameterValidation = validation?.filter(v => v.parameterId === param?.id)
+        const decorationStyle: CSSProperties =
+            parameterValidation?.length
+                ? underlineBySeverity[parameterValidation[0].type]
+                : {};
+
         if (param) {
             switch (param?.value?.__typename) {
                 case "LiteralValue":
-                    return <DFlowInputLiteralBadge value={param.value}/>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <DFlowInputLiteralBadge value={param.value}/>
+                    </div>
                 case "ReferenceValue":
-                    return <DFlowInputReferenceBadge value={param.value}/>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <DFlowInputReferenceBadge value={param.value}/>
+                    </div>
                 case "NodeFunctionIdWrapper":
-                    return <span>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
                         <DFlowInputNodeBadge value={param.value} flowId={props.data.flowId}/>
                         <Handle
                             key={param?.id}
@@ -107,7 +117,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                             isConnectable={false}
                             className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                         />
-                    </span>
+                    </div>
             }
             return <Badge style={{verticalAlign: "middle"}} border>
                 <Text size={"sm"}>

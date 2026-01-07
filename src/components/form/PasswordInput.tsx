@@ -47,7 +47,7 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         right={rightAction}
         rightType={"action"}
         type={"password"}
-        ref={ref}
+        ref={ref as RefObject<HTMLInputElement>}
         {...rest}
     />
 

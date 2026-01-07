@@ -33,7 +33,7 @@ export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSu
         }}
         right={rightAction}
         type={"text"}
-        ref={ref}
+        ref={ref as RefObject<HTMLInputElement>}
         {...rest}
     />
 })

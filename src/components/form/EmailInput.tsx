@@ -38,7 +38,7 @@ export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = Reac
     return <Input
         right={rightAction}
         type={"email"}
-        ref={ref}
+        ref={ref as RefObject<HTMLInputElement>}
         {...rest}
     />
 

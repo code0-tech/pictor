@@ -33,7 +33,7 @@ export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.
     return <Input
         right={rightAction}
         type={"text"}
-        ref={ref}
+        ref={ref as RefObject<HTMLInputElement>}
         {...rest}
     />
 

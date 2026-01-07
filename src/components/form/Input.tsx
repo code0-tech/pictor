@@ -698,7 +698,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                         >
                             <InputSuggestionMenuContent
                                 color={"secondary"}
-                                inputRef={activeControlRef}
+                                inputRef={activeControlRef as RefObject<HTMLInputElement>}
                             >
                                 {suggestionsHeader}
                                 <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
@@ -707,7 +707,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                                         <InputSuggestionMenuContentItems
                                             /* @ts-ignore */
                                             ref={menuRef}
-                                            inputRef={activeControlRef}
+                                            inputRef={activeControlRef as RefObject<HTMLInputElement>}
                                             suggestions={availableSuggestions}
                                             onSuggestionSelect={handleSuggestionSelect}
                                         />

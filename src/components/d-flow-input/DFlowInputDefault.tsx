@@ -1,6 +1,6 @@
 import React from "react";
 import {TextInput, TextInputProps} from "../form";
-import {Flow, NodeFunction, NodeParameter} from "@code0-tech/sagittarius-graphql-types";
+import {Flow, NodeFunction, NodeParameter, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {MenuItem} from "../menu/Menu";
 import {Text} from "../text/Text";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
@@ -155,8 +155,9 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
             }
 
             if (value?.__typename === "ReferenceValue") {
+                const node = flowService.getNodeById(flowId, (value as ReferenceValue).nodeFunctionId)
                 return buildBlockSegment(
-                    <DFlowInputReferenceBadge value={value}/>,
+                    <DFlowInputReferenceBadge flowId={flowId} definition={functionService.getById(node?.functionDefinition?.id)} value={value}/>,
                     value
                 )
             }

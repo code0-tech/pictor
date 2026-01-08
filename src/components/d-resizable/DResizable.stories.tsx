@@ -135,12 +135,12 @@ export const Dashboard = () => {
         <ContextStoreProvider
             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
             <DLayout>
-                <DResizablePanelGroup direction={"horizontal"}>
-                    <DResizablePanel id={"1"} order={1} defaultSize={20}>
+                <DResizablePanelGroup orientation={"horizontal"}>
+                    <DResizablePanel id={"1"} defaultSize={"20%"}>
                         <Folder/>
                     </DResizablePanel>
                     <DResizableHandle/>
-                    <DResizablePanel id={"2"} order={2}>
+                    <DResizablePanel id={"2"}>
                         <DLayout rightContent={
                             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                                 <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
@@ -163,14 +163,14 @@ export const Dashboard = () => {
                                 </Button>
                             </Flex>
                         }>
-                            <DResizablePanelGroup direction={"horizontal"}>
-                                <DResizablePanel id={"2"} order={2}>
+                            <DResizablePanelGroup orientation={"horizontal"}>
+                                <DResizablePanel id={"2"}>
                                     <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
                                 </DResizablePanel>
                                 {show && (
                                     <>
                                         <DResizableHandle/>
-                                        <DResizablePanel id={"3"} order={3} defaultSize={25}>
+                                        <DResizablePanel id={"3"} defaultSize={"25%"}>
                                             <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
                                                        projectId={undefined}/>
                                         </DResizablePanel>

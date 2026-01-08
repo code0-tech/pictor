@@ -14,7 +14,6 @@ import {FileTabsService} from "../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../d-flow-file/DFlowTabDefault";
 import type {NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../badge/Badge";
-import {md5} from "js-md5";
 import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
 import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
 import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
@@ -141,6 +140,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             key={id}
             data-flow-refernce={id}
             paddingSize={"xs"}
+            py={data.isParameter ? "0.35" : undefined}
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
             className={activeTabId == node?.id ? "d-flow-viewport-default-card--active" : undefined}

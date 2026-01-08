@@ -1,25 +1,17 @@
 "use client"
 
 import * as React from "react"
-import {Code0ComponentProps} from "../../utils/types";
-import {mergeCode0Props} from "../../utils/utils";
-import {
-    Panel,
-    PanelGroup,
-    PanelGroupProps,
-    PanelProps,
-    PanelResizeHandle,
-    PanelResizeHandleProps
-} from "react-resizable-panels";
+import {Code0ComponentProps} from "../../utils";
+import {mergeCode0Props} from "../../utils";
+import {Group, GroupProps, Panel, PanelProps, Separator, SeparatorProps} from "react-resizable-panels";
 import "./DResizable.style.scss"
-import {IconFolder, IconGripVertical} from "@tabler/icons-react";
 
-type DResizablePanelGroupProps = Code0ComponentProps & PanelGroupProps
+type DResizablePanelGroupProps = Code0ComponentProps & GroupProps
 type DResizablePanelProps = Code0ComponentProps & PanelProps
-type DResizableHandleProps = Code0ComponentProps & PanelResizeHandleProps
+type DResizableHandleProps = Code0ComponentProps & SeparatorProps
 
 export const DResizablePanelGroup: React.FC<DResizablePanelGroupProps> = (props) => {
-    return <PanelGroup
+    return <Group
         data-slot="resizable-panel-group"
         {...(mergeCode0Props("d-resizable", props) as DResizablePanelGroupProps)}
     />
@@ -31,11 +23,11 @@ export const DResizablePanel: React.FC<DResizablePanelProps> = (props) => {
 }
 
 export const DResizableHandle: React.FC<DResizableHandleProps> = (props) => {
-    return <PanelResizeHandle
+    return <Separator
         data-slot="resizable-handle"
         {...mergeCode0Props("d-resizable__handle", props)}>
         <div className={"d-resizable__handle-bar"}/>
-    </PanelResizeHandle>
+    </Separator>
 
 }
 

@@ -34,9 +34,7 @@ export const DResizableHandle: React.FC<DResizableHandleProps> = (props) => {
     return <PanelResizeHandle
         data-slot="resizable-handle"
         {...mergeCode0Props("d-resizable__handle", props)}>
-        <div className={"d-resizable__handle-bar"}>
-            <IconGripVertical size={16}/>
-        </div>
+        <div className={"d-resizable__handle-bar"}/>
     </PanelResizeHandle>
 
 }

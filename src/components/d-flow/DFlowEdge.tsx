@@ -64,7 +64,11 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                 id={id}
                 path={edgePath}
                 {...rest}
-                style={{stroke: `url(#${gradientId})`, strokeWidth: "2px", strokeLinecap: "round"}}
+                style={{
+                    stroke: `url(#${gradientId})`,
+                    strokeWidth: data?.type === "default" ? "3px" : "2px",
+                    strokeLinecap: "round"
+                }}
             />
 
             {label ? (

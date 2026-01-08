@@ -27,15 +27,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: helpers.borderColor();
+    outline: none;
 
-    &[data-panel-group-direction=horizontal] {
+    &[aria-orientation=vertical] {
       width: 1px;
       height: 100%;
-      background: helpers.borderColor();
     }
 
-    &[data-panel-group-direction=vertical] {
-      height: 1rem;
+    &[aria-orientation=horizontal] {
+      height: 1px;
       width: 100%;
     }
   }

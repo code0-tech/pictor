@@ -26,23 +26,29 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     const fileTabsService = useService(FileTabsService)
     const fileTabsStore = useStore(FileTabsService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
     const [, startTransition] = React.useTransition()
 
     //memoized values
     const activeTab = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
-    const result = useSuggestions(undefined, [], flowId, 0, [0], 0)
+    const result = useSuggestions(flowId, activeTab?.content?.props?.node?.id as NodeFunction['id'] | undefined)
 
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return
+        if (!(activeTab.content.props.flowId as Flow['id'])) return
         // @ts-ignore
         startTransition(async () => {
+            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab.content.props.node.id)
+            linkedNodes.forEach(node => {
+                if (node.id) fileTabsService.deleteById(node.id)
+            })
+
             await flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
         })
-        fileTabsService.deleteById(activeTab.id)
-    }, [activeTab, flowService])
+    }, [activeTab, flowService, flowStore])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {
         if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {
@@ -56,8 +62,6 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
         }
     }, [flowId, flowService, activeTab])
 
-    //TODO: Add execute flow button functionality
-    //TODO: disable button if active tab is the trigger node
     return <Panel position={"bottom-center"}>
         <ButtonGroup>
             <Tooltip>
@@ -83,7 +87,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button disabled={!activeTab} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
+                    <Button disabled={!activeTab || !(activeTab.content.props.flowId as Flow['id'])} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
                             color={"primary"}>
                         <IconTrash size={16}/>
                     </Button>

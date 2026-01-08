@@ -42,12 +42,10 @@ const errorResult = (
 ): ValidationResult => ({
     parameterId,
     type: InspectionSeverity.ERROR,
-    message: {
-        nodes: [{
-            code: "en-US",
-            content: `Argument of type ${actual?.name?.nodes!![0]?.content} is not assignable to parameter of type ${expected?.name?.nodes!![0]?.content}`
-        }]
-    }
+    message: [{
+        code: "en-US",
+        content: `Argument of type ${actual?.name!![0]?.content} is not assignable to parameter of type ${expected?.name!![0]?.content}`
+    }]
 })
 
 export const useNodeValidation = (
@@ -95,7 +93,8 @@ export const useNodeValidation = (
             if (!value) continue
 
             const expectedType = parameter.dataTypeIdentifier
-            const expectedDT = dataTypeService.getDataType(expectedType!!)
+            const expectedResolvedType = replaceGenericKeysInType(expectedType!, genericMap)
+            const expectedDT = dataTypeService.getDataType(expectedResolvedType)
             const valueType = resolveValueType(value, expectedDT)
             const valueDT = dataTypeService.getDataType(valueType!!)
 
@@ -112,18 +111,16 @@ export const useNodeValidation = (
 
             if (isGeneric) {
                 const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)
-
                 if (isReferenceOrNode(value)) {
                     const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
                     isValid = useDataTypeValidation(resolvedExpectedDT, resolvedValueDT)
                 } else {
-                    const resolvedType = replaceGenericKeysInType(expectedType, genericMap)
                     isValid = useValueValidation(
                         value,
                         resolvedExpectedDT,
                         dataTypeService,
                         flow,
-                        resolvedType?.genericType?.genericMappers!
+                        expectedResolvedType?.genericType?.genericMappers!
                     )
                 }
             } else {

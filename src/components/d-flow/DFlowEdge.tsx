@@ -54,9 +54,9 @@ export const DFlowEdge: React.FC<DFlowEdgeProps> = memo((props) => {
                     gradientUnits="userSpaceOnUse"
                 >
                     {/* Start: volle Farbe */}
-                    <stop offset="0" stopColor={color} stopOpacity={0.75}/>
+                    <stop offset="0" stopColor={color} stopOpacity={0.25}/>
                     {/* Ende: gleiche Farbe, aber transparent */}
-                    <stop offset="1" stopColor={color} stopOpacity={0.25}/>
+                    <stop offset="1" stopColor={color} stopOpacity={0.75}/>
                 </linearGradient>
             </defs>
 

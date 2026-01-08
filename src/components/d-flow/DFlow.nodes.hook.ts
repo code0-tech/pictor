@@ -17,6 +17,7 @@ import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunc
 import {DFlowFunctionTriggerCardDataProps} from "../d-flow-function/DFlowFunctionTriggerCard";
 import {DFlowFunctionGroupCardDataProps} from "../d-flow-function/DFlowFunctionGroupCard";
 import {md5} from "js-md5";
+import {hashToColor} from "./DFlow.util";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -173,12 +174,13 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ) => {
-            const id = `${node.id}-${idCounter++}`;
+            if (!node) return
+            const id = `${node?.id}-${idCounter++}`;
             const index = ++globalNodeIndex; // global node level
 
             nodes.push({
                 id,
-                type: bestMatchValue(packageNodes, node.functionDefinition?.identifier!!),
+                type: bestMatchValue(packageNodes, node?.functionDefinition?.identifier!!),
                 position: {x: 0, y: 0},
                 draggable: false,
                 parentId: parentGroup,
@@ -194,7 +196,7 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                 },
             });
 
-            const definition = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache);
+            const definition = getFunctionDefinitionCached(node?.functionDefinition?.id!!, fnCache);
 
             node.parameters?.nodes?.forEach((param) => {
                 const paramType = definition?.parameterDefinitions!!.find(p => p.id == param?.runtimeParameter?.id)?.dataTypeIdentifier;
@@ -206,13 +208,6 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
 
                         // New group: extend scope PATH with a fresh segment and increase depth.
                         const childScopePath = [...scopePath, nextScopeId()];
-
-                        const hash = md5(`${id}-param-${JSON.stringify(param)}`)
-                        const hashToHue = (md5: string): number => {
-                            // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                            const int = parseInt(md5.slice(0, 8), 16)
-                            return int % 360
-                        }
 
                         nodes.push({
                             id: groupId,
@@ -227,7 +222,7 @@ export const useFlowNodes = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                                 flowId: flowId!!,
                                 depth: depth + 1,
                                 scope: childScopePath,
-                                color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                                color: hashToColor(param.value?.id ?? ""),
                             },
                         });
 

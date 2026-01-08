@@ -1,26 +1,25 @@
-import type {
+import {
     DataTypeIdentifier,
     FunctionDefinition,
     Maybe, ParameterDefinition,
     RuntimeFunctionDefinition,
-    Scalars,
-    TranslationConnection
+    Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
 
 export class FunctionDefinitionView {
 
     /** Name of the function */
-    private readonly _aliases?: Maybe<TranslationConnection>;
+    private readonly _aliases?: Maybe<Array<Translation>>;
     /** Time when this FunctionDefinition was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
     /** Deprecation message of the function */
-    private readonly _deprecationMessages?: Maybe<TranslationConnection>;
+    private readonly _deprecationMessages?: Maybe<Array<Translation>>;
     /** Description of the function */
-    private readonly _descriptions?: Maybe<TranslationConnection>;
+    private readonly _descriptions?: Maybe<Array<Translation>>;
     /** Display message of the function */
-    private readonly _displayMessages?: Maybe<TranslationConnection>;
+    private readonly _displayMessages?: Maybe<Array<Translation>>;
     /** Documentation of the function */
-    private readonly _documentations?: Maybe<TranslationConnection>;
+    private readonly _documentations?: Maybe<Array<Translation>>;
     /** Generic keys of the function */
     private readonly _genericKeys?: Maybe<Array<Scalars['String']['output']>>;
     /** Global ID of this FunctionDefinition */
@@ -28,7 +27,7 @@ export class FunctionDefinitionView {
     /** Identifier of the function */
     private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the function */
-    private readonly _names?: Maybe<TranslationConnection>;
+    private readonly _names?: Maybe<Array<Translation>>;
     /** Parameters of the function */
     private readonly _parameterDefinitions?: Maybe<ParameterDefinitionView[]>;
     /** Return type of the function */
@@ -59,7 +58,7 @@ export class FunctionDefinitionView {
     }
 
 
-    get aliases(): Maybe<TranslationConnection> | undefined {
+    get aliases(): Maybe<Array<Translation>> | undefined {
         return this._aliases;
     }
 
@@ -67,19 +66,19 @@ export class FunctionDefinitionView {
         return this._createdAt;
     }
 
-    get deprecationMessages(): Maybe<TranslationConnection> | undefined {
+    get deprecationMessages(): Maybe<Array<Translation>> | undefined {
         return this._deprecationMessages;
     }
 
-    get descriptions(): Maybe<TranslationConnection> | undefined {
+    get descriptions(): Maybe<Array<Translation>> | undefined {
         return this._descriptions;
     }
 
-    get displayMessages(): Maybe<TranslationConnection> | undefined {
+    get displayMessages(): Maybe<Array<Translation>> | undefined {
         return this._displayMessages;
     }
 
-    get documentations(): Maybe<TranslationConnection> | undefined {
+    get documentations(): Maybe<Array<Translation>> | undefined {
         return this._documentations;
     }
 
@@ -95,7 +94,7 @@ export class FunctionDefinitionView {
         return this._identifier;
     }
 
-    get names(): Maybe<TranslationConnection> | undefined {
+    get names(): Maybe<Array<Translation>> | undefined {
         return this._names;
     }
 
@@ -149,15 +148,15 @@ export class ParameterDefinitionView {
     /** Data type of the parameter */
     private readonly _dataTypeIdentifier?: Maybe<DataTypeIdentifier>;
     /** Description of the parameter */
-    private readonly _descriptions?: Maybe<TranslationConnection>;
+    private readonly _descriptions?: Maybe<Array<Translation>>;
     /** Documentation of the parameter */
-    private readonly _documentations?: Maybe<TranslationConnection>;
+    private readonly _documentations?: Maybe<Array<Translation>>;
     /** Global ID of this ParameterDefinition */
     private readonly _id?: Maybe<Scalars['ParameterDefinitionID']['output']>;
     /** Identifier of the parameter */
     private readonly _identifier?: Maybe<Scalars['String']['output']>;
     /** Name of the parameter */
-    private readonly _names?: Maybe<TranslationConnection>;
+    private readonly _names?: Maybe<Array<Translation>>;
     /** Time when this ParameterDefinition was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
@@ -181,11 +180,11 @@ export class ParameterDefinitionView {
         return this._dataTypeIdentifier;
     }
 
-    get descriptions(): Maybe<TranslationConnection> | undefined {
+    get descriptions(): Maybe<Array<Translation>> | undefined {
         return this._descriptions;
     }
 
-    get documentations(): Maybe<TranslationConnection> | undefined {
+    get documentations(): Maybe<Array<Translation>> | undefined {
         return this._documentations;
     }
 
@@ -197,7 +196,7 @@ export class ParameterDefinitionView {
         return this._identifier;
     }
 
-    get names(): Maybe<TranslationConnection> | undefined {
+    get names(): Maybe<Array<Translation>> | undefined {
         return this._names;
     }
 

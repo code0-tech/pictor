@@ -69,7 +69,7 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
                                 return <ContextMenuItem key={flowType.id} onSelect={() => {
                                     props.onCreate?.(flowType.id)
                                 }}>
-                                    {flowType.names?.nodes!![0]?.content ?? flowType.id}
+                                    {flowType.names!![0]?.content ?? flowType.id}
                                 </ContextMenuItem>
                             })}
                         </ContextMenuSubContent>

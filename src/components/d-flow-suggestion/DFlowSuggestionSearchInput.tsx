@@ -3,15 +3,15 @@ import React, {RefObject} from "react";
 import {Button} from "../button/Button";
 import {IconX} from "@tabler/icons-react";
 import "./DFlowSuggestionSearchInput.style.scss"
-import {setElementKey} from "../form/Input.utils";
+import {clearInputElement} from "../form/Input.utils";
 
 interface DFlowSuggestionSearchInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     //defaults to false
     clearable?: boolean
 }
 
-export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSuggestionSearchInputProps> = React.forwardRef((props, ref: RefObject<HTMLInputElement>) => {
-    ref = ref || React.useRef(null)
+export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSuggestionSearchInputProps> = React.forwardRef((props, ref: RefObject<HTMLElement>) => {
+    ref = ref || React.useRef<HTMLElement>(null)
 
     const {
         clearable = false,
@@ -20,7 +20,7 @@ export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSu
     } = props
 
     const toClearable = () => {
-        if (ref.current) setElementKey(ref.current, "value", "", "change")
+        clearInputElement(ref.current)
     }
 
     const rightAction = [right]
@@ -33,7 +33,7 @@ export const DFlowSuggestionSearchInput: React.ForwardRefExoticComponent<DFlowSu
         }}
         right={rightAction}
         type={"text"}
-        ref={ref}
+        ref={ref as RefObject<HTMLInputElement>}
         {...rest}
     />
 })

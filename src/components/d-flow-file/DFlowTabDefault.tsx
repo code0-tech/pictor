@@ -1,55 +1,127 @@
 import React from "react";
-import {TextInput} from "../form";
+import {useForm} from "../form";
 import {Flex} from "../flex/Flex";
-import {useService} from "../../utils";
-import {DFlowFunctionReactiveService} from "../d-flow-function";
-import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
-import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
-import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
+import {useService, useStore} from "../../utils";
+import {DFlowFunctionReactiveService, ParameterDefinitionView} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
-import {DFlowSuggestion} from "../d-flow-suggestion";
-import {ParameterDefinitionView} from "../d-flow-function";
-import {Badge} from "../badge/Badge";
-import type {
+import {
     LiteralValue,
-    NodeFunction, NodeParameterValue,
+    NodeFunction,
+    NodeParameterValue,
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {InputSyntaxSegment} from "../form/Input.syntax.hook";
+import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
+import {FileTabsService} from "../file-tabs/FileTabs.service";
+import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
     flowId: Scalars["FlowID"]["output"]
-    depthLevel?: number
-    scopeLevel?: number[]
-    nodeLevel?: number
 }
 
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
-    const {node, flowId, depthLevel, scopeLevel, nodeLevel} = props
+    const {node, flowId} = props
+
     const functionService = useService(DFlowFunctionReactiveService)
+    const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
+    const fileTabsService = useService(FileTabsService)
+    const validation = useNodeValidation(node.id, flowId)
+
+    const changedParameters = React.useRef<Set<string>>(new Set())
     const [, startTransition] = React.useTransition()
 
-    const definition = functionService.getById(node.functionDefinition?.id!!)
+    const definition = React.useMemo(() => {
+        return functionService.getById(node.functionDefinition?.id!!)
+    }, [functionStore])
+
     const paramDefinitions = React.useMemo(() => {
         const map: Record<string, ParameterDefinitionView> = {}
         definition?.parameterDefinitions?.forEach(pd => {
             map[pd.id!!] = pd
         })
         return map
-    }, [definition?.parameterDefinitions])
+    }, [definition])
 
     const sortedParameters = React.useMemo(() => {
         return [...(node.parameters?.nodes || [])].sort((a, b) => a!!.id!!.localeCompare(b?.id!!))
-    }, [node.parameters])
+    }, [node])
 
-    const suggestionsById: Record<string, DFlowSuggestion[]> = {}
-    sortedParameters.forEach(parameter => {
-        const parameterDefinition = paramDefinitions[parameter?.id!!]
-        suggestionsById[parameter?.id!!] = useSuggestions(parameterDefinition?.dataTypeIdentifier!!, [], flowId, depthLevel, scopeLevel, nodeLevel)
+    const initialValues = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        sortedParameters.forEach(parameter => {
+            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter?.value)
+        })
+        return values
+    }, [sortedParameters])
+
+    const validations = React.useMemo(() => {
+        const values: Record<string, any> = {}
+        sortedParameters.forEach(parameter => {
+            values[parameter?.id!!] = (_: any) => {
+                const validationForParameter = validation?.find(v => v.parameterId === parameter?.id)
+                if (validationForParameter) {
+                    return validationForParameter.message!![0]?.content || "Invalid value"
+                }
+                return null
+            }
+        })
+        return values
+    }, [sortedParameters, validation])
+
+    const onSubmit = React.useCallback((values: any) => {
+        startTransition(async () => {
+            for (const paramDefinitions1 of sortedParameters) {
+                if (!changedParameters.current.has(paramDefinitions1?.id!!)) continue;
+                const syntaxSegment = values[paramDefinitions1?.id!]
+                const previousValue = paramDefinitions1?.value as NodeParameterValue
+                const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
+
+                if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
+                    const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
+                    linkedNodes.reverse().forEach(node => {
+                        if (node.id) fileTabsService.deleteById(node.id)
+                    })
+                }
+
+                if (!syntaxValue || !syntaxSegment) {
+                    await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, undefined);
+                }
+
+                try {
+                    const parsedSyntaxValue = JSON.parse(String(syntaxValue))
+                    if (!syntaxValue?.__typename) {
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                            __typename: "LiteralValue",
+                            value: parsedSyntaxValue
+                        } : undefined);
+                        continue;
+                    }
+                } catch (e) {
+                    if (!syntaxValue?.__typename) {
+                        await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
+                            __typename: "LiteralValue",
+                            value: syntaxValue,
+                        } : undefined);
+                        continue;
+                    }
+                }
+
+                await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
+            }
+            changedParameters.current.clear()
+        })
+    }, [flowStore, sortedParameters])
+
+    const [inputs, validate] = useForm<Record<Scalars['NodeParameterID']['output'], InputSyntaxSegment[]>>({
+        initialValues: initialValues,
+        validate: validations,
+        truthyValidationBeforeSubmit: false,
+        onSubmit: onSubmit
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
@@ -57,105 +129,25 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
             if (!parameter) return null
 
-            const submitValue = (value: NodeFunction | LiteralValue | ReferenceValue | undefined) => {
-                startTransition(async () => {
-                    await flowService.setParameterValue(flowId, node.id!!, parameter.id!!, value)
-                })
-
-            }
-
-            const submitValueEvent = (event: any) => {
-                try {
-                    const value = JSON.parse(event.target.value) as NodeFunction | LiteralValue | ReferenceValue
-                    if (!value.__typename) {
-                        submitValue(value ? {
-                            __typename: "LiteralValue",
-                            value: value
-                        } : undefined)
-                        return
-                    }
-                    submitValue(value.__typename === "LiteralValue" ? (!!value.value ? value : undefined) : value)
-                } catch (e) {
-                    // @ts-ignore
-                    submitValue(event.target.value == "" || !event.target.value ? undefined : {
-                        __typename: "LiteralValue",
-                        value: event.target.value
-                    } as LiteralValue)
-                }
-            }
-
             const parameterDefinition = paramDefinitions[parameter.id!!]
-            const result = suggestionsById[parameter.id!!]
-            const title = parameterDefinition?.names ? parameterDefinition?.names?.nodes!![0]?.content : parameterDefinition?.id
-            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions?.nodes!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
-            const defaultValue: string | undefined = parameter.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter.value)
+            const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
+            const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 
             return <div>
-                <TextInput title={title}
-                           description={description}
-                           clearable
-                           key={JSON.stringify(parameter.value)}
-                           transformSyntax={(value): InputSyntaxSegment[] => {
-                               const rawValue = value ?? ""
-                               const textValue = typeof rawValue === "string" ? rawValue : String(rawValue)
-
-                               const buildTextSegment = (text: string): InputSyntaxSegment[] => [{
-                                   type: "text",
-                                   start: 0,
-                                   end: text.length,
-                                   visualLength: text.length,
-                                   content: text,
-                               }]
-
-                               const buildBlockSegment = (node: React.ReactNode): InputSyntaxSegment[] => [{
-                                   type: "block",
-                                   start: 0,
-                                   end: textValue.length,
-                                   visualLength: 1,
-                                   content: node,
-                               }]
-
-                               try {
-
-                                   const parsed = JSON.parse(textValue) as NodeParameterValue
-                                   if (parsed?.__typename === "NodeFunctionIdWrapper") {
-                                       const node = flowService.getNodeById(flowId, parsed.id)
-                                       const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-                                       return buildBlockSegment(
-                                           <Badge color={"info"}>{functionDefinition?.names?.nodes!![0]?.content}</Badge>
-                                       )
-                                   }
-
-                                   if (parsed?.__typename === "ReferenceValue") {
-                                       const refObject = parsed as ReferenceValue
-                                       return buildBlockSegment(
-                                           <Badge color={"warning"}>{refObject.depth}-{refObject.scope}-{refObject.node}</Badge>
-                                       )
-                                   }
-                               } catch (e) {
-                                   // fall through to text rendering
-                               }
-
-                               return buildTextSegment(textValue)
-                           }}
-                           defaultValue={defaultValue}
-                           onSuggestionSelect={(suggestion) => {
-                               submitValue(suggestion.value)
-                           }}
-                           //TODO: validation
-                           formValidation={{
-                               setValue: () => {},
-                               valid: true,
-                               notValidMessage: ""
-                           }}
-                           onBlur={submitValueEvent}
-                           onClear={submitValueEvent}
-                           suggestionsFooter={<DFlowSuggestionMenuFooter/>}
-                           suggestions={toInputSuggestions(result)}
-
+                {/*@ts-ignore*/}
+                <DFlowInputDefault flowId={flowId}
+                                   nodeId={node.id}
+                                   parameterId={parameter.id}
+                                   title={title}
+                                   description={description}
+                                   clearable
+                                   onChange={() => {
+                                       changedParameters.current.add(parameter.id!!)
+                                       validate()
+                                   }}
+                                   {...inputs.getInputProps(parameter.id!!)}
                 />
             </div>
         })}
     </Flex>
-
 }

@@ -5,7 +5,7 @@ import {
     Flow,
     FlowInput,
     FlowSetting,
-    LiteralValue,
+    LiteralValue, Maybe,
     Namespace,
     NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
@@ -17,7 +17,7 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    ReferenceValue
+    ReferenceValue, Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
 export type DFlowDependencies = {
@@ -51,6 +51,22 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                 })
             }
         }
+    }
+
+    getLinkedNodesById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction[] {
+        const parentNode = this.getNodeById(flowId, nodeId)
+        const nextNodes = parentNode ? this.getLinkedNodesById(flowId, parentNode.nextNodeId) : []
+        const parameterNodes: NodeFunction[] = []
+        parentNode?.parameters?.nodes?.forEach(p => {
+            if (p?.value?.__typename === "NodeFunctionIdWrapper") {
+                const parameterNode = this.getNodeById(flowId, (p.value as NodeFunctionIdWrapper)?.id!!)
+                if (parameterNode) {
+                    parameterNodes.push(parameterNode)
+                    parameterNodes.push(...(parameterNode ? this.getLinkedNodesById(flowId, parameterNode.nextNodeId) : []))
+                }
+            }
+        })
+        return [...(parentNode ? [parentNode]: []), ...parameterNodes, ...nextNodes]
     }
 
     getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
@@ -122,6 +138,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
     async deleteNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): Promise<void> {
         const flow = this.getById(flowId)
         const node = this.getNodeById(flowId, nodeId)
+        const parentNode = flow?.nodes?.nodes?.find(node => node?.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId))
         const previousNodes = flow?.nodes?.nodes?.find(n => n?.nextNodeId === nodeId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow || !node) return
@@ -129,10 +146,18 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         flow.nodes!.nodes = flow.nodes!.nodes!.filter(n => n?.id !== nodeId)
         node.parameters?.nodes?.forEach(p => this.removeParameterNode(flow, p!!))
 
+
         if (previousNodes) {
             previousNodes.nextNodeId = node.nextNodeId
         } else {
-            flow.startingNodeId = node.nextNodeId ?? undefined
+            if (!parentNode) flow.startingNodeId = node.nextNodeId ?? undefined
+        }
+
+        if (parentNode) {
+            const parameter = parentNode.parameters?.nodes?.find(p => p?.value?.__typename === "NodeFunctionIdWrapper" && (p.value as NodeFunction)?.id === nodeId)
+            if (parameter) {
+                parameter.value = undefined
+            }
         }
 
         this.set(index, flow)
@@ -149,7 +174,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         const nextNodeIndex: number = Math.max(0, ...flow.nodes?.nodes?.map(node => Number(node?.id?.match(/NodeFunction\/(\d+)$/)?.[1] ?? 0)) ?? [0])
         const nextNodeId: NodeFunction['id'] = `gid://sagittarius/NodeFunction/${nextNodeIndex + 1}`
         const addingNode: NodeFunction = {
-            ...nextNode,
+            ...JSON.parse(JSON.stringify(nextNode)),
             id: nextNodeId,
         }
 
@@ -170,11 +195,11 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         this.set(index, flow)
     }
 
-    async setSettingValue(flowId: Flow['id'], settingId: FlowSetting['id'], value: FlowSetting['value']): Promise<void> {
+    async setSettingValue(flowId: Flow['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
-        const setting = flow.settings?.nodes?.find(s => s?.id === settingId)
+        const setting = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
         if (!setting) return
         setting.value = value
         this.set(index, flow)

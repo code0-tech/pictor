@@ -6,7 +6,6 @@ import {Code0Component, mergeCode0Props, useService, useStore} from "../../utils
 import {
     IconChevronDown,
     IconChevronRight,
-    IconDots,
     IconFile,
     IconFolderFilled,
     IconFolderOpen
@@ -23,6 +22,7 @@ import {
     DFlowFolderContextMenuItemData
 } from "./DFlowFolderContextMenu";
 import {md5} from "js-md5";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 
 export interface DFlowFolderProps {
@@ -216,24 +216,34 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
 
 export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
 
-    const {name, flows, defaultOpen = false, children, ...rest} = props
+    const {
+        name,
+        flows,
+        defaultOpen = false,
+        children,
+        onCreate,
+        onDelete,
+        onRename,
+        activeFlowId,
+        namespaceId,
+        projectId,
+        ...code0Props
+    } = props
     const [open, setOpen] = React.useState(defaultOpen)
+    const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
 
     return <>
         <DFlowFolderContextMenu contextData={{
             name: name,
             flow: flows,
             type: "folder"
-        }} {...rest}>
-            <div onClick={() => setOpen(prevState => !prevState)} {...mergeCode0Props(`d-folder`, rest)}>
+        }} {...contextMenuProps}>
+            <div onClick={() => setOpen(prevState => !prevState)} {...mergeCode0Props(`d-folder`, code0Props)}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
                     {open ? <IconFolderOpen size={12}/> : <IconFolderFilled size={12}/>}
                     <Text>{name}</Text>
                 </Flex>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <Button p={"0"} variant={"none"}>
-                        <IconDots size={12}/>
-                    </Button>
                     <Button p={"0"} variant={"none"}>
                         {open ? <IconChevronDown size={12}/> : <IconChevronRight size={12}/>}
                     </Button>
@@ -248,23 +258,31 @@ export const DFlowFolderGroup: React.FC<DFlowFolderGroupProps> = (props) => {
 
 export const DFlowFolderItem: React.FC<DFlowFolderItemProps> = (props) => {
 
-    const {name, path, flow, onSelect, active, ...rest} = props
+    const {
+        name,
+        path,
+        flow,
+        onSelect,
+        active,
+        onCreate,
+        onDelete,
+        onRename,
+        activeFlowId,
+        namespaceId,
+        projectId,
+        ...code0Props
+    } = props
 
-    const colorHash = md5(path + name)
-    const hashToHue = (md5: string): number => {
-        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-        const int = parseInt(md5.slice(0, 8), 16)
-        return int % 360
-    }
+    const contextMenuProps = {onCreate, onDelete, onRename, activeFlowId, namespaceId, projectId}
 
     return <DFlowFolderContextMenu contextData={{
         name: path,
         flow: flow,
         type: "item"
-    }} {...rest}>
-        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, rest)}
+    }} {...contextMenuProps}>
+        <div {...mergeCode0Props(`d-folder__item ${active ? "d-folder__item--active" : ""}`, code0Props)}
              onClick={() => onSelect?.(flow)}>
-            <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
+            <IconFile color={hashToColor(path + name)} size={12}/>
             <Text>{name}</Text>
         </div>
     </DFlowFolderContextMenu>

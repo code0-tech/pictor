@@ -22,7 +22,7 @@ import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Badge} from "../badge/Badge";
 import {InputLabel} from "../form";
-import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
+import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import {DFlowSuggestionType} from "../d-flow-suggestion";
@@ -333,14 +333,14 @@ const RuleItem: React.FC<{
             const mapper = genericMap.get(identifier.genericKey)
             const source = mapper?.sourceDataTypeIdentifiers?.[0]
             return (
-                source?.dataType?.name?.nodes?.[0]?.content ??
-                source?.genericType?.dataType?.name?.nodes?.[0]?.content
+                source?.dataType?.name?.[0]?.content ??
+                source?.genericType?.dataType?.name?.[0]?.content
             )
         }
 
         return (
-            identifier.dataType?.name?.nodes?.[0]?.content ??
-            identifier.genericType?.dataType?.name?.nodes?.[0]?.content
+            identifier.dataType?.name?.[0]?.content ??
+            identifier.genericType?.dataType?.name?.[0]?.content
         )
     }, [genericMap, identifier, isTypeRule])
 
@@ -505,11 +505,11 @@ const RuleHeader: React.FC<{
 
     const variant = rule.variant as DataTypeRulesVariant | undefined
     const isTypeRule = variant ? !NON_TYPE_RULE_VARIANTS.has(variant) : false
-    const suggestions = isTypeRule ? useSuggestions({
+    const suggestions = isTypeRule ? useDataTypeSuggestions({
         dataType: {
-            id: "gid://sagittarius/DataType/878634678"
+            id: "gid://sagittarius/DataType/-1"
         }
-    }, [], "" as Flow['id'], 0, [0], 1, [DFlowSuggestionType.DATA_TYPE]) : []
+    }) : []
     const rulesCount = (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.dataType?.rules?.nodes?.length ?? (rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericType?.dataType?.rules?.nodes?.length ?? genericMap.get((rule?.config as DataTypeRulesParentTypeConfig)?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers?.map(type => type?.dataType?.rules?.nodes?.length ?? type.genericType?.dataType?.rules?.nodes?.length) ?? 0
 
     const [keyValue, setKeyValue] = React.useState<string>(() => ("key" in (rule?.config ?? {}) ? (rule?.config as any)?.key ?? "" : ""))

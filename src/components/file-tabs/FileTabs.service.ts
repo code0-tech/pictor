@@ -71,26 +71,17 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         this.update()
     }
 
-    public delete(index: number) {
+    deleteById(id: string) {
+        const index = this.values().findIndex((item: FileTabsView) => item.id === id)
         const tab = this.get(index)
 
-        if (tab.active && this.has(index - 1)) {
+        if (tab && tab.active && this.has(index - 1)) {
             this.activateTab(this.get(index - 1).id!!)
-        } else if (tab.active && this.has(index + 1)) {
+        } else if (tab && tab.active && this.has(index + 1)) {
             this.activateTab(this.get(index + 1).id!!)
         }
 
-        super.delete(index);
-        this.update()
-    }
-
-    deleteById(id: string) {
-        const index = this.values().findIndex((item: FileTabsView) => item.id === id)
-
-        if (index !== -1) {
-            this.delete(index)
-        }
-        this.update()
+        if (tab) this.access.setState(prev => prev.filter((tab) => tab.id !== id))
     }
 
     registerTab(value: FileTabsView) {

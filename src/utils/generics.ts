@@ -6,8 +6,7 @@ import type {
     DataTypeRule,
     DataTypeRuleConnection,
     DataTypeRulesConfig,
-    DataTypeRulesVariant,
-    DataTypeVariant, Flow,
+    Flow,
     GenericCombinationStrategyType,
     GenericMapper,
     GenericType,
@@ -23,6 +22,7 @@ type GenericMappingResult = Record<string, DataTypeIdentifier>;
 type GenericReplacement = DataTypeIdentifier | GenericMapper;
 
 export type GenericMap = Map<string, GenericReplacement>;
+export type GenericTargetMap = Map<string, string>;
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -446,8 +446,12 @@ function ruleMatches(sourceRule: DataTypeRule, targetRule: DataTypeRule): boolea
             return identifiersMatch(sourceConfig.dataTypeIdentifier, targetConfig.dataTypeIdentifier);
         }
         case "INPUT_TYPES": {
-            const sourceConfig = sourceRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
-            const targetConfig = targetRule.config as { inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }> };
+            const sourceConfig = sourceRule.config as {
+                inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }>
+            };
+            const targetConfig = targetRule.config as {
+                inputTypes?: Array<{ dataTypeIdentifier: DataTypeIdentifier }>
+            };
             const targetInputTypes = targetConfig.inputTypes ?? [];
             const sourceInputTypes = sourceConfig.inputTypes ?? [];
             return targetInputTypes.every(targetInput =>
@@ -526,7 +530,9 @@ export const resolveType = (
 
         if (dataType.variant === "ARRAY" && genericKeys.length > 0) {
             const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === "CONTAINS_TYPE");
-            const innerIdentifier = (innerTypeRule?.config as { dataTypeIdentifier?: DataTypeIdentifier })?.dataTypeIdentifier;
+            const innerIdentifier = (innerTypeRule?.config as {
+                dataTypeIdentifier?: DataTypeIdentifier
+            })?.dataTypeIdentifier;
             if (innerIdentifier) {
                 const [genericKey] = genericKeys;
                 if (!genericKey) return type;
@@ -596,6 +602,28 @@ const sortValue = (value: unknown): unknown => {
 
     return value;
 };
+
+export const targetForGenericKey = (func: FunctionDefinitionView, target: DataTypeIdentifier): GenericTargetMap => {
+    if (!target.genericType) return new Map()
+
+    const genericKeySet = new Set(func.genericKeys ?? []);
+    const targetMap: GenericTargetMap = new Map();
+
+    for (const mapper of target.genericType.genericMappers ?? []) {
+        const targetKey = mapper.target!;
+        if (genericKeySet.has(targetKey)) continue;
+
+        for (const source of mapper.sourceDataTypeIdentifiers ?? []) {
+            const sourceKey = source.genericKey;
+            if (sourceKey && genericKeySet.has(sourceKey)) {
+                targetMap.set(sourceKey, targetKey);
+            }
+        }
+    }
+
+    return targetMap
+
+}
 
 export const replaceGenericsAndSortType = (
     type: DataTypeIdentifier,

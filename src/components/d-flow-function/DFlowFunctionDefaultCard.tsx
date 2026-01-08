@@ -1,10 +1,10 @@
-import {Code0Component, InspectionSeverity} from "../../utils";
+import {Code0Component, underlineBySeverity} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
-import React, {memo} from "react";
+import React, {CSSProperties, memo} from "react";
 import {Card} from "../card/Card";
 import "./DFlowFunctionDefaultCard.style.scss";
 import {Flex} from "../flex/Flex";
-import {IconFile} from "@tabler/icons-react";
+import {IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore as usePictorStore} from "../../utils/contextStore";
 import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
@@ -15,6 +15,10 @@ import {DFlowTabDefault} from "../d-flow-file/DFlowTabDefault";
 import type {NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../badge/Badge";
 import {md5} from "js-md5";
+import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
+import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
+import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     nodeId: NodeFunction['id']
@@ -74,50 +78,40 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                         .flatMap(p => p.trim() === "," ? [","] : p.trim() ? [p.trim()] : [])
             );
 
-    const colorHash = md5(id)
-    const hashToHue = (md5: string): number => {
-        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-        const int = parseInt(md5.slice(0, 8), 16)
-        return int % 360
-    }
-
-    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages?.nodes!![0]?.content ?? "").map(item => {
+    const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const param = node?.parameters?.nodes?.find(p => {
             const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
             return parameterDefinition?.identifier == item
         })
 
+        const parameterValidation = validation?.filter(v => v.parameterId === param?.id)
+        const decorationStyle: CSSProperties =
+            parameterValidation?.length
+                ? underlineBySeverity[parameterValidation[0].type]
+                : {};
+
         if (param) {
             switch (param?.value?.__typename) {
                 case "LiteralValue":
-                    return <Badge style={{verticalAlign: "middle"}} color={"secondary"}>
-                        <Text size={"sm"}>
-                            {String(param?.value?.value)}
-                        </Text>
-                    </Badge>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <DFlowInputLiteralBadge value={param.value}/>
+                    </div>
                 case "ReferenceValue":
-                    return <Badge style={{verticalAlign: "middle"}}>
-                        <Text size={"sm"}>
-                            {String(param?.value.node)}-{String(param?.value.depth)}-{String(param?.value.scope)}
-                        </Text>
-                    </Badge>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <DFlowInputReferenceBadge flowId={props.data.flowId} value={param.value}/>
+                    </div>
                 case "NodeFunctionIdWrapper":
-                    const hash = md5(`${id}-param-${JSON.stringify(param)}`)
-                    const node = flowService.getNodeById(props.data.flowId, param.value.id)
-                    return <Badge style={{verticalAlign: "middle"}} color={`hsl(${hashToHue(hash)}, 100%, 72%)`} border
-                                  pos={"relative"}>
-                        <Text size={"sm"} style={{color: "inherit"}}>
-                            {String(functionService.getById(node?.functionDefinition?.id)?.names?.nodes!![0]?.content)}
-                        </Text>
+                    return <div style={{...decorationStyle, display: "inline-block"}}>
+                        <DFlowInputNodeBadge value={param.value} flowId={props.data.flowId}/>
                         <Handle
                             key={param?.id}
                             type={"target"}
-                            position={Position.Bottom}
+                            position={Position.Right}
                             id={`param-${param?.id}`}
                             isConnectable={false}
                             className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
                         />
-                    </Badge>
+                    </div>
             }
             return <Badge style={{verticalAlign: "middle"}} border>
                 <Text size={"sm"}>
@@ -135,11 +129,10 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             active: false,
             closeable: true,
             children: <>
-                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={12}/>
-                <Text size={"sm"}>{definition?.names?.nodes!![0]?.content}</Text>
+                <IconNote color={hashToColor(data.nodeId!)} size={12}/>
+                <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
-            content: <DFlowTabDefault flowId={props.data.flowId} depthLevel={data.depth} scopeLevel={data.scope}
-                                      nodeLevel={data.index} node={node}/>
+            content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
         })
     }, [node?.id, definition, data])
 
@@ -151,7 +144,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
             className={activeTabId == node?.id ? "d-flow-viewport-default-card--active" : undefined}
-            color={(validation?.filter(v => v.type === InspectionSeverity.ERROR)?.length ?? 0) > 0 ? "error" : "primary"}
+            color={"primary"}
             onClick={() => {
                 flowInstance.setViewport({
                     x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),
@@ -181,7 +174,7 @@ export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> =
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconFile color={`hsl(${hashToHue(colorHash)}, 100%, 72%)`} size={16}/>
+                <IconNote color={hashToColor(data.nodeId!)} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
         </Card>

@@ -50,6 +50,7 @@ export const toInputSuggestions = (suggestions: DFlowSuggestion[]): InputSuggest
 
         return {
             children,
+            insertMode: "replace",
             valueData: suggestion,
             value: suggestion.value,
             groupBy: groupLabel,

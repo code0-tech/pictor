@@ -10,10 +10,9 @@ import {
     IconFile,
     IconMessageChatbot
 } from "@tabler/icons-react";
-import {useReactiveArrayService} from "../../utils";
+import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {ContextStoreProvider} from "../../utils";
 import {DFlowTabs} from "../d-flow-file";
 import DataTypesData from "./data_types.json";
 import FunctionsData from "./runtime_functions.json";
@@ -25,7 +24,9 @@ import {
     NamespacesProjectsFlowsCreateInput,
     NamespacesProjectsFlowsCreatePayload,
     NamespacesProjectsFlowsDeleteInput,
-    NamespacesProjectsFlowsDeletePayload, NamespacesProjectsFlowsUpdateInput, NamespacesProjectsFlowsUpdatePayload
+    NamespacesProjectsFlowsDeletePayload,
+    NamespacesProjectsFlowsUpdateInput,
+    NamespacesProjectsFlowsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
@@ -73,7 +74,7 @@ export const Dashboard = () => {
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveServiceExtend, [{
         id: "gid://sagittarius/Flow/1",
         type: {
-            id: "gid://sagittarius/FlowType/867",
+            id: "gid://sagittarius/FlowType/868",
         },
         name: "de/codezero/examples/REST Flow",
         settings: {
@@ -91,7 +92,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/2",
         type: {
-            id: "gid://sagittarius/FlowType/867",
+            id: "gid://sagittarius/FlowType/868",
         },
         name: "de/codezero/examples-2/REST Flow",
         settings: {
@@ -109,7 +110,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/3",
         type: {
-            id: "gid://sagittarius/FlowType/867",
+            id: "gid://sagittarius/FlowType/868",
         },
         name: "en/codezero/examples/REST Flow",
         settings: {
@@ -133,47 +134,54 @@ export const Dashboard = () => {
     return <DFullScreen>
         <ContextStoreProvider
             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-            <DLayout rightContent={
-                <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                    <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
-                        <IconFile size={16}/>
-                    </Button>
-                    <Button variant={"none"} paddingSize={"xs"}>
-                        <IconDatabase size={16}/>
-                    </Button>
-                    <Button variant={"none"} paddingSize={"xs"}>
-                        <IconMessageChatbot size={16}/>
-                    </Button>
-                </Flex>
-            } bottomContent={
-                <Flex p={0.35} style={{gap: "0.7rem"}}>
-                    <Button variant={"none"} paddingSize={"xs"}>
-                        <Text>Logbook</Text>
-                    </Button>
-                    <Button variant={"none"} paddingSize={"xs"}>
-                        <Text>Problems</Text>
-                    </Button>
-                </Flex>
-            }>
+            <DLayout>
                 <DResizablePanelGroup direction={"horizontal"}>
-                    <DResizablePanel id={"1"} order={1} defaultSize={15}>
+                    <DResizablePanel id={"1"} order={1} defaultSize={20}>
                         <Folder/>
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"} order={2}>
-                        <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
+                        <DLayout rightContent={
+                            <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
+                                    <IconFile size={16}/>
+                                </Button>
+                                <Button variant={"none"} paddingSize={"xs"}>
+                                    <IconDatabase size={16}/>
+                                </Button>
+                                <Button variant={"none"} paddingSize={"xs"}>
+                                    <IconMessageChatbot size={16}/>
+                                </Button>
+                            </Flex>
+                        } bottomContent={
+                            <Flex p={0.35} style={{gap: "0.7rem"}}>
+                                <Button variant={"none"} paddingSize={"xs"}>
+                                    <Text>Logbook</Text>
+                                </Button>
+                                <Button variant={"none"} paddingSize={"xs"}>
+                                    <Text>Problems</Text>
+                                </Button>
+                            </Flex>
+                        }>
+                            <DResizablePanelGroup direction={"horizontal"}>
+                                <DResizablePanel id={"2"} order={2}>
+                                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
+                                </DResizablePanel>
+                                {show && (
+                                    <>
+                                        <DResizableHandle/>
+                                        <DResizablePanel id={"3"} order={3} defaultSize={25}>
+                                            <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                                       projectId={undefined}/>
+                                        </DResizablePanel>
+                                    </>
+                                )}
+                            </DResizablePanelGroup>
+                        </DLayout>
                     </DResizablePanel>
-                    {show && (
-                        <>
-                            <DResizableHandle/>
-                            <DResizablePanel id={"3"} order={3} defaultSize={25}>
-                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
-                                           projectId={undefined}/>
-                            </DResizablePanel>
-                        </>
-                    )}
                 </DResizablePanelGroup>
             </DLayout>
+
         </ContextStoreProvider>
     </DFullScreen>
 
@@ -184,7 +192,7 @@ const Folder = () => {
     const ref = React.useRef<DFlowFolderHandle>(null)
 
     return <DLayout topContent={
-        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.75}>
+        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.7}>
             <Button paddingSize={"xxs"} color={"success"}>
                 <Text>Create new flow</Text>
             </Button>
@@ -192,7 +200,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
-                            <IconCircleDot size={16}/>
+                            <IconCircleDot size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -205,7 +213,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
-                            <IconArrowsMinimize size={16}/>
+                            <IconArrowsMinimize size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -218,7 +226,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
-                            <IconArrowsMaximize size={16}/>
+                            <IconArrowsMaximize size={12}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>

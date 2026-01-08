@@ -14,6 +14,7 @@ import type {
 } from "@code0-tech/sagittarius-graphql-types";
 import {md5} from "js-md5";
 import {DFlowEdgeDataProps} from "./DFlowEdge";
+import {hashToColor} from "./DFlow.util";
 
 export const FLOW_EDGE_RAINBOW: string[] = [
     'rgba(255, 255, 255, 0.25)',
@@ -71,7 +72,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             fnCache = functionCache,
             dtCache = dataTypeCache,
         ): string => {
-
+            if (!node) return ""
             const fnId = `${node.id}-${idCounter++}`;
 
             if (idCounter == 1) {
@@ -134,32 +135,25 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                 if (!val) return
 
                 if (paramDT?.variant === "NODE") {
-                    const groupId = `${fnId}-group-${idCounter++}`;
-                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
-                    const hashToHue = (md5: string): number => {
-                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                        const int = parseInt(md5.slice(0, 8), 16)
-                        return int % 360
-                    }
-
-                    edges.push({
-                        id: `${fnId}-${groupId}-param-${param.id}`,
-                        source: fnId,
-                        target: groupId,
-                        deletable: false,
-                        selectable: false,
-                        animated: true,
-                        label: def?.names?.nodes!![0]?.content ?? param.id,
-                        data: {
-                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
-                            type: 'group',
-                            flowId: flowId,
-                            parentNodeId: parentNode?.id
-                        },
-                    });
-
-
                     if (val && val.__typename === "NodeFunctionIdWrapper") {
+
+                        const groupId = `${fnId}-group-${idCounter++}`;
+
+                        edges.push({
+                            id: `${fnId}-${groupId}-param-${param.id}`,
+                            source: fnId,
+                            target: groupId,
+                            deletable: false,
+                            selectable: false,
+                            animated: true,
+                            label: def?.names!![0]?.content ?? param.id,
+                            data: {
+                                color: hashToColor(val?.id || ""),
+                                type: 'group',
+                                flowId: flowId,
+                                parentNodeId: parentNode?.id
+                            },
+                        });
 
                         (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
                             groupsWithValue.get(fnId)!))
@@ -184,13 +178,6 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         dtCache
                     );
 
-                    const hash = md5(`${fnId}-param-${JSON.stringify(param)}`)
-                    const hashToHue = (md5: string): number => {
-                        // nimm z.B. 8 Hex-Zeichen = 32 Bit
-                        const int = parseInt(md5.slice(0, 8), 16)
-                        return int % 360
-                    }
-
                     edges.push({
                         id: `${subFnId}-${fnId}-param-${param.id}`,
                         source: subFnId,
@@ -200,7 +187,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                         deletable: false,
                         selectable: false,
                         data: {
-                            color: `hsl(${hashToHue(hash)}, 100%, 72%)`,
+                            color: hashToColor(val?.id || ""),
                             type: 'parameter',
                             flowId: flowId,
                             parentNodeId: parentNode?.id

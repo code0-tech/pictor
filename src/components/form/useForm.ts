@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 export type Validations<Values> = Partial<{
     [Key in keyof Values]: (value: Values[Key], values?: Values) => string | null;
@@ -9,6 +9,7 @@ export type Validations<Values> = Partial<{
 export interface FormValidationProps<Values> {
     initialValues: Values
     validate?: Validations<Values>,
+    truthyValidationBeforeSubmit?: boolean
     onSubmit?: (values: Values) => void
 }
 
@@ -36,7 +37,6 @@ export interface IValidation<Values> {
 class Validation<Values> implements IValidation<Values> {
 
     private readonly changeValue: (key: string, value: any) => void
-    private readonly initialRender: boolean
     private readonly currentValues: Values
     private readonly currentValidations?: Validations<Values>
 
@@ -44,12 +44,10 @@ class Validation<Values> implements IValidation<Values> {
         changeValue: (key: string, value: any) => void,
         values: Values,
         validations: Validations<Values>,
-        initial: boolean
     ) {
         this.changeValue = changeValue
         this.currentValues = values
         this.currentValidations = validations
-        this.initialRender = initial
     }
 
     isValid(): boolean {
@@ -78,9 +76,7 @@ class Validation<Values> implements IValidation<Values> {
                 ? this.currentValidations[key]!
                 : (_value: Values[Key]) => null
 
-        const message = !this.initialRender
-            ? currentFc(rawValue, this.currentValues)
-            : null
+        const message = currentFc(rawValue, this.currentValues)
 
         return {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
@@ -90,13 +86,9 @@ class Validation<Values> implements IValidation<Values> {
                 setValue: (value: any) => {
                     this.changeValue(currentName, value)
                 },
-                ...(!this.initialRender
-                    ? {
+                ...({
                         notValidMessage: message,
                         valid: message === null,
-                    }
-                    : {
-                        valid: true,
                     })
             },
             ...(this.currentValidations && this.currentValidations[key]
@@ -110,42 +102,44 @@ export const useForm = <
     Values extends Record<string, any> = Record<string, any>
 >(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
-    const {initialValues, validate = {}, onSubmit} = props
+    const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, onSubmit} = props
 
     const [values, setValues] = useState<Values>(initialValues)
-    const [hasValidated, setHasValidated] = useState(false)
+    const valuesRef = useRef<Values>(initialValues)
 
     useEffect(() => {
         setValues(initialValues)
-        setHasValidated(false)
+        valuesRef.current = initialValues
     }, [initialValues])
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
-        setValues(prevState => ({
-            ...prevState,
-            [key]: value,
-        }))
+        setValues(prevState => {
+            const nextState = {
+                ...prevState,
+                [key]: value,
+            }
+            valuesRef.current = nextState
+            return nextState
+        })
     }, [])
 
     const validation = useMemo(
-        () => new Validation<Values>(changeValue, values, validate, !hasValidated),
-        [changeValue, values, validate, hasValidated]
+        () => new Validation<Values>(changeValue, values, validate),
+        [changeValue, values, validate]
     )
 
     const validateFunction = useCallback(() => {
-        setHasValidated(true)
 
         const currentValidation = new Validation<Values>(
             changeValue,
-            values,
-            validate,
-            false
+            valuesRef.current,
+            validate
         )
 
-        if (onSubmit && currentValidation.isValid()) {
-            onSubmit(values as Values)
+        if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
+            onSubmit(valuesRef.current as Values)
         }
-    }, [changeValue, values, validate, onSubmit])
+    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit])
 
     return [
         validation,

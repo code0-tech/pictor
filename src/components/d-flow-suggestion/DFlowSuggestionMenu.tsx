@@ -21,7 +21,6 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
 
     const {suggestions = [], triggerContent, onSuggestionSelect = () => {}} = props
 
-    const flowStoreApi = useStoreApi()
     const menuRef = React.useRef<InputSuggestionMenuContentItemsHandle | null>(null); // Ref to suggestion list
     const [stateSuggestions, setStateSuggestions] = React.useState(suggestions)
 
@@ -29,15 +28,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
         setStateSuggestions(suggestions)
     }, [suggestions])
 
-    return <Menu onOpenChange={event => {
-        setTimeout(() => {
-            flowStoreApi.setState({
-                nodesDraggable: !event,
-                nodesConnectable: !event,
-                elementsSelectable: !event,
-            });
-        }, 250) // Timeout to ensure the menu is fully opened before changing the state
-    }}>
+    return <Menu>
         <MenuTrigger asChild>
             {triggerContent}
         </MenuTrigger>

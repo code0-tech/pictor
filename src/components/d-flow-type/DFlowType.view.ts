@@ -5,6 +5,7 @@ import type {
     Maybe,
     Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
+import {DataTypeView} from "../d-flow-data-type";
 
 
 export class FlowTypeView {
@@ -44,10 +45,13 @@ export class FlowTypeView {
         this._flowTypeSettings = flowType.flowTypeSettings;
         this._id = flowType.id;
         this._identifier = flowType.identifier;
-        this._inputType = flowType.inputType;
+        this._inputType = flowType.inputType ? new DataTypeView(flowType.inputType).json : undefined;
         this._names = flowType.names;
-        this._returnType = flowType.returnType;
+        this._returnType = flowType.returnType ? new DataTypeView(flowType.returnType).json : undefined;
         this._updatedAt = flowType.updatedAt;
+
+        console.log(JSON.stringify(this.inputType))
+        console.log(this.inputType)
     }
 
     get aliases(): Maybe<Array<Translation>> | undefined {

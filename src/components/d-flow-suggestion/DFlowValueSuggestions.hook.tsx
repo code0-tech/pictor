@@ -45,7 +45,7 @@ export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DF
                         displayText: [i.toString() ?? ""],
                         value: {
                             __typename: "LiteralValue",
-                            value: i
+                            value: String(i)
                         },
                     })
                 }

@@ -175,7 +175,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             [isSyntaxMode],
         )
 
-        React.useImperativeHandle(ref, () => activeControlRef.current ?? null, [activeControlRef])
+        React.useImperativeHandle(ref, () => activeControlRef.current ?? null)
 
         const mergedInputProps = useMemo(
             () => ({...inputProps, onChange: userOnChange, onInput: userOnInput}),

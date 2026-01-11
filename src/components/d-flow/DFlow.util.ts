@@ -104,7 +104,6 @@ export const resolveDataTypeIdentifiers = (
             dataTypeIdentifiers: { ...dt.dataTypeIdentifiers, nodes: localResolved },
         }
 
-        // WICHTIG: Ergebnis zurückgeben (attach ist nicht mutierend)
         return attachDataTypeIdentifiers(localResolved, dtWithNodes)
     }
 

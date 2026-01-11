@@ -13,14 +13,18 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = props => {
 
     const {splitter = <IconChevronRight size={16}/>, children, ...rest} = props
 
-    return <div {...mergeCode0Props(`breadcrumb`, rest)}>
-        {
-            React.Children.map(children, (child, index) => {
-                return <>
+    const count = React.Children.count(children)
+
+    return (
+        <div {...mergeCode0Props(`breadcrumb`, rest)}>
+            {React.Children.map(children, (child, index) => (
+                <React.Fragment key={index}>
                     {child}
-                    {index <= (React.Children.count(child)) ? <span className={"breadcrumb__splitter"}>{splitter}</span> : null}
-                </>
-            })
-        }
-    </div>
+                    {index < count - 1 ? (
+                        <span className="breadcrumb__splitter">{splitter}</span>
+                    ) : null}
+                </React.Fragment>
+            ))}
+        </div>
+    )
 }

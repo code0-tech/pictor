@@ -1,12 +1,12 @@
 [
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/82372372783872323",
+    "id": "gid://sagittarius/DataType/7237832873223",
     "name": [
       {
         "__typename": "Translation",
         "code": "en-US",
-        "content": "Data Type"
+        "content": "DataType"
       }
     ],
     "variant": "DATA_TYPE"
@@ -41,12 +41,18 @@
       "count": 0,
       "nodes": []
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "OBJECT"
   },
   {
     "__typename": "DataType",
     "id": "gid://sagittarius/DataType/1",
-    "genericKeys": [],
+    "genericKeys": [
+      "O"
+    ],
     "identifier": "REST_ADAPTER_INPUT",
     "aliases": [
       {
@@ -70,128 +76,134 @@
       }
     ],
     "rules": {
-      "count": 3,
+      "count": 2,
       "nodes": [
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/2",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/2",
             "key": "body"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/4",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/0",
-                "genericKeys": [],
-                "identifier": "REST_HEADER_INPUT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "http;rest;header;entry;input"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Headers"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Headers"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/8",
             "key": "headers"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 3,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/6",
+          "genericKey": "O"
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/2",
+          "genericType": {
+            "id": "gid://sagittarius/GenericType/3",
+            "dataType": {
+              "__typename": "DataType",
+              "id": "gid://sagittarius/DataType/4",
+              "genericKeys": [
+                "T"
+              ],
+              "identifier": "OBJECT",
+              "aliases": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "object;struct;data"
+                }
+              ],
+              "displayMessages": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "name": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "rules": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "variant": "PARENT_TYPE",
+                    "config": {
+                      "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/5"
+                    }
+                  }
+                ]
+              },
+              "dataTypeIdentifiers": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "id": "gid://sagittarius/DataTypeIdentifier/5",
+                    "genericKey": "T"
+                  }
+                ]
+              },
+              "variant": "OBJECT"
+            },
+            "genericMappers": [
+              {
+                "genericCombinationStrategies": [],
+                "sourceDataTypeIdentifierIds": [
+                  "gid://sagittarius/DataTypeIdentifier/6"
+                ],
+                "target": "T",
+                "id": "gid://sagittarius/GenericMapper/7"
+              }
+            ]
           }
         },
         {
-          "variant": "PARENT_TYPE",
-          "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/5",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
+          "id": "gid://sagittarius/DataTypeIdentifier/8",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/0",
+            "genericKeys": [],
+            "identifier": "REST_HEADER_INPUT",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;rest;header;entry;input"
               }
-            }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Headers"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Headers"
+              }
+            ],
+            "rules": {
+              "count": 0,
+              "nodes": []
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "OBJECT"
           }
         }
       ]
@@ -200,7 +212,7 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/6",
+    "id": "gid://sagittarius/DataType/9",
     "genericKeys": [],
     "identifier": "HTTP_HEADER_MAP",
     "aliases": [
@@ -230,237 +242,225 @@
         {
           "variant": "PARENT_TYPE",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/7",
-              "genericType": {
-                "id": "gid://sagittarius/GenericType/8",
-                "dataType": {
-                  "__typename": "DataType",
-                  "id": "gid://sagittarius/DataType/9",
-                  "genericKeys": [
-                    "T"
-                  ],
-                  "identifier": "LIST",
-                  "aliases": [
-                    {
-                      "__typename": "Translation",
-                      "code": "en-US",
-                      "content": "list;array;collection"
-                    }
-                  ],
-                  "displayMessages": [
-                    {
-                      "__typename": "Translation",
-                      "code": "en-US",
-                      "content": "List of ${T}"
-                    }
-                  ],
-                  "name": [
-                    {
-                      "__typename": "Translation",
-                      "code": "en-US",
-                      "content": "Generic List"
-                    }
-                  ],
-                  "rules": {
-                    "count": 1,
-                    "nodes": [
-                      {
-                        "variant": "CONTAINS_TYPE",
-                        "config": {
-                          "dataTypeIdentifier": {
-                            "id": "gid://sagittarius/DataTypeIdentifier/10",
-                            "genericKey": "T"
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "variant": "ARRAY"
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/10"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 2,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/14",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/15",
+            "genericKeys": [],
+            "identifier": "HTTP_HEADER_ENTRY",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;header;entry"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Header Entry"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Header Entry"
+              }
+            ],
+            "rules": {
+              "count": 2,
+              "nodes": [
+                {
+                  "variant": "CONTAINS_KEY",
+                  "config": {
+                    "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/16",
+                    "key": "key"
+                  }
                 },
-                "genericMappers": [
-                  {
-                    "genericCombinationStrategies": [],
-                    "sourceDataTypeIdentifiers": [
+                {
+                  "variant": "CONTAINS_KEY",
+                  "config": {
+                    "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/18",
+                    "key": "value"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 2,
+              "nodes": [
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/16",
+                  "dataType": {
+                    "__typename": "DataType",
+                    "id": "gid://sagittarius/DataType/17",
+                    "genericKeys": [],
+                    "identifier": "TEXT",
+                    "aliases": [
                       {
-                        "id": "gid://sagittarius/DataTypeIdentifier/11",
-                        "dataType": {
-                          "__typename": "DataType",
-                          "id": "gid://sagittarius/DataType/12",
-                          "genericKeys": [],
-                          "identifier": "HTTP_HEADER_ENTRY",
-                          "aliases": [
-                            {
-                              "__typename": "Translation",
-                              "code": "en-US",
-                              "content": "http;header;entry"
-                            }
-                          ],
-                          "displayMessages": [
-                            {
-                              "__typename": "Translation",
-                              "code": "en-US",
-                              "content": "HTTP Header Entry"
-                            }
-                          ],
-                          "name": [
-                            {
-                              "__typename": "Translation",
-                              "code": "en-US",
-                              "content": "HTTP Header Entry"
-                            }
-                          ],
-                          "rules": {
-                            "count": 3,
-                            "nodes": [
-                              {
-                                "variant": "CONTAINS_KEY",
-                                "config": {
-                                  "dataTypeIdentifier": {
-                                    "id": "gid://sagittarius/DataTypeIdentifier/13",
-                                    "dataType": {
-                                      "__typename": "DataType",
-                                      "id": "gid://sagittarius/DataType/14",
-                                      "genericKeys": [],
-                                      "identifier": "TEXT",
-                                      "aliases": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "text;char;literal;string"
-                                        }
-                                      ],
-                                      "displayMessages": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Text"
-                                        }
-                                      ],
-                                      "name": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Text"
-                                        }
-                                      ],
-                                      "rules": {
-                                        "count": 1,
-                                        "nodes": [
-                                          {
-                                            "variant": "REGEX",
-                                            "config": {
-                                              "pattern": "[\\s\\S]*"
-                                            }
-                                          }
-                                        ]
-                                      },
-                                      "variant": "PRIMITIVE"
-                                    }
-                                  },
-                                  "key": "key"
-                                }
-                              },
-                              {
-                                "variant": "CONTAINS_KEY",
-                                "config": {
-                                  "dataTypeIdentifier": {
-                                    "id": "gid://sagittarius/DataTypeIdentifier/15",
-                                    "dataType": {
-                                      "__typename": "DataType",
-                                      "id": "gid://sagittarius/DataType/14",
-                                      "genericKeys": [],
-                                      "identifier": "TEXT",
-                                      "aliases": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "text;char;literal;string"
-                                        }
-                                      ],
-                                      "displayMessages": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Text"
-                                        }
-                                      ],
-                                      "name": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Text"
-                                        }
-                                      ],
-                                      "rules": {
-                                        "count": 1,
-                                        "nodes": [
-                                          {
-                                            "variant": "REGEX",
-                                            "config": {
-                                              "pattern": "[\\s\\S]*"
-                                            }
-                                          }
-                                        ]
-                                      },
-                                      "variant": "PRIMITIVE"
-                                    }
-                                  },
-                                  "key": "value"
-                                }
-                              },
-                              {
-                                "variant": "PARENT_TYPE",
-                                "config": {
-                                  "dataTypeIdentifier": {
-                                    "id": "gid://sagittarius/DataTypeIdentifier/16",
-                                    "dataType": {
-                                      "__typename": "DataType",
-                                      "id": "gid://sagittarius/DataType/3",
-                                      "genericKeys": [],
-                                      "identifier": "OBJECT",
-                                      "aliases": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "object;struct;data"
-                                        }
-                                      ],
-                                      "displayMessages": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Object"
-                                        }
-                                      ],
-                                      "name": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "Object"
-                                        }
-                                      ],
-                                      "rules": {
-                                        "count": 0,
-                                        "nodes": []
-                                      },
-                                      "variant": "OBJECT"
-                                    }
-                                  }
-                                }
-                              }
-                            ]
-                          },
-                          "variant": "OBJECT"
-                        }
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "text;char;literal;string"
                       }
                     ],
-                    "target": "T",
-                    "id": "gid://sagittarius/GenericMapper/17"
+                    "displayMessages": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "Text"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "Text"
+                      }
+                    ],
+                    "rules": {
+                      "count": 1,
+                      "nodes": [
+                        {
+                          "variant": "REGEX",
+                          "config": {
+                            "pattern": "[\\s\\S]*"
+                          }
+                        }
+                      ]
+                    },
+                    "dataTypeIdentifiers": {
+                      "count": 0,
+                      "nodes": []
+                    },
+                    "variant": "PRIMITIVE"
+                  }
+                },
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/18",
+                  "dataType": {
+                    "__typename": "DataType",
+                    "id": "gid://sagittarius/DataType/17",
+                    "genericKeys": [],
+                    "identifier": "TEXT",
+                    "aliases": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "text;char;literal;string"
+                      }
+                    ],
+                    "displayMessages": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "Text"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "Text"
+                      }
+                    ],
+                    "rules": {
+                      "count": 1,
+                      "nodes": [
+                        {
+                          "variant": "REGEX",
+                          "config": {
+                            "pattern": "[\\s\\S]*"
+                          }
+                        }
+                      ]
+                    },
+                    "dataTypeIdentifiers": {
+                      "count": 0,
+                      "nodes": []
+                    },
+                    "variant": "PRIMITIVE"
+                  }
+                }
+              ]
+            },
+            "variant": "OBJECT"
+          }
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/10",
+          "genericType": {
+            "id": "gid://sagittarius/GenericType/11",
+            "dataType": {
+              "__typename": "DataType",
+              "id": "gid://sagittarius/DataType/12",
+              "genericKeys": [
+                "T"
+              ],
+              "identifier": "LIST",
+              "aliases": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "list;array;collection"
+                }
+              ],
+              "displayMessages": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "List of ${T}"
+                }
+              ],
+              "name": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Generic List"
+                }
+              ],
+              "rules": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "variant": "CONTAINS_TYPE",
+                    "config": {
+                      "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/13"
+                    }
                   }
                 ]
+              },
+              "dataTypeIdentifiers": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "id": "gid://sagittarius/DataTypeIdentifier/13",
+                    "genericKey": "T"
+                  }
+                ]
+              },
+              "variant": "ARRAY"
+            },
+            "genericMappers": [
+              {
+                "genericCombinationStrategies": [],
+                "sourceDataTypeIdentifierIds": [
+                  "gid://sagittarius/DataTypeIdentifier/14"
+                ],
+                "target": "T",
+                "id": "gid://sagittarius/GenericMapper/19"
               }
-            }
+            ]
           }
         }
       ]
@@ -469,7 +469,7 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/9",
+    "id": "gid://sagittarius/DataType/12",
     "genericKeys": [
       "T"
     ],
@@ -501,11 +501,17 @@
         {
           "variant": "CONTAINS_TYPE",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/10",
-              "genericKey": "T"
-            }
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/13"
           }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 1,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/13",
+          "genericKey": "T"
         }
       ]
     },
@@ -513,7 +519,57 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/18",
+    "id": "gid://sagittarius/DataType/20",
+    "genericKeys": [
+      "T"
+    ],
+    "identifier": "DATA_TYPE",
+    "aliases": [
+      {
+        "__typename": "Translation",
+        "code": "en-US",
+        "content": "type;struct;data;data_type;datatype"
+      }
+    ],
+    "displayMessages": [
+      {
+        "__typename": "Translation",
+        "code": "en-US",
+        "content": "DataType"
+      }
+    ],
+    "name": [
+      {
+        "__typename": "Translation",
+        "code": "en-US",
+        "content": "DataType"
+      }
+    ],
+    "rules": {
+      "count": 1,
+      "nodes": [
+        {
+          "variant": "PARENT_TYPE",
+          "config": {
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/21"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 1,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/21",
+          "genericKey": "T"
+        }
+      ]
+    },
+    "variant": "DATA_TYPE"
+  },
+  {
+    "__typename": "DataType",
+    "id": "gid://sagittarius/DataType/22",
     "genericKeys": [
       "I"
     ],
@@ -545,48 +601,7 @@
         {
           "variant": "RETURN_TYPE",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/19",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/20",
-                "genericKeys": [],
-                "identifier": "NUMBER",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "number;integer;float;double;long"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Number"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Number"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "REGEX",
-                      "config": {
-                        "pattern": "^(?:-(?:[1-9](?:\\d{0,2}(?:,\\d{3})+|\\d*))|(?:0|(?:[1-9](?:\\d{0,2}(?:,\\d{3})+|\\d*))))(?:.\\d+|)$"
-                      }
-                    }
-                  ]
-                },
-                "variant": "PRIMITIVE"
-              }
-            }
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/23"
           }
         },
         {
@@ -594,17 +609,11 @@
           "config": {
             "inputTypes": [
               {
-                "dataTypeIdentifier": {
-                  "id": "gid://sagittarius/DataTypeIdentifier/21",
-                  "genericKey": "I"
-                },
+                "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/25",
                 "inputIdentifier": "left"
               },
               {
-                "dataTypeIdentifier": {
-                  "id": "gid://sagittarius/DataTypeIdentifier/22",
-                  "genericKey": "I"
-                },
+                "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/26",
                 "inputIdentifier": "right"
               }
             ]
@@ -612,11 +621,70 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 3,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/23",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/24",
+            "genericKeys": [],
+            "identifier": "NUMBER",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "number;integer;float;double;long"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Number"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Number"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "REGEX",
+                  "config": {
+                    "pattern": "^(?:-(?:[1-9](?:\\d{0,2}(?:,\\d{3})+|\\d*))|(?:0|(?:[1-9](?:\\d{0,2}(?:,\\d{3})+|\\d*))))(?:.\\d+|)$"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "PRIMITIVE"
+          }
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/25",
+          "genericKey": "I"
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/26",
+          "genericKey": "I"
+        }
+      ]
+    },
     "variant": "NODE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/23",
+    "id": "gid://sagittarius/DataType/27",
     "genericKeys": [
       "T"
     ],
@@ -650,14 +718,20 @@
           "config": {
             "inputTypes": [
               {
-                "dataTypeIdentifier": {
-                  "id": "gid://sagittarius/DataTypeIdentifier/24",
-                  "genericKey": "T"
-                },
-                "inputIdentifier": "item"
+                "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/28",
+                "inputIdentifier": "consumer"
               }
             ]
           }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 1,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/28",
+          "genericKey": "T"
         }
       ]
     },
@@ -665,7 +739,7 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/25",
+    "id": "gid://sagittarius/DataType/29",
     "genericKeys": [
       "T"
     ],
@@ -697,48 +771,7 @@
         {
           "variant": "RETURN_TYPE",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/26",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/27",
-                "genericKeys": [],
-                "identifier": "BOOLEAN",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "bool;boolean;bit"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Boolean"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Boolean"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "REGEX",
-                      "config": {
-                        "pattern": "^(true|false)$"
-                      }
-                    }
-                  ]
-                },
-                "variant": "PRIMITIVE"
-              }
-            }
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/30"
           }
         },
         {
@@ -746,10 +779,7 @@
           "config": {
             "inputTypes": [
               {
-                "dataTypeIdentifier": {
-                  "id": "gid://sagittarius/DataTypeIdentifier/28",
-                  "genericKey": "T"
-                },
+                "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/32",
                 "inputIdentifier": "predicate"
               }
             ]
@@ -757,11 +787,66 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 2,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/30",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/31",
+            "genericKeys": [],
+            "identifier": "BOOLEAN",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "bool;boolean;bit"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Boolean"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Boolean"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "REGEX",
+                  "config": {
+                    "pattern": "^(true|false)$"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "PRIMITIVE"
+          }
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/32",
+          "genericKey": "T"
+        }
+      ]
+    },
     "variant": "NODE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/29",
+    "id": "gid://sagittarius/DataType/33",
     "genericKeys": [],
     "identifier": "RUNNABLE",
     "aliases": [
@@ -789,11 +874,15 @@
       "count": 0,
       "nodes": []
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "NODE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/30",
+    "id": "gid://sagittarius/DataType/34",
     "genericKeys": [
       "I",
       "R"
@@ -826,10 +915,7 @@
         {
           "variant": "RETURN_TYPE",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/31",
-              "genericKey": "R"
-            }
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/35"
           }
         },
         {
@@ -837,10 +923,7 @@
           "config": {
             "inputTypes": [
               {
-                "dataTypeIdentifier": {
-                  "id": "gid://sagittarius/DataTypeIdentifier/32",
-                  "genericKey": "I"
-                },
+                "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/36",
                 "inputIdentifier": "transform"
               }
             ]
@@ -848,11 +931,24 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 2,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/35",
+          "genericKey": "R"
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/36",
+          "genericKey": "I"
+        }
+      ]
+    },
     "variant": "NODE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/12",
+    "id": "gid://sagittarius/DataType/15",
     "genericKeys": [],
     "identifier": "HTTP_HEADER_ENTRY",
     "aliases": [
@@ -877,142 +973,117 @@
       }
     ],
     "rules": {
-      "count": 3,
+      "count": 2,
       "nodes": [
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/13",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/14",
-                "genericKeys": [],
-                "identifier": "TEXT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "text;char;literal;string"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Text"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Text"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "REGEX",
-                      "config": {
-                        "pattern": "[\\s\\S]*"
-                      }
-                    }
-                  ]
-                },
-                "variant": "PRIMITIVE"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/16",
             "key": "key"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/15",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/14",
-                "genericKeys": [],
-                "identifier": "TEXT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "text;char;literal;string"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Text"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Text"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "REGEX",
-                      "config": {
-                        "pattern": "[\\s\\S]*"
-                      }
-                    }
-                  ]
-                },
-                "variant": "PRIMITIVE"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/18",
             "key": "value"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 2,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/16",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/17",
+            "genericKeys": [],
+            "identifier": "TEXT",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "text;char;literal;string"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Text"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Text"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "REGEX",
+                  "config": {
+                    "pattern": "[\\s\\S]*"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "PRIMITIVE"
           }
         },
         {
-          "variant": "PARENT_TYPE",
-          "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/16",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
+          "id": "gid://sagittarius/DataTypeIdentifier/18",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/17",
+            "genericKeys": [],
+            "identifier": "TEXT",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "text;char;literal;string"
               }
-            }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Text"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "Text"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "REGEX",
+                  "config": {
+                    "pattern": "[\\s\\S]*"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "PRIMITIVE"
           }
         }
       ]
@@ -1021,8 +1092,10 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/33",
-    "genericKeys": [],
+    "id": "gid://sagittarius/DataType/37",
+    "genericKeys": [
+      "O"
+    ],
     "identifier": "HTTP_REQUEST",
     "aliases": [
       {
@@ -1046,468 +1119,468 @@
       }
     ],
     "rules": {
-      "count": 5,
+      "count": 4,
       "nodes": [
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/34",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/35",
-                "genericKeys": [],
-                "identifier": "HTTP_METHOD",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "http;method;get;post;put;delete;path;head"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Method"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Method"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "ITEM_OF_COLLECTION",
-                      "config": {
-                        "items": [
-                          "GET",
-                          "POST",
-                          "PUT",
-                          "DELETE",
-                          "PATCH",
-                          "HEAD"
-                        ]
-                      }
-                    }
-                  ]
-                },
-                "variant": "TYPE"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/38",
             "key": "method"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/36",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/37",
-                "genericKeys": [],
-                "identifier": "HTTP_URL",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "http;route;url"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Route"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Route"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "REGEX",
-                      "config": {
-                        "pattern": "^/\\w+(?:[.:~-]\\w+)*(?:/\\w+(?:[.:~-]\\w+)*)*$"
-                      }
-                    }
-                  ]
-                },
-                "variant": "TYPE"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/40",
             "key": "url"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/38",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/42",
             "key": "body"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/39",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/6",
-                "genericKeys": [],
-                "identifier": "HTTP_HEADER_MAP",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "http;headers"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Headers"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Headers"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "PARENT_TYPE",
-                      "config": {
-                        "dataTypeIdentifier": {
-                          "id": "gid://sagittarius/DataTypeIdentifier/7",
-                          "genericType": {
-                            "id": "gid://sagittarius/GenericType/8",
-                            "dataType": {
-                              "__typename": "DataType",
-                              "id": "gid://sagittarius/DataType/9",
-                              "genericKeys": [
-                                "T"
-                              ],
-                              "identifier": "LIST",
-                              "aliases": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "list;array;collection"
-                                }
-                              ],
-                              "displayMessages": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "List of ${T}"
-                                }
-                              ],
-                              "name": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "Generic List"
-                                }
-                              ],
-                              "rules": {
-                                "count": 1,
-                                "nodes": [
-                                  {
-                                    "variant": "CONTAINS_TYPE",
-                                    "config": {
-                                      "dataTypeIdentifier": {
-                                        "id": "gid://sagittarius/DataTypeIdentifier/10",
-                                        "genericKey": "T"
-                                      }
-                                    }
-                                  }
-                                ]
-                              },
-                              "variant": "ARRAY"
-                            },
-                            "genericMappers": [
-                              {
-                                "genericCombinationStrategies": [],
-                                "sourceDataTypeIdentifiers": [
-                                  {
-                                    "id": "gid://sagittarius/DataTypeIdentifier/11",
-                                    "dataType": {
-                                      "__typename": "DataType",
-                                      "id": "gid://sagittarius/DataType/12",
-                                      "genericKeys": [],
-                                      "identifier": "HTTP_HEADER_ENTRY",
-                                      "aliases": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "http;header;entry"
-                                        }
-                                      ],
-                                      "displayMessages": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "HTTP Header Entry"
-                                        }
-                                      ],
-                                      "name": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "HTTP Header Entry"
-                                        }
-                                      ],
-                                      "rules": {
-                                        "count": 3,
-                                        "nodes": [
-                                          {
-                                            "variant": "CONTAINS_KEY",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/13",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/14",
-                                                  "genericKeys": [],
-                                                  "identifier": "TEXT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "text;char;literal;string"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 1,
-                                                    "nodes": [
-                                                      {
-                                                        "variant": "REGEX",
-                                                        "config": {
-                                                          "pattern": "[\\s\\S]*"
-                                                        }
-                                                      }
-                                                    ]
-                                                  },
-                                                  "variant": "PRIMITIVE"
-                                                }
-                                              },
-                                              "key": "key"
-                                            }
-                                          },
-                                          {
-                                            "variant": "CONTAINS_KEY",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/15",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/14",
-                                                  "genericKeys": [],
-                                                  "identifier": "TEXT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "text;char;literal;string"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 1,
-                                                    "nodes": [
-                                                      {
-                                                        "variant": "REGEX",
-                                                        "config": {
-                                                          "pattern": "[\\s\\S]*"
-                                                        }
-                                                      }
-                                                    ]
-                                                  },
-                                                  "variant": "PRIMITIVE"
-                                                }
-                                              },
-                                              "key": "value"
-                                            }
-                                          },
-                                          {
-                                            "variant": "PARENT_TYPE",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/16",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/3",
-                                                  "genericKeys": [],
-                                                  "identifier": "OBJECT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "object;struct;data"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Object"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Object"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 0,
-                                                    "nodes": []
-                                                  },
-                                                  "variant": "OBJECT"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        ]
-                                      },
-                                      "variant": "OBJECT"
-                                    }
-                                  }
-                                ],
-                                "target": "T",
-                                "id": "gid://sagittarius/GenericMapper/17"
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "variant": "ARRAY"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/46",
             "key": "headers"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 5,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/38",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/39",
+            "genericKeys": [],
+            "identifier": "HTTP_METHOD",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;method;get;post;put;delete;path;head"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Method"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Method"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "ITEM_OF_COLLECTION",
+                  "config": {
+                    "items": [
+                      "GET",
+                      "POST",
+                      "PUT",
+                      "DELETE",
+                      "PATCH",
+                      "HEAD"
+                    ]
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "TYPE"
           }
         },
         {
-          "variant": "PARENT_TYPE",
-          "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/40",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
+          "id": "gid://sagittarius/DataTypeIdentifier/40",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/41",
+            "genericKeys": [],
+            "identifier": "HTTP_URL",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;route;url"
               }
-            }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Route"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Route"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "REGEX",
+                  "config": {
+                    "pattern": "^/\\w+(?:[.:~-]\\w+)*(?:/\\w+(?:[.:~-]\\w+)*)*$"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 0,
+              "nodes": []
+            },
+            "variant": "TYPE"
+          }
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/44",
+          "genericKey": "O"
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/42",
+          "genericType": {
+            "id": "gid://sagittarius/GenericType/43",
+            "dataType": {
+              "__typename": "DataType",
+              "id": "gid://sagittarius/DataType/4",
+              "genericKeys": [
+                "T"
+              ],
+              "identifier": "OBJECT",
+              "aliases": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "object;struct;data"
+                }
+              ],
+              "displayMessages": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "name": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "rules": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "variant": "PARENT_TYPE",
+                    "config": {
+                      "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/5"
+                    }
+                  }
+                ]
+              },
+              "dataTypeIdentifiers": {
+                "count": 1,
+                "nodes": [
+                  {
+                    "id": "gid://sagittarius/DataTypeIdentifier/5",
+                    "genericKey": "T"
+                  }
+                ]
+              },
+              "variant": "OBJECT"
+            },
+            "genericMappers": [
+              {
+                "genericCombinationStrategies": [],
+                "sourceDataTypeIdentifierIds": [
+                  "gid://sagittarius/DataTypeIdentifier/44"
+                ],
+                "target": "T",
+                "id": "gid://sagittarius/GenericMapper/45"
+              }
+            ]
+          }
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/46",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/9",
+            "genericKeys": [],
+            "identifier": "HTTP_HEADER_MAP",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;headers"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Headers"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Headers"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "PARENT_TYPE",
+                  "config": {
+                    "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/10"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 2,
+              "nodes": [
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/14",
+                  "dataType": {
+                    "__typename": "DataType",
+                    "id": "gid://sagittarius/DataType/15",
+                    "genericKeys": [],
+                    "identifier": "HTTP_HEADER_ENTRY",
+                    "aliases": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "http;header;entry"
+                      }
+                    ],
+                    "displayMessages": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "HTTP Header Entry"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "HTTP Header Entry"
+                      }
+                    ],
+                    "rules": {
+                      "count": 2,
+                      "nodes": [
+                        {
+                          "variant": "CONTAINS_KEY",
+                          "config": {
+                            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/16",
+                            "key": "key"
+                          }
+                        },
+                        {
+                          "variant": "CONTAINS_KEY",
+                          "config": {
+                            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/18",
+                            "key": "value"
+                          }
+                        }
+                      ]
+                    },
+                    "dataTypeIdentifiers": {
+                      "count": 2,
+                      "nodes": [
+                        {
+                          "id": "gid://sagittarius/DataTypeIdentifier/16",
+                          "dataType": {
+                            "__typename": "DataType",
+                            "id": "gid://sagittarius/DataType/17",
+                            "genericKeys": [],
+                            "identifier": "TEXT",
+                            "aliases": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "text;char;literal;string"
+                              }
+                            ],
+                            "displayMessages": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "name": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "rules": {
+                              "count": 1,
+                              "nodes": [
+                                {
+                                  "variant": "REGEX",
+                                  "config": {
+                                    "pattern": "[\\s\\S]*"
+                                  }
+                                }
+                              ]
+                            },
+                            "dataTypeIdentifiers": {
+                              "count": 0,
+                              "nodes": []
+                            },
+                            "variant": "PRIMITIVE"
+                          }
+                        },
+                        {
+                          "id": "gid://sagittarius/DataTypeIdentifier/18",
+                          "dataType": {
+                            "__typename": "DataType",
+                            "id": "gid://sagittarius/DataType/17",
+                            "genericKeys": [],
+                            "identifier": "TEXT",
+                            "aliases": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "text;char;literal;string"
+                              }
+                            ],
+                            "displayMessages": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "name": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "rules": {
+                              "count": 1,
+                              "nodes": [
+                                {
+                                  "variant": "REGEX",
+                                  "config": {
+                                    "pattern": "[\\s\\S]*"
+                                  }
+                                }
+                              ]
+                            },
+                            "dataTypeIdentifiers": {
+                              "count": 0,
+                              "nodes": []
+                            },
+                            "variant": "PRIMITIVE"
+                          }
+                        }
+                      ]
+                    },
+                    "variant": "OBJECT"
+                  }
+                },
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/10",
+                  "genericType": {
+                    "id": "gid://sagittarius/GenericType/11",
+                    "dataType": {
+                      "__typename": "DataType",
+                      "id": "gid://sagittarius/DataType/12",
+                      "genericKeys": [
+                        "T"
+                      ],
+                      "identifier": "LIST",
+                      "aliases": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "list;array;collection"
+                        }
+                      ],
+                      "displayMessages": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "List of ${T}"
+                        }
+                      ],
+                      "name": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "Generic List"
+                        }
+                      ],
+                      "rules": {
+                        "count": 1,
+                        "nodes": [
+                          {
+                            "variant": "CONTAINS_TYPE",
+                            "config": {
+                              "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/13"
+                            }
+                          }
+                        ]
+                      },
+                      "dataTypeIdentifiers": {
+                        "count": 1,
+                        "nodes": [
+                          {
+                            "id": "gid://sagittarius/DataTypeIdentifier/13",
+                            "genericKey": "T"
+                          }
+                        ]
+                      },
+                      "variant": "ARRAY"
+                    },
+                    "genericMappers": [
+                      {
+                        "genericCombinationStrategies": [],
+                        "sourceDataTypeIdentifierIds": [
+                          "gid://sagittarius/DataTypeIdentifier/14"
+                        ],
+                        "target": "T",
+                        "id": "gid://sagittarius/GenericMapper/19"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "variant": "ARRAY"
           }
         }
       ]
@@ -1516,8 +1589,10 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/41",
-    "genericKeys": [],
+    "id": "gid://sagittarius/DataType/47",
+    "genericKeys": [
+      "O"
+    ],
     "identifier": "HTTP_RESPONSE",
     "aliases": [
       {
@@ -1541,365 +1616,355 @@
       }
     ],
     "rules": {
-      "count": 3,
+      "count": 2,
       "nodes": [
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/42",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/6",
-                "genericKeys": [],
-                "identifier": "HTTP_HEADER_MAP",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "http;headers"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Headers"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "HTTP Headers"
-                  }
-                ],
-                "rules": {
-                  "count": 1,
-                  "nodes": [
-                    {
-                      "variant": "PARENT_TYPE",
-                      "config": {
-                        "dataTypeIdentifier": {
-                          "id": "gid://sagittarius/DataTypeIdentifier/7",
-                          "genericType": {
-                            "id": "gid://sagittarius/GenericType/8",
-                            "dataType": {
-                              "__typename": "DataType",
-                              "id": "gid://sagittarius/DataType/9",
-                              "genericKeys": [
-                                "T"
-                              ],
-                              "identifier": "LIST",
-                              "aliases": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "list;array;collection"
-                                }
-                              ],
-                              "displayMessages": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "List of ${T}"
-                                }
-                              ],
-                              "name": [
-                                {
-                                  "__typename": "Translation",
-                                  "code": "en-US",
-                                  "content": "Generic List"
-                                }
-                              ],
-                              "rules": {
-                                "count": 1,
-                                "nodes": [
-                                  {
-                                    "variant": "CONTAINS_TYPE",
-                                    "config": {
-                                      "dataTypeIdentifier": {
-                                        "id": "gid://sagittarius/DataTypeIdentifier/10",
-                                        "genericKey": "T"
-                                      }
-                                    }
-                                  }
-                                ]
-                              },
-                              "variant": "ARRAY"
-                            },
-                            "genericMappers": [
-                              {
-                                "genericCombinationStrategies": [],
-                                "sourceDataTypeIdentifiers": [
-                                  {
-                                    "id": "gid://sagittarius/DataTypeIdentifier/11",
-                                    "dataType": {
-                                      "__typename": "DataType",
-                                      "id": "gid://sagittarius/DataType/12",
-                                      "genericKeys": [],
-                                      "identifier": "HTTP_HEADER_ENTRY",
-                                      "aliases": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "http;header;entry"
-                                        }
-                                      ],
-                                      "displayMessages": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "HTTP Header Entry"
-                                        }
-                                      ],
-                                      "name": [
-                                        {
-                                          "__typename": "Translation",
-                                          "code": "en-US",
-                                          "content": "HTTP Header Entry"
-                                        }
-                                      ],
-                                      "rules": {
-                                        "count": 3,
-                                        "nodes": [
-                                          {
-                                            "variant": "CONTAINS_KEY",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/13",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/14",
-                                                  "genericKeys": [],
-                                                  "identifier": "TEXT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "text;char;literal;string"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 1,
-                                                    "nodes": [
-                                                      {
-                                                        "variant": "REGEX",
-                                                        "config": {
-                                                          "pattern": "[\\s\\S]*"
-                                                        }
-                                                      }
-                                                    ]
-                                                  },
-                                                  "variant": "PRIMITIVE"
-                                                }
-                                              },
-                                              "key": "key"
-                                            }
-                                          },
-                                          {
-                                            "variant": "CONTAINS_KEY",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/15",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/14",
-                                                  "genericKeys": [],
-                                                  "identifier": "TEXT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "text;char;literal;string"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Text"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 1,
-                                                    "nodes": [
-                                                      {
-                                                        "variant": "REGEX",
-                                                        "config": {
-                                                          "pattern": "[\\s\\S]*"
-                                                        }
-                                                      }
-                                                    ]
-                                                  },
-                                                  "variant": "PRIMITIVE"
-                                                }
-                                              },
-                                              "key": "value"
-                                            }
-                                          },
-                                          {
-                                            "variant": "PARENT_TYPE",
-                                            "config": {
-                                              "dataTypeIdentifier": {
-                                                "id": "gid://sagittarius/DataTypeIdentifier/16",
-                                                "dataType": {
-                                                  "__typename": "DataType",
-                                                  "id": "gid://sagittarius/DataType/3",
-                                                  "genericKeys": [],
-                                                  "identifier": "OBJECT",
-                                                  "aliases": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "object;struct;data"
-                                                    }
-                                                  ],
-                                                  "displayMessages": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Object"
-                                                    }
-                                                  ],
-                                                  "name": [
-                                                    {
-                                                      "__typename": "Translation",
-                                                      "code": "en-US",
-                                                      "content": "Object"
-                                                    }
-                                                  ],
-                                                  "rules": {
-                                                    "count": 0,
-                                                    "nodes": []
-                                                  },
-                                                  "variant": "OBJECT"
-                                                }
-                                              }
-                                            }
-                                          }
-                                        ]
-                                      },
-                                      "variant": "OBJECT"
-                                    }
-                                  }
-                                ],
-                                "target": "T",
-                                "id": "gid://sagittarius/GenericMapper/17"
-                              }
-                            ]
-                          }
-                        }
-                      }
-                    }
-                  ]
-                },
-                "variant": "ARRAY"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/48",
             "key": "headers"
           }
         },
         {
           "variant": "CONTAINS_KEY",
           "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/43",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
-                  }
-                ],
-                "displayMessages": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
-              }
-            },
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/49",
             "key": "body"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 3,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/48",
+          "dataType": {
+            "__typename": "DataType",
+            "id": "gid://sagittarius/DataType/9",
+            "genericKeys": [],
+            "identifier": "HTTP_HEADER_MAP",
+            "aliases": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "http;headers"
+              }
+            ],
+            "displayMessages": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Headers"
+              }
+            ],
+            "name": [
+              {
+                "__typename": "Translation",
+                "code": "en-US",
+                "content": "HTTP Headers"
+              }
+            ],
+            "rules": {
+              "count": 1,
+              "nodes": [
+                {
+                  "variant": "PARENT_TYPE",
+                  "config": {
+                    "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/10"
+                  }
+                }
+              ]
+            },
+            "dataTypeIdentifiers": {
+              "count": 2,
+              "nodes": [
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/14",
+                  "dataType": {
+                    "__typename": "DataType",
+                    "id": "gid://sagittarius/DataType/15",
+                    "genericKeys": [],
+                    "identifier": "HTTP_HEADER_ENTRY",
+                    "aliases": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "http;header;entry"
+                      }
+                    ],
+                    "displayMessages": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "HTTP Header Entry"
+                      }
+                    ],
+                    "name": [
+                      {
+                        "__typename": "Translation",
+                        "code": "en-US",
+                        "content": "HTTP Header Entry"
+                      }
+                    ],
+                    "rules": {
+                      "count": 2,
+                      "nodes": [
+                        {
+                          "variant": "CONTAINS_KEY",
+                          "config": {
+                            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/16",
+                            "key": "key"
+                          }
+                        },
+                        {
+                          "variant": "CONTAINS_KEY",
+                          "config": {
+                            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/18",
+                            "key": "value"
+                          }
+                        }
+                      ]
+                    },
+                    "dataTypeIdentifiers": {
+                      "count": 2,
+                      "nodes": [
+                        {
+                          "id": "gid://sagittarius/DataTypeIdentifier/16",
+                          "dataType": {
+                            "__typename": "DataType",
+                            "id": "gid://sagittarius/DataType/17",
+                            "genericKeys": [],
+                            "identifier": "TEXT",
+                            "aliases": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "text;char;literal;string"
+                              }
+                            ],
+                            "displayMessages": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "name": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "rules": {
+                              "count": 1,
+                              "nodes": [
+                                {
+                                  "variant": "REGEX",
+                                  "config": {
+                                    "pattern": "[\\s\\S]*"
+                                  }
+                                }
+                              ]
+                            },
+                            "dataTypeIdentifiers": {
+                              "count": 0,
+                              "nodes": []
+                            },
+                            "variant": "PRIMITIVE"
+                          }
+                        },
+                        {
+                          "id": "gid://sagittarius/DataTypeIdentifier/18",
+                          "dataType": {
+                            "__typename": "DataType",
+                            "id": "gid://sagittarius/DataType/17",
+                            "genericKeys": [],
+                            "identifier": "TEXT",
+                            "aliases": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "text;char;literal;string"
+                              }
+                            ],
+                            "displayMessages": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "name": [
+                              {
+                                "__typename": "Translation",
+                                "code": "en-US",
+                                "content": "Text"
+                              }
+                            ],
+                            "rules": {
+                              "count": 1,
+                              "nodes": [
+                                {
+                                  "variant": "REGEX",
+                                  "config": {
+                                    "pattern": "[\\s\\S]*"
+                                  }
+                                }
+                              ]
+                            },
+                            "dataTypeIdentifiers": {
+                              "count": 0,
+                              "nodes": []
+                            },
+                            "variant": "PRIMITIVE"
+                          }
+                        }
+                      ]
+                    },
+                    "variant": "OBJECT"
+                  }
+                },
+                {
+                  "id": "gid://sagittarius/DataTypeIdentifier/10",
+                  "genericType": {
+                    "id": "gid://sagittarius/GenericType/11",
+                    "dataType": {
+                      "__typename": "DataType",
+                      "id": "gid://sagittarius/DataType/12",
+                      "genericKeys": [
+                        "T"
+                      ],
+                      "identifier": "LIST",
+                      "aliases": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "list;array;collection"
+                        }
+                      ],
+                      "displayMessages": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "List of ${T}"
+                        }
+                      ],
+                      "name": [
+                        {
+                          "__typename": "Translation",
+                          "code": "en-US",
+                          "content": "Generic List"
+                        }
+                      ],
+                      "rules": {
+                        "count": 1,
+                        "nodes": [
+                          {
+                            "variant": "CONTAINS_TYPE",
+                            "config": {
+                              "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/13"
+                            }
+                          }
+                        ]
+                      },
+                      "dataTypeIdentifiers": {
+                        "count": 1,
+                        "nodes": [
+                          {
+                            "id": "gid://sagittarius/DataTypeIdentifier/13",
+                            "genericKey": "T"
+                          }
+                        ]
+                      },
+                      "variant": "ARRAY"
+                    },
+                    "genericMappers": [
+                      {
+                        "genericCombinationStrategies": [],
+                        "sourceDataTypeIdentifierIds": [
+                          "gid://sagittarius/DataTypeIdentifier/14"
+                        ],
+                        "target": "T",
+                        "id": "gid://sagittarius/GenericMapper/19"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "variant": "ARRAY"
           }
         },
         {
-          "variant": "PARENT_TYPE",
-          "config": {
-            "dataTypeIdentifier": {
-              "id": "gid://sagittarius/DataTypeIdentifier/44",
-              "dataType": {
-                "__typename": "DataType",
-                "id": "gid://sagittarius/DataType/3",
-                "genericKeys": [],
-                "identifier": "OBJECT",
-                "aliases": [
+          "id": "gid://sagittarius/DataTypeIdentifier/51",
+          "genericKey": "O"
+        },
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/49",
+          "genericType": {
+            "id": "gid://sagittarius/GenericType/50",
+            "dataType": {
+              "__typename": "DataType",
+              "id": "gid://sagittarius/DataType/4",
+              "genericKeys": [
+                "T"
+              ],
+              "identifier": "OBJECT",
+              "aliases": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "object;struct;data"
+                }
+              ],
+              "displayMessages": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "name": [
+                {
+                  "__typename": "Translation",
+                  "code": "en-US",
+                  "content": "Object"
+                }
+              ],
+              "rules": {
+                "count": 1,
+                "nodes": [
                   {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "object;struct;data"
+                    "variant": "PARENT_TYPE",
+                    "config": {
+                      "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/5"
+                    }
                   }
-                ],
-                "displayMessages": [
+                ]
+              },
+              "dataTypeIdentifiers": {
+                "count": 1,
+                "nodes": [
                   {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
+                    "id": "gid://sagittarius/DataTypeIdentifier/5",
+                    "genericKey": "T"
                   }
+                ]
+              },
+              "variant": "OBJECT"
+            },
+            "genericMappers": [
+              {
+                "genericCombinationStrategies": [],
+                "sourceDataTypeIdentifierIds": [
+                  "gid://sagittarius/DataTypeIdentifier/51"
                 ],
-                "name": [
-                  {
-                    "__typename": "Translation",
-                    "code": "en-US",
-                    "content": "Object"
-                  }
-                ],
-                "rules": {
-                  "count": 0,
-                  "nodes": []
-                },
-                "variant": "OBJECT"
+                "target": "T",
+                "id": "gid://sagittarius/GenericMapper/52"
               }
-            }
+            ]
           }
         }
       ]
@@ -1908,8 +1973,10 @@
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/3",
-    "genericKeys": [],
+    "id": "gid://sagittarius/DataType/4",
+    "genericKeys": [
+      "T"
+    ],
     "identifier": "OBJECT",
     "aliases": [
       {
@@ -1933,14 +2000,30 @@
       }
     ],
     "rules": {
-      "count": 0,
-      "nodes": []
+      "count": 1,
+      "nodes": [
+        {
+          "variant": "PARENT_TYPE",
+          "config": {
+            "dataTypeIdentifierId": "gid://sagittarius/DataTypeIdentifier/5"
+          }
+        }
+      ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 1,
+      "nodes": [
+        {
+          "id": "gid://sagittarius/DataTypeIdentifier/5",
+          "genericKey": "T"
+        }
+      ]
     },
     "variant": "OBJECT"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/27",
+    "id": "gid://sagittarius/DataType/31",
     "genericKeys": [],
     "identifier": "BOOLEAN",
     "aliases": [
@@ -1975,11 +2058,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "PRIMITIVE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/20",
+    "id": "gid://sagittarius/DataType/24",
     "genericKeys": [],
     "identifier": "NUMBER",
     "aliases": [
@@ -2014,11 +2101,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "PRIMITIVE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/14",
+    "id": "gid://sagittarius/DataType/17",
     "genericKeys": [],
     "identifier": "TEXT",
     "aliases": [
@@ -2053,11 +2144,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "PRIMITIVE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/35",
+    "id": "gid://sagittarius/DataType/39",
     "genericKeys": [],
     "identifier": "HTTP_METHOD",
     "aliases": [
@@ -2099,11 +2194,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "TYPE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/45",
+    "id": "gid://sagittarius/DataType/53",
     "genericKeys": [],
     "identifier": "HTTP_STATUS_CODE",
     "aliases": [
@@ -2139,11 +2238,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "TYPE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/37",
+    "id": "gid://sagittarius/DataType/41",
     "genericKeys": [],
     "identifier": "HTTP_URL",
     "aliases": [
@@ -2178,11 +2281,15 @@
         }
       ]
     },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
+    },
     "variant": "TYPE"
   },
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/46",
+    "id": "gid://sagittarius/DataType/54",
     "genericKeys": [],
     "identifier": "TEXT_ENCODING",
     "aliases": [
@@ -2218,6 +2325,10 @@
           }
         }
       ]
+    },
+    "dataTypeIdentifiers": {
+      "count": 0,
+      "nodes": []
     },
     "variant": "TYPE"
   }

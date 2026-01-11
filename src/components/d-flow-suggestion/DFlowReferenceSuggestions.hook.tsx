@@ -126,7 +126,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             const nodeContext = nodeContexts?.find(context => context.nodeFunctionId === node?.id)
 
             if (resolvedReturnType && nodeContext) {
-                return referenceExtraction(nodeContext, resolvedReturnType)
+                return referenceExtraction(nodeContext, resolvedReturnType, dataTypeService)
             }
 
             return {} as ReferenceValue
@@ -196,7 +196,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                             parameterIndex: index,
                             inputTypeIndex: inputIndex,
                             inputTypeIdentifier: inputType.inputIdentifier!
-                        }, resolved)
+                        }, resolved, dataTypeService)
                     })
                 })
             })
@@ -210,13 +210,14 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier): ReferenceValue[] => {
+const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier, dataTypeService?: DFlowDataTypeReactiveService): ReferenceValue[] => {
 
-    const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
+    const dataType: Maybe<DataType> | undefined = dataTypeService ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
 
     const references = dataType.rules?.nodes?.map(rule => {
         if (rule?.variant === "CONTAINS_KEY") {
+            if (!dataTypeIdentifier) return
             return referenceExtraction({
                 ...nodeContext,
                 referencePath: [

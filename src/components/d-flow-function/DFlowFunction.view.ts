@@ -1,10 +1,11 @@
 import {
-    DataTypeIdentifier,
+    DataTypeIdentifier, DataTypeIdentifierConnection,
     FunctionDefinition,
     Maybe, ParameterDefinition,
     RuntimeFunctionDefinition,
     Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
+import {attachDataTypeIdentifiers, resolveDataTypeIdentifiers} from "../d-flow/DFlow.util";
 
 export class FunctionDefinitionView {
 
@@ -12,6 +13,8 @@ export class FunctionDefinitionView {
     private readonly _aliases?: Maybe<Array<Translation>>;
     /** Time when this FunctionDefinition was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** All data type identifiers used within this Node Function */
+    private readonly _dataTypeIdentifiers?: Maybe<DataTypeIdentifierConnection>;
     /** Deprecation message of the function */
     private readonly _deprecationMessages?: Maybe<Array<Translation>>;
     /** Description of the function */
@@ -40,8 +43,12 @@ export class FunctionDefinitionView {
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
     constructor(object: FunctionDefinition) {
+
+        const dataTypeIdentifiers = resolveDataTypeIdentifiers((object.dataTypeIdentifiers?.nodes ?? []) as DataTypeIdentifier[])
+
         this._aliases = object.aliases;
         this._createdAt = object.createdAt;
+        this._dataTypeIdentifiers = object.dataTypeIdentifiers;
         this._deprecationMessages = object.deprecationMessages;
         this._descriptions = object.descriptions;
         this._displayMessages = object.displayMessages;
@@ -50,8 +57,8 @@ export class FunctionDefinitionView {
         this._id = object.id;
         this._identifier = object.identifier;
         this._names = object.names;
-        this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterDefinitionView(definition!!)) ?? undefined;
-        this._returnType = object.returnType;
+        this._parameterDefinitions = object.parameterDefinitions?.nodes?.map(definition => new ParameterDefinitionView(definition!!, dataTypeIdentifiers)) ?? undefined;
+        this._returnType = attachDataTypeIdentifiers(dataTypeIdentifiers, object.returnType);
         this._runtimeFunctionDefinition = object.runtimeFunctionDefinition;
         this._throwsError = object.throwsError;
         this._updatedAt = object.updatedAt;
@@ -64,6 +71,10 @@ export class FunctionDefinitionView {
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
+    }
+
+    get dataTypeIdentifiers(): Maybe<DataTypeIdentifierConnection> | undefined {
+        return this._dataTypeIdentifiers;
     }
 
     get deprecationMessages(): Maybe<Array<Translation>> | undefined {
@@ -136,7 +147,8 @@ export class FunctionDefinitionView {
             returnType: this._returnType,
             runtimeFunctionDefinition: this._runtimeFunctionDefinition,
             throwsError: this._throwsError,
-            updatedAt: this._updatedAt
+            updatedAt: this._updatedAt,
+            dataTypeIdentifiers: this._dataTypeIdentifiers
         }
     }
 }
@@ -160,9 +172,9 @@ export class ParameterDefinitionView {
     /** Time when this ParameterDefinition was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
-    constructor(object: ParameterDefinition) {
+    constructor(object: ParameterDefinition, dataTypeIdentifiers: DataTypeIdentifier[]) {
         this._createdAt = object.createdAt;
-        this._dataTypeIdentifier = object.dataTypeIdentifier;
+        this._dataTypeIdentifier = attachDataTypeIdentifiers(dataTypeIdentifiers, object.dataTypeIdentifier);
         this._descriptions = object.descriptions;
         this._documentations = object.documentations;
         this._id = object.id;

@@ -1,8 +1,9 @@
-import type {
-    DataType,
+import {
+    DataType, DataTypeIdentifier, DataTypeIdentifierConnection,
     DataTypeRuleConnection,
     DataTypeVariant, Maybe, Runtime, Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
+import {attachDataTypeIdentifiers, resolveDataTypeIdentifiers} from "../d-flow/DFlow.util";
 
 
 export class DataTypeView {
@@ -11,6 +12,8 @@ export class DataTypeView {
     private readonly _aliases?: Maybe<Array<Translation>>;
     /** Time when this DataType was created */
     private readonly _createdAt?: Maybe<Scalars['Time']['output']>;
+    /** The data type identifiers that are referenced in this data type and its rules */
+    private readonly _dataTypeIdentifiers?: Maybe<DataTypeIdentifierConnection>;
     /** Display message of the function */
     private readonly _displayMessages?: Maybe<Array<Translation>>;
     /** Generic keys of the datatype */
@@ -33,13 +36,14 @@ export class DataTypeView {
     constructor(dataType: DataType) {
         this._aliases = dataType.aliases;
         this._createdAt = dataType.createdAt;
+        this._dataTypeIdentifiers = dataType.dataTypeIdentifiers;
         this._displayMessages = dataType.displayMessages;
         this._genericKeys = dataType.genericKeys;
         this._id = dataType.id;
         this._identifier = dataType.identifier;
         this._name = dataType.name;
         this._runtime = dataType.runtime;
-        this._rules = dataType.rules;
+        this._rules = attachDataTypeIdentifiers(resolveDataTypeIdentifiers((this._dataTypeIdentifiers?.nodes ?? []) as DataTypeIdentifier[]), dataType.rules);
         this._updatedAt = dataType.updatedAt;
         this._variant = dataType.variant;
     }
@@ -50,6 +54,10 @@ export class DataTypeView {
 
     get createdAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._createdAt;
+    }
+
+    get dataTypeIdentifiers(): Maybe<DataTypeIdentifierConnection> | undefined {
+        return this._dataTypeIdentifiers;
     }
 
     get displayMessages(): Maybe<Array<Translation>> | undefined {
@@ -98,7 +106,8 @@ export class DataTypeView {
             runtime: this._runtime,
             variant: this._variant,
             genericKeys: this._genericKeys,
-            rules: this._rules
+            rules: this._rules,
+            dataTypeIdentifiers: this._dataTypeIdentifiers
         }
     }
 }

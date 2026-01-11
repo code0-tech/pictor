@@ -74,7 +74,7 @@ export const Dashboard = () => {
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveServiceExtend, [{
         id: "gid://sagittarius/Flow/1",
         type: {
-            id: "gid://sagittarius/FlowType/868",
+            id: "gid://sagittarius/FlowType/888",
         },
         name: "de/codezero/examples/REST Flow",
         settings: {
@@ -92,7 +92,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/2",
         type: {
-            id: "gid://sagittarius/FlowType/868",
+            id: "gid://sagittarius/FlowType/888",
         },
         name: "de/codezero/examples-2/REST Flow",
         settings: {
@@ -110,7 +110,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/3",
         type: {
-            id: "gid://sagittarius/FlowType/868",
+            id: "gid://sagittarius/FlowType/888",
         },
         name: "en/codezero/examples/REST Flow",
         settings: {

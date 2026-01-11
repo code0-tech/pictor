@@ -1,6 +1,6 @@
 import React from "react"
 import type {InputSuggestion} from "./InputSuggestion"
-import {InputSyntaxSegment, buildDefaultSyntax} from "./Input.syntax.hook"
+import {InputSyntaxSegment} from "./Input.syntax.hook"
 
 /**
  * =========================
@@ -30,6 +30,7 @@ export type UseContentEditableControllerReturn = {
 
     initializeFromExternalValue: (externalValue: string) => string
     updateEditorState: (rootEl: HTMLElement | null) => void
+    takePendingSelection: () => {start: number; end: number} | null
 
     applySuggestionValueSyntax: (suggestion: InputSuggestion) => void
 
@@ -314,7 +315,7 @@ const getLastTokenBeforeCaret = (rootEl: HTMLElement | null): LastTokenMatch | n
  * ✅ FIX (caret after deleting last token):
  * Selection can have startContainer = ELEMENT_NODE with an offset (i.e. “between childNodes”).
  */
-const getSelectionOffsetsInValue = (rootEl: HTMLElement): {start: number; end: number} | null => {
+export const getSelectionOffsetsInValue = (rootEl: HTMLElement): {start: number; end: number} | null => {
     const sel = window.getSelection()
     if (!sel || sel.rangeCount === 0) return null
 
@@ -385,7 +386,7 @@ const getSelectionOffsetsInValue = (rootEl: HTMLElement): {start: number; end: n
     return {start: Math.min(start, end), end: Math.max(start, end)}
 }
 
-const setSelectionOffsetsInValue = (rootEl: HTMLElement, start: number, end: number) => {
+export const setSelectionOffsetsInValue = (rootEl: HTMLElement, start: number, end: number) => {
     const clamp = (n: number) => Math.max(0, n)
     const sOff = clamp(start)
     const eOff = clamp(end)
@@ -518,11 +519,11 @@ const setCaretAt = (node: Node, offset: number) => {
 
 const removeZwspNeighbors = (parent: Node, tokenIndex: number) => {
     const before = parent.childNodes[tokenIndex - 1]
-    if (before && isZwspTextNode(before)) parent.removeChild(before)
+    if (before && isZwspTextNode(before) && before.parentNode === parent) parent.removeChild(before)
 
     const idxNow = Math.max(0, Math.min(tokenIndex, parent.childNodes.length - 1))
     const afterNow = parent.childNodes[idxNow + 1]
-    if (afterNow && isZwspTextNode(afterNow)) parent.removeChild(afterNow)
+    if (afterNow && isZwspTextNode(afterNow) && afterNow.parentNode === parent) parent.removeChild(afterNow)
 }
 
 const tryDeleteAdjacentToken = (root: HTMLElement, mode: "backspace" | "delete") => {
@@ -551,6 +552,7 @@ const tryDeleteAdjacentToken = (root: HTMLElement, mode: "backspace" | "delete")
         const idx = skipZwspBackward(b.index)
         const prev = idx > 0 ? children[idx - 1] : null
         if (prev && isTokenElement(prev)) {
+            if (prev.parentNode !== parent) return false
             const tokenIndex = idx - 1
             parent.removeChild(prev)
             removeZwspNeighbors(parent, tokenIndex)
@@ -563,6 +565,7 @@ const tryDeleteAdjacentToken = (root: HTMLElement, mode: "backspace" | "delete")
     const idx = skipZwspForward(b.index)
     const next = children[idx] ?? null
     if (next && isTokenElement(next)) {
+        if (next.parentNode !== parent) return false
         const tokenIndex = idx
         parent.removeChild(next)
         removeZwspNeighbors(parent, tokenIndex)
@@ -591,75 +594,6 @@ const updateTokenSelectionVisual = (root: HTMLElement) => {
     })
 }
 
-const renderEditorFromSegments = (
-    rootEl: HTMLElement,
-    value: string,
-    segments: InputSyntaxSegment[] | undefined | null,
-    appliedParts: EditorPart[],
-) => {
-    normalizeEmptyRoot(rootEl)
-
-    const safeSegments = (segments ?? [])
-        .filter(Boolean)
-        .filter(
-            (s: any) =>
-                s &&
-                (s.type === "text" || s.type === "block") &&
-                Number.isFinite(s.start) &&
-                Number.isFinite(s.end) &&
-                s.start <= s.end,
-        ) as InputSyntaxSegment[]
-
-    const resolved = safeSegments.length ? safeSegments : buildDefaultSyntax(value)
-
-    const tokenQueue = appliedParts.filter((p) => typeof p !== "string")
-    const frag = document.createDocumentFragment()
-
-    const appendZwspOnce = () => {
-        const last = frag.lastChild
-        if (last?.nodeType === Node.TEXT_NODE && (last.textContent ?? "") === ZWSP) return
-        frag.appendChild(document.createTextNode(ZWSP))
-    }
-
-    resolved.forEach((seg: any) => {
-        if (!seg || !seg.type) return
-
-        const segmentValue = seg.value ?? value.slice(seg.start, seg.end)
-
-        if (seg.type === "text") {
-            const text =
-                typeof seg.content === "string"
-                    ? seg.content
-                    : typeof segmentValue === "string"
-                        ? segmentValue
-                        : value.slice(seg.start, seg.end)
-            if (text?.length) frag.appendChild(document.createTextNode(text))
-            return
-        }
-
-        const normalizedSegmentValue = normalizeTokenValue(segmentValue)
-
-        let tokenData: any | undefined
-        if (tokenQueue.length) {
-            const next = tokenQueue[0]
-            const nextValue = normalizeTokenValue((next as any)?.value ?? next)
-            if (normalizedSegmentValue === "" || nextValue === normalizedSegmentValue) {
-                tokenData = next
-                tokenQueue.shift()
-            }
-        }
-        if (!tokenData) tokenData = {value: segmentValue}
-
-        appendZwspOnce()
-        frag.appendChild(createTokenElement(tokenData))
-        appendZwspOnce()
-    })
-
-    rootEl.innerHTML = ""
-    rootEl.appendChild(frag)
-    normalizeEmptyRoot(rootEl)
-}
-
 /**
  * =========================
  * Hook
@@ -671,6 +605,7 @@ export const useContentEditableController = (
     const {editorRef, transformSyntax, filterSuggestionsByLastToken = false, onLastTokenChange, onStateChange} = props
 
     const [editorHtml, setEditorHtml] = React.useState<string>("")
+    const pendingSelectionRef = React.useRef<{start: number; end: number} | null>(null)
 
     const updateEditorState = React.useCallback(
         (rootEl: HTMLElement | null) => {
@@ -679,6 +614,7 @@ export const useContentEditableController = (
             normalizeEmptyRoot(rootEl)
 
             const savedSel = getSelectionOffsetsInValue(rootEl)
+            pendingSelectionRef.current = savedSel
 
             const parts = serializeEditorParts(rootEl)
             const nextValue = partsToTextValue(parts)
@@ -691,16 +627,9 @@ export const useContentEditableController = (
             let segments: InputSyntaxSegment[] | null = null
             if (transformSyntax) {
                 segments = transformSyntax(nextValue as any, parts)
-                renderEditorFromSegments(rootEl, nextValue, segments, parts)
             }
 
-            if (savedSel) setSelectionOffsetsInValue(rootEl, savedSel.start, savedSel.end)
-            else ensureEditorRange(rootEl)
-
             updateTokenSelectionVisual(rootEl)
-
-            const nextHtml = rootEl.innerHTML ?? ""
-            setEditorHtml((prev) => (prev === nextHtml ? prev : nextHtml))
 
             onStateChange?.({value: nextValue, tokens, segments})
         },
@@ -710,22 +639,13 @@ export const useContentEditableController = (
     const initializeFromExternalValue = React.useCallback(
         (externalValue: string) => {
             const parts: EditorPart[] = []
-            const segments = transformSyntax ? transformSyntax(externalValue as any, parts) : null
-            const root = editorRef.current
-            if (root) {
-                renderEditorFromSegments(root, externalValue, segments, parts)
-                const html = root.innerHTML ?? ""
-                setEditorHtml(html)
-                return html
-            }
-
-            const tmp = document.createElement("div")
-            renderEditorFromSegments(tmp, externalValue, segments, parts)
-            const html = tmp.innerHTML ?? ""
-            setEditorHtml(html)
-            return html
+            const nextValue = externalValue ?? ""
+            const segments = transformSyntax ? transformSyntax(nextValue as any, parts) : null
+            onStateChange?.({value: nextValue, tokens: [], segments})
+            setEditorHtml("")
+            return nextValue
         },
-        [editorRef, transformSyntax],
+        [onStateChange, transformSyntax],
     )
 
     const applySuggestionValueSyntax = React.useCallback(
@@ -867,6 +787,11 @@ export const useContentEditableController = (
         setEditorHtml,
         initializeFromExternalValue,
         updateEditorState,
+        takePendingSelection: () => {
+            const pending = pendingSelectionRef.current
+            pendingSelectionRef.current = null
+            return pending
+        },
         applySuggestionValueSyntax,
         handlePaste,
         handleChange,

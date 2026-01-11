@@ -7,7 +7,7 @@
  * this component provides robust interaction patterns and user guidance.
  */
 
-import React, {LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
+import React, {LegacyRef, RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react"
 
 import {Code0Component, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "./useForm"
@@ -26,11 +26,11 @@ import {
     InputSuggestionMenuContentItemsHandle,
 } from "./InputSuggestion"
 
-import {InputSyntaxSegment} from "./Input.syntax.hook"
+import {InputSyntaxSegment, buildDefaultSyntax} from "./Input.syntax.hook"
 import {getSelectionMetrics, setElementKey, setSelectionRangeSafe} from "./Input.utils"
 import {Card} from "../card/Card"
 
-import {useContentEditableController} from "./InputContentEditable.hook"
+import {setSelectionOffsetsInValue, useContentEditableController} from "./InputContentEditable.hook"
 
 export type Code0Input = Omit<
     Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
@@ -82,6 +82,14 @@ const normalizeTokenValue = (value: any) => {
     } catch {
         return String(value ?? "")
     }
+}
+
+const serializeTokenData = (token: any) => {
+    if (token && typeof token === "object") {
+        const {children, __contentHtml, ...rest} = token as any
+        return rest
+    }
+    return {value: token}
 }
 
 const getLastTokenBeforeCaretInInput = (inputEl: HTMLInputElement | null) => {
@@ -235,11 +243,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             if (didInitSyntaxRef.current) return
 
             const nextValue = normalizeTextValue(externalValue)
-            setValue(nextValue)
             contentEditable.initializeFromExternalValue(nextValue)
-            if (validationUsesSyntax && transformSyntax) {
-                setSyntaxSegments(transformSyntax(nextValue as any, []))
-            }
 
             didInitSyntaxRef.current = true
         }, [isSyntaxMode, transformSyntax, externalValue, validationUsesSyntax, contentEditable])
@@ -583,6 +587,14 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 if (isSyntaxMode) {
                     const handled = contentEditable.handleKeyDown(event as any)
                     if (handled) {
+                        if (event.key === "Backspace" || event.key === "Delete") {
+                            const target = activeControlRef.current
+                            if (target) {
+                                const synthetic = {type: "change", target, currentTarget: target} as any
+                                userOnInput?.(synthetic)
+                                userOnChange?.(synthetic)
+                            }
+                        }
                         userOnKeyDown?.(event as any)
                         return
                     }
@@ -596,7 +608,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
                 userOnKeyDown?.(event as any)
             },
-            [contentEditable, isSyntaxMode, suggestions, setOpenSafe, userOnKeyDown],
+            [activeControlRef, contentEditable, isSyntaxMode, suggestions, setOpenSafe, userOnChange, userOnInput, userOnKeyDown],
         )
 
         /**
@@ -604,8 +616,106 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
          * Render control
          * =========================
          */
+        const syntaxChildren = useMemo(() => {
+            if (!isSyntaxMode) return null
+            const rawValue = normalizeTextValue(value)
+
+            const safeSegments = (syntaxSegments ?? [])
+                .filter(Boolean)
+                .filter(
+                    (s: any) =>
+                        s &&
+                        (s.type === "text" || s.type === "block") &&
+                        Number.isFinite(s.start) &&
+                        Number.isFinite(s.end) &&
+                        s.start <= s.end,
+                ) as InputSyntaxSegment[]
+
+            const resolved = safeSegments.length ? safeSegments : buildDefaultSyntax(rawValue)
+            const tokenQueue = (activeSuggestions ?? []).slice()
+
+            const children: React.ReactNode[] = []
+
+            resolved.forEach((seg, index) => {
+                const segmentValue = seg.value ?? rawValue.slice(seg.start, seg.end)
+
+                if (seg.type === "text") {
+                    const text =
+                        typeof seg.content === "string"
+                            ? seg.content
+                            : typeof segmentValue === "string"
+                                ? segmentValue
+                                : rawValue.slice(seg.start, seg.end)
+                    if (text?.length) children.push(text)
+                    return
+                }
+
+                const normalizedSegmentValue = normalizeTokenValue(segmentValue)
+
+                let tokenData: any | undefined
+                if (tokenQueue.length) {
+                    const next = tokenQueue[0]
+                    const nextValue = normalizeTokenValue((next as any)?.value ?? next)
+                    if (normalizedSegmentValue === "" || nextValue === normalizedSegmentValue) {
+                        tokenData = next
+                        tokenQueue.shift()
+                    }
+                }
+                if (!tokenData) tokenData = {value: segmentValue}
+
+                const serializedTokenData = serializeTokenData(tokenData)
+                const content =
+                    seg.content && typeof seg.content !== "string"
+                        ? seg.content
+                        : typeof seg.content === "string"
+                            ? seg.content
+                            : serializedTokenData?.label ?? serializedTokenData?.value ?? ""
+
+                children.push(
+                    <React.Fragment key={`${index}-${normalizedSegmentValue}`}>
+                        {"\u200B"}
+                        <span
+                            className="input__token"
+                            contentEditable={false}
+                            aria-data={JSON.stringify(serializedTokenData)}
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                verticalAlign: "middle",
+                                userSelect: "text",
+                                WebkitUserSelect: "text",
+                            }}
+                        >
+                            {content}
+                        </span>
+                        {"\u200B"}
+                    </React.Fragment>,
+                )
+            })
+
+            return children
+        }, [activeSuggestions, isSyntaxMode, syntaxSegments, value])
+
+        useLayoutEffect(() => {
+            if (!isSyntaxMode) return
+            const root = editorRef.current
+            if (!root) return
+            const pending = contentEditable.takePendingSelection()
+            if (!pending) return
+            setSelectionOffsetsInValue(root, pending.start, pending.end)
+        }, [contentEditable, isSyntaxMode, syntaxChildren])
+
+        const syntaxRenderKey = useMemo(() => {
+            if (!isSyntaxMode) return "plain"
+            const rawValue = normalizeTextValue(value)
+            const tokenCount = activeSuggestions?.length ?? 0
+            const segmentCount = syntaxSegments?.length ?? 0
+            return `${rawValue}-${tokenCount}-${segmentCount}`
+        }, [activeSuggestions, isSyntaxMode, syntaxSegments, value])
+
         const control = isSyntaxMode ? (
             <div
+                key={syntaxRenderKey}
                 ref={editorRef as any}
                 {...mergedEditableProps}
                 contentEditable={!disabled && !disabledOnValue}
@@ -618,13 +728,18 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                     userOnInput?.(synthetic)
                     userOnChange?.(synthetic)
                 }}
+                onChange={(event) => {
+                    contentEditable.handleChange(event)
+                }}
                 onPaste={contentEditable.handlePaste}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
                 onKeyDown={handleKeyDown}
                 spellCheck={false}
-            />
+            >
+                {syntaxChildren}
+            </div>
         ) : (
             <input
                 ref={inputRef as LegacyRef<HTMLInputElement>}

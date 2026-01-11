@@ -8,7 +8,6 @@
  */
 
 import React, {LegacyRef, RefObject, useEffect, useMemo, useRef, useState} from "react"
-import ContentEditable from "react-contenteditable"
 
 import {Code0Component, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "./useForm"
@@ -606,15 +605,18 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
          * =========================
          */
         const control = isSyntaxMode ? (
-            <ContentEditable
-                innerRef={editorRef as any}
-                html={contentEditable.editorHtml}
+            <div
+                ref={editorRef as any}
                 {...mergedEditableProps}
-                disabled={disabled || disabledOnValue}
-                onChange={(event) => {
-                    contentEditable.handleChange(event as any)
-                    userOnChange?.(event as any)
-                    userOnInput?.(event as any)
+                contentEditable={!disabled && !disabledOnValue}
+                suppressContentEditableWarning
+                aria-disabled={disabled || disabledOnValue}
+                onInput={(event) => {
+                    contentEditable.updateEditorState(editorRef.current)
+                    const target = event.currentTarget
+                    const synthetic = {type: "change", target, currentTarget: target} as any
+                    userOnInput?.(synthetic)
+                    userOnChange?.(synthetic)
                 }}
                 onPaste={contentEditable.handlePaste}
                 onFocus={handleFocus}
@@ -622,7 +624,6 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 onKeyDownCapture={handleKeyDownCapture}
                 onKeyDown={handleKeyDown}
                 spellCheck={false}
-                contentEditable={!disabled && !disabledOnValue}
             />
         ) : (
             <input

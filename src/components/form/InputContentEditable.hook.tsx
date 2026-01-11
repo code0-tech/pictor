@@ -1,8 +1,6 @@
 import React from "react"
-import {renderToStaticMarkup} from "react-dom/server.browser"
 import type {InputSuggestion} from "./InputSuggestion"
 import {InputSyntaxSegment, buildDefaultSyntax} from "./Input.syntax.hook"
-import type {ContentEditableEvent} from "react-contenteditable"
 
 /**
  * =========================
@@ -36,7 +34,7 @@ export type UseContentEditableControllerReturn = {
     applySuggestionValueSyntax: (suggestion: InputSuggestion) => void
 
     handlePaste: (event: React.ClipboardEvent<HTMLDivElement>) => void
-    handleChange: (event: ContentEditableEvent) => void
+    handleChange: (event: React.FormEvent<HTMLDivElement>) => void
 
     handleKeyDownCapture: (event: React.KeyboardEvent<HTMLDivElement>) => void
     handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => boolean
@@ -49,7 +47,7 @@ export type UseContentEditableControllerReturn = {
  */
 const TOKEN_CLASS = "input__token"
 const TOKEN_SELECTED_CLASS = "input__token--selected"
-const TOKEN_ATTR = "title"
+const TOKEN_ATTR = "aria-data"
 
 const ZWSP = "\u200B"
 const stripZwsp = (s: string) => (s ?? "").split(ZWSP).join("")
@@ -115,7 +113,7 @@ const getTokenDataFromElement = (el: HTMLElement): any => {
     return parsed ?? {value: el.textContent ?? ""}
 }
 
-const createTokenElement = (token: any, contentHtml?: string) => {
+const createTokenElement = (token: any) => {
     const element = document.createElement("span")
     element.setAttribute("contenteditable", "false")
     element.className = TOKEN_CLASS
@@ -123,12 +121,8 @@ const createTokenElement = (token: any, contentHtml?: string) => {
     const tokenData = serializeTokenData(token)
     element.setAttribute(TOKEN_ATTR, safeStringify(tokenData))
 
-    if (contentHtml !== undefined) {
-        element.innerHTML = contentHtml
-    } else {
-        const label = tokenData?.label ?? tokenData?.value ?? ""
-        element.textContent = String(label ?? "")
-    }
+    const label = tokenData?.label ?? tokenData?.value ?? ""
+    element.textContent = String(label ?? "")
 
     element.style.display = "inline-flex"
     element.style.alignItems = "center"
@@ -656,13 +650,8 @@ const renderEditorFromSegments = (
         }
         if (!tokenData) tokenData = {value: segmentValue}
 
-        const contentHtml =
-            seg.content && typeof seg.content !== "string"
-                ? renderToStaticMarkup(<>{seg.content}</>)
-                : undefined
-
         appendZwspOnce()
-        frag.appendChild(createTokenElement(tokenData, contentHtml))
+        frag.appendChild(createTokenElement(tokenData))
         appendZwspOnce()
     })
 
@@ -711,8 +700,6 @@ export const useContentEditableController = (
             updateTokenSelectionVisual(rootEl)
 
             const nextHtml = rootEl.innerHTML ?? ""
-
-            // 🔥 critical: keep ContentEditable "html" in sync with DOM
             setEditorHtml((prev) => (prev === nextHtml ? prev : nextHtml))
 
             onStateChange?.({value: nextValue, tokens, segments})
@@ -722,15 +709,23 @@ export const useContentEditableController = (
 
     const initializeFromExternalValue = React.useCallback(
         (externalValue: string) => {
-            const tmp = document.createElement("div")
             const parts: EditorPart[] = []
             const segments = transformSyntax ? transformSyntax(externalValue as any, parts) : null
+            const root = editorRef.current
+            if (root) {
+                renderEditorFromSegments(root, externalValue, segments, parts)
+                const html = root.innerHTML ?? ""
+                setEditorHtml(html)
+                return html
+            }
+
+            const tmp = document.createElement("div")
             renderEditorFromSegments(tmp, externalValue, segments, parts)
             const html = tmp.innerHTML ?? ""
             setEditorHtml(html)
             return html
         },
-        [transformSyntax],
+        [editorRef, transformSyntax],
     )
 
     const applySuggestionValueSyntax = React.useCallback(
@@ -812,7 +807,7 @@ export const useContentEditableController = (
     )
 
     const handleChange = React.useCallback(
-        (_event: ContentEditableEvent) => {
+        (_event: React.FormEvent<HTMLDivElement>) => {
             // IMPORTANT: we always derive from DOM, not from event.target.value/html
             updateEditorState(editorRef.current)
         },

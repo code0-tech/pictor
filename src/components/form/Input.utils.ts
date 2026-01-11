@@ -26,7 +26,7 @@ export const clearInputElement = (element: HTMLElement | null) => {
         return
     }
 
-    if (element.isContentEditable) {
+    if (element.contentEditable == "true") {
         element.innerHTML = ""
         element.dispatchEvent(new Event("input", {bubbles: true}))
         element.dispatchEvent(new Event("change", {bubbles: true}))

@@ -149,6 +149,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         const menuContentRef = useRef<HTMLDivElement | null>(null)
 
         const shouldPreventCloseRef = useRef(false)
+        const ignoreBlurRef = useRef(false)
         const suggestionIdRef = useRef(0)
         const lastValidationValueRef = useRef<any>(null)
 
@@ -511,6 +512,11 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
         const handleBlur = React.useCallback(
             (event: React.FocusEvent<HTMLInputElement | HTMLDivElement>) => {
+                if (ignoreBlurRef.current) {
+                    ignoreBlurRef.current = false
+                    userOnBlur?.(event as any)
+                    return
+                }
                 if (shouldPreventCloseRef.current) {
                     userOnBlur?.(event as any)
                     return
@@ -723,6 +729,14 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 aria-disabled={disabled || disabledOnValue}
                 onInput={(event) => {
                     contentEditable.updateEditorState(editorRef.current)
+                    if (suggestions) {
+                        shouldPreventCloseRef.current = true
+                        ignoreBlurRef.current = true
+                        setOpenSafe(true)
+                        requestAnimationFrame(() => {
+                            shouldPreventCloseRef.current = false
+                        })
+                    }
                     const target = event.currentTarget
                     const synthetic = {type: "change", target, currentTarget: target} as any
                     userOnInput?.(synthetic)

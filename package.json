@@ -18,8 +18,8 @@
   "author": "CodeZero",
   "devDependencies": {
     "@ariakit/react": "^0.4.17",
-    "@babel/plugin-proposal-decorators": "^7.28.0",
-    "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/plugin-proposal-decorators": "^7.28.6",
+    "@babel/plugin-transform-class-properties": "^7.28.6",
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-a2b1f5e9adf8f52b5a0f235ca9906ac5a699b4fc",
     "@dagrejs/dagre": "^2.0.0",
     "@mdx-js/react": "^3.1.1",

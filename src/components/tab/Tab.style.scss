@@ -7,9 +7,17 @@
     display: flex;
   }
 
+  &[data-orientation="horizontal"] {
+    padding-bottom: 0.475rem;
+  }
+
   &__list {
     display: flex;
     gap: variables.$xs;
+
+    &[data-orientation="horizontal"] {
+      align-items: end;
+    }
 
     &[data-orientation="vertical"] {
       flex-direction: column;
@@ -25,34 +33,18 @@
     opacity: 0.5;
     transition: all ease-in-out 0.2s;
 
-    &:after {
-      content: "";
-      position: absolute;
-      background: transparent;
-      background: helpers.backgroundColor(variables.$secondary);
-    }
-
-    &[data-orientation="vertical"] {
-
-      &:after {
-        border-bottom-right-radius: 50rem;
-        border-top-right-radius: 50rem;
-        height: 35%;
-        width: 3px;
-        top: 50%;
-        transform: translateY(-50%);
-        left: 0;
-      }
-    }
-
     &[data-orientation="horizontal"] {
       &:after {
+        content: "";
+        position: absolute;
+        background: transparent;
+
         border-top-left-radius: 50rem;
         border-top-right-radius: 50rem;
-        width: 10%;
+        width: 35%;
         min-width: 28px;
-        height: 3px;
-        bottom: 0;
+        height: 2px;
+        bottom: -0.475rem;
         left: 50%;
         transform: translateX(-50%);
       }

@@ -177,10 +177,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
         React.useImperativeHandle(ref, () => activeControlRef.current ?? null)
 
-        const mergedInputProps = useMemo(
-            () => ({...inputProps, onChange: userOnChange, onInput: userOnInput}),
-            [inputProps, userOnChange, userOnInput],
-        )
+        const mergedInputProps = useMemo(() => ({...inputProps}), [inputProps])
 
         const mergedEditableProps = useMemo(() => {
             const {value: _value, defaultValue: _defaultValue, ...restProps} = inputProps as Record<string, any>
@@ -219,6 +216,16 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 formValidation.setValue(validationValue)
             },
             [formValidation?.setValue, inputProps.type, validationUsesSyntax],
+        )
+
+        const handlePlainValueChange = React.useCallback(
+            (event: React.FormEvent<HTMLInputElement>) => {
+                const target = event.currentTarget
+                const nextValue = inputProps.type === "checkbox" ? target.checked : target.value
+                setValue(nextValue)
+                syncValidationValue(nextValue, null)
+            },
+            [inputProps.type, syncValidationValue],
         )
 
         const contentEditable = useContentEditableController({
@@ -762,6 +769,14 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
                 onKeyDown={handleKeyDown}
+                onInput={(event) => {
+                    handlePlainValueChange(event)
+                    userOnInput?.(event as any)
+                }}
+                onChange={(event) => {
+                    handlePlainValueChange(event)
+                    userOnChange?.(event as any)
+                }}
                 spellCheck={false}
                 disabled={disabled || disabledOnValue}
             />

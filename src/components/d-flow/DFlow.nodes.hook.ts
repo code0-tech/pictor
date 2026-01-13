@@ -5,10 +5,9 @@ import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {DFlowFunctionDefaultCardDataProps} from "../d-flow-function/DFlowFunctionDefaultCard";
-import {DFlowFunctionSuggestionCardDataProps} from "../d-flow-function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCardDataProps} from "../d-flow-function/DFlowFunctionTriggerCard";
-import {DFlowFunctionGroupCardDataProps} from "../d-flow-function/DFlowFunctionGroupCard";
+import {DFlowNodeDefaultCardDataProps} from "../d-flow-node/DFlowNodeDefaultCard";
+import {DFlowNodeTriggerCardDataProps} from "../d-flow-node/DFlowNodeTriggerCard";
+import {DFlowNodeGroupCardDataProps} from "../d-flow-node/DFlowNodeGroupCard";
 import {hashToColor} from "./DFlow.util";
 
 const packageNodes = new Map<string, string>([
@@ -96,7 +95,7 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
 };
 
 // @ts-ignore
-export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<DFlowFunctionDefaultCardDataProps | DFlowFunctionSuggestionCardDataProps | DFlowFunctionTriggerCardDataProps | DFlowFunctionGroupCardDataProps>[] => {
+export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<DFlowNodeDefaultCardDataProps | DFlowNodeTriggerCardDataProps | DFlowNodeGroupCardDataProps>[] => {
 
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService);

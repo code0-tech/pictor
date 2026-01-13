@@ -4,21 +4,9 @@ import {Edge} from "@xyflow/react";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import React from "react";
-import type {
-    DataTypeIdentifier,
-    Flow,
-    Namespace,
-    NamespaceProject,
-    NodeFunction,
-    Scalars
-} from "@code0-tech/sagittarius-graphql-types";
-import {md5} from "js-md5";
+import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowEdgeDataProps} from "./DFlowEdge";
 import {hashToColor} from "./DFlow.util";
-
-export const FLOW_EDGE_RAINBOW: string[] = [
-    'rgba(255, 255, 255, 0.25)',
-];
 
 // @ts-ignore
 export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
@@ -41,47 +29,20 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
 
         let idCounter = 0;
 
-        const functionCache = new Map<string, ReturnType<typeof functionService.getById>>();
-        const dataTypeCache = new Map<DataTypeIdentifier, ReturnType<typeof dataTypeService.getDataType>>();
-
-        const getFunctionDefinitionCached = (
-            id: Scalars['FunctionDefinitionID']['output'],
-            cache = functionCache,
-        ) => {
-            if (!cache.has(id)) {
-                cache.set(id, functionService.getById(id));
-            }
-            return cache.get(id);
-        };
-
-        const getDataTypeCached = (
-            type: DataTypeIdentifier,
-            cache = dataTypeCache,
-        ) => {
-            if (!cache.has(type)) {
-                cache.set(type, dataTypeService.getDataType(type));
-            }
-            return cache.get(type);
-        };
-
         const traverse = (
             node: NodeFunction,
             parentNode?: NodeFunction,
-            parentNodeId?: string,
-            level = 0,
-            fnCache = functionCache,
-            dtCache = dataTypeCache,
+            isParameter = false
         ): string => {
             if (!node) return ""
-            const fnId = `${node.id}-${idCounter++}`;
 
-            if (idCounter == 1) {
+            if (node.id == flow.startingNodeId) {
                 edges.push({
-                    id: `trigger-${fnId}-next`,
+                    id: `trigger-${node.id}-next`,
                     source: flow.id as string,
-                    target: fnId,
+                    target: node.id!,
                     data: {
-                        color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                        color: "#ffffff",
                         type: 'default',
                         flowId: flowId,
                         parentNodeId: parentNode?.id
@@ -91,16 +52,16 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                 });
             }
 
-            if (parentNodeId) {
-                const startGroups = groupsWithValue.get(parentNodeId) ?? [];
+            if (parentNode?.id && !isParameter) {
+                const startGroups = groupsWithValue.get(parentNode.id) ?? [];
 
                 if (startGroups.length > 0) {
                     startGroups.forEach((gId, idx) => edges.push({
-                        id: `${gId}-${fnId}-next-${idx}`,
+                        id: `${gId}-${node.id}-next-${idx}`,
                         source: gId,
-                        target: fnId,
+                        target: node.id!,
                         data: {
-                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                            color: "#ffffff",
                             type: 'default',
                             flowId: flowId,
                             parentNodeId: parentNode?.id
@@ -110,14 +71,14 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                     }));
                 } else {
                     edges.push({
-                        id: `${parentNodeId}-${fnId}-next`,
-                        source: parentNodeId,
-                        target: fnId,
+                        id: `${parentNode.id}-${node.id}-next`,
+                        source: parentNode.id,
+                        target: node.id!,
                         data: {
-                            color: FLOW_EDGE_RAINBOW[level % FLOW_EDGE_RAINBOW.length],
+                            color: "#ffffff",
                             type: 'default',
                             flowId: flowId,
-                            parentNodeId: parentNode?.id
+                            parentNodeId: parentNode.id
                         },
                         deletable: false,
                         selectable: false,
@@ -126,68 +87,61 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             }
 
             node.parameters?.nodes?.forEach((param) => {
-                const val = param?.value;
-                const def = getFunctionDefinitionCached(node.functionDefinition?.id!!, fnCache)
-                    ?.parameterDefinitions?.find(p => p.id === param?.id);
-                const paramType = def?.dataTypeIdentifier;
-                const paramDT = paramType ? getDataTypeCached(paramType, dtCache) : undefined;
+                const parameterValue = param?.value;
+                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.find(p => p.id === param?.id);
+                const parameterDataTypeIdentifier = parameterDefinition?.dataTypeIdentifier;
+                const parameterDataType = parameterDataTypeIdentifier ? dataTypeService.getDataType(parameterDataTypeIdentifier) : undefined;
 
-                if (!val) return
+                if (!parameterValue) return
 
-                if (paramDT?.variant === "NODE") {
-                    if (val && val.__typename === "NodeFunctionIdWrapper") {
+                if (parameterDataType?.variant === "NODE") {
+                    if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
 
-                        const groupId = `${fnId}-group-${idCounter++}`;
+                        const groupId = `${node.id}-group-${idCounter++}`;
 
                         edges.push({
-                            id: `${fnId}-${groupId}-param-${param.id}`,
-                            source: fnId,
+                            id: `${node.id}-${groupId}-param-${param.id}`,
+                            source: node.id!,
                             target: groupId,
                             deletable: false,
                             selectable: false,
                             animated: true,
-                            label: def?.names!![0]?.content ?? param.id,
+                            label: parameterDefinition?.names!![0]?.content ?? param.id,
                             data: {
-                                color: hashToColor(val?.id || ""),
+                                color: hashToColor(parameterValue?.id || ""),
                                 type: 'group',
                                 flowId: flowId,
                                 parentNodeId: parentNode?.id
                             },
                         });
 
-                        (groupsWithValue.get(fnId) ?? (groupsWithValue.set(fnId, []),
-                            groupsWithValue.get(fnId)!))
+                        (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []),
+                            groupsWithValue.get(node.id!)!))
                             .push(groupId);
 
                         traverse(
-                            flowService.getNodeById(flowId, val.id)!,
+                            flowService.getNodeById(flowId, parameterValue.id)!,
                             node,
-                            undefined,
-                            level + 1,
-                            fnCache,
-                            dtCache
+                            true
                         );
                     }
-                } else if (val && val.__typename === "NodeFunctionIdWrapper") {
+                } else if (parameterValue && parameterValue.__typename === "NodeFunctionIdWrapper") {
                     const subFnId = traverse(
-                        flowService.getNodeById(flowId, val.id)!,
+                        flowService.getNodeById(flowId, parameterValue.id)!,
                         node,
-                        undefined,
-                        level + 1,
-                        fnCache,
-                        dtCache
+                        true
                     );
 
                     edges.push({
-                        id: `${subFnId}-${fnId}-param-${param.id}`,
+                        id: `${subFnId}-${node.id}-param-${param.id}`,
                         source: subFnId,
-                        target: fnId,
+                        target: node.id!,
                         targetHandle: `param-${param.id}`,
                         animated: true,
                         deletable: false,
                         selectable: false,
                         data: {
-                            color: hashToColor(val?.id || ""),
+                            color: hashToColor(parameterValue?.id || ""),
                             type: 'parameter',
                             flowId: flowId,
                             parentNodeId: parentNode?.id
@@ -197,14 +151,14 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
             });
 
             if (node.nextNodeId) {
-                traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node, fnId, level, fnCache, dtCache);   // gleiche Ebenentiefe
+                traverse(flowService.getNodeById(flow.id!!, node.nextNodeId!!)!!, node);
             }
 
-            return fnId;
+            return node.id!;
         };
 
         if (flow.startingNodeId) {
-            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, undefined, 0, functionCache, dataTypeCache);
+            traverse(flowService.getNodeById(flow.id!!, flow.startingNodeId!!)!!, undefined, false);
         }
 
         return edges

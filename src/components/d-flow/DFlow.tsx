@@ -13,10 +13,9 @@ import {
 import React from "react";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import {DFlowFunctionDefaultCard} from "../d-flow-function/DFlowFunctionDefaultCard";
-import {DFlowFunctionGroupCard} from "../d-flow-function/DFlowFunctionGroupCard";
-import {DFlowFunctionSuggestionCard} from "../d-flow-function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowNodeDefaultCard} from "../d-flow-node/DFlowNodeDefaultCard";
+import {DFlowNodeGroupCard} from "../d-flow-node/DFlowNodeGroupCard";
+import {DFlowNodeTriggerCard} from "../d-flow-node/DFlowNodeTriggerCard";
 import {DFlowEdge} from "./DFlowEdge";
 import {DFlowPanelSize} from "../d-flow-panel";
 import {DFlowValidation} from "../d-flow-validation";
@@ -613,10 +612,9 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     const {flowId, namespaceId, projectId} = props
     const nodeTypes = React.useMemo(() => ({
-        default: DFlowFunctionDefaultCard,
-        group: DFlowFunctionGroupCard,
-        suggestion: DFlowFunctionSuggestionCard,
-        trigger: DFlowFunctionTriggerCard,
+        default: DFlowNodeDefaultCard,
+        group: DFlowNodeGroupCard,
+        trigger: DFlowNodeTriggerCard,
     }), [])
 
     const edgeTypes = React.useMemo(() => ({

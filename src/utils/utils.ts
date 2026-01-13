@@ -1,6 +1,6 @@
 import React, {CSSProperties, ReactNode} from "react";
 import mergeProps from "merge-props";
-import {Code0Component, Code0ComponentProps} from "./types";
+import {Code0Component, Code0ComponentProps, Code0Sizes} from "./types";
 
 export const parseUnit = (str: string): (number | string)[] => {
 
@@ -207,4 +207,23 @@ export const getPositionAroundTarget = (target: HTMLElement, element: HTMLElemen
         x: positionObject[0].calculationX
     }
 
+}
+
+export const getDOMSizeFromCodeZeroSize = (size: Code0Sizes | CSSProperties['x']): CSSProperties['x'] => {
+    switch (size) {
+        case "xxs":
+            return "0.35rem"
+        case "xs":
+            return "0.7rem"
+        case "sm":
+            return "0.8rem"
+        case "md":
+            return "1rem"
+        case "lg":
+            return "1.2rem"
+        case "xl":
+            return "1.3rem"
+        default:
+            return size
+    }
 }

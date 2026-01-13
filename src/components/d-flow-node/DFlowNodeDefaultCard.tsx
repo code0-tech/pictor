@@ -16,7 +16,6 @@ import {Badge} from "../badge/Badge";
 import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
 import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
 import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
-import {hashToColor} from "../d-flow/DFlow.util";
 import {DFlowNodeProps} from "./DFlowNode";
 
 export type DFlowNodeDefaultCardProps = NodeProps<Node<DFlowNodeProps>>
@@ -117,7 +116,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
             active: false,
             closeable: true,
             children: <>
-                <IconNote color={hashToColor(data.nodeId!)} size={12}/>
+                <IconNote color={data.color} size={12}/>
                 <Text size={"sm"}>{definition?.names!![0]?.content}</Text>
             </>,
             content: <DFlowTabDefault flowId={props.data.flowId} node={node}/>
@@ -163,7 +162,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
             <Flex align={"center"} style={{gap: "0.7rem"}}>
-                <IconNote color={hashToColor(data.nodeId!)} size={16}/>
+                <IconNote color={data.color} size={16}/>
                 <Text size={"md"}>{displayMessage}</Text>
             </Flex>
         </Card>

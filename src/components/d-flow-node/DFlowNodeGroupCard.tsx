@@ -1,30 +1,23 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Card} from "../card/Card";
-import {Code0Component} from "../../utils";
+import {DFlowNodeProps} from "./DFlowNode";
 
-export interface DFlowFunctionGroupCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    isParameter: boolean
-    linkingId: string
-    flowId: string
-    depth: number
-    scope: number[]
-    color?: string
-}
+export type DFlowNodeGroupCardProps = NodeProps<Node<DFlowNodeProps>>
 
-// @ts-ignore
-export type DFlowFunctionGroupCardProps = NodeProps<Node<DFlowFunctionGroupCardDataProps>>
+export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props) => {
 
-export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
     const {data, id} = props
 
     return (
-        <Card w={"100%"} h={"100%"}
+        <Card key={id}
+              w={"100%"}
+              h={"100%"}
               style={{background: mixColorRgb(data.color!!, 9), border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
             <Handle
                 type="target"
                 position={Position.Top}
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                className={"d-flow-node__handle d-flow-node__handle--target"}
                 isConnectable={false}
                 draggable={false}
                 style={{top: "0px", left: "50%", transform: "translateX(-50%)"}}
@@ -32,7 +25,7 @@ export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = mem
             <Handle
                 type="source"
                 position={Position.Bottom}
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
+                className={"d-flow-node__handle d-flow-node__handle--source"}
                 isConnectable={false}
                 draggable={false}
                 style={{bottom: "0px", left: "50%", transform: "translateX(-50%)"}}

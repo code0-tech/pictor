@@ -13,10 +13,9 @@ import {
 import React from "react";
 import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
-import {DFlowFunctionDefaultCard} from "../d-flow-function/DFlowFunctionDefaultCard";
-import {DFlowFunctionGroupCard} from "../d-flow-function/DFlowFunctionGroupCard";
-import {DFlowFunctionSuggestionCard} from "../d-flow-function/DFlowFunctionSuggestionCard";
-import {DFlowFunctionTriggerCard} from "../d-flow-function/DFlowFunctionTriggerCard";
+import {DFlowNodeDefaultCard} from "../d-flow-node/DFlowNodeDefaultCard";
+import {DFlowNodeGroupCard} from "../d-flow-node/DFlowNodeGroupCard";
+import {DFlowNodeTriggerCard} from "../d-flow-node/DFlowNodeTriggerCard";
 import {DFlowEdge} from "./DFlowEdge";
 import {DFlowPanelSize} from "../d-flow-panel";
 import {DFlowValidation} from "../d-flow-validation";
@@ -56,7 +55,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     const paramIds = new Map<string, string[]>()
 
     for (const n of nodes) {
-        const link = (n.data as any)?.linkingId
+        const link = (n.data as any)?.parentNodeId
         if (link) {
             const arr = paramIds.get(link) ?? []
             arr.push(n.id)
@@ -329,7 +328,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const kidsAll = rfKids.get(f.node.id) ?? []
                             const kids: Node[] = []
                             for (const k of kidsAll) {
-                                if (!(k.data as any)?.linkingId) kids.push(k)
+                                if (!(k.data as any)?.parentNodeId) kids.push(k)
                             }
                             f.kids = kids
                             f.kidIndex = 0
@@ -384,7 +383,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // Root-Nodes stapeln
         let yCursor = 0
         for (const r of nodes) {
-            if (!(r.data as any)?.linkingId && !r.parentId) {
+            if (!(r.data as any)?.parentNodeId && !r.parentId) {
                 const b = layoutIter(r, 0, yCursor + size(r).h / 2)
                 yCursor = b + V
             }
@@ -613,10 +612,9 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     const {flowId, namespaceId, projectId} = props
     const nodeTypes = React.useMemo(() => ({
-        default: DFlowFunctionDefaultCard,
-        group: DFlowFunctionGroupCard,
-        suggestion: DFlowFunctionSuggestionCard,
-        trigger: DFlowFunctionTriggerCard,
+        default: DFlowNodeDefaultCard,
+        group: DFlowNodeGroupCard,
+        trigger: DFlowNodeTriggerCard,
     }), [])
 
     const edgeTypes = React.useMemo(() => ({

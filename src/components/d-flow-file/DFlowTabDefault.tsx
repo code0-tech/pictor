@@ -5,6 +5,7 @@ import {useService, useStore} from "../../utils";
 import {DFlowFunctionReactiveService, ParameterDefinitionView} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {
+    Flow,
     LiteralValue,
     NodeFunction,
     NodeParameterValue,
@@ -18,7 +19,7 @@ import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
-    flowId: Scalars["FlowID"]["output"]
+    flowId: Flow['id']
 }
 
 export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {

@@ -33,6 +33,7 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
     const viewportHeight = useStore(s => s.height)
 
     React.useEffect(() => {
+        if (!definition?.id) return
         fileTabsService.registerTab({
             id: definition?.id!!,
             active: true,
@@ -44,7 +45,7 @@ export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> =
             content: <DFlowTabTrigger instance={data.instance}/>,
             show: true
         })
-    }, [definition?.id, data.instance, fileTabsService, definition?.names])
+    }, [definition, data.instance, fileTabsService])
 
     return <Flex align={"center"} style={{flexDirection: "column"}} key={id} data-flow-refernce={id}>
         <Badge color={"info"} style={{borderTopRightRadius: "0.35rem", borderTopLeftRadius: "0.35rem", borderBottomLeftRadius: 0, borderBottomRightRadius: 0}}>Starting node</Badge>

@@ -1,17 +1,9 @@
 import React, {memo} from "react";
 import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Card} from "../card/Card";
-import {Code0Component} from "../../utils";
+import {DFlowNodeProps} from "./DFlowNode";
 
-export interface DFlowNodeGroupCardDataProps extends Code0Component<HTMLDivElement> {
-    isParameter: boolean
-    linkingId: string
-    flowId: string
-    color?: string
-}
-
-// @ts-ignore
-export type DFlowNodeGroupCardProps = NodeProps<Node<DFlowNodeGroupCardDataProps>>
+export type DFlowNodeGroupCardProps = NodeProps<Node<DFlowNodeProps>>
 
 export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props) => {
     const {data, id} = props
@@ -22,7 +14,7 @@ export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props
             <Handle
                 type="target"
                 position={Position.Top}
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                className={"d-flow-node__handle d-flow-node__handle--target"}
                 isConnectable={false}
                 draggable={false}
                 style={{top: "0px", left: "50%", transform: "translateX(-50%)"}}
@@ -30,7 +22,7 @@ export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props
             <Handle
                 type="source"
                 position={Position.Bottom}
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
+                className={"d-flow-node__handle d-flow-node__handle--source"}
                 isConnectable={false}
                 draggable={false}
                 style={{bottom: "0px", left: "50%", transform: "translateX(-50%)"}}

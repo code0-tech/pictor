@@ -23,9 +23,9 @@ export const DashboardLayoutExample = () => {
              topContent={<Text>Top</Text>}
              bottomContent={<Text>Bottom</Text>}>
         <>
-            <Text>Text</Text>
+            <Text>Content</Text>
             <div style={{marginBottom: "200vh"}}/>
-            <Text>Text</Text>
+            <Text>Content</Text>
         </>
     </DLayout>
 

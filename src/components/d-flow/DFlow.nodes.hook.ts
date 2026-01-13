@@ -5,10 +5,8 @@ import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import type {Flow, Namespace, NamespaceProject, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
-import {DFlowNodeDefaultCardDataProps} from "../d-flow-node/DFlowNodeDefaultCard";
-import {DFlowNodeTriggerCardDataProps} from "../d-flow-node/DFlowNodeTriggerCard";
-import {DFlowNodeGroupCardDataProps} from "../d-flow-node/DFlowNodeGroupCard";
 import {hashToColor} from "./DFlow.util";
+import {DFlowNodeProps} from "../d-flow-node/DFlowNode";
 
 const packageNodes = new Map<string, string>([
     ['std', 'default'],
@@ -95,7 +93,7 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
 };
 
 // @ts-ignore
-export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<DFlowNodeDefaultCardDataProps | DFlowNodeTriggerCardDataProps | DFlowNodeGroupCardDataProps>[] => {
+export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<DFlowNodeProps>[] => {
 
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService);
@@ -107,7 +105,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
     return React.useMemo(() => {
         if (!flow) return [];
 
-        const nodes: Node<any>[] = [];
+        const nodes: Node<DFlowNodeProps>[] = [];
         const visited = new Set<string>();
 
         let groupCounter = 0;
@@ -120,15 +118,15 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             position: {x: 0, y: 0},
             draggable: false,
             data: {
-                instance: flow,
                 flowId,
+                nodeId: undefined
             },
         });
 
         const traverse = (
             node: NodeFunction,
             isParameter = false,
-            parentId?: string,
+            parentId?: NodeFunction['id'],
             parentGroup?: string
         ) => {
             if (!node?.id) return;
@@ -149,7 +147,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                         nodeId,
                         isParameter,
                         flowId,
-                        linkingId: isParameter ? parentId : undefined,
+                        parentNodeId: isParameter ? parentId : undefined,
                         index: ++globalIndex,
                     },
                 });
@@ -183,8 +181,9 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             extent: parentGroup ? "parent" : undefined,
                             data: {
                                 isParameter: true,
-                                linkingId: nodeId,
-                                flowId,
+                                parentNodeId: nodeId,
+                                nodeId: nodeId,
+                                flowId: flowId,
                                 color: hashToColor(value.id!),
                             },
                         });

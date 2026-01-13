@@ -118,8 +118,9 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             position: {x: 0, y: 0},
             draggable: false,
             data: {
-                flowId,
-                nodeId: undefined
+                flowId: flowId,
+                nodeId: undefined,
+                color: hashToColor(flowId!),
             },
         });
 
@@ -144,11 +145,12 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                     parentId: parentGroup,
                     extent: parentGroup ? "parent" : undefined,
                     data: {
-                        nodeId,
-                        isParameter,
-                        flowId,
+                        nodeId: nodeId,
+                        isParameter: isParameter,
+                        flowId: flowId,
                         parentNodeId: isParameter ? parentId : undefined,
                         index: ++globalIndex,
+                        color: hashToColor(nodeId),
                     },
                 });
             }

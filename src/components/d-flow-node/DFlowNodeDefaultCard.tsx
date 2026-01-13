@@ -1,8 +1,8 @@
-import {Code0Component, underlineBySeverity} from "../../utils";
+import {underlineBySeverity} from "../../utils";
 import {Handle, Node, NodeProps, Position, useReactFlow, useStore} from "@xyflow/react";
 import React, {CSSProperties, memo} from "react";
 import {Card} from "../card/Card";
-import "./DFlowFunctionDefaultCard.style.scss";
+import "./DFlowNode.style.scss";
 import {Flex} from "../flex/Flex";
 import {IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
@@ -12,23 +12,14 @@ import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {DFlowReactiveService} from "../d-flow";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
 import {DFlowTabDefault} from "../d-flow-file/DFlowTabDefault";
-import type {NodeFunction, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {Badge} from "../badge/Badge";
 import {DFlowInputLiteralBadge} from "../d-flow-input/DFlowInputLiteralBadge";
 import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge";
 import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
 import {hashToColor} from "../d-flow/DFlow.util";
+import {DFlowNodeProps} from "./DFlowNode";
 
-export interface DFlowNodeDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
-    nodeId: NodeFunction['id']
-    flowId: Scalars["FlowID"]["output"]
-    isParameter: boolean
-    linkingId?: string
-    index: number
-}
-
-// @ts-ignore
-export type DFlowNodeDefaultCardProps = NodeProps<Node<DFlowNodeDefaultCardDataProps>>
+export type DFlowNodeDefaultCardProps = NodeProps<Node<DFlowNodeProps>>
 
 export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((props) => {
     const {data, id, width = 0, height = 0} = props
@@ -106,7 +97,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
                             position={Position.Right}
                             id={`param-${param?.id}`}
                             isConnectable={false}
-                            className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                            className={"d-flow-node__handle d-flow-node__handle--target"}
                         />
                     </div>
             }
@@ -141,7 +132,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
             py={data.isParameter ? "0.35" : undefined}
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
-            className={activeTabId == node?.id ? "d-flow-viewport-default-card--active" : undefined}
+            className={activeTabId == node?.id ? "d-flow-node--active" : undefined}
             color={"primary"}
             onClick={() => {
                 flowInstance.setViewport({
@@ -158,7 +149,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
                 isConnectable={false}
                 draggable={false}
                 type="target"
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--target"}
+                className={"d-flow-node__handle d-flow-node__handle--target"}
                 style={{...(data.isParameter ? {right: "2px"} : {top: "2px"})}}
                 position={data.isParameter ? Position.Right : Position.Top}
             />
@@ -168,7 +159,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
                 isConnectable={false}
                 type="source"
                 style={{...(data.isParameter ? {left: "2px"} : {bottom: "2px"})}}
-                className={"d-flow-viewport-default-card__handle d-flow-viewport-default-card__handle--source"}
+                className={"d-flow-node__handle d-flow-node__handle--source"}
                 position={data.isParameter ? Position.Left : Position.Bottom}
             />
             <Flex align={"center"} style={{gap: "0.7rem"}}>

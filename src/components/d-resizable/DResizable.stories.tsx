@@ -134,14 +134,14 @@ export const Dashboard = () => {
     return <DFullScreen>
         <ContextStoreProvider
             services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-            <DLayout>
+            <DLayout layoutGap={"0"}>
                 <DResizablePanelGroup orientation={"horizontal"}>
                     <DResizablePanel id={"1"} defaultSize={"20%"}>
                         <Folder/>
                     </DResizablePanel>
                     <DResizableHandle/>
                     <DResizablePanel id={"2"}>
-                        <DLayout rightContent={
+                        <DLayout layoutGap={"0"} rightContent={
                             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                                 <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
                                     <IconFile size={16}/>
@@ -191,7 +191,7 @@ const Folder = () => {
 
     const ref = React.useRef<DFlowFolderHandle>(null)
 
-    return <DLayout topContent={
+    return <DLayout layoutGap={"0"} topContent={
         <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.7}>
             <Button paddingSize={"xxs"} color={"success"}>
                 <Text>Create new flow</Text>

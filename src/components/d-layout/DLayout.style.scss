@@ -26,23 +26,25 @@
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
+  height: 100%;
   width: 100%;
 }
 
-.d-layout__left {
-  border-right: 1px solid helpers.borderColor();
-}
+.d-layout__splitter {
+  background: helpers.borderColor();
+  position: relative;
+  align-self: stretch;
 
-.d-layout__right {
-  border-left: 1px solid helpers.borderColor();
-}
+  &[aria-orientation=vertical] {
+    width: 1px;
+    height: auto;
+  }
 
-.d-layout__top {
-  border-bottom: 1px solid helpers.borderColor();
-}
+  &[aria-orientation=horizontal] {
+    width: 100%;
+    height: 1px;
+  }
 
-.d-layout__bottom {
-  border-top: 1px solid helpers.borderColor();
 }
 
 

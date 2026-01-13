@@ -78,7 +78,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                 fileTabsService.activateTab(value);
             }}
         >
-            <DLayout topContent={<FileTabsList
+            <DLayout layoutGap={"0"} topContent={<FileTabsList
                 controls={
                     <Flex>
                         <Menu>

@@ -13,14 +13,14 @@ import {DFlowTypeReactiveService} from "../d-flow-type";
 import {Badge} from "../badge/Badge";
 import {Flow} from "@code0-tech/sagittarius-graphql-types";
 
-export interface DFlowFunctionTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+export interface DFlowNodeTriggerCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     instance: Flow
 }
 
 // @ts-ignore
-export type DFlowFunctionTriggerCardProps = NodeProps<Node<DFlowFunctionTriggerCardDataProps>>
+export type DFlowNodeTriggerCardProps = NodeProps<Node<DFlowNodeTriggerCardDataProps>>
 
-export const DFlowFunctionTriggerCard: React.FC<DFlowFunctionTriggerCardProps> = memo((props) => {
+export const DFlowNodeTriggerCard: React.FC<DFlowNodeTriggerCardProps> = memo((props) => {
 
     const {data, id} = props
     const fileTabsService = useService(FileTabsService)

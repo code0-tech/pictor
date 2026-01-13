@@ -7,7 +7,7 @@ import {Flex} from "../flex/Flex";
 import {IconNote} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {useService, useStore as usePictorStore} from "../../utils/contextStore";
-import {DFlowFunctionReactiveService} from "./DFlowFunction.service";
+import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {DFlowReactiveService} from "../d-flow";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
@@ -19,20 +19,18 @@ import {DFlowInputReferenceBadge} from "../d-flow-input/DFlowInputReferenceBadge
 import {DFlowInputNodeBadge} from "../d-flow-input/DFlowInputNodeBadge";
 import {hashToColor} from "../d-flow/DFlow.util";
 
-export interface DFlowFunctionDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+export interface DFlowNodeDefaultCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
     nodeId: NodeFunction['id']
     flowId: Scalars["FlowID"]["output"]
     isParameter: boolean
     linkingId?: string
-    depth: number
-    scope: number[]
     index: number
 }
 
 // @ts-ignore
-export type DFlowFunctionDefaultCardProps = NodeProps<Node<DFlowFunctionDefaultCardDataProps>>
+export type DFlowNodeDefaultCardProps = NodeProps<Node<DFlowNodeDefaultCardDataProps>>
 
-export const DFlowFunctionDefaultCard: React.FC<DFlowFunctionDefaultCardProps> = memo((props) => {
+export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((props) => {
     const {data, id, width = 0, height = 0} = props
 
     const viewportWidth = useStore(s => s.width);

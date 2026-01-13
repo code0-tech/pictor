@@ -3,19 +3,17 @@ import {Handle, Node, NodeProps, Position} from "@xyflow/react";
 import {Card} from "../card/Card";
 import {Code0Component} from "../../utils";
 
-export interface DFlowFunctionGroupCardDataProps extends Omit<Code0Component<HTMLDivElement>, "scope"> {
+export interface DFlowNodeGroupCardDataProps extends Code0Component<HTMLDivElement> {
     isParameter: boolean
     linkingId: string
     flowId: string
-    depth: number
-    scope: number[]
     color?: string
 }
 
 // @ts-ignore
-export type DFlowFunctionGroupCardProps = NodeProps<Node<DFlowFunctionGroupCardDataProps>>
+export type DFlowNodeGroupCardProps = NodeProps<Node<DFlowNodeGroupCardDataProps>>
 
-export const DFlowFunctionGroupCard: React.FC<DFlowFunctionGroupCardProps> = memo((props) => {
+export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props) => {
     const {data, id} = props
 
     return (

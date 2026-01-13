@@ -49,9 +49,6 @@ export class FlowTypeView {
         this._names = flowType.names;
         this._returnType = flowType.returnType ? new DataTypeView(flowType.returnType).json : undefined;
         this._updatedAt = flowType.updatedAt;
-
-        console.log(JSON.stringify(this.inputType))
-        console.log(this.inputType)
     }
 
     get aliases(): Maybe<Array<Translation>> | undefined {

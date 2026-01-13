@@ -1,6 +1,5 @@
 import React from "react";
 import {MiniMap, Panel, useNodes} from "@xyflow/react";
-import {FLOW_EDGE_RAINBOW} from "../d-flow";
 import "./DFlowMiniMap.style.scss"
 
 export const DFlowMiniMap: React.FC = (props) => {
@@ -17,8 +16,7 @@ export const DFlowMiniMap: React.FC = (props) => {
 
             if (node.type == "group") {
 
-                const depth = (node.data as any)?.depth ?? 0;
-                const color = FLOW_EDGE_RAINBOW[depth % FLOW_EDGE_RAINBOW.length];
+                const color = "#ffffff";
 
                 return <rect width={props1.width}
                              height={props1.height}

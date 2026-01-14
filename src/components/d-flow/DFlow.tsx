@@ -66,16 +66,20 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const parentNode = n.parentId ? byId.get(n.parentId) : undefined
         const isInParameterGroup = parentNode?.type === "parameterGroup"
 
-        if (isInParameterGroup && n.parentId) {
-            // Kinder einer parameterGroup werden über parentId ermittelt
-            const arr = paramGroupKidIds.get(n.parentId) ?? []
-            arr.push(n.id)
-            paramGroupKidIds.set(n.parentId, arr)
-        } else if (link) {
+
+        // Nodes mit parentNodeId sind immer Parameter, unabhängig davon wo sie visuell liegen
+        // Nur Nodes ohne parentNodeId, die direkt in einer ParameterGroup liegen, werden als Kinder behandelt
+        if (link) {
             // Parameter einer Node (über parentNodeId in data)
             const arr = paramIds.get(link) ?? []
             arr.push(n.id)
             paramIds.set(link, arr)
+        } else if (isInParameterGroup && n.parentId) {
+            // Kinder einer parameterGroup werden über parentId ermittelt
+            // Nur wenn sie KEIN parentNodeId haben
+            const arr = paramGroupKidIds.get(n.parentId) ?? []
+            arr.push(n.id)
+            paramGroupKidIds.set(n.parentId, arr)
         }
 
         // rfKids: Kinder einer Gruppe (parentId), aber nicht Parameter und nicht in parameterGroup
@@ -167,18 +171,25 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
             for (const k of kids) {
                 const ks = size(k)
-                rowW += ks.w
 
-                // Berechne die volle Höhe des Kindes inklusive Group-Parameter (die unterhalb erscheinen)
+                // Berechne die volle Breite und Höhe des Kindes inklusive seiner Parameter
+                let kidFullW = ks.w
                 let kidFullH = ks.h
                 const kidParams = params.get(k.id) ?? []
                 for (const kp of kidParams) {
                     if (kp.type === "group") {
                         // Group-Parameter erscheint unterhalb: V + Höhe der Gruppe
                         kidFullH += V + size(kp).h
+                        // Die Gruppe ist zentriert, also kann sie breiter sein als das Kind
+                        const gpW = size(kp).w
+                        if (gpW > kidFullW) kidFullW = gpW
+                    } else {
+                        // Nicht-Gruppen-Parameter erscheinen rechts: H + Breite des Parameters
+                        kidFullW += H + size(kp).w
                     }
                 }
 
+                rowW += kidFullW
                 if (kidFullH > hMax) hMax = kidFullH
                 count++
             }
@@ -198,7 +209,18 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         for (const k of kids) {
             const ks = size(k)
             stackH += ks.h
-            if (ks.w > wMax) wMax = ks.w
+
+            // Berechne die volle Breite des Kindes inklusive seiner Parameter (rechts davon)
+            let kidFullW = ks.w
+            const kidParams = params.get(k.id) ?? []
+            for (const kp of kidParams) {
+                if (kp.type !== "group") {
+                    // Nicht-Gruppen-Parameter erscheinen rechts: H + Breite des Parameters
+                    kidFullW += H + size(kp).w
+                }
+            }
+
+            if (kidFullW > wMax) wMax = kidFullW
             count++
         }
         stackH += V * Math.max(0, count - 1)
@@ -209,20 +231,21 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     }
 
     // Berechne die effektive Höhe eines Parameters (rekursiv)
-    // Dies ist die Höhe, die der Parameter vertikal benötigt, inklusive aller Kinder-Parameter
+    // Dies ist die Höhe, die der Parameter vertikal benötigt im Kontext eines vertikalen Stacks
+    // WICHTIG: Group-Parameter erscheinen UNTERHALB und beeinflussen NICHT den Stack-Abstand
     const effectiveHeight = (n: Node): number => {
         const baseH = size(n).h
 
         if (n.type === "parameterGroup") {
             // Für parameterGroup: Die Kinder sind bei cy (Center der Box) positioniert
-            // Ihre Parameter werden vertikal zentriert um sie
-            // Die effektive Höhe ist die maximale Kind-effektive-Höhe (nicht die Summe, da horizontal)
+            // Ihre nicht-Group-Parameter werden vertikal zentriert um sie
+            // Group-Parameter der Kinder erscheinen UNTERHALB und beeinflussen NICHT den Stack-Abstand
             const kids = paramGroupKids.get(n.id) ?? []
             if (kids.length === 0) return baseH
 
             let maxKidEffH = 0
             for (const kid of kids) {
-                // Rekursiv die effektive Höhe des Kindes berechnen
+                // Nur die effektive Höhe der nicht-Group-Parameter berücksichtigen
                 const kidEffH = effectiveHeight(kid)
                 if (kidEffH > maxKidEffH) maxKidEffH = kidEffH
             }
@@ -230,15 +253,19 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             return Math.max(baseH, maxKidEffH)
         }
 
-        // Für normale Nodes: Maximum aus eigener Höhe und Summe der Parameter-Höhen (vertikal gestapelt)
+        // Für normale Nodes: Maximum aus eigener Höhe und Summe der NICHT-Group-Parameter-Höhen (vertikal gestapelt)
         const nodeParams = params.get(n.id) ?? []
         if (nodeParams.length === 0) return baseH
 
+        // Nur nicht-Group-Parameter berücksichtigen (diese erscheinen rechts)
+        const rightParams = nodeParams.filter(p => p.type !== "group")
+        if (rightParams.length === 0) return baseH
+
         let paramsTotal = 0
-        for (const p of nodeParams) {
+        for (const p of rightParams) {
             paramsTotal += effectiveHeight(p)
         }
-        paramsTotal += V * Math.max(0, nodeParams.length - 1)
+        paramsTotal += V * Math.max(0, rightParams.length - 1)
 
         return Math.max(baseH, paramsTotal)
     }
@@ -251,17 +278,34 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
         if (n.type === "parameterGroup") {
             // Für parameterGroup: Kinder sind horizontal bei cy positioniert
-            // Ihre Parameter sind vertikal zentriert um sie
+            // Ihre nicht-Group-Parameter sind vertikal zentriert um sie
+            // Ihre Group-Parameter erscheinen unterhalb
             const kids = paramGroupKids.get(n.id) ?? []
             if (kids.length === 0) return { top: -halfH, bottom: halfH }
 
             let maxTop = -halfH
             let maxBottom = halfH
             for (const kid of kids) {
+                // Die effektive Höhe berücksichtigt nur nicht-Group-Parameter
                 const kidEffH = effectiveHeight(kid)
-                // Kind ist bei cy positioniert, Parameter sind vertikal zentriert
+                // Kind ist bei cy positioniert, nicht-Group-Parameter sind vertikal zentriert
                 const kidTop = -kidEffH / 2
-                const kidBottom = kidEffH / 2
+                let kidBottom = kidEffH / 2
+
+                // Group-Parameter erscheinen unterhalb der Node (relativ zu cy)
+                const kidParams = params.get(kid.id) ?? []
+                for (const kp of kidParams) {
+                    if (kp.type === "group") {
+                        const ks = size(kid)
+                        // Group ist V unterhalb der Node-Box positioniert
+                        const gbb = boundingBox(kp)
+                        const gSize = size(kp)
+                        // Die untere Kante der Gruppe relativ zu cy
+                        const gBottom = ks.h / 2 + V + gSize.h / 2 + gbb.bottom
+                        if (gBottom > kidBottom) kidBottom = gBottom
+                    }
+                }
+
                 if (kidTop < maxTop) maxTop = kidTop
                 if (kidBottom > maxBottom) maxBottom = kidBottom
             }
@@ -283,6 +327,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
 
         if (rightParams.length > 0) {
+            // Berechne die Gesamthöhe der rechten Parameter im Stack (für Zentrierung)
             let paramsTotal = 0
             for (const p of rightParams) {
                 paramsTotal += effectiveHeight(p)
@@ -328,13 +373,17 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
         // relatives Layout (Center in globalen Koordinaten)
         const relCenter = new Map<string, Pos>()
+        // Tracke die logische Parent-Gruppe während des Layouts
+        // Dies kann sich von n.parentId unterscheiden für Nodes, die visuell woanders positioniert werden
+        const layoutParent = new Map<string, string | undefined>()
 
-        const layoutIter = (root: Node, cx: number, cy: number): number => {
+        const layoutIter = (root: Node, cx: number, cy: number, containerId?: string): number => {
             type Frame = {
                 node: Node
                 cx: number
                 cy: number
                 phase: number
+                containerId?: string // Die Gruppe, die diese Node visuell enthält
                 w?: number
                 h?: number
                 right?: Node[]
@@ -358,7 +407,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 pxCursor?: number
             }
 
-            const stack: Frame[] = [{ node: root, cx, cy, phase: 0 }]
+            const stack: Frame[] = [{ node: root, cx, cy, phase: 0, containerId }]
             let returnBottom = 0
             let maxYBottom = 0 // Tracke die maximale untere Y-Koordinate aller Nodes
 
@@ -367,6 +416,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 switch (f.phase) {
                     case 0: {
                         relCenter.set(f.node.id, { x: f.cx, y: f.cy })
+                        // Setze die logische Parent-Gruppe basierend auf dem Layout
+                        layoutParent.set(f.node.id, f.containerId)
+
                         const { w, h } = size(f.node)
                         f.w = w
                         f.h = h
@@ -418,10 +470,12 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             // ✅ parameterGroup: params horizontal nebeneinander
                             if (f.node.type === "parameterGroup") {
                                 const px = (f.pxCursor ?? (f.cx - f.w! / 2 + PAD)) + ps.w / 2
+                                // Alle Kinder einer ParameterGroup sind vertikal zentriert bei f.cy
                                 const pcy = f.cy
 
                                 f.childPs = ps
-                                stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
+                                // Parameter in einer ParameterGroup sind in der ParameterGroup
+                                stack.push({ node: p, cx: px, cy: pcy, phase: 0, containerId: f.node.id })
                                 f.phase = 10
                                 break
                             }
@@ -442,7 +496,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             if (paramBottom > maxYBottom) maxYBottom = paramBottom
 
                             f.childPs = ps
-                            stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
+                            // Parameter sind im gleichen Container wie ihre Parent-Node
+                            stack.push({ node: p, cx: px, cy: pcy, phase: 0, containerId: f.containerId })
                             f.phase = 10
                         } else {
                             // f.bottom ist die absolute untere Kante dieser Node inklusive aller Parameter
@@ -460,7 +515,22 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         // ✅ parameterGroup: horizontal cursor weiter
                         if (f.node.type === "parameterGroup") {
                             f.rightBottom = Math.max(f.rightBottom ?? (f.cy + f.h! / 2), subBottom)
-                            f.pxCursor = (f.pxCursor ?? (f.cx - f.w! / 2 + PAD)) + f.childPs!.w + H
+
+                            // Berechne die volle Breite des Kindes inklusive Parameter
+                            let fullW = f.childPs!.w
+                            const kidParams = params.get(currentParam.id) ?? []
+                            for (const kp of kidParams) {
+                                if (kp.type === "group") {
+                                    // Group-Parameter sind zentriert, können breiter sein
+                                    const gpW = size(kp).w
+                                    if (gpW > fullW) fullW = gpW
+                                } else {
+                                    // Nicht-Gruppen-Parameter erscheinen rechts
+                                    fullW += H + size(kp).w
+                                }
+                            }
+
+                            f.pxCursor = (f.pxCursor ?? (f.cx - f.w! / 2 + PAD)) + fullW + H
                             f.rightIndex!++
                             f.phase = 1
                             break
@@ -515,7 +585,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const gcy = f.gy! + gs.h / 2
                             f.gx! += gs.w + H
 
-                            stack.push({ node: g, cx: gcx, cy: gcy, phase: 0 })
+                            // Group-Parameter sind im gleichen Container wie ihre Parent-Node
+                            stack.push({ node: g, cx: gcx, cy: gcy, phase: 0, containerId: f.containerId })
                             f.childPs = gs
                             f.phase = 30
                         } else {
@@ -564,7 +635,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             const ks = size(k)
                             const ky = f.curY! + ks.h / 2
 
-                            stack.push({ node: k, cx: f.cx, cy: ky, phase: 0 })
+                            // Kinder einer Gruppe sind in der Gruppe
+                            stack.push({ node: k, cx: f.cx, cy: ky, phase: 0, containerId: f.node.id })
                             f.childPs = ks
                             f.phase = 50
                         } else {
@@ -627,6 +699,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
 
         // initial posTL setzen (in RF-Koordinaten, relativ zu Parent)
+        // Die Position wird immer relativ zum tatsächlichen n.parentId berechnet,
+        // da React Flow dies erwartet
         for (const n of nodes) {
             const tl = absTL_initial.get(n.id)!
             let px = tl.x

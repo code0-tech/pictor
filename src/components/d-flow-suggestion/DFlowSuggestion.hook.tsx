@@ -46,5 +46,5 @@ export const useSuggestions = (
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterId])
+    }, [flowId, nodeId, parameterId, functionStore, flowStore])
 }

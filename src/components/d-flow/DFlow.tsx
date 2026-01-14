@@ -168,7 +168,18 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
             for (const k of kids) {
                 const ks = size(k)
                 rowW += ks.w
-                if (ks.h > hMax) hMax = ks.h
+
+                // Berechne die volle Höhe des Kindes inklusive Group-Parameter (die unterhalb erscheinen)
+                let kidFullH = ks.h
+                const kidParams = params.get(k.id) ?? []
+                for (const kp of kidParams) {
+                    if (kp.type === "group") {
+                        // Group-Parameter erscheint unterhalb: V + Höhe der Gruppe
+                        kidFullH += V + size(kp).h
+                    }
+                }
+
+                if (kidFullH > hMax) hMax = kidFullH
                 count++
             }
             rowW += H * Math.max(0, count - 1)
@@ -259,23 +270,50 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
         // Für normale Nodes: Parameter sind rechts und vertikal zentriert
         const nodeParams = params.get(n.id) ?? []
-        if (nodeParams.length === 0) return { top: -halfH, bottom: halfH }
 
-        // Berechne die Gesamthöhe aller Parameter
-        let paramsTotal = 0
+        let topBound = -halfH
+        let bottomBound = halfH
+
+        // Rechte Parameter (nicht group) sind vertikal zentriert um die Node
+        const rightParams: Node[] = []
+        const groupParams: Node[] = []
         for (const p of nodeParams) {
-            paramsTotal += effectiveHeight(p)
+            if (p.type === "group") groupParams.push(p)
+            else rightParams.push(p)
         }
-        paramsTotal += V * Math.max(0, nodeParams.length - 1)
 
-        // Parameter sind vertikal zentriert um die Node
-        const paramsTop = -paramsTotal / 2
-        const paramsBottom = paramsTotal / 2
+        if (rightParams.length > 0) {
+            let paramsTotal = 0
+            for (const p of rightParams) {
+                paramsTotal += effectiveHeight(p)
+            }
+            paramsTotal += V * Math.max(0, rightParams.length - 1)
 
-        return {
-            top: Math.min(-halfH, paramsTop),
-            bottom: Math.max(halfH, paramsBottom)
+            const paramsTop = -paramsTotal / 2
+            const paramsBottom = paramsTotal / 2
+
+            if (paramsTop < topBound) topBound = paramsTop
+            if (paramsBottom > bottomBound) bottomBound = paramsBottom
         }
+
+        // Group-Parameter erscheinen unterhalb der Node (bei halfH + V + groupH/2)
+        // Die untere Kante ist halfH + V + groupH
+        if (groupParams.length > 0) {
+            let maxGroupBottom = bottomBound
+            for (const g of groupParams) {
+                // Group-Parameter erscheinen V unterhalb der Node-Box
+                // Rekursiv die Bounding Box der Gruppe berechnen
+                const gbb = boundingBox(g)
+                const gSize = size(g)
+                // Die Gruppe ist bei halfH + V + gSize.h/2 positioniert
+                // Ihre untere Kante (relativ zum Parent-Center) ist halfH + V + gSize.h/2 + gbb.bottom
+                const gBottom = halfH + V + gSize.h / 2 + gbb.bottom
+                if (gBottom > maxGroupBottom) maxGroupBottom = gBottom
+            }
+            bottomBound = maxGroupBottom
+        }
+
+        return { top: topBound, bottom: bottomBound }
     }
 
     // ----------------------------
@@ -458,7 +496,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                             f.gSizes = gSizes
                             f.gx = f.cx - rowW / 2
-                            f.gy = f.bottom! + V
+                            // Group-Parameter erscheinen V unterhalb der Node-Box (nicht unterhalb der Parameter-Ausdehnung)
+                            f.gy = f.cy + f.h! / 2 + V
                             f.rowBottom = f.bottom
                             f.gIndex = 0
                             f.phase = 3
@@ -572,7 +611,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 // cy so setzen, dass die obere Bounding-Kante (cy + bb.top) bei yCursor liegt
                 // => cy = yCursor - bb.top
                 const cy = yCursor - bb.top
-                const b = layoutIter(r, 0, cy)
+                layoutIter(r, 0, cy)
                 // Nächste Node beginnt nach der unteren Bounding-Kante + V Spacing
                 // Die untere Bounding-Kante ist cy + bb.bottom
                 yCursor = cy + bb.bottom + V

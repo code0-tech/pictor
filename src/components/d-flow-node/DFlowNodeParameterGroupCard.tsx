@@ -13,7 +13,7 @@ export const DFlowNodeParameterGroupCard: React.FC<DFlowNodeParameterGroupCardPr
         <Card key={id}
               w={"100%"}
               h={"100%"}
-              style={{background: "transparent", border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
+              style={{background: "transparent", border: `5px double ${withAlpha(data.color!!, 0.25)}`}}>
             <Handle
                 type="target"
                 position={Position.Top}

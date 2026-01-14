@@ -124,12 +124,13 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             },
         });
 
-        const traverse = (
-            node: NodeFunction,
-            isParameter = false,
-            parentId?: NodeFunction['id'],
-            parentGroup?: string
-        ) => {
+    const traverse = (
+        node: NodeFunction,
+        isParameter = false,
+        parentNodeId?: NodeFunction['id'],
+        parentGroup?: string,
+        parameterGroupId?: string
+    ) => {
             if (!node?.id) return;
 
             const nodeId = node.id;
@@ -137,18 +138,22 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             if (!visited.has(nodeId)) {
                 visited.add(nodeId);
 
+                // Die parentId bestimmt die visuelle Gruppe (React Flow)
+                // Eine Node kann nur in EINER Gruppe sein - entweder parameterGroup oder parentGroup
+                const visualParentId = parentGroup ?? parameterGroupId;
+
                 nodes.push({
                     id: nodeId,
                     type: bestMatchValue(packageNodes, node.functionDefinition?.identifier ?? ""),
                     position: {x: 0, y: 0},
                     draggable: false,
-                    parentId: parentGroup,
-                    extent: parentGroup ? "parent" : undefined,
+                    parentId: visualParentId,
+                    extent: visualParentId ? "parent" : undefined,
                     data: {
                         nodeId: nodeId,
                         isParameter: isParameter,
                         flowId: flowId,
-                        parentNodeId: isParameter ? parentId : undefined,
+                        parentNodeId: isParameter ? parentNodeId : undefined,
                         index: ++globalIndex,
                         color: hashToColor(nodeId),
                     },
@@ -167,16 +172,17 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 const dataType = paramDef?.dataTypeIdentifier
                     ? dataTypeService.getDataType(paramDef.dataTypeIdentifier)
                     : undefined;
+                const isParameterGroup = dataType?.variant !== "NODE";
+                const activeParameterGroupId = parameterGroupId ?? (!isParameter && isParameterGroup ? `${nodeId}-params-${param?.id}` : undefined);
+                const parameterParentId = activeParameterGroupId ?? parentGroup;
 
-                if (dataType?.variant === "NODE") {
-                    const groupId = `${nodeId}-group-${groupCounter++}`;
-
-                    if (!visited.has(groupId)) {
-                        visited.add(groupId);
+                if (activeParameterGroupId && !parameterGroupId && !isParameter && isParameterGroup) {
+                    if (!visited.has(activeParameterGroupId)) {
+                        visited.add(activeParameterGroupId);
 
                         nodes.push({
-                            id: groupId,
-                            type: "group",
+                            id: activeParameterGroupId,
+                            type: "parameterGroup",
                             position: {x: 0, y: 0},
                             draggable: false,
                             parentId: parentGroup,
@@ -190,18 +196,42 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                             },
                         });
                     }
+                }
+
+                if (dataType?.variant === "NODE") {
+                    const groupId = `${nodeId}-group-${groupCounter++}`;
+
+                    if (!visited.has(groupId)) {
+                        visited.add(groupId);
+
+                        nodes.push({
+                            id: groupId,
+                            type: "group",
+                            position: {x: 0, y: 0},
+                            draggable: false,
+                            parentId: parameterParentId,
+                            extent: parameterParentId ? "parent" : undefined,
+                            data: {
+                                isParameter: true,
+                                parentNodeId: nodeId,
+                                nodeId: nodeId,
+                                flowId: flowId,
+                                color: hashToColor(value.id!),
+                            },
+                        });
+                    }
 
                     const child = flowService.getNodeById(flowId, value.id);
-                    if (child) traverse(child, false, undefined, groupId);
+                    if (child) traverse(child, false, undefined, groupId, activeParameterGroupId);
                 } else {
                     const child = flowService.getNodeById(flowId, value.id);
-                    if (child) traverse(child, true, nodeId, parentGroup);
+                    if (child) traverse(child, true, nodeId, parameterParentId, activeParameterGroupId);
                 }
             });
 
             if (node.nextNodeId) {
                 const next = flowService.getNodeById(flow.id, node.nextNodeId);
-                if (next) traverse(next, false, undefined, parentGroup);
+                if (next) traverse(next, false, undefined, parentGroup, parameterGroupId);
             }
         };
 
@@ -210,6 +240,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
             if (start) traverse(start);
         }
 
+        console.log(nodes)
         return nodes;
     }, [flow, flowStore]);
 };

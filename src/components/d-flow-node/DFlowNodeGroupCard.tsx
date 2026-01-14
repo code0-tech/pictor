@@ -13,7 +13,7 @@ export const DFlowNodeGroupCard: React.FC<DFlowNodeGroupCardProps> = memo((props
         <Card key={id}
               w={"100%"}
               h={"100%"}
-              style={{background: mixColorRgb(data.color!!, 9), border: `2px dashed ${withAlpha(data.color!!, 0.1)}`}}>
+              style={{background: mixColorRgb(data.color!!, 9), border: "transparent"}}>
             <Handle
                 type="target"
                 position={Position.Top}

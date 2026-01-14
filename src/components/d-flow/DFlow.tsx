@@ -15,6 +15,7 @@ import '@xyflow/react/dist/style.css';
 import "./DFlow.style.scss"
 import {DFlowNodeDefaultCard} from "../d-flow-node/DFlowNodeDefaultCard";
 import {DFlowNodeGroupCard} from "../d-flow-node/DFlowNodeGroupCard";
+import {DFlowNodeParameterGroupCard} from "../d-flow-node/DFlowNodeParameterGroupCard";
 import {DFlowNodeTriggerCard} from "../d-flow-node/DFlowNodeTriggerCard";
 import {DFlowEdge} from "./DFlowEdge";
 import {DFlowPanelSize} from "../d-flow-panel";
@@ -53,22 +54,37 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     // ----------------------------
     const rfKidIds = new Map<string, string[]>()
     const paramIds = new Map<string, string[]>()
+    // parameterGroupKids: Kinder einer parameterGroup (basierend auf parentId)
+    const paramGroupKidIds = new Map<string, string[]>()
+
+    const byId = new Map(nodes.map(n => [n.id, n] as const))
 
     for (const n of nodes) {
         const link = (n.data as any)?.parentNodeId
-        if (link) {
+
+        // Prüfe ob der Parent eine parameterGroup ist
+        const parentNode = n.parentId ? byId.get(n.parentId) : undefined
+        const isInParameterGroup = parentNode?.type === "parameterGroup"
+
+        if (isInParameterGroup && n.parentId) {
+            // Kinder einer parameterGroup werden über parentId ermittelt
+            const arr = paramGroupKidIds.get(n.parentId) ?? []
+            arr.push(n.id)
+            paramGroupKidIds.set(n.parentId, arr)
+        } else if (link) {
+            // Parameter einer Node (über parentNodeId in data)
             const arr = paramIds.get(link) ?? []
             arr.push(n.id)
             paramIds.set(link, arr)
         }
-        if (n.parentId && !link) {
+
+        // rfKids: Kinder einer Gruppe (parentId), aber nicht Parameter und nicht in parameterGroup
+        if (n.parentId && !link && !isInParameterGroup) {
             const arr = rfKidIds.get(n.parentId) ?? []
             arr.push(n.id)
             rfKidIds.set(n.parentId, arr)
         }
     }
-
-    const byId = new Map(nodes.map(n => [n.id, n] as const))
 
     const rfKids = new Map<string, Node[]>()
     for (const [k, ids] of rfKidIds) {
@@ -82,6 +98,13 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         const arr: Node[] = new Array(ids.length)
         for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!
         params.set(k, arr)
+    }
+
+    const paramGroupKids = new Map<string, Node[]>()
+    for (const [k, ids] of paramGroupKidIds) {
+        const arr: Node[] = new Array(ids.length)
+        for (let i = 0; i < ids.length; i++) arr[i] = byId.get(ids[i])!
+        paramGroupKids.set(k, arr)
     }
 
     type Size = { w: number; h: number }
@@ -117,7 +140,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         if (cached) return cached
 
         // non-group: aus baseSizes
-        if (n.type !== "group") {
+        if (!isGroupType(n)) {
             const s = baseSizes.get(n.id)!
             sizeCache.set(n.id, s)
             return s
@@ -133,6 +156,29 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
 
         // sonst aus Kindern ableiten
+// parameterGroup: Größe aus paramGroupKids (Kinder über parentId) als horizontale Row
+        if (n.type === "parameterGroup") {
+            const kids = (paramGroupKids.get(n.id) ?? []).slice()
+                .sort((a, b) => (+(a.data as any)?.paramIndex) - (+(b.data as any)?.paramIndex))
+
+            let rowW = 0
+            let hMax = 0
+            let count = 0
+
+            for (const k of kids) {
+                const ks = size(k)
+                rowW += ks.w
+                if (ks.h > hMax) hMax = ks.h
+                count++
+            }
+            rowW += H * Math.max(0, count - 1)
+
+            const g = { w: (count ? rowW : 0) + 2 * PAD, h: hMax + 2 * PAD }
+            sizeCache.set(n.id, g)
+            return g
+        }
+
+// normale group: Größe aus rfKids vertikal stacken
         const kids = rfKids.get(n.id) ?? []
         let stackH = 0
         let wMax = 0
@@ -195,6 +241,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 kidIndex?: number
                 curY?: number
                 bottom?: number
+                pxCursor?: number
             }
 
             const stack: Frame[] = [{ node: root, cx, cy, phase: 0 }]
@@ -209,7 +256,11 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         f.w = w
                         f.h = h
 
-                        const paramsOf = params.get(f.node.id) ?? []
+                        // Für parameterGroup: verwende paramGroupKids (Kinder über parentId)
+                        // Für andere Nodes: verwende params (über parentNodeId)
+                        const paramsOf = f.node.type === "parameterGroup"
+                            ? (paramGroupKids.get(f.node.id) ?? [])
+                            : (params.get(f.node.id) ?? [])
                         const right: Node[] = []
                         const gParams: Node[] = []
                         for (const p of paramsOf) {
@@ -221,6 +272,11 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                         f.right = right
                         f.gParams = gParams
+
+                        if (f.node.type === "parameterGroup") {
+                            // wir layouten die params der parameterGroup als horizontale row
+                            f.pxCursor = f.cx - f.w! / 2 + PAD
+                        }
 
                         let total = 0
                         for (const p of right) total += size(p).h
@@ -237,7 +293,21 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         if (f.rightIndex! < f.right!.length) {
                             const p = f.right![f.rightIndex!]
                             const ps = size(p)
-                            const px = f.cx + f.w! / 2 + H + ps.w / 2
+
+                            // ✅ parameterGroup: params horizontal nebeneinander
+                            if (f.node.type === "parameterGroup") {
+                                const px = (f.pxCursor ?? (f.cx - f.w! / 2 + PAD)) + ps.w / 2
+                                const pcy = f.cy
+
+                                f.childPs = ps
+                                stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
+                                f.phase = 10
+                                break
+                            }
+
+                            // ✅ default: params vertikal (wie vorher)
+                            const padShift = p.type === "parameterGroup" ? PAD : 0
+                            const px = f.cx + f.w! / 2 + H + ps.w / 2 - padShift
                             let pcy = f.py! + ps.h / 2
 
                             const key = colKey(px)
@@ -263,6 +333,17 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                     case 10: {
                         const subBottom = f.lastChildBottom!
+
+                        // ✅ parameterGroup: horizontal cursor weiter
+                        if (f.node.type === "parameterGroup") {
+                            f.rightBottom = Math.max(f.rightBottom ?? (f.cy + f.h! / 2), subBottom)
+                            f.pxCursor = (f.pxCursor ?? (f.cx - f.w! / 2 + PAD)) + f.childPs!.w + H
+                            f.rightIndex!++
+                            f.phase = 1
+                            break
+                        }
+
+                        // ✅ default: vertical collision logic
                         columnBottom.set(
                             f.childKey!,
                             Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom)
@@ -324,7 +405,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     }
 
                     case 4: {
-                        if (f.node.type === "group") {
+                        if (isGroupType(f.node)) {
                             const kidsAll = rfKids.get(f.node.id) ?? []
                             const kids: Node[] = []
                             for (const k of kidsAll) {
@@ -429,7 +510,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
 
         const groups: Node[] = []
-        for (const n of nodes) if (n.type === "group") groups.push(n)
+        for (const n of nodes) if (isGroupType(n)) groups.push(n)
         groups.sort((a, b) => depth(b) - depth(a))
 
         const childSize = (n: Node): Size => {
@@ -595,6 +676,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 }
 
 const getCachedLayoutElements = React.cache(getLayoutElements)
+const isGroupType = (node: Node) => node.type === "group" || node.type === "parameterGroup"
 
 export interface DFlowProps extends Code0ComponentProps {
     flowId: Flow['id']
@@ -614,6 +696,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
     const nodeTypes = React.useMemo(() => ({
         default: DFlowNodeDefaultCard,
         group: DFlowNodeGroupCard,
+        parameterGroup: DFlowNodeParameterGroupCard,
         trigger: DFlowNodeTriggerCard,
     }), [])
 

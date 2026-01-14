@@ -197,6 +197,87 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         return g
     }
 
+    // Berechne die effektive Höhe eines Parameters (rekursiv)
+    // Dies ist die Höhe, die der Parameter vertikal benötigt, inklusive aller Kinder-Parameter
+    const effectiveHeight = (n: Node): number => {
+        const baseH = size(n).h
+
+        if (n.type === "parameterGroup") {
+            // Für parameterGroup: Die Kinder sind bei cy (Center der Box) positioniert
+            // Ihre Parameter werden vertikal zentriert um sie
+            // Die effektive Höhe ist die maximale Kind-effektive-Höhe (nicht die Summe, da horizontal)
+            const kids = paramGroupKids.get(n.id) ?? []
+            if (kids.length === 0) return baseH
+
+            let maxKidEffH = 0
+            for (const kid of kids) {
+                // Rekursiv die effektive Höhe des Kindes berechnen
+                const kidEffH = effectiveHeight(kid)
+                if (kidEffH > maxKidEffH) maxKidEffH = kidEffH
+            }
+            // Die effektive Höhe der parameterGroup ist das Maximum aus Box-Höhe und der maximalen Kind-Höhe
+            return Math.max(baseH, maxKidEffH)
+        }
+
+        // Für normale Nodes: Maximum aus eigener Höhe und Summe der Parameter-Höhen (vertikal gestapelt)
+        const nodeParams = params.get(n.id) ?? []
+        if (nodeParams.length === 0) return baseH
+
+        let paramsTotal = 0
+        for (const p of nodeParams) {
+            paramsTotal += effectiveHeight(p)
+        }
+        paramsTotal += V * Math.max(0, nodeParams.length - 1)
+
+        return Math.max(baseH, paramsTotal)
+    }
+
+    // Berechne die Bounding Box einer Node (inklusive aller Parameter)
+    // Gibt {top, bottom} relativ zum Node-Center zurück
+    const boundingBox = (n: Node): { top: number; bottom: number } => {
+        const baseH = size(n).h
+        const halfH = baseH / 2
+
+        if (n.type === "parameterGroup") {
+            // Für parameterGroup: Kinder sind horizontal bei cy positioniert
+            // Ihre Parameter sind vertikal zentriert um sie
+            const kids = paramGroupKids.get(n.id) ?? []
+            if (kids.length === 0) return { top: -halfH, bottom: halfH }
+
+            let maxTop = -halfH
+            let maxBottom = halfH
+            for (const kid of kids) {
+                const kidEffH = effectiveHeight(kid)
+                // Kind ist bei cy positioniert, Parameter sind vertikal zentriert
+                const kidTop = -kidEffH / 2
+                const kidBottom = kidEffH / 2
+                if (kidTop < maxTop) maxTop = kidTop
+                if (kidBottom > maxBottom) maxBottom = kidBottom
+            }
+            return { top: maxTop, bottom: maxBottom }
+        }
+
+        // Für normale Nodes: Parameter sind rechts und vertikal zentriert
+        const nodeParams = params.get(n.id) ?? []
+        if (nodeParams.length === 0) return { top: -halfH, bottom: halfH }
+
+        // Berechne die Gesamthöhe aller Parameter
+        let paramsTotal = 0
+        for (const p of nodeParams) {
+            paramsTotal += effectiveHeight(p)
+        }
+        paramsTotal += V * Math.max(0, nodeParams.length - 1)
+
+        // Parameter sind vertikal zentriert um die Node
+        const paramsTop = -paramsTotal / 2
+        const paramsBottom = paramsTotal / 2
+
+        return {
+            top: Math.min(-halfH, paramsTop),
+            bottom: Math.max(halfH, paramsBottom)
+        }
+    }
+
     // ----------------------------
     // 3) Layout-Iteration (wie bisher), nur dass wir am Ende posTL/styleWH/measuredWH updaten
     // ----------------------------
@@ -241,6 +322,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
             const stack: Frame[] = [{ node: root, cx, cy, phase: 0 }]
             let returnBottom = 0
+            let maxYBottom = 0 // Tracke die maximale untere Y-Koordinate aller Nodes
 
             while (stack.length) {
                 const f = stack[stack.length - 1]
@@ -250,6 +332,10 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         const { w, h } = size(f.node)
                         f.w = w
                         f.h = h
+
+                        // Tracke die untere Kante dieser Node
+                        const nodeBottom = f.cy + h / 2
+                        if (nodeBottom > maxYBottom) maxYBottom = nodeBottom
 
                         // Für parameterGroup: verwende paramGroupKids (Kinder über parentId)
                         // Für andere Nodes: verwende params (über parentNodeId)
@@ -274,7 +360,9 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                         }
 
                         let total = 0
-                        for (const p of right) total += size(p).h
+                        for (const p of right) {
+                            total += effectiveHeight(p)
+                        }
                         total += V * Math.max(0, right.length - 1)
 
                         f.py = f.cy - total / 2
@@ -303,13 +391,25 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             // ✅ default: params vertikal (wie vorher)
                             const padShift = p.type === "parameterGroup" ? PAD : 0
                             const px = f.cx + f.w! / 2 + H + ps.w / 2 - padShift
-                            const pcy = f.py! + ps.h / 2
+
+                            // Für parameterGroup: zentriere im effektiven Slot
+                            // Für andere: positioniere oben im Slot
+                            const effH = effectiveHeight(p)
+                            const pcy = p.type === "parameterGroup"
+                                ? f.py! + effH / 2
+                                : f.py! + ps.h / 2
+
+                            // Tracke die untere Kante dieses Parameters
+                            const paramBottom = f.py! + effH
+                            if (paramBottom > maxYBottom) maxYBottom = paramBottom
 
                             f.childPs = ps
                             stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
                             f.phase = 10
                         } else {
-                            f.bottom = Math.max(f.cy + f.h! / 2, f.rightBottom!)
+                            // f.bottom ist die absolute untere Kante dieser Node inklusive aller Parameter
+                            const bb = boundingBox(f.node)
+                            f.bottom = f.cy + bb.bottom
                             f.phase = 2
                         }
                         break
@@ -317,6 +417,7 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                     case 10: {
                         const subBottom = f.lastChildBottom!
+                        const currentParam = f.right![f.rightIndex!]
 
                         // ✅ parameterGroup: horizontal cursor weiter
                         if (f.node.type === "parameterGroup") {
@@ -327,10 +428,18 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             break
                         }
 
-                        // ✅ default: vertical layout - nächster Parameter beginnt nach dem aktuellen subBottom
-                        f.rightBottom = Math.max(f.rightBottom!, subBottom)
-                        // Nächste Parameter-Position: nach dem aktuellen Parameter + Spacing
-                        f.py = subBottom + V
+                        // ✅ default: vertical layout
+                        // Berechne die untere Kante basierend auf der effektiven Höhe
+                        const effH = effectiveHeight(currentParam)
+                        const paramTop = f.py!
+                        const effBottom = paramTop + effH
+
+                        // Die tatsächliche untere Kante ist das Maximum aus subBottom und effBottom
+                        const actualBottom = Math.max(subBottom, effBottom)
+                        f.rightBottom = Math.max(f.rightBottom!, actualBottom)
+
+                        // Nächste Parameter-Position: nach der effektiven Höhe + V Spacing
+                        f.py = actualBottom + V
                         f.rightIndex!++
                         f.phase = 1
                         break
@@ -386,6 +495,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                     }
 
                     case 4: {
+                        // Für parameterGroup: Kinder wurden bereits in Phase 1 als horizontale Row verarbeitet
+                        // f.bottom wurde in Phase 2 korrekt auf max(cy+h/2, rightBottom) gesetzt
+                        // rfKids ist für parameterGroup leer, also überspringen wir Phase 5
+                        if (f.node.type === "parameterGroup") {
+                            f.phase = 6
+                            break
+                        }
+
                         if (isGroupType(f.node)) {
                             const kidsAll = rfKids.get(f.node.id) ?? []
                             const kids: Node[] = []
@@ -429,10 +546,14 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
 
                     case 6: {
                         const finished = stack.pop()!
+
+                        // Tracke die maximale untere Kante
+                        if (finished.bottom! > maxYBottom) maxYBottom = finished.bottom!
+
                         if (stack.length) {
                             stack[stack.length - 1].lastChildBottom = finished.bottom
                         } else {
-                            returnBottom = finished.bottom!
+                            returnBottom = maxYBottom
                         }
                         break
                     }
@@ -443,11 +564,18 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         }
 
         // Root-Nodes stapeln
+        // Jede Node wird so positioniert, dass ihre obere Bounding-Kante bei yCursor liegt
         let yCursor = 0
         for (const r of nodes) {
             if (!(r.data as any)?.parentNodeId && !r.parentId) {
-                const b = layoutIter(r, 0, yCursor + size(r).h / 2)
-                yCursor = b + V
+                const bb = boundingBox(r)
+                // cy so setzen, dass die obere Bounding-Kante (cy + bb.top) bei yCursor liegt
+                // => cy = yCursor - bb.top
+                const cy = yCursor - bb.top
+                const b = layoutIter(r, 0, cy)
+                // Nächste Node beginnt nach der unteren Bounding-Kante + V Spacing
+                // Die untere Bounding-Kante ist cy + bb.bottom
+                yCursor = cy + bb.bottom + V
             }
         }
 
@@ -656,7 +784,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     return { nodes: out }
 }
 
-const getCachedLayoutElements = React.cache(getLayoutElements)
+// DEBUG: Caching deaktiviert um Änderungen zu testen
+const getCachedLayoutElements = getLayoutElements // React.cache(getLayoutElements)
 const isGroupType = (node: Node) => node.type === "group" || node.type === "parameterGroup"
 
 export interface DFlowProps extends Code0ComponentProps {

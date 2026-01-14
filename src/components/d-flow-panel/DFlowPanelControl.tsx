@@ -33,6 +33,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     const activeTab = React.useMemo(() => {
         return fileTabsStore.find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
+
     const result = useSuggestions(flowId, activeTab?.content?.props?.node?.id as NodeFunction['id'] | undefined)
 
     //callbacks

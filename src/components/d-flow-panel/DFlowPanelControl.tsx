@@ -60,7 +60,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                 await flowService.addNextNodeById(flowId, null, suggestion.value)
             })
         }
-    }, [flowId, flowService, activeTab])
+    }, [flowId, flowService, flowStore, activeTab])
 
     return <Panel position={"bottom-center"}>
         <ButtonGroup>

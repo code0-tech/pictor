@@ -33,8 +33,8 @@ import {DFlowPanelLayout} from "../d-flow-panel";
  * - Sub-parameter nodes do NOT influence the vertical stacking of main nodes; only direct parameters are considered.
  *
  * @param nodes Array of all nodes to be positioned. Each node should have at least: id, measured?.width, measured?.height, data?.isParameter, data?.parentId, and optionally data?.paramIndex.
- * @param edges Array of edge objects, unchanged by this function (used only for return type symmetry).
- * @returns An object containing the new positioned nodes and the unchanged edges.
+ * @param dirtyIds Optional set of node IDs that have changed and need re-layout.
+ * @returns An object containing the new positioned nodes.
  */
 const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
     if (!dirtyIds || dirtyIds.size === 0) return { nodes }
@@ -210,10 +210,6 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
         // relatives Layout (Center in globalen Koordinaten)
         const relCenter = new Map<string, Pos>()
 
-        // Unterkante je rechter Spalten-"Band", damit Parameter nicht kollidieren
-        const columnBottom = new Map<number, number>()
-        const colKey = (x: number) => Math.round(x / 10)
-
         const layoutIter = (root: Node, cx: number, cy: number): number => {
             type Frame = {
                 node: Node
@@ -226,7 +222,6 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                 rightIndex?: number
                 py?: number
                 rightBottom?: number
-                childKey?: number
                 childPs?: Size
                 lastChildBottom?: number
 
@@ -308,19 +303,8 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             // ✅ default: params vertikal (wie vorher)
                             const padShift = p.type === "parameterGroup" ? PAD : 0
                             const px = f.cx + f.w! / 2 + H + ps.w / 2 - padShift
-                            let pcy = f.py! + ps.h / 2
+                            const pcy = f.py! + ps.h / 2
 
-                            const key = colKey(px)
-                            const occ = columnBottom.get(key) ?? Number.NEGATIVE_INFINITY
-                            const minTop = occ + V
-                            const desiredTop = pcy - ps.h / 2
-
-                            if (desiredTop < minTop) {
-                                pcy = minTop + ps.h / 2
-                                f.py = pcy - ps.h / 2
-                            }
-
-                            f.childKey = key
                             f.childPs = ps
                             stack.push({ node: p, cx: px, cy: pcy, phase: 0 })
                             f.phase = 10
@@ -343,13 +327,10 @@ const getLayoutElements = (nodes: Node[], dirtyIds?: Set<string>) => {
                             break
                         }
 
-                        // ✅ default: vertical collision logic
-                        columnBottom.set(
-                            f.childKey!,
-                            Math.max(columnBottom.get(f.childKey!) ?? Number.NEGATIVE_INFINITY, subBottom)
-                        )
+                        // ✅ default: vertical layout - nächster Parameter beginnt nach dem aktuellen subBottom
                         f.rightBottom = Math.max(f.rightBottom!, subBottom)
-                        f.py = Math.max(f.py! + f.childPs!.h + V, subBottom + V)
+                        // Nächste Parameter-Position: nach dem aktuellen Parameter + Spacing
+                        f.py = subBottom + V
                         f.rightIndex!++
                         f.phase = 1
                         break

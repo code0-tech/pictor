@@ -24,7 +24,7 @@ export const DFlowFolderDeleteDialog: React.FC<DFlowFolderDeleteDialogProps> = (
         setDeleteDialogOpen(open)
     }, [open])
 
-    return <Dialog open={deleteDialogOpen} onOpenChange={(open) => setDeleteDialogOpen(open)}>
+    return <Dialog open={deleteDialogOpen} onOpenChange={(open) => props.onOpenChange?.(open)}>
         <DialogPortal>
             <DialogContent autoFocus showCloseButton
                            title={props.contextData.type == "item" ? "Remove flow" : "Remove folder"}>

@@ -20,6 +20,10 @@ export const DFlowFolderDeleteDialog: React.FC<DFlowFolderDeleteDialogProps> = (
 
     const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(open)
 
+    React.useEffect(() => {
+        setDeleteDialogOpen(open)
+    }, [open])
+
     return <Dialog open={deleteDialogOpen} onOpenChange={(open) => setDeleteDialogOpen(open)}>
         <DialogPortal>
             <DialogContent autoFocus showCloseButton

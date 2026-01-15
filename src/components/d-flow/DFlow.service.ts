@@ -5,7 +5,8 @@ import {
     Flow,
     FlowInput,
     FlowSetting,
-    LiteralValue, Maybe,
+    LiteralValue,
+    Maybe,
     Namespace,
     NamespaceProject,
     NamespacesProjectsFlowsCreateInput,
@@ -17,7 +18,8 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    ReferenceValue, Scalars
+    ReferenceValue,
+    Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 
 export type DFlowDependencies = {
@@ -66,7 +68,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                 }
             }
         })
-        return [...(parentNode ? [parentNode]: []), ...parameterNodes, ...nextNodes]
+        return [...(parentNode ? [parentNode] : []), ...parameterNodes, ...nextNodes]
     }
 
     getNodeById(flowId: Flow['id'], nodeId: NodeFunction['id']): NodeFunction | undefined {
@@ -112,11 +114,17 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                     parameters: node?.parameters?.nodes?.map(parameter => {
                         return {
                             runtimeParameterDefinitionId: parameter?.runtimeParameter?.id!,
-                            value: parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
-                                nodeFunctionId: parameter.value.id!
-                            } : parameter?.value?.__typename === "LiteralValue" ? {
-                                literalValue: parameter.value.value!
-                            } : {
+                            ...(parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
+                                value: {
+                                    nodeFunctionId: parameter.value.id!
+                                }
+                            } : {}),
+                            ...(parameter?.value?.__typename === "LiteralValue" ? {
+                                value: {
+                                    literalValue: parameter.value.value!
+                                }
+                            } : {}),
+                            ...(parameter?.value?.__typename === "ReferenceValue" ? {
                                 referenceValue: {
                                     dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
                                     depth: (parameter?.value as ReferenceValue).depth!,
@@ -125,7 +133,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                                     referencePath: (parameter?.value as ReferenceValue).referencePath!,
                                     scope: (parameter?.value as ReferenceValue).scope!,
                                 }
-                            },
+                            } : {})
                         }
                     }) ?? [],
                     runtimeFunctionId: node?.functionDefinition?.runtimeFunctionDefinition?.id!

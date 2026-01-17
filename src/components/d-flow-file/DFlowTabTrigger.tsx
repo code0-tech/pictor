@@ -48,17 +48,15 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
             const description = settingDefinition?.descriptions!![0]?.content ?? ""
             const result = suggestionsById[settingDefinition.identifier!!]
 
-            if (!setting) return null
 
-            // @ts-ignore
-            const defaultValue = setting.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
+            const defaultValue = setting?.value?.__typename === "LiteralValue" ? typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value : typeof setting?.value == "object" ? JSON.stringify(setting?.value) : setting?.value
 
             const submitValue = (value: NodeParameterValue) => {
                 startTransition(async () => {
-                    if (value?.__typename == "LiteralValue") {
-                        await flowService.setSettingValue(props.instance.id, setting.flowSettingIdentifier!, value.value)
-                    } else {
-                        await flowService.setSettingValue(props.instance.id, setting.flowSettingIdentifier!, value)
+                    if (value?.__typename == "LiteralValue" && settingDefinition.identifier) {
+                        await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value.value)
+                    } else if (settingDefinition.identifier)  {
+                        await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value)
                     }
                 })
 
@@ -74,7 +72,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                     submitValue(value)
                 } catch (e) {
                     // @ts-ignore
-                    submitValue(event.target.value)
+                    //submitValue(event.target.value)
                 }
             }
 
@@ -85,7 +83,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                                    title={title}
                                    description={description}
                                    clearable
-                                   key={JSON.stringify(setting.value)}
+                                   key={settingDefinition.identifier}
                                    defaultValue={defaultValue}
                                    onBlur={submitValueEvent}
                                    onClear={submitValueEvent}

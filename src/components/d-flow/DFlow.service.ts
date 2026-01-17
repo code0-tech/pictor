@@ -208,7 +208,8 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
         const setting = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
-        if (!setting) return
+        //console.log(flow, settingIdentifier, setting, value)
+        if (!setting) return //TODO if the settings is not found create it
         setting.value = value
         this.set(index, flow)
     }

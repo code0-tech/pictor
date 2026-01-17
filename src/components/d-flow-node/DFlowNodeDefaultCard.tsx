@@ -128,7 +128,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
             key={id}
             data-flow-refernce={id}
             paddingSize={"xs"}
-            py={data.isParameter ? "0.35" : undefined}
+            py={"0.35"}
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
             className={activeTabId == node?.id ? "d-flow-node--active" : undefined}

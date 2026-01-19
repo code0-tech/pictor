@@ -46,7 +46,7 @@ export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) =
         return (functionService as DFlowFunctionReactiveService).getById((node as NodeFunction)?.functionDefinition?.id)?.names?.[0]?.content
     }, [functionStore, node])
 
-    return <Badge style={{verticalAlign: "middle"}}
+    return <Badge style={{verticalAlign: "middle", textWrap: "nowrap"}}
                   color={isTrigger ? "info" : hashToColor(value.id || "")}
                   border
                   {...rest}>

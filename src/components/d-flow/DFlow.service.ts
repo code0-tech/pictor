@@ -113,7 +113,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                     nextNodeId: node?.nextNodeId!,
                     parameters: node?.parameters?.nodes?.map(parameter => {
                         return {
-                            runtimeParameterDefinitionId: parameter?.runtimeParameter?.id!,
+                            parameterDefinitionId: parameter?.parameterDefinition?.id!,
                             ...(parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
                                 value: {
                                     nodeFunctionId: parameter.value.id!
@@ -136,7 +136,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                             } : {})
                         }
                     }) ?? [],
-                    runtimeFunctionId: node?.functionDefinition?.runtimeFunctionDefinition?.id!
+                    functionDefinitionId: node?.functionDefinition?.id!
                 }
             }) ?? [],
             startingNodeId: flow?.startingNodeId!,

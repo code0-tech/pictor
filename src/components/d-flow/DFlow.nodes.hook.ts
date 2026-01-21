@@ -163,7 +163,7 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
                 const value = param?.value;
                 if (!value || value.__typename !== "NodeFunctionIdWrapper") return;
 
-                const paramDef = definition?.parameterDefinitions?.find(p => p.id === param?.id);
+                const paramDef = definition?.parameterDefinitions?.find(p => p.id === param?.parameterDefinition?.id);
                 const dataType = paramDef?.dataTypeIdentifier
                     ? dataTypeService.getDataType(paramDef.dataTypeIdentifier)
                     : undefined;

@@ -130,7 +130,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
             if (!parameter) return null
 
-            const parameterDefinition = paramDefinitions[parameter.id!!]
+            const parameterDefinition = paramDefinitions[parameter?.parameterDefinition?.id!!]
             const title = parameterDefinition?.names ? parameterDefinition?.names!![0]?.content : parameterDefinition?.id
             const description = parameterDefinition?.descriptions ? parameterDefinition?.descriptions!![0]?.content : JSON.stringify(parameterDefinition?.dataTypeIdentifier)
 

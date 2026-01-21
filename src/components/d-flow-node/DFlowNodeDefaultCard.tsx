@@ -67,7 +67,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
 
     const displayMessage = React.useMemo(() => splitTemplate(definition?.displayMessages!![0]?.content ?? "").map(item => {
         const param = node?.parameters?.nodes?.find(p => {
-            const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.id)
+            const parameterDefinition = definition?.parameterDefinitions?.find(pd => pd.id == p?.parameterDefinition?.id)
             return parameterDefinition?.identifier == item
         })
 

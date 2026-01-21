@@ -88,7 +88,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
 
             node.parameters?.nodes?.forEach((param) => {
                 const parameterValue = param?.value;
-                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.find(p => p.id === param?.id);
+                const parameterDefinition = functionService.getById(node.functionDefinition?.id!!)?.parameterDefinitions?.find(p => p.id === param?.parameterDefinition?.id);
                 const parameterDataTypeIdentifier = parameterDefinition?.dataTypeIdentifier;
                 const parameterDataType = parameterDataTypeIdentifier ? dataTypeService.getDataType(parameterDataTypeIdentifier) : undefined;
 

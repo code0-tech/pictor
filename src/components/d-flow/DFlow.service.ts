@@ -106,7 +106,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                     flowSettingIdentifier: setting?.flowSettingIdentifier!,
                     value: setting?.value!,
                 }
-            }),
+            }) ?? [],
             nodes: flow?.nodes?.nodes?.map(node => {
                 return {
                     id: node?.id!,

@@ -125,13 +125,20 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                                 }
                             } : {}),
                             ...(parameter?.value?.__typename === "ReferenceValue" ? {
-                                referenceValue: {
-                                    dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
-                                    depth: (parameter?.value as ReferenceValue).depth!,
-                                    node: (parameter?.value as ReferenceValue).node!,
-                                    nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
-                                    referencePath: (parameter?.value as ReferenceValue).referencePath!,
-                                    scope: (parameter?.value as ReferenceValue).scope!,
+                                value: {
+                                    referenceValue: {
+                                        dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
+                                        depth: (parameter?.value as ReferenceValue).depth!,
+                                        node: (parameter?.value as ReferenceValue).node!,
+                                        nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
+                                        referencePath: (parameter?.value as ReferenceValue).referencePath!,
+                                        scope: (parameter?.value as ReferenceValue).scope!,
+                                    }
+                                }
+                            } : {}),
+                            ...(!parameter?.value ? {
+                                value: {
+                                    literalValue: null
                                 }
                             } : {})
                         }

@@ -131,7 +131,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                                         depth: (parameter?.value as ReferenceValue).depth!,
                                         node: (parameter?.value as ReferenceValue).node!,
                                         nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
-                                        referencePath: (parameter?.value as ReferenceValue).referencePath!,
+                                        referencePath: (parameter?.value as ReferenceValue).referencePath ?? [],
                                         scope: (parameter?.value as ReferenceValue).scope!,
                                     }
                                 }

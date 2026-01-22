@@ -95,15 +95,19 @@ const bestMatchValue = (map: Map<string, string>, input: string): string => {
 // @ts-ignore
 export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], projectId?: NamespaceProject["id"]): Node<DFlowNodeProps>[] => {
 
-    const flowService = useService(DFlowReactiveService);
-    const flowStore = useStore(DFlowReactiveService);
-    const functionService = useService(DFlowFunctionReactiveService);
-    const dataTypeService = useService(DFlowDataTypeReactiveService);
+    const flowService = useService(DFlowReactiveService)
+    const flowStore = useStore(DFlowReactiveService)
+    const functionService = useService(DFlowFunctionReactiveService)
+    const functionStore = useStore(DFlowFunctionReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
     const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore]);
 
     return React.useMemo(() => {
-        if (!flow) return [];
+        if (!flow) return []
+        if (functionStore.length <= 0) return []
+        if (dataTypeStore.length <= 0) return []
 
         const nodes: Node<DFlowNodeProps>[] = [];
         const visited = new Set<string>();
@@ -211,5 +215,5 @@ export const useFlowNodes = (flowId: Flow["id"], namespaceId?: Namespace["id"], 
         }
 
         return nodes;
-    }, [flow, flowStore]);
+    }, [flow, flowStore, functionStore, dataTypeStore]);
 };

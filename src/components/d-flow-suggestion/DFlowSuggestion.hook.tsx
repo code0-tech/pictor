@@ -3,11 +3,7 @@ import {DFlowSuggestion} from "./DFlowSuggestion.view";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import React from "react";
-import type {
-    Flow,
-    NodeFunction,
-    NodeParameter,
-} from "@code0-tech/sagittarius-graphql-types";
+import type {Flow, NodeFunction, NodeParameter,} from "@code0-tech/sagittarius-graphql-types";
 import {useValueSuggestions} from "./DFlowValueSuggestions.hook";
 import {useReferenceSuggestions} from "./DFlowReferenceSuggestions.hook";
 import {useFunctionSuggestions} from "./DFlowFunctionSuggestions.hook";
@@ -23,13 +19,16 @@ export const useSuggestions = (
 ): DFlowSuggestion[] => {
 
     const functionService = useService(DFlowFunctionReactiveService)
-    const flowService = useService(DFlowReactiveService)
     const functionStore = useStore(DFlowFunctionReactiveService)
+    const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
 
     const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowService, flowStore, nodeId])
     const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, functionService, node?.functionDefinition?.id])
-    const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => definition.id === parameterId)), [functionDefinition?.parameterDefinitions, parameterId])
+    const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => {
+        const parameterDefinitionId = node?.parameters?.nodes?.find(parameter => parameter?.id === parameterId)?.parameterDefinition?.id
+        return definition.id === parameterDefinitionId
+    })), [functionDefinition?.parameterDefinitions, node])
 
     const dataTypeIdentifier = parameterDefinition?.dataTypeIdentifier!
     const genericKeys = functionDefinition?.genericKeys ?? []
@@ -46,5 +45,5 @@ export const useSuggestions = (
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterId, functionStore, flowStore])
+    }, [flowId, nodeId, parameterId, functionStore, flowStore, valueSuggestions, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
 }

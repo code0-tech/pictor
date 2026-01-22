@@ -10,6 +10,7 @@ import {hashToColor} from "./DFlow.util";
 
 // @ts-ignore
 export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], projectId?: NamespaceProject['id']): Edge<DFlowEdgeDataProps>[] => {
+
     const flowService = useService(DFlowReactiveService);
     const flowStore = useStore(DFlowReactiveService)
     const functionService = useService(DFlowFunctionReactiveService);
@@ -20,10 +21,12 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
     const flow = React.useMemo(() => flowService.getById(flowId, {namespaceId, projectId}), [flowId, flowStore])
 
     return React.useMemo(() => {
-        if (!flow) return [];
+        if (!flow) return []
+        if (functionStore.length <= 0) return []
+        if (dataTypeStore.length <= 0) return []
 
         // @ts-ignore
-        const edges: Edge<DFlowEdgeDataProps>[] = [];
+        const edges: Edge<DFlowEdgeDataProps>[] = []
 
         const groupsWithValue = new Map<string, string[]>();
 
@@ -115,9 +118,7 @@ export const useFlowEdges = (flowId: Flow['id'], namespaceId?: Namespace['id'], 
                             },
                         });
 
-                        (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []),
-                            groupsWithValue.get(node.id!)!))
-                            .push(groupId);
+                        (groupsWithValue.get(node.id!) ?? (groupsWithValue.set(node.id!, []), groupsWithValue.get(node.id!)!)).push(groupId);
 
                         traverse(
                             flowService.getNodeById(flowId, parameterValue.id)!,

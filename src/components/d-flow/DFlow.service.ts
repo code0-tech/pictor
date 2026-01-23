@@ -2,7 +2,6 @@ import {ReactiveArrayService} from "../../utils";
 import {
     DataTypeIdentifier,
     DataTypeIdentifierInput,
-    Flow,
     FlowInput,
     FlowSetting,
     LiteralValue,
@@ -21,6 +20,7 @@ import {
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {Flow} from "./DFlow.view";
 
 export type DFlowDependencies = {
     namespaceId: Namespace['id']

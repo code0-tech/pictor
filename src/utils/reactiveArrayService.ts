@@ -1,15 +1,16 @@
 import React, {startTransition} from "react";
 import {ArrayService} from "./arrayService";
+import {Payload, View} from "./view";
 
 export type ReactiveArrayStore<T> = {
     getState: () => T[];
     setState: React.Dispatch<React.SetStateAction<T[]>>;
 };
 
-export class ReactiveArrayService<T, D = Record<string, any>> implements ArrayService<T, D> {
-    protected readonly access: ReactiveArrayStore<T>;
+export class ReactiveArrayService<T extends Payload, D = Record<string, any>> implements ArrayService<View<T>, D> {
+    protected readonly access: ReactiveArrayStore<View<T>>;
 
-    constructor(access: ReactiveArrayStore<T>) {
+    constructor(access: ReactiveArrayStore<View<T>>) {
         this.access = access;
     }
 
@@ -19,13 +20,13 @@ export class ReactiveArrayService<T, D = Record<string, any>> implements ArraySe
         })
     }
 
-    add(value: T) {
+    add(value: View<T>) {
         startTransition(() => {
             this.access.setState(prev => [...prev, value]);
         })
     }
 
-    set(index: number, value: T) {
+    set(index: number, value: View<T>) {
         startTransition(() => {
             this.access.setState(prev => {
                 const next = prev.slice();
@@ -44,7 +45,7 @@ export class ReactiveArrayService<T, D = Record<string, any>> implements ArraySe
         return this.access.getState()[index];
     }
 
-    values(_dependencies?: D): T[] {
+    values(_dependencies?: D): View<T>[] {
         return this.access.getState();
     }
 

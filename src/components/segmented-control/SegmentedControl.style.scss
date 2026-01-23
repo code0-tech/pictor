@@ -4,14 +4,15 @@
 
 .segmented-control {
 
-  padding: variables.$xxs variables.$xxs;
-  gap: variables.$xxs;
+  padding: variables.$xxs / 2;
+  gap: variables.$xs;
   display: flex;
   flex-wrap: nowrap;
 
   & {
-    @include box.box(variables.$primary, variables.$primary, variables.$primary);
+    @include box.box(variables.$secondary);
     @include helpers.borderRadius();
+    border-width: 0;
   }
 
   &__item {
@@ -25,10 +26,26 @@
     }
 
     & {
-      @include box.box();
+      @include box.box(variables.$secondary);
       @include helpers.disabled();
-      border-radius: variables.$borderRadius - variables.$xxs;
+      background: helpers.backgroundColor(variables.$secondary, 2);
+      border-radius: variables.$borderRadius - (variables.$xxs / 2);
       border: none;
+    }
+
+    &:disabled {
+      background: transparent;
+    }
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      bottom: 0;
+      right: -1 * (variables.$xxs);
+      height: 50%;
+      width: 1px;
+      background: helpers.borderColor();
     }
 
   }

@@ -9,7 +9,6 @@ import {DFlowReactiveService} from "../d-flow";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {Text} from "../text/Text";
-import {Badge} from "../badge/Badge";
 import {DFlowSuggestionMenu} from "../d-flow-suggestion/DFlowSuggestionMenu";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 
@@ -31,7 +30,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
 
     //memoized values
     const activeTab = React.useMemo(() => {
-        return fileTabsStore.find((t: any) => (t as any).active)
+        return fileTabsService.values().find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
 
     const result = useSuggestions(flowId, activeTab?.content?.props?.node?.id as NodeFunction['id'] | undefined)
@@ -39,22 +38,22 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return
-        if (!(activeTab.content.props.flowId as Flow['id'])) return
+        if (!(activeTab?.content?.props?.flowId as Flow['id'])) return
         // @ts-ignore
         startTransition(async () => {
-            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab.content.props.node.id)
+            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab?.content?.props?.node.id)
             linkedNodes.forEach(node => {
                 if (node.id) fileTabsService.deleteById(node.id)
             })
 
-            await flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
+            await flowService.deleteNodeById((activeTab?.content?.props?.flowId as Flow['id']), (activeTab?.content?.props?.node.id as NodeFunction['id']))
         })
     }, [activeTab, flowService, flowStore])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {
-        if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {
+        if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab!.content?.props) {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, (activeTab.content.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
+                await flowService.addNextNodeById(flowId, (activeTab?.content?.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
             })
         } else {
             startTransition(async () => {
@@ -90,13 +89,13 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
             {/*</Tooltip>*/}
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button disabled={!activeTab || !(activeTab.content.props.flowId as Flow['id'])}
+                    <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}
                             onClick={deleteActiveNode}
                             paddingSize={"xxs"}
                             variant={"filled"}
                             color={"error"}>
-                        <IconTrash size={16}/>
-                        Delete
+                        <IconTrash size={13}/>
+                        <Text>Delete</Text>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
@@ -113,8 +112,8 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                                              paddingSize={"xxs"}
                                              variant={"filled"}
                                              color={"secondary"}>
-                                         <IconPlus size={16}/>
-                                         Next node
+                                         <IconPlus size={13}/>
+                                         <Text>Next node</Text>
                                      </Button>
                                  }/>
         </ButtonGroup>

@@ -21,6 +21,7 @@ import {
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {Flow} from "./DFlow.view";
+import {View} from "../../utils/view";
 
 export type DFlowDependencies = {
     namespaceId: Namespace['id']
@@ -175,7 +176,9 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
             }
         }
 
-        this.set(index, flow)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
@@ -207,7 +210,9 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
             flow.startingNodeId = addingNode.id
         }
 
-        this.set(index, flow)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     async setSettingValue(flowId: Flow['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
@@ -217,8 +222,11 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         const setting = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
         //console.log(flow, settingIdentifier, setting, value)
         if (!setting) return //TODO if the settings is not found create it
+
         setting.value = value
-        this.set(index, flow)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
@@ -244,7 +252,10 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         } else {
             parameter.value = value as LiteralValue | ReferenceValue
         }
-        this.set(index, flow)
+
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>

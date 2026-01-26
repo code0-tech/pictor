@@ -9,7 +9,7 @@
   position: relative;
   display: flex;
   padding: variables.$xxs / 2;
-  gap: variables.$xs;
+  gap: variables.$xxs;
 
   & {
     @include box.box(variables.$secondary);
@@ -30,7 +30,7 @@
       position: absolute;
       top: 25%;
       bottom: 0;
-      right: -1 * (variables.$xxs);
+      right: -1 * (variables.$xxs / 2);
       height: 50%;
       width: 1px;
       background: helpers.borderColor();

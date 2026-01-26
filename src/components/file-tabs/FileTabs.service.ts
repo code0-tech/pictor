@@ -4,8 +4,6 @@ import {View} from "../../utils/view";
 
 export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
-    private i = 0
-
     getById(id: string): FileTabsView | undefined {
         return this.values().find((item: FileTabsView) => item.id === id)
     }

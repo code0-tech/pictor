@@ -19,8 +19,10 @@ export const DFlowPanelUpdate: React.FC<DFlowPanelUpdateProps> = (props) => {
 
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
+    const [loading, startTransition] = React.useTransition()
 
     const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore])
+
     const edited = React.useMemo(
         () => !!flow?.editedAt && new Date(flow?.updatedAt ?? Date.now()).getTime() != new Date(flow?.editedAt ?? Date.now()).getTime(),
         [flow, flowStore]
@@ -32,13 +34,26 @@ export const DFlowPanelUpdate: React.FC<DFlowPanelUpdateProps> = (props) => {
         [flow, flowStore]
     )
 
+    const flowUpdate = React.useCallback(() => {
+        const flowInput = flowService.getPayloadById(flowId)
+        if (!flowId) return
+
+
+        startTransition(async () => {
+            await flowService.flowUpdate({
+                flowInput: flowInput!,
+                flowId: flowId!
+            })
+        })
+
+    }, [flowId, flowService])
+
     return <Panel position={"top-right"}>
         {edited ? (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant={"filled"} paddingSize={"xxs"}>
-                        <IconCloudUpload size={13}/>
-                        Save changes
+                    <Button onClick={flowUpdate} disabled={loading} variant={"filled"} paddingSize={"xxs"}>
+                        {loading ? ("Saving...") : (<IconCloudUpload size={13}/>)}
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
@@ -51,15 +66,12 @@ export const DFlowPanelUpdate: React.FC<DFlowPanelUpdateProps> = (props) => {
         ) : (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Badge color={"primary"} border>
-                        <IconCloudCheck size={13} color={"#70ffb2"}/>
-                        <Text>Last save {lastSave}</Text>
-                    </Badge>
+                    <IconCloudCheck size={16} color={"#70ffb2"}/>
                 </TooltipTrigger>
                 <TooltipPortal>
                     <TooltipContent side={"bottom"} maw={"200px"}>
                         <TooltipArrow/>
-                        <Text>Changes are also saved automatically within 1 minute</Text>
+                        <Text>Last save <Badge border color={"secondary"}>{lastSave}</Badge>.<br/> Everything is synced.</Text>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>

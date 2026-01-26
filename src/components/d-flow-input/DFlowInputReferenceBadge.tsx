@@ -18,7 +18,6 @@ export const DFlowInputReferenceBadge: React.FC<DFlowInputReferenceBadge> = (pro
 
     const {value, flowId, definition, ...rest} = props
     const content = React.useMemo(() => {
-        console.log(value)
         if (value.nodeFunctionId && flowId) {
             return <Flex align={"center"} display={"inline-flex"}>
                 <DFlowInputNodeBadge definition={definition} value={{

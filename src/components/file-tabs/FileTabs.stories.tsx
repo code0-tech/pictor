@@ -9,6 +9,7 @@ import {FileTabsService} from "./FileTabs.service";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
 import {Menu, MenuContent, MenuItem, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
+import {View} from "../../utils/view";
 
 export default {
     title: "File Tabs",
@@ -100,26 +101,28 @@ export const ExampleFileTabs = () => {
     }, [store])
 
     const onClick = React.useCallback(() => {
-        service.add({
-            id: String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0",
-            active: true,
-            children: <Flex style={{gap: "0.35rem"}} align={"center"}>
-                <IconFileLambdaFilled color={"#70ffb2"} size={16}/>
-                {Array(service.values().length + 1).fill(0).map(() => <>Test</>)}
-            </Flex>,
-            content: <>
-                <Flex>
-                    <div>
-                        <Text size={"xl"} hierarchy={"primary"} display={"block"}>Your Flow under</Text>
-                        <Text size={"xl"} hierarchy={"tertiary"}>Your Control</Text>
-                    </div>
-                    <Flex ml={1}>
-                        <Text size={"md"}hierarchy={"tertiary"}>Build business flows <br/> in no-time with <br/> CodeZero.</Text>
+        service.add(new View(
+            {
+                id: String(Number(service.values()[service.values().length - 1]?.id ?? 0) + 1) || "0",
+                active: true,
+                children: <Flex style={{gap: "0.35rem"}} align={"center"}>
+                    <IconFileLambdaFilled color={"#70ffb2"} size={16}/>
+                    {Array(service.values().length + 1).fill(0).map(() => <>Test</>)}
+                </Flex>,
+                content: <>
+                    <Flex>
+                        <div>
+                            <Text size={"xl"} hierarchy={"primary"} display={"block"}>Your Flow under</Text>
+                            <Text size={"xl"} hierarchy={"tertiary"}>Your Control</Text>
+                        </div>
+                        <Flex ml={1}>
+                            <Text size={"md"}hierarchy={"tertiary"}>Build business flows <br/> in no-time with <br/> CodeZero.</Text>
+                        </Flex>
                     </Flex>
-                </Flex>
-            </>,
-            closeable: true
-        })
+                </>,
+                closeable: true
+            }
+        ))
     }, [store])
 
     return <>

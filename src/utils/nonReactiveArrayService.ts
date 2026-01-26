@@ -6,7 +6,7 @@ import {ArrayService} from "./arrayService";
  */
 export type NonReactiveArrayStore<K> = K[]
 
-export class NonReactiveArrayService<T> implements ArrayService<T> {
+export class NonReactiveArrayService<T> implements ArrayService<T, T> {
 
     protected store: NonReactiveArrayStore<T>
 

@@ -2,7 +2,6 @@ import {ReactiveArrayService} from "../../utils";
 import {
     DataTypeIdentifier,
     DataTypeIdentifierInput,
-    Flow,
     FlowInput,
     FlowSetting,
     LiteralValue,
@@ -21,6 +20,8 @@ import {
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
+import {Flow} from "./DFlow.view";
+import {View} from "../../utils/view";
 
 export type DFlowDependencies = {
     namespaceId: Namespace['id']
@@ -75,7 +76,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
-    getPayloadById(flowId: Flow['id']): FlowInput | undefined {
+    getPayloadById(flowId: Flow['id']): FlowInput {
         const flow = this.getById(flowId)
 
         const getDataTypeIdentifierPayload = (identifier: DataTypeIdentifier): DataTypeIdentifierInput => {
@@ -106,39 +107,48 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                     flowSettingIdentifier: setting?.flowSettingIdentifier!,
                     value: setting?.value!,
                 }
-            }),
-            nodes: flow?.nodes?.nodes?.map(node => {
-                return {
-                    id: node?.id!,
-                    nextNodeId: node?.nextNodeId!,
-                    parameters: node?.parameters?.nodes?.map(parameter => {
-                        return {
-                            runtimeParameterDefinitionId: parameter?.runtimeParameter?.id!,
-                            ...(parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
-                                value: {
-                                    nodeFunctionId: parameter.value.id!
-                                }
-                            } : {}),
-                            ...(parameter?.value?.__typename === "LiteralValue" ? {
-                                value: {
-                                    literalValue: parameter.value.value!
-                                }
-                            } : {}),
-                            ...(parameter?.value?.__typename === "ReferenceValue" ? {
-                                referenceValue: {
-                                    dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
-                                    depth: (parameter?.value as ReferenceValue).depth!,
-                                    node: (parameter?.value as ReferenceValue).node!,
-                                    nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
-                                    referencePath: (parameter?.value as ReferenceValue).referencePath!,
-                                    scope: (parameter?.value as ReferenceValue).scope!,
-                                }
-                            } : {})
-                        }
-                    }) ?? [],
-                    runtimeFunctionId: node?.functionDefinition?.runtimeFunctionDefinition?.id!
-                }
             }) ?? [],
+            nodes: (flow?.nodes?.nodes ?? []).map(node => ({
+                id: node?.id!,
+                nextNodeId: node?.nextNodeId!,
+                functionDefinitionId: node?.functionDefinition?.id!,
+                parameters: (node?.parameters?.nodes ?? []).map(parameter => {
+                    let value
+
+                    switch (parameter?.value?.__typename) {
+                        case "NodeFunctionIdWrapper":
+                            value = { nodeFunctionId: parameter.value.id! }
+                            break
+
+                        case "LiteralValue":
+                            value = { literalValue: parameter.value.value! }
+                            break
+
+                        case "ReferenceValue": {
+                            const v = parameter.value as ReferenceValue
+                            value = {
+                                referenceValue: {
+                                    dataTypeIdentifier: getDataTypeIdentifierPayload(v.dataTypeIdentifier!),
+                                    depth: v.depth!,
+                                    node: v.node!,
+                                    nodeFunctionId: v.nodeFunctionId!,
+                                    referencePath: v.referencePath ?? [],
+                                    scope: v.scope!,
+                                },
+                            }
+                            break
+                        }
+
+                        default:
+                            value = { literalValue: null }
+                    }
+
+                    return {
+                        parameterDefinitionId: parameter?.parameterDefinition?.id!,
+                        value,
+                    }
+                }),
+            })),
             startingNodeId: flow?.startingNodeId!,
         }
     }
@@ -168,7 +178,9 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
             }
         }
 
-        this.set(index, flow)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     async addNextNodeById(flowId: Flow['id'], parentNodeId: NodeFunction['id'] | null, nextNode: NodeFunction): Promise<void> {
@@ -200,18 +212,32 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
             flow.startingNodeId = addingNode.id
         }
 
-        this.set(index, flow)
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     async setSettingValue(flowId: Flow['id'], settingIdentifier: Maybe<Scalars['String']['output']>, value: FlowSetting['value']): Promise<void> {
         const flow = this.getById(flowId)
         const index = this.values().findIndex(f => f.id === flowId)
         if (!flow) return
-        const setting = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
-        //console.log(flow, settingIdentifier, setting, value)
-        if (!setting) return //TODO if the settings is not found create it
-        setting.value = value
-        this.set(index, flow)
+
+        flow.editedAt = new Date().toISOString()
+
+        const setting: Maybe<FlowSetting> | undefined = flow.settings?.nodes?.find(s => s?.flowSettingIdentifier === settingIdentifier)
+
+        if (!setting) {
+            const localSetting = {
+                flowSettingIdentifier: settingIdentifier,
+                value: null
+            }
+            localSetting.value = value
+            flow.settings!.nodes!.push(localSetting)
+        } else {
+            setting.value = value
+        }
+
+        this.set(index, new View(flow))
     }
 
     async setParameterValue(flowId: Flow['id'], nodeId: NodeFunction['id'], parameterId: NodeParameter['id'], value?: LiteralValue | ReferenceValue | NodeFunction): Promise<void> {
@@ -237,7 +263,10 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         } else {
             parameter.value = value as LiteralValue | ReferenceValue
         }
-        this.set(index, flow)
+
+        flow.editedAt = new Date().toISOString()
+
+        this.set(index, new View(flow))
     }
 
     abstract flowCreate(payload: NamespacesProjectsFlowsCreateInput): Promise<NamespacesProjectsFlowsCreatePayload | undefined>

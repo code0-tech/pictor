@@ -1,4 +1,4 @@
-import {Maybe, Scalars, Translation} from "@code0-tech/sagittarius-graphql-types";
+import {Maybe, type NodeParameter, Scalars, Translation} from "@code0-tech/sagittarius-graphql-types";
 import {CSSProperties} from "react";
 
 export enum InspectionSeverity {
@@ -10,7 +10,7 @@ export enum InspectionSeverity {
 }
 
 export interface ValidationResult {
-    parameterId: Maybe<Scalars["ParameterDefinitionID"]["output"]>
+    parameterId: NodeParameter['id']
     type: InspectionSeverity
     message: Array<Translation>
 }

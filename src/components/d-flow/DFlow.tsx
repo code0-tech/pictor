@@ -24,6 +24,7 @@ import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
 import {DFlowPanelControl} from "../d-flow-panel";
 import {DFlowPanelLayout} from "../d-flow-panel";
+import {DFlowPanelUpdate} from "../d-flow-panel/DFlowPanelUpdate";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -703,6 +704,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             <DFlowPanelLayout/>
             <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
             <DFlowPanelControl flowId={flowId}/>
+            <DFlowPanelUpdate flowId={flowId}/>
         </ReactFlow>
     )
 }

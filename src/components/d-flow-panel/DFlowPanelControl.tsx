@@ -9,7 +9,6 @@ import {DFlowReactiveService} from "../d-flow";
 import {Flow, NodeFunction} from "@code0-tech/sagittarius-graphql-types";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {Text} from "../text/Text";
-import {Badge} from "../badge/Badge";
 import {DFlowSuggestionMenu} from "../d-flow-suggestion/DFlowSuggestionMenu";
 import {useSuggestions} from "../d-flow-suggestion/DFlowSuggestion.hook";
 
@@ -31,7 +30,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
 
     //memoized values
     const activeTab = React.useMemo(() => {
-        return fileTabsStore.find((t: any) => (t as any).active)
+        return fileTabsService.values().find((t: any) => (t as any).active)
     }, [fileTabsStore, fileTabsService])
 
     const result = useSuggestions(flowId, activeTab?.content?.props?.node?.id as NodeFunction['id'] | undefined)
@@ -39,22 +38,22 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     //callbacks
     const deleteActiveNode = React.useCallback(() => {
         if (!activeTab) return
-        if (!(activeTab.content.props.flowId as Flow['id'])) return
+        if (!(activeTab?.content?.props?.flowId as Flow['id'])) return
         // @ts-ignore
         startTransition(async () => {
-            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab.content.props.node.id)
+            const linkedNodes = flowService.getLinkedNodesById(flowId, activeTab?.content?.props?.node.id)
             linkedNodes.forEach(node => {
                 if (node.id) fileTabsService.deleteById(node.id)
             })
 
-            await flowService.deleteNodeById((activeTab.content.props.flowId as Flow['id']), (activeTab.content.props.node.id as NodeFunction['id']))
+            await flowService.deleteNodeById((activeTab?.content?.props?.flowId as Flow['id']), (activeTab?.content?.props?.node.id as NodeFunction['id']))
         })
     }, [activeTab, flowService, flowStore])
 
     const addNodeToFlow = React.useCallback((suggestion: any) => {
-        if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab.content.props) {
+        if (flowId && suggestion.value.__typename === "NodeFunction" && "node" in activeTab!.content?.props) {
             startTransition(async () => {
-                await flowService.addNextNodeById(flowId, (activeTab.content.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
+                await flowService.addNextNodeById(flowId, (activeTab?.content?.props.node.id as NodeFunction['id']) ?? undefined, suggestion.value)
             })
         } else {
             startTransition(async () => {
@@ -65,32 +64,37 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
 
     return <Panel position={"bottom-center"}>
         <ButtonGroup>
+            {/*<Tooltip>*/}
+            {/*    <TooltipTrigger asChild>*/}
+            {/*        <Button paddingSize={"xxs"}*/}
+            {/*                variant={"filled"}*/}
+            {/*                color={"primary"}>*/}
+            {/*            Execute flow*/}
+            {/*        </Button>*/}
+            {/*    </TooltipTrigger>*/}
+            {/*    <TooltipPortal>*/}
+            {/*        <TooltipContent maw={"300px"}>*/}
+            {/*            <Text>*/}
+            {/*                To execute this flow you can call the following endpoint {" "} <br/>*/}
+            {/*                <Badge>*/}
+            {/*                    <Text>POST</Text>*/}
+            {/*                </Badge>*/}
+            {/*                <Badge color={"info"} border>*/}
+            {/*                    <Text style={{color: "inherit"}}>localhost:6212/72hsa13/users/get</Text>*/}
+            {/*                </Badge>*/}
+            {/*            </Text>*/}
+            {/*            <TooltipArrow/>*/}
+            {/*        </TooltipContent>*/}
+            {/*    </TooltipPortal>*/}
+            {/*</Tooltip>*/}
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button color={"info"} paddingSize={"xxs"} variant={"none"} aria-selected={true}>
-                        Execute flow
-                    </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent maw={"300px"}>
-                        <Text>
-                            To execute this flow you can call the following endpoint {" "} <br/>
-                            <Badge>
-                                <Text>POST</Text>
-                            </Badge>
-                            <Badge color={"info"} border>
-                                <Text style={{color: "inherit"}}>localhost:6212/72hsa13/users/get</Text>
-                            </Badge>
-                        </Text>
-                        <TooltipArrow/>
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button disabled={!activeTab || !(activeTab.content.props.flowId as Flow['id'])} onClick={deleteActiveNode} paddingSize={"xxs"} variant={"none"}
-                            color={"primary"}>
-                        <IconTrash size={16}/>
+                    <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}
+                            onClick={deleteActiveNode}
+                            paddingSize={"xxs"}
+                            variant={"filled"}
+                            color={"error"}>
+                        <Text>Delete node</Text>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
@@ -103,10 +107,11 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
             <DFlowSuggestionMenu suggestions={result}
                                  onSuggestionSelect={addNodeToFlow}
                                  triggerContent={
-                                     <Button disabled={!activeTab} paddingSize={"xxs"} variant={"none"}
-                                             color={"primary"}>
-                                         <IconPlus size={16}/>
-                                         Next node
+                                     <Button disabled={!activeTab}
+                                             paddingSize={"xxs"}
+                                             variant={"filled"}
+                                             color={"secondary"}>
+                                         <Text>Add next node</Text>
                                      </Button>
                                  }/>
         </ButtonGroup>

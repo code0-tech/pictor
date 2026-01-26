@@ -1,11 +1,10 @@
 import React from "react"
 import type {
     Flow,
-    Maybe,
     NodeFunction,
     NodeFunctionIdWrapper,
-    NodeParameterValue,
-    Scalars
+    NodeParameter,
+    NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types"
 import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type"
 import {InspectionSeverity, useService, useStore, ValidationResult} from "../../utils"
@@ -36,7 +35,7 @@ const resolveDataTypeWithGenerics = (
     )
 
 const errorResult = (
-    parameterId: Maybe<Scalars["ParameterDefinitionID"]["output"]>,
+    parameterId: NodeParameter['id'],
     expected?: DataTypeView,
     actual?: DataTypeView
 ): ValidationResult => ({
@@ -90,6 +89,7 @@ export const useNodeValidation = (
         for (let i = 0; i < parameters.length; i++) {
             const parameter = parameters[i]
             const value = values[i]
+            const nodeParameter = node?.parameters?.nodes?.find(p => p?.parameterDefinition?.id === parameter.id)
             if (!value) continue
 
             const expectedType = parameter.dataTypeIdentifier
@@ -99,7 +99,7 @@ export const useNodeValidation = (
             const valueDT = dataTypeService.getDataType(valueType!!)
 
             if (!expectedDT || !valueDT) {
-                errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
+                errors.push(errorResult(nodeParameter?.id, expectedDT, valueDT))
                 continue
             }
 
@@ -132,7 +132,7 @@ export const useNodeValidation = (
             }
 
             if (!isValid) {
-                errors.push(errorResult(parameter.id!!, expectedDT, valueDT))
+                errors.push(errorResult(nodeParameter?.id, expectedDT, valueDT))
             }
         }
 

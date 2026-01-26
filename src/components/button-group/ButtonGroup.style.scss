@@ -8,17 +8,34 @@
   background: transparent;
   position: relative;
   display: flex;
-  padding: variables.$xxs;
+  padding: variables.$xxs / 2;
   gap: variables.$xxs;
 
   & {
-    @include box.box(variables.$primary);
+    @include box.box(variables.$secondary);
     @include helpers.borderRadius();
+    border-width: 0;
   }
 
   .button {
     display: inline-flex;
     height: 100%;
+    border-radius: variables.$borderRadius - (variables.$xxs / 2);
   }
+
+  &__first, &__item {
+    position: relative;
+    &:after {
+      content: '';
+      position: absolute;
+      top: 25%;
+      bottom: 0;
+      right: -1 * (variables.$xxs / 2);
+      height: 50%;
+      width: 1px;
+      background: helpers.borderColor();
+    }
+  }
+
 
 }

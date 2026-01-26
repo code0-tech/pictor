@@ -7,9 +7,7 @@ import {isMatchingType, replaceGenericsAndSortType, resolveType} from "../../uti
 import type {
     DataTypeIdentifier,
     LiteralValue,
-    Maybe,
     NodeFunction,
-    NodeParameter,
     ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types";
 
@@ -33,7 +31,7 @@ export const useFunctionSuggestions = (
     return React.useMemo(() => {
         const matchingFunctions = functionService.values().filter(funcDefinition => {
             if (!dataTypeIdentifier || !resolvedType) return true
-            if (funcDefinition.runtimeFunctionDefinition?.identifier == "std::control::return" && dataTypeIdentifier) return false
+            if (funcDefinition.runtimeFunctionDefinition?.identifier == "std::control::return") return false
             if (dataType?.variant === "NODE") return true
             if (!funcDefinition.returnType) return false
             if (!funcDefinition.genericKeys) return false
@@ -61,14 +59,14 @@ export const useFunctionSuggestions = (
                     runtimeFunctionDefinition: funcDefinition.runtimeFunctionDefinition
                 },
                 parameters: {
-                    nodes: (funcDefinition.parameterDefinitions?.map(definition => {
+                    nodes: (funcDefinition.parameterDefinitions?.map((definition, index) => {
                         return {
-                            id: definition.id,
-                            runtimeParameter: {
+                            id: `gid://sagittarius/NodeParameter/${index}`,
+                            parameterDefinition: {
                                 id: definition.id
                             }
                         }
-                    }) ?? []) as Maybe<Array<Maybe<NodeParameter>>>
+                    }) ?? [])
                 }
             }
 
@@ -79,5 +77,5 @@ export const useFunctionSuggestions = (
                 value: nodeFunctionSuggestion,
             }
         })
-    }, [dataType, dataTypeIdentifier, dataTypeService, functionService, functionStore, resolvedType])
+    }, [dataType, dataTypeIdentifier, dataTypeService, functionService, functionStore, resolvedType, dataTypeStore])
 }

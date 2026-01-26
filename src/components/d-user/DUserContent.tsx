@@ -3,7 +3,7 @@ import {User} from "@code0-tech/sagittarius-graphql-types";
 import {Flex} from "../flex/Flex";
 import {Avatar} from "../avatar/Avatar";
 import {useUserSession} from "./DUser.session.hook";
-import {useService} from "../../utils";
+import {useService, useStore} from "../../utils";
 import {DUserReactiveService} from "./DUser.service";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
@@ -25,20 +25,21 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
     } = props
 
     const userService = useService(DUserReactiveService)
+    const userStore = useStore(DUserReactiveService)
     const currentSession = useUserSession()
     const [remove, setRemove] = React.useState(false)
-    const user = React.useMemo(() => userService.getById(userId)!, [userService, userId])
-    const isCurrentUser = currentSession?.user?.id === user.id
+    const user = React.useMemo(() => userService.getById(userId), [userStore, userId])
+    const isCurrentUser = React.useMemo(() => currentSession?.user?.id === user?.id, [currentSession, user])
 
     return <Flex justify={"space-between"} align={"center"}>
         <Flex style={{gap: ".7rem"}} align={"center"}>
-            <Avatar identifier={user.username!!} bg={"transparent"}/>
+            <Avatar identifier={user?.username!!} bg={"transparent"}/>
             <Flex style={{gap: ".35rem", flexDirection: "column"}}>
                 <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <Text size={"md"} hierarchy={"primary"}>{user.username}</Text>
-                    {user.admin ? <Badge color={"secondary"}>Owner</Badge> : null}
+                    <Text size={"md"} hierarchy={"primary"}>{user?.username}</Text>
+                    {user?.admin ? <Badge color={"secondary"}>Owner</Badge> : null}
                 </Flex>
-                <Text size={"sm"} hierarchy={"tertiary"}>{user.email}</Text>
+                <Text size={"sm"} hierarchy={"tertiary"}>{user?.email}</Text>
             </Flex>
         </Flex>
         <Flex style={{gap: "1.3rem"}} align={"center"}>
@@ -56,7 +57,7 @@ export const DUserContent: React.FC<DUserContentProps> = (props) => {
                             <Flex align={"center"} style={{gap: "0.35rem"}}>
                                 <Button variant={"filled"} color={"error"} onClick={(event) => {
                                     event.stopPropagation()
-                                    onRemove(user)
+                                    user && onRemove(user)
                                 }}>
                                     Confirm remove
                                 </Button>

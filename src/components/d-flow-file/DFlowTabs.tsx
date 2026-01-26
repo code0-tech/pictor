@@ -42,15 +42,15 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
 
     const triggerTab = React.useMemo(() => {
         if (!flowType?.id) return undefined
-        return fileTabsStore.find((tab: FileTabsView) => tab.id === flowType.id)
+        return fileTabsService.values().find((tab: FileTabsView) => tab.id === flowType.id)
     }, [fileTabsStore, flowType])
 
     const visibleTabs = React.useMemo(() => {
-        return fileTabsStore.filter((tab: FileTabsView) => tab.show)
+        return fileTabsService.values().filter((tab: FileTabsView) => tab.show)
     }, [fileTabsStore, triggerTab])
 
     const hiddenTabs = React.useMemo(() => {
-        return fileTabsStore.filter((tab: FileTabsView) => !tab.show && tab.id !== triggerTab?.id)
+        return fileTabsService.values().filter((tab: FileTabsView) => !tab.show && tab.id !== triggerTab?.id)
     }, [fileTabsStore, triggerTab])
 
     React.useEffect(() => {
@@ -189,11 +189,13 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                     </FileTabsTrigger>
                 })}
             </FileTabsList>}>
-                {fileTabsStore.map((tab: FileTabsView) => (
-                    <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
-                        {tab.content}
-                    </FileTabsContent>
-                ))}
+                <>
+                    {fileTabsService.values().map((tab: FileTabsView) => (
+                        <FileTabsContent key={`content-${tab.id}`} value={tab.id!}>
+                            {tab.content}
+                        </FileTabsContent>
+                    ))}
+                </>
             </DLayout>
         </FileTabs>
     );

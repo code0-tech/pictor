@@ -37,7 +37,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
     const definition = React.useMemo(() => node ? functionService.getById(node.functionDefinition?.id!!) : undefined, [functionStore, data, node])
     const validation = useNodeValidation(data.nodeId, data.flowId)
     const activeTabId = React.useMemo(() => {
-        return fileTabsStore.find((t: any) => (t as any).active)?.id
+        return fileTabsService.getActiveTab()?.id
     }, [fileTabsStore, fileTabsService]);
 
     const firstItem = useStore((s) => {

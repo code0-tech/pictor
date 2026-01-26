@@ -88,7 +88,8 @@ export const Dashboard = () => {
         },
         nodes: {
             nodes: []
-        }
+        },
+        updatedAt: "1769364427",
     }, {
         id: "gid://sagittarius/Flow/2",
         type: {

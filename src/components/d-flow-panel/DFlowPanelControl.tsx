@@ -94,8 +94,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                             paddingSize={"xxs"}
                             variant={"filled"}
                             color={"error"}>
-                        <IconTrash size={13}/>
-                        <Text>Delete</Text>
+                        <Text>Delete node</Text>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
@@ -112,8 +111,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                                              paddingSize={"xxs"}
                                              variant={"filled"}
                                              color={"secondary"}>
-                                         <IconPlus size={13}/>
-                                         <Text>Next node</Text>
+                                         <Text>Add next node</Text>
                                      </Button>
                                  }/>
         </ButtonGroup>

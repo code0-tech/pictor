@@ -42,7 +42,7 @@ export class ReactiveArrayService<T extends Payload, D = Record<string, any>> im
     }
 
     get(index: number) {
-        return this.access.getState()[index].payload;
+        return this.access.getState()[index]?.payload;
     }
 
     values(_dependencies?: D) {

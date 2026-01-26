@@ -1,12 +1,10 @@
 import {FileTabsView} from "./FileTabs.view";
-import {ReactiveArrayService, ReactiveArrayStore} from "../../utils/reactiveArrayService";
-import {startTransition} from "react";
+import {ReactiveArrayService} from "../../utils/reactiveArrayService";
+import {View} from "../../utils/view";
 
 export class FileTabsService extends ReactiveArrayService<FileTabsView> {
 
-    constructor(store: ReactiveArrayStore<FileTabsView>) {
-        super(store);
-    }
+    private i = 0
 
     getById(id: string): FileTabsView | undefined {
         return this.values().find((item: FileTabsView) => item.id === id)
@@ -16,7 +14,7 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         const index = this.getActiveIndex()
         this.access.getState().forEach((tab, indexTab) => {
             if (indexTab >= index) return
-            this.removeTabById(tab.id!)
+            this.removeTabById(tab.payload.id!)
         })
     }
 
@@ -24,7 +22,7 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         const index = this.getActiveIndex()
         this.access.getState().forEach((tab, indexTab) => {
             if (indexTab <= index) return
-            this.removeTabById(tab.id!)
+            this.removeTabById(tab.payload.id!)
         })
     }
 
@@ -32,13 +30,13 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
         const index = this.getActiveIndex()
         this.access.getState().forEach((tab, indexTab) => {
             if (indexTab == index) return
-            this.removeTabById(tab.id!)
+            this.removeTabById(tab.payload.id!)
         })
     }
 
     public clearAll(): void {
         this.access.getState().forEach((tab) => {
-            this.removeTabById(tab.id!)
+            this.removeTabById(tab.payload.id!)
         })
     }
 
@@ -81,44 +79,41 @@ export class FileTabsService extends ReactiveArrayService<FileTabsView> {
             this.activateTab(this.get(index + 1).id!!)
         }
 
-        if (tab) this.access.setState(prev => prev.filter((tab) => tab.id !== id))
+        if (tab) this.access.setState(prev => prev.filter((tab) => tab.payload.id !== id))
     }
 
     registerTab(value: FileTabsView) {
+
         const nextValue = {...value, show: value.show ?? false}
+        const tabAlreadyExist = !!this.values().find((tab) => tab.id === nextValue.id)
 
-        startTransition(() => {
-            this.access.setState((prevState) => {
-                const existingIndex = prevState.findIndex((tab) => tab.id === nextValue.id)
+        if (tabAlreadyExist) return
 
-                if (existingIndex !== -1) return prevState
-
-                return [...prevState, nextValue]
-            })
-        })
+        this.add(new View(nextValue))
     }
 
-    public add(value: FileTabsView) {
-        const nextValue = {...value, show: value.show ?? true}
+    public add(value: View<FileTabsView>) {
 
-        startTransition(() => {
-            this.access.setState((prevState) => {
-                const existingIndex = prevState.findIndex((tab) => tab.id === nextValue.id)
-                const nextState = prevState.map((tab) => ({...tab, active: nextValue.active ? false : tab.active}))
 
-                if (existingIndex !== -1) {
-                    nextState[existingIndex] = {
-                        ...nextState[existingIndex],
-                        ...nextValue,
-                        active: nextValue.active ?? nextState[existingIndex].active,
-                        show: nextValue.show ?? nextState[existingIndex].show,
-                    }
-                    return nextState
+        const nextValue: FileTabsView = {...value.payload, show: value.payload.show ?? true}
+
+        this.access.setState((prevState) => {
+            const existingIndex = prevState.findIndex((tab) => tab.payload.id === nextValue.id)
+            const nextState: FileTabsView[] = prevState.map((tab) => ({...tab.payload, active: nextValue.active ? false : tab.payload.active}))
+
+            if (existingIndex !== -1) {
+                nextState[existingIndex] = {
+                    ...nextState[existingIndex],
+                    ...nextValue,
+                    active: nextValue.active ?? nextState[existingIndex].active,
+                    show: nextValue.show ?? nextState[existingIndex].show,
                 }
+                return [...nextState.map(tab => new View(tab))]
+            }
 
-                return [...nextState, nextValue]
-            })
+            return [...nextState.map(tab => new View(tab)), new View(nextValue)]
         })
+
     }
 
     public getActiveTab(): FileTabsView | undefined {

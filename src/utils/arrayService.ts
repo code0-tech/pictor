@@ -1,10 +1,10 @@
-export interface ArrayService<T, D = Record<string, any>> {
+export interface ArrayService<I, R, D = Record<string, any>> {
     delete(index: number): void
-    add(index: T): void
-    set(index: number, value: T): void
+    add(index: I): void
+    set(index: number, value: I): void
     has(index: number): boolean
-    get(index: number): T
-    values(dependencies?: D): T[]
+    get(index: number): R
+    values(dependencies?: D): R[]
     update(): void
     clear(): void
 }

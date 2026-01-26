@@ -108,45 +108,47 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                     value: setting?.value!,
                 }
             }) ?? [],
-            nodes: flow?.nodes?.nodes?.map(node => {
-                return {
-                    id: node?.id!,
-                    nextNodeId: node?.nextNodeId!,
-                    parameters: node?.parameters?.nodes?.map(parameter => {
-                        return {
-                            parameterDefinitionId: parameter?.parameterDefinition?.id!,
-                            ...(parameter?.value?.__typename === "NodeFunctionIdWrapper" ? {
-                                value: {
-                                    nodeFunctionId: parameter.value.id!
-                                }
-                            } : {}),
-                            ...(parameter?.value?.__typename === "LiteralValue" ? {
-                                value: {
-                                    literalValue: parameter.value.value!
-                                }
-                            } : {}),
-                            ...(parameter?.value?.__typename === "ReferenceValue" ? {
-                                value: {
-                                    referenceValue: {
-                                        dataTypeIdentifier: getDataTypeIdentifierPayload((parameter?.value as ReferenceValue).dataTypeIdentifier!),
-                                        depth: (parameter?.value as ReferenceValue).depth!,
-                                        node: (parameter?.value as ReferenceValue).node!,
-                                        nodeFunctionId: (parameter?.value as ReferenceValue).nodeFunctionId!,
-                                        referencePath: (parameter?.value as ReferenceValue).referencePath ?? [],
-                                        scope: (parameter?.value as ReferenceValue).scope!,
-                                    }
-                                }
-                            } : {}),
-                            ...(!parameter?.value ? {
-                                value: {
-                                    literalValue: null
-                                }
-                            } : {})
+            nodes: (flow?.nodes?.nodes ?? []).map(node => ({
+                id: node?.id!,
+                nextNodeId: node?.nextNodeId!,
+                functionDefinitionId: node?.functionDefinition?.id!,
+                parameters: (node?.parameters?.nodes ?? []).map(parameter => {
+                    let value
+
+                    switch (parameter?.value?.__typename) {
+                        case "NodeFunctionIdWrapper":
+                            value = { nodeFunctionId: parameter.value.id! }
+                            break
+
+                        case "LiteralValue":
+                            value = { literalValue: parameter.value.value! }
+                            break
+
+                        case "ReferenceValue": {
+                            const v = parameter.value as ReferenceValue
+                            value = {
+                                referenceValue: {
+                                    dataTypeIdentifier: getDataTypeIdentifierPayload(v.dataTypeIdentifier!),
+                                    depth: v.depth!,
+                                    node: v.node!,
+                                    nodeFunctionId: v.nodeFunctionId!,
+                                    referencePath: v.referencePath ?? [],
+                                    scope: v.scope!,
+                                },
+                            }
+                            break
                         }
-                    }) ?? [],
-                    functionDefinitionId: node?.functionDefinition?.id!
-                }
-            }) ?? [],
+
+                        default:
+                            value = { literalValue: null }
+                    }
+
+                    return {
+                        parameterDefinitionId: parameter?.parameterDefinition?.id!,
+                        value,
+                    }
+                }),
+            })),
             startingNodeId: flow?.startingNodeId!,
         }
     }

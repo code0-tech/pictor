@@ -76,7 +76,7 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
         return this.getById(flowId)?.nodes?.nodes?.find(node => node?.id === nodeId)!!
     }
 
-    getPayloadById(flowId: Flow['id']): FlowInput | undefined {
+    getPayloadById(flowId: Flow['id']): FlowInput {
         const flow = this.getById(flowId)
 
         const getDataTypeIdentifierPayload = (identifier: DataTypeIdentifier): DataTypeIdentifierInput => {

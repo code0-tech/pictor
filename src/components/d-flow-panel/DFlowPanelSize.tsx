@@ -32,11 +32,11 @@ export const DFlowPanelSize: React.FC = () => {
         <Flex align="center" style={{gap: ".35rem"}}>
             <ButtonGroup>
                 <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => zoomIn()}><IconPlus size={15}/></Button>
+                        onClick={() => zoomIn()}><IconPlus size={13}/></Button>
                 <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => zoomOut()}><IconMinus size={15}/></Button>
+                        onClick={() => zoomOut()}><IconMinus size={13}/></Button>
                 <Button style={{border: "none"}} paddingSize={"xxs"} color={"secondary"}
-                        onClick={() => center()}><IconFocusCentered size={15}/></Button>
+                        onClick={() => center()}><IconFocusCentered size={13}/></Button>
             </ButtonGroup>
             <Badge color={"primary"} style={{border: "none"}}>
                 <Text>{getCurrentZoomInPercent()}%</Text>

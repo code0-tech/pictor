@@ -7,7 +7,7 @@ export type ReactiveArrayStore<T> = {
     setState: React.Dispatch<React.SetStateAction<T[]>>;
 };
 
-export class ReactiveArrayService<T extends Payload, D = Record<string, any>> implements ArrayService<View<T>, D> {
+export class ReactiveArrayService<T extends Payload, D = Record<string, any>> implements ArrayService<View<T>, T, D> {
     protected readonly access: ReactiveArrayStore<View<T>>;
 
     constructor(access: ReactiveArrayStore<View<T>>) {
@@ -42,11 +42,11 @@ export class ReactiveArrayService<T extends Payload, D = Record<string, any>> im
     }
 
     get(index: number) {
-        return this.access.getState()[index];
+        return this.access.getState()[index].payload;
     }
 
-    values(_dependencies?: D): View<T>[] {
-        return this.access.getState();
+    values(_dependencies?: D) {
+        return this.access.getState().map(view => view.payload)
     }
 
     update() {
@@ -62,53 +62,57 @@ export class ReactiveArrayService<T extends Payload, D = Record<string, any>> im
     }
 }
 
-type ArrayServiceCtor<K, S extends ArrayService<K>> =
-    new (access: ReactiveArrayStore<K>) => S;
+type ArrayServiceCtor<I, R, S extends ArrayService<I, R>> =
+    new (access: ReactiveArrayStore<I>) => S
 
-type InitialArg<K, S extends ArrayService<K>> = K[] | ((svc: S) => K[]);
+type InitialArg<R> = R[]
 
-export function useReactiveArrayService<K, S extends ArrayService<K>>(
-    Ctor: ArrayServiceCtor<K, S> | ((store: ReactiveArrayStore<K>) => S),
-    initial: InitialArg<K, S> = []
-): [K[], S] {
-    const [state, setState] = React.useState<K[]>(
-        Array.isArray(initial) ? initial : []
-    );
+export function useReactiveArrayService<
+    R extends Payload,
+    S extends ArrayService<View<R>, R>
+>(
+    Ctor: ArrayServiceCtor<View<R>, R, S> | ((store: ReactiveArrayStore<View<R>>) => S),
+    initial: InitialArg<R> = []
+): [View<R>[], S] {
 
-    const ref = React.useRef(state);
-    React.useEffect(() => {
-        ref.current = state;
-    }, [state]);
+    const [state, setState] = React.useState<View<R>[]>([])
+    const stateRef = React.useRef<View<R>[]>([])
 
-    const getState = React.useCallback(() => ref.current, []);
+    stateRef.current = state
+
+    const getState = React.useCallback(() => stateRef.current, [])
 
     const service = React.useMemo(() => {
-        const store = {getState, setState};
+        const store: ReactiveArrayStore<View<R>> = { getState, setState }
 
-        const handler = {
-            construct() {
-                return handler
-            }
-        }
-
+        const handler = { construct: () => handler }
         const isConstructor = (x: any) => {
             try {
-                return !!(new (new Proxy(x, handler))())
-            } catch (e) {
+                return !!new (new Proxy(x, handler))()
+            } catch {
                 return false
             }
         }
 
         return isConstructor(Ctor)
-            ? new (Ctor as ArrayServiceCtor<K, S>)(store) // Klasse → mit new
-            : (Ctor as (store: ReactiveArrayStore<K>) => S)(store); // Factory → direkt aufrufen
-    }, [Ctor, getState, setState]);
+            ? new (Ctor as ArrayServiceCtor<View<R>, R, S>)(store)
+            : (Ctor as (store: ReactiveArrayStore<View<R>>) => S)(store)
+    }, [Ctor, getState])
 
+    const createView = React.useCallback((payload: R): View<R> => {
+        return new View(payload)
+    }, [])
+
+    const didInit = React.useRef(false)
     React.useEffect(() => {
-        if (typeof initial === "function") {
-            setState((initial as (svc: S) => K[])(service));
-        }
-    }, [service, initial]);
+        if (didInit.current) return
+        didInit.current = true
 
-    return [state, service];
+        service.clear()
+        initial.forEach((raw) => {
+            service.add(createView(raw))
+        })
+    }, [service, initial, createView])
+
+    return [state, service]
 }

@@ -4,8 +4,13 @@ import type {
     ApplicationSettingsUpdateInput,
     ApplicationSettingsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
+import {Payload} from "../../utils/view";
 
-export abstract class DApplicationService extends ReactiveArrayService<Application> {
+interface App extends Payload, Application{
+
+}
+
+export abstract class DApplicationService extends ReactiveArrayService<App> {
 
     abstract settingsUpdate(payload: ApplicationSettingsUpdateInput): Promise<ApplicationSettingsUpdatePayload | undefined>;
 

@@ -116,7 +116,7 @@ export const DFlowInputDefault: React.FC<DFlowInputDefaultProps> = (props) => {
 
     const transformSyntax = React.useCallback((value: string): InputSyntaxSegment[] => {
 
-        const textValue = String(value ?? "")
+        const textValue = value === null || value === undefined ? value : String(value ?? "")
         let cursor = 0
 
         const buildTextSegment = (text: string): InputSyntaxSegment => {

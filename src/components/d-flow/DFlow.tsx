@@ -3,12 +3,14 @@ import {
     Background,
     BackgroundVariant,
     Edge,
-    Node, Panel,
+    Node,
     ReactFlow,
     ReactFlowProvider,
     useEdgesState,
     useNodesState,
-    useUpdateNodeInternals
+    useReactFlow,
+    useUpdateNodeInternals,
+    ViewportPortal
 } from "@xyflow/react";
 import React from "react";
 import '@xyflow/react/dist/style.css';
@@ -17,16 +19,16 @@ import {DFlowNodeDefaultCard} from "../d-flow-node/DFlowNodeDefaultCard";
 import {DFlowNodeGroupCard} from "../d-flow-node/DFlowNodeGroupCard";
 import {DFlowNodeTriggerCard} from "../d-flow-node/DFlowNodeTriggerCard";
 import {DFlowEdge} from "./DFlowEdge";
-import {DFlowPanelSize} from "../d-flow-panel";
+import {DFlowPanelControl, DFlowPanelLayout, DFlowPanelSize} from "../d-flow-panel";
 import {DFlowValidation} from "../d-flow-validation";
 import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {useFlowNodes} from "./DFlow.nodes.hook";
 import {useFlowEdges} from "./DFlow.edges.hook";
-import {DFlowPanelControl} from "../d-flow-panel";
-import {DFlowPanelLayout} from "../d-flow-panel";
 import {DFlowPanelUpdate} from "../d-flow-panel/DFlowPanelUpdate";
-import {Button} from "../button/Button";
-import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Text} from "../text/Text";
+import {LineWobble} from 'ldrs/react'
+import 'ldrs/react/LineWobble.css'
+import {Spacing} from "../spacing/Spacing";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -612,8 +614,8 @@ export const DFlow: React.FC<DFlowProps> = (props) => {
 }
 
 const InternalDFlow: React.FC<DFlowProps> = (props) => {
+    const {flowId, namespaceId, projectId, ...rest} = props
 
-    const {flowId, namespaceId, projectId} = props
     const nodeTypes = React.useMemo(() => ({
         default: DFlowNodeDefaultCard,
         group: DFlowNodeGroupCard,
@@ -626,9 +628,15 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     const initialNodes = useFlowNodes(flowId, namespaceId, projectId)
     const initialEdges = useFlowEdges(flowId, namespaceId, projectId)
+
     const [nodes, setNodes] = useNodesState<Node>([])
     const [edges, setEdges, edgeChangeEvent] = useEdgesState<Edge>([])
+    const [showTree, setShowTree] = React.useState<boolean>(false)
+
     const updateNodeInternals = useUpdateNodeInternals()
+
+    const {fitView} = useReactFlow()
+    const didFitViewRef = React.useRef(false)
 
     const revalidateHandles = React.useCallback((ids: string[]) => {
         requestAnimationFrame(() => {
@@ -688,26 +696,110 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
 
     }, [initialNodes, initialEdges, revalidateHandles])
 
+    React.useEffect(() => {
+        if (didFitViewRef.current) return
+        if (nodes.length <= 0) return
+
+        didFitViewRef.current = true
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                setTimeout(async () => {
+                    await fitView({
+                        padding: "64px",
+                        maxZoom: 1
+                    })
+                    setShowTree(true)
+                }, 1000)
+            })
+        })
+    }, [nodes, didFitViewRef])
+
     return (
         <ReactFlow
             onlyRenderVisibleElements
             panOnScroll={false}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            onInit={(rf) => rf.fitView()}
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
-            {...mergeCode0Props("flow", props)}
+            {...mergeCode0Props("flow", rest)}
+            data-tree-visibility={showTree}
             proOptions={{hideAttribution: true}}
             nodes={nodes}
             edges={edges}
+            panOnDrag={showTree}
+            zoomOnScroll={showTree}
+            zoomOnPinch={showTree}
+            zoomOnDoubleClick={showTree}
         >
-            <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
-            <DFlowPanelSize/>
-            <DFlowPanelLayout/>
-            <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
-            <DFlowPanelControl flowId={flowId}/>
-            <DFlowPanelUpdate flowId={flowId}/>
+
+            {!showTree ? (
+                <ViewportPortal>
+                    <div style={{
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%, -50%)",
+                        position: 'absolute',
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexDirection: "column"
+                    }}>
+                        <LineWobble
+                            size="200"
+                            stroke="5"
+                            bgOpacity="0.5"
+                            speed="2"
+                            color="rgba(255, 255, 255, 0.15)"
+                        />
+                        <Spacing spacing={"xl"}/>
+                        <LoadingFlowText/>
+                        <Spacing spacing={"xs"}/>
+                        <Text hierarchy={"tertiary"} style={{
+                            margin: "0 20%",
+                            textAlign: "center"
+                        }}>
+                            We are running requests to prepare your flow. This may take a few moments.
+                        </Text>
+                    </div>
+                </ViewportPortal>
+            ) : null}
+            {showTree ? (
+                <>
+                    <Background variant={BackgroundVariant.Dots} color="rgba(255,255,255, .05)" gap={8} size={2}/>
+                    <DFlowPanelSize/>
+                    <DFlowPanelLayout/>
+                    <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
+                    <DFlowPanelControl flowId={flowId}/>
+                    <DFlowPanelUpdate flowId={flowId}/>
+                </>
+            ) : null}
         </ReactFlow>
+    )
+}
+
+const LoadingFlowText: React.FC = () => {
+
+    const [index, setIndex] = React.useState(0)
+
+    const loadingTexts = [
+        "Preparing flow data",
+        "Loading node and edge definitions",
+        "Calculating perfect layout"
+    ]
+
+    React.useEffect(() => {
+        const id = setInterval(() => {
+            setIndex(i => (i + 1) % loadingTexts.length)
+        }, 2000)
+
+        return () => clearInterval(id)
+    }, [])
+
+    return (
+        <Text size="md">
+            {loadingTexts[index]}
+        </Text>
     )
 }

@@ -17,6 +17,8 @@
     @include box.boxActive(variables.$primary, variables.$white, variables.$white);
     @include helpers.fontStyle();
     @include helpers.borderRadius();
+    box-shadow: inset 0 1px 1px 0 rgba(variables.$white, .1);
+    border: none;
   }
 
   &:has(&__control:focus),
@@ -26,6 +28,7 @@
 
   &--not-valid {
     @include box.box(variables.$error, variables.$white, variables.$error);
+    border: none;
   }
 
   &__left, &__right {

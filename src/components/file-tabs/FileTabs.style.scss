@@ -41,23 +41,22 @@
     text-wrap: nowrap;
     margin-bottom: 1px;
     cursor: pointer;
+    margin-top: 2px;
 
     & {
       @include box.box(variables.$primary);
       @include box.boxHover(variables.$primary, variables.$primary, variables.$primary);
       @include helpers.borderRadius();
       @include helpers.fontStyle();
-      background: transparent;
       border: none;
+
       &:after {
-        position: absolute;
         content: "";
-        height: 75%;
-        width: 100%;
-        left: variables.$xxs;
-        top: 50%;
-        transform: translateY(-50%);
-        border-right: 1px solid helpers.borderColor();
+        position: absolute;
+        inset: -1px;
+        pointer-events: none;
+        border-radius: variables.$borderRadius;
+        background: linear-gradient(helpers.backgroundColor(variables.$secondary, 3), helpers.backgroundColor(variables.$primary, 1));
         z-index: -1;
       }
     }

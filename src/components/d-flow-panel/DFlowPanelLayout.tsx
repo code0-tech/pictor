@@ -13,8 +13,14 @@ export const DFlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
 
     const {} = props
 
+    const [value, setValue] = React.useState("horizontal");
+
     return <Panel position={"top-center"}>
-        <SegmentedControl type={"single"} defaultValue={"horizontal"}>
+        <SegmentedControl type={"single"}
+                          value={value}
+                          onValueChange={(value) => {
+                              if (value) setValue(value);
+                          }}>
             <Tooltip>
                 <TooltipTrigger asChild>
                     <SegmentedControlItem value={"horizontal"} display={"flex"}>
@@ -30,7 +36,7 @@ export const DFlowPanelLayout: React.FC<DFlowPanelLayoutProps> = (props) => {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <SegmentedControlItem disabled value={"vertical"} display={"flex"}>
+                    <SegmentedControlItem value={"vertical"} display={"flex"}>
                         <IconLayoutDistributeVertical size={13}/>
                     </SegmentedControlItem>
                 </TooltipTrigger>

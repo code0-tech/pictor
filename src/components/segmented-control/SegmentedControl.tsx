@@ -8,7 +8,10 @@ type SegmentedControlProps = Code0ComponentProps & ToggleGroupSingleProps
 type SegmentedControlItemProps = Code0ComponentProps & ToggleGroupItemProps
 
 export const SegmentedControl: React.FC<SegmentedControlProps> = (props) => {
-    return <Root {...mergeCode0Props("segmented-control", props) as SegmentedControlProps}/>
+    return <Root {...mergeCode0Props("segmented-control", props) as SegmentedControlProps}>
+        {props.children}
+        <div className={"segmented-control__bubble"}/>
+    </Root>
 }
 
 export const SegmentedControlItem: React.FC<SegmentedControlItemProps> = (props) => {

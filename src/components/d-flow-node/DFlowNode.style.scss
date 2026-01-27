@@ -3,6 +3,7 @@
 @use "../../styles/box";
 
 .d-flow-node {
+  border: none;
   &__handle {
     border: none !important;
     padding: 1px;
@@ -20,6 +21,16 @@
       @include helpers.borderRadius();
       position: absolute;
     }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    border-radius: variables.$borderRadius;
+    background: linear-gradient(helpers.backgroundColor(variables.$secondary, 2), helpers.backgroundColor(variables.$primary, 1));
+    z-index: -1;
   }
 
   &--active {

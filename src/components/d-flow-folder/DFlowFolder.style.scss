@@ -29,6 +29,10 @@
     background: variables.$primary;
   }
 
+  &:hover {
+    box-shadow: inset 0 1px 1px 0 rgba(variables.$white, .1);
+  }
+
   &[data-state=open] {
     @include box.boxActiveStyle(variables.$secondary);
     border: none;
@@ -67,6 +71,7 @@
     cursor: pointer;
     font-size: variables.$sm;
     position: relative;
+    margin: variables.$xxs 0;
 
     & {
       @include helpers.borderRadius();
@@ -80,6 +85,11 @@
     &[data-state=open], &--active {
       @include box.boxActiveStyle(variables.$secondary);
       border: none;
+      box-shadow: inset 0 1px 1px 0 rgba(variables.$white, .1);
+    }
+
+    &:hover {
+      box-shadow: inset 0 1px 1px 0 rgba(variables.$white, .1);
     }
   }
 }

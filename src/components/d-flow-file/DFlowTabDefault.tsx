@@ -98,7 +98,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                     if (!syntaxValue?.__typename) {
                         await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
                             __typename: "LiteralValue",
-                            value: parsedSyntaxValue
+                            value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
                         } : undefined);
                         continue;
                     }

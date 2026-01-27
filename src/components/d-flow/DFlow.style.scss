@@ -1,5 +1,18 @@
 .flow {
   overflow: hidden;
+
+  &[data-tree-visibility=false] {
+    .react-flow__node, .react-flow__edgelabel-renderer, .react-flow__edge {
+      opacity: 0;
+    }
+  }
+
+  &[data-tree-visibility=true] {
+    .react-flow__node, .react-flow__edgelabel-renderer, .react-flow__edge {
+      opacity: 100%;
+    }
+  }
+
   .react-flow__node {
     background: transparent;
     padding: unset;

@@ -55,7 +55,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
         sortedParameters.forEach(parameter => {
-            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" ? JSON.stringify(parameter.value?.value) : parameter.value.value) : JSON.stringify(parameter?.value)
+            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" && parameter.value?.value != null ? JSON.stringify(parameter.value?.value) : parameter.value.value) : parameter?.value != null  ? JSON.stringify(parameter?.value) : parameter?.value
         })
         return values
     }, [sortedParameters])

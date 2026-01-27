@@ -20,8 +20,8 @@ import {useDataTypeValidation} from "./DDataTypeValidation.hook"
 import {useValueValidation} from "./DValueValidation.hook"
 import {DFlowReactiveService} from "../d-flow"
 
-const isReferenceOrNode = (value: NodeParameterValue) =>
-    value.__typename === "ReferenceValue" || value.__typename === "NodeFunctionIdWrapper"
+const isReference = (value: NodeParameterValue) =>
+    value.__typename === "ReferenceValue"
 
 const isNode = (value: NodeParameterValue) =>
     value.__typename === "NodeFunctionIdWrapper"
@@ -111,21 +111,30 @@ export const useNodeValidation = (
 
             if (isGeneric) {
                 const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)
-                if (isReferenceOrNode(value)) {
+                if (isReference(value)) {
                     const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
                     isValid = useDataTypeValidation(resolvedExpectedDT, resolvedValueDT)
                 } else {
-                    isValid = useValueValidation(
-                        value,
-                        resolvedExpectedDT,
-                        dataTypeService,
-                        flow,
-                        expectedResolvedType?.genericType?.genericMappers!
-                    )
+                    console.log(value, expectedDT.variant === "NODE", isGeneric)
+
+                    if (expectedDT.variant === "NODE") {
+                        isValid = isNode(value)
+                    } else {
+                        isValid = useValueValidation(
+                            value,
+                            resolvedExpectedDT,
+                            dataTypeService,
+                            flow,
+                            expectedResolvedType?.genericType?.genericMappers!
+                        )
+                    }
+
                 }
             } else {
-                if (isReferenceOrNode(value) && expectedDT.variant !== "NODE") {
+                if (isReference(value)) {
                     isValid = useDataTypeValidation(expectedDT, valueDT)
+                } else if (expectedDT.variant === "NODE") {
+                    isValid = isNode(value)
                 } else {
                     isValid = useValueValidation(value, expectedDT, dataTypeService, flow)
                 }

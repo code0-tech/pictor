@@ -41,27 +41,7 @@ export const ContextMenuPortal: React.FC<ContextMenuPortalProps> = (props) => {
 
 export const ContextMenuContent: React.FC<ContextMenuContentProps> = (props) => {
     return <Radix.ContextMenuContent
-        align={props.align} {...mergeCode0Props(`context-menu__content context-menu__content--${props.color ?? "secondary"}`, props) as ContextMenuContentProps}>
-        <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
-            {props.children}
-        </Card>
-        <ContextMenuLabel>
-            <Flex style={{gap: ".35rem"}}>
-                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <Flex>
-                        <Badge border><IconArrowUp size={12}/></Badge>
-                        <Badge border><IconArrowDown size={12}/></Badge>
-                    </Flex>
-                    move
-                </Flex>
-                <Spacing spacing={"xxs"}/>
-                <Flex align={"center"} style={{gap: ".35rem"}}>
-                    <Badge border><IconCornerDownLeft size={12}/></Badge>
-                    select
-                </Flex>
-            </Flex>
-        </ContextMenuLabel>
-    </Radix.ContextMenuContent>
+        align={props.align} {...mergeCode0Props(`context-menu__content context-menu__content--${props.color ?? "primary"}`, props) as ContextMenuContentProps}/>
 }
 
 export const ContextMenuLabel: React.FC<ContextMenuLabelProps> = (props) => {
@@ -85,27 +65,7 @@ export const ContextMenuSubTrigger: React.FC<ContextMenuSubTriggerProps> = (prop
 }
 
 export const ContextMenuSubContent: React.FC<ContextMenuSubContentProps> = (props) => {
-    return <Radix.ContextMenuSubContent {...mergeCode0Props(`context-menu__sub-content context-menu__sub-content--${props.color ?? "secondary"}`, props) as ContextMenuSubContentProps}>
-        <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
-            {props.children}
-        </Card>
-        <ContextMenuLabel>
-            <Flex style={{gap: ".35rem"}}>
-                <Flex align={"center"} style={{gap: "0.35rem"}}>
-                    <Flex>
-                        <Badge border><IconArrowUp size={12}/></Badge>
-                        <Badge border><IconArrowDown size={12}/></Badge>
-                    </Flex>
-                    move
-                </Flex>
-                <Spacing spacing={"xxs"}/>
-                <Flex align={"center"} style={{gap: ".35rem"}}>
-                    <Badge border><IconCornerDownLeft size={12}/></Badge>
-                    select
-                </Flex>
-            </Flex>
-        </ContextMenuLabel>
-    </Radix.ContextMenuSubContent>
+    return <Radix.ContextMenuSubContent align={props.align} {...mergeCode0Props(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, props) as ContextMenuSubContentProps}/>
 }
 
 export const ContextMenuSeparator: React.FC<ContextMenuSeparatorProps> = (props) => {

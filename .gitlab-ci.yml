@@ -1,5 +1,5 @@
 build:
-  image: node:24.12.0
+  image: node:24.13.0
   stage: build
   script:
     - npm ci
@@ -8,7 +8,7 @@ build:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 storybook:build:
-  image: node:24.12.0
+  image: node:24.13.0
   stage: build
   script:
     - npm ci
@@ -29,7 +29,7 @@ storybook:build:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 test:
-  image: node:24.12.0
+  image: node:24.13.0
   stage: test
   script:
     - npm ci
@@ -38,7 +38,7 @@ test:
     - if: $C0_UPDATE_SNAPSHOTS == null
 
 .storybook:test:base:
-  image: ghcr.io/code0-tech/build-images/node-playwright:256.1-node-24.12
+  image: ghcr.io/code0-tech/build-images/node-playwright:269.1-node-24.13
   stage: test
   before_script:
     - npm ci

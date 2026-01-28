@@ -8,7 +8,8 @@ import {
     IconCircleDot,
     IconDatabase,
     IconFile,
-    IconMessageChatbot
+    IconMessageChatbot,
+    IconPlus
 } from "@tabler/icons-react";
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -36,6 +37,7 @@ import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-function";
 import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -76,7 +78,7 @@ export const Dashboard = () => {
         type: {
             id: "gid://sagittarius/FlowType/888",
         },
-        name: "de/codezero/examples/REST Flow",
+        name: "de/codezero/examples/Discord Channel Create Event Flow Example",
         settings: {
             nodes: [{
                 flowSettingIdentifier: "HTTP_URL",
@@ -126,6 +128,96 @@ export const Dashboard = () => {
         nodes: {
             nodes: []
         }
+    }, {
+        id: "gid://sagittarius/Flow/4",
+        type: {
+            id: "gid://sagittarius/FlowType/888",
+        },
+        name: "sp/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
+    }, {
+        id: "gid://sagittarius/Flow/5",
+        type: {
+            id: "gid://sagittarius/FlowType/888",
+        },
+        name: "us/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
+    }, {
+        id: "gid://sagittarius/Flow/6",
+        type: {
+            id: "gid://sagittarius/FlowType/888",
+        },
+        name: "cz/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
+    }, {
+        id: "gid://sagittarius/Flow/7",
+        type: {
+            id: "gid://sagittarius/FlowType/888",
+        },
+        name: "ens/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
+    }, {
+        id: "gid://sagittarius/Flow/8",
+        type: {
+            id: "gid://sagittarius/FlowType/888",
+        },
+        name: "ensp/codezero/examples/REST Flow",
+        settings: {
+            nodes: [{
+                flowSettingIdentifier: "HTTP_URL",
+            }, {
+                flowSettingIdentifier: "HTTP_METHOD",
+            }, {
+                flowSettingIdentifier: "HTTP_HOST",
+            }]
+        },
+        nodes: {
+            nodes: []
+        }
     }]);
     // @ts-ignore
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
@@ -144,7 +236,8 @@ export const Dashboard = () => {
                     <DResizablePanel id={"2"}>
                         <DLayout layoutGap={"0"} rightContent={
                             <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"} paddingSize={"xs"}>
+                                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
+                                        paddingSize={"xs"}>
                                     <IconFile size={16}/>
                                 </Button>
                                 <Button variant={"none"} paddingSize={"xs"}>
@@ -166,7 +259,8 @@ export const Dashboard = () => {
                         }>
                             <DResizablePanelGroup orientation={"horizontal"}>
                                 <DResizablePanel id={"2"}>
-                                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
+                                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                           projectId={undefined}/>
                                 </DResizablePanel>
                                 {show && (
                                     <>
@@ -193,15 +287,25 @@ const Folder = () => {
     const ref = React.useRef<DFlowFolderHandle>(null)
 
     return <DLayout layoutGap={"0"} topContent={
-        <Flex style={{gap: "0.35rem"}} align={"center"} justify={"space-between"} p={0.7}>
-            <Button paddingSize={"xxs"} color={"success"}>
-                <Text>Create new flow</Text>
-            </Button>
-            <Flex style={{gap: "0.35rem"}}>
+        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"} p={0.7}>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant={"filled"} paddingSize={"xxs"}>
+                        <IconPlus size={13}/>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipPortal>
+                    <TooltipContent>
+                        <Text>Add new flow</Text>
+                        <TooltipArrow/>
+                    </TooltipContent>
+                </TooltipPortal>
+            </Tooltip>
+            <ButtonGroup>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
-                            <IconCircleDot size={12}/>
+                            <IconCircleDot size={13}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -214,7 +318,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
-                            <IconArrowsMinimize size={12}/>
+                            <IconArrowsMinimize size={13}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -227,7 +331,7 @@ const Folder = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
-                            <IconArrowsMaximize size={12}/>
+                            <IconArrowsMaximize size={13}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
@@ -237,16 +341,15 @@ const Folder = () => {
                         </TooltipContent>
                     </TooltipPortal>
                 </Tooltip>
-            </Flex>
+            </ButtonGroup>
         </Flex>
     }>
-        <div style={{padding: "0.75rem"}}>
-            <DFlowFolder onDelete={contextData => console.log(contextData)}
-                         onRename={contextData => console.log(contextData)}
-                         onCreate={type => console.log(type)}
-                         onSelect={(flow) => console.log("select", flow)}
-                         ref={ref}
-                         activeFlowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
-        </div>
+        <DFlowFolder onDelete={contextData => console.log(contextData)}
+                     onRename={contextData => console.log(contextData)}
+                     onCreate={type => console.log(type)}
+                     onSelect={(flow) => console.log("select", flow)}
+                     ref={ref}
+                     activeFlowId={"gid://sagittarius/Flow/1"} namespaceId={undefined} projectId={undefined}/>
+
     </DLayout>
 }

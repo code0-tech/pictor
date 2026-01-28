@@ -23,8 +23,8 @@ export const useSuggestions = (
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
 
-    const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowService, flowStore, nodeId])
-    const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, functionService, node?.functionDefinition?.id])
+    const node = React.useMemo(() => (flowService.getNodeById(flowId, nodeId)), [flowId, flowStore, nodeId])
+    const functionDefinition = React.useMemo(() => (node?.functionDefinition?.id ? functionService.getById(node.functionDefinition.id) : undefined), [functionStore, node?.functionDefinition?.id])
     const parameterDefinition = React.useMemo(() => (functionDefinition?.parameterDefinitions?.find(definition => {
         const parameterDefinitionId = node?.parameters?.nodes?.find(parameter => parameter?.id === parameterId)?.parameterDefinition?.id
         return definition.id === parameterDefinitionId
@@ -45,5 +45,5 @@ export const useSuggestions = (
             ...refObjectSuggestions,
             ...functionSuggestions
         ].sort()
-    }, [flowId, nodeId, parameterId, functionStore, flowStore, valueSuggestions, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
+    }, [flowId, nodeId, parameterId, dataTypeSuggestions, refObjectSuggestions, functionSuggestions])
 }

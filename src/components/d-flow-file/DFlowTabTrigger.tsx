@@ -55,7 +55,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                 startTransition(async () => {
                     if (value?.__typename == "LiteralValue" && settingDefinition.identifier) {
                         await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value.value)
-                    } else if (settingDefinition.identifier)  {
+                    } else if (settingDefinition.identifier) {
                         await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value)
                     }
                 })

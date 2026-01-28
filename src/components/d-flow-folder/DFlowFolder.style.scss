@@ -20,6 +20,13 @@
   -ms-user-select: none;
   user-select: none;
 
+  &__root {
+    padding: 0.7rem;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
   & {
     @include helpers.borderRadius();
     @include box.box(variables.$primary);
@@ -67,6 +74,7 @@
     cursor: pointer;
     font-size: variables.$sm;
     position: relative;
+    margin: (variables.$xxs / 2) 0;
 
     & {
       @include helpers.borderRadius();
@@ -74,6 +82,16 @@
       @include box.boxHover(variables.$secondary);
       @include box.boxActive(variables.$secondary);
       @include helpers.fontStyle();
+      border: none;
+    }
+
+    &-hover-card {
+      @include box.box(variables.$secondary);
+      @include box.boxActiveStyle(variables.$secondary);
+      @include box.boxHover(variables.$secondary);
+      @include box.boxActive(variables.$secondary);
+      @include helpers.borderRadius();
+      cursor: pointer;
       border: none;
     }
 

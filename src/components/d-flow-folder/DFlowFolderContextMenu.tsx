@@ -4,6 +4,7 @@ import {
     ContextMenu,
     ContextMenuContent,
     ContextMenuItem,
+    ContextMenuLabel,
     ContextMenuPortal,
     ContextMenuSeparator,
     ContextMenuSub,
@@ -14,15 +15,9 @@ import {
 import {Flex} from "../flex/Flex";
 import {Text} from "../text/Text";
 import {IconChevronRight, IconEdit, IconTrash} from "@tabler/icons-react";
-import {Dialog, DialogClose, DialogContent, DialogPortal} from "../dialog/Dialog";
-import {Badge} from "../badge/Badge";
-import {Button} from "../button/Button";
 import {useService, useStore} from "../../utils";
 import {DFlowTypeReactiveService} from "../d-flow-type";
-import {DFlowFolderItemPathInput} from "./DFlowFolderItemPathInput";
-import {Flow, FlowType} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowFolderRenameDialog} from "./DFlowFolderRenameDialog";
-import {DFlowFolderCreateDialog} from "./DFlowFolderCreateDialog";
+import {Flow} from "@code0-tech/sagittarius-graphql-types";
 
 export interface DFlowFolderContextMenuGroupData {
     name: string
@@ -38,7 +33,7 @@ export interface DFlowFolderContextMenuItemData {
 
 export interface DFlowFolderContextMenuProps extends DFlowFolderProps {
     children: React.ReactNode
-    contextData: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData
+    contextData?: DFlowFolderContextMenuGroupData | DFlowFolderContextMenuItemData
 }
 
 export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (props) => {
@@ -59,12 +54,13 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
                 <ContextMenuContent>
                     <ContextMenuSub>
                         <ContextMenuSubTrigger>
-                            <Flex align={"center"} justify={"space-between"} w={"100%"}>
-                                <Text>New flow</Text>
+                            <Flex align={"center"} justify={"space-between"} style={{gap: "0.7rem"}} w={"100%"}>
+                                <Text>Create new flow</Text>
                                 <IconChevronRight size={12}/>
                             </Flex>
                         </ContextMenuSubTrigger>
                         <ContextMenuSubContent>
+                            <ContextMenuLabel>Flow types</ContextMenuLabel>
                             {flowTypes.map(flowType => {
                                 return <ContextMenuItem key={flowType.id} onSelect={() => {
                                     props.onCreate?.(flowType.id)
@@ -73,15 +69,19 @@ export const DFlowFolderContextMenu: React.FC<DFlowFolderContextMenuProps> = (pr
                                 </ContextMenuItem>
                             })}
                         </ContextMenuSubContent>
-                        <ContextMenuSeparator/>
-                        <ContextMenuItem onSelect={() => props.onRename?.(props.contextData)}>
-                            <IconEdit size={12} color={"purple"}/>
-                            <Text>Rename</Text>
-                        </ContextMenuItem>
-                        <ContextMenuItem onSelect={() => props.onDelete?.(props.contextData)}>
-                            <IconTrash size={12} color={"red"}/>
-                            <Text>Delete</Text>
-                        </ContextMenuItem>
+                        {props.contextData ? (
+                            <>
+                                <ContextMenuSeparator/>
+                                <ContextMenuItem disabled onSelect={() => props.onRename?.(props.contextData!)}>
+                                    <IconEdit size={13}/>
+                                    <Text>Rename</Text>
+                                </ContextMenuItem>
+                                <ContextMenuItem onSelect={() => props.onDelete?.(props.contextData!)}>
+                                    <IconTrash size={13}/>
+                                    <Text>Delete</Text>
+                                </ContextMenuItem>
+                            </>
+                        ) : null}
                     </ContextMenuSub>
                 </ContextMenuContent>
             </ContextMenuPortal>

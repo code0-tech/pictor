@@ -38,7 +38,7 @@ export const useValueSuggestions = (dataTypeIdentifier?: DataTypeIdentifier): DF
                 if (config.from === null || config.from === undefined) return
                 if (config.to === null || config.to === undefined) return
 
-                for (let i = config.from; i <= config.to; i += (config.steps ?? 1)) {
+                for (let i = config.from; i <= config.to; i += ((config.steps ?? 1) <= 0 ? 1 : (config.steps ?? 1))) {
                     suggestions.push({
                         path: [],
                         type: DFlowSuggestionType.VALUE,

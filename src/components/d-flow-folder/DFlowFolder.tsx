@@ -64,8 +64,13 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
         flow?: Flow
     }
 
-    const normalizePath = (p: string) =>
-        p.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean)
+    const normalizePath = (p: string) => {
+        const trimmed = p.replace(/\/+$/g, "")
+
+        return trimmed.split("/").filter((seg, idx) => {
+            return idx === 0 || seg.length > 0
+        })
+    }
 
     const flows = React.useMemo<Flow[]>(() => {
         const raw = (flowService.values?.({namespaceId, projectId}) ?? []) as Flow[]
@@ -88,7 +93,22 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
             let acc = ""
             for (let i = 0; i < segs.length; i++) {
                 const seg = segs[i]
-                acc = acc ? `${acc}/${seg}` : seg
+                // Behandle führenden leeren String (von führendem /) speziell
+                if (i === 0 && seg === "") {
+                    acc = "/"
+                    // Erstelle Root-Level Ordner für führenden Slash
+                    if (!cur.children["/"]) {
+                        cur.children["/"] = {
+                            name: "/",
+                            path: "/",
+                            children: {}
+                        }
+                    }
+                    cur = cur.children["/"]
+                    continue
+                }
+
+                acc = acc === "/" ? `/${seg}` : (acc ? `${acc}/${seg}` : seg)
 
                 if (i === segs.length - 1) {
                     // leaf (Flow)

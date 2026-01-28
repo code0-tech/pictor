@@ -133,7 +133,7 @@ export const Dashboard = () => {
         type: {
             id: "gid://sagittarius/FlowType/888",
         },
-        name: "sp/codezero/examples/REST Flow",
+        name: "//sp/////codezero/examples/REST Flow",
         settings: {
             nodes: [{
                 flowSettingIdentifier: "HTTP_URL",

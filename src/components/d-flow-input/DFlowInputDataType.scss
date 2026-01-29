@@ -1,0 +1,36 @@
+ul {
+  list-style: none;
+  margin: 0;
+  margin-inline-start: 2px;
+  margin-block-start: 0.7rem;
+  padding-inline-start: 0.7rem;
+  text-wrap: nowrap;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+li {
+  position: relative;
+  padding-inline-start: 0.7rem;
+
+  &:before {
+    content: '';
+    position: absolute;
+    height: 40px;
+    background: transparent;
+    width: 0.7rem;
+    left: -0.7rem;
+    top: -10px;
+    transform: translateY(-50%);
+    border-left: 2px solid rgb(28.2, 25.5, 43.5);
+    border-bottom: 2px solid rgb(28.2, 25.5, 43.5);
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  &:first-child:before {
+    height: 20px;
+    top: 0;
+  }
+}

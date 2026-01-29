@@ -7,7 +7,7 @@ import {DFlowSuggestion} from "../d-flow-suggestion";
 import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
 import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import type {DataType, Flow, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
+import type {DataType, Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
 import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
 
@@ -71,8 +71,10 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                     }
                     submitValue(value)
                 } catch (e) {
-                    // @ts-ignore
-                    //submitValue(event.target.value)
+                    submitValue({
+                        value: event.target.innerText,
+                        __typename: "LiteralValue"
+                    } as LiteralValue)
                 }
             }
 

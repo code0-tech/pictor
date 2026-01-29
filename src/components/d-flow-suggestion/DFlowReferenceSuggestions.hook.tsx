@@ -151,7 +151,6 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
         return flow.nodes.nodes.flatMap((node) => {
             const functionDefinition = functionService.getById(node?.functionDefinition?.id)
             if (!functionDefinition) return []
-
             const nodeValues =
                 node?.parameters?.nodes?.map((p) => p?.value!).filter(Boolean) ?? []
 
@@ -162,12 +161,14 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                 const pType = dataTypeService.getDataType(dataTypeIdentifier)
                 if (!pType || pType.variant !== "NODE") return []
 
-                const paramInstance = node?.parameters?.nodes?.find((p) => p?.id === paramDef?.id)
+
+                const paramInstance = node?.parameters?.nodes?.find((p) => p?.parameterDefinition?.id === paramDef?.id)
                 if (!paramInstance?.value || paramInstance.value.__typename !== "NodeFunctionIdWrapper") return []
 
                 const paramNodeContext = nodeContexts?.find(
                     (context) => paramInstance?.value?.__typename === "NodeFunctionIdWrapper" && context.nodeFunctionId === paramInstance.value?.id
                 )
+
                 if (!paramNodeContext) return []
 
                 const inputTypeRules =
@@ -288,7 +289,7 @@ const useNodeContext = (
                 if (current.parameters && def.parameterDefinitions) {
                     for (const pDef of def.parameterDefinitions) {
                         const pType = dataTypeService.getDataType(pDef.dataTypeIdentifier!!);
-                        const paramInstance = current.parameters?.nodes?.find((p) => p?.id === pDef.id);
+                        const paramInstance = current.parameters?.nodes?.find((p) => p?.parameterDefinition?.id === pDef.id);
 
                         if (pType?.variant === "NODE") {
                             if (paramInstance?.value && paramInstance.value.__typename === "NodeFunctionIdWrapper") {

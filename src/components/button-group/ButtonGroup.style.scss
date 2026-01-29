@@ -36,6 +36,11 @@
       background: helpers.borderColor();
     }
   }
+}
 
-
+@each $name, $color in variables.$colors {
+  .button-group--#{$name} {
+    @include box.box($color);
+    border-width: 0;
+  }
 }

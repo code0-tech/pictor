@@ -1,7 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import {Code0Component, Code0ComponentProps} from "../../utils";
+import {Code0Component, Code0ComponentProps, mergeCode0Props} from "../../utils";
 import React from "react";
-import {mergeCode0Props} from "../../utils";
 import {IconX} from "@tabler/icons-react"
 import "./Dialog.style.scss"
 import {Button} from "../button/Button";
@@ -48,22 +47,19 @@ export const DialogOverlay: React.FC<DialogOverlayProps> = (props) => {
 
 export const DialogContent: React.FC<DialogContentProps> = (props) => {
     return (
-        <DialogPrimitive.Portal>
-            <DialogOverlay/>
-            <DialogPrimitive.Content {...mergeCode0Props("dialog__content", props) as DialogContentProps}>
-                {props.showCloseButton && (
-                    <Flex align={"center"} justify={"space-between"}>
-                        <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
-                        <DialogClose asChild>
-                            <Button>
-                                <IconX size={16}/>
-                            </Button>
-                        </DialogClose>
-                    </Flex>
-                )}
-                {props.children}
-            </DialogPrimitive.Content>
-        </DialogPrimitive.Portal>
+        <DialogPrimitive.Content {...mergeCode0Props("dialog__content", props) as DialogContentProps}>
+            {props.showCloseButton && (
+                <Flex align={"center"} justify={"space-between"}>
+                    <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
+                    <DialogClose asChild>
+                        <Button>
+                            <IconX size={16}/>
+                        </Button>
+                    </DialogClose>
+                </Flex>
+            )}
+            {props.children}
+        </DialogPrimitive.Content>
     )
 }
 

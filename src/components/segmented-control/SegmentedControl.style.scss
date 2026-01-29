@@ -48,6 +48,17 @@
       background: helpers.borderColor();
     }
 
+    &:last-child:after {
+      display: none;
+    }
+
   }
 
+}
+
+@each $name, $color in variables.$colors {
+  .segmented-control--#{$name} {
+    @include box.box($color);
+    border-width: 0;
+  }
 }

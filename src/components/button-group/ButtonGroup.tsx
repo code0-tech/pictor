@@ -1,18 +1,19 @@
 import React, {ReactElement} from "react";
 import {ButtonProps} from "../button/Button";
 import "./ButtonGroup.style.scss"
-import {Code0Component} from "../../utils/types";
+import {Code0Component, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 
 export interface ButtonGroupType extends Code0Component<HTMLDivElement> {
     children: ReactElement<ButtonProps>[]
+    color?: Color
 }
 
 export const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
 
-    const {children, ...args} = props
+    const {children, color = "secondary", ...args} = props
 
-    return <div {...mergeCode0Props("button-group", args)}>
+    return <div {...mergeCode0Props(`button-group button-group--${color}`, args)}>
 
         {children.map((child, i) => {
             return <div

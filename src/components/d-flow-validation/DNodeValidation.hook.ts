@@ -111,30 +111,21 @@ export const useNodeValidation = (
 
             if (isGeneric) {
                 const resolvedExpectedDT = resolveDataTypeWithGenerics(expectedDT, genericMap)
-                if (isReference(value)) {
+                if (isReference(value) || (isNode(value) && expectedDT.variant !== "NODE")) {
                     const resolvedValueDT = resolveDataTypeWithGenerics(valueDT, genericMap)
                     isValid = useDataTypeValidation(resolvedExpectedDT, resolvedValueDT)
                 } else {
-                    console.log(value, expectedDT.variant === "NODE", isGeneric)
-
-                    if (expectedDT.variant === "NODE") {
-                        isValid = isNode(value)
-                    } else {
-                        isValid = useValueValidation(
-                            value,
-                            resolvedExpectedDT,
-                            dataTypeService,
-                            flow,
-                            expectedResolvedType?.genericType?.genericMappers!
-                        )
-                    }
-
+                    isValid = useValueValidation(
+                        value,
+                        resolvedExpectedDT,
+                        dataTypeService,
+                        flow,
+                        expectedResolvedType?.genericType?.genericMappers!
+                    )
                 }
             } else {
-                if (isReference(value)) {
+                if (isReference(value) || (isNode(value) && expectedDT.variant !== "NODE")) {
                     isValid = useDataTypeValidation(expectedDT, valueDT)
-                } else if (expectedDT.variant === "NODE") {
-                    isValid = isNode(value)
                 } else {
                     isValid = useValueValidation(value, expectedDT, dataTypeService, flow)
                 }

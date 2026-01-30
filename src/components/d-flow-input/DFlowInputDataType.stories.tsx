@@ -15,21 +15,17 @@ import {Spacing} from "../spacing/Spacing";
 import {Breadcrumb} from "../breadcrumb/Breadcrumb";
 import "./DFlowInputDataType.scss"
 import {ButtonGroup} from "../button-group/ButtonGroup";
-import {PrismLight as SyntaxHighlighter} from "react-syntax-highlighter";
-import json from "react-syntax-highlighter/dist/esm/languages/prism/json";
-import editorStyle from "react-syntax-highlighter/dist/esm/styles/prism/vsc-dark-plus";
+import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
+import {Editor} from "@monaco-editor/react";
 import prettier from "prettier/standalone";
 import parserBabel from "prettier/plugins/babel";
 import parserEstree from "prettier/plugins/estree";
-import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
 
 export const Concept1 = () => {
 
     const [editOpen, setEditOpen] = React.useState(false)
     const [jsonOpen, setJsonOpen] = React.useState(true)
     const [formatted, setFormatted] = React.useState("")
-
-    SyntaxHighlighter.registerLanguage("json", json);
 
     React.useEffect(() => {
         (async () => {
@@ -74,16 +70,19 @@ export const Concept1 = () => {
                     border: "none"
                 }}>
                     <DLayout layoutGap={0} showLayoutSplitter={false}
-                             topContent={<Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"} align={"center"}>
+                             topContent={<Flex style={{gap: ".7rem"}} p={0.7} justify={"space-between"}
+                                               align={"center"}>
                                  <Flex style={{gap: ".35rem"}} align={"center"}>
                                      <Text>Rest Adapter Input Type</Text>
                                      <Badge color={"secondary"} border>2 rules</Badge>
                                  </Flex>
                                  <SegmentedControl type={"single"} color={"primary"} defaultValue={"visual"}>
-                                     <SegmentedControlItem value={"json"} style={{boxShadow: "inset 0 1px 1px 0 rgba(255, 255, 255, 0.15)"}}>
+                                     <SegmentedControlItem value={"json"}
+                                                           style={{boxShadow: "inset 0 1px 1px 0 rgba(255, 255, 255, 0.15)"}}>
                                          <IconJson size={13}/>
                                      </SegmentedControlItem>
-                                     <SegmentedControlItem value={"visual"} style={{boxShadow: "inset 0 1px 1px 0 rgba(255, 255, 255, 0.15)"}}>
+                                     <SegmentedControlItem value={"visual"}
+                                                           style={{boxShadow: "inset 0 1px 1px 0 rgba(255, 255, 255, 0.15)"}}>
                                          <IconEyeEdit size={13}/>
                                      </SegmentedControlItem>
                                  </SegmentedControl>
@@ -135,23 +134,35 @@ export const Concept1 = () => {
                             </DResizablePanel>
                             <DResizableHandle/>
                             <DResizablePanel p={1}>
-                                <SyntaxHighlighter showLineNumbers
-                                                   style={editorStyle}
-                                                   customStyle={{
-                                                       background: "transparent",
-                                                       margin: "0",
-                                                       padding: "0",
-                                                       fontSize: "0.8rem",
-                                                       textShadow: "none"
-                                                   }}
-                                                   lineNumberStyle={{
-                                                       fontSize: "0.8rem",
-                                                       background: "transparent",
-                                                       color: "rgba(255, 255, 255, 0.75)"
-                                                   }}
-                                                   language="json">
-                                    {formatted}
-                                </SyntaxHighlighter>
+                                <Editor beforeMount={(monaco) => {
+                                    monaco.editor.defineTheme("transparentTheme", {
+                                        base: "vs-dark",
+                                        inherit: true,
+                                        rules: [],
+                                        colors: {
+                                            "editor.background": "#00000000",
+                                            "scrollbar.shadow": "#00000000",
+                                            "editorOverviewRuler.border": "#00000000"
+                                        }
+                                    });
+                                }}
+                                        theme="transparentTheme"
+                                        options={{
+                                            minimap: {enabled: false},
+                                            overviewRulerBorder: false,
+                                            scrollbar: {
+                                                verticalScrollbarSize: 10,
+                                                horizontalScrollbarSize: 10,
+                                                useShadows: false,
+                                                verticalHasArrows: false,
+                                                horizontalHasArrows: false
+                                            },
+                                            scrollBeyondLastLine: false,
+                                            renderLineHighlight: "none"
+                                        }}
+                                        className={"editor"}
+                                        height={"100%"}
+                                        defaultLanguage="json" defaultValue={formatted}/>
                             </DResizablePanel>
                         </DResizablePanelGroup>
                     </DLayout>

@@ -1,3 +1,7 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
 ul {
   list-style: none;
   margin: 0;
@@ -32,5 +36,23 @@ li {
   &:first-child:before {
     height: 20px;
     top: 0;
+  }
+}
+
+.editor {
+  .monaco-scrollable-element > .scrollbar > .slider {
+    @include box.box();
+    @include helpers.borderRadius();
+    border: none !important;
+    transition: none;
+    cursor: grabbing;
+
+    &:hover {
+      @include box.box();
+    }
+
+    &.active {
+      @include box.box();
+    }
   }
 }

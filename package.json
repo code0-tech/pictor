@@ -127,6 +127,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "react-syntax-highlighter": "^16.1.0"
   }
 }

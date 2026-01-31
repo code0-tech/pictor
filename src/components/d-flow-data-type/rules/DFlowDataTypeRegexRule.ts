@@ -4,7 +4,7 @@ import type {DataTypeRulesRegexConfig, NodeParameterValue} from "@code0-tech/sag
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeRegexRule {
     public static validate(value: NodeParameterValue, config: DataTypeRulesRegexConfig): boolean {
-        if (value.__typename != 'LiteralValue') return false
+        if (value?.__typename != 'LiteralValue') return false
         if (!config.pattern) return false
         return new RegExp(config.pattern).test(String(value.value))
     }

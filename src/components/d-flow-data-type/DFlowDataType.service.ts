@@ -5,14 +5,20 @@ import {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesInputTypesConfig, Flow,
+    DataTypeRulesInputTypesConfig,
+    Flow,
     GenericMapper,
     LiteralValue,
-    Maybe, Namespace, NamespaceProject,
-    NodeParameterValue, Runtime,
+    Maybe,
+    Namespace,
+    NamespaceProject,
+    NodeFunctionIdWrapper,
+    NodeParameterValue,
+    Runtime,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
+import {findReturnNode} from "./rules/DFlowDataTypeReturnTypeRule";
 
 export type DFlowDataTypeDependencies = {
     namespaceId: Namespace['id']
@@ -103,8 +109,15 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
             if (ruleThatIncludesGenericKey
                 && ruleThatIncludesGenericKey.variant == "RETURN_TYPE"
                 && dataType.variant === "NODE") {
+
+                const foundReturnFunction = findReturnNode(value as NodeFunctionIdWrapper, flow!!)
+                const returnValue = foundReturnFunction?.parameters?.nodes?.[0]?.value;
+
                 return {
-                    sourceDataTypeIdentifiers: [this.getTypeFromValue(value, flow, dependencies)],
+                    sourceDataTypeIdentifiers: [this.getTypeFromValue(returnValue ?? {
+                        __typename: "LiteralValue",
+                        value: null
+                    }, flow, dependencies)],
                     target: genericKey
                 } as GenericMapper
             }

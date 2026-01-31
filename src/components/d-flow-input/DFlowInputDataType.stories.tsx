@@ -20,6 +20,7 @@ import {Editor} from "@monaco-editor/react";
 import prettier from "prettier/standalone";
 import parserBabel from "prettier/plugins/babel";
 import parserEstree from "prettier/plugins/estree";
+import {Concept} from "../editor/EditorInput.stories";
 
 export const Concept1 = () => {
 
@@ -134,35 +135,7 @@ export const Concept1 = () => {
                             </DResizablePanel>
                             <DResizableHandle/>
                             <DResizablePanel p={1}>
-                                <Editor beforeMount={(monaco) => {
-                                    monaco.editor.defineTheme("transparentTheme", {
-                                        base: "vs-dark",
-                                        inherit: true,
-                                        rules: [],
-                                        colors: {
-                                            "editor.background": "#00000000",
-                                            "scrollbar.shadow": "#00000000",
-                                            "editorOverviewRuler.border": "#00000000"
-                                        }
-                                    });
-                                }}
-                                        theme="transparentTheme"
-                                        options={{
-                                            minimap: {enabled: false},
-                                            overviewRulerBorder: false,
-                                            scrollbar: {
-                                                verticalScrollbarSize: 10,
-                                                horizontalScrollbarSize: 10,
-                                                useShadows: false,
-                                                verticalHasArrows: false,
-                                                horizontalHasArrows: false
-                                            },
-                                            scrollBeyondLastLine: false,
-                                            renderLineHighlight: "none"
-                                        }}
-                                        className={"editor"}
-                                        height={"100%"}
-                                        defaultLanguage="json" defaultValue={formatted}/>
+                                <Concept/>
                             </DResizablePanel>
                         </DResizablePanelGroup>
                     </DLayout>

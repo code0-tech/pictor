@@ -3,6 +3,7 @@ import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} fr
 import {EditorInput, RenderMap, UserTokenRule} from "./EditorInput";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
+import {Panel} from "@xyflow/react";
 
 
 export const Concept: React.FC = () => {

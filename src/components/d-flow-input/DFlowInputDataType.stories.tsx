@@ -183,38 +183,38 @@ export const Concept1 = () => {
 const ExampleRule1 = () => {
     return <>
         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}}>
-            <Text size={"md"}>Has a field named</Text>
             <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                 <Text style={{color: "inherit"}}>body</Text>
             </Badge>
+            <Text size={"md"}>is a field</Text>
         </Flex>
         <ul>
             <li>
                 <div>
                     <Flex align={"center"} style={{gap: ".35rem"}}>
-                        <Text>Which has a field named</Text>
                         <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                             <Text size={"xs"} style={{color: "inherit"}}>users</Text>
                         </Badge>
+                        <Text>is a field inside</Text>
                     </Flex>
                     <ul>
                         <li>
                             <div>
                                 <Flex align={"center"} style={{gap: ".35rem"}}>
-                                    <Text>Each entity on</Text>
+                                    <Text>Inside</Text>
                                     <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                                         <Text size={"xs"} style={{color: "inherit"}}>users</Text>
                                     </Badge>
+                                    <Text>, each entity has</Text>
                                 </Flex>
                                 <ul>
                                     <li>
                                         <div>
                                             <Flex align={"center"} style={{gap: ".35rem"}}>
-                                                <Text>Has a field named</Text>
                                                 <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>username</Text>
                                                 </Badge>
-                                                <Text>of</Text>
+                                                <Text>which is a field of type</Text>
                                                 <Badge border color={hashToColor("Text")}
                                                        style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
@@ -225,11 +225,10 @@ const ExampleRule1 = () => {
                                     <li>
                                         <div>
                                             <Flex align={"center"} style={{gap: ".35rem"}}>
-                                                <Text>Has a field named</Text>
                                                 <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>email</Text>
                                                 </Badge>
-                                                <Text>of</Text>
+                                                <Text>which is a field of type</Text>
                                                 <Badge border color={hashToColor("Text")}
                                                        style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
@@ -240,14 +239,27 @@ const ExampleRule1 = () => {
                                     <li>
                                         <div>
                                             <Flex align={"center"} style={{gap: ".35rem"}}>
-                                                <Text>Has a field named</Text>
                                                 <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>password</Text>
                                                 </Badge>
-                                                <Text>of</Text>
+                                                <Text>which is a field of type</Text>
                                                 <Badge border color={hashToColor("Text")}
                                                        style={{verticalAlign: "middle"}}>
                                                     <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
+                                                </Badge>
+                                            </Flex>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div>
+                                            <Flex align={"center"} style={{gap: ".35rem"}}>
+                                                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                                                    <Text size={"xs"} style={{color: "inherit"}}>lastLogin</Text>
+                                                </Badge>
+                                                <Text>which is a field of type</Text>
+                                                <Badge border color={hashToColor("Number233232")}
+                                                       style={{verticalAlign: "middle"}}>
+                                                    <Text size={"xs"} style={{color: "inherit"}}>Number</Text>
                                                 </Badge>
                                             </Flex>
                                         </div>
@@ -265,20 +277,19 @@ const ExampleRule1 = () => {
 const ExampleRule2 = () => {
     return <>
         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}}>
-            <Text size={"md"}>Has a field named</Text>
             <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                 <Text style={{color: "inherit"}}>headers</Text>
             </Badge>
+            <Text size={"md"}>is a field</Text>
         </Flex>
         <ul>
 
             <li>
                 <Flex align={"center"} style={{gap: ".35rem"}}>
-                    <Text>Which has a field named</Text>
                     <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Access-Control-Request-Method</Text>
                     </Badge>
-                    <Text>of</Text>
+                    <Text>is a field inside of type </Text>
                     <Badge border color={hashToColor("Text")} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
                     </Badge>
@@ -286,11 +297,10 @@ const ExampleRule2 = () => {
             </li>
             <li>
                 <Flex align={"center"} style={{gap: ".35rem"}}>
-                    <Text>Which has a field named</Text>
                     <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Authorization</Text>
                     </Badge>
-                    <Text>of</Text>
+                    <Text>is a field inside of type </Text>
                     <Badge border color={hashToColor("Text")} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
                     </Badge>
@@ -298,11 +308,10 @@ const ExampleRule2 = () => {
             </li>
             <li>
                 <Flex align={"center"} style={{gap: ".35rem"}}>
-                    <Text>Which has a field named</Text>
                     <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Cache-Control</Text>
                     </Badge>
-                    <Text>of</Text>
+                    <Text>is a field inside of type </Text>
                     <Badge border color={hashToColor("Text")} style={{verticalAlign: "middle"}}>
                         <Text size={"xs"} style={{color: "inherit"}}>Text</Text>
                     </Badge>

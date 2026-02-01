@@ -13,11 +13,8 @@ export const Concept: React.FC = () => {
             users: [{
                 username: "Text",
                 email: "Text",
-                password: "Text"
-            }, {
-                username: "Text",
-                email: "Text",
-                password: "Text"
+                password: "Text",
+                lastLogin: 1
             }]
         },
         headers: {
@@ -39,8 +36,13 @@ export const Concept: React.FC = () => {
             </Badge>
         },
         String: ({rawValue}) => {
-            return <Badge color={hashToColor("Text")} border>
+            return <Badge key={"Text"} color={hashToColor("Text")} border>
                 Text
+            </Badge>
+        },
+        Number: ({rawValue}) => {
+            return <Badge key={"Number"} color={hashToColor("Number233232")} border>
+                Number
             </Badge>
         }
     };

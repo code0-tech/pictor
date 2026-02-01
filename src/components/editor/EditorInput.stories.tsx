@@ -3,7 +3,6 @@ import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} fr
 import {EditorInput, RenderMap, UserTokenRule} from "./EditorInput";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
-import {Panel} from "@xyflow/react";
 
 
 export const Concept: React.FC = () => {
@@ -24,8 +23,8 @@ export const Concept: React.FC = () => {
         }
     })
 
-    const myUserRule: UserTokenRule = (stream) => {
-        if (stream.match(/@\w+/)) return "mention";
+    const myUserRule: UserTokenRule = (content) => {
+        if (content.startsWith("@")) return "mention";
         return null;
     };
 
@@ -35,12 +34,12 @@ export const Concept: React.FC = () => {
                 {rawValue}
             </Badge>
         },
-        String: ({rawValue}) => {
+        string: ({rawValue}) => {
             return <Badge key={"Text"} color={hashToColor("Text")} border>
                 Text
             </Badge>
         },
-        Number: ({rawValue}) => {
+        number: ({rawValue}) => {
             return <Badge key={"Number"} color={hashToColor("Number233232")} border>
                 Number
             </Badge>

@@ -1,0 +1,349 @@
+import React from "react"
+import {createPortal} from "react-dom"
+import {Code0Component, mergeCode0Props} from "../../utils"
+import {ValidationProps} from "../form"
+import CodeMirror, {
+    Decoration,
+    EditorView,
+    Extension,
+    RangeSetBuilder,
+    ViewPlugin,
+    WidgetType
+} from "@uiw/react-codemirror"
+import {json, jsonParseLinter} from "@codemirror/lang-json"
+import {Diagnostic, linter} from "@codemirror/lint"
+import {syntaxTree} from "@codemirror/language"
+import prettier from "prettier/standalone"
+import parserBabel from "prettier/plugins/babel"
+import parserEstree from "prettier/plugins/estree"
+import {createTheme} from "@uiw/codemirror-themes"
+import {getStyleTags, tags as t} from "@lezer/highlight"
+import {hashToColor} from "../d-flow/DFlow.util"
+import "./Editor.styles.scss"
+import {Badge} from "../badge/Badge";
+import {IconAlertSquareRounded, IconAlertTriangle, IconExclamationCircle, IconInfoCircle} from "@tabler/icons-react";
+import {Text} from "../text/Text";
+import {Flex} from "../flex/Flex";
+import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
+import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
+
+export type EditorTokenizer = (content: string) => string | null
+
+export interface EditorRendererProps {
+    content: string
+}
+
+export interface EditorTokenHighlights {
+    [tokenName: string]: (props: EditorRendererProps) => React.ReactNode
+}
+
+export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange'>, ValidationProps<object> {
+    language?: 'json'
+    tokenizer?: EditorTokenizer
+    tokenHighlights: EditorTokenHighlights
+    onChange?: (value: string) => void
+    extensions?: Extension[]
+    disabled?: boolean
+    readonly?: boolean
+}
+
+class ReactAnchorWidget extends WidgetType {
+    constructor(public type: string, public rawValue: string) {
+        super()
+    }
+
+    toDOM() {
+        const span = document.createElement("span")
+        span.className = "cm-react-anchor"
+        span.dataset.type = this.type
+        span.dataset.value = this.rawValue
+        span.contentEditable = "false"
+
+        span.style.pointerEvents = "none"
+
+        span.style.verticalAlign = "middle"
+        span.style.display = "inline-flex"
+        return span
+    }
+
+    ignoreEvent() {
+        return true
+    }
+
+    eq(other: ReactAnchorWidget) {
+        return other.type === this.type && other.rawValue === this.rawValue
+    }
+}
+
+const myTheme = createTheme({
+    theme: 'light',
+    settings: {
+        background: 'transparent',
+        backgroundImage: '',
+        foreground: 'rgba(255,255,255, 0.75)',
+        caret: 'gray',
+        selection: 'rgba(112,179,255,0.25)',
+        selectionMatch: 'rgba(112,179,255,0.1)',
+        fontSize: "0.8rem",
+        gutterBackground: 'transparent',
+        gutterForeground: 'rgba(255,255,255, 0.5)',
+        gutterBorder: 'transparent',
+        gutterActiveForeground: 'rgba(255,255,255, 1)',
+        lineHighlight: 'rgba(255,255,255, 0.1)',
+    },
+    styles: [
+        {tag: t.squareBracket, color: hashToColor("squareBracket")},
+        {tag: t.bracket, color: hashToColor("bracket")},
+        {tag: t.string, color: hashToColor("Text")},
+        {tag: t.bool, color: hashToColor("Boolean")},
+        {tag: t.number, color: hashToColor("Number")},
+    ]
+})
+
+export const Editor: React.FC<EditorInputProps> = (props) => {
+    const {
+        language,
+        tokenizer,
+        tokenHighlights,
+        onChange,
+        extensions = [],
+        initialValue,
+        formValidation,
+        disabled,
+        readonly,
+        ...rest
+    } = props
+
+    const [formatted, setFormatted] = React.useState("")
+    const [anchors, setAnchors] = React.useState<Map<HTMLElement, { type: string, value: string }>>(new Map())
+    const [diagnostics, setDiagnostics] = React.useState<readonly Diagnostic[]>([])
+    const containerRef = React.useRef<HTMLDivElement>(null)
+
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const pretty = await prettier.format(JSON.stringify(initialValue) ?? "", {
+                    parser: language,
+                    plugins: [parserBabel, parserEstree],
+                    printWidth: 1
+                })
+                setFormatted(pretty)
+            } catch (e) {
+                setFormatted(JSON.stringify(initialValue) ?? "")
+            }
+        })()
+    }, [initialValue])
+
+    const internalExtensions = React.useMemo(() => {
+        const exts: Extension[] = [...extensions]
+
+        if (language === "json") {
+            exts.push(json())
+            exts.push(linter(jsonParseLinter(), {
+                markerFilter: (diagnosticsArray) => {
+                    setDiagnostics(diagnosticsArray)
+                    return []
+                }
+            }))
+        }
+
+        const badgePlugin = ViewPlugin.fromClass(class {
+            decorations: any
+
+            constructor(view: any) {
+                this.decorations = this.build(view)
+            }
+
+            update(update: any) {
+                if (update.docChanged || update.viewportChanged) {
+                    this.decorations = this.build(update.view)
+                }
+            }
+
+            build(view: any) {
+                const builder = new RangeSetBuilder<Decoration>()
+                const renderKeys = Object.keys(tokenHighlights || {})
+
+                syntaxTree(view.state).iterate({
+                    enter: (node) => {
+
+                        const rawText = view.state.doc.sliceString(node.from, node.to)
+
+                        if (rawText.includes('\n')) return
+
+                        const userTag = tokenizer?.(rawText)
+                        const tags = getStyleTags(node)?.tags.map(tag => "name" in tag ? tag.name : undefined)
+
+                        const foundKey = renderKeys.find(key => {
+                            return tags?.includes(key)
+                        })
+
+                        if (foundKey && !userTag) {
+                            builder.add(node.from, node.to, Decoration.replace({
+                                widget: new ReactAnchorWidget(foundKey, rawText),
+                                point: true
+                            }))
+                        } else if (userTag) {
+                            builder.add(node.from, node.to, Decoration.replace({
+                                widget: new ReactAnchorWidget(userTag, rawText),
+                                point: true
+                            }))
+                        }
+                    }
+                })
+                return builder.finish()
+            }
+        }, {decorations: v => v.decorations})
+
+        exts.push(badgePlugin)
+
+        exts.push(EditorView.atomicRanges.of(view => {
+            return view.plugin(badgePlugin)?.decorations || Decoration.none
+        }))
+
+        return exts
+    }, [language, tokenizer, tokenHighlights, extensions])
+
+    const handleUpdate = React.useCallback((viewUpdate: any) => {
+        if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
+            window.requestAnimationFrame(() => {
+                const foundNodes = containerRef.current?.querySelectorAll('.cm-react-anchor')
+                const newAnchors = new Map()
+
+                foundNodes?.forEach((node: any) => {
+                    newAnchors.set(node, {
+                        type: node.dataset.type,
+                        value: node.dataset.value
+                    })
+                })
+
+                setAnchors(newAnchors)
+            })
+        }
+    }, [])
+
+    return (
+        <ScrollArea h={"100%"} type={"always"}>
+            <ScrollAreaViewport>
+                <div ref={containerRef} {...mergeCode0Props(`editor`, rest)}>
+                    <CodeMirror
+                        width="100%"
+                        height="100%"
+                        value={formatted}
+                        theme={myTheme}
+                        readOnly={disabled || readonly}
+                        editable={!disabled}
+                        extensions={internalExtensions}
+                        aria-disabled={disabled}
+                        className={"editor__control"}
+                        onChange={(val) => {
+                            setFormatted(val)
+                            try {
+                                const json = JSON.parse(val)
+                                onChange?.(json)
+                                formValidation?.setValue(json)
+                            } catch (e) {
+                            }
+                        }}
+                        onUpdate={handleUpdate}
+                    />
+
+                    {tokenHighlights && Array.from(anchors.entries()).map(([anchor, data]) => {
+                        const renderFn = tokenHighlights[data.type]
+                        if (!renderFn) return null
+
+                        return createPortal(
+                            <div key={anchor.outerHTML + data.value} style={{display: 'contents'}}>
+                                {renderFn({content: data.value})}
+                            </div>,
+                            anchor
+                        )
+                    })}
+
+                    <div className={"editor__diagnostics"}>
+                        <Flex style={{gap: "0.35rem"}} align={"center"}>
+                            {diagnostics.filter(d => d.severity == "error").length > 0 ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge color={"red"}>
+                                            <IconExclamationCircle size={13}/>
+                                            <Text>{diagnostics.filter(d => d.severity == "error").length}</Text>
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent side={"bottom"}>
+                                            <TooltipArrow/>
+                                            {diagnostics.filter(d => d.severity == "error").map(d => {
+                                                return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                            })}
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            ) : null}
+                            {diagnostics.filter(d => d.severity == "warning").length > 0 ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge color={"orange"}>
+                                            <IconAlertTriangle size={13}/>
+                                            <Text>{diagnostics.filter(d => d.severity == "warning").length}</Text>
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent side={"bottom"}>
+                                            <TooltipArrow/>
+                                            {diagnostics.filter(d => d.severity == "warning").map(d => {
+                                                return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                            })}
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            ) : null}
+                            {diagnostics.filter(d => d.severity == "info").length > 0 ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge color={"#9ca3af"}>
+                                            <IconAlertSquareRounded size={13}/>
+                                            <Text>{diagnostics.filter(d => d.severity == "info").length}</Text>
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent side={"bottom"}>
+                                            <TooltipArrow/>
+                                            {diagnostics.filter(d => d.severity == "info").map(d => {
+                                                return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                            })}
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            ) : null}
+                            {diagnostics.filter(d => d.severity == "hint").length > 0 ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge color={"#3b82f6"}>
+                                            <IconInfoCircle size={13}/>
+                                            <Text>{diagnostics.filter(d => d.severity == "hint").length}</Text>
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipPortal>
+                                        <TooltipContent side={"bottom"}>
+                                            <TooltipArrow/>
+                                            {diagnostics.filter(d => d.severity == "hint").map(d => {
+                                                return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                            })}
+                                        </TooltipContent>
+                                    </TooltipPortal>
+                                </Tooltip>
+                            ) : null}
+                        </Flex>
+                    </div>
+                </div>
+            </ScrollAreaViewport>
+            <ScrollAreaScrollbar orientation={"vertical"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+            <ScrollAreaScrollbar orientation={"horizontal"}>
+                <ScrollAreaThumb/>
+            </ScrollAreaScrollbar>
+        </ScrollArea>
+    )
+}

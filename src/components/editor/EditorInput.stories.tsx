@@ -1,13 +1,14 @@
 import React from "react";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
-import {EditorInput, RenderMap, UserTokenRule} from "./EditorInput";
+import {Editor, EditorTokenHighlights, EditorTokenizer} from "./Editor";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
+import {DFullScreen} from "../d-fullscreen/DFullScreen";
 
 
 export const Concept: React.FC = () => {
 
-    const value = JSON.stringify({
+    const value = {
         body: {
             users: [{
                 username: "Text",
@@ -21,56 +22,48 @@ export const Concept: React.FC = () => {
             "Authorization": "Text",
             "Cache-Control": "Text"
         }
-    })
+    }
 
-    const myUserRule: UserTokenRule = (content) => {
+    const tokenizer: EditorTokenizer = (content) => {
         if (content.startsWith("@")) return "mention";
         return null;
     };
 
-    const myRenderMap: RenderMap = {
-        mention: ({rawValue}) => {
+    const myRenderMap: EditorTokenHighlights = {
+        mention: ({content}) => {
             return <Badge color={hashToColor("Mention")} border>
-                {rawValue}
+                {content}
             </Badge>
         },
-        string: ({rawValue}) => {
+        string: ({content}) => {
             return <Badge key={"Text"} color={hashToColor("Text")} border>
                 Text
             </Badge>
         },
-        number: ({rawValue}) => {
-            return <Badge key={"Number"} color={hashToColor("Number233232")} border>
+        number: ({content}) => {
+            return <Badge key={"Number"} color={hashToColor("Number")} border>
                 Number
             </Badge>
         }
     };
 
     return (
-        <ScrollArea h={"100%"} type={"always"}>
-            <ScrollAreaViewport>
-                <EditorInput
+        <DFullScreen>
+                <Editor
                     language={"json"}
                     initialValue={value}
-                    userRule={myUserRule}
-                    renderMap={myRenderMap}
+                    tokenizer={tokenizer}
+                    tokenHighlights={myRenderMap}
                     onChange={(val) => console.log("New Value:", val)}
                 />
-            </ScrollAreaViewport>
-            <ScrollAreaScrollbar orientation={"vertical"}>
-                <ScrollAreaThumb/>
-            </ScrollAreaScrollbar>
-            <ScrollAreaScrollbar orientation={"horizontal"}>
-                <ScrollAreaThumb/>
-            </ScrollAreaScrollbar>
-        </ScrollArea>
+        </DFullScreen>
 
     )
 }
 
 
 export default {
-    title: "Concepts/EditorInput",
+    title: "Concepts/Editor",
     component: Concept,
     parameters: {
         visualTest: {

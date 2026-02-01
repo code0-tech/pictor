@@ -11,7 +11,7 @@ import CodeMirror, {
     WidgetType
 } from "@uiw/react-codemirror"
 import {json} from "@codemirror/lang-json"
-import {StreamLanguage, syntaxTree} from "@codemirror/language"
+import {syntaxTree} from "@codemirror/language"
 import prettier from "prettier/standalone"
 import parserBabel from "prettier/plugins/babel"
 import parserEstree from "prettier/plugins/estree"

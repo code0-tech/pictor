@@ -19,6 +19,7 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
 import {findReturnNode} from "./rules/DFlowDataTypeReturnTypeRule";
+import {md5} from "js-md5";
 
 export type DFlowDataTypeDependencies = {
     namespaceId: Namespace['id']
@@ -28,31 +29,37 @@ export type DFlowDataTypeDependencies = {
 
 export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<DataTypeView, DFlowDataTypeDependencies> {
 
-    getDataType (type: DataTypeIdentifier, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
+    getDataType(type: DataTypeIdentifier, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
         if (!type) return undefined
         if ((type as DataTypeIdentifier).genericKey) return undefined
-        const identifier = (type as DataTypeIdentifier).dataType?.identifier ?? (type as DataTypeIdentifier).genericType?.dataType?.identifier
-        const id = (type as DataTypeIdentifier).dataType?.id ?? (type as DataTypeIdentifier).genericType?.dataType?.id
+        const dataType = type.dataType ?? type.genericType?.dataType
+        const identifier = dataType?.identifier
+        const id = dataType?.id
+
+        if (dataType?.rules) {
+            //console.log(dataType, new DataTypeView(dataType))
+            return new DataTypeView(dataType)
+        }
+
         return this.values().find(value => {
             return value.identifier == identifier || value.id == id
         });
     }
 
-    getDataTypeFromValue (value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
+    getDataTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): DataTypeView | undefined {
 
         if (!value) return undefined
 
         if (value.__typename == "LiteralValue") {
             //hardcode primitive types (NUMBER, BOOLEAN, TEXT)
             if (Array.isArray(value.value) && Array.from(value.value).length > 0) return this.getDataType({dataType: {identifier: "LIST"}})
+            if (typeof value.value === "object") return this.getDataType({dataType: {identifier: "OBJECT"}}, dependencies)
             if (typeof value.value === "string") return this.getDataType({dataType: {identifier: "TEXT"}}, dependencies)
             if (typeof value.value === "number") return this.getDataType({dataType: {identifier: "NUMBER"}}, dependencies)
             if (typeof value.value === "boolean") return this.getDataType({dataType: {identifier: "BOOLEAN"}}, dependencies)
         }
 
-        //TODO: performance here is bad
         const matchingDataTypes = this.values(dependencies).filter(type => {
-            if (type.identifier === "OBJECT") return false
             if (value.__typename === "NodeFunctionIdWrapper" && (type.variant != "NODE" || !flow)) return false
             return useValueValidation(value, type, this, flow)
         })
@@ -61,7 +68,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
     }
 
-    getTypeFromValue (value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
+    getTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
 
         if (!value) return undefined
 
@@ -83,6 +90,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
                 && ruleThatIncludesGenericKey.variant == "CONTAINS_TYPE"
                 && "value" in value && value?.value
                 && dataType.variant === "ARRAY") {
+
                 return {
                     sourceDataTypeIdentifiers: [this.getTypeFromValue({
                         __typename: "LiteralValue",
@@ -133,18 +141,55 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
                 } as GenericMapper
             }
 
+            if (ruleThatIncludesGenericKey
+                && ruleThatIncludesGenericKey.variant == "PARENT_TYPE"
+                && dataType.variant === "OBJECT"
+                && value.__typename === "LiteralValue") {
+                const rules: Array<DataTypeRule> = Object.entries(value.value).map(innerValue => {
+                    return {
+                        __typename: "DataTypeRule",
+                        variant: "CONTAINS_KEY",
+                        config: {
+                            key: innerValue[0],
+                            dataTypeIdentifier: this.getTypeFromValue({
+                                __typename: "LiteralValue",
+                                value: innerValue[1]
+                            }, flow, dependencies) ?? null
+                        }
+                    }
+                })
+
+                const innerDataType = new DataTypeView({
+                    ...dataType.json,
+                    genericKeys: [],
+                    identifier: md5(String(value.value)),
+                    rules: {
+                        nodes: rules
+                    }
+                })
+                return {
+                    sourceDataTypeIdentifiers: [{
+                        dataType: innerDataType.json
+                    }],
+                    target: genericKey
+                } as GenericMapper
+            }
+
             return null
         }).filter(mapper => !!mapper)
 
         const resolvedType: DataTypeIdentifier = genericMapper.length > 0 ? {
             genericType: {
-                dataType: {id: dataType.id as Maybe<Scalars['DataTypeID']['output']>, identifier: dataType.identifier},
+                dataType: {
+                    id: dataType.id,
+                    identifier: dataType.identifier,
+                },
                 genericMappers: genericMapper
             }
         } : {
             dataType: {
-                id: dataType.id as Maybe<Scalars['DataTypeID']['output']>,
-                identifier: dataType.identifier
+                id: dataType.id,
+                identifier: dataType.identifier,
             }
         }
 

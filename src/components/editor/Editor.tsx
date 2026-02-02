@@ -37,7 +37,7 @@ export interface EditorTokenHighlights {
     [tokenName: string]: (props: EditorRendererProps) => React.ReactNode
 }
 
-export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange'>, ValidationProps<object> {
+export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<object> {
     language?: 'json'
     tokenizer?: EditorTokenizer
     tokenHighlights: EditorTokenHighlights

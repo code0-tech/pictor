@@ -38,21 +38,3 @@ li {
     top: 0;
   }
 }
-
-.editor {
-  .monaco-scrollable-element > .scrollbar > .slider {
-    @include box.box();
-    @include helpers.borderRadius();
-    border: none !important;
-    transition: none;
-    cursor: grabbing;
-
-    &:hover {
-      @include box.box();
-    }
-
-    &.active {
-      @include box.box();
-    }
-  }
-}

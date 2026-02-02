@@ -32,10 +32,7 @@ import {Card} from "../card/Card"
 
 import {setSelectionOffsetsInValue, useContentEditableController} from "./InputContentEditable.hook"
 
-export type Code0Input = Omit<
-    Omit<Omit<Code0Component<HTMLInputElement>, "left">, "right">,
-    "title"
->
+export type Code0Input = Omit<Code0Component<HTMLInputElement>, "left" | "right" | "title" | "defaultValue" | "value">
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestions?: InputSuggestion[]

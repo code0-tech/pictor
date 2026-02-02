@@ -125,14 +125,15 @@ const identifiersMatch = (
     return !!targetId && targetId === sourceId;
 };
 
-const replaceIdentifiersInConfig = (
+export const replaceIdentifiersInConfig = (
     config: DataTypeRulesConfig,
     genericMap: GenericMap
 ): DataTypeRulesConfig => {
     switch (config.__typename) {
         case "DataTypeRulesContainsKeyConfig":
         case "DataTypeRulesContainsTypeConfig":
-        case "DataTypeRulesReturnTypeConfig": {
+        case "DataTypeRulesReturnTypeConfig":
+        case "DataTypeRulesParentTypeConfig":{
             const identifier = (config as { dataTypeIdentifier?: DataTypeIdentifier }).dataTypeIdentifier;
             if (!identifier) return config;
             return {
@@ -153,6 +154,66 @@ const replaceIdentifiersInConfig = (
         }
         default:
             return config;
+    }
+};
+
+export const replaceIdentifiersInRule = (
+    rule: DataTypeRule,
+    genericMap: GenericMap
+): DataTypeRule => {
+    switch (rule.variant) {
+        case "CONTAINS_KEY": {
+            const config = replaceIdentifiersInConfig({
+                ...rule.config,
+                __typename: "DataTypeRulesContainsKeyConfig"
+            }!, genericMap)
+            return {
+                ...rule,
+                config
+            }
+        }
+        case "CONTAINS_TYPE": {
+            const config = replaceIdentifiersInConfig({
+                ...rule.config,
+                __typename: "DataTypeRulesContainsTypeConfig"
+            }!, genericMap)
+            return {
+                ...rule,
+                config
+            }
+        }
+        case "RETURN_TYPE": {
+            const config = replaceIdentifiersInConfig({
+                ...rule.config,
+                __typename: "DataTypeRulesReturnTypeConfig"
+            }!, genericMap)
+            return {
+                ...rule,
+                config
+            }
+        }
+        case "INPUT_TYPES": {
+            const config = replaceIdentifiersInConfig({
+                ...rule.config,
+                __typename: "DataTypeRulesInputTypesConfig"
+            }!, genericMap)
+            return {
+                ...rule,
+                config
+            }
+        }
+        case "PARENT_TYPE": {
+            const config = replaceIdentifiersInConfig({
+                ...rule.config,
+                __typename: "DataTypeRulesParentTypeConfig"
+            }!, genericMap)
+            return {
+                ...rule,
+                config
+            }
+        }
+        default:
+            return rule;
     }
 };
 

@@ -1,18 +1,6 @@
 [
   {
     "__typename": "DataType",
-    "id": "gid://sagittarius/DataType/7237832873223",
-    "name": [
-      {
-        "__typename": "Translation",
-        "code": "en-US",
-        "content": "DataType"
-      }
-    ],
-    "variant": "DATA_TYPE"
-  },
-  {
-    "__typename": "DataType",
     "id": "gid://sagittarius/DataType/0",
     "genericKeys": [],
     "identifier": "REST_HEADER_INPUT",

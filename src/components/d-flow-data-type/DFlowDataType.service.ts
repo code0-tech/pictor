@@ -37,7 +37,6 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
         const id = dataType?.id
 
         if (dataType?.rules) {
-            //console.log(dataType, new DataTypeView(dataType))
             return new DataTypeView(dataType)
         }
 
@@ -66,6 +65,86 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
         return matchingDataTypes[matchingDataTypes.length - 1]
 
+    }
+
+    getValueFromType(dataTypeIdentifier: DataTypeIdentifier, flow?: Flow, dependencies?: DFlowDataTypeDependencies): NodeParameterValue | undefined {
+        const type = this.getDataType(dataTypeIdentifier, dependencies)
+        if (!type) return undefined
+
+        if (type.identifier === "TEXT") return {__typename: "LiteralValue", value: ""}
+        if (type.identifier === "NUMBER") return {__typename: "LiteralValue", value: 0}
+        if (type.identifier === "BOOLEAN") return {__typename: "LiteralValue", value: false}
+
+        const rules = type.rules?.nodes ?? []
+        if (rules.length === 0) return {__typename: "LiteralValue", value: null}
+
+        const isList = rules.some(rule => rule?.variant === "CONTAINS_TYPE")
+        const isObject = !isList && rules.some(rule => rule?.variant === "CONTAINS_KEY" || rule?.variant === "PARENT_TYPE")
+
+        if (!isList && !isObject) {
+            return {
+                __typename: "LiteralValue",
+                value: null
+            }
+        }
+
+        const mappedValues = rules.map(rule => {
+            if (!rule) return undefined
+
+            if (rule.variant === "CONTAINS_TYPE" && isList) {
+                // @ts-ignore
+                const configId = rule.config?.dataTypeIdentifier as DataTypeIdentifier
+                if (configId) {
+                    const mapper = configId.genericKey && dataTypeIdentifier.genericType?.genericMappers
+                        ? dataTypeIdentifier.genericType.genericMappers.find(m => m.target === configId.genericKey)
+                        : undefined
+                    const resolvedId = mapper?.sourceDataTypeIdentifiers?.[0] ?? configId
+
+                    const nestedVal = this.getValueFromType(resolvedId, flow, dependencies)
+                    if (nestedVal && nestedVal.__typename === "LiteralValue") {
+                        return nestedVal.value
+                    }
+                }
+            }
+
+            if (rule.variant === "CONTAINS_KEY" && isObject) {
+                const keyConfig = rule.config as DataTypeRulesContainsKeyConfig
+                if (keyConfig?.key && keyConfig?.dataTypeIdentifier) {
+                    const mapper = keyConfig.dataTypeIdentifier.genericKey && dataTypeIdentifier.genericType?.genericMappers
+                        ? dataTypeIdentifier.genericType.genericMappers.find(m => m.target === keyConfig.dataTypeIdentifier.genericKey)
+                        : undefined
+                    const resolvedId = mapper?.sourceDataTypeIdentifiers?.[0] ?? keyConfig.dataTypeIdentifier
+
+                    const nestedVal = this.getValueFromType(resolvedId, flow, dependencies)
+                    if (nestedVal && nestedVal.__typename === "LiteralValue") {
+                        return {[keyConfig.key]: nestedVal.value}
+                    }
+                }
+            }
+
+            if (rule.variant === "PARENT_TYPE" && isObject) {
+                // @ts-ignore
+                const configId = rule.config?.dataTypeIdentifier as DataTypeIdentifier
+                if (configId) {
+                    const mapper = configId.genericKey && dataTypeIdentifier.genericType?.genericMappers
+                        ? dataTypeIdentifier.genericType.genericMappers.find(m => m.target === configId.genericKey)
+                        : undefined
+                    const resolvedId = mapper?.sourceDataTypeIdentifiers?.[0] ?? configId
+
+                    const nestedVal = this.getValueFromType(resolvedId, flow, dependencies)
+                    if (nestedVal && nestedVal.__typename === "LiteralValue" && typeof nestedVal.value === "object" && !Array.isArray(nestedVal.value)) {
+                        return nestedVal.value
+                    }
+                }
+            }
+
+            return undefined
+        }).filter(val => val !== undefined)
+
+        return {
+            __typename: "LiteralValue",
+            value: isList ? mappedValues : Object.assign({}, ...mappedValues)
+        }
     }
 
     getTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
@@ -143,7 +222,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
             if (ruleThatIncludesGenericKey
                 && ruleThatIncludesGenericKey.variant == "PARENT_TYPE"
-                && dataType.variant === "OBJECT"
+                && dataType.identifier === "OBJECT"
                 && value.__typename === "LiteralValue") {
                 const rules: Array<DataTypeRule> = Object.entries(value.value).map(innerValue => {
                     return {

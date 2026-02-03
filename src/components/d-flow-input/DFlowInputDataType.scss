@@ -6,35 +6,58 @@ ul {
   list-style: none;
   margin: 0;
   margin-inline-start: 2px;
-  margin-block-start: 0.7rem;
-  padding-inline-start: 0.7rem;
+  margin-block-start: variables.$xxs;
+  padding-inline-start: variables.$xxs;
   text-wrap: nowrap;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: variables.$xxs;
 }
 
 li {
   position: relative;
-  padding-inline-start: 0.7rem;
+  padding-inline-start: variables.$xs;
 
   &:before {
     content: '';
     position: absolute;
-    height: 40px;
     background: transparent;
     width: 0.7rem;
-    left: -0.7rem;
-    top: -10px;
+    left: -0.35rem;
+    height: 20px;
+    top: 5px;
     transform: translateY(-50%);
-    border-left: 2px solid rgb(28.2, 25.5, 43.5);
-    border-bottom: 2px solid rgb(28.2, 25.5, 43.5);
+    border-left: 2px solid helpers.backgroundColor(variables.$secondary, 1.5);
+    border-bottom: 2px solid helpers.backgroundColor(variables.$secondary, 1.5);
     border-bottom-left-radius: 0.5rem;
   }
 
-  &:first-child:before {
-    height: 20px;
+  &:not(:last-child):after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: helpers.backgroundColor(variables.$secondary, 1.5);
     top: 0;
+    left: -0.35rem;
+  }
+}
+
+.rule {
+
+  padding: variables.$xxs / 2 variables.$xxs;
+  margin-left: -1 * variables.$xxs;
+  width: calc(100% + (0.35rem));
+
+  & {
+    @include helpers.borderRadius();
+    @include box.box(variables.$primary);
+    @include box.boxHover(variables.$secondary);
+    @include box.boxActive(variables.$secondary);
+    @include helpers.fontStyle();
+    border-color: transparent;
+    //border-top: 1px solid helpers.borderColor();
+    cursor: pointer;
   }
 }

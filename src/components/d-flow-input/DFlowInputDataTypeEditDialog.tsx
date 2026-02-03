@@ -30,12 +30,6 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
     const [dataTypeIdentifier, setDataTypeIdentifier] = React.useState<DataTypeIdentifier>(props.dataTypeIdentifier)
 
     React.useEffect(() => {
-        if (dataTypeIdentifier !== props.dataTypeIdentifier) {
-            onDataTypeChange?.(dataTypeIdentifier)
-        }
-    }, [dataTypeIdentifier, props.dataTypeIdentifier])
-
-    React.useEffect(() => {
         setEditOpen(open)
         setDataTypeIdentifier(props.dataTypeIdentifier)
     }, [open])
@@ -91,6 +85,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                     __typename: "LiteralValue",
                                     value: value
                                 })
+                                onDataTypeChange?.(dataTypeIdentifier!)
                                 setDataTypeIdentifier(dataTypeIdentifier!)
                             }}/>
                         </DResizablePanel>

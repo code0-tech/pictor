@@ -58,7 +58,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
     })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DFlowInputDataType initialValue={testDataType}/> : null}
+        {definition?.inputType ? <DFlowInputDataType initialValue={testDataType} onChange={(dataTypeIdentifier) => console.log(dataTypeIdentifier)}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {
             const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
             const title = settingDefinition.names!![0]?.content ?? ""

@@ -1,6 +1,5 @@
 import {ValidationProps} from "../form";
 import {
-    DataType,
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
@@ -11,21 +10,13 @@ import {Card} from "../card/Card";
 import {Flex} from "../flex/Flex";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
-import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconEdit, IconEyeEdit, IconFilterCheck, IconJson} from "@tabler/icons-react";
+import {IconEdit} from "@tabler/icons-react";
 import CardSection from "../card/CardSection";
 import "./DFlowInputDataType.style.scss"
 import {hashToColor} from "../d-flow/DFlow.util";
 import {useService, useStore} from "../../utils";
-import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {Dialog, DialogContent, DialogOverlay, DialogPortal} from "../dialog/Dialog";
-import {DLayout} from "../d-layout/DLayout";
-import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
-import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable";
-import {Breadcrumb} from "../breadcrumb/Breadcrumb";
-import {Spacing} from "../spacing/Spacing";
-import {Editor} from "../editor/Editor";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {DFlowInputDataTypeEditDialog} from "./DFlowInputDataTypeEditDialog";
 
 export interface DFlowInputDataTypeProps extends ValidationProps<DataTypeIdentifier> {
@@ -57,6 +48,7 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
     return <>
         <DFlowInputDataTypeEditDialog dataTypeIdentifier={initValue!}
                                       open={editOpen}
+                                      onDataTypeChange={props.onChange}
                                       onOpenChange={open => setEditOpen(open)}/>
         <Card color={"secondary"} paddingSize={"xs"}>
             <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>

@@ -16,17 +16,24 @@ export interface DFlowInputDataTypeEditDialogProps {
     dataTypeIdentifier: DataTypeIdentifier
     open?: boolean
     onOpenChange?: (open: boolean) => void
+    onDataTypeChange?: (dataTypeIdentifier: DataTypeIdentifier) => void
 }
 
 export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialogProps> = (props) => {
 
-    const {open, onOpenChange} = props
+    const {open, onOpenChange, onDataTypeChange} = props
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
     const [editOpen, setEditOpen] = React.useState(open)
     const [dataTypeIdentifier, setDataTypeIdentifier] = React.useState<DataTypeIdentifier>(props.dataTypeIdentifier)
+
+    React.useEffect(() => {
+        if (dataTypeIdentifier !== props.dataTypeIdentifier) {
+            onDataTypeChange?.(dataTypeIdentifier)
+        }
+    }, [dataTypeIdentifier, props.dataTypeIdentifier])
 
     React.useEffect(() => {
         setEditOpen(open)

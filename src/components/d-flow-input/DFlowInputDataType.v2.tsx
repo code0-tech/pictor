@@ -4,12 +4,6 @@ import {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesContainsTypeConfig,
-    DataTypeRulesItemOfCollectionConfig,
-    DataTypeRulesNumberRangeConfig,
-    DataTypeRulesParentTypeConfig,
-    DataTypeRulesRegexConfig,
-    type GenericMapper,
     Maybe
 } from "@code0-tech/sagittarius-graphql-types";
 import React from "react";
@@ -19,167 +13,172 @@ import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconEdit, IconFilterCheck} from "@tabler/icons-react";
+import {IconEdit, IconEyeEdit, IconFilterCheck, IconJson} from "@tabler/icons-react";
 import CardSection from "../card/CardSection";
 import "./DFlowInputDataType.scss"
 import {hashToColor} from "../d-flow/DFlow.util";
 import {useService, useStore} from "../../utils";
 import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type";
-import {replaceIdentifiersInRule} from "../../utils/generics";
+import {Dialog, DialogContent, DialogOverlay, DialogPortal} from "../dialog/Dialog";
+import {DLayout} from "../d-layout/DLayout";
+import {SegmentedControl, SegmentedControlItem} from "../segmented-control/SegmentedControl";
+import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable";
+import {Breadcrumb} from "../breadcrumb/Breadcrumb";
+import {Spacing} from "../spacing/Spacing";
+import {Editor} from "../editor/Editor";
+import {DFlowInputDataTypeEditDialog} from "./DFlowInputDataTypeEditDialog";
 
-export interface DFlowInputDataTypeProps extends ValidationProps<DataType | DataTypeIdentifier> {
-    onChange?: (value: DataType | DataTypeIdentifier | null) => void
+export interface DFlowInputDataTypeProps extends ValidationProps<DataTypeIdentifier> {
+    onChange?: (value: DataTypeIdentifier | null) => void
     description?: string
     label?: string
 }
 
+export interface DFlowInputDataTypeRuleTreeProps {
+    dataTypeIdentifier: DataTypeIdentifier
+    parentRule?: Maybe<DataTypeRule>
+    isRoot?: boolean
+}
+
 export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => {
 
-    const {initialValue, defaultValue, value, label, description, onChange} = props
+    const {initialValue, defaultValue, value} = props
     const initValue = value ?? initialValue ?? defaultValue ?? null
-    const isDataTypeIdentifier = initValue?.__typename === "DataTypeIdentifier" || ("dataType" in initValue!) || ("genericType" in initValue!)
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
+    const [editOpen, setEditOpen] = React.useState(false)
+
     const initialDataType = React.useMemo(() => {
-        return isDataTypeIdentifier ? dataTypeService.getDataType(initValue) : new DataTypeView((initValue as DataType))
-    }, [dataTypeStore])
+        return dataTypeService.getDataType(initValue!)
+    }, [dataTypeStore, initValue])
 
-
-    console.log(initialDataType)
-
-    return <Card color={"secondary"} paddingSize={"xs"}>
-        <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>
-            <Flex style={{gap: ".35rem"}} align={"center"}>
-                <Text hierarchy={"tertiary"}>
-                    {(initialDataType?.name?.[0].content) ?? "Unnamed Data Type"}
-                </Text>
-            </Flex>
-            <Flex style={{gap: ".35rem"}} align={"center"}>
-                <ButtonGroup color={"primary"}>
-                    <Button paddingSize={"xxs"}
-                            variant={"filled"}
-                            color={"secondary"}>
-                        <IconFilterCheck size={13}/>
-                    </Button>
-                    <Button paddingSize={"xxs"}
-                            variant={"filled"}
-                            color={"secondary"}>
+    return <>
+        <DFlowInputDataTypeEditDialog dataTypeIdentifier={initValue!}
+                                      open={editOpen}
+                                      onOpenChange={open => setEditOpen(open)}/>
+        <Card color={"secondary"} paddingSize={"xs"}>
+            <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>
+                <Flex style={{gap: ".35rem"}} align={"center"}>
+                    <Text hierarchy={"tertiary"}>
+                        {(initialDataType?.name?.[0].content) ?? "Unnamed Data Type"}
+                    </Text>
+                </Flex>
+                <Flex style={{gap: ".35rem"}} align={"center"}>
+                    <Button paddingSize={"xxs"} variant={"filled"} color={"primary"} onClick={() => setEditOpen(true)}>
                         <IconEdit size={13}/>
                     </Button>
-                </ButtonGroup>
+                </Flex>
             </Flex>
-        </Flex>
-        <Card paddingSize={"xs"} mt={0.7} mb={-0.7} mx={-0.7} style={{borderWidth: "2px"}}>
-            {initialDataType?.rules?.nodes?.map(rule => {
-                const map = new Map<string, GenericMapper>((initValue as DataTypeIdentifier).genericType?.genericMappers?.map(generic => [generic.target!!, generic]))
-                return <CardSection border>
-                    <DFlowInputDataTypeRuleTree rule={rule} genericMap={map}/>
-                </CardSection>
-            })}
+            <Card paddingSize={"xs"} mt={0.7} mb={-0.7} mx={-0.7} style={{borderWidth: "2px"}}>
+                <DFlowInputDataTypeRuleTree dataTypeIdentifier={initValue!}/>
+            </Card>
         </Card>
-    </Card>
-
+    </>
 }
 
-export interface DFlowInputDataTypeRuleTreeProps {
-    rule?: Maybe<DataTypeRule>
-    genericMap?: Map<string, GenericMapper>
-    previousRule?: Maybe<DataTypeRule>
-}
+export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProps> = (props) => {
+    const {dataTypeIdentifier, parentRule, isRoot = !parentRule} = props
 
-const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProps> = (props) => {
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
+    const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
-    const {rule, previousRule} = props
+    const genericMap = React.useMemo(() => {
+        const rules = dataTypeIdentifier.genericType?.genericMappers ?? [];
+        return new Map(rules.map(g => [g.target!!, g] as const))
+    }, [dataTypeIdentifier])
 
-    const ruleVariant = rule?.variant
-    const previousRuleVariant = previousRule?.variant
+    const currentDataTypes = React.useMemo(() => {
+        if (dataTypeIdentifier.genericKey) {
+            const genericEntry = genericMap.get(dataTypeIdentifier.genericKey)
+            return genericEntry?.sourceDataTypeIdentifiers?.map(id => dataTypeService.getDataType(id)) ?? []
+        }
+        return [dataTypeService.getDataType(dataTypeIdentifier)]
+    }, [dataTypeStore, dataTypeIdentifier, genericMap])
 
-    if (ruleVariant === "CONTAINS_KEY") {
-        const config = rule?.config as DataTypeRulesContainsKeyConfig
-        const dataType = config.dataTypeIdentifier?.dataType ?? config.dataTypeIdentifier?.genericType?.dataType
-        return <div>
-            <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}}>
-                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
-                    <Text style={{color: "inherit"}}>{config?.key}</Text>
-                </Badge>
-                <Text size={"md"}>
-                    {previousRuleVariant === "CONTAINS_KEY" ? "is a field inside" : "is a field"}
-                    {(dataType?.rules?.nodes?.length ?? 0) <= 0 ? ` of type` : ""}
-                </Text>
-                {(dataType?.rules?.nodes?.length ?? 0) <= 0 ? (
-                    <Badge border color={hashToColor(dataType?.name?.[0].content ?? "")}
-                           style={{verticalAlign: "middle"}}>
-                        <Text style={{color: "inherit"}}>{dataType?.name?.[0].content}</Text>
-                    </Badge>
-                ) : null}
-            </Flex>
-            {(dataType?.rules?.nodes?.length ?? 0) > 0 && (
-                <ul>
-                    {dataType?.rules?.nodes?.map(nextRule => {
-                        if (nextRule?.variant === "PARENT_TYPE") {
-                            const config = nextRule?.config as DataTypeRulesParentTypeConfig
-                            const dataType = config.dataTypeIdentifier?.dataType ?? config.dataTypeIdentifier?.genericType?.dataType
-                            return dataType?.rules?.nodes?.map(nextRule => {
-                                return <li>
-                                    <DFlowInputDataTypeRuleTree rule={nextRule} previousRule={rule}/>
-                                </li>
-                            })
-                        }
-                        return <li>
-                            <DFlowInputDataTypeRuleTree rule={nextRule} previousRule={rule}/>
-                        </li>
-                    })}
-                </ul>
-            )}
-        </div>
-    } else if (ruleVariant === "CONTAINS_TYPE") {
-        const config = rule?.config as DataTypeRulesContainsTypeConfig
-        const dataType = config.dataTypeIdentifier?.dataType ?? config.dataTypeIdentifier?.genericType?.dataType
-        return <div>
-            <Flex align={"center"} style={{gap: ".35rem"}}>
-                <Text>Inside</Text>
-                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
-                    <Text size={"xs"}
-                          style={{color: "inherit"}}>{(previousRule?.config as DataTypeRulesContainsKeyConfig)?.key}</Text>
-                </Badge>
-                <Text>, each entity has</Text>
-            </Flex>
-            {(dataType?.rules?.nodes?.length ?? 0) > 0 && (
-                <ul>
-                    {dataType?.rules?.nodes?.map(nextRule => {
-                        if (nextRule?.variant === "PARENT_TYPE") {
-                            const config = nextRule?.config as DataTypeRulesParentTypeConfig
-                            const dataType = config.dataTypeIdentifier?.dataType ?? config.dataTypeIdentifier?.genericType?.dataType
-                            return dataType?.rules?.nodes?.map(nextRule => {
-                                return <li>
-                                    <DFlowInputDataTypeRuleTree rule={nextRule} previousRule={rule}/>
-                                </li>
-                            })
-                        }
-                        return <li>
-                            <DFlowInputDataTypeRuleTree rule={nextRule} previousRule={rule}/>
-                        </li>
-                    })}
-                </ul>
-            )}
-        </div>
-    } else if (ruleVariant === "PARENT_TYPE") {
-        const config = rule?.config as DataTypeRulesParentTypeConfig
-        console.log(config)
-        const dataType = config.dataTypeIdentifier?.dataType ?? config.dataTypeIdentifier?.genericType?.dataType
-        return dataType?.rules?.nodes?.map(nextRule => {
-            return  <DFlowInputDataTypeRuleTree rule={nextRule} previousRule={rule}/>
+    const resolveChildIdentifier = React.useCallback((childRawIdentifier: DataTypeIdentifier): DataTypeIdentifier | null => {
+        if (!childRawIdentifier) return null
+        if (childRawIdentifier.genericKey) {
+            return genericMap.get(childRawIdentifier.genericKey)?.sourceDataTypeIdentifiers?.[0] ?? null
+        }
+        return childRawIdentifier
+    }, [genericMap])
+
+    const nodes = React.useMemo(() => {
+        return currentDataTypes.flatMap((dataType, typeIndex) => {
+            const rules = dataType?.rules?.nodes ?? []
+            if (!rules.length) return []
+
+            return rules.map((rule, ruleIndex) => {
+                const key = `${typeIndex}-${ruleIndex}`
+                const rawChildId = (rule?.config as any)?.dataTypeIdentifier as DataTypeIdentifier
+                const childId = resolveChildIdentifier(rawChildId)
+
+                if (rule?.variant === "PARENT_TYPE" && childId) {
+                    return <DFlowInputDataTypeRuleTree
+                        key={key}
+                        dataTypeIdentifier={childId}
+                        parentRule={rule}
+                        isRoot={isRoot}
+                    />
+                }
+
+                if (!childId) return null
+
+                const childType = dataTypeService.getDataType(childId)
+                const isChildPrimitive = childType?.variant === "PRIMITIVE"
+                const typeName = childType?.name?.[0]?.content
+
+                let label: React.ReactNode = null
+                if (rule?.variant === "CONTAINS_KEY") {
+                    const keyConfig = rule?.config as DataTypeRulesContainsKeyConfig
+                    label = (
+                        <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
+                            <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                                <Text size={"xs"} style={{color: "inherit"}}>{keyConfig?.key}</Text>
+                            </Badge>
+                            <Text>
+                                {parentRule?.variant === "CONTAINS_KEY" ? "is a field inside" : "is a field"}
+                                {isChildPrimitive ? " of type" : ""}
+                            </Text>
+                            {isChildPrimitive && (
+                                <Badge border color={hashToColor(typeName ?? "")} style={{verticalAlign: "middle"}}>
+                                    <Text size={"xs"} style={{color: "inherit"}}>{typeName}</Text>
+                                </Badge>
+                            )}
+                        </Flex>
+                    )
+                } else if (rule?.variant === "CONTAINS_TYPE") {
+                    const prevKey = (parentRule?.config as DataTypeRulesContainsKeyConfig)?.key
+                    label = (
+                        <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
+                            <Text>Inside</Text>
+                            {prevKey && (
+                                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                                    <Text size={"xs"} style={{color: "inherit"}}>{prevKey}</Text>
+                                </Badge>
+                            )}
+                            <Text>, each entity has</Text>
+                        </Flex>
+                    )
+                }
+
+                const childTree = <DFlowInputDataTypeRuleTree dataTypeIdentifier={childId} parentRule={rule}/>
+
+                if (isRoot) return <CardSection key={key} border> {label} {childTree} </CardSection>
+
+                return <li key={key}> {label} {childTree} </li>
+            })
         })
-    } else if (ruleVariant === "ITEM_OF_COLLECTION") {
-        const config = rule?.config as DataTypeRulesItemOfCollectionConfig
-    } else if (ruleVariant === "REGEX") {
-        const config = rule?.config as DataTypeRulesRegexConfig
-    } else if (ruleVariant === "NUMBER_RANGE") {
-        const config = rule?.config as DataTypeRulesNumberRangeConfig
+    }, [currentDataTypes, isRoot, resolveChildIdentifier, dataTypeService, parentRule])
+
+    const validNodes = nodes.filter(Boolean)
+    if (validNodes.length === 0) return null
+
+    if (isRoot || parentRule?.variant === "PARENT_TYPE") {
+        return <>{validNodes}</>
     }
 
-    return null
+    return <ul>{validNodes}</ul>
 }
-

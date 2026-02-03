@@ -38,140 +38,6 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
         ].sort()
     })
 
-    const exampleDataType: DataType = {
-        name: [{content: "Rest Adapter Input"}],
-        rules: {
-            nodes: [{
-                variant: DataTypeRulesVariant.ContainsKey,
-                config: {
-                    key: "body",
-                    dataTypeIdentifier: {
-                        dataType: {
-                            name: [{content: "Object"}],
-                            rules: {
-                                nodes: [{
-                                    variant: DataTypeRulesVariant.ParentType,
-                                    config: {
-                                        dataTypeIdentifier: {
-                                            dataType: {
-                                                name: [{content: "Users"}],
-                                                rules: {
-                                                    nodes: [{
-                                                        variant: DataTypeRulesVariant.ContainsKey,
-                                                        config: {
-                                                            key: "users",
-                                                            dataTypeIdentifier: {
-                                                                dataType: {
-                                                                    name: [{content: "List"}],
-                                                                    rules: {
-                                                                        nodes: [{
-                                                                            variant: DataTypeRulesVariant.ContainsType,
-                                                                            config: {
-                                                                                dataTypeIdentifier: {
-                                                                                    dataType: {
-                                                                                        name: [{content: "User"}],
-                                                                                        rules: {
-                                                                                            nodes: [{
-                                                                                                variant: DataTypeRulesVariant.ContainsKey,
-                                                                                                config: {
-                                                                                                    key: "username",
-                                                                                                    dataTypeIdentifier: {
-                                                                                                        dataType: {
-                                                                                                            name: [{content: "Text"}],
-                                                                                                            rules: {
-                                                                                                                nodes: []
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }, {
-                                                                                                variant: DataTypeRulesVariant.ContainsKey,
-                                                                                                config: {
-                                                                                                    key: "email",
-                                                                                                    dataTypeIdentifier: {
-                                                                                                        dataType: {
-                                                                                                            name: [{content: "Text"}],
-                                                                                                            rules: {
-                                                                                                                nodes: []
-                                                                                                            }
-                                                                                                        }
-                                                                                                    }
-                                                                                                }
-                                                                                            }]
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }]
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }]
-                                                }
-                                            }
-                                        }
-                                    }
-                                }]
-                            }
-                        },
-                    }
-                }
-            }, {
-                variant: DataTypeRulesVariant.ContainsKey,
-                config: {
-                    key: "headers",
-                    dataTypeIdentifier: {
-                        dataType: {
-                            name: [{content: "Object"}],
-                            rules: {
-                                nodes: [{
-                                    variant: DataTypeRulesVariant.ParentType,
-                                    config: {
-                                        dataTypeIdentifier: {
-                                            dataType: {
-                                                name: [{content: "User"}],
-                                                rules: {
-                                                    nodes: [{
-                                                        variant: DataTypeRulesVariant.ContainsKey,
-                                                        config: {
-                                                            key: "username",
-                                                            dataTypeIdentifier: {
-                                                                dataType: {
-                                                                    name: [{content: "Text"}],
-                                                                    rules: {
-                                                                        nodes: []
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }, {
-                                                        variant: DataTypeRulesVariant.ContainsKey,
-                                                        config: {
-                                                            key: "email",
-                                                            dataTypeIdentifier: {
-                                                                dataType: {
-                                                                    name: [{content: "Text"}],
-                                                                    rules: {
-                                                                        nodes: []
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }]
-                                                }
-                                            }
-                                        }
-                                    }
-                                }]
-                            }
-                        }
-                    }
-                }
-            }]
-        }
-    }
-
     const testDataType = dataTypeService.getTypeFromValue({
         __typename: "LiteralValue",
         value: {
@@ -181,7 +47,8 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                         username: "john_doe",
                         email: "test@test.de",
                     }
-                ]
+                ],
+                test: "sd"
             },
             headers: {
                 username: "john_doe",

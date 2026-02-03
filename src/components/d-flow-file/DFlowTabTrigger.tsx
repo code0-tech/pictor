@@ -9,7 +9,7 @@ import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggesti
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
 import {DataType, DataTypeRulesVariant, Flow, NodeParameterValue, LiteralValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
-import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType.v2";
+import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 
 export interface DFlowTabTriggerProps {

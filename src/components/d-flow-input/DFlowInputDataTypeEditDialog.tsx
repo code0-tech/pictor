@@ -6,7 +6,7 @@ import {Text} from "../text/Text";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable";
 import {Editor} from "../editor/Editor";
 import {DataTypeIdentifier, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowInputDataTypeRuleTree} from "./DFlowInputDataType.v2";
+import {DFlowInputDataTypeRuleTree} from "./DFlowInputDataType";
 import {useService, useStore} from "../../utils";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";

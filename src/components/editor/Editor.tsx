@@ -40,8 +40,8 @@ export interface EditorTokenHighlights {
 export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<object> {
     language?: 'json'
     tokenizer?: EditorTokenizer
-    tokenHighlights: EditorTokenHighlights
-    onChange?: (value: string) => void
+    tokenHighlights?: EditorTokenHighlights
+    onChange?: (value: any) => void
     extensions?: Extension[]
     disabled?: boolean
     readonly?: boolean
@@ -223,7 +223,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     }, [])
 
     return (
-        <ScrollArea h={"100%"} type={"always"}>
+        <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport>
                 <div ref={containerRef} {...mergeCode0Props(`editor`, rest)}>
                     <CodeMirror

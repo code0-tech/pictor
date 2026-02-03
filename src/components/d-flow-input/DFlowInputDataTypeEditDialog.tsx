@@ -4,13 +4,15 @@ import {DLayout} from "../d-layout/DLayout";
 import {Flex} from "../flex/Flex";
 import {Text} from "../text/Text";
 import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable";
-import {Editor} from "../editor/Editor";
+import {Editor, EditorTokenHighlights} from "../editor/Editor";
 import {DataTypeIdentifier, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataTypeRuleTree} from "./DFlowInputDataType";
 import {useService, useStore} from "../../utils";
 import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Spacing} from "../spacing/Spacing";
+import {Badge} from "../badge/Badge";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 export interface DFlowInputDataTypeEditDialogProps {
     dataTypeIdentifier: DataTypeIdentifier
@@ -41,6 +43,24 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
     const initialDataType = React.useMemo(() => {
         return dataTypeService.getDataType(dataTypeIdentifier!)
     }, [dataTypeStore, dataTypeIdentifier])
+
+    const myRenderMap: EditorTokenHighlights = {
+        bool: ({content}) => {
+            return <Badge color={hashToColor("Boolean")} border>
+                Boolean
+            </Badge>
+        },
+        string: ({content}) => {
+            return <Badge key={"Text"} color={hashToColor("Text")} border>
+                Text
+            </Badge>
+        },
+        number: ({content}) => {
+            return <Badge key={"Number"} color={hashToColor("Number")} border>
+                Number
+            </Badge>
+        }
+    }
 
     return <Dialog open={editOpen} onOpenChange={(open) => onOpenChange?.(open)}>
         <DialogPortal>
@@ -80,7 +100,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                         </DResizablePanel>
                         <DResizableHandle/>
                         <DResizablePanel>
-                            <Editor language={"json"} initialValue={editorValue?.value} onChange={value => {
+                            <Editor tokenHighlights={myRenderMap} language={"json"} initialValue={editorValue?.value} onChange={value => {
                                 const dataTypeIdentifier = dataTypeService.getTypeFromValue({
                                     __typename: "LiteralValue",
                                     value: value

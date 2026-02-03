@@ -1,4 +1,4 @@
-import {ValidationProps} from "../form";
+import {InputDescription, InputLabel, ValidationProps} from "../form";
 import {
     DataTypeIdentifier,
     DataTypeRule,
@@ -33,7 +33,7 @@ export interface DFlowInputDataTypeRuleTreeProps {
 
 export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => {
 
-    const {initialValue, defaultValue, value} = props
+    const {initialValue, defaultValue, value, label, description} = props
     const initValue = value ?? initialValue ?? defaultValue ?? null
 
     const dataTypeService = useService(DFlowDataTypeReactiveService)
@@ -45,11 +45,13 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
         return dataTypeService.getDataType(initValue!)
     }, [dataTypeStore, initValue])
 
-    return <>
+    return <div>
         <DFlowInputDataTypeEditDialog dataTypeIdentifier={initValue!}
                                       open={editOpen}
                                       onDataTypeChange={props.onChange}
                                       onOpenChange={open => setEditOpen(open)}/>
+        <InputLabel>{label}</InputLabel>
+        <InputDescription>{description}</InputDescription>
         <Card color={"secondary"} paddingSize={"xs"}>
             <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>
                 <Flex style={{gap: ".35rem"}} align={"center"}>
@@ -67,7 +69,7 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
                 <DFlowInputDataTypeRuleTree dataTypeIdentifier={initValue!}/>
             </Card>
         </Card>
-    </>
+    </div>
 }
 
 export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProps> = (props) => {
@@ -151,7 +153,7 @@ export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProp
                                     <Text size={"xs"} style={{color: "inherit"}}>{prevKey}</Text>
                                 </Badge>
                             )}
-                            <Text>, each entity has</Text>
+                            <Text ml={-0.35}>, each entity has</Text>
                         </Flex>
                     )
                 }

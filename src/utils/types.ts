@@ -1,6 +1,6 @@
 import React, {HTMLProps} from "react";
 
-export type Color = "primary" | "secondary" | "info" | "success" | "warning" | "error";
+export type Color = "primary" | "secondary" | "tertiary" | "info" | "success" | "warning" | "error";
 
 export const Colors: Color[] = ["primary", "secondary", "info", "success", "warning", "error"]
 

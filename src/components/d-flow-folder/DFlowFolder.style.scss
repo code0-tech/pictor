@@ -29,15 +29,14 @@
 
   & {
     @include helpers.borderRadius();
-    @include box.box(variables.$primary);
-    @include box.boxHover(variables.$secondary);
+    @include box.boxHover(variables.$tertiary);
     @include helpers.fontStyle();
     border: none;
-    background: variables.$primary;
+    background: transparent;
   }
 
   &[data-state=open] {
-    @include box.boxActiveStyle(variables.$secondary);
+    @include box.boxActiveStyle(variables.$tertiary);
     border: none;
   }
 
@@ -57,7 +56,7 @@
     &:before {
       height: 100%;
       width: 1px;
-      background: helpers.backgroundColor(variables.$secondary);
+      background: helpers.backgroundColor(variables.$tertiary);
       position: absolute;
       content: "";
       left: 5px;
@@ -78,25 +77,25 @@
 
     & {
       @include helpers.borderRadius();
-      @include box.box(variables.$primary);
-      @include box.boxHover(variables.$secondary);
-      @include box.boxActive(variables.$secondary);
+      @include box.boxHover(variables.$tertiary);
+      @include box.boxActive(variables.$tertiary);
       @include helpers.fontStyle();
       border: none;
+      background: transparent;
     }
 
     &-hover-card {
-      @include box.box(variables.$secondary);
-      @include box.boxActiveStyle(variables.$secondary);
-      @include box.boxHover(variables.$secondary);
-      @include box.boxActive(variables.$secondary);
+      @include box.box(variables.$tertiary);
+      @include box.boxActiveStyle(variables.$tertiary);
+      @include box.boxHover(variables.$tertiary);
+      @include box.boxActive(variables.$tertiary);
       @include helpers.borderRadius();
       cursor: pointer;
       border: none;
     }
 
     &[data-state=open], &--active {
-      @include box.boxActiveStyle(variables.$secondary);
+      @include box.boxActiveStyle(variables.$tertiary);
       border: none;
     }
   }

@@ -1,6 +1,11 @@
+@use "../../styles/variables";
+@use "../../styles/helpers";
+@use "../../styles/box";
+
 .d-full-screen {
   position: relative;
   overflow: hidden;
   overscroll-behavior: contain;
   box-sizing: border-box;
+  background: helpers.backgroundColor(variables.$secondary);
 }

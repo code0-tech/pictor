@@ -122,7 +122,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                  {initialDataType?.name?.[0].content ?? "Unnamed Data Type"}
                              </Text>
                              <DialogClose asChild>
-                                 <Button variant={"filled"} color={"primary"} paddingSize={"xxs"}>
+                                 <Button variant={"filled"} color={"tertiary"} paddingSize={"xxs"}>
                                      <IconX size={13}/>
                                  </Button>
                              </DialogClose>

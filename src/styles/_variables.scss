@@ -1,6 +1,7 @@
 //colors
 $primary: #030014;
-$secondary: #ffffff;
+$secondary: #bfbfbf;
+$tertiary: #ffffff;
 $info: #70ffb2;
 $success: #29BF12;
 $warning: #FFBE0B;
@@ -43,6 +44,7 @@ $borderRadius: $md;
 $colors: (
         "primary": $primary,
         "secondary": $secondary,
+        "tertiary": $tertiary,
         "success": $success,
         "warning": $warning,
         "error": $error,

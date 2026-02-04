@@ -12,7 +12,6 @@
     z-index: 0;
 
     & {
-      @include box.box(variables.$primary);
       border: none;
     }
 
@@ -27,7 +26,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: helpers.backgroundColor(variables.$secondary);
+    background: helpers.backgroundColor(variables.$tertiary);
     outline: none;
 
     &[aria-orientation=vertical] {
@@ -49,9 +48,9 @@
     padding: .2rem;
 
     & {
-      @include box.box(variables.$secondary);
-      @include box.boxHover(variables.$secondary);
-      @include box.boxActive(variables.$secondary);
+      @include box.box(variables.$tertiary);
+      @include box.boxHover(variables.$tertiary);
+      @include box.boxActive(variables.$tertiary);
       border: none;
     }
   }

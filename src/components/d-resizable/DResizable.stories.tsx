@@ -7,9 +7,9 @@ import {
     IconArrowsMinimize,
     IconCircleDot,
     IconDatabase,
-    IconFile,
+    IconFile, IconInbox,
     IconMessageChatbot,
-    IconPlus
+    IconPlus, IconSearch
 } from "@tabler/icons-react";
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -38,6 +38,10 @@ import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-fu
 import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Breadcrumb} from "../breadcrumb/Breadcrumb";
+import {TextInput} from "../form";
+import {Badge} from "../badge/Badge";
+import {PanelImperativeHandle, usePanelRef} from "react-resizable-panels";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -223,61 +227,91 @@ export const Dashboard = () => {
     const [flowTypeStore, flowTypeService] = useReactiveArrayService<FlowTypeView, DFlowTypeReactiveService>(DFlowTypeReactiveService, [...FlowTypeData.map(data => new FlowTypeView(data))]);
 
     const [show, setShow] = React.useState(false);
+    const [isFolderCollapsed, setIsFolderCollapsed] = React.useState(false);
+
+    const styles = React.useMemo(() => {
+        return !isFolderCollapsed ? {borderTopLeftRadius: "1rem"} : {borderTopLeftRadius: "0rem"}
+    }, [isFolderCollapsed])
 
     return <DFullScreen>
-        <ContextStoreProvider
-            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-            <DLayout layoutGap={"0"}>
-                <DResizablePanelGroup orientation={"horizontal"}>
-                    <DResizablePanel id={"1"} defaultSize={"20%"}>
-                        <Folder/>
-                    </DResizablePanel>
-                    <DResizableHandle/>
-                    <DResizablePanel id={"2"}>
-                        <DLayout layoutGap={"0"} rightContent={
-                            <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
-                                        paddingSize={"xs"}>
-                                    <IconFile size={16}/>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <IconDatabase size={16}/>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <IconMessageChatbot size={16}/>
+        <DLayout layoutGap={0} style={{zIndex: 0}} topContent={
+            <>
+                <div style={{
+                    padding: "0 0.7rem",
+                    background: "rgb(21.8, 19.1, 37.1)",
+                }}>
+                    <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
+                        <Flex align={"center"} justify={"space-between"}>
+                            <Flex align={"center"} style={{gap: "1.3rem"}}>
+                                <img width={30} src={"https://code0.tech/code0_logo.png"}/>
+                                <Breadcrumb>
+                                    <Text>CodeZero Orga</Text>
+                                    <Text>projects</Text>
+                                    <Text>Discord Bot</Text>
+                                    <Text>flow</Text>
+                                    <Text>#1</Text>
+                                </Breadcrumb>
+                            </Flex>
+                            <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
+                                           placeholder={"Search..."}/>
+                                <Button>
+                                    <IconInbox size={16}/>
                                 </Button>
                             </Flex>
-                        } bottomContent={
-                            <Flex p={0.35} style={{gap: "0.7rem"}}>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <Text>Logbook</Text>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <Text>Problems</Text>
-                                </Button>
-                            </Flex>
-                        }>
-                            <DResizablePanelGroup orientation={"horizontal"}>
-                                <DResizablePanel id={"2"}>
-                                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
-                                           projectId={undefined}/>
-                                </DResizablePanel>
-                                {show && (
-                                    <>
-                                        <DResizableHandle/>
-                                        <DResizablePanel id={"3"} defaultSize={"25%"}>
-                                            <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
-                                                       projectId={undefined}/>
-                                        </DResizablePanel>
-                                    </>
-                                )}
-                            </DResizablePanelGroup>
-                        </DLayout>
-                    </DResizablePanel>
-                </DResizablePanelGroup>
-            </DLayout>
+                        </Flex>
+                    </Flex>
+                </div>
+            </>
+        }>
+            <ContextStoreProvider
+                services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
+                <DLayout layoutGap={"0"}>
+                    <DResizablePanelGroup orientation={"horizontal"}>
+                        <DResizablePanel onResize={(panelSize) => setIsFolderCollapsed(panelSize.asPercentage <= 0)} id={"1"} defaultSize={"20%"} collapsedSize={"0%"} collapsible minSize={"10%"}>
+                            <Folder/>
+                        </DResizablePanel>
+                        <DResizableHandle bg={"transparent"}/>
+                        <DResizablePanel id={"2"}>
+                            <DLayout layoutGap={"0"} style={{
+                                ...styles,
+                                outline: "100px solid rgb(21.8, 19.1, 37.1)"
+                            }} rightContent={
+                                <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                                    <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
+                                            paddingSize={"xs"}>
+                                        <IconFile size={16}/>
+                                    </Button>
+                                    <Button variant={"none"} paddingSize={"xs"}>
+                                        <IconDatabase size={16}/>
+                                    </Button>
+                                    <Button variant={"none"} paddingSize={"xs"}>
+                                        <IconMessageChatbot size={16}/>
+                                    </Button>
+                                </Flex>
+                            }>
+                                <DResizablePanelGroup orientation={"horizontal"}>
+                                    <DResizablePanel id={"2"}>
+                                        <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                               projectId={undefined}/>
+                                    </DResizablePanel>
+                                    {show && (
+                                        <>
+                                            <DResizableHandle/>
+                                            <DResizablePanel id={"3"} defaultSize={"25%"}>
+                                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                                           projectId={undefined}/>
+                                            </DResizablePanel>
+                                        </>
+                                    )}
+                                </DResizablePanelGroup>
+                            </DLayout>
+                        </DResizablePanel>
+                    </DResizablePanelGroup>
+                </DLayout>
 
-        </ContextStoreProvider>
+            </ContextStoreProvider>
+        </DLayout>
     </DFullScreen>
 
 }
@@ -287,10 +321,10 @@ const Folder = () => {
     const ref = React.useRef<DFlowFolderHandle>(null)
 
     return <DLayout layoutGap={"0"} topContent={
-        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"} p={0.7}>
+        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"} px={0.7}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant={"filled"} paddingSize={"xxs"}>
+                    <Button variant={"filled"} color={"tertiary"} paddingSize={"xxs"}>
                         <IconPlus size={13}/>
                     </Button>
                 </TooltipTrigger>
@@ -301,7 +335,7 @@ const Folder = () => {
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <ButtonGroup color={"primary"} p={0}>
+            <ButtonGroup color={"secondary"} p={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>

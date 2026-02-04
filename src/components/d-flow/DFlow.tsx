@@ -696,6 +696,7 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             onNodesChange={nodeChangeEvent}
             onEdgesChange={edgeChangeEvent}
             {...mergeCode0Props("flow", props)}
+            proOptions={{hideAttribution: true}}
             nodes={nodes}
             edges={edges}
         >

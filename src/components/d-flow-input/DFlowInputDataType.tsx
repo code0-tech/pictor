@@ -60,7 +60,7 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
                     </Text>
                 </Flex>
                 <Flex style={{gap: ".35rem"}} align={"center"}>
-                    <Button paddingSize={"xxs"} variant={"filled"} color={"primary"} onClick={() => setEditOpen(true)}>
+                    <Button paddingSize={"xxs"} variant={"filled"} color={"tertiary"} onClick={() => setEditOpen(true)}>
                         <IconEdit size={13}/>
                     </Button>
                 </Flex>

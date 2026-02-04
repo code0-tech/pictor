@@ -37,21 +37,6 @@
       background: transparent;
     }
 
-    &:after {
-      content: '';
-      position: absolute;
-      top: 25%;
-      bottom: 0;
-      right: -1 * (variables.$xxs / 2);
-      height: 50%;
-      width: 1px;
-      background: helpers.borderColor();
-    }
-
-    &:last-child:after {
-      display: none;
-    }
-
   }
 
 }

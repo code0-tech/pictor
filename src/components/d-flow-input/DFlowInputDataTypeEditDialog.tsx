@@ -1,5 +1,5 @@
 import React from "react";
-import {Dialog, DialogContent, DialogOverlay, DialogPortal, DialogTitle} from "../dialog/Dialog";
+import {Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogTitle} from "../dialog/Dialog";
 import {DLayout} from "../d-layout/DLayout";
 import {Flex} from "../flex/Flex";
 import {Text} from "../text/Text";
@@ -15,6 +15,8 @@ import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
 import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
 import {syntaxTree} from "@codemirror/language";
+import {Button} from "../button/Button";
+import {IconX} from "@tabler/icons-react";
 
 export interface DFlowInputDataTypeEditDialogProps {
     dataTypeIdentifier: DataTypeIdentifier
@@ -119,6 +121,11 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                              <Text>
                                  {initialDataType?.name?.[0].content ?? "Unnamed Data Type"}
                              </Text>
+                             <DialogClose asChild>
+                                 <Button variant={"filled"} color={"primary"} paddingSize={"xxs"}>
+                                     <IconX size={13}/>
+                                 </Button>
+                             </DialogClose>
                          </Flex>}>
                     <DResizablePanelGroup style={{borderRadius: "1rem"}}>
                         <DResizablePanel>

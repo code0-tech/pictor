@@ -26,6 +26,7 @@ import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
+import {autocompletion, CompletionContext, CompletionResult} from "@codemirror/autocomplete";
 
 export type EditorTokenizer = (content: string) => string | null
 
@@ -41,6 +42,7 @@ export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, '
     language?: 'json'
     tokenizer?: EditorTokenizer
     tokenHighlights?: EditorTokenHighlights
+    suggestions?: (context: CompletionContext) => CompletionResult | null
     onChange?: (value: any) => void
     extensions?: Extension[]
     disabled?: boolean
@@ -105,6 +107,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         language,
         tokenizer,
         tokenHighlights,
+        suggestions,
         onChange,
         extensions = [],
         initialValue,
@@ -135,11 +138,15 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     }, [initialValue])
 
     const internalExtensions = React.useMemo(() => {
-        const exts: Extension[] = [...extensions]
+        const internExtensions: Extension[] = [...extensions]
+
+        if (suggestions) {
+            internExtensions.push(autocompletion({ override: [suggestions] }))
+        }
 
         if (language === "json") {
-            exts.push(json())
-            exts.push(linter(jsonParseLinter(), {
+            internExtensions.push(json())
+            internExtensions.push(linter(jsonParseLinter(), {
                 markerFilter: (diagnosticsArray) => {
                     setDiagnostics(diagnosticsArray)
                     return []
@@ -195,13 +202,13 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
             }
         }, {decorations: v => v.decorations})
 
-        exts.push(badgePlugin)
+        internExtensions.push(badgePlugin)
 
-        exts.push(EditorView.atomicRanges.of(view => {
+        internExtensions.push(EditorView.atomicRanges.of(view => {
             return view.plugin(badgePlugin)?.decorations || Decoration.none
         }))
 
-        return exts
+        return internExtensions
     }, [language, tokenizer, tokenHighlights, extensions])
 
     const handleUpdate = React.useCallback((viewUpdate: any) => {

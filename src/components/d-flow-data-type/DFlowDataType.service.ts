@@ -5,7 +5,7 @@ import {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesInputTypesConfig,
+    DataTypeRulesInputTypesConfig, DataTypeRulesVariant,
     Flow,
     GenericMapper,
     LiteralValue,
@@ -109,8 +109,8 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
             if (rule.variant === "CONTAINS_KEY" && isObject) {
                 const keyConfig = rule.config as DataTypeRulesContainsKeyConfig
                 if (keyConfig?.key && keyConfig?.dataTypeIdentifier) {
-                    const mapper = keyConfig.dataTypeIdentifier.genericKey && dataTypeIdentifier.genericType?.genericMappers
-                        ? dataTypeIdentifier.genericType.genericMappers.find(m => m.target === keyConfig.dataTypeIdentifier.genericKey)
+                    const mapper = keyConfig.dataTypeIdentifier?.genericKey && dataTypeIdentifier.genericType?.genericMappers
+                        ? dataTypeIdentifier.genericType.genericMappers.find(m => m.target === keyConfig.dataTypeIdentifier?.genericKey)
                         : undefined
                     const resolvedId = mapper?.sourceDataTypeIdentifiers?.[0] ?? keyConfig.dataTypeIdentifier
 
@@ -232,12 +232,12 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
                 const rules: Array<DataTypeRule> = Object.entries(value.value).map(innerValue => {
                     return {
                         __typename: "DataTypeRule",
-                        variant: "CONTAINS_KEY",
+                        variant: "CONTAINS_KEY" as DataTypeRulesVariant.ContainsKey,
                         config: {
-                            key: innerValue[0],
+                            key: innerValue[0]!,
                             dataTypeIdentifier: this.getTypeFromValue({
                                 __typename: "LiteralValue",
-                                value: innerValue[1]
+                                value: innerValue[1]!
                             }, flow, dependencies) ?? null
                         }
                     }

@@ -24,12 +24,14 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
+    z-index: 2;
   }
 
   &__tools {
     position: absolute;
     bottom: 1rem;
     right: 1rem;
+    z-index: 2;
   }
 
 }

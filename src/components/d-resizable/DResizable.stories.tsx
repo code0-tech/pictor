@@ -301,7 +301,7 @@ const Folder = () => {
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <ButtonGroup>
+            <ButtonGroup color={"primary"} p={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>

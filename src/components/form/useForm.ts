@@ -14,7 +14,9 @@ export interface FormValidationProps<Values> {
 }
 
 export interface ValidationProps<Value> {
-    initialValue?: Value | null
+    initialValue?: Value | null,
+    defaultValue?: Value | null
+    value?: Value | null
     required?: boolean
     formValidation?: {
         setValue: (value: any) => void

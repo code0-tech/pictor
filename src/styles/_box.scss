@@ -25,7 +25,7 @@
   $borderColor: variables.$secondary
 ) {
   &:hover {
-    background: helpers.backgroundColor($background, 1.5);
+    background: helpers.backgroundColor($background, 1.25);
   }
 }
 
@@ -34,7 +34,7 @@
   $color: variables.$secondary,
   $borderColor: variables.$secondary
 ) {
-  background: helpers.backgroundColor($background, 2);
+  background: helpers.backgroundColor($background, 1.5);
   outline: none;
 }
 

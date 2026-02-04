@@ -7,9 +7,10 @@ import {DFlowSuggestion} from "../d-flow-suggestion";
 import {useValueSuggestions} from "../d-flow-suggestion/DFlowValueSuggestions.hook";
 import {useDataTypeSuggestions} from "../d-flow-suggestion/DFlowDataTypeSuggestions.hook";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import type {DataType, Flow, LiteralValue, NodeParameterValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
-import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
+import {DataType, DataTypeRulesVariant, Flow, NodeParameterValue, LiteralValue, Scalars} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
+import {DFlowInputDataType} from "../d-flow-input/DFlowInputDataType";
+import {DFlowDataTypeReactiveService} from "../d-flow-data-type";
 
 export interface DFlowTabTriggerProps {
     instance: Flow
@@ -21,6 +22,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     const flowTypeService = useService(DFlowTypeReactiveService)
     const flowService = useService(DFlowReactiveService)
+    const dataTypeService = useService(DFlowDataTypeReactiveService)
     const [, startTransition] = React.useTransition()
 
     const definition = flowTypeService.getById(instance.type?.id!!)
@@ -36,12 +38,31 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
         ].sort()
     })
 
+    const testDataType = dataTypeService.getTypeFromValue({
+        __typename: "LiteralValue",
+        value: {
+            body: {
+                users: [
+                    {
+                        username: "john_doe",
+                        email: "test@test.de",
+                    }
+                ],
+                test: "sd"
+            },
+            headers: {
+                username: "john_doe",
+                email: "sd",
+            }
+        }
+    })
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
-        {definition?.inputType ? <DFlowInputDataType onDataTypeChange={value => {
-            instance.inputType = value as DataType
-            flowService.update()
-        }} initialValue={instance.inputType || definition.inputType} blockingDataType={definition.inputType}/> : null}
+        {definition?.inputType ? <DFlowInputDataType
+            initialValue={testDataType}
+            label={"Test Data Type"}
+            description={"Data type used for testing"}
+            onChange={(dataTypeIdentifier) => console.log(dataTypeIdentifier)}/> : null}
         {definition?.flowTypeSettings?.map(settingDefinition => {
             const setting = instance.settings?.nodes?.find(s => s?.flowSettingIdentifier == settingDefinition.identifier)
             const title = settingDefinition.names!![0]?.content ?? ""
@@ -55,7 +76,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
                 startTransition(async () => {
                     if (value?.__typename == "LiteralValue" && settingDefinition.identifier) {
                         await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value.value)
-                    } else if (settingDefinition.identifier)  {
+                    } else if (settingDefinition.identifier) {
                         await flowService.setSettingValue(props.instance.id, String(settingDefinition.identifier), value)
                     }
                 })

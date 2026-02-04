@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: helpers.borderColor();
+    background: helpers.backgroundColor(variables.$secondary);
     outline: none;
 
     &[aria-orientation=vertical] {
@@ -50,6 +50,8 @@
 
     & {
       @include box.box(variables.$secondary);
+      @include box.boxHover(variables.$secondary);
+      @include box.boxActive(variables.$secondary);
       border: none;
     }
   }

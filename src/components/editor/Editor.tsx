@@ -64,7 +64,7 @@ class ReactAnchorWidget extends WidgetType {
         span.style.pointerEvents = "none"
 
         span.style.verticalAlign = "middle"
-        span.style.display = "inline-flex"
+        span.style.display = "inline-block"
         return span
     }
 

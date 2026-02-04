@@ -238,7 +238,7 @@ export const Dashboard = () => {
             <>
                 <div style={{
                     padding: "0 0.7rem",
-                    background: "rgb(21.8, 19.1, 37.1)",
+                    background: "var(--secondary)",
                 }}>
                     <Flex style={{gap: "0.7rem", flexDirection: "column"}} py={0.7} w={"100%"}>
                         <Flex align={"center"} justify={"space-between"}>
@@ -255,7 +255,7 @@ export const Dashboard = () => {
                             <Flex align={"center"} style={{gap: "0.7rem"}}>
                                 <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>} rightType={"icon"}
                                            placeholder={"Search..."}/>
-                                <Button>
+                                <Button color={"tertiary"}>
                                     <IconInbox size={16}/>
                                 </Button>
                             </Flex>
@@ -275,7 +275,7 @@ export const Dashboard = () => {
                         <DResizablePanel id={"2"}>
                             <DLayout layoutGap={"0"} style={{
                                 ...styles,
-                                outline: "100px solid rgb(21.8, 19.1, 37.1)"
+                                outline: "100px solid var(--secondary)"
                             }} rightContent={
                                 <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
                                     <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}

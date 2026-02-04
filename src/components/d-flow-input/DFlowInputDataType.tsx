@@ -65,7 +65,7 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
                     </Button>
                 </Flex>
             </Flex>
-            <Card paddingSize={"xs"} mt={0.7} mb={-0.7} mx={-0.7} style={{borderWidth: "2px"}}>
+            <Card paddingSize={"xs"} mt={0.7} mb={-0.55} mx={-0.55}>
                 <DFlowInputDataTypeRuleTree dataTypeIdentifier={initValue!}/>
             </Card>
         </Card>

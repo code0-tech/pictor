@@ -324,18 +324,18 @@ const Folder = () => {
         <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"} px={0.7}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant={"filled"} color={"tertiary"} paddingSize={"xxs"}>
+                    <Button color={"tertiary"} paddingSize={"xxs"}>
                         <IconPlus size={13}/>
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent side={"bottom"}>
                         <Text>Add new flow</Text>
                         <TooltipArrow/>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>
-            <ButtonGroup color={"secondary"} p={0}>
+            <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
@@ -343,7 +343,7 @@ const Folder = () => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
-                        <TooltipContent>
+                        <TooltipContent side={"bottom"}>
                             <Text>Open active flow</Text>
                             <TooltipArrow/>
                         </TooltipContent>
@@ -356,7 +356,7 @@ const Folder = () => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
-                        <TooltipContent>
+                        <TooltipContent side={"bottom"}>
                             <Text>Close all</Text>
                             <TooltipArrow/>
                         </TooltipContent>
@@ -369,7 +369,7 @@ const Folder = () => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
-                        <TooltipContent>
+                        <TooltipContent side={"bottom"}>
                             <Text>Open all</Text>
                             <TooltipArrow/>
                         </TooltipContent>

@@ -33,9 +33,9 @@
     cursor: grabbing;
 
     & {
-      @include box.box();
+      @include box.box(variables.$tertiary);
       @include helpers.borderRadius();
-      border-width: 0px;
+      box-shadow: none;
     }
   }
 

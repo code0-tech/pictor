@@ -13,7 +13,7 @@
       @include box.box(variables.$secondary);
       @include helpers.fontStyle();
       @include helpers.borderRadius();
-      border: none;
+      box-shadow: none;
     }
   }
 

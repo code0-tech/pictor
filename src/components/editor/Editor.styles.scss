@@ -45,8 +45,6 @@
   & {
     @include box.box(variables.$secondary);
     @include helpers.borderRadius();
-    border: none;
-    box-shadow: inset 0 1px 1px helpers.borderColor();
   }
 
   > ul {
@@ -78,7 +76,7 @@
       @include helpers.noFocusStyle();
       @include helpers.fontStyle();
       @include helpers.disabled();
-      border: none;
+      box-shadow: none;
     }
 
     &[aria-selected]{

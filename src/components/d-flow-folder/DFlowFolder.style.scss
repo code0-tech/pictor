@@ -31,13 +31,13 @@
     @include helpers.borderRadius();
     @include box.boxHover(variables.$tertiary);
     @include helpers.fontStyle();
-    border: none;
+    box-shadow: none;
     background: transparent;
   }
 
   &[data-state=open] {
     @include box.boxActiveStyle(variables.$tertiary);
-    border: none;
+    box-shadow: none;
   }
 
   &__icon, &__status, &__item-icon {
@@ -55,7 +55,7 @@
 
     &:before {
       height: 100%;
-      width: 1px;
+      width: 2px;
       background: helpers.backgroundColor(variables.$tertiary);
       position: absolute;
       content: "";
@@ -80,7 +80,7 @@
       @include box.boxHover(variables.$tertiary);
       @include box.boxActive(variables.$tertiary);
       @include helpers.fontStyle();
-      border: none;
+      box-shadow: none;
       background: transparent;
     }
 
@@ -91,12 +91,10 @@
       @include box.boxActive(variables.$tertiary);
       @include helpers.borderRadius();
       cursor: pointer;
-      border: none;
     }
 
     &[data-state=open], &--active {
       @include box.boxActiveStyle(variables.$tertiary);
-      border: none;
     }
   }
 }

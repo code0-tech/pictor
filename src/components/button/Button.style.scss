@@ -45,7 +45,7 @@
 
     &.button--none {
       background: transparent;
-      border-color: transparent;
+      box-shadow: none;
 
       &:hover {
         background: helpers.backgroundColor($color, 1.5);
@@ -57,7 +57,7 @@
     }
 
     &.button--filled {
-      border-color: transparent;
+      box-shadow: none;
     }
   }
 }

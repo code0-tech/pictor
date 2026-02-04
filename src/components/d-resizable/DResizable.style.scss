@@ -51,7 +51,7 @@
       @include box.box(variables.$tertiary);
       @include box.boxHover(variables.$tertiary);
       @include box.boxActive(variables.$tertiary);
-      border: none;
+      box-shadow: none !important;
     }
   }
 

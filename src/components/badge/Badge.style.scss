@@ -14,7 +14,7 @@
 
   @if (var(--badge-color)) {
     background-color: var(--badge-color-background);
-    border: 1px solid var(--badge-color-border);
+    box-shadow: inset 0 1px 1px 0 var(--badge-color-border);
     color: var(--badge-color);
   }
 

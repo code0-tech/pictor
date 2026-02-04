@@ -3,7 +3,7 @@ import {
     Background,
     BackgroundVariant,
     Edge,
-    Node,
+    Node, Panel,
     ReactFlow,
     ReactFlowProvider,
     useEdgesState,
@@ -25,6 +25,8 @@ import {useFlowEdges} from "./DFlow.edges.hook";
 import {DFlowPanelControl} from "../d-flow-panel";
 import {DFlowPanelLayout} from "../d-flow-panel";
 import {DFlowPanelUpdate} from "../d-flow-panel/DFlowPanelUpdate";
+import {Button} from "../button/Button";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 /**
  * Dynamically layouts a tree of nodes and their parameter nodes for a flow-based editor.
@@ -706,6 +708,12 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
             <DFlowPanelControl flowId={flowId}/>
             <DFlowPanelUpdate flowId={flowId}/>
+            <Panel position={"top-left"}>
+                <ButtonGroup>
+                    <Button paddingSize={"xxs"} variant={"filled"}>Undo</Button>
+                    <Button paddingSize={"xxs"} variant={"filled"}>Redo</Button>
+                </ButtonGroup>
+            </Panel>
         </ReactFlow>
     )
 }

@@ -80,7 +80,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
         >
             <DLayout layoutGap={"0"} topContent={<FileTabsList
                 controls={
-                    <Flex>
+                    <ButtonGroup color={"primary"} p={0}>
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="none" paddingSize={"xxs"} color="primary">
@@ -173,7 +173,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
-                    </Flex>
+                    </ButtonGroup>
                 }
             >
                 {visibleTabs.map((tab: FileTabsView, _: number) => {

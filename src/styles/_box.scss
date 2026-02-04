@@ -4,7 +4,7 @@
 
 @mixin box(
   $background: variables.$secondary,
-  $color: variables.$secondary,
+  $color: variables.$tertiary,
   $borderColor: variables.$secondary
 ) {
 
@@ -26,7 +26,7 @@
   $borderColor: variables.$secondary
 ) {
   &:hover {
-    background: helpers.backgroundColor($background, 1.25);
+    background: helpers.backgroundColor($background, 1.5);
     box-shadow: inset 0 1px 1px helpers.borderColor($borderColor);
   }
 }
@@ -36,7 +36,7 @@
   $color: variables.$secondary,
   $borderColor: variables.$secondary
 ) {
-  background: helpers.backgroundColor($background, 1.5);
+  background: helpers.backgroundColor($background, 2);
   box-shadow: inset 0 1px 1px helpers.borderColor($borderColor);
   outline: none;
 }

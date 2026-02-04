@@ -13,6 +13,8 @@ import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} fr
 import {Spacing} from "../spacing/Spacing";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
+import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
+import {syntaxTree} from "@codemirror/language";
 
 export interface DFlowInputDataTypeEditDialogProps {
     dataTypeIdentifier: DataTypeIdentifier
@@ -43,6 +45,42 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
     const initialDataType = React.useMemo(() => {
         return dataTypeService.getDataType(dataTypeIdentifier!)
     }, [dataTypeStore, dataTypeIdentifier])
+
+    const suggestions = (context: CompletionContext): CompletionResult | null => {
+
+        const word = context.matchBefore(/\w*/)
+
+        if (!word || (word.from === word.to && !context.explicit)) {
+            return null;
+        }
+
+        const node = syntaxTree(context.state).resolveInner(context.pos, -1);
+        const prevNode = syntaxTree(context.state).resolveInner(context.pos, 0);
+
+        if (node.name === "Property" || prevNode.name === "Property") {
+            return {
+                from: word.from,
+                options: [
+                    {
+                        label: "Text",
+                        type: "type",
+                        apply: `"Text"`,
+                    },
+                    {
+                        label: "Boolean",
+                        type: "type",
+                        apply: `true`,
+                    },
+                    {
+                        label: "Number",
+                        type: "type",
+                        apply: `1`,
+                    },
+                ]
+            }
+        }
+        return null
+    }
 
     const myRenderMap: EditorTokenHighlights = {
         bool: ({content}) => {
@@ -100,7 +138,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                         </DResizablePanel>
                         <DResizableHandle/>
                         <DResizablePanel>
-                            <Editor tokenHighlights={myRenderMap} language={"json"} initialValue={editorValue?.value} onChange={value => {
+                            <Editor suggestions={suggestions} tokenHighlights={myRenderMap} language={"json"} initialValue={editorValue?.value} onChange={value => {
                                 const dataTypeIdentifier = dataTypeService.getTypeFromValue({
                                     __typename: "LiteralValue",
                                     value: value

@@ -64,29 +64,6 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
 
     return <Panel position={"bottom-center"}>
         <ButtonGroup>
-            {/*<Tooltip>*/}
-            {/*    <TooltipTrigger asChild>*/}
-            {/*        <Button paddingSize={"xxs"}*/}
-            {/*                variant={"filled"}*/}
-            {/*                color={"primary"}>*/}
-            {/*            Execute flow*/}
-            {/*        </Button>*/}
-            {/*    </TooltipTrigger>*/}
-            {/*    <TooltipPortal>*/}
-            {/*        <TooltipContent maw={"300px"}>*/}
-            {/*            <Text>*/}
-            {/*                To execute this flow you can call the following endpoint {" "} <br/>*/}
-            {/*                <Badge>*/}
-            {/*                    <Text>POST</Text>*/}
-            {/*                </Badge>*/}
-            {/*                <Badge color={"info"} border>*/}
-            {/*                    <Text style={{color: "inherit"}}>localhost:6212/72hsa13/users/get</Text>*/}
-            {/*                </Badge>*/}
-            {/*            </Text>*/}
-            {/*            <TooltipArrow/>*/}
-            {/*        </TooltipContent>*/}
-            {/*    </TooltipPortal>*/}
-            {/*</Tooltip>*/}
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}

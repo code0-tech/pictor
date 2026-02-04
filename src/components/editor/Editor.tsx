@@ -21,7 +21,13 @@ import {getStyleTags, tags as t} from "@lezer/highlight"
 import {hashToColor} from "../d-flow/DFlow.util"
 import "./Editor.styles.scss"
 import {Badge} from "../badge/Badge";
-import {IconAlertSquareRounded, IconAlertTriangle, IconExclamationCircle, IconInfoCircle} from "@tabler/icons-react";
+import {
+    IconAlertSquareRounded,
+    IconAlertTriangle,
+    IconExclamationCircle,
+    IconInfoCircle,
+    IconSpace
+} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
@@ -141,7 +147,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         const internExtensions: Extension[] = [...extensions]
 
         if (suggestions) {
-            internExtensions.push(autocompletion({ override: [suggestions] }))
+            internExtensions.push(autocompletion({override: [suggestions]}))
         }
 
         if (language === "json") {
@@ -231,7 +237,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
 
     return (
         <ScrollArea h={"100%"} type={"scroll"}>
-            <ScrollAreaViewport>
+            <ScrollAreaViewport asChild>
                 <div ref={containerRef} {...mergeCode0Props(`editor`, rest)}>
                     <CodeMirror
                         width="100%"
@@ -341,6 +347,18 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                                     </TooltipPortal>
                                 </Tooltip>
                             ) : null}
+                        </Flex>
+                    </div>
+                    <div className={"editor__tools"}>
+                        <Flex style={{gap: "0.35rem"}} align={"center"}>
+                            <Flex style={{gap: "0.35rem"}} align={"center"}>
+                                <Badge color={"secondary"} border>
+                                    <Text>{navigator !== undefined && /Mac/.test(navigator.userAgent) ? "⌃" : "strg"}</Text>
+                                    <Text>+</Text>
+                                    <IconSpace size={13}/>
+                                </Badge>
+                                <Text>for suggestions</Text>
+                            </Flex>
                         </Flex>
                     </div>
                 </div>

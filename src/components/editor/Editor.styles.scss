@@ -37,16 +37,33 @@
   & {
     @include box.box(variables.$secondary);
     @include helpers.borderRadius();
+    border: none;
+    box-shadow: inset 0 1px 1px helpers.borderColor();
+  }
+
+  > ul {
+    list-style: none;
+    gap: 0;
+    display: block;
   }
 
   > ul > li {
-    padding: variables.$xxs variables.$xs !important;
-    border-radius: variables.$borderRadius - variables.$xxs;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    padding: variables.$xxs variables.$xxs !important;
+    border-radius: variables.$borderRadius - (variables.$xxs) !important;
     cursor: pointer;
     width: 100%;
+    font-size: variables.$xs !important;
     display: flex;
     align-items: center;
-    font-size: variables.$sm;
+    gap: variables.$xxs;
+
+    &::before {
+      content: none;
+      display: none;
+    }
 
     & {
       @include box.box(variables.$secondary);
@@ -65,12 +82,11 @@
 }
 
 .cm-completionIcon {
-  width: 0.8rem;
-  height: 0.8rem;
+  width: variables.$sm;
+  height: variables.$sm;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  margin-right: variables.$xxs;
 
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;

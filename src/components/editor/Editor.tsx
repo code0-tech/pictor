@@ -8,7 +8,8 @@ import CodeMirror, {
     Extension,
     RangeSetBuilder,
     ViewPlugin,
-    WidgetType
+    WidgetType,
+    keymap, Prec
 } from "@uiw/react-codemirror"
 import {json, jsonParseLinter} from "@codemirror/lang-json"
 import {Diagnostic, linter} from "@codemirror/lint"
@@ -32,7 +33,7 @@ import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
-import {autocompletion, CompletionContext, CompletionResult} from "@codemirror/autocomplete";
+import {autocompletion, CompletionContext, CompletionResult, acceptCompletion} from "@codemirror/autocomplete";
 
 export type EditorTokenizer = (content: string) => string | null
 
@@ -148,6 +149,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
 
         if (suggestions) {
             internExtensions.push(autocompletion({override: [suggestions]}))
+            internExtensions.push(Prec.highest(keymap.of([{ key: "Tab", run: acceptCompletion }])))
         }
 
         if (language === "json") {

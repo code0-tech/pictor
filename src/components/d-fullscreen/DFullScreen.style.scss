@@ -3,6 +3,10 @@
 @use "../../styles/box";
 
 .d-full-screen {
+
+  --primary: #{helpers.backgroundColor(variables.$primary)};
+  --secondary: #{helpers.backgroundColor(variables.$secondary)};
+
   position: relative;
   overflow: hidden;
   overscroll-behavior: contain;

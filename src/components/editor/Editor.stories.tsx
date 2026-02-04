@@ -1,9 +1,10 @@
 import React from "react";
-import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {Editor, EditorTokenHighlights, EditorTokenizer} from "./Editor";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
+import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
+import {syntaxTree} from "@codemirror/language";
 
 
 export const Concept: React.FC = () => {
@@ -24,15 +25,10 @@ export const Concept: React.FC = () => {
         }
     }
 
-    const tokenizer: EditorTokenizer = (content) => {
-        if (content.startsWith("@")) return "mention";
-        return null;
-    };
-
-    const myRenderMap: EditorTokenHighlights = {
-        mention: ({content}) => {
-            return <Badge color={hashToColor("Mention")} border>
-                {content}
+    const tokenHighlights: EditorTokenHighlights = {
+        bool: ({content}) => {
+            return <Badge color={hashToColor("Boolean")} border>
+                Boolean
             </Badge>
         },
         string: ({content}) => {
@@ -45,17 +41,53 @@ export const Concept: React.FC = () => {
                 Number
             </Badge>
         }
-    };
+    }
+
+    const suggestions = (context: CompletionContext): CompletionResult | null => {
+
+        const word = context.matchBefore(/\w*/)
+
+        if (!word || (word.from === word.to && !context.explicit)) {
+            return null;
+        }
+
+        const node = syntaxTree(context.state).resolveInner(context.pos, -1);
+        const prevNode = syntaxTree(context.state).resolveInner(context.pos, 0);
+
+        if (node.name === "Property" || prevNode.name === "Property") {
+            return {
+                from: word.from,
+                options: [
+                    {
+                        label: "Text",
+                        type: "type",
+                        apply: `"Text"`,
+                    },
+                    {
+                        label: "Boolean",
+                        type: "type",
+                        apply: `true`,
+                    },
+                    {
+                        label: "Number",
+                        type: "type",
+                        apply: `1`,
+                    },
+                ]
+            }
+        }
+        return null
+    }
 
     return (
         <DFullScreen>
-                <Editor
-                    language={"json"}
-                    initialValue={value}
-                    tokenizer={tokenizer}
-                    tokenHighlights={myRenderMap}
-                    onChange={(val) => console.log("New Value:", val)}
-                />
+            <Editor
+                language={"json"}
+                initialValue={value}
+                suggestions={suggestions}
+                tokenHighlights={tokenHighlights}
+                onChange={(val) => console.log("New Value:", val)}
+            />
         </DFullScreen>
 
     )

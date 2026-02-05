@@ -129,10 +129,10 @@ export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProp
                     const keyConfig = rule?.config as DataTypeRulesContainsKeyConfig
                     label = (
                         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
-                            <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                            <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
                                 <Text size={"xs"} style={{color: "inherit"}}>{keyConfig?.key}</Text>
                             </Badge>
-                            <Text>
+                            <Text hierarchy={"tertiary"}>
                                 {parentRule?.variant === "CONTAINS_KEY" ? "is a field inside" : "is a field"}
                                 {isChildPrimitive ? " of type" : ""}
                             </Text>
@@ -149,11 +149,11 @@ export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProp
                         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
                             <Text>Inside</Text>
                             {prevKey && (
-                                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                                <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
                                     <Text size={"xs"} style={{color: "inherit"}}>{prevKey}</Text>
                                 </Badge>
                             )}
-                            <Text ml={-0.35}>, each entity has</Text>
+                            <Text hierarchy={"tertiary"} ml={-0.35}>, each entity has</Text>
                         </Flex>
                     )
                 }

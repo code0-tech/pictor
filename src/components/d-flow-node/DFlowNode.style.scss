@@ -5,6 +5,7 @@
 .d-flow-node {
   border: 1px solid helpers.borderColor();
   box-shadow: none;
+  text-wrap: nowrap;
 
   &__handle {
     border: none !important;

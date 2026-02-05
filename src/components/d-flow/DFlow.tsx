@@ -708,12 +708,6 @@ const InternalDFlow: React.FC<DFlowProps> = (props) => {
             <DFlowValidation flowId={"gid://sagittarius/Flow/1"}/>
             <DFlowPanelControl flowId={flowId}/>
             <DFlowPanelUpdate flowId={flowId}/>
-            <Panel position={"top-left"}>
-                <ButtonGroup>
-                    <Button paddingSize={"xxs"} variant={"filled"}>Undo</Button>
-                    <Button paddingSize={"xxs"} variant={"filled"}>Redo</Button>
-                </ButtonGroup>
-            </Panel>
         </ReactFlow>
     )
 }

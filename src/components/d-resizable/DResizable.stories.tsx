@@ -267,7 +267,7 @@ export const Dashboard = () => {
             <ContextStoreProvider
                 services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
                 <DLayout layoutGap={"0"} showLayoutSplitter={false} rightContent={
-                    <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                    <Flex p={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
                         <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
                                 paddingSize={"xs"}>
                             <IconFile size={16}/>

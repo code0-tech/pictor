@@ -63,7 +63,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     }, [flowId, flowService, flowStore, activeTab])
 
     return <Panel position={"bottom-center"}>
-        <ButtonGroup>
+        <ButtonGroup style={{textWrap: "nowrap"}}>
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}

@@ -266,7 +266,20 @@ export const Dashboard = () => {
         }>
             <ContextStoreProvider
                 services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-                <DLayout layoutGap={"0"}>
+                <DLayout layoutGap={"0"} showLayoutSplitter={false} rightContent={
+                    <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
+                        <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
+                                paddingSize={"xs"}>
+                            <IconFile size={16}/>
+                        </Button>
+                        <Button variant={"none"} paddingSize={"xs"}>
+                            <IconDatabase size={16}/>
+                        </Button>
+                        <Button variant={"none"} paddingSize={"xs"}>
+                            <IconMessageChatbot size={16}/>
+                        </Button>
+                    </Flex>
+                }>
                     <DResizablePanelGroup orientation={"horizontal"}>
                         <DResizablePanel color={"secondary"} onResize={(panelSize) => setIsFolderCollapsed(panelSize.asPercentage <= 0)} id={"1"} defaultSize={"20%"} collapsedSize={"0%"} collapsible minSize={"10%"}>
                             <Folder/>
@@ -275,21 +288,9 @@ export const Dashboard = () => {
                         <DResizablePanel id={"2"}>
                             <DLayout layoutGap={"0"} style={{
                                 ...styles,
+                                borderTopRightRadius: "1rem",
                                 outline: "100px solid var(--secondary)"
-                            }} rightContent={
-                                <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                                    <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
-                                            paddingSize={"xs"}>
-                                        <IconFile size={16}/>
-                                    </Button>
-                                    <Button variant={"none"} paddingSize={"xs"}>
-                                        <IconDatabase size={16}/>
-                                    </Button>
-                                    <Button variant={"none"} paddingSize={"xs"}>
-                                        <IconMessageChatbot size={16}/>
-                                    </Button>
-                                </Flex>
-                            }>
+                            }} >
                                 <DResizablePanelGroup orientation={"horizontal"}>
                                     <DResizablePanel id={"2"}>
                                         <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}

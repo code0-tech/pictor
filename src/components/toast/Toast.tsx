@@ -44,12 +44,12 @@ export function Toast(props: ToastProps) {
         <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
-                    {color && <ToastIcon color={color}/>}
+                    {color && <ToastIcon color={color as Color}/>}
                     <Text size={"md"}>{title}</Text>
                 </Flex>
                 {dismissible &&
                     <span className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
-                        <IconX size={18}/>
+                        <IconX size={16}/>
                     </span>
                 }
             </Flex>
@@ -69,12 +69,13 @@ export function Toast(props: ToastProps) {
 
 const ToastIcon: React.FC<{color: Color}> = ({ color }) => {
     const icons: Record<Color, React.ReactElement<IconProps>> = {
-        "primary": <IconCircleDot className={"toast__icon"} size={18}/>,
-        "secondary": <IconCircleDot className={"toast__icon"} size={18}/>,
-        "info": <IconInfoCircle className={"toast__icon"} size={18}/>,
-        "success": <IconCircleCheck className={"toast__icon"} size={18}/>,
-        "warning": <IconAlertCircle className={"toast__icon"} size={18}/>,
-        "error": <IconCircleX className={"toast__icon"} size={18}/>,
+        "primary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "secondary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "tertiary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "info": <IconInfoCircle className={"toast__icon"} size={16}/>,
+        "success": <IconCircleCheck className={"toast__icon"} size={16}/>,
+        "warning": <IconAlertCircle className={"toast__icon"} size={16}/>,
+        "error": <IconCircleX className={"toast__icon"} size={16}/>,
     }
 
     return icons[color] ?? null

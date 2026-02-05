@@ -1,7 +1,6 @@
 import React from "react";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconPlus, IconTrash} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
 import {useService, useStore} from "../../utils";
 import {FileTabsService} from "../file-tabs/FileTabs.service";

@@ -6,6 +6,7 @@
 
   --primary: #{helpers.backgroundColor(variables.$primary)};
   --secondary: #{helpers.backgroundColor(variables.$secondary)};
+  --tertiary: #{helpers.backgroundColor(variables.$tertiary)};
 
   position: relative;
   overflow: hidden;

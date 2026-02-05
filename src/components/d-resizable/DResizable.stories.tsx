@@ -3,7 +3,7 @@ import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResiza
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
 import {
-    IconAdjustmentsCog,
+    IconAdjustmentsCog, IconAi,
     IconArrowsMaximize,
     IconArrowsMinimize,
     IconCircleDot,
@@ -46,6 +46,7 @@ import {Breadcrumb} from "../breadcrumb/Breadcrumb";
 import {TextInput} from "../form";
 import {Badge} from "../badge/Badge";
 import {AuroraBackground} from "../aurora/Aurora";
+import {Avatar} from "../avatar/Avatar";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -233,84 +234,79 @@ export const Dashboard = () => {
     const [show, setShow] = React.useState(false);
 
     return <DFullScreen>
-        <DLayout layoutGap={0} style={{zIndex: 0}} topContent={
-            <>
-                <div style={{
-                    padding: "0.7rem",
-                    paddingLeft: "1.1rem"
-                }}>
-                    <div style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "50%",
-                        transform: "scaleX(-1)",
-                        height: "40%",
-                        zIndex: "-1",
-                    }}>
-                        <div style={{
-                            position: "absolute",
-                            top: "0",
-                            left: "0",
-                            width: "100%",
-                            height: "100%",
-                            background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.5) 0%, rgba(25, 24, 37, 1) 50%)",
-                            zIndex: "1"
-                        }}/>
-                        <AuroraBackground/>
+        <DLayout layoutGap={0} style={{zIndex: 0}}
+                 showLayoutSplitter={false}
+                 leftContent={<Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+                     <div style={{
+                         position: "absolute",
+                         top: 0,
+                         left: 0,
+                         width: "50%",
+                         transform: "scaleX(-1)",
+                         height: "40%",
+                         zIndex: "-1",
+                     }}>
+                         <div style={{
+                             position: "absolute",
+                             top: "0",
+                             left: "0",
+                             width: "100%",
+                             height: "100%",
+                             background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.5) 0%, rgba(25, 24, 37, 1) 25%)",
+                             zIndex: "1"
+                         }}/>
+                         <AuroraBackground/>
 
-                    </div>
-                    <Flex align={"center"} justify={"space-between"}>
-                        <Flex align={"center"} style={{gap: "1.3rem"}}>
-                            <img width={30} src={"https://code0.tech/code0_logo.png"}/>
-                            <Breadcrumb>
-                                <Text hierarchy={"tertiary"}>CodeZero Orga</Text>
-                                <Text hierarchy={"tertiary"}>projects</Text>
-                                <Text hierarchy={"tertiary"}>Discord Bot</Text>
-                                <Text hierarchy={"tertiary"}>flow</Text>
-                                <Text hierarchy={"tertiary"}>#1</Text>
-                            </Breadcrumb>
-                        </Flex>
-                        <Flex align={"center"} style={{gap: "0.7rem"}}>
-                            <TextInput disabled left={<IconSearch size={16}/>} right={<Badge>⌘K</Badge>}
-                                       rightType={"icon"}
-                                       placeholder={"Search..."}/>
-                            <Button color={"tertiary"}>
-                                <IconInbox size={16}/>
-                            </Button>
-                        </Flex>
-                    </Flex>
-                </div>
-            </>
-        }>
+                     </div>
+                     <img width={30} src={"https://code0.tech/code0_logo.png"}/>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <Button variant={"none"} paddingSize={"xs"}>
+                                 <IconTournament size={16}/>
+                             </Button>
+                         </TooltipTrigger>
+                         <TooltipPortal>
+                             <TooltipContent side={"right"} align={"center"}>
+                                 <Text>Flow builder</Text>
+                             </TooltipContent>
+                         </TooltipPortal>
+                     </Tooltip>
+                     <Button variant={"none"} paddingSize={"xs"}>
+                         <IconAdjustmentsCog size={16}/>
+                     </Button>
+                 </Flex>}>
             <ContextStoreProvider
                 services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-                <DLayout layoutGap={"0"} showLayoutSplitter={false} rightContent={
+                <DLayout layoutGap={"0"} showLayoutSplitter={false} topContent={
+                    <>
+                        <div style={{
+                            padding: "0.7rem"
+                        }}>
+                            <Flex align={"center"} justify={"space-between"}>
+                                <Breadcrumb>
+                                    <Text hierarchy={"tertiary"}>CodeZero Orga</Text>
+                                    <Text hierarchy={"tertiary"}>projects</Text>
+                                    <Text hierarchy={"tertiary"}>Discord Bot</Text>
+                                    <Text hierarchy={"tertiary"}>flow</Text>
+                                    <Text hierarchy={"tertiary"}>#1</Text>
+                                </Breadcrumb>
+                                <Flex align={"center"} style={{gap: ".7rem"}}>
+                                    <Button disabled variant={"none"} paddingSize={"xs"}>
+                                        <IconSearch size={16}/>
+                                    </Button>
+                                    <Button disabled variant={"none"} paddingSize={"xs"}>
+                                        <IconInbox size={16}/>
+                                    </Button>
+                                    <Avatar identifier={"nsammito"}/>
+                                </Flex>
+                            </Flex>
+                        </div>
+                    </>
+                } rightContent={
                     <Flex px={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
                         <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
                                 paddingSize={"xs"} aria-selected={show}>
                             <IconFile size={16}/>
-                        </Button>
-                    </Flex>
-                } leftContent={
-                    <Flex px={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <IconTournament size={16}/>
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"right"} align={"center"}>
-                                    <Text>Flow builder</Text>
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                        <Button variant={"none"} paddingSize={"xs"}>
-                            <IconDatabase size={16}/>
-                        </Button>
-                        <Button variant={"none"} paddingSize={"xs"}>
-                            <IconAdjustmentsCog size={16}/>
                         </Button>
                     </Flex>
                 }>
@@ -320,25 +316,21 @@ export const Dashboard = () => {
                             <Folder/>
                         </DResizablePanel>
                         <DResizableHandle/>
-                        <DResizablePanel id={"2"}>
+                        <DResizablePanel id={"2"} style={{
+                            borderTopLeftRadius: "1rem",
+                            borderTopRightRadius: "1rem",
+                            outline: "100px solid transparent"
+                        }}>
                             <DLayout layoutGap={"0"}>
                                 <DResizablePanelGroup orientation={"horizontal"}>
-                                    <DResizablePanel color={"primary"} id={"2"} style={{
-                                        borderTopLeftRadius: "1rem",
-                                        borderTopRightRadius: "1rem",
-                                        outline: "100px solid transparent"
-                                    }}>
+                                    <DResizablePanel color={"primary"} id={"2"}>
                                         <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
                                                projectId={undefined}/>
                                     </DResizablePanel>
                                     {show && (
                                         <>
                                             <DResizableHandle/>
-                                            <DResizablePanel color={"primary"} id={"3"} defaultSize={"25%"} style={{
-                                                borderTopLeftRadius: "1rem",
-                                                borderTopRightRadius: "1rem",
-                                                outline: "100px solid transparent"
-                                            }}>
+                                            <DResizablePanel color={"primary"} id={"3"} defaultSize={"25%"}>
                                                 <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
                                                            projectId={undefined}/>
                                             </DResizablePanel>
@@ -363,7 +355,7 @@ const Folder = () => {
     return <DLayout layoutGap={"0"} topContent={
         <Flex style={{flexDirection: "column", gap: "0.7rem"}} px={0.7}>
             <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
-                <Text size={"lg"} hierarchy={"primary"}>Explorer</Text>
+                <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
                 <Button variant={"none"} paddingSize={"xxs"}>
                     <IconLayoutSidebar size={16}/>
                 </Button>

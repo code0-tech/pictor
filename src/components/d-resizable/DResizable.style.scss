@@ -27,12 +27,12 @@
     outline: none;
 
     &[aria-orientation=vertical] {
-      width: variables.$xs;
+      width: 1px;
       height: 100%;
     }
 
     &[aria-orientation=horizontal] {
-      height: variables.$xs;
+      height: 1px;
       width: 100%;
     }
 

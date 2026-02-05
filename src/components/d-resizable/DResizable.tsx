@@ -19,7 +19,7 @@ export const DResizablePanelGroup: React.FC<DResizablePanelGroupProps> = (props)
 }
 
 export const DResizablePanel: React.FC<DResizablePanelProps> = (props) => {
-    return <Panel data-slot="resizable-panel" {...mergeCode0Props(`d-resizable__panel d-resizable__panel--${props.color ?? "primary"}`, props)} />
+    return <Panel data-slot="resizable-panel" {...mergeCode0Props(`d-resizable__panel ${props.color ? `d-resizable__panel--${props.color ?? "primary"}` : ""}`, props)} />
 }
 
 export const DResizableHandle: React.FC<DResizableHandleProps> = (props) => {

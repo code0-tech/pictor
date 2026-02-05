@@ -55,7 +55,7 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
         <Card color={"secondary"} paddingSize={"xs"}>
             <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>
                 <Flex style={{gap: ".35rem"}} align={"center"}>
-                    <Text hierarchy={"tertiary"}>
+                    <Text>
                         {(initialDataType?.name?.[0].content) ?? "Unnamed Data Type"}
                     </Text>
                 </Flex>

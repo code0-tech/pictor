@@ -10,7 +10,7 @@
     padding: variables.$xxs variables.$xs;
 
     & {
-      @include box.box(variables.$secondary);
+      @include box.box(variables.$tertiary);
       @include helpers.fontStyle();
       @include helpers.borderRadius();
       box-shadow: none;
@@ -18,7 +18,7 @@
   }
 
   &__arrow {
-    fill: helpers.backgroundColor(variables.$secondary);
+    fill: helpers.backgroundColor(variables.$tertiary);
   }
 
 }

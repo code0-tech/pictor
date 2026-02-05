@@ -54,6 +54,13 @@
       box-shadow: none !important;
     }
   }
+}
 
-
+@each $name, $color in variables.$colors {
+  .d-resizable__panel--#{$name} {
+    & {
+      background: helpers.backgroundColor($color);
+      border: none;
+    }
+  }
 }

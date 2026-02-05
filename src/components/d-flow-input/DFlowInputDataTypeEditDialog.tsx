@@ -127,7 +127,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                  </Button>
                              </DialogClose>
                          </Flex>}>
-                    <DResizablePanelGroup style={{borderRadius: "1rem"}}>
+                    <DResizablePanelGroup bg={"black"} style={{borderRadius: "1rem"}}>
                         <DResizablePanel>
                             <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport px={1}>

@@ -268,7 +268,7 @@ export const Dashboard = () => {
                 services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
                 <DLayout layoutGap={"0"}>
                     <DResizablePanelGroup orientation={"horizontal"}>
-                        <DResizablePanel onResize={(panelSize) => setIsFolderCollapsed(panelSize.asPercentage <= 0)} id={"1"} defaultSize={"20%"} collapsedSize={"0%"} collapsible minSize={"10%"}>
+                        <DResizablePanel color={"secondary"} onResize={(panelSize) => setIsFolderCollapsed(panelSize.asPercentage <= 0)} id={"1"} defaultSize={"20%"} collapsedSize={"0%"} collapsible minSize={"10%"}>
                             <Folder/>
                         </DResizablePanel>
                         <DResizableHandle bg={"transparent"}/>

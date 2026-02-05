@@ -213,7 +213,7 @@ export const DFlowFolder = React.forwardRef<DFlowFolderHandle, DFlowFolderProps>
     }, [activeFlowId, computeDefaultOpen, resetEpoch])
 
     return (
-        <ScrollArea h={"100%"}>
+        <ScrollArea h={"100%"} type={"scroll"}>
             <ScrollAreaViewport asChild>
                 <DFlowFolderContextMenu {...props}>
                     <div className="d-folder__root">

@@ -38,6 +38,19 @@
       height: 1px;
       width: 100%;
     }
+
+    &[data-separator="hover"] {
+      .d-resizable__handle-bar {
+        background: helpers.backgroundColor(variables.$tertiary, 1.5);
+      }
+    }
+
+    &[data-separator="active"] {
+      .d-resizable__handle-bar {
+        background: helpers.backgroundColor(variables.$tertiary, 2);
+      }
+    }
+
   }
 
   &__handle-bar {

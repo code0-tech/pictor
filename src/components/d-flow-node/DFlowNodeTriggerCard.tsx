@@ -53,7 +53,7 @@ export const DFlowNodeTriggerCard: React.FC<DFlowNodeTriggerCardProps> = memo((p
                  paddingSize={"xs"}
                  key={id}
                  data-flow-refernce={id}
-                 className={fileTabsService.getActiveTab()?.id == definition?.id ? "d-flow-node--active" : undefined}
+                 className={`d-flow-node ${fileTabsService.getActiveTab()?.id == definition?.id ? "d-flow-node--active" : undefined}`}
                  onClick={() => {
                      flowInstance.setViewport({
                          x: (viewportWidth / 2) + (props.positionAbsoluteX * -1) - (width / 2),

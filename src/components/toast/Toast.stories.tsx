@@ -18,7 +18,7 @@ export const ExampleToast = () => {
     const renderToast = () => {
         toast({
             title: "Cannot delete the last administrative role",
-            color: "warning",
+            color: "info",
             dismissible: true,
             duration: 10000,
             children: <Text>Some content</Text>

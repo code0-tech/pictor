@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react"
 import {Text} from "../text/Text"
 import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
 
 export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title" | "id"> {
     children?: React.ReactNode | React.ReactNode[]
@@ -48,9 +49,9 @@ export function Toast(props: ToastProps) {
                     <Text size={"md"}>{title}</Text>
                 </Flex>
                 {dismissible &&
-                    <span className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
+                    <Button variant={"none"} paddingSize={"xxs"} color={color as Color} className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
                         <IconX size={16}/>
-                    </span>
+                    </Button>
                 }
             </Flex>
             {children &&
@@ -58,11 +59,11 @@ export function Toast(props: ToastProps) {
                     {children}
                 </div>
             }
-            <div className={"toast__duration"}  style={{
+            <Flex className={"toast__duration"} style={{
                 ["--toast-duration" as any]: `${duration}ms`,
             }}>
-                <Text hierarchy={"tertiary"}>This message will close in <Text hierarchy={"primary"}>{duration / 1000}</Text> seconds</Text>
-            </div>
+                <Text hierarchy={"tertiary"}>This message will close in</Text> <Text hierarchy={"primary"}>{duration / 1000}</Text> <Text>seconds</Text>
+            </Flex>
         </div>
     )
 }

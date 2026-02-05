@@ -843,7 +843,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                                 inputRef={activeControlRef as RefObject<HTMLInputElement>}
                             >
                                 {suggestionsHeader}
-                                <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
                                     {availableSuggestions?.length === 0 && suggestionsEmptyState}
                                     {!!availableSuggestions?.length && (
                                         <InputSuggestionMenuContentItems

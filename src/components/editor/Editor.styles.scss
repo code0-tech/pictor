@@ -81,7 +81,7 @@
 
     &[aria-selected]{
       border: none;
-      background: helpers.backgroundColor(variables.$secondary, 1.5);
+      background: helpers.backgroundColor(variables.$secondary, 2);
       width: 100%;
     }
   }

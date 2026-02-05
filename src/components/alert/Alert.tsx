@@ -19,12 +19,13 @@ export const Alert: React.FC<AlertProps> = (props) => {
     const {color = "secondary", children, ...rest} = props
 
     const icons: Record<Color, React.ReactElement<IconProps>> = {
-        "primary": <IconCircleDot size={18}/>,
-        "secondary": <IconCircleDot size={18}/>,
-        "info": <IconInfoCircle size={18}/>,
-        "success": <IconCircleCheck size={18}/>,
-        "warning": <IconAlertCircle size={18}/>,
-        "error": <IconCircleX size={18}/>,
+        "primary": <IconCircleDot size={16}/>,
+        "secondary": <IconCircleDot size={16}/>,
+        "tertiary": <IconCircleDot size={16}/>,
+        "info": <IconInfoCircle size={16}/>,
+        "success": <IconCircleCheck size={16}/>,
+        "warning": <IconAlertCircle size={16}/>,
+        "error": <IconCircleX size={16}/>,
     }
 
     return <div {...mergeCode0Props(`alert alert--${color}`, rest)}>

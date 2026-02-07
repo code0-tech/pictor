@@ -13,7 +13,6 @@
       @include box.box(variables.$tertiary);
       @include helpers.fontStyle();
       @include helpers.borderRadius();
-      box-shadow: none;
     }
   }
 
@@ -21,4 +20,16 @@
     fill: helpers.backgroundColor(variables.$tertiary);
   }
 
+}
+
+@each $name, $color in variables.$colors {
+
+  .tooltip__content--#{$name} {
+    & {
+      @include box.box($color);
+    }
+  }
+  .tooltip__arrow--#{$name} {
+    fill: helpers.backgroundColor($color);
+  }
 }

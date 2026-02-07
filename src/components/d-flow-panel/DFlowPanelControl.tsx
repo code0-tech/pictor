@@ -74,9 +74,8 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent sideOffset={8}>
                         <Text>Select a node to delete it</Text>
-                        <TooltipArrow/>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>

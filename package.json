@@ -134,7 +134,8 @@
     "@monaco-editor/react": "^4.7.0",
     "@uiw/codemirror-themes": "^4.25.4",
     "@uiw/react-codemirror": "^4.25.4",
-    "react-syntax-highlighter": "^16.1.0"
+    "react-syntax-highlighter": "^16.1.0",
+    "ldrs": "^1.1.9"
   },
   "publishConfig": {
     "access": "public"

@@ -325,7 +325,7 @@
       left: calc(-1 * $padding / 2);
 
       & {
-        @include box.box();
+        @include box.box(variables.$tertiary);
         @include helpers.borderRadius();
         position: absolute;
         width: $size * 2.5 + $padding;

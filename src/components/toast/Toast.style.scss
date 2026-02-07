@@ -80,6 +80,7 @@
     position: relative;
     margin: variables.$md (-1 * variables.$md) (-1 * variables.$md);
     padding: variables.$xxs variables.$md (variables.$xxs + 0.25rem);
+    gap: variables.$xxs;
 
     & {
       border-top: 1px solid helpers.borderColor();

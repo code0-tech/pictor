@@ -1,7 +1,6 @@
 import React from "react";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
-import {IconPlus, IconTrash} from "@tabler/icons-react";
 import {Panel} from "@xyflow/react";
 import {useService, useStore} from "../../utils";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
@@ -63,30 +62,7 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
     }, [flowId, flowService, flowStore, activeTab])
 
     return <Panel position={"bottom-center"}>
-        <ButtonGroup>
-            {/*<Tooltip>*/}
-            {/*    <TooltipTrigger asChild>*/}
-            {/*        <Button paddingSize={"xxs"}*/}
-            {/*                variant={"filled"}*/}
-            {/*                color={"primary"}>*/}
-            {/*            Execute flow*/}
-            {/*        </Button>*/}
-            {/*    </TooltipTrigger>*/}
-            {/*    <TooltipPortal>*/}
-            {/*        <TooltipContent maw={"300px"}>*/}
-            {/*            <Text>*/}
-            {/*                To execute this flow you can call the following endpoint {" "} <br/>*/}
-            {/*                <Badge>*/}
-            {/*                    <Text>POST</Text>*/}
-            {/*                </Badge>*/}
-            {/*                <Badge color={"info"} border>*/}
-            {/*                    <Text style={{color: "inherit"}}>localhost:6212/72hsa13/users/get</Text>*/}
-            {/*                </Badge>*/}
-            {/*            </Text>*/}
-            {/*            <TooltipArrow/>*/}
-            {/*        </TooltipContent>*/}
-            {/*    </TooltipPortal>*/}
-            {/*</Tooltip>*/}
+        <ButtonGroup style={{textWrap: "nowrap"}}>
             <Tooltip>
                 <TooltipTrigger asChild>
                     <Button disabled={!activeTab || !(activeTab?.content?.props.flowId as Flow['id'])}
@@ -98,9 +74,8 @@ export const DFlowPanelControl: React.FC<DFlowPanelControlProps> = (props) => {
                     </Button>
                 </TooltipTrigger>
                 <TooltipPortal>
-                    <TooltipContent>
+                    <TooltipContent sideOffset={8}>
                         <Text>Select a node to delete it</Text>
-                        <TooltipArrow/>
                     </TooltipContent>
                 </TooltipPortal>
             </Tooltip>

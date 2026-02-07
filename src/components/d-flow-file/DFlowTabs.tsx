@@ -80,7 +80,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
         >
             <DLayout layoutGap={"0"} topContent={<FileTabsList
                 controls={
-                    <ButtonGroup color={"primary"} p={0}>
+                    <ButtonGroup color={"primary"} p={0} style={{boxShadow: "none"}}>
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="none" paddingSize={"xxs"} color="primary">
@@ -89,7 +89,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                             </MenuTrigger>
                             <MenuPortal>
                                 <MenuContent align="start" sideOffset={8} color={"secondary"}>
-                                    <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                    <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
                                         <MenuLabel>Starting Node</MenuLabel>
                                         {triggerTab &&
                                             <MenuItem onSelect={() => fileTabsService.activateTab(triggerTab.id!!)}>
@@ -144,7 +144,7 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                             </MenuTrigger>
                             <MenuPortal>
                                 <MenuContent align="end" sideOffset={8} color={"secondary"}>
-                                    <Card paddingSize={"xxs"} mt={-0.35} mx={-0.35} style={{borderWidth: "2px"}}>
+                                    <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
                                         <MenuItem onClick={() => fileTabsService.clearAll()}>Close all tabs</MenuItem>
                                         <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
                                             tabs</MenuItem>

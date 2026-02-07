@@ -44,12 +44,12 @@
       @include helpers.noFocusStyle();
       @include helpers.fontStyle();
       @include helpers.disabled();
-      border: none;
+      box-shadow: none;
     }
 
     &:focus, &[data-focus=true] {
       @include box.box(variables.$white, variables.$white, variables.$white);
-      border: none;
+      box-shadow: none;
       width: 100%;
     }
   }

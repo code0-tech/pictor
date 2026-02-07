@@ -52,7 +52,7 @@ export const DFlowPanelUpdate: React.FC<DFlowPanelUpdateProps> = (props) => {
         {edited ? (
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button onClick={flowUpdate} disabled={loading} variant={"filled"} paddingSize={"xxs"}>
+                    <Button onClick={flowUpdate} disabled={loading} paddingSize={"xxs"}>
                         {loading ? ("Saving...") : (<IconCloudUpload size={13}/>)}
                     </Button>
                 </TooltipTrigger>

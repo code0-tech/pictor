@@ -8,16 +8,12 @@
   &__panel {
     color: white;
     position: relative;
+    background: transparent;
     overflow: hidden;
     z-index: 0;
 
     & {
-      @include box.box(variables.$primary);
       border: none;
-    }
-
-    &:has(.d-resizable__panel) {
-      background: variables.$primary;
     }
 
   }
@@ -27,18 +23,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: helpers.backgroundColor(variables.$secondary);
+    background: transparent;
     outline: none;
 
     &[aria-orientation=vertical] {
-      width: 1px;
+      width: variables.$xs;
       height: 100%;
     }
 
     &[aria-orientation=horizontal] {
-      height: 1px;
+      height: variables.$xs;
       width: 100%;
     }
+
+    &[data-separator="hover"] {
+      .d-resizable__handle-bar {
+        background: helpers.backgroundColor(variables.$tertiary, 1.5);
+      }
+    }
+
+    &[data-separator="active"] {
+      .d-resizable__handle-bar {
+        background: helpers.backgroundColor(variables.$tertiary, 2);
+      }
+    }
+
   }
 
   &__handle-bar {
@@ -49,12 +58,19 @@
     padding: .2rem;
 
     & {
-      @include box.box(variables.$secondary);
-      @include box.boxHover(variables.$secondary);
-      @include box.boxActive(variables.$secondary);
+      @include box.box(variables.$tertiary);
+      @include box.boxHover(variables.$tertiary);
+      @include box.boxActive(variables.$tertiary);
+      box-shadow: none !important;
+    }
+  }
+}
+
+@each $name, $color in variables.$colors {
+  .d-resizable__panel--#{$name} {
+    & {
+      background: helpers.backgroundColor($color);
       border: none;
     }
   }
-
-
 }

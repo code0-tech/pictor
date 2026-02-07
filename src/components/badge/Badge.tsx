@@ -31,7 +31,7 @@ export const Badge: React.FC<BadgeType> = (props) => {
                         ...args.style,
                         "--badge-color-background": mixColorRgb(color, 9),
                         "--badge-color-border": withAlpha(color, 0.1),
-                        "--badge-color": withAlpha(color, 1),
+                        "--badge-color": withAlpha(color, 0.75),
                     },
                 }
             )}
@@ -79,7 +79,7 @@ const mixColorRgb = (color: string, level: number) => {
     const w = clamp01(level * 0.1)
 
     const c1 = parseCssColorToRgba(color)
-    const c2 = parseCssColorToRgba("#030014")
+    const c2 = parseCssColorToRgba("#070514")
 
     const mix = (a: number, b: number) =>
         Math.round(a * (1 - w) + b * w)

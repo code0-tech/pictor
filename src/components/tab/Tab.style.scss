@@ -25,7 +25,6 @@
   }
 
   &__trigger {
-    background: transparent;
     border: none;
     margin: 0;
     position: relative;
@@ -50,10 +49,25 @@
       }
     }
 
+    &[data-orientation="vertical"] {
+      &:after {
+        content: "";
+        position: absolute;
+        background: transparent;
+
+        border-bottom-right-radius: 50rem;
+        border-top-right-radius: 50rem;
+        width: 2px;
+        height: 35%;
+        top: 50%;
+        left: -0.7rem;
+        transform: translateY(-50%);
+      }
+    }
+
     &[aria-selected=true] {
       &[data-orientation="vertical"], &[data-orientation="horizontal"] {
         opacity: 1;
-
         &:after {
           background: variables.$info;
         }

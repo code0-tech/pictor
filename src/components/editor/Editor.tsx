@@ -321,7 +321,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
             <div className={"editor__tools"}>
                 <Flex style={{gap: "0.35rem", textWrap: "nowrap"}} align={"center"}>
                     <Flex style={{gap: "0.35rem"}} align={"center"}>
-                        <Badge color={"primary"} border>
+                        <Badge color={"secondary"} border>
                             <Text>{navigator !== undefined && /Mac/.test(navigator.userAgent) ? "⌃" : "strg"}</Text>
                             <Text>+</Text>
                             <IconSpace size={13}/>
@@ -330,7 +330,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     </Flex>
                     <Text>and</Text>
                     <Flex style={{gap: "0.35rem"}} align={"center"}>
-                        <Badge color={"primary"} border>
+                        <Badge color={"secondary"} border>
                             <IconArrowBarToRight size={13}/>
                             <Text>or</Text>
                             <IconCornerDownLeft size={13}/>

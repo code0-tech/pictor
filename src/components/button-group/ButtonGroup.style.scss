@@ -3,7 +3,6 @@
 @use "../../styles/box";
 
 .button-group {
-  border: none;
   width: fit-content;
   background: transparent;
   position: relative;
@@ -14,7 +13,6 @@
   & {
     @include box.box(variables.$secondary);
     @include helpers.borderRadius();
-    border-width: 0;
   }
 
   .button {

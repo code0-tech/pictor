@@ -23,7 +23,7 @@
       width: 100%;
       overflow-x: scroll;
       flex-wrap: nowrap;
-      gap: variables.$xs;
+      gap: variables.$xxs;
       -ms-overflow-style: none; /* Internet Explorer 10+ */
       scrollbar-width: none; /* Firefox, Safari 18.2+, Chromium 121+ */
       &::-webkit-scrollbar {
@@ -48,23 +48,11 @@
       @include helpers.borderRadius();
       @include helpers.fontStyle();
       background: transparent;
-      border: none;
-      &:after {
-        position: absolute;
-        content: "";
-        height: 75%;
-        width: 100%;
-        left: variables.$xxs;
-        top: 50%;
-        transform: translateY(-50%);
-        border-right: 1px solid helpers.borderColor();
-        z-index: -1;
-      }
+      box-shadow: none;
     }
 
     &[data-state="active"] {
       @include box.boxActiveStyle(variables.$secondary);
-      border: none;
     }
 
   }

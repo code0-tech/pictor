@@ -55,17 +55,17 @@ export const DFlowInputDataType: React.FC<DFlowInputDataTypeProps> = (props) => 
         <Card color={"secondary"} paddingSize={"xs"}>
             <Flex style={{gap: ".7rem"}} align={"center"} justify={"space-between"}>
                 <Flex style={{gap: ".35rem"}} align={"center"}>
-                    <Text hierarchy={"tertiary"}>
+                    <Text>
                         {(initialDataType?.name?.[0].content) ?? "Unnamed Data Type"}
                     </Text>
                 </Flex>
                 <Flex style={{gap: ".35rem"}} align={"center"}>
-                    <Button paddingSize={"xxs"} variant={"filled"} color={"primary"} onClick={() => setEditOpen(true)}>
+                    <Button paddingSize={"xxs"} variant={"filled"} color={"tertiary"} onClick={() => setEditOpen(true)}>
                         <IconEdit size={13}/>
                     </Button>
                 </Flex>
             </Flex>
-            <Card paddingSize={"xs"} mt={0.7} mb={-0.7} mx={-0.7} style={{borderWidth: "2px"}}>
+            <Card paddingSize={"xs"} mt={0.7} mb={-0.55} mx={-0.55}>
                 <DFlowInputDataTypeRuleTree dataTypeIdentifier={initValue!}/>
             </Card>
         </Card>
@@ -129,10 +129,10 @@ export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProp
                     const keyConfig = rule?.config as DataTypeRulesContainsKeyConfig
                     label = (
                         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
-                            <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                            <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
                                 <Text size={"xs"} style={{color: "inherit"}}>{keyConfig?.key}</Text>
                             </Badge>
-                            <Text>
+                            <Text hierarchy={"tertiary"}>
                                 {parentRule?.variant === "CONTAINS_KEY" ? "is a field inside" : "is a field"}
                                 {isChildPrimitive ? " of type" : ""}
                             </Text>
@@ -149,11 +149,11 @@ export const DFlowInputDataTypeRuleTree: React.FC<DFlowInputDataTypeRuleTreeProp
                         <Flex align={"center"} style={{gap: ".35rem", textWrap: "nowrap"}} className={"rule"}>
                             <Text>Inside</Text>
                             {prevKey && (
-                                <Badge border color={"secondary"} style={{verticalAlign: "middle"}}>
+                                <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
                                     <Text size={"xs"} style={{color: "inherit"}}>{prevKey}</Text>
                                 </Badge>
                             )}
-                            <Text ml={-0.35}>, each entity has</Text>
+                            <Text hierarchy={"tertiary"} ml={-0.35}>, each entity has</Text>
                         </Flex>
                     )
                 }

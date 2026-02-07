@@ -3,13 +3,17 @@ import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "./DResiza
 import React from "react";
 import {DFullScreen} from "../d-fullscreen/DFullScreen";
 import {
+    IconAdjustmentsCog, IconAi,
     IconArrowsMaximize,
     IconArrowsMinimize,
     IconCircleDot,
     IconDatabase,
     IconFile,
-    IconMessageChatbot,
-    IconPlus
+    IconInbox,
+    IconLayoutSidebar,
+    IconPlus,
+    IconSearch,
+    IconTournament
 } from "@tabler/icons-react";
 import {ContextStoreProvider, useReactiveArrayService} from "../../utils";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
@@ -38,6 +42,11 @@ import {DFlowFunctionReactiveService, FunctionDefinitionView} from "../d-flow-fu
 import {DFlowTypeReactiveService, FlowTypeView} from "../d-flow-type";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Breadcrumb} from "../breadcrumb/Breadcrumb";
+import {TextInput} from "../form";
+import {Badge} from "../badge/Badge";
+import {AuroraBackground} from "../aurora/Aurora";
+import {Avatar} from "../avatar/Avatar";
 
 const meta: Meta = {
     title: "Dashboard Resizable",
@@ -225,59 +234,130 @@ export const Dashboard = () => {
     const [show, setShow] = React.useState(false);
 
     return <DFullScreen>
-        <ContextStoreProvider
-            services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
-            <DLayout layoutGap={"0"}>
-                <DResizablePanelGroup orientation={"horizontal"}>
-                    <DResizablePanel id={"1"} defaultSize={"20%"}>
-                        <Folder/>
-                    </DResizablePanel>
-                    <DResizableHandle/>
-                    <DResizablePanel id={"2"}>
-                        <DLayout layoutGap={"0"} rightContent={
-                            <Flex p={0.35} style={{flexDirection: "column", gap: "0.7rem"}}>
-                                <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
-                                        paddingSize={"xs"}>
-                                    <IconFile size={16}/>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <IconDatabase size={16}/>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <IconMessageChatbot size={16}/>
-                                </Button>
-                            </Flex>
-                        } bottomContent={
-                            <Flex p={0.35} style={{gap: "0.7rem"}}>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <Text>Logbook</Text>
-                                </Button>
-                                <Button variant={"none"} paddingSize={"xs"}>
-                                    <Text>Problems</Text>
-                                </Button>
-                            </Flex>
-                        }>
-                            <DResizablePanelGroup orientation={"horizontal"}>
-                                <DResizablePanel id={"2"}>
-                                    <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
-                                           projectId={undefined}/>
-                                </DResizablePanel>
-                                {show && (
-                                    <>
-                                        <DResizableHandle/>
-                                        <DResizablePanel id={"3"} defaultSize={"25%"}>
-                                            <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
-                                                       projectId={undefined}/>
-                                        </DResizablePanel>
-                                    </>
-                                )}
-                            </DResizablePanelGroup>
-                        </DLayout>
-                    </DResizablePanel>
-                </DResizablePanelGroup>
-            </DLayout>
+        <DLayout layoutGap={0} style={{zIndex: 0}}
+                 showLayoutSplitter={false}
+                 leftContent={<Flex p={0.7} pt={1} align={"center"} style={{flexDirection: "column", gap: "0.7rem"}}>
+                     <div style={{
+                         position: "absolute",
+                         top: 0,
+                         left: 0,
+                         width: "50%",
+                         transform: "scaleX(-1)",
+                         height: "40%",
+                         zIndex: "-1",
+                     }}>
+                         <div style={{
+                             position: "absolute",
+                             top: "0",
+                             left: "0",
+                             width: "100%",
+                             height: "100%",
+                             background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.5) 0%, rgba(25, 24, 37, 1) 25%)",
+                             zIndex: "1"
+                         }}/>
+                         <AuroraBackground/>
 
-        </ContextStoreProvider>
+                     </div>
+                     <img width={30} src={"https://code0.tech/code0_logo.png"}/>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <Button variant={"none"} paddingSize={"xs"}>
+                                 <IconTournament size={16}/>
+                             </Button>
+                         </TooltipTrigger>
+                         <TooltipPortal>
+                             <TooltipContent sideOffset={8} color={"primary"} side={"right"} align={"center"}>
+                                 <Text>Flow builder</Text>
+                             </TooltipContent>
+                         </TooltipPortal>
+                     </Tooltip>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <Button variant={"none"} paddingSize={"xs"}>
+                                 <IconAdjustmentsCog size={16}/>
+                             </Button>
+                         </TooltipTrigger>
+                         <TooltipPortal>
+                             <TooltipContent sideOffset={8} color={"primary"} side={"right"} align={"center"}>
+                                 <Text>Project Settings</Text>
+                             </TooltipContent>
+                         </TooltipPortal>
+                     </Tooltip>
+                 </Flex>}>
+            <ContextStoreProvider
+                services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
+                <DLayout layoutGap={"0"} showLayoutSplitter={false} topContent={
+                    <>
+                        <div style={{
+                            padding: "0.7rem"
+                        }}>
+                            <Flex align={"center"} justify={"space-between"}>
+                                <Breadcrumb>
+                                    <Text hierarchy={"tertiary"}>CodeZero Orga</Text>
+                                    <Text hierarchy={"tertiary"}>projects</Text>
+                                    <Text hierarchy={"tertiary"}>Discord Bot</Text>
+                                    <Text hierarchy={"tertiary"}>flow</Text>
+                                    <Text hierarchy={"tertiary"}>#1</Text>
+                                </Breadcrumb>
+                                <Flex align={"center"} style={{gap: ".7rem"}}>
+                                    <Button disabled variant={"none"} paddingSize={"xs"}>
+                                        <IconSearch size={16}/>
+                                    </Button>
+                                    <Button disabled variant={"none"} paddingSize={"xs"}>
+                                        <IconInbox size={16}/>
+                                    </Button>
+                                    <Avatar identifier={"nsammito"}/>
+                                </Flex>
+                            </Flex>
+                        </div>
+                    </>
+                } rightContent={
+                    <Flex px={0.7} style={{flexDirection: "column", gap: "0.7rem"}}>
+                        <Button onClick={() => setShow(prevState => !prevState)} variant={"none"}
+                                paddingSize={"xs"} aria-selected={show}>
+                            <IconFile size={16}/>
+                        </Button>
+                    </Flex>
+                }>
+                    <DResizablePanelGroup orientation={"horizontal"}>
+                        <DResizablePanel id={"1"} defaultSize={"20%"} collapsedSize={"0%"}
+                                         collapsible minSize={"10%"}>
+                            <Folder/>
+                        </DResizablePanel>
+                        <DResizableHandle/>
+                        <DResizablePanel id={"2"}>
+                            <DLayout layoutGap={"0"}>
+                                <DResizablePanelGroup orientation={"horizontal"}>
+                                    <DResizablePanel color={"primary"} id={"2"} style={{
+                                        borderTopLeftRadius: "1rem",
+                                        borderTopRightRadius: "1rem",
+                                        outline: "100px solid transparent"
+                                    }}>
+                                        <DFlow flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                               projectId={undefined}/>
+                                    </DResizablePanel>
+                                    {show && (
+                                        <>
+                                            <DResizableHandle/>
+                                            <DResizablePanel color={"primary"} id={"3"} collapsedSize={"0%"}
+                                                             collapsible minSize={"10%"} defaultSize={"25%"} style={{
+                                                borderTopLeftRadius: "1rem",
+                                                borderTopRightRadius: "1rem",
+                                                outline: "100px solid transparent"
+                                            }}>
+                                                <DFlowTabs flowId={"gid://sagittarius/Flow/1"} namespaceId={undefined}
+                                                           projectId={undefined}/>
+                                            </DResizablePanel>
+                                        </>
+                                    )}
+                                </DResizablePanelGroup>
+                            </DLayout>
+                        </DResizablePanel>
+                    </DResizablePanelGroup>
+                </DLayout>
+
+            </ContextStoreProvider>
+        </DLayout>
     </DFullScreen>
 
 }
@@ -287,61 +367,65 @@ const Folder = () => {
     const ref = React.useRef<DFlowFolderHandle>(null)
 
     return <DLayout layoutGap={"0"} topContent={
-        <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"} p={0.7}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button variant={"filled"} paddingSize={"xxs"}>
-                        <IconPlus size={13}/>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipPortal>
-                    <TooltipContent>
-                        <Text>Add new flow</Text>
-                        <TooltipArrow/>
-                    </TooltipContent>
-                </TooltipPortal>
-            </Tooltip>
-            <ButtonGroup color={"primary"} p={0}>
+        <Flex style={{flexDirection: "column", gap: "0.7rem"}} px={0.7}>
+            <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
+                <Text size={"md"} hierarchy={"secondary"}>Explorer</Text>
+                <Button variant={"none"} paddingSize={"xxs"}>
+                    <IconLayoutSidebar size={16}/>
+                </Button>
+            </Flex>
+            <Flex style={{gap: "0.7rem"}} align={"center"} justify={"space-between"}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
-                            <IconCircleDot size={13}/>
+                        <Button color={"tertiary"} paddingSize={"xxs"}>
+                            <IconPlus size={13}/>
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
-                        <TooltipContent>
-                            <Text>Open active flow</Text>
-                            <TooltipArrow/>
+                        <TooltipContent side={"bottom"} sideOffset={8}>
+                            <Text>Add new flow</Text>
                         </TooltipContent>
                     </TooltipPortal>
                 </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
-                            <IconArrowsMinimize size={13}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent>
-                            <Text>Close all</Text>
-                            <TooltipArrow/>
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
-                            <IconArrowsMaximize size={13}/>
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                        <TooltipContent>
-                            <Text>Open all</Text>
-                            <TooltipArrow/>
-                        </TooltipContent>
-                    </TooltipPortal>
-                </Tooltip>
-            </ButtonGroup>
+                <ButtonGroup color={"secondary"} style={{boxShadow: "none"}} p={0}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.openActivePath()}>
+                                <IconCircleDot size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
+                                <Text>Open active flow</Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={"none"} paddingSize={"xxs"} onClick={() => ref.current?.closeAll()}>
+                                <IconArrowsMinimize size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
+                                <Text>Close all</Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button paddingSize={"xxs"} variant={"none"} onClick={() => ref.current?.openAll()}>
+                                <IconArrowsMaximize size={13}/>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
+                                <Text>Open all</Text>
+                            </TooltipContent>
+                        </TooltipPortal>
+                    </Tooltip>
+                </ButtonGroup>
+            </Flex>
         </Flex>
     }>
         <DFlowFolder onDelete={contextData => console.log(contextData)}

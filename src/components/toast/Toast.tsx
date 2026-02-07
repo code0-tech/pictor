@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react"
 import {Text} from "../text/Text"
 import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
 
 export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title" | "id"> {
     children?: React.ReactNode | React.ReactNode[]
@@ -44,13 +45,13 @@ export function Toast(props: ToastProps) {
         <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
-                    {color && <ToastIcon color={color}/>}
+                    {color && <ToastIcon color={color as Color}/>}
                     <Text size={"md"}>{title}</Text>
                 </Flex>
                 {dismissible &&
-                    <span className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
-                        <IconX size={18}/>
-                    </span>
+                    <Button variant={"none"} paddingSize={"xxs"} color={color as Color} className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
+                        <IconX size={16}/>
+                    </Button>
                 }
             </Flex>
             {children &&
@@ -58,23 +59,24 @@ export function Toast(props: ToastProps) {
                     {children}
                 </div>
             }
-            <div className={"toast__duration"}  style={{
+            <Flex className={"toast__duration"} style={{
                 ["--toast-duration" as any]: `${duration}ms`,
             }}>
-                <Text hierarchy={"tertiary"}>This message will close in <Text hierarchy={"primary"}>{duration / 1000}</Text> seconds</Text>
-            </div>
+                <Text hierarchy={"tertiary"}>This message will close in</Text> <Text hierarchy={"primary"}>{duration / 1000}</Text> <Text>seconds</Text>
+            </Flex>
         </div>
     )
 }
 
 const ToastIcon: React.FC<{color: Color}> = ({ color }) => {
     const icons: Record<Color, React.ReactElement<IconProps>> = {
-        "primary": <IconCircleDot className={"toast__icon"} size={18}/>,
-        "secondary": <IconCircleDot className={"toast__icon"} size={18}/>,
-        "info": <IconInfoCircle className={"toast__icon"} size={18}/>,
-        "success": <IconCircleCheck className={"toast__icon"} size={18}/>,
-        "warning": <IconAlertCircle className={"toast__icon"} size={18}/>,
-        "error": <IconCircleX className={"toast__icon"} size={18}/>,
+        "primary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "secondary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "tertiary": <IconCircleDot className={"toast__icon"} size={16}/>,
+        "info": <IconInfoCircle className={"toast__icon"} size={16}/>,
+        "success": <IconCircleCheck className={"toast__icon"} size={16}/>,
+        "warning": <IconAlertCircle className={"toast__icon"} size={16}/>,
+        "error": <IconCircleX className={"toast__icon"} size={16}/>,
     }
 
     return icons[color] ?? null

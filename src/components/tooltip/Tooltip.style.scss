@@ -10,15 +10,26 @@
     padding: variables.$xxs variables.$xs;
 
     & {
-      @include box.box(variables.$secondary);
+      @include box.box(variables.$tertiary);
       @include helpers.fontStyle();
       @include helpers.borderRadius();
-      border: none;
     }
   }
 
   &__arrow {
-    fill: helpers.backgroundColor(variables.$secondary);
+    fill: helpers.backgroundColor(variables.$tertiary);
   }
 
+}
+
+@each $name, $color in variables.$colors {
+
+  .tooltip__content--#{$name} {
+    & {
+      @include box.box($color);
+    }
+  }
+  .tooltip__arrow--#{$name} {
+    fill: helpers.backgroundColor($color);
+  }
 }

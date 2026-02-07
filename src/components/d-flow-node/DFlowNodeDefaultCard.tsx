@@ -131,7 +131,7 @@ export const DFlowNodeDefaultCard: React.FC<DFlowNodeDefaultCardProps> = memo((p
             py={"0.35"}
             outline={firstItem.id === id}
             borderColor={activeTabId == node?.id ? "info" : undefined}
-            className={activeTabId == node?.id ? "d-flow-node--active" : undefined}
+            className={`d-flow-node ${activeTabId == node?.id ? "d-flow-node--active" : undefined}`}
             color={"primary"}
             onClick={() => {
                 flowInstance.setViewport({

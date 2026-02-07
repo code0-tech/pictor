@@ -3,6 +3,7 @@ import {Code0Component} from "../../utils/types";
 import {md5} from 'js-md5';
 import "./Avatar.style.scss"
 import {mergeCode0Props} from "../../utils/utils";
+import {hashToColor} from "../d-flow/DFlow.util";
 
 interface AvatarImageProps {
     src: string
@@ -34,7 +35,7 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
     const updateCanvas = () => {
         const hash = md5(identifier)
         const block = Math.floor(size / 5)
-        const hashColor = hash.slice(0, 6)
+        const hashColor = hashToColor(identifier)
 
         canvas.current!!.width = block * 5
         canvas.current!!.height = block * 5
@@ -61,7 +62,7 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
         map.forEach((row, i) => {
             row.forEach((el, j) => {
                 if (el) {
-                    ctx!!.fillStyle = '#' + hashColor;
+                    ctx!!.fillStyle = hashColor;
                     ctx!!.fillRect(
                         block * i,
                         block * j,

@@ -40,13 +40,16 @@
       padding-right: 0;
     }
 
-    &--action { padding: 0; }
+    &--action {
+      padding: 0;
+    }
 
     &--placeholder {
       @include box.box(variables.$primary);
       @include helpers.fontStyle();
       border-radius: variables.$borderRadius - ($padding / 4);
       padding: $padding;
+      box-shadow: none;
     }
   }
 
@@ -100,7 +103,9 @@
     font-size: variables.$xs;
     display: block;
 
-    & { @include helpers.fontStyle(); }
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
   &__description {
@@ -109,7 +114,9 @@
     margin: calc($padding / 2) 0 $padding;
     display: block;
 
-    & { @include helpers.fontStyle(); }
+    & {
+      @include helpers.fontStyle();
+    }
   }
 
   &__message {
@@ -125,6 +132,7 @@
       @include box.box(variables.$error, variables.$white, variables.$error);
       @include helpers.borderRadius();
       @include helpers.fontStyle();
+      box-shadow: none;
     }
 
     > svg {
@@ -161,11 +169,12 @@
   }
 }
 
-.radio-group { }
+.radio-group {
+}
 
 .radio-input {
   background: transparent !important;
-  border: none !important;
+  box-shadow: none !important;
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -181,7 +190,7 @@
     & {
       @include helpers.fontStyle();
       @include box.boxActive();
-      @include box.box();
+      @include box.box(variables.$tertiary);
       @include helpers.disabled();
       @include helpers.borderRadius();
     }
@@ -200,7 +209,9 @@
     &[data-state="checked"] {
       background-color: variables.$info;
 
-      & { @include helpers.borderRadius(); }
+      & {
+        @include helpers.borderRadius();
+      }
     }
   }
 }
@@ -216,11 +227,10 @@
   $size: 0.9rem;
 
   background: transparent !important;
-  border: none !important;
+  box-shadow: none !important;
   align-items: center;
   box-sizing: border-box;
   gap: variables.$xxs;
-  padding: $padding 0;
 
   &__button {
     aspect-ratio: 1/1;
@@ -238,10 +248,6 @@
       @include box.box();
       @include helpers.disabled();
     }
-
-    &[data-state="checked"] {
-      @include box.boxActiveStyle(variables.$info);
-    }
   }
 
   &__indicator {
@@ -250,6 +256,7 @@
     align-items: center;
     justify-content: center;
     top: 1px;
+    color: variables.$info;
   }
 }
 
@@ -258,17 +265,18 @@
   $padding: variables.$xxs;
   $size: 0.9rem;
 
+  box-shadow: none !important;
   background: transparent !important;
-  border: none !important;
+  width: fit-content;
 
   .input__control {
 
     position: relative;
     box-sizing: border-box;
     padding: 0;
-    width: $size;
-    height: $size;
-
+    margin: 0;
+    height: 16px;
+    width: 0;
     appearance: none;
     outline: none;
     cursor: pointer;

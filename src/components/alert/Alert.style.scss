@@ -24,5 +24,6 @@
 @each $name, $color in variables.$colors {
     .alert--#{$name} {
       @include box.box($color);
+      box-shadow: none;
     }
 }

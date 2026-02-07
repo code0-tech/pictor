@@ -49,10 +49,12 @@
 
       &:hover {
         background: helpers.backgroundColor($color, 1.5);
+        box-shadow: inset 0 1px 1px helpers.borderColor($color);
       }
 
       &:active, &:focus, &[aria-selected=true], &[data-state=open] {
         background: helpers.backgroundColor($color, 2);
+        box-shadow: inset 0 1px 1px helpers.borderColor($color);
       }
     }
 

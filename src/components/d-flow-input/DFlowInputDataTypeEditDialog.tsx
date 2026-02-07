@@ -127,8 +127,8 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                  </Button>
                              </DialogClose>
                          </Flex>}>
-                    <DResizablePanelGroup bg={"black"} style={{borderRadius: "1rem"}}>
-                        <DResizablePanel>
+                    <DResizablePanelGroup style={{borderRadius: "1rem"}}>
+                        <DResizablePanel color={"primary"}>
                             <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport px={1}>
                                     <Spacing spacing={"md"}/>
@@ -144,7 +144,7 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                             </ScrollArea>
                         </DResizablePanel>
                         <DResizableHandle/>
-                        <DResizablePanel>
+                        <DResizablePanel color={"primary"}>
                             <Editor suggestions={suggestions} tokenHighlights={myRenderMap} language={"json"} initialValue={editorValue?.value} onChange={value => {
                                 const dataTypeIdentifier = dataTypeService.getTypeFromValue({
                                     __typename: "LiteralValue",

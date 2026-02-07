@@ -18,7 +18,7 @@
   "author": "CodeZero",
   "devDependencies": {
     "@ariakit/react": "^0.4.17",
-    "@babel/plugin-proposal-decorators": "^7.28.6",
+    "@babel/plugin-proposal-decorators": "^7.29.0",
     "@babel/plugin-transform-class-properties": "^7.28.6",
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-e610ffe24a7dc3cf7b4c285994830412410f229e",
     "@dagrejs/dagre": "^2.0.3",

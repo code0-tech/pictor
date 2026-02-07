@@ -245,7 +245,7 @@
     & {
       @include helpers.fontStyle();
       @include box.boxActive();
-      @include box.box();
+      @include box.box(variables.$tertiary);
       @include helpers.disabled();
     }
   }

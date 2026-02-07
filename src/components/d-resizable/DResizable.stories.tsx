@@ -266,14 +266,23 @@ export const Dashboard = () => {
                              </Button>
                          </TooltipTrigger>
                          <TooltipPortal>
-                             <TooltipContent side={"right"} align={"center"}>
+                             <TooltipContent sideOffset={8} color={"primary"} side={"right"} align={"center"}>
                                  <Text>Flow builder</Text>
                              </TooltipContent>
                          </TooltipPortal>
                      </Tooltip>
-                     <Button variant={"none"} paddingSize={"xs"}>
-                         <IconAdjustmentsCog size={16}/>
-                     </Button>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <Button variant={"none"} paddingSize={"xs"}>
+                                 <IconAdjustmentsCog size={16}/>
+                             </Button>
+                         </TooltipTrigger>
+                         <TooltipPortal>
+                             <TooltipContent sideOffset={8} color={"primary"} side={"right"} align={"center"}>
+                                 <Text>Project Settings</Text>
+                             </TooltipContent>
+                         </TooltipPortal>
+                     </Tooltip>
                  </Flex>}>
             <ContextStoreProvider
                 services={[[flowTypeStore, flowTypeService], [fileTabsStore, fileTabsService], [dataTypeStore, dataTypeService], [functionStore, functionService], [flowStore, flowService]]}>
@@ -373,9 +382,8 @@ const Folder = () => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipPortal>
-                        <TooltipContent side={"bottom"}>
+                        <TooltipContent side={"bottom"} sideOffset={8}>
                             <Text>Add new flow</Text>
-                            <TooltipArrow/>
                         </TooltipContent>
                     </TooltipPortal>
                 </Tooltip>
@@ -387,9 +395,8 @@ const Folder = () => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
                                 <Text>Open active flow</Text>
-                                <TooltipArrow/>
                             </TooltipContent>
                         </TooltipPortal>
                     </Tooltip>
@@ -400,9 +407,8 @@ const Folder = () => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
                                 <Text>Close all</Text>
-                                <TooltipArrow/>
                             </TooltipContent>
                         </TooltipPortal>
                     </Tooltip>
@@ -413,9 +419,8 @@ const Folder = () => {
                             </Button>
                         </TooltipTrigger>
                         <TooltipPortal>
-                            <TooltipContent side={"bottom"}>
+                            <TooltipContent side={"bottom"} sideOffset={8}>
                                 <Text>Open all</Text>
-                                <TooltipArrow/>
                             </TooltipContent>
                         </TooltipPortal>
                     </Tooltip>

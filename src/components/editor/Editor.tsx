@@ -13,6 +13,7 @@ import CodeMirror, {
     WidgetType
 } from "@uiw/react-codemirror"
 import {json, jsonParseLinter} from "@codemirror/lang-json"
+import {StreamLanguage} from "@codemirror/language"
 import {Diagnostic, linter} from "@codemirror/lint"
 import {syntaxTree} from "@codemirror/language"
 import prettier from "prettier/standalone"
@@ -37,6 +38,7 @@ import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 import {acceptCompletion, autocompletion, CompletionContext, CompletionResult} from "@codemirror/autocomplete";
+import type {BasicSetupOptions} from "@uiw/codemirror-extensions-basic-setup";
 
 export type EditorTokenizer = (content: string) => string | null
 
@@ -48,8 +50,8 @@ export interface EditorTokenHighlights {
     [tokenName: string]: (props: EditorRendererProps) => React.ReactNode
 }
 
-export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<object> {
-    language?: 'json'
+export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<any> {
+    language?: 'json' | StreamLanguage<unknown>
     tokenizer?: EditorTokenizer
     tokenHighlights?: EditorTokenHighlights
     suggestions?: (context: CompletionContext) => CompletionResult | null
@@ -57,6 +59,9 @@ export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, '
     extensions?: Extension[]
     disabled?: boolean
     readonly?: boolean
+    showTooltips?: boolean
+    showValidation?: boolean,
+    basicSetup?: BasicSetupOptions
 }
 
 class ReactAnchorWidget extends WidgetType {
@@ -123,7 +128,10 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         initialValue,
         formValidation,
         disabled,
+        showTooltips = true,
+        showValidation = true,
         readonly,
+        basicSetup,
         ...rest
     } = props
 
@@ -132,7 +140,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     const [diagnostics, setDiagnostics] = React.useState<readonly Diagnostic[]>([])
     const containerRef = React.useRef<HTMLDivElement>(null)
 
-    React.useEffect(() => {
+    language === "json" && React.useEffect(() => {
         (async () => {
             try {
                 const pretty = await prettier.format(JSON.stringify(initialValue) ?? "", {
@@ -163,6 +171,8 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     return []
                 }
             }))
+        } else if (language) {
+            internExtensions.push(language)
         }
 
         const badgePlugin = ViewPlugin.fromClass(class {
@@ -240,112 +250,128 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         }
     }, [])
 
+    React.useEffect(() => {
+        if (containerRef.current) {
+            const timer = window.setTimeout(() => {
+                const event = new CustomEvent('scroll');
+                containerRef.current?.dispatchEvent(event);
+                handleUpdate({ docChanged: true, viewportChanged: true, selectionSet: false });
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+        return null
+    }, [handleUpdate]);
+
     return (
         <ScrollArea h={"100%"} type={"scroll"}>
-            <div className={"editor__diagnostics"}>
-                <Flex style={{gap: "0.35rem", textWrap: "nowrap"}} align={"center"}>
-                    {diagnostics.filter(d => d.severity == "error").length > 0 ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge color={"red"}>
-                                    <IconExclamationCircle size={13}/>
-                                    <Text>{diagnostics.filter(d => d.severity == "error").length}</Text>
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <TooltipArrow/>
-                                    {diagnostics.filter(d => d.severity == "error").map(d => {
-                                        return <Text size={"xs"} key={d.message}>{d.message}</Text>
-                                    })}
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    ) : null}
-                    {diagnostics.filter(d => d.severity == "warning").length > 0 ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge color={"orange"}>
-                                    <IconAlertTriangle size={13}/>
-                                    <Text>{diagnostics.filter(d => d.severity == "warning").length}</Text>
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <TooltipArrow/>
-                                    {diagnostics.filter(d => d.severity == "warning").map(d => {
-                                        return <Text size={"xs"} key={d.message}>{d.message}</Text>
-                                    })}
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    ) : null}
-                    {diagnostics.filter(d => d.severity == "info").length > 0 ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge color={"#9ca3af"}>
-                                    <IconAlertSquareRounded size={13}/>
-                                    <Text>{diagnostics.filter(d => d.severity == "info").length}</Text>
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <TooltipArrow/>
-                                    {diagnostics.filter(d => d.severity == "info").map(d => {
-                                        return <Text size={"xs"} key={d.message}>{d.message}</Text>
-                                    })}
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    ) : null}
-                    {diagnostics.filter(d => d.severity == "hint").length > 0 ? (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge color={"#3b82f6"}>
-                                    <IconInfoCircle size={13}/>
-                                    <Text>{diagnostics.filter(d => d.severity == "hint").length}</Text>
-                                </Badge>
-                            </TooltipTrigger>
-                            <TooltipPortal>
-                                <TooltipContent side={"bottom"}>
-                                    <TooltipArrow/>
-                                    {diagnostics.filter(d => d.severity == "hint").map(d => {
-                                        return <Text size={"xs"} key={d.message}>{d.message}</Text>
-                                    })}
-                                </TooltipContent>
-                            </TooltipPortal>
-                        </Tooltip>
-                    ) : null}
-                </Flex>
-            </div>
-            <div className={"editor__tools"}>
-                <Flex style={{gap: "0.35rem", textWrap: "nowrap"}} align={"center"}>
-                    <Flex style={{gap: "0.35rem"}} align={"center"}>
-                        <Badge color={"secondary"} border>
-                            <Text>{navigator !== undefined && /Mac/.test(navigator.userAgent) ? "⌃" : "strg"}</Text>
-                            <Text>+</Text>
-                            <IconSpace size={13}/>
-                        </Badge>
-                        <Text>to show</Text>
+            {showValidation && (
+                <div className={"editor__diagnostics"}>
+                    <Flex style={{gap: "0.35rem", textWrap: "nowrap"}} align={"center"}>
+                        {diagnostics.filter(d => d.severity == "error").length > 0 ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge color={"red"}>
+                                        <IconExclamationCircle size={13}/>
+                                        <Text>{diagnostics.filter(d => d.severity == "error").length}</Text>
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipPortal>
+                                    <TooltipContent side={"bottom"}>
+                                        <TooltipArrow/>
+                                        {diagnostics.filter(d => d.severity == "error").map(d => {
+                                            return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                        })}
+                                    </TooltipContent>
+                                </TooltipPortal>
+                            </Tooltip>
+                        ) : null}
+                        {diagnostics.filter(d => d.severity == "warning").length > 0 ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge color={"orange"}>
+                                        <IconAlertTriangle size={13}/>
+                                        <Text>{diagnostics.filter(d => d.severity == "warning").length}</Text>
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipPortal>
+                                    <TooltipContent side={"bottom"}>
+                                        <TooltipArrow/>
+                                        {diagnostics.filter(d => d.severity == "warning").map(d => {
+                                            return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                        })}
+                                    </TooltipContent>
+                                </TooltipPortal>
+                            </Tooltip>
+                        ) : null}
+                        {diagnostics.filter(d => d.severity == "info").length > 0 ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge color={"#9ca3af"}>
+                                        <IconAlertSquareRounded size={13}/>
+                                        <Text>{diagnostics.filter(d => d.severity == "info").length}</Text>
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipPortal>
+                                    <TooltipContent side={"bottom"}>
+                                        <TooltipArrow/>
+                                        {diagnostics.filter(d => d.severity == "info").map(d => {
+                                            return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                        })}
+                                    </TooltipContent>
+                                </TooltipPortal>
+                            </Tooltip>
+                        ) : null}
+                        {diagnostics.filter(d => d.severity == "hint").length > 0 ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge color={"#3b82f6"}>
+                                        <IconInfoCircle size={13}/>
+                                        <Text>{diagnostics.filter(d => d.severity == "hint").length}</Text>
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipPortal>
+                                    <TooltipContent side={"bottom"}>
+                                        <TooltipArrow/>
+                                        {diagnostics.filter(d => d.severity == "hint").map(d => {
+                                            return <Text size={"xs"} key={d.message}>{d.message}</Text>
+                                        })}
+                                    </TooltipContent>
+                                </TooltipPortal>
+                            </Tooltip>
+                        ) : null}
                     </Flex>
-                    <Text>and</Text>
-                    <Flex style={{gap: "0.35rem"}} align={"center"}>
-                        <Badge color={"secondary"} border>
-                            <IconArrowBarToRight size={13}/>
-                            <Text>or</Text>
-                            <IconCornerDownLeft size={13}/>
-                        </Badge>
-                        <Text>to select</Text>
+                </div>
+            )}
+            {showTooltips && (
+                <div className={"editor__tools"}>
+                    <Flex style={{gap: "0.35rem", textWrap: "nowrap"}} align={"center"}>
+                        <Flex style={{gap: "0.35rem"}} align={"center"}>
+                            <Badge color={"secondary"} border>
+                                <Text>{navigator !== undefined && /Mac/.test(navigator.userAgent) ? "⌃" : "strg"}</Text>
+                                <Text>+</Text>
+                                <IconSpace size={13}/>
+                            </Badge>
+                            <Text>to show</Text>
+                        </Flex>
+                        <Text>and</Text>
+                        <Flex style={{gap: "0.35rem"}} align={"center"}>
+                            <Badge color={"secondary"} border>
+                                <IconArrowBarToRight size={13}/>
+                                <Text>or</Text>
+                                <IconCornerDownLeft size={13}/>
+                            </Badge>
+                            <Text>to select</Text>
+                        </Flex>
+                        <Text>suggestions</Text>
                     </Flex>
-                    <Text>suggestions</Text>
-                </Flex>
-            </div>
+                </div>
+            )}
             <ScrollAreaViewport asChild>
                 <div ref={containerRef} {...mergeCode0Props(`editor`, rest)}>
                     <CodeMirror
                         width="100%"
                         height="100%"
-                        value={formatted}
+                        value={language === "json" ? formatted : initialValue}
                         theme={myTheme}
                         readOnly={disabled || readonly}
                         editable={!disabled}
@@ -362,6 +388,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                             }
                         }}
                         onUpdate={handleUpdate}
+                        basicSetup={basicSetup}
                     />
 
                     {tokenHighlights && Array.from(anchors.entries()).map(([anchor, data]) => {

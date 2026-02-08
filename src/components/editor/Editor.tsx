@@ -259,7 +259,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
             }, 50);
             return () => clearTimeout(timer);
         }
-        return null
+        return () => {}
     }, [handleUpdate]);
 
     return (

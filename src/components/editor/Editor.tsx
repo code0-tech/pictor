@@ -1,4 +1,4 @@
-import React from "react"
+import React, {isValidElement} from "react"
 import {createPortal} from "react-dom"
 import {Code0Component, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "../form"
@@ -13,9 +13,8 @@ import CodeMirror, {
     WidgetType
 } from "@uiw/react-codemirror"
 import {json, jsonParseLinter} from "@codemirror/lang-json"
-import {StreamLanguage} from "@codemirror/language"
+import {StreamLanguage, syntaxTree} from "@codemirror/language"
 import {Diagnostic, linter} from "@codemirror/lint"
-import {syntaxTree} from "@codemirror/language"
 import prettier from "prettier/standalone"
 import parserBabel from "prettier/plugins/babel"
 import parserEstree from "prettier/plugins/estree"
@@ -37,7 +36,7 @@ import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
-import {acceptCompletion, autocompletion, CompletionContext, CompletionResult} from "@codemirror/autocomplete";
+import {acceptCompletion, autocompletion, CompletionContext, CompletionResult, startCompletion} from "@codemirror/autocomplete";
 import type {BasicSetupOptions} from "@uiw/codemirror-extensions-basic-setup";
 
 export type EditorTokenizer = (content: string) => string | null
@@ -54,7 +53,8 @@ export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, '
     language?: 'json' | StreamLanguage<unknown>
     tokenizer?: EditorTokenizer
     tokenHighlights?: EditorTokenHighlights
-    suggestions?: (context: CompletionContext) => CompletionResult | null
+    suggestions?: (context: CompletionContext) => CompletionResult | React.ReactNode | null
+    customSuggestionComponent?: boolean
     onChange?: (value: any) => void
     extensions?: Extension[]
     disabled?: boolean
@@ -117,6 +117,12 @@ const myTheme = createTheme({
     ]
 })
 
+
+// Helper function to check if value is a ReactNode
+const isReactNode = (value: any): value is React.ReactNode => {
+    return isValidElement(value) || typeof value === 'string' || typeof value === 'number' || Array.isArray(value);
+}
+
 export const Editor: React.FC<EditorInputProps> = (props) => {
     const {
         language,
@@ -132,12 +138,17 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         showValidation = true,
         readonly,
         basicSetup,
+        customSuggestionComponent = false,
         ...rest
     } = props
 
     const [formatted, setFormatted] = React.useState("")
     const [anchors, setAnchors] = React.useState<Map<HTMLElement, { type: string, value: string }>>(new Map())
     const [diagnostics, setDiagnostics] = React.useState<readonly Diagnostic[]>([])
+    const [customSuggestion, setCustomSuggestion] = React.useState<{
+        component: React.ReactNode;
+        position: { top: number; left: number };
+    } | null>(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
 
     language === "json" && React.useEffect(() => {
@@ -159,8 +170,64 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         const internExtensions: Extension[] = [...extensions]
 
         if (suggestions) {
-            internExtensions.push(autocompletion({override: [suggestions]}))
+            // Wrapper function to handle both CompletionResult and ReactNode
+            const suggestionWrapper = (context: CompletionContext): CompletionResult | null => {
+                const result = suggestions(context)
+
+                // Check if result is a ReactNode
+                if (result && isReactNode(result)) {
+                    // Get cursor coordinates
+                    const coords = context.view?.coordsAtPos(context.pos)
+
+                    if (coords) {
+                        setCustomSuggestion({
+                            component: result,
+                            position: {
+                                top: coords.bottom,
+                                left: coords.left
+                            }
+                        })
+                    }
+
+                    // Return null to prevent standard autocomplete
+                    return null
+                }
+
+                // Clear custom suggestion if CompletionResult is returned
+                setCustomSuggestion(null)
+
+                // Return CompletionResult or null
+                return result as CompletionResult | null
+            }
+
+            internExtensions.push(autocompletion({override: (customSuggestionComponent ? [suggestionWrapper] : [suggestions])}))
             internExtensions.push(Prec.highest(keymap.of([{key: "Tab", run: acceptCompletion}])))
+
+            // Add ArrowUp/ArrowDown handlers for custom suggestion component
+            if (customSuggestionComponent) {
+                internExtensions.push(Prec.highest(keymap.of([
+                    {
+                        key: "ArrowUp",
+                        run: (view) => {
+                            if (!customSuggestion) {
+                                startCompletion(view)
+                                return true
+                            }
+                            return false
+                        }
+                    },
+                    {
+                        key: "ArrowDown",
+                        run: (view) => {
+                            if (!customSuggestion) {
+                                startCompletion(view)
+                                return true
+                            }
+                            return false
+                        }
+                    }
+                ])))
+            }
         }
 
         if (language === "json") {
@@ -230,10 +297,15 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         }))
 
         return internExtensions
-    }, [language, tokenizer, tokenHighlights, extensions])
+    }, [language, tokenizer, tokenHighlights, extensions, suggestions])
 
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
+            // Clear custom suggestion on cursor move or doc change
+            if (viewUpdate.selectionSet || viewUpdate.docChanged) {
+                setCustomSuggestion(null)
+            }
+
             window.requestAnimationFrame(() => {
                 const foundNodes = containerRef.current?.querySelectorAll('.cm-react-anchor')
                 const newAnchors = new Map()
@@ -255,11 +327,12 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
             const timer = window.setTimeout(() => {
                 const event = new CustomEvent('scroll');
                 containerRef.current?.dispatchEvent(event);
-                handleUpdate({ docChanged: true, viewportChanged: true, selectionSet: false });
+                handleUpdate({docChanged: true, viewportChanged: true, selectionSet: false});
             }, 50);
             return () => clearTimeout(timer);
         }
-        return () => {}
+        return () => {
+        }
     }, [handleUpdate]);
 
     return (
@@ -391,6 +464,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                         basicSetup={basicSetup}
                     />
 
+
                     {tokenHighlights && Array.from(anchors.entries()).map(([anchor, data]) => {
                         const renderFn = tokenHighlights[data.type]
                         if (!renderFn) return null
@@ -402,6 +476,20 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                             anchor
                         )
                     })}
+
+                    {customSuggestion && createPortal(
+                        <div
+                            style={{
+                                position: 'fixed',
+                                top: customSuggestion.position.top,
+                                left: customSuggestion.position.left,
+                                zIndex: 9999,
+                            }}
+                        >
+                            {customSuggestion.component}
+                        </div>,
+                        document.body
+                    )}
 
                 </div>
             </ScrollAreaViewport>

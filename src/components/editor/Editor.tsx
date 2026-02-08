@@ -36,7 +36,13 @@ import {Text} from "../text/Text";
 import {Flex} from "../flex/Flex";
 import {Tooltip, TooltipArrow, TooltipContent, TooltipPortal, TooltipTrigger} from "../tooltip/Tooltip";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
-import {acceptCompletion, autocompletion, CompletionContext, CompletionResult, startCompletion} from "@codemirror/autocomplete";
+import {
+    acceptCompletion,
+    autocompletion,
+    CompletionContext,
+    CompletionResult,
+    startCompletion
+} from "@codemirror/autocomplete";
 import type {BasicSetupOptions} from "@uiw/codemirror-extensions-basic-setup";
 
 export type EditorTokenizer = (content: string) => string | null
@@ -143,6 +149,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     } = props
 
     const [formatted, setFormatted] = React.useState("")
+    const ref = React.useRef<HTMLDivElement>(null)
     const [anchors, setAnchors] = React.useState<Map<HTMLElement, { type: string, value: string }>>(new Map())
     const [diagnostics, setDiagnostics] = React.useState<readonly Diagnostic[]>([])
     const [customSuggestion, setCustomSuggestion] = React.useState<{
@@ -200,7 +207,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                 return result as CompletionResult | null
             }
 
-            internExtensions.push(autocompletion({override: (customSuggestionComponent ? [suggestionWrapper] : [suggestions])}))
+            internExtensions.push(autocompletion({...(customSuggestionComponent ? {override: [suggestionWrapper]} : {override: [suggestions as any]})}))
             internExtensions.push(Prec.highest(keymap.of([{key: "Tab", run: acceptCompletion}])))
 
             // Add ArrowUp/ArrowDown handlers for custom suggestion component
@@ -213,7 +220,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                                 startCompletion(view)
                                 return true
                             }
-                            return false
+                            return true
                         }
                     },
                     {
@@ -223,7 +230,8 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                                 startCompletion(view)
                                 return true
                             }
-                            return false
+                            ref?.current?.querySelector<HTMLElement>('[tabindex]')?.focus()
+                            return true
                         }
                     }
                 ])))
@@ -297,14 +305,19 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         }))
 
         return internExtensions
-    }, [language, tokenizer, tokenHighlights, extensions, suggestions])
+    }, [language, tokenizer, tokenHighlights, extensions, suggestions, ref.current])
 
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
             // Clear custom suggestion on cursor move or doc change
-            if (viewUpdate.selectionSet || viewUpdate.docChanged) {
+            if (viewUpdate.selectionSet && !viewUpdate.docChanged) {
                 setCustomSuggestion(null)
             }
+
+            if (viewUpdate.selectionSet && !viewUpdate.docChanged) {
+                startCompletion(viewUpdate.view)
+            }
+
 
             window.requestAnimationFrame(() => {
                 const foundNodes = containerRef.current?.querySelectorAll('.cm-react-anchor')
@@ -478,13 +491,12 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     })}
 
                     {customSuggestion && createPortal(
-                        <div
-                            style={{
-                                position: 'fixed',
-                                top: customSuggestion.position.top,
-                                left: customSuggestion.position.left,
-                                zIndex: 9999,
-                            }}
+                        <div ref={ref} style={{
+                            position: 'fixed',
+                            top: customSuggestion.position.top,
+                            left: customSuggestion.position.left,
+                            zIndex: 9999,
+                        }}
                         >
                             {customSuggestion.component}
                         </div>,

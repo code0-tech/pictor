@@ -1,7 +1,7 @@
 import React from "react"
 import {Editor} from "../editor/Editor"
 import {StreamLanguage, syntaxTree} from "@codemirror/language"
-import {EditorState, keymap, Prec} from "@uiw/react-codemirror"
+import {EditorState} from "@uiw/react-codemirror"
 import {Badge} from "../badge/Badge"
 import {hashToColor} from "../d-flow/DFlow.util"
 import {CompletionContext} from "@codemirror/autocomplete"
@@ -27,7 +27,7 @@ const OP_CHARS = {isOneOf: "=", isNotOneOf: "!="} as const
 const strip = (s: string) => s.replace(/^\\|\\$/g, "")
 
 export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{
-    expecting: "key" | "operator" | "value"
+    expecting: "key" | "operator" | "value" | "nextValue"
 }>({
     startState: () => ({expecting: "key"}),
     token(stream, state) {
@@ -53,7 +53,10 @@ export const createGithubQueryLanguage = (validTokens: string[]) => StreamLangua
             return "operator"
         }
         if (state.expecting === "value") {
-            if (stream.eat(',')) return null
+            if (stream.eat(",")) {
+                state.expecting = "value"
+                return "nextValue"
+            }
             if (stream.peek() === '\\') {
                 stream.next()
                 while (!stream.eol() && stream.peek() !== '\\') stream.next()
@@ -75,39 +78,36 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
     const language = React.useMemo(() => createGithubQueryLanguage(filterTokens?.map(t => t.token) || []), [filterTokens])
 
     const parseFilterQuery = React.useCallback((query: string): DataTableFilterProps => {
-        if (!query.trim()) return {}
+        if (!query.trim()) return {};
 
-        const filter: DataTableFilterProps = {}
+        const filter: DataTableFilterProps = {};
 
-        // Regular expression to match: \token\operator\value1\,\value2\,...
-        const filterPattern = /\\([^\\]+)\\(!=|=)([^\\]*(?:\\[^\\]+\\[^\\]*)*)/g
+        const filterPattern = /\\([^\\]+)\\(!=|=)((?:\\[^\\]+\\(?:,\\[^\\]+\\)*)+)/g;
 
-        let match: RegExpExecArray | null
+        let match: RegExpExecArray | null;
         while ((match = filterPattern.exec(query)) !== null) {
-            const token = match[1]
-            const operatorChar = match[2]
-            const valuesString = match[3]
+            const token = match[1];
+            const operatorChar = match[2];
+            const valuesString = match[3];
 
-            // Find the token config to get the key
-            const tokenConfig = filterTokens?.find(t => t.token === token)
-            if (!tokenConfig) continue
+            const tokenConfig = filterTokens?.find(t => t.token === token);
+            if (!tokenConfig) continue;
 
-            const operator = OP_MAP[operatorChar as keyof typeof OP_MAP]
-            if (!operator) continue
+            const operator = OP_MAP[operatorChar as keyof typeof OP_MAP];
+            if (!operator) continue;
 
-            // Parse values - they are separated by commas and wrapped in backslashes
-            const valueMatches = valuesString.match(/\\([^\\]+)\\/g)
-            const values = valueMatches ? valueMatches.map(v => strip(v)) : []
+            const valueMatches = valuesString.match(/\\([^\\]+)\\/g);
+            const values = valueMatches ? valueMatches.map(v => strip(v)) : [];
 
             if (values.length > 0) {
                 filter[tokenConfig.key] = {
                     operator,
-                    value: values.length === 1 ? values[0] : values
-                }
+                    value: values
+                };
             }
         }
 
-        return filter
+        return filter;
     }, [filterTokens])
 
     const handleEditorChange = React.useCallback((value: string) => {
@@ -127,6 +127,7 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             }
             return foundNodes
         })()
+
         const currentInputMode: "propertyName" | "operator" | "literal" | "none" =
             !propertyNode ? "propertyName" :
             context.pos < propertyNode.to ? "propertyName" :
@@ -135,8 +136,6 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             context.pos < operatorNode.to ? "operator" :
             context.pos === operatorNode.to ? "literal" :
             cursorLeftNode.name === "literal" ? (
-                context.pos === cursorLeftNode.to ? "none" :
-                context.pos < cursorLeftNode.to ? "literal" :
                 (() => {
                     const textBetween = context.state.sliceDoc(cursorLeftNode.to, context.pos)
                     return textBetween.includes(',') ? "literal" : textBetween.includes(' ') ? "propertyName" : "none"

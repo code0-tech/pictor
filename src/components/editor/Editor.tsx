@@ -310,26 +310,30 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
 
-            const {from, to} = viewUpdate.state.selection.main
+            if (viewUpdate.view) {
+                const {from, to} = viewUpdate.state?.selection?.main ?? {from: 0, to: 0}
 
-            let nodeCount = 0;
-            syntaxTree(viewUpdate.state).iterate({
-                from: from || 0,
-                to: to || 0,
-                enter: (node) => {
-                    if (node.from >= from && node.to <= to) {
-                        nodeCount++;
+                let nodeCount = 0;
+                syntaxTree(viewUpdate.state).iterate({
+                    from: from,
+                    to: to,
+                    enter: (node) => {
+                        if (node.from >= from && node.to <= to) {
+                            nodeCount++;
+                        }
                     }
-                }
-            })
+                })
 
-            if (viewUpdate.selectionSet && nodeCount < 2) {
+                if (viewUpdate.selectionSet && nodeCount < 2) {
+                    setCustomSuggestion(null)
+                    startCompletion(viewUpdate.view)
+                } else if (viewUpdate.selectionSet && nodeCount >= 2) {
+                    setCustomSuggestion(null)
+                }
+            } else if (viewUpdate.selectionSet) {
                 setCustomSuggestion(null)
                 startCompletion(viewUpdate.view)
-            } else if (viewUpdate.selectionSet && nodeCount >= 2) {
-                setCustomSuggestion(null)
             }
-
 
 
             window.requestAnimationFrame(() => {

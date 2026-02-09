@@ -1,0 +1,27 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.data-table {
+  width: 100%;
+  -webkit-border-horizontal-spacing: 0px;
+  -webkit-border-vertical-spacing: 0px;
+
+  &__row {
+    td {
+      border-bottom: 1px solid helpers.borderColor();
+      padding: variables.$xs variables.$xxs;
+    }
+
+    &:hover {
+      background: helpers.backgroundColor();
+      cursor: pointer;
+    }
+
+    td:last-child {
+      width: 1px;
+      white-space: nowrap;
+    }
+  }
+
+}

@@ -317,7 +317,6 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                 from: from || 0,
                 to: to || 0,
                 enter: (node) => {
-                    // Ensure the node is within the selection range
                     if (node.from >= from && node.to <= to) {
                         nodeCount++;
                     }

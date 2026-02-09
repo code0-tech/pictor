@@ -309,14 +309,28 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
 
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
-            // Clear custom suggestion on cursor move or doc change
-            if (viewUpdate.selectionSet) {
+
+            const {from, to} = viewUpdate.state.selection.main
+
+            let nodeCount = 0;
+            syntaxTree(viewUpdate.state).iterate({
+                from: from || 0,
+                to: to || 0,
+                enter: (node) => {
+                    // Ensure the node is within the selection range
+                    if (node.from >= from && node.to <= to) {
+                        nodeCount++;
+                    }
+                }
+            })
+
+            if (viewUpdate.selectionSet && nodeCount < 2) {
+                setCustomSuggestion(null)
+                startCompletion(viewUpdate.view)
+            } else if (viewUpdate.selectionSet && nodeCount >= 2) {
                 setCustomSuggestion(null)
             }
 
-            if (viewUpdate.selectionSet) {
-                startCompletion(viewUpdate.view)
-            }
 
 
             window.requestAnimationFrame(() => {

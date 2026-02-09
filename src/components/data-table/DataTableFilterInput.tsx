@@ -239,7 +239,6 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
         customSuggestionComponent={true}
         suggestions={getSuggestions}
         extensions={[
-            Prec.highest(keymap.of([{key: "Enter", run: () => true}])),
             EditorState.transactionFilter.of((tr) => tr.docChanged && tr.newDoc.lines > 1 ? [] : tr),
         ]}
         basicSetup={{

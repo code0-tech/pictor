@@ -310,11 +310,11 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
             // Clear custom suggestion on cursor move or doc change
-            if (viewUpdate.selectionSet && !viewUpdate.docChanged) {
+            if (viewUpdate.selectionSet) {
                 setCustomSuggestion(null)
             }
 
-            if (viewUpdate.selectionSet && !viewUpdate.docChanged) {
+            if (viewUpdate.selectionSet) {
                 startCompletion(viewUpdate.view)
             }
 

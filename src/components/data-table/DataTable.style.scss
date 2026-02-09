@@ -4,8 +4,9 @@
 
 .data-table {
   width: 100%;
-  -webkit-border-horizontal-spacing: 0px;
-  -webkit-border-vertical-spacing: 0px;
+  -webkit-border-horizontal-spacing: 0;
+  -webkit-border-vertical-spacing: 0;
+  border-spacing: 0;
 
   &__row {
     td {

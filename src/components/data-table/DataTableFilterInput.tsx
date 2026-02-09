@@ -1,139 +1,211 @@
-import React from "react";
-import {Editor, EditorTokenHighlights} from "../editor/Editor";
-import {StreamLanguage, syntaxTree} from "@codemirror/language";
-import {EditorState, Extension, keymap, Prec} from "@uiw/react-codemirror";
-import {Badge} from "../badge/Badge";
-import {hashToColor} from "../d-flow/DFlow.util";
-import {Menu, MenuContent, MenuItem, MenuTrigger} from "../menu/Menu";
-import {CompletionContext} from "@codemirror/autocomplete";
+import React from "react"
+import {Editor} from "../editor/Editor"
+import {StreamLanguage, syntaxTree} from "@codemirror/language"
+import {EditorState, keymap, Prec} from "@uiw/react-codemirror"
+import {Badge} from "../badge/Badge"
+import {hashToColor} from "../d-flow/DFlow.util"
+import {CompletionContext} from "@codemirror/autocomplete"
+import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu"
+import {MenuItem} from "../menu/Menu"
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
 export interface DataTableFilterTokens {
     token: string
     operators: DataTableFilterOperator[]
-    suggestion?: (token: string, operator: DataTableFilterOperator, applySuggestion: (value: string) => void) => React.ReactNode
+    suggestion?: (context: CompletionContext, operator: DataTableFilterOperator, applySuggestion: (value: string) => void) => React.ReactNode
 }
 
 export interface DataTableFilterInputProps {
     filterTokens?: DataTableFilterTokens[]
 }
 
-export const githubQueryLanguage = StreamLanguage.define<{ expecting: "key" | "operator" | "value" }>({
+const OP_MAP = {"=": "isOneOf", "!=": "isNotOneOf"} as const
+const OP_LABELS = {isOneOf: "is one of", isNotOneOf: "is not one of"} as const
+const OP_CHARS = {isOneOf: "=", isNotOneOf: "!="} as const
+const strip = (s: string) => s.replace(/^\\|\\$/g, "")
+
+export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{
+    expecting: "key" | "operator" | "value"
+}>({
     startState: () => ({expecting: "key"}),
     token(stream, state) {
         if (stream.eatSpace()) {
-            if (state.expecting === "value") state.expecting = "key";
-            return null;
+            if (state.expecting === "value") state.expecting = "key"
+            return null
         }
-        if (state.expecting === "key" && stream.match(/[\w-]+(?=(!=|=))/)) {
-            state.expecting = "operator";
-            return "propertyName";
+        if (state.expecting === "key" && stream.peek() === '\\') {
+            stream.next()
+            const chars: string[] = []
+            while (!stream.eol() && stream.peek() !== '\\') chars.push(stream.next()!)
+            if (stream.peek() === '\\') {
+                stream.next()
+                if (validTokens.includes(chars.join(""))) {
+                    state.expecting = "operator"
+                    return "propertyName"
+                }
+            }
+            return "invalid"
         }
         if (state.expecting === "operator" && stream.match(/^(!=|=)/)) {
-            state.expecting = "value";
-            return "operator";
+            state.expecting = "value"
+            return "operator"
         }
         if (state.expecting === "value") {
-            if (stream.eat(',')) return null;
-            if (stream.eatWhile(/[^ ,]/)) return "literal";
+            if (stream.eat(',')) return null
+            if (stream.peek() === '\\') {
+                stream.next()
+                while (!stream.eol() && stream.peek() !== '\\') stream.next()
+                if (stream.peek() === '\\') {
+                    stream.next()
+                    return "literal"
+                }
+                return "invalid"
+            }
+            stream.next()
+            return null
         }
-        stream.next();
-        return null;
+        stream.next()
+        return null
     }
 })
 
-const singleLineExtension: Extension = [
-    Prec.highest(keymap.of([{key: "Enter", run: () => true}])),
-    EditorState.transactionFilter.of((tr) => tr.docChanged && tr.newDoc.lines > 1 ? [] : tr),
-]
+export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filterTokens}) => {
+    const language = React.useMemo(() => createGithubQueryLanguage(filterTokens?.map(t => t.token) || []), [filterTokens])
 
-const operatorLabels: Record<string, string> = {"=": "is one of", "!=": "is not one of"};
+    const getSuggestions = React.useCallback((context: CompletionContext) => {
+        const syntaxTreeRoot = syntaxTree(context.state)
+        const cursorLeftNode = syntaxTreeRoot.resolveInner(context.pos, -1)
+        const cursorRightNode = syntaxTreeRoot.resolveInner(context.pos, 1)
+        const {propertyNode, operatorNode} = (() => {
+            const foundNodes = {propertyNode: null as any, operatorNode: null as any}
+            for (let currentNode: any = cursorLeftNode; currentNode; currentNode = currentNode.prevSibling) {
+                if (currentNode.name === "propertyName" && !foundNodes.propertyNode) foundNodes.propertyNode = currentNode
+                if (currentNode.name === "operator" && !foundNodes.operatorNode) foundNodes.operatorNode = currentNode
+            }
+            return foundNodes
+        })()
+        const currentInputMode: "propertyName" | "operator" | "literal" | "none" =
+            !propertyNode ? "propertyName" :
+            context.pos < propertyNode.to ? "propertyName" :
+            context.pos === propertyNode.to ? "operator" :
+            !operatorNode ? (cursorRightNode.name === "operator" ? "operator" : "operator") :
+            context.pos < operatorNode.to ? "operator" :
+            context.pos === operatorNode.to ? "literal" :
+            cursorLeftNode.name === "literal" ? (
+                context.pos === cursorLeftNode.to ? "none" :
+                context.pos < cursorLeftNode.to ? "literal" :
+                (() => {
+                    const textBetween = context.state.sliceDoc(cursorLeftNode.to, context.pos)
+                    return textBetween.includes(',') ? "literal" : textBetween.includes(' ') ? "propertyName" : "none"
+                })()
+            ) :
+            cursorLeftNode.name === "invalid" && context.state.sliceDoc(cursorLeftNode.from, cursorLeftNode.to).startsWith('\\') ? "literal" :
+            (() => {
+                const textAfterOperator = context.state.sliceDoc(operatorNode.to, context.pos)
+                return !textAfterOperator.trim() ? (textAfterOperator.length > 0 ? "propertyName" : "literal") :
+                    (textAfterOperator.includes(",") || !textAfterOperator.includes(" ") ? "literal" : "propertyName")
+            })()
+        const currentPropertyName = propertyNode ? strip(context.state.sliceDoc(propertyNode.from, propertyNode.to)) : ""
+        const currentTokenConfig = filterTokens?.find(t => t.token === currentPropertyName)
 
-const tokenHighlights: EditorTokenHighlights = {
-    literal: ({content}) => <Badge>{content}</Badge>,
-    operator: ({content}) => operatorLabels[content] ?
-        <Badge color="tertiary" style={{boxShadow: "none"}}>{operatorLabels[content]}</Badge> : content,
-    propertyName: ({content}) => <Badge color={hashToColor(content)}>{content}</Badge>
-}
+        const applyTextChange = (startPos: number, endPos: number, newText: string) => {
+            context.view?.dispatch({
+                changes: {from: startPos, to: endPos, insert: newText},
+                selection: {anchor: startPos + newText.length},
+                scrollIntoView: true
+            })
+            context.view?.focus()
+        }
 
-const basicSetup = {
-    lineNumbers: false,
-    foldGutter: false,
-    highlightActiveLine: false,
-    highlightActiveLineGutter: false,
-    dropCursor: false,
-    allowMultipleSelections: false,
-    indentOnInput: false,
-};
+        if (currentInputMode === "propertyName") {
+            const alreadyUsedTokens = new Set<string>()
+            const partialWord = context.matchBefore(/\\?[\w-]*/)
+            const replaceStartPos = partialWord ? partialWord.from : context.pos
+            const cursorInsideProperty = propertyNode && context.pos <= propertyNode.to
+            const replaceEndPos = cursorRightNode.name === "propertyName" ? cursorRightNode.to : cursorInsideProperty ? propertyNode.to : context.pos
+            const actualReplaceStart = cursorInsideProperty && propertyNode.from < replaceStartPos ? propertyNode.from : replaceStartPos
+            const userSearchText = strip(context.state.sliceDoc(actualReplaceStart, context.pos))
+            const availableTokens = filterTokens?.filter(t => t.token.startsWith(userSearchText) && !alreadyUsedTokens.has(t.token)) || []
 
-const SuggestionsMenu = ({context, node, pos, prevNode}: { context: CompletionContext, node: any, pos: number, prevNode: any }) => {
-    const handleSelect = () => {
-        const targetNode = prevNode.type.name === "literal" ? node : null;
-        const from = targetNode ? targetNode.from : pos;
-        const to = targetNode ? targetNode.to : pos;
+            syntaxTreeRoot.iterate({enter: (node) => {
+                if (node.name === "propertyName") alreadyUsedTokens.add(strip(context.state.sliceDoc(node.from, node.to)))
+            }})
 
-        context.view?.dispatch({
-            changes: {from, to, insert: "value"},
-            selection: {anchor: from + "value".length}
-        });
-        context.view?.focus();
-    };
+            if (availableTokens.length) {
+                return <DataTableFilterSuggestionMenu context={context}>
+                    {availableTokens.map(tokenDef => (
+                        <MenuItem key={tokenDef.token} onSelect={() => applyTextChange(actualReplaceStart, replaceEndPos, `\\${tokenDef.token}\\`)}>
+                            {tokenDef.token}
+                        </MenuItem>
+                    ))}
+                </DataTableFilterSuggestionMenu>
+            }
+        }
 
-    const MenuContentAny = MenuContent as any;
+        if (currentInputMode === "operator" && currentTokenConfig) {
+            const partialWord = context.matchBefore(/[!=]+/)
+            const replaceStartPos = partialWord ? partialWord.from : context.pos
+            const cursorInsideOperator = operatorNode && context.pos <= operatorNode.to
+            const replaceEndPos = cursorRightNode.name === "operator" ? cursorRightNode.to : cursorInsideOperator ? operatorNode.to : context.pos
+            const actualReplaceStart = cursorInsideOperator && operatorNode.from < replaceStartPos ? operatorNode.from : replaceStartPos
 
-    const content = <MenuContentAny
-        onOpenAutoFocus={(e: Event) => {
-            e.preventDefault();
-            ((e.currentTarget as HTMLElement).querySelector('[role="menuitem"]') as HTMLElement)?.focus();
-        }}
-        onKeyDown={(event: any) => {
-            if (!["Escape", "ArrowUp", "ArrowDown"].includes(event.key)) context.view?.focus();
-        }}
-        style={{position: 'fixed', top: 0, left: 0, pointerEvents: 'auto'}}
-    >
-        {["false", "true"].map(val => (
-            <MenuItem key={val} onSelect={handleSelect}>{val}</MenuItem>
-        ))}
-    </MenuContentAny>;
+            return <DataTableFilterSuggestionMenu context={context}>
+                {currentTokenConfig.operators.map(operatorType => (
+                    <MenuItem key={operatorType} onSelect={() => applyTextChange(actualReplaceStart, replaceEndPos, OP_CHARS[operatorType])}>
+                        {OP_LABELS[operatorType]}
+                    </MenuItem>
+                ))}
+            </DataTableFilterSuggestionMenu>
+        }
 
-    return (
-        <Menu open={true} modal={false}>
-            <MenuTrigger asChild>
-                <div style={{position: 'absolute', top: 0, left: 0, width: 0, height: 0}}/>
-            </MenuTrigger>
-            {content}
-        </Menu>
-    );
-}
+        if (currentInputMode === "literal" && currentTokenConfig?.suggestion) {
+            const operatorText = operatorNode ? context.state.sliceDoc(operatorNode.from, operatorNode.to) : ""
+            const selectedOperator = OP_MAP[operatorText as keyof typeof OP_MAP]
 
-export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = () => {
+            if (selectedOperator && currentTokenConfig.operators.includes(selectedOperator)) {
+                return currentTokenConfig.suggestion(context, selectedOperator, (selectedValue) => {
+                    const isExistingLiteral = cursorLeftNode.name === "literal" || (cursorLeftNode.name === "invalid" && context.state.sliceDoc(cursorLeftNode.from, cursorLeftNode.to).startsWith('\\'))
+                    const replaceStartPos = isExistingLiteral ? cursorLeftNode.from : context.pos
+                    const replaceEndPos = isExistingLiteral ? cursorLeftNode.to : cursorRightNode.name === "literal" ? cursorRightNode.to : context.pos
+                    applyTextChange(replaceStartPos, replaceEndPos, `\\${selectedValue}\\`)
+                })
+            }
+        }
+
+        return null
+    }, [filterTokens])
+
     return <Editor
-        w={"400px"}
+        w="400px"
         style={{
             backgroundColor: "rgba(255,255,255,.1)",
             padding: "0.35rem",
             borderRadius: "1rem",
             boxShadow: "inset 0 1px 1px 0 rgba(255,255,255,.2)",
         }}
-        tokenHighlights={tokenHighlights}
-        initialValue={'members=233,2323 status!=false'}
+        tokenHighlights={{
+            literal: ({content}) => <Badge>{strip(content)}</Badge>,
+            operator: ({content}) => <Badge color="tertiary" style={{boxShadow: "none"}}>{OP_LABELS[OP_MAP[content as keyof typeof OP_MAP]] || content}</Badge>,
+            propertyName: ({content}) => <Badge color={hashToColor(strip(content))}>{strip(content)}</Badge>
+        }}
         showTooltips={false}
         showValidation={false}
         customSuggestionComponent={true}
-        suggestions={context => {
-            const prevNode = syntaxTree(context.state).resolveInner(context.pos, -1);
-            if (prevNode.type.name !== "operator" && prevNode.type.name !== "literal") return null;
-
-            return <SuggestionsMenu
-                context={context}
-                node={syntaxTree(context.state).resolveInner(context.pos, -1)}
-                pos={context.state.selection.main.head}
-                prevNode={prevNode}
-            />
+        suggestions={getSuggestions}
+        extensions={[
+            Prec.highest(keymap.of([{key: "Enter", run: () => true}])),
+            EditorState.transactionFilter.of((tr) => tr.docChanged && tr.newDoc.lines > 1 ? [] : tr),
+        ]}
+        basicSetup={{
+            lineNumbers: false,
+            foldGutter: false,
+            highlightActiveLine: false,
+            highlightActiveLineGutter: false,
+            dropCursor: false,
+            allowMultipleSelections: false,
+            indentOnInput: false,
         }}
-        extensions={[singleLineExtension]}
-        basicSetup={basicSetup}
-        language={githubQueryLanguage}
+        language={language}
     />
 }

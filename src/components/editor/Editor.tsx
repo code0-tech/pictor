@@ -466,11 +466,15 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                         className={"editor__control"}
                         onChange={(val) => {
                             setFormatted(val)
-                            try {
-                                const json = JSON.parse(val)
-                                onChange?.(json)
-                                formValidation?.setValue(json)
-                            } catch (e) {
+                            if (language === "json") {
+                                try {
+                                    const json = JSON.parse(val)
+                                    onChange?.(json)
+                                    formValidation?.setValue(json)
+                                } catch (e) {
+                                }
+                            } else {
+                                onChange?.(val)
                             }
                         }}
                         onUpdate={handleUpdate}

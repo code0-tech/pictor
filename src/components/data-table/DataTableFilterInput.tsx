@@ -239,15 +239,7 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
         customSuggestionComponent={true}
         suggestions={getSuggestions}
         extensions={[
-            EditorState.transactionFilter.of((tr) => {
-                // Erlaube Änderungen, die den gesamten Text löschen
-                if (tr.docChanged && tr.newDoc.length === 0) {
-                    return tr
-                }
-                // Blockiere nur Änderungen, die mehrere Zeilen erstellen
-                return tr.docChanged && tr.newDoc.lines > 1 ? [] : tr
-            })
-
+            EditorState.transactionFilter.of((tr) => tr.docChanged && tr.newDoc.lines > 1 ? [] : tr),
         ]}
         basicSetup={{
             lineNumbers: false,

@@ -7,17 +7,18 @@ import {hashToColor} from "../d-flow/DFlow.util"
 import {CompletionContext} from "@codemirror/autocomplete"
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu"
 import {MenuItem} from "../menu/Menu"
-
-export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
+import {DataTableFilterOperator, DataTableFilterProps} from "./DataTable";
 
 export interface DataTableFilterTokens {
     token: string
+    key: string
     operators: DataTableFilterOperator[]
     suggestion?: (context: CompletionContext, operator: DataTableFilterOperator, applySuggestion: (value: string) => void) => React.ReactNode
 }
 
 export interface DataTableFilterInputProps {
     filterTokens?: DataTableFilterTokens[]
+    onChange?: (filter: DataTableFilterProps) => void
 }
 
 const OP_MAP = {"=": "isOneOf", "!=": "isNotOneOf"} as const
@@ -70,8 +71,49 @@ export const createGithubQueryLanguage = (validTokens: string[]) => StreamLangua
     }
 })
 
-export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filterTokens}) => {
+export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filterTokens, onChange}) => {
     const language = React.useMemo(() => createGithubQueryLanguage(filterTokens?.map(t => t.token) || []), [filterTokens])
+
+    const parseFilterQuery = React.useCallback((query: string): DataTableFilterProps => {
+        if (!query.trim()) return {}
+
+        const filter: DataTableFilterProps = {}
+
+        // Regular expression to match: \token\operator\value1\,\value2\,...
+        const filterPattern = /\\([^\\]+)\\(!=|=)([^\\]*(?:\\[^\\]+\\[^\\]*)*)/g
+
+        let match: RegExpExecArray | null
+        while ((match = filterPattern.exec(query)) !== null) {
+            const token = match[1]
+            const operatorChar = match[2]
+            const valuesString = match[3]
+
+            // Find the token config to get the key
+            const tokenConfig = filterTokens?.find(t => t.token === token)
+            if (!tokenConfig) continue
+
+            const operator = OP_MAP[operatorChar as keyof typeof OP_MAP]
+            if (!operator) continue
+
+            // Parse values - they are separated by commas and wrapped in backslashes
+            const valueMatches = valuesString.match(/\\([^\\]+)\\/g)
+            const values = valueMatches ? valueMatches.map(v => strip(v)) : []
+
+            if (values.length > 0) {
+                filter[tokenConfig.key] = {
+                    operator,
+                    value: values.length === 1 ? values[0] : values
+                }
+            }
+        }
+
+        return filter
+    }, [filterTokens])
+
+    const handleEditorChange = React.useCallback((value: string) => {
+        const parsedFilter = parseFilterQuery(value)
+        onChange?.(parsedFilter)
+    }, [parseFilterQuery, onChange])
 
     const getSuggestions = React.useCallback((context: CompletionContext) => {
         const syntaxTreeRoot = syntaxTree(context.state)
@@ -177,10 +219,13 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
     }, [filterTokens])
 
     return <Editor
-        w="400px"
+        w="100%"
+        initialValue=""
+        onChange={handleEditorChange}
         style={{
             backgroundColor: "rgba(255,255,255,.1)",
             padding: "0.35rem",
+            boxSizing: "border-box",
             borderRadius: "1rem",
             boxShadow: "inset 0 1px 1px 0 rgba(255,255,255,.2)",
         }}

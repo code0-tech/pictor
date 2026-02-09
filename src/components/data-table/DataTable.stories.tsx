@@ -66,7 +66,9 @@ export const Default = () => {
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xl"}/>
-        <DataTableFilterInput onChange={filter => setFilter(filter)} filterTokens={[
+        <DataTableFilterInput onChange={filter => {
+            setFilter(filter)
+        }} filterTokens={[
             {
                 token: "name",
                 key: "name",

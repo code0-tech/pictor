@@ -247,7 +247,6 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             highlightActiveLine: false,
             highlightActiveLineGutter: false,
             dropCursor: false,
-            allowMultipleSelections: false,
             indentOnInput: false,
         }}
         language={language}

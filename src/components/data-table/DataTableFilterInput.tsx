@@ -226,16 +226,16 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
         }}
         tokenHighlights={{
             literal: ({content}) => {
-                const splitted = strip(content).split(',')
-                if (splitted.length > 1) {
-                    return <Badge p={0.175}>
-                        {splitted.map((item => <Badge style={{boxShadow: "none"}} color={"secondary"} key={item}>{item}</Badge>))}
+                const split = strip(content).split(',')
+                if (split.length > 1) {
+                    return <Badge p={0.175} mx={0.175}>
+                        {split.map((item => <Badge style={{boxShadow: "none"}} color={"secondary"} key={item}>{item}</Badge>))}
                     </Badge>
                 }
-                return <Badge>{strip(content)}</Badge>
+                return <Badge mx={0.175}>{strip(content)}</Badge>
             },
             operator: ({content}) => <Badge color="tertiary" style={{boxShadow: "none"}}>{OP_LABELS[OP_MAP[content as keyof typeof OP_MAP]] || content}</Badge>,
-            propertyName: ({content}) => <Badge color={hashToColor(strip(content))}>{strip(content)}</Badge>
+            propertyName: ({content}) => <Badge mx={0.175} color={hashToColor(strip(content))}>{strip(content)}</Badge>
         }}
         showTooltips={false}
         showValidation={false}

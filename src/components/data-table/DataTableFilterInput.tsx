@@ -13,7 +13,7 @@ export interface DataTableFilterTokens {
     token: string
     key: string
     operators: DataTableFilterOperator[]
-    suggestion?: (context: CompletionContext, operator: DataTableFilterOperator, applySuggestion: (value: string) => void) => React.ReactNode
+    suggestion?: (context: CompletionContext, operator: DataTableFilterOperator, currentValue: string, applySuggestion: (value: string, silently?: boolean) => void) => React.ReactNode
 }
 
 export interface DataTableFilterInputProps {
@@ -26,51 +26,31 @@ const OP_LABELS = {isOneOf: "is one of", isNotOneOf: "is not one of"} as const
 const OP_CHARS = {isOneOf: "=", isNotOneOf: "!="} as const
 const strip = (s: string) => s.replace(/^\\|\\$/g, "")
 
-export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{
-    expecting: "key" | "operator" | "value" | "nextValue"
-}>({
-    startState: () => ({expecting: "key"}),
-    token(stream, state) {
-        if (stream.eatSpace()) {
-            if (state.expecting === "value") state.expecting = "key"
-            return null
-        }
-        if (state.expecting === "key" && stream.peek() === '\\') {
-            stream.next()
-            const chars: string[] = []
-            while (!stream.eol() && stream.peek() !== '\\') chars.push(stream.next()!)
+export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{}>({
+    startState: () => ({}),
+    token(stream) {
+        if (stream.eatSpace()) return null;
+        // Operatoren erkennen
+        if (stream.match('!=')) return "operator";
+        if (stream.match('=')) return "operator";
+        // Token oder Value erkennen
+        if (stream.peek() === '\\') {
+            stream.next();
+            const chars: string[] = [];
+            while (!stream.eol() && stream.peek() !== '\\') chars.push(stream.next()!);
             if (stream.peek() === '\\') {
-                stream.next()
-                if (validTokens.includes(chars.join(""))) {
-                    state.expecting = "operator"
-                    return "propertyName"
+                stream.next();
+                const content = chars.join("");
+                if (validTokens.includes(content)) {
+                    return "propertyName";
+                } else {
+                    return "literal";
                 }
             }
-            return "invalid"
+            return "invalid";
         }
-        if (state.expecting === "operator" && stream.match(/^(!=|=)/)) {
-            state.expecting = "value"
-            return "operator"
-        }
-        if (state.expecting === "value") {
-            if (stream.eat(",")) {
-                state.expecting = "value"
-                return "nextValue"
-            }
-            if (stream.peek() === '\\') {
-                stream.next()
-                while (!stream.eol() && stream.peek() !== '\\') stream.next()
-                if (stream.peek() === '\\') {
-                    stream.next()
-                    return "literal"
-                }
-                return "invalid"
-            }
-            stream.next()
-            return null
-        }
-        stream.next()
-        return null
+        stream.next();
+        return null;
     }
 })
 
@@ -79,26 +59,19 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
 
     const parseFilterQuery = React.useCallback((query: string): DataTableFilterProps => {
         if (!query.trim()) return {};
-
         const filter: DataTableFilterProps = {};
-
-        const filterPattern = /\\([^\\]+)\\(!=|=)((?:\\[^\\]+\\(?:,\\[^\\]+\\)*)+)/g;
-
-        let match: RegExpExecArray | null;
-        while ((match = filterPattern.exec(query)) !== null) {
-            const token = match[1];
-            const operatorChar = match[2];
-            const valuesString = match[3];
-
+        // Minimal: Splitte an Backslashes, filtere leere Segmente
+        const segments = query.split(/\\/).filter(Boolean);
+        for (let i = 0; i + 2 < segments.length; i += 3) {
+            const token = segments[i];
+            const operatorChar = segments[i + 1];
+            const valueString = segments[i + 2];
+            if (!token || !operatorChar || !valueString) continue;
             const tokenConfig = filterTokens?.find(t => t.token === token);
             if (!tokenConfig) continue;
-
             const operator = OP_MAP[operatorChar as keyof typeof OP_MAP];
             if (!operator) continue;
-
-            const valueMatches = valuesString.match(/\\([^\\]+)\\/g);
-            const values = valueMatches ? valueMatches.map(v => strip(v)) : [];
-
+            const values = valueString.split(',').map(v => v.trim()).filter(Boolean);
             if (values.length > 0) {
                 filter[tokenConfig.key] = {
                     operator,
@@ -135,28 +108,31 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             !operatorNode ? (cursorRightNode.name === "operator" ? "operator" : "operator") :
             context.pos < operatorNode.to ? "operator" :
             context.pos === operatorNode.to ? "literal" :
-            cursorLeftNode.name === "literal" ? (
-                (() => {
-                    const textBetween = context.state.sliceDoc(cursorLeftNode.to, context.pos)
-                    return textBetween.includes(',') ? "literal" : textBetween.includes(' ') ? "propertyName" : "none"
-                })()
-            ) :
+            cursorLeftNode.name === "literal" ? "propertyName" :
             cursorLeftNode.name === "invalid" && context.state.sliceDoc(cursorLeftNode.from, cursorLeftNode.to).startsWith('\\') ? "literal" :
             (() => {
                 const textAfterOperator = context.state.sliceDoc(operatorNode.to, context.pos)
                 return !textAfterOperator.trim() ? (textAfterOperator.length > 0 ? "propertyName" : "literal") :
-                    (textAfterOperator.includes(",") || !textAfterOperator.includes(" ") ? "literal" : "propertyName")
+                    (textAfterOperator.includes(" ") ? "propertyName" : "literal")
             })()
         const currentPropertyName = propertyNode ? strip(context.state.sliceDoc(propertyNode.from, propertyNode.to)) : ""
         const currentTokenConfig = filterTokens?.find(t => t.token === currentPropertyName)
 
-        const applyTextChange = (startPos: number, endPos: number, newText: string) => {
-            context.view?.dispatch({
-                changes: {from: startPos, to: endPos, insert: newText},
-                selection: {anchor: startPos + newText.length},
-                scrollIntoView: true
-            })
-            context.view?.focus()
+        const applyTextChange = (startPos: number, endPos: number, newText: string, silently?: boolean) => {
+            if (silently) {
+                context.view?.dispatch({
+                    changes: {from: startPos, to: endPos, insert: newText},
+                    selection: {anchor: context.pos},
+                    scrollIntoView: false
+                })
+            } else {
+                context.view?.dispatch({
+                    changes: {from: startPos, to: endPos, insert: newText},
+                    selection: {anchor: startPos + newText.length},
+                    scrollIntoView: true
+                })
+                context.view?.focus()
+            }
         }
 
         if (currentInputMode === "propertyName") {
@@ -174,13 +150,24 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             }})
 
             if (availableTokens.length) {
-                return <DataTableFilterSuggestionMenu context={context}>
-                    {availableTokens.map(tokenDef => (
-                        <MenuItem key={tokenDef.token} onSelect={() => applyTextChange(actualReplaceStart, replaceEndPos, `\\${tokenDef.token}\\`)}>
-                            {tokenDef.token}
-                        </MenuItem>
-                    ))}
-                </DataTableFilterSuggestionMenu>
+                return (
+                    <DataTableFilterSuggestionMenu context={context}>
+                        {availableTokens.map(tokenDef => (
+                            <MenuItem key={tokenDef.token} onSelect={() => {
+                                let insertText = `\\${tokenDef.token}\\`;
+                                if (cursorLeftNode.name === "literal") {
+                                    const after = context.state.sliceDoc(replaceEndPos, replaceEndPos + 1);
+                                    if (after !== "\\") {
+                                        insertText = "\\" + insertText;
+                                    }
+                                }
+                                applyTextChange(actualReplaceStart, replaceEndPos, insertText);
+                            }}>
+                                {tokenDef.token}
+                            </MenuItem>
+                        ))}
+                    </DataTableFilterSuggestionMenu>
+                );
             }
         }
 
@@ -204,12 +191,21 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             const operatorText = operatorNode ? context.state.sliceDoc(operatorNode.from, operatorNode.to) : ""
             const selectedOperator = OP_MAP[operatorText as keyof typeof OP_MAP]
 
+
+
             if (selectedOperator && currentTokenConfig.operators.includes(selectedOperator)) {
-                return currentTokenConfig.suggestion(context, selectedOperator, (selectedValue) => {
+
+                const currentValue =
+                    cursorRightNode.name === "literal"
+                        ? context.state.sliceDoc(cursorRightNode.from, cursorRightNode.to)
+                        : "";
+
+                return currentTokenConfig.suggestion(context, selectedOperator, strip(currentValue), (selectedValue, silently) => {
                     const isExistingLiteral = cursorLeftNode.name === "literal" || (cursorLeftNode.name === "invalid" && context.state.sliceDoc(cursorLeftNode.from, cursorLeftNode.to).startsWith('\\'))
                     const replaceStartPos = isExistingLiteral ? cursorLeftNode.from : context.pos
                     const replaceEndPos = isExistingLiteral ? cursorLeftNode.to : cursorRightNode.name === "literal" ? cursorRightNode.to : context.pos
-                    applyTextChange(replaceStartPos, replaceEndPos, `\\${selectedValue}\\`)
+
+                    applyTextChange(replaceStartPos, replaceEndPos, `\\${selectedValue}\\`, silently)
                 })
             }
         }
@@ -229,7 +225,15 @@ export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filte
             boxShadow: "inset 0 1px 1px 0 rgba(255,255,255,.2)",
         }}
         tokenHighlights={{
-            literal: ({content}) => <Badge>{strip(content)}</Badge>,
+            literal: ({content}) => {
+                const splitted = strip(content).split(',')
+                if (splitted.length > 1) {
+                    return <Badge p={0.175}>
+                        {splitted.map((item => <Badge style={{boxShadow: "none"}} color={"secondary"} key={item}>{item}</Badge>))}
+                    </Badge>
+                }
+                return <Badge>{strip(content)}</Badge>
+            },
             operator: ({content}) => <Badge color="tertiary" style={{boxShadow: "none"}}>{OP_LABELS[OP_MAP[content as keyof typeof OP_MAP]] || content}</Badge>,
             propertyName: ({content}) => <Badge color={hashToColor(strip(content))}>{strip(content)}</Badge>
         }}

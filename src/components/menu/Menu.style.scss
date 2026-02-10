@@ -29,7 +29,7 @@
     }
   }
 
-  &__item, &__sub-trigger {
+  &__item, &__sub-trigger, &__checkbox-item {
     border-radius: variables.$borderRadius - variables.$xxs;
     padding: variables.$xxs variables.$xs;
     gap: variables.$xs;
@@ -47,7 +47,7 @@
       box-shadow: none;
     }
 
-    &:focus, &[data-focus=true] {
+    &:focus, &[data-focus=true], &[aria-checked=true] {
       @include box.box(variables.$white, variables.$white, variables.$white);
       box-shadow: none;
       width: 100%;

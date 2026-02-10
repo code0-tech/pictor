@@ -67,8 +67,23 @@ export const DataTable = <T,>(props: DataTableProps<T>) => {
         })
     })
 
+    const sortedData = React.useMemo(() => {
+        if (!sort) return filteredData
+
+        return [...filteredData].sort((a, b) => {
+            for (const [key, direction] of Object.entries(sort)) {
+                const aValue = getNestedValue(a, key);
+                const bValue = getNestedValue(b, key);
+
+                if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        })
+    }, [filteredData, sort])
+
     return <table className={"data-table"}>
-        {filteredData.map((item, i) => {
+        {sortedData.map((item, i) => {
             return <tr className={"data-table__row"}>
                 {children?.(item, i)}
             </tr>

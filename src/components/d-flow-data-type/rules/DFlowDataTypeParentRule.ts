@@ -10,12 +10,12 @@ export interface DFlowDataTypeParentRuleConfig {
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeParentRule {
-    public static validate(value: NodeParameterValue, config: DFlowDataTypeParentRuleConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: Flow): boolean {
+    public static validate(value: NodeParameterValue, config: DFlowDataTypeParentRuleConfig, generics?: Map<string, GenericMapper>, flow?: Flow, dataTypeService?: DFlowDataTypeReactiveService): boolean {
 
         const replacedType = generics ? replaceGenericKeysInType(config.type, generics) : config.type
 
-        if (!service) return false
-        return useValueValidation(value, service.getDataType(replacedType)!!, service, flow, Array.from(generics!!, ([_, value]) => value))
+        if (!dataTypeService) return false
+        return useValueValidation(value, dataTypeService.getDataType(replacedType)!!, dataTypeService, flow, Array.from(generics!!, ([_, value]) => value))
 
     }
 }

@@ -24,12 +24,15 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
-import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
+import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
 
 interface ExtendedReferenceValue extends ReferenceValue {
     parameterIndex?: number
     inputTypeIndex?: number
     inputTypeIdentifier?: string
+    node: number
+    depth: number
+    scope: number[]
 }
 
 export const useReferenceSuggestions = (
@@ -59,6 +62,8 @@ export const useReferenceSuggestions = (
 
     const refObjects = useRefObjects(flowId)
 
+    const returnTypes = useReturnTypes(flowId)
+
     return React.useMemo(() => {
         if (!resolvedType || !nodeContext) return []
 
@@ -78,7 +83,9 @@ export const useReferenceSuggestions = (
             if (value.depth > depth!) return []
             if (value.scope.some(r => !scope!.includes(r))) return []
 
-            const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!!, dataTypeService), [])
+            //TODO: useReturnType hook to resolve actual return type of node
+            const returnTypeIdentifier = returnTypes.get(value.nodeFunctionId)
+            const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(returnTypeIdentifier!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
 
             return [{
@@ -117,19 +124,19 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
     const nodeContexts = useNodeContext(flowId)
 
+    const returnTypes = useReturnTypes(flowId)
+
     const nodeSuggestions = React.useMemo(() => {
         return flow?.nodes?.nodes?.map(node => {
 
-            const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
-            const functionDefinition = functionService.getById(node?.functionDefinition?.id)
-            const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService)
+            const resolvedReturnType = returnTypes.get(node?.id)
             const nodeContext = nodeContexts?.find(context => context.nodeFunctionId === node?.id)
 
             if (resolvedReturnType && nodeContext) {
                 return referenceExtraction(nodeContext, resolvedReturnType, dataTypeService)
             }
 
-            return {} as ReferenceValue
+            return {} as ExtendedReferenceValue
 
         }) ?? []
     }, [flow])
@@ -145,7 +152,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
         })
     }, [flow])
 
-    const inputSuggestions: ReferenceValue[] = React.useMemo(() => {
+    const inputSuggestions: ExtendedReferenceValue[] = React.useMemo(() => {
         if (!flow?.nodes?.nodes?.length) return []
 
         return flow.nodes.nodes.flatMap((node) => {
@@ -174,7 +181,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                 const inputTypeRules =
                     pType.rules?.nodes?.filter((r) => r?.variant === "INPUT_TYPES") ?? []
 
-                const genericTypeMap = resolveGenericKeys(functionDefinition, nodeValues, dataTypeService)
+                const genericTypeMap = resolveGenericKeys(functionDefinition, nodeValues, dataTypeService, functionService)
                 const genericTargetMap = targetForGenericKey(functionDefinition, dataTypeIdentifier)
                 const resolvedGenericMap = new Map(
                     [...genericTypeMap].map(([key, value]) => [genericTargetMap.get(key) ?? key, value])
@@ -211,7 +218,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier, dataTypeService?: DFlowDataTypeReactiveService): ReferenceValue[] => {
+const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier, dataTypeService?: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
 
     const dataType: Maybe<DataType> | undefined = dataTypeService ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
@@ -238,7 +245,6 @@ const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdenti
         ...references,
         {
             __typename: "ReferenceValue",
-            dataTypeIdentifier,
             nodeFunctionId: nodeContext.nodeFunctionId,
             ...nodeContext
         }]

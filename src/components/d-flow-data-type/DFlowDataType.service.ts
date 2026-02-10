@@ -5,7 +5,8 @@ import {
     DataTypeIdentifier,
     DataTypeRule,
     DataTypeRulesContainsKeyConfig,
-    DataTypeRulesInputTypesConfig, DataTypeRulesVariant,
+    DataTypeRulesInputTypesConfig,
+    DataTypeRulesVariant,
     Flow,
     GenericMapper,
     LiteralValue,
@@ -19,6 +20,7 @@ import {
 import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
 import {findReturnNode} from "./rules/DFlowDataTypeReturnTypeRule";
 import {md5} from "js-md5";
+import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
 
 export type DFlowDataTypeDependencies = {
     namespaceId: Namespace['id']
@@ -149,8 +151,6 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
     getTypeFromValue(value: NodeParameterValue, flow?: Flow, dependencies?: DFlowDataTypeDependencies): Maybe<DataTypeIdentifier> | undefined {
 
         if (!value) return undefined
-
-        if (value.__typename === "ReferenceValue") return value.dataTypeIdentifier
 
         const dataType = this.getDataTypeFromValue(value, flow, dependencies)
         if ((dataType?.genericKeys?.length ?? 0) <= 0 || !dataType?.genericKeys) return {

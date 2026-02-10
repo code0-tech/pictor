@@ -7,7 +7,7 @@ export const useDataTypeValidation = (
     secondDataType: DataTypeView
 ) => {
 
-    if (firstDataType.variant !== secondDataType.variant) return false
+    if (firstDataType?.variant !== secondDataType?.variant) return false
 
     const isObject = (value: unknown): value is Record<string, unknown> => {
         return value !== null && typeof value === "object"

@@ -4,7 +4,7 @@ import type {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
-    NodeParameterValue
+    NodeParameterValue, ReferenceValue
 } from "@code0-tech/sagittarius-graphql-types"
 import {DataTypeView, DFlowDataTypeReactiveService} from "../d-flow-data-type"
 import {InspectionSeverity, useService, useStore, ValidationResult} from "../../utils"
@@ -66,17 +66,17 @@ export const useNodeValidation = (
     const parameters = functionDefinition?.parameterDefinitions ?? []
     const genericKeys = functionDefinition?.genericKeys ?? []
     const genericMap = React.useMemo(
-        () => resolveGenericKeys(functionDefinition!, values, dataTypeService, flow),
+        () => resolveGenericKeys(functionDefinition!, values, dataTypeService, functionService, flow),
         [functionDefinition, values, dataTypeService, dataTypeStore, flow, flowStore]
     )
 
     const resolveValueType = React.useCallback(
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
-            if (isNode(value) && expectedDT?.variant !== "NODE") {
-                const node = flowService.getNodeById(flowId, (value as NodeFunctionIdWrapper).id)
+            if ((isNode(value) && expectedDT?.variant !== "NODE") || isReference(value)) {
+                const node = flowService.getNodeById(flowId, value.__typename == "NodeFunctionIdWrapper" ? value.id : value.__typename === "ReferenceValue" ? value.nodeFunctionId : undefined)
                 const fn = functionService.getById(node?.functionDefinition?.id!!)!!
                 const params = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
-                return useReturnType(fn, params, dataTypeService)
+                return useReturnType(fn, params, dataTypeService, functionService)
             }
             return dataTypeService.getTypeFromValue(value, flow)
         },
@@ -120,14 +120,15 @@ export const useNodeValidation = (
                         resolvedExpectedDT,
                         dataTypeService,
                         flow,
-                        expectedResolvedType?.genericType?.genericMappers!
+                        expectedResolvedType?.genericType?.genericMappers!,
+                        functionService
                     )
                 }
             } else {
                 if (isReference(value) || (isNode(value) && expectedDT.variant !== "NODE")) {
                     isValid = useDataTypeValidation(expectedDT, valueDT)
                 } else {
-                    isValid = useValueValidation(value, expectedDT, dataTypeService, flow)
+                    isValid = useValueValidation(value, expectedDT, dataTypeService, flow, [], functionService)
                 }
             }
 

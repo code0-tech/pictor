@@ -1,7 +1,7 @@
 import React from "react";
 import {DataTableFilterInput} from "./DataTableFilterInput";
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu";
-import {MenuItem} from "../menu/Menu";
+import {MenuCheckboxItem, MenuItem, MenuItemIndicator} from "../menu/Menu";
 import {DataTable, DataTableFilterProps} from "./DataTable";
 import {Text} from "../text/Text";
 import {Button} from "../button/Button";
@@ -68,12 +68,13 @@ export const Default = () => {
         <Spacing spacing={"xl"}/>
         <DataTableFilterInput onChange={filter => {
             setFilter(filter)
+            console.log(filter)
         }} filterTokens={[
             {
                 token: "name",
                 key: "name",
                 operators: ["isOneOf", "isNotOneOf"],
-                suggestion: (context, operator, applySuggestion) => {
+                suggestion: (context, operator, currentValue, applySuggestion) => {
                     return <DataTableFilterSuggestionMenu context={context}>
                         {testData.map(item => {
                             return <MenuItem onSelect={() => applySuggestion(item.name)}>{item.name}</MenuItem>
@@ -85,13 +86,26 @@ export const Default = () => {
                 token: "members",
                 key: "members.name",
                 operators: ["isOneOf", "isNotOneOf"],
-                suggestion: (context, operator, applySuggestion) => {
+                suggestion: (context, operator, currentValue, applySuggestion) => {
                     const allMembers = testData.flatMap(item => item.members.map(m => m.name));
                     const uniqueMembers = Array.from(new Set(allMembers));
 
+                    const split = currentValue.split(",").map(s => s.trim()).filter(Boolean);
+
                     return <DataTableFilterSuggestionMenu context={context}>
                         {uniqueMembers.map(memberName => {
-                            return <MenuItem key={memberName} onSelect={() => applySuggestion(memberName)}>{memberName}</MenuItem>
+                            const isChecked = split.includes(memberName);
+                            return <MenuCheckboxItem key={memberName} checked={isChecked} onSelect={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const updated = isChecked
+                                    ? split.filter(name => name !== memberName)
+                                    : [...split, memberName];
+                                applySuggestion(updated.join(","), true);
+                            }}>
+                                {memberName}
+                                <MenuItemIndicator/>
+                            </MenuCheckboxItem>
                         })}
                     </DataTableFilterSuggestionMenu>
                 }

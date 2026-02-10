@@ -326,13 +326,15 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     }
                 })
 
+                console.log(from, to, nodeCount)
+
                 if (viewUpdate.selectionSet && nodeCount < 2) {
                     if (from === to && from !== selection?.from) {
                         setCustomSuggestion(null)
-                    } else if (from === to && from === selection?.from) {
-                        const coords = viewUpdate.view?.coordsAtPos(from)
-                        console.log(coords)
+                    } else if (from === to && from === selection?.from && from != 0) {
                         setCustomSuggestion(prevState => prevState)
+                    } else if (from === to && from === selection?.from && from == 0) {
+                        setCustomSuggestion(null)
                     }
                     startCompletion(viewUpdate.view)
                 } else if (viewUpdate.selectionSet && nodeCount >= 2) {

@@ -326,8 +326,6 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     }
                 })
 
-                console.log(from, to, nodeCount)
-
                 if (viewUpdate.selectionSet && nodeCount < 2) {
                     if (from === to && from !== selection?.from) {
                         setCustomSuggestion(null)

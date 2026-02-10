@@ -12,6 +12,8 @@ import type {
     GenericType,
     NodeParameterValue
 } from "@code0-tech/sagittarius-graphql-types";
+import {useReturnType} from "../components/d-flow-function/DFlowFunction.return.hook";
+import {DFlowFunctionReactiveService} from "../components/d-flow-function";
 
 const GENERIC_PLACEHOLDER = "GENERIC";
 
@@ -133,7 +135,7 @@ export const replaceIdentifiersInConfig = (
         case "DataTypeRulesContainsKeyConfig":
         case "DataTypeRulesContainsTypeConfig":
         case "DataTypeRulesReturnTypeConfig":
-        case "DataTypeRulesParentTypeConfig":{
+        case "DataTypeRulesParentTypeConfig": {
             const identifier = (config as { dataTypeIdentifier?: DataTypeIdentifier }).dataTypeIdentifier;
             if (!identifier) return config;
             return {
@@ -435,6 +437,7 @@ export const resolveGenericKeys = (
     func: FunctionDefinitionView,
     values: NodeParameterValue[],
     dataTypeService: DFlowDataTypeReactiveService,
+    functionService: DFlowFunctionReactiveService,
     flow?: Flow
 ): GenericMap => {
     const genericMap: GenericMap = new Map();
@@ -447,7 +450,14 @@ export const resolveGenericKeys = (
     func.parameterDefinitions.forEach((parameter, index) => {
         const parameterType = parameter.dataTypeIdentifier as DataTypeIdentifier;
         const value = values[index];
-        const valueType = dataTypeService.getTypeFromValue(value, flow) as DataTypeIdentifier;
+        const valueType = value?.__typename === "ReferenceValue" ?
+            (() => {
+                const node = flow?.nodes?.nodes?.find(n => n?.id === value.nodeFunctionId)
+                const lvalues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+                const funDef = functionService.getById(node?.functionDefinition?.id!!)
+                return useReturnType(funDef!, lvalues, dataTypeService, functionService)
+            })()
+            : dataTypeService.getTypeFromValue(value, flow) as DataTypeIdentifier;
 
         if (!parameterType || !valueType) return;
 

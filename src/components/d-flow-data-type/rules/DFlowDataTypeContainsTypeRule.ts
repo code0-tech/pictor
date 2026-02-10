@@ -12,7 +12,7 @@ import {useValueValidation} from "../../d-flow-validation/DValueValidation.hook"
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsTypeRule {
-    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: Flow): boolean {
+    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, flow?: Flow, dataTypeService?: DFlowDataTypeReactiveService): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
         const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers
@@ -21,12 +21,12 @@ export class DFlowDataTypeContainsTypeRule {
         //TODO: seperate general validation
         if ("value" in value && !(Array.isArray(value.value))) return false
 
-        if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
+        if (config?.dataTypeIdentifier?.genericKey && !genericMapper && !dataTypeService?.getDataType(config.dataTypeIdentifier)) return true
 
-        if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
+        if (!(dataTypeService?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
 
         //use of generic key but datatype does not exist
-        if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
+        if (genericMapper && !dataTypeService?.hasDataTypes(genericTypes!!)) return false
 
         //check if all generic combinations are set
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
@@ -39,12 +39,12 @@ export class DFlowDataTypeContainsTypeRule {
                         return useValueValidation({
                             __typename: "LiteralValue",
                             value: value1
-                        }, service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
+                        }, dataTypeService?.getDataType(genericType)!!, dataTypeService!!, flow, ((genericType.genericType as GenericType)!!.genericMappers as GenericMapper[]))
                     }
                     return useValueValidation({
                         __typename: "LiteralValue",
                         value: value1
-                    }, service?.getDataType(genericType)!!, service!!, flow)
+                    }, dataTypeService?.getDataType(genericType)!!, dataTypeService!!, flow)
                 })
             })
 
@@ -59,10 +59,10 @@ export class DFlowDataTypeContainsTypeRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!))
+            return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!))
         }
 
-        return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, service?.getDataType(config.dataTypeIdentifier!!)!!, service!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
+        return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
 
     }
 }

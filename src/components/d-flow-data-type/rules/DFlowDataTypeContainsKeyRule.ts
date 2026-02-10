@@ -12,7 +12,7 @@ import {useValueValidation} from "../../d-flow-validation/DValueValidation.hook"
 
 @staticImplements<DFlowDataTypeRule>()
 export class DFlowDataTypeContainsKeyRule {
-    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, service?: DFlowDataTypeReactiveService, flow?: Flow): boolean {
+    public static validate(value: NodeParameterValue, config: DataTypeRulesContainsKeyConfig, generics?: Map<string, GenericMapper>, flow?: Flow, dataTypeService?: DFlowDataTypeReactiveService): boolean {
 
         const genericMapper = generics?.get(config?.dataTypeIdentifier?.genericKey!!)
         const genericTypes = generics?.get(config?.dataTypeIdentifier?.genericKey!!)?.sourceDataTypeIdentifiers
@@ -20,12 +20,12 @@ export class DFlowDataTypeContainsKeyRule {
 
         //TODO: seperate general validation
         //if (!(isObject(value))) return false
-        if ((config?.key ?? "") in value && config?.dataTypeIdentifier?.genericKey && !genericMapper && !service?.getDataType(config.dataTypeIdentifier)) return true
+        if ((config?.key ?? "") in value && config?.dataTypeIdentifier?.genericKey && !genericMapper && !dataTypeService?.getDataType(config.dataTypeIdentifier)) return true
 
-        if (!(service?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
+        if (!(dataTypeService?.getDataType(config.dataTypeIdentifier!!) || genericMapper)) return false
 
         //use of generic key but datatypes does not exist
-        if (genericMapper && !service?.hasDataTypes(genericTypes!!)) return false
+        if (genericMapper && !dataTypeService?.hasDataTypes(genericTypes!!)) return false
 
         //check if all generic combinations are set
         if (genericMapper && !(((genericCombination?.length ?? 0) + 1) == genericTypes!!.length)) return false
@@ -33,7 +33,7 @@ export class DFlowDataTypeContainsKeyRule {
         //use generic given type for checking against value
         if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return useValueValidation((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(genericType)!!, service!!, flow, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
+                return useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(genericType)!!, dataTypeService!!, flow, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
             })
 
             const combination = checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -49,9 +49,9 @@ export class DFlowDataTypeContainsKeyRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier)!!, service!!)
+            return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(config.dataTypeIdentifier)!!, dataTypeService!!)
         }
 
-        return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], service?.getDataType(config.dataTypeIdentifier!!)!!, service!!, flow, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
+        return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
     }
 }

@@ -1,7 +1,6 @@
 import {ReactiveArrayService} from "../../utils";
 import {
     DataTypeIdentifier,
-    DataTypeIdentifierInput,
     FlowInput,
     FlowSetting,
     LiteralValue,
@@ -79,26 +78,6 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
     getPayloadById(flowId: Flow['id']): FlowInput {
         const flow = this.getById(flowId)
 
-        const getDataTypeIdentifierPayload = (identifier: DataTypeIdentifier): DataTypeIdentifierInput => {
-            return {
-                ...(identifier?.dataType ? {
-                    dataTypeId: identifier?.dataType?.id
-                } : {}),
-                ...(identifier?.genericKey ? {
-                    genericKey: identifier?.genericKey
-                } : {}),
-                ...(identifier?.genericType ? {
-                    genericType: {
-                        dataTypeId: identifier?.genericType?.dataType?.id!,
-                        genericMappers: identifier?.genericType?.genericMappers?.map(genericMap => ({
-                            target: genericMap.target!,
-                            sourceDataTypeIdentifiers: genericMap.sourceDataTypeIdentifiers?.map(getDataTypeIdentifierPayload) ?? []
-                        })) ?? []
-                    }
-                } : {})
-            }
-        }
-
         return {
             name: flow?.name!,
             type: flow?.type?.id!,
@@ -128,12 +107,8 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                             const v = parameter.value as ReferenceValue
                             value = {
                                 referenceValue: {
-                                    dataTypeIdentifier: getDataTypeIdentifierPayload(v.dataTypeIdentifier!),
-                                    depth: v.depth!,
-                                    node: v.node!,
                                     nodeFunctionId: v.nodeFunctionId!,
                                     referencePath: v.referencePath ?? [],
-                                    scope: v.scope!,
                                 },
                             }
                             break

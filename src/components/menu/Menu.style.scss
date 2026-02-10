@@ -47,7 +47,7 @@
       box-shadow: none;
     }
 
-    &:focus, &[data-focus=true], &[aria-checked=true] {
+    &:focus, &[data-focus=true] {
       @include box.box(variables.$white, variables.$white, variables.$white);
       box-shadow: none;
       width: 100%;

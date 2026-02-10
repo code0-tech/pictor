@@ -1,11 +1,18 @@
 import React from "react";
 import {DataTableFilterInput} from "./DataTableFilterInput";
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu";
-import {MenuCheckboxItem, MenuItem, MenuItemIndicator} from "../menu/Menu";
-import {DataTable, DataTableFilterProps} from "./DataTable";
+import {Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuItemIndicator, MenuPortal, MenuTrigger} from "../menu/Menu";
+import {DataTable, DataTableFilterProps, DataTableSortProps} from "./DataTable";
 import {Text} from "../text/Text";
 import {Button} from "../button/Button";
-import {IconDotsVertical} from "@tabler/icons-react";
+import {
+    IconCheck,
+    IconDotsVertical, IconMinus,
+    IconSortAscending,
+    IconSortDescending,
+    IconSquare,
+    IconSquareCheck
+} from "@tabler/icons-react";
 import {Avatar} from "../avatar/Avatar";
 import {Spacing} from "../spacing/Spacing";
 import {Flex} from "../flex/Flex";
@@ -44,11 +51,12 @@ export const Default = () => {
                 name: "@mstaedtler",
             }],
             payload: {
-                id: "2",
+                id: "3",
             }
         }
     ]
     const [filter, setFilter] = React.useState<DataTableFilterProps>({})
+    const [sort, setSort] = React.useState<DataTableSortProps>({})
 
     return <>
         <Flex align={"end"} justify={"space-between"} style={{gap: "1.3rem"}}>
@@ -62,7 +70,43 @@ export const Default = () => {
             </Flex>
             <ButtonGroup>
                 <Button color={"success"} variant={"filled"}>Create</Button>
-                <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                <Menu>
+                    <MenuTrigger asChild>
+                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                    </MenuTrigger>
+                    <MenuPortal>
+                        <MenuContent>
+                            <MenuCheckboxItem checked={sort["name"] === undefined ? "indeterminate" : sort["name"] === "asc"} onSelect={event => {
+                                if (sort["name"] === null || sort["name"] === undefined)
+                                    setSort(prev => ({...prev, name: "asc"}))
+                                else if (sort["name"] === "asc")
+                                    setSort(prev => ({...prev, name: "desc"}))
+                                else
+                                    setSort(prev => ({...prev, name: undefined}))
+
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }}>
+                                {sort["name"] === undefined  ? <IconMinus size={13}/> : sort["name"] === "asc" ? <IconSortDescending size={13} /> : <IconSortAscending size={13} />}
+                                Name
+                            </MenuCheckboxItem>
+                            <MenuCheckboxItem checked={sort["payload.id"] === undefined ? "indeterminate" : sort["payload.id"] === "asc"} onSelect={event => {
+                                if (sort["payload.id"] === null || sort["payload.id"] === undefined)
+                                    setSort(prev => ({...prev, "payload.id": "asc"}))
+                                else if (sort["payload.id"] === "asc")
+                                    setSort(prev => ({...prev, "payload.id": "desc"}))
+                                else
+                                    setSort(prev => ({...prev, "payload.id": undefined}))
+
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }}>
+                                {sort["payload.id"] === undefined  ? <IconMinus size={13}/> : sort["payload.id"] === "asc" ? <IconSortDescending size={13} /> : <IconSortAscending size={13} />}
+                                Identifier
+                            </MenuCheckboxItem>
+                        </MenuContent>
+                    </MenuPortal>
+                </Menu>
             </ButtonGroup>
         </Flex>
         <Spacing spacing={"xl"}/>
@@ -103,8 +147,8 @@ export const Default = () => {
                                     : [...split, memberName];
                                 applySuggestion(updated.join(","), true);
                             }}>
+                                {isChecked ? <IconCheck size={13}/> : <IconCheck color={"transparent"} size={13}/>}
                                 {memberName}
-                                <MenuItemIndicator/>
                             </MenuCheckboxItem>
                         })}
                     </DataTableFilterSuggestionMenu>
@@ -112,7 +156,7 @@ export const Default = () => {
             }
         ]}/>
         <Spacing spacing={"xl"}/>
-        <DataTable filter={filter} data={testData}>
+        <DataTable sort={sort} filter={filter} data={testData}>
             {(item: any) => {
                 return <>
                     <td>

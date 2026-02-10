@@ -307,6 +307,8 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         return internExtensions
     }, [language, tokenizer, tokenHighlights, extensions, suggestions, ref.current])
 
+    const [selection, setSelection] = React.useState<{ from: number, to: number } | null>(null)
+
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
 
@@ -325,11 +327,18 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                 })
 
                 if (viewUpdate.selectionSet && nodeCount < 2) {
-                    setCustomSuggestion(null)
+                    if (from === to && from !== selection?.from) {
+                        setCustomSuggestion(null)
+                    } else if (from === to && from === selection?.from) {
+                        const coords = viewUpdate.view?.coordsAtPos(from)
+                        console.log(coords)
+                        setCustomSuggestion(prevState => prevState)
+                    }
                     startCompletion(viewUpdate.view)
                 } else if (viewUpdate.selectionSet && nodeCount >= 2) {
                     setCustomSuggestion(null)
                 }
+                setSelection({from, to})
             } else if (viewUpdate.selectionSet) {
                 setCustomSuggestion(null)
                 startCompletion(viewUpdate.view)
@@ -350,7 +359,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                 setAnchors(newAnchors)
             })
         }
-    }, [])
+    }, [selection])
 
     React.useEffect(() => {
         if (containerRef.current) {
@@ -512,7 +521,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     })}
 
                     {customSuggestion && createPortal(
-                        <div ref={ref} style={{
+                        <div  key={customSuggestion.position.top + '-' + customSuggestion.position.left} ref={ref} style={{
                             position: 'fixed',
                             top: customSuggestion.position.top,
                             left: customSuggestion.position.left,

@@ -11,6 +11,7 @@ import {Spacing} from "../spacing/Spacing";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Badge} from "../badge/Badge";
+import {DataTableColumn} from "./DataTableColumn";
 
 export const Default = () => {
 
@@ -170,26 +171,26 @@ export const Default = () => {
             })}
         </Flex>
         <Spacing spacing={"md"}/>
-        <DataTable emptyComponent={<td>
+        <DataTable emptyComponent={<DataTableColumn>
             <Text>No data found</Text>
-        </td>} sort={sort} filter={filter} data={testData}>
+        </DataTableColumn>} sort={sort} filter={filter} data={testData}>
             {(item: any) => {
                 return <>
-                    <td>
+                    <DataTableColumn>
                         <Avatar identifier={String(item.name)}/>
-                    </td>
-                    <td>
+                    </DataTableColumn>
+                    <DataTableColumn>
                         <Text>{String(item.name)}</Text>
-                    </td>
-                    <td style={{maxWidth: "100px", wordWrap: "break-word"}}>
+                    </DataTableColumn>
+                    <DataTableColumn style={{maxWidth: "100px", wordWrap: "break-word"}}>
                         <Text>{item.members.map((m: any) => m.name).join(", ")}</Text>
-                    </td>
-                    <td>
+                    </DataTableColumn>
+                    <DataTableColumn>
                         <Text>{item.payload.id}</Text>
-                    </td>
-                    <td>
+                    </DataTableColumn>
+                    <DataTableColumn>
                         <Button><IconDotsVertical size={13}/> </Button>
-                    </td>
+                    </DataTableColumn>
                 </>
             }}
         </DataTable>

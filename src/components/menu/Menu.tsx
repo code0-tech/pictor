@@ -5,9 +5,9 @@ import {Code0ComponentProps, Color} from "../../utils/types";
 import {mergeCode0Props} from "../../utils/utils";
 import {
     DropdownMenu, DropdownMenuArrow,
-    DropdownMenuArrowProps, DropdownMenuContent,
+    DropdownMenuArrowProps, DropdownMenuCheckboxItem, DropdownMenuCheckboxItemProps, DropdownMenuContent,
     DropdownMenuContentProps, DropdownMenuGroup,
-    DropdownMenuGroupProps, DropdownMenuItem,
+    DropdownMenuGroupProps, DropdownMenuItem, DropdownMenuItemIndicator, DropdownMenuItemIndicatorProps,
     DropdownMenuItemProps, DropdownMenuLabel,
     DropdownMenuLabelProps, DropdownMenuPortal,
     DropdownMenuPortalProps,
@@ -27,6 +27,8 @@ export type MenuContentProps = Code0ComponentProps & DropdownMenuContentProps & 
 }
 export type MenuLabelProps = Code0ComponentProps & DropdownMenuLabelProps
 export type MenuItemProps = Code0ComponentProps & DropdownMenuItemProps
+export type MenuCheckboxItemProps = Code0ComponentProps & DropdownMenuCheckboxItemProps
+export type MenuItemIndicatorProps = Code0ComponentProps & DropdownMenuItemIndicatorProps
 export type MenuGroupProps = Code0ComponentProps & DropdownMenuGroupProps
 export type MenuSubProps = Code0ComponentProps & DropdownMenuSubProps
 export type MenuSubTriggerProps = Code0ComponentProps & DropdownMenuSubTriggerProps
@@ -78,6 +80,14 @@ export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
 
 export const MenuSeparator: React.FC<MenuSeparatorProps> = (props) => {
     return <DropdownMenuSeparator {...mergeCode0Props("menu__separator", props) as MenuSeparatorProps}/>
+}
+
+export const MenuCheckboxItem: React.FC<MenuCheckboxItemProps> = (props) => {
+    return <DropdownMenuCheckboxItem {...mergeCode0Props("menu__checkbox-item", props) as MenuCheckboxItemProps}/>
+}
+
+export const MenuItemIndicator: React.FC<MenuItemIndicatorProps> = (props) => {
+    return <DropdownMenuItemIndicator {...mergeCode0Props("menu__item-indicator", props) as MenuItemIndicatorProps}/>
 }
 
 export const MenuArrow: React.FC<MenuArrowProps> = (props) => {

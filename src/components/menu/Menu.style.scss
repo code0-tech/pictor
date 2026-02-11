@@ -29,7 +29,7 @@
     }
   }
 
-  &__item, &__sub-trigger {
+  &__item, &__sub-trigger, &__checkbox-item {
     border-radius: variables.$borderRadius - variables.$xxs;
     padding: variables.$xxs variables.$xs;
     gap: variables.$xs;

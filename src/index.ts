@@ -32,6 +32,7 @@ export * from "./components/d-role/index"
 export * from "./components/d-runtime/index"
 export * from "./components/d-user/index"
 
+export * from "./components/data-table/index"
 export * from "./components/dialog/Dialog"
 export * from "./components/flex/Flex"
 export * from "./components/form/index"

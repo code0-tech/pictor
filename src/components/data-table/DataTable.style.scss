@@ -10,7 +10,8 @@
 
   &__row {
     td {
-      border-bottom: 1px solid helpers.borderColor();
+      border-bottom: 0.5px solid helpers.borderColor();
+      border-top: 0.5px solid helpers.borderColor();
       padding: variables.$xs variables.$xxs;
     }
 

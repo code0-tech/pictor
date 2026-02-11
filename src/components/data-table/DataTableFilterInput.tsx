@@ -26,14 +26,21 @@ const OP_LABELS = {isOneOf: "is one of", isNotOneOf: "is not one of"} as const
 const OP_CHARS = {isOneOf: "=", isNotOneOf: "!="} as const
 const strip = (s: string) => s.replace(/^\\|\\$/g, "")
 
-export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{}>({
-    startState: () => ({}),
-    token(stream) {
+export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{tokens: string[]}>({
+    startState: () => ({
+        tokens: []
+    }),
+    token(stream, state) {
+        console.log(state.tokens)
         if (stream.eatSpace()) return null;
-        // Operatoren erkennen
-        if (stream.match('!=')) return "operator";
-        if (stream.match('=')) return "operator";
-        // Token oder Value erkennen
+        if (stream.match('!=')) {
+            state.tokens.push("operator")
+            return "operator"
+        }
+        if (stream.match('=') && stream.peek() !== '=') {
+            state.tokens.push("operator")
+            return "operator"
+        }
         if (stream.peek() === '\\') {
             stream.next();
             const chars: string[] = [];
@@ -41,13 +48,15 @@ export const createGithubQueryLanguage = (validTokens: string[]) => StreamLangua
             if (stream.peek() === '\\') {
                 stream.next();
                 const content = chars.join("");
-                if (validTokens.includes(content)) {
+                if (validTokens.includes(content) && state.tokens[state.tokens.length - 1] !== "propertyName") {
+                    state.tokens.push("propertyName")
                     return "propertyName";
-                } else {
+                } else if (state.tokens[state.tokens.length - 1] !== "literal") {
+                    state.tokens.push("literal")
                     return "literal";
                 }
             }
-            return "invalid";
+            return null;
         }
         stream.next();
         return null;

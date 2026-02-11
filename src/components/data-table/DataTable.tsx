@@ -1,5 +1,6 @@
 import React from "react";
 import "./DataTable.style.scss"
+import {Text} from "../text/Text";
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
@@ -88,5 +89,10 @@ export const DataTable = <T,>(props: DataTableProps<T>) => {
                 {children?.(item, i)}
             </tr>
         })}
+        {sortedData.length === 0 && !loading && emptyComponent ? (
+            <tr className={"data-table__row"}>
+                {emptyComponent}
+            </tr>
+        ) : null}
     </table>
 }

@@ -170,7 +170,9 @@ export const Default = () => {
             })}
         </Flex>
         <Spacing spacing={"md"}/>
-        <DataTable sort={sort} filter={filter} data={testData}>
+        <DataTable emptyComponent={<td>
+            <Text>No data found</Text>
+        </td>} sort={sort} filter={filter} data={testData}>
             {(item: any) => {
                 return <>
                     <td>

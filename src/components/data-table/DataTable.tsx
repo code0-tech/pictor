@@ -1,6 +1,6 @@
 import React from "react";
 import "./DataTable.style.scss"
-import {Text} from "../text/Text";
+import {Code0Component, mergeCode0Props} from "../../utils";
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
@@ -15,13 +15,14 @@ export interface DataTableSortProps {
     [key: string]: 'asc' | 'desc' | undefined
 }
 
-export interface DataTableProps<T> {
+export interface DataTableProps<T> extends Omit<Code0Component<HTMLTableElement>, 'data' | 'children' | 'onSelect'> {
     data: Array<T>
     sort?: DataTableSortProps
     filter?: DataTableFilterProps
     loading?: boolean
     loadingComponent?: React.ReactNode
     emptyComponent?: React.ReactNode
+    onSelect?: (item: T | undefined) => void
     children?: (item: T, index: number) => React.ReactNode
 }
 
@@ -38,9 +39,9 @@ const getNestedValue = (obj: any, path: string): any => {
 };
 
 
-export const DataTable = <T,>(props: DataTableProps<T>) => {
+export const DataTable = <T, >(props: DataTableProps<T>) => {
 
-    const {data, sort, filter, loading, loadingComponent, emptyComponent, children} = props
+    const {data, sort, filter, loading, loadingComponent, emptyComponent, onSelect, children, ...rest} = props
 
     const filteredData = data.filter(item => {
         return Object.entries(filter || {}).every(([key, {operator, value}]) => {
@@ -83,14 +84,15 @@ export const DataTable = <T,>(props: DataTableProps<T>) => {
         })
     }, [filteredData, sort])
 
-    return <table className={"data-table"}>
+    // @ts-ignore
+    return <table {...mergeCode0Props("data-table", rest)}>
         {sortedData.map((item, i) => {
-            return <tr className={"data-table__row"}>
+            return <tr className={"data-table__row"} onClick={() => onSelect?.(item)}>
                 {children?.(item, i)}
             </tr>
         })}
         {sortedData.length === 0 && !loading && emptyComponent ? (
-            <tr className={"data-table__row"}>
+            <tr className={"data-table__row"} onClick={() => onSelect?.(undefined)}>
                 {emptyComponent}
             </tr>
         ) : null}

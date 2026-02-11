@@ -1,22 +1,16 @@
 import React from "react";
 import {DataTableFilterInput} from "./DataTableFilterInput";
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu";
-import {Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuItemIndicator, MenuPortal, MenuTrigger} from "../menu/Menu";
+import {Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuPortal, MenuTrigger} from "../menu/Menu";
 import {DataTable, DataTableFilterProps, DataTableSortProps} from "./DataTable";
 import {Text} from "../text/Text";
 import {Button} from "../button/Button";
-import {
-    IconCheck,
-    IconDotsVertical, IconMinus,
-    IconSortAscending,
-    IconSortDescending,
-    IconSquare,
-    IconSquareCheck
-} from "@tabler/icons-react";
+import {IconCheck, IconDotsVertical, IconMinus, IconSortAscending, IconSortDescending} from "@tabler/icons-react";
 import {Avatar} from "../avatar/Avatar";
 import {Spacing} from "../spacing/Spacing";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Badge} from "../badge/Badge";
 
 export const Default = () => {
 
@@ -76,32 +70,39 @@ export const Default = () => {
                     </MenuTrigger>
                     <MenuPortal>
                         <MenuContent>
-                            <MenuCheckboxItem checked={sort["name"] === undefined ? "indeterminate" : sort["name"] === "asc"} onSelect={event => {
-                                if (sort["name"] === null || sort["name"] === undefined)
-                                    setSort(prev => ({...prev, name: "asc"}))
-                                else if (sort["name"] === "asc")
-                                    setSort(prev => ({...prev, name: "desc"}))
-                                else
-                                    setSort(prev => ({...prev, name: undefined}))
+                            <MenuCheckboxItem
+                                checked={sort["name"] === undefined ? "indeterminate" : sort["name"] === "asc"}
+                                onSelect={event => {
+                                    if (sort["name"] === null || sort["name"] === undefined)
+                                        setSort(prev => ({...prev, name: "asc"}))
+                                    else if (sort["name"] === "asc")
+                                        setSort(prev => ({...prev, name: "desc"}))
+                                    else
+                                        setSort(prev => ({...prev, name: undefined}))
 
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }}>
-                                {sort["name"] === undefined  ? <IconMinus size={13}/> : sort["name"] === "asc" ? <IconSortDescending size={13} /> : <IconSortAscending size={13} />}
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }}>
+                                {sort["name"] === undefined ? <IconMinus size={13}/> : sort["name"] === "asc" ?
+                                    <IconSortDescending size={13}/> : <IconSortAscending size={13}/>}
                                 Name
                             </MenuCheckboxItem>
-                            <MenuCheckboxItem checked={sort["payload.id"] === undefined ? "indeterminate" : sort["payload.id"] === "asc"} onSelect={event => {
-                                if (sort["payload.id"] === null || sort["payload.id"] === undefined)
-                                    setSort(prev => ({...prev, "payload.id": "asc"}))
-                                else if (sort["payload.id"] === "asc")
-                                    setSort(prev => ({...prev, "payload.id": "desc"}))
-                                else
-                                    setSort(prev => ({...prev, "payload.id": undefined}))
+                            <MenuCheckboxItem
+                                checked={sort["payload.id"] === undefined ? "indeterminate" : sort["payload.id"] === "asc"}
+                                onSelect={event => {
+                                    if (sort["payload.id"] === null || sort["payload.id"] === undefined)
+                                        setSort(prev => ({...prev, "payload.id": "asc"}))
+                                    else if (sort["payload.id"] === "asc")
+                                        setSort(prev => ({...prev, "payload.id": "desc"}))
+                                    else
+                                        setSort(prev => ({...prev, "payload.id": undefined}))
 
-                                event.preventDefault()
-                                event.stopPropagation()
-                            }}>
-                                {sort["payload.id"] === undefined  ? <IconMinus size={13}/> : sort["payload.id"] === "asc" ? <IconSortDescending size={13} /> : <IconSortAscending size={13} />}
+                                    event.preventDefault()
+                                    event.stopPropagation()
+                                }}>
+                                {sort["payload.id"] === undefined ?
+                                    <IconMinus size={13}/> : sort["payload.id"] === "asc" ?
+                                        <IconSortDescending size={13}/> : <IconSortAscending size={13}/>}
                                 Identifier
                             </MenuCheckboxItem>
                         </MenuContent>
@@ -156,6 +157,19 @@ export const Default = () => {
             }
         ]}/>
         <Spacing spacing={"xl"}/>
+        <Flex align={"center"} justify={"end"} style={{gap: "0.35rem"}}>
+            {Object.entries(sort).map(([key, value], index) => {
+                return value ? <Text>
+                    {index == 0 ? "Sort " : ""}
+                    <Badge color={"secondary"}>
+                        <Text>{key}</Text>
+                    </Badge> {" "}
+                    {value === "asc" ? "ascending" : "descending"} {" "}
+                    {index < Object.entries(sort).filter(([_, v]) => v).length - 1 ? ", " : ""}
+                </Text> : null
+            })}
+        </Flex>
+        <Spacing spacing={"md"}/>
         <DataTable sort={sort} filter={filter} data={testData}>
             {(item: any) => {
                 return <>

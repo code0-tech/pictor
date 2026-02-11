@@ -26,12 +26,11 @@ const OP_LABELS = {isOneOf: "is one of", isNotOneOf: "is not one of"} as const
 const OP_CHARS = {isOneOf: "=", isNotOneOf: "!="} as const
 const strip = (s: string) => s.replace(/^\\|\\$/g, "")
 
-export const createGithubQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{tokens: string[]}>({
+export const createFilterQueryLanguage = (validTokens: string[]) => StreamLanguage.define<{tokens: string[]}>({
     startState: () => ({
         tokens: []
     }),
     token(stream, state) {
-        console.log(state.tokens)
         if (stream.eatSpace()) return null;
         if (stream.match('!=')) {
             state.tokens.push("operator")
@@ -64,7 +63,7 @@ export const createGithubQueryLanguage = (validTokens: string[]) => StreamLangua
 })
 
 export const DataTableFilterInput: React.FC<DataTableFilterInputProps> = ({filterTokens, onChange}) => {
-    const language = React.useMemo(() => createGithubQueryLanguage(filterTokens?.map(t => t.token) || []), [filterTokens])
+    const language = React.useMemo(() => createFilterQueryLanguage(filterTokens?.map(t => t.token) || []), [filterTokens])
 
     const parseFilterQuery = React.useCallback((query: string): DataTableFilterProps => {
         if (!query.trim()) return {};

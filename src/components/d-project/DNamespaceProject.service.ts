@@ -3,7 +3,8 @@ import {
     NamespaceProject,
     NamespacesProjectsAssignRuntimesInput, NamespacesProjectsAssignRuntimesPayload,
     NamespacesProjectsCreateInput, NamespacesProjectsCreatePayload,
-    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload
+    NamespacesProjectsDeleteInput, NamespacesProjectsDeletePayload, NamespacesProjectsUpdateInput,
+    NamespacesProjectsUpdatePayload
 } from "@code0-tech/sagittarius-graphql-types";
 import {DNamespaceProjectView} from "./DNamespaceProject.view";
 import {ReactiveArrayService} from "../../utils";
@@ -19,6 +20,8 @@ export abstract class DNamespaceProjectReactiveService extends ReactiveArrayServ
     }
 
     abstract projectAssignRuntimes(payload: NamespacesProjectsAssignRuntimesInput): Promise<NamespacesProjectsAssignRuntimesPayload | undefined>
+
+    abstract projectUpdate(payload: NamespacesProjectsUpdateInput): Promise<NamespacesProjectsUpdatePayload | undefined>
 
     abstract projectCreate(payload: NamespacesProjectsCreateInput): Promise<NamespacesProjectsCreatePayload | undefined>
 

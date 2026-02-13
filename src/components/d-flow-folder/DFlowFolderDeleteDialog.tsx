@@ -1,4 +1,4 @@
-import {Dialog, DialogClose, DialogContent, DialogPortal} from "../dialog/Dialog";
+import {Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal} from "../dialog/Dialog";
 import {Text} from "../text/Text";
 import {Badge} from "../badge/Badge";
 import {Flex} from "../flex/Flex";
@@ -26,6 +26,7 @@ export const DFlowFolderDeleteDialog: React.FC<DFlowFolderDeleteDialogProps> = (
 
     return <Dialog open={deleteDialogOpen} onOpenChange={(open) => props.onOpenChange?.(open)}>
         <DialogPortal>
+            <DialogOverlay/>
             <DialogContent autoFocus showCloseButton
                            title={props.contextData.type == "item" ? "Remove flow" : "Remove folder"}>
                 <Text size={"md"} hierarchy={"secondary"}>

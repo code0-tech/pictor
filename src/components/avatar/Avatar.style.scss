@@ -4,16 +4,13 @@
 
 .avatar {
   aspect-ratio: 1 / 1;
-  padding: variables.$xxs;
   display: flex;
-  width: 38px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 
   & {
     @include box.box();
-    @include helpers.borderRadius();
     background: transparent;
     box-shadow: none;
   }

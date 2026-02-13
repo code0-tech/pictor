@@ -13,19 +13,21 @@ interface AvatarImageProps {
 interface AvatarIdenticonProps {
     identifier: string
     size: number
+    color?: string
 }
 
 export interface AvatarProps extends Code0Component<HTMLDivElement> {
     identifier?: string
     src?: string
     size?: number
+    color?: string
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({src, size}) => {
     return <img src={src} width={size} height={size} alt="Avatar image"/>
 }
 
-const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => {
+const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size, color}) => {
     const canvas = React.useRef<HTMLCanvasElement>(null);
 
     React.useEffect(() => {
@@ -35,7 +37,7 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
     const updateCanvas = () => {
         const hash = md5(identifier)
         const block = Math.floor(size / 5)
-        const hashColor = hashToColor(identifier)
+        const hashColor = color ?? hashToColor(identifier)
 
         canvas.current!!.width = block * 5
         canvas.current!!.height = block * 5
@@ -87,11 +89,11 @@ const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size}) => 
 
 export const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
 
-    const {identifier, src, size = 25, ...rest} = props
+    const {identifier, color, src, size = 25, ...rest} = props
 
     return <div {...mergeCode0Props(`avatar ${!identifier && src ? "avatar--image" : ""}`, rest)}>
         {identifier ?
-            <AvatarIdenticon identifier={identifier} size={size}/> :
+            <AvatarIdenticon color={color} identifier={identifier} size={size}/> :
             src ? <AvatarImage src={src} size={size + 13}/> : null
         }
     </div>

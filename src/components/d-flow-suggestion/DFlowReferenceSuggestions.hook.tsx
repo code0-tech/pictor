@@ -61,7 +61,6 @@ export const useReferenceSuggestions = (
     ), [dataTypeIdentifier, dataTypeService, dataTypeStore, genericKeys])
 
     const refObjects = useRefObjects(flowId)
-
     const returnTypes = useReturnTypes(flowId)
 
     return React.useMemo(() => {
@@ -83,7 +82,6 @@ export const useReferenceSuggestions = (
             if (value.depth > depth!) return []
             if (value.scope.some(r => !scope!.includes(r))) return []
 
-            //TODO: useReturnType hook to resolve actual return type of node
             const returnTypeIdentifier = returnTypes.get(value.nodeFunctionId)
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(returnTypeIdentifier!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
@@ -95,7 +93,7 @@ export const useReferenceSuggestions = (
                 value: value as ReferenceValue,
             }]
         })
-    }, [dataTypeService, nodeContext, nodeParameters, refObjects, resolvedType])
+    }, [dataTypeService, nodeContext, nodeParameters, refObjects, resolvedType, returnTypes])
 }
 
 

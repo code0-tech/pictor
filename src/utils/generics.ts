@@ -100,6 +100,7 @@ const normalizeObjectForComparison = (value: unknown): unknown => {
     if (isPlainObject(value)) {
         const normalized: Record<string, unknown> = {};
         Object.entries(value).forEach(([key, val]) => {
+            if (val === undefined || val === null) return
             if (key === "__typename" || key === "id" || key === "createdAt" || key === "updatedAt") return;
             normalized[key] = normalizeObjectForComparison(val);
         });

@@ -1,8 +1,8 @@
-import type {
+import {
     DataType,
     FlowType,
     FlowTypeSetting,
-    Maybe,
+    Maybe, Runtime,
     Scalars, Translation,
 } from "@code0-tech/sagittarius-graphql-types";
 import {DataTypeView} from "../d-flow-data-type";
@@ -32,6 +32,8 @@ export class FlowTypeView {
     private readonly _names?: Maybe<Array<Translation>>;
     /** Return type of the flow type */
     private readonly _returnType?: Maybe<DataType>;
+    /** Runtime of the flow type */
+    private readonly _runtime?: Maybe<Runtime>;
     /** Time when this FlowType was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
 
@@ -48,6 +50,7 @@ export class FlowTypeView {
         this._inputType = flowType.inputType ? new DataTypeView(flowType.inputType).json : undefined;
         this._names = flowType.names;
         this._returnType = flowType.returnType ? new DataTypeView(flowType.returnType).json : undefined;
+        this._runtime = flowType.runtime;
         this._updatedAt = flowType.updatedAt;
     }
 
@@ -95,14 +98,20 @@ export class FlowTypeView {
         return this._returnType;
     }
 
+    get runtime(): Maybe<Runtime> | undefined {
+        return this._runtime;
+    }
+
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {
         return this._updatedAt;
     }
 
     json(): FlowType {
         return {
+            aliases: this._aliases,
             createdAt: this._createdAt,
             descriptions: this._descriptions,
+            displayMessages: this._displayMessages,
             editable: this._editable,
             flowTypeSettings: this._flowTypeSettings,
             id: this._id,
@@ -110,6 +119,7 @@ export class FlowTypeView {
             inputType: this._inputType,
             names: this._names,
             returnType: this._returnType,
+            runtime: this._runtime,
             updatedAt: this._updatedAt
         }
     }

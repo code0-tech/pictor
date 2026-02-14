@@ -3,9 +3,9 @@ import {FlowTypeView} from "./DFlowType.view";
 import {FlowType, Namespace, NamespaceProject, Runtime} from "@code0-tech/sagittarius-graphql-types";
 
 export type DFlowTypeDependencies = {
-    namespaceId: Namespace['id']
-    projectId: NamespaceProject['id']
-    runtimeId: Runtime['id']
+    namespaceId?: Namespace['id']
+    projectId?: NamespaceProject['id']
+    runtimeId?: Runtime['id']
 }
 
 export abstract class DFlowTypeReactiveService extends ReactiveArrayService<FlowTypeView, DFlowTypeDependencies> {

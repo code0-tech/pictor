@@ -23,7 +23,7 @@ const DUserMenu: React.FC<DUserMenuProps> = props => {
             <Menu {...props}>
                 <MenuTrigger asChild>
                     <Flex align={"center"} style={{gap: ".5rem"}}>
-                        <Avatar src={currentUser?.avatarPath ?? ""} identifier={currentUser?.username ?? ""}/>
+                        <Avatar src={currentUser?.avatarPath ?? ""} type={"character"} identifier={currentUser?.username ?? ""}/>
                         <Flex style={{flexDirection: "column"}}>
                             <Text size={"md"} hierarchy={"secondary"}>
                                 {currentUser?.username}

@@ -2,7 +2,7 @@ import {
     Flow,
     FlowConnection,
     Maybe,
-    Namespace, NamespaceProject, NamespaceProjectUserAbilities,
+    Namespace, NamespaceProject, NamespaceProjectUserAbilities, NamespaceRoleConnection,
     Runtime,
     RuntimeConnection,
     Scalars
@@ -25,8 +25,12 @@ export class DNamespaceProjectView {
     private readonly _namespace?: Maybe<Namespace>;
     /** The primary runtime for the project */
     private readonly _primaryRuntime?: Maybe<Runtime>;
+    /** Roles assigned to this project */
+    private readonly _roles?: Maybe<NamespaceRoleConnection>;
     /** Runtimes assigned to this project */
     private readonly _runtimes?: Maybe<RuntimeConnection>;
+    /** Slug of the project used in URLs to identify flows */
+    private readonly _slug?: Maybe<Scalars['String']['output']>;
     /** Time when this NamespaceProject was last updated */
     private readonly _updatedAt?: Maybe<Scalars['Time']['output']>;
     /** Abilities for the current user on this NamespaceProject */
@@ -41,7 +45,9 @@ export class DNamespaceProjectView {
         this._name = payload.name;
         this._namespace = payload.namespace;
         this._primaryRuntime = payload.primaryRuntime;
+        this._roles = payload.roles;
         this._runtimes = payload.runtimes;
+        this._slug = payload.slug;
         this._updatedAt = payload.updatedAt;
         this._userAbilities = payload.userAbilities;
     }
@@ -79,8 +85,16 @@ export class DNamespaceProjectView {
         return this._primaryRuntime;
     }
 
+    get roles(): Maybe<NamespaceRoleConnection> | undefined {
+        return this._roles;
+    }
+
     get runtimes(): Maybe<RuntimeConnection> | undefined {
         return this._runtimes;
+    }
+
+    get slug(): Maybe<Scalars["String"]["output"]> | undefined {
+        return this._slug;
     }
 
     get updatedAt(): Maybe<Scalars["Time"]["output"]> | undefined {

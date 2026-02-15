@@ -48,7 +48,7 @@
     }
 
     &:focus, &[data-focus=true] {
-      @include box.box(variables.$white, variables.$white, variables.$white);
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
       box-shadow: none;
       width: 100%;
     }
@@ -64,7 +64,8 @@
 }
 
 @each $name, $color in variables.$colors {
-    .menu__content--#{$name}, .menu__sub-content--#{$name} {
-        @include box.box($color);
-    }
+  .menu__content--#{$name}, .menu__sub-content--#{$name} {
+    @include box.box($color);
+    border: helpers.backgroundColor(variables.$secondary) 2px solid;
+  }
 }

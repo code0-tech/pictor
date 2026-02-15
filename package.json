@@ -23,7 +23,12 @@
     "@code0-tech/sagittarius-graphql-types": "^0.0.0-703d578a55a3f0f20be3cb6892418f9e04d25716",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/lint": "^6.9.4",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.13",
     "@dagrejs/dagre": "^2.0.3",
+    "@lezer/common": "^1.5.1",
     "@mdx-js/react": "^3.1.1",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -93,11 +98,7 @@
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-lib-inject-css": "^2.2.2",
     "vitest": "^4.0.17",
-    "@codemirror/lint": "^6.9.4",
-    "@codemirror/language": "^6.12.1",
-    "@codemirror/state": "^6.5.4",
-    "@codemirror/view": "^6.39.13",
-    "@lezer/common": "^1.5.1"
+    "avvvatars-react": "^0.4.2"
   },
   "main": "dist/index.js",
   "repository": {
@@ -112,11 +113,11 @@
     "@ariakit/react": "^0.4.17",
     "@code0-tech/sagittarius-graphql-types": "0.0.0-703d578a55a3f0f20be3cb6892418f9e04d25716",
     "@codemirror/autocomplete": "^6.20.0",
-    "@codemirror/lint": "^6.9.4",
-    "@codemirror/view": "^6.39.13",
     "@codemirror/lang-json": "^6.0.2",
-    "@codemirror/state": "^6.5.4",
     "@codemirror/language": "^6.12.1",
+    "@codemirror/lint": "^6.9.4",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.13",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-context-menu": "^2.2.16",
@@ -144,7 +145,8 @@
     "react-resizable-panels": "^4.3.1",
     "react-syntax-highlighter": "^16.1.0",
     "react-zoom-pan-pinch": "^3.7.0",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "avvvatars-react": "^0.4.2"
   },
   "publishConfig": {
     "access": "public"

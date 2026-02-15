@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: 50%;
 
   & {
     @include box.box();
@@ -17,5 +18,16 @@
 
   &--image {
     padding: 0;
+  }
+
+  &--identicon {
+    > div > div {
+      --color: inherit;
+      background: helpers.backgroundColor(variables.$tertiary);
+    }
+
+    > div > div > span, > div > div > p {
+      color: var(--color)
+    }
   }
 }

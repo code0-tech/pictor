@@ -1,70 +1,7 @@
-import React, {CSSProperties, ReactNode} from "react";
+import {CSSProperties} from "react";
 import mergeProps from "merge-props";
 import {Code0Component, Code0ComponentProps, Code0Sizes} from "./types";
-
-export const parseUnit = (str: string): (number | string)[] => {
-
-    const NUMBER_REGEX = /-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/
-
-    // parse the number at the start of the string (this could return it in exponential notation)
-    const val = parseFloat(str)
-
-    // this is the actual number string,
-    // might not be the same length as val if val is in exponential notation
-    const numberStrings = str.match(NUMBER_REGEX) || []
-
-    // get everything after this number
-    const unit = numberStrings.length > 0
-        ? str.substr(numberStrings[0]?.length ?? 0).trim()
-        : ''
-
-    return [val, unit];
-}
-
-export const getChild = (children: ReactNode | ReactNode[], child: React.FC<any>, required?: boolean, matchingProps?: Object): React.ReactElement | undefined => {
-
-    let childComponent: React.ReactElement | undefined = undefined;
-    let found = false
-    React.Children.forEach(children, (childT, index) => {
-
-        let matching = true
-
-        if (React.isValidElement(childT) && matchingProps) {
-            for (const key in matchingProps) {
-                const value = (matchingProps as any)[key as string]
-                if (!(childT.props as any)[key] || (childT.props as any)[key] != value) {
-                    matching = false
-                    break;
-                }
-            }
-        }
-
-
-        if (React.isValidElement(childT) && childT.type == child && matching) {
-            childComponent = childT
-            found = true
-        } else if (React.Children.count(children) - 1 == index && !found && !childComponent && required) throw new Error(`${child.name} is required`)
-    })
-
-    return childComponent
-}
-
-export const getContent = (children: ReactNode | ReactNode[], ...child: React.FC<any>[]): ReactNode[] | null => {
-
-    const array = React.Children.toArray(children).filter((childT) => {
-        if (!React.isValidElement(childT)) return true;
-        return !child.find(value => value == childT.type);
-    })
-
-    return array.length == 0 ? null : array
-}
-
-export interface Positioning {
-    height: number
-    width: number
-    x: number
-    y: number
-}
+import {md5} from "js-md5";
 
 const createStyle = (styles: Code0Component<any>): CSSProperties => ({
     ...(styles.m ? {margin: `${styles.m}rem`} : {}),
@@ -122,93 +59,6 @@ export const mergeCode0Props = (cn: string, rest: object) => {
     })
 }
 
-export const getWindowPositioning = (): Omit<Omit<Positioning, "x">, "y"> => {
-    return {
-        height: window.innerHeight,
-        width: window.innerWidth
-    }
-}
-
-export const getPositioning = (node: HTMLElement): Positioning => {
-    return {
-        width: node.offsetWidth,
-        height: node.offsetHeight,
-        x: node.getBoundingClientRect().left,
-        y: node.getBoundingClientRect().top
-    }
-}
-
-export const getPositionAroundTarget = (target: HTMLElement, element: HTMLElement, position: 'top' | 'bottom' | 'left' | 'right' = "bottom") => {
-
-    const margin = 8
-    const targetPos = getPositioning(target)
-    const elementPos = getPositioning(element)
-    const windowSize = getWindowPositioning()
-
-    const positionObject = [
-        {
-            name: "bottom",
-            hierarchy: ["top", "left", "right"],
-            calculationY: (targetPos.y + targetPos.height + margin),
-            calculationX: (targetPos.x),
-            conditionFit: ((targetPos.y + targetPos.height + margin + elementPos.height) <= windowSize.height)
-        },
-        {
-            name: "top",
-            hierarchy: ["bottom", "left", "right"],
-            calculationY: (targetPos.y - margin - elementPos.height),
-            calculationX: (targetPos.x),
-            conditionFit: ((targetPos.y - margin - elementPos.height) >= 0)
-        },
-        {
-            name: "left",
-            hierarchy: ["right", "bottom", "top"],
-            calculationY: (targetPos.y),
-            calculationX: (targetPos.x - margin - elementPos.width),
-            conditionFit: ((targetPos.x - margin - elementPos.width) >= 0)
-        },
-        {
-            name: "right",
-            hierarchy: ["left", "bottom", "top"],
-            calculationY: (targetPos.y),
-            calculationX: (targetPos.x + margin + targetPos.width),
-            conditionFit: ((targetPos.x + targetPos.width + margin + elementPos.width) <= windowSize.width)
-        }
-    ]
-
-    const currentPositionObject = positionObject.find(value => value.name == position)
-
-    if (!currentPositionObject) return {
-        position: "bottom",
-        y: positionObject[0].calculationY,
-        x: positionObject[0].calculationX
-    }
-
-    if (currentPositionObject.conditionFit) return {
-        position,
-        y: currentPositionObject.calculationY,
-        x: currentPositionObject.calculationX
-    }
-
-
-    for (let i = 0; i < currentPositionObject.hierarchy.length; i++) {
-        const tempPositionObject = positionObject.find(value => value.name == currentPositionObject.hierarchy[i])
-        if (tempPositionObject?.conditionFit) return {
-            position: tempPositionObject.name,
-            y: tempPositionObject.calculationY,
-            x: tempPositionObject.calculationX
-        }
-
-    }
-
-    return {
-        position: "bottom",
-        y: positionObject[0].calculationY,
-        x: positionObject[0].calculationX
-    }
-
-}
-
 export const getDOMSizeFromCodeZeroSize = (size: Code0Sizes | CSSProperties['x']): CSSProperties['x'] => {
     switch (size) {
         case "xxs":
@@ -226,4 +76,24 @@ export const getDOMSizeFromCodeZeroSize = (size: Code0Sizes | CSSProperties['x']
         default:
             return size
     }
+}
+
+const GOLDEN_ANGLE = 137.50776405003785
+
+const extractIdNumber = (s: string) => {
+    const m = s.match(/\/(\d+)\s*$/)
+    return m ? Number(m[1]) : null
+}
+
+export const hashToColor = (s: string, from: number = 25, to: number = 320): string => {
+    const range = to - from;
+    const n = extractIdNumber(s);
+    if (n != null) {
+        const hue = from + ((n * GOLDEN_ANGLE) % range);
+        return `hsl(${hue}, 100%, 72%)`;
+    }
+
+    const h = md5(md5(s));
+    const a = parseInt(h.slice(0, 8), 16);
+    return `hsl(${from + (a % range)}, 100%, 72%)`;
 }

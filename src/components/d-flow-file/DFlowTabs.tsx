@@ -4,17 +4,13 @@ import {FileTabs, FileTabsContent, FileTabsList, FileTabsTrigger} from "../file-
 import React from "react";
 import {Menu, MenuContent, MenuItem, MenuLabel, MenuPortal, MenuSeparator, MenuTrigger} from "../menu/Menu";
 import {Button} from "../button/Button";
-import {IconArrowDown, IconArrowUp, IconCornerDownLeft, IconDotsVertical, IconPlus} from "@tabler/icons-react";
+import {IconDotsVertical, IconPlus} from "@tabler/icons-react";
 import {FileTabsView} from "../file-tabs/FileTabs.view";
 import {DLayout} from "../d-layout/DLayout";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Flow, type Namespace, type NamespaceProject} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowReactiveService} from "../d-flow";
 import {DFlowTypeReactiveService} from "../d-flow-type";
-import {Card} from "../card/Card";
-import {Flex} from "../flex/Flex";
-import {Badge} from "../badge/Badge";
-import {Spacing} from "../spacing/Spacing";
 
 export interface DFlowTabsProps {
     flowId: Flow['id']
@@ -88,50 +84,32 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
-                                <MenuContent align="start" sideOffset={8} color={"secondary"}>
-                                    <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
-                                        <MenuLabel>Starting Node</MenuLabel>
-                                        {triggerTab &&
-                                            <MenuItem onSelect={() => fileTabsService.activateTab(triggerTab.id!!)}>
-                                                {triggerTab.children}
-                                            </MenuItem>}
-                                        <MenuSeparator/>
-                                        <MenuLabel>Opened Nodes</MenuLabel>
-                                        {visibleTabs.map((tab: FileTabsView) => (
-                                            <MenuItem key={`menu-${tab.id}`}
-                                                      onSelect={() => {
-                                                          fileTabsService.activateTab(tab.id!)
-                                                      }}>
-                                                {tab.children}
-                                            </MenuItem>
-                                        ))}
-                                        <MenuSeparator/>
-                                        <MenuLabel>Available Node</MenuLabel>
-                                        {hiddenTabs.map((tab: FileTabsView) => (
-                                            <MenuItem key={`menu-${tab.id}`}
-                                                      onSelect={() => {
-                                                          fileTabsService.activateTab(tab.id!)
-                                                      }}>
-                                                {tab.children}
-                                            </MenuItem>
-                                        ))}
-                                    </Card>
-                                    <MenuLabel>
-                                        <Flex style={{gap: ".35rem"}}>
-                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                <Flex>
-                                                    <Badge border><IconArrowUp size={12}/></Badge>
-                                                    <Badge border><IconArrowDown size={12}/></Badge>
-                                                </Flex>
-                                                move
-                                            </Flex>
-                                            <Spacing spacing={"xxs"}/>
-                                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                                <Badge border><IconCornerDownLeft size={12}/></Badge>
-                                                select
-                                            </Flex>
-                                        </Flex>
-                                    </MenuLabel>
+                                <MenuContent align="start" sideOffset={8}>
+                                    <MenuLabel>Starting Node</MenuLabel>
+                                    {triggerTab &&
+                                        <MenuItem onSelect={() => fileTabsService.activateTab(triggerTab.id!!)}>
+                                            {triggerTab.children}
+                                        </MenuItem>}
+                                    <MenuSeparator/>
+                                    <MenuLabel>Opened Nodes</MenuLabel>
+                                    {visibleTabs.map((tab: FileTabsView) => (
+                                        <MenuItem key={`menu-${tab.id}`}
+                                                  onSelect={() => {
+                                                      fileTabsService.activateTab(tab.id!)
+                                                  }}>
+                                            {tab.children}
+                                        </MenuItem>
+                                    ))}
+                                    <MenuSeparator/>
+                                    <MenuLabel>Available Node</MenuLabel>
+                                    {hiddenTabs.map((tab: FileTabsView) => (
+                                        <MenuItem key={`menu-${tab.id}`}
+                                                  onSelect={() => {
+                                                      fileTabsService.activateTab(tab.id!)
+                                                  }}>
+                                            {tab.children}
+                                        </MenuItem>
+                                    ))}
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>
@@ -143,33 +121,15 @@ export const DFlowTabs: React.FC<DFlowTabsProps> = (props) => {
                                 </Button>
                             </MenuTrigger>
                             <MenuPortal>
-                                <MenuContent align="end" sideOffset={8} color={"secondary"}>
-                                    <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
-                                        <MenuItem onClick={() => fileTabsService.clearAll()}>Close all tabs</MenuItem>
-                                        <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
-                                            tabs</MenuItem>
-                                        <MenuSeparator/>
-                                        <MenuItem onClick={() => fileTabsService.clearLeft()}>Close all tabs to
-                                            left</MenuItem>
-                                        <MenuItem onClick={() => fileTabsService.clearRight()}>Close all tabs to
-                                            right</MenuItem>
-                                    </Card>
-                                    <MenuLabel>
-                                        <Flex style={{gap: ".35rem"}}>
-                                            <Flex align={"center"} style={{gap: "0.35rem"}}>
-                                                <Flex>
-                                                    <Badge border><IconArrowUp size={12}/></Badge>
-                                                    <Badge border><IconArrowDown size={12}/></Badge>
-                                                </Flex>
-                                                move
-                                            </Flex>
-                                            <Spacing spacing={"xxs"}/>
-                                            <Flex align={"center"} style={{gap: ".35rem"}}>
-                                                <Badge border><IconCornerDownLeft size={12}/></Badge>
-                                                select
-                                            </Flex>
-                                        </Flex>
-                                    </MenuLabel>
+                                <MenuContent align="end" sideOffset={8}>
+                                    <MenuItem onClick={() => fileTabsService.clearAll()}>Close all tabs</MenuItem>
+                                    <MenuItem onClick={() => fileTabsService.clearWithoutActive()}>Close other
+                                        tabs</MenuItem>
+                                    <MenuSeparator/>
+                                    <MenuItem onClick={() => fileTabsService.clearLeft()}>Close all tabs to
+                                        left</MenuItem>
+                                    <MenuItem onClick={() => fileTabsService.clearRight()}>Close all tabs to
+                                        right</MenuItem>
                                 </MenuContent>
                             </MenuPortal>
                         </Menu>

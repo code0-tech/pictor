@@ -72,6 +72,8 @@ export const useNodeValidation = (
 
     const resolveValueType = React.useCallback(
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
+
+            //TODO seperate check for flow input, return type and parameter type to properly resolve variables
             if ((isNode(value) && expectedDT?.variant !== "NODE") || isReference(value)) {
                 const node = flowService.getNodeById(flowId, value.__typename == "NodeFunctionIdWrapper" ? value.id : value.__typename === "ReferenceValue" ? value.nodeFunctionId : undefined)
                 const fn = functionService.getById(node?.functionDefinition?.id!!)!!

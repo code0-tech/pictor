@@ -30,6 +30,7 @@ interface ExtendedReferenceValue extends ReferenceValue {
     parameterIndex?: number
     inputTypeIndex?: number
     inputTypeIdentifier?: string
+    dataTypeIdentifier?: DataTypeIdentifier
     node: number
     depth: number
     scope: number[]
@@ -61,7 +62,8 @@ export const useReferenceSuggestions = (
     ), [dataTypeIdentifier, dataTypeService, dataTypeStore, genericKeys])
 
     const refObjects = useRefObjects(flowId)
-    const returnTypes = useReturnTypes(flowId)
+
+    console.log(refObjects)
 
     return React.useMemo(() => {
         if (!resolvedType || !nodeContext) return []
@@ -82,8 +84,7 @@ export const useReferenceSuggestions = (
             if (value.depth > depth!) return []
             if (value.scope.some(r => !scope!.includes(r))) return []
 
-            const returnTypeIdentifier = returnTypes.get(value.nodeFunctionId)
-            const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(returnTypeIdentifier!, dataTypeService), [])
+            const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!, dataTypeService), [])
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
 
             return [{
@@ -93,7 +94,7 @@ export const useReferenceSuggestions = (
                 value: value as ReferenceValue,
             }]
         })
-    }, [dataTypeService, nodeContext, nodeParameters, refObjects, resolvedType, returnTypes])
+    }, [dataTypeService, nodeContext, nodeParameters, refObjects, resolvedType])
 }
 
 
@@ -144,7 +145,10 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             node: 0,
             depth: 0,
             nodeFunctionId: "gid://sagittarius/NodeFunction/-1",
-            scope: [0]
+            scope: [0],
+            dataTypeIdentifier: {
+                dataType: flow?.inputType
+            },
         }, {
             dataType: flow?.inputType
         })
@@ -201,7 +205,8 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                             nodeFunctionId: node?.id!,
                             parameterIndex: index,
                             inputTypeIndex: inputIndex,
-                            inputTypeIdentifier: inputType.inputIdentifier!
+                            inputTypeIdentifier: inputType.inputIdentifier!,
+                            dataTypeIdentifier: resolved,
                         }, resolved, dataTypeService)
                     })
                 })
@@ -226,6 +231,7 @@ const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdenti
             if (!dataTypeIdentifier) return
             return referenceExtraction({
                 ...nodeContext,
+                dataTypeIdentifier: dataTypeIdentifier,
                 referencePath: [
                     ...(nodeContext.referencePath ?? []),
                     {

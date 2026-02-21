@@ -78,7 +78,7 @@
     "ldrs": "^1.1.9",
     "merge-props": "^6.0.0",
     "overlap-area": "^1.1.0",
-    "playwright": "1.58.1",
+    "playwright": "1.58.2",
     "react": "^19.2.4",
     "react-contenteditable": "^3.3.7",
     "react-dom": "^19.2.4",

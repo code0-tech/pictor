@@ -16,8 +16,12 @@ ul {
 }
 
 li {
+
+  --color: inherit;
+
   position: relative;
   padding-inline-start: variables.$xs;
+  list-style: none;
 
   &:before {
     content: '';
@@ -28,8 +32,8 @@ li {
     height: 20px;
     top: 5px;
     transform: translateY(-50%);
-    border-left: 2px solid helpers.backgroundColor(variables.$tertiary);
-    border-bottom: 2px solid helpers.backgroundColor(variables.$tertiary);
+    border-left: 2px solid var(--color);
+    border-bottom: 2px solid var(--color);
     border-bottom-left-radius: 0.5rem;
   }
 
@@ -38,7 +42,7 @@ li {
     position: absolute;
     width: 2px;
     height: 100%;
-    background: helpers.backgroundColor(variables.$tertiary);
+    background: var(--color);
     top: 0;
     left: -0.35rem;
   }

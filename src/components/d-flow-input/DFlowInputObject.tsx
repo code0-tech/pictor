@@ -96,7 +96,7 @@ const DFlowInputObjectRuleTree: React.FC<DFlowInputObjectRuleTreeProps & {
                         <Text size="xs" style={{color: "inherit"}}>{key}</Text>
                     </Badge>
                     <Text hierarchy="tertiary">has value</Text>
-                    <Badge border color={parentColorEffective} style={{verticalAlign: "middle"}}>
+                    <Badge border color={"tertiary"} style={{verticalAlign: "middle"}}>
                         <Text size="xs" style={{color: "inherit"}}>{String(value)}</Text>
                     </Badge>
                 </Flex>

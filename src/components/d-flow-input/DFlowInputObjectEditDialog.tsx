@@ -85,7 +85,7 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
 
     React.useEffect(() => {
         setEditorValue(getValueAtPath(editedObject, activePath))
-    }, [activePath, editedObject])
+    }, [activePath])
 
     React.useEffect(() => {
         setActivePath(entry?.path ?? [])
@@ -113,7 +113,6 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
     }
 
     const handleEditorChange = (val: unknown) => {
-        setEditorValue(val)
         const updated = setValueAtPath(editedObject, activePath, val)
         setEditedObject(updated)
         onObjectChange?.(updated)

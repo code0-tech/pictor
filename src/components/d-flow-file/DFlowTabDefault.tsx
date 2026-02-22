@@ -80,7 +80,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                 if (!changedParameters.current.has(paramDefinitions1?.id!!)) continue;
                 const syntaxSegment = values[paramDefinitions1?.id!]
                 const previousValue = paramDefinitions1?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment?.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)

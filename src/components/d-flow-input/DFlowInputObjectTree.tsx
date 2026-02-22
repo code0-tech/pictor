@@ -34,19 +34,27 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
         parentColor,
     } = props
 
-    const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
+    // value für Root und Kind korrekt bestimmen
     const value = isRoot ? object?.value : object
     if (typeof value !== "object" || value === null) return null
+
+    // Click/DoubleClick robust trennen
+    const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
+    const CLICK_DELAY = 250 // ms
 
     const handleClick = (entry: EditableObjectEntry) => {
         if (clickTimeout.current) clearTimeout(clickTimeout.current)
         clickTimeout.current = setTimeout(() => {
             onEntryClick(entry)
-        }, 200)
+            clickTimeout.current = null
+        }, CLICK_DELAY)
     }
 
     const handleDoubleClick = (currentPath: string[], isCollapsed: boolean) => {
-        if (clickTimeout.current) clearTimeout(clickTimeout.current)
+        if (clickTimeout.current) {
+            clearTimeout(clickTimeout.current)
+            clickTimeout.current = null
+        }
         if (onDoubleClick) {
             onDoubleClick(currentPath, isCollapsed)
         } else {
@@ -132,7 +140,7 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
                     <div
                         onClick={e => {
                             e.stopPropagation()
-                            onEntryClick({key, value: val as LiteralValue, path: currentPath})
+                            handleClick({key, value: val as LiteralValue, path: currentPath})
                         }}
                         onDoubleClick={e => {
                             e.stopPropagation()

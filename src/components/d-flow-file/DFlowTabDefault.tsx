@@ -12,10 +12,10 @@ import {
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
-import {InputSyntaxSegment} from "../form/Input.syntax.hook";
+import {InputSyntaxSegment} from "../form";
 import {useNodeValidation} from "../d-flow-validation/DNodeValidation.hook";
 import {FileTabsService} from "../file-tabs/FileTabs.service";
-import {DFlowInputDefault} from "../d-flow-input/DFlowInputDefault";
+import {DFlowInput} from "../d-flow-input/DFlowInput";
 
 export interface DFlowTabDefaultProps {
     node: NodeFunction
@@ -55,7 +55,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
     const initialValues = React.useMemo(() => {
         const values: Record<string, any> = {}
         sortedParameters.forEach(parameter => {
-            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" && parameter.value?.value != null ? JSON.stringify(parameter.value?.value) : parameter.value.value) : parameter?.value != null  ? JSON.stringify(parameter?.value) : parameter?.value
+            values[parameter?.id!!] = parameter?.value?.__typename === "LiteralValue" ? (typeof parameter.value?.value === "object" && parameter.value?.value != null ? JSON.stringify(parameter.value?.value) : parameter.value.value) : parameter?.value != null ? JSON.stringify(parameter?.value) : parameter?.value
         })
         return values
     }, [sortedParameters])
@@ -80,7 +80,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                 if (!changedParameters.current.has(paramDefinitions1?.id!!)) continue;
                 const syntaxSegment = values[paramDefinitions1?.id!]
                 const previousValue = paramDefinitions1?.value as NodeParameterValue
-                const syntaxValue = syntaxSegment?.[0]?.value as NodeFunction | LiteralValue | ReferenceValue
+                const syntaxValue = syntaxSegment?.[0]?.value ?? syntaxSegment.value ?? syntaxSegment as NodeFunction | LiteralValue | ReferenceValue
 
                 if (previousValue && previousValue.__typename === "NodeFunctionIdWrapper" && previousValue.id) {
                     const linkedNodes = flowService.getLinkedNodesById(flowId, previousValue.id)
@@ -136,17 +136,17 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
             return <div>
                 {/*@ts-ignore*/}
-                <DFlowInputDefault flowId={flowId}
-                                   nodeId={node.id}
-                                   parameterId={parameter.id}
-                                   title={title}
-                                   description={description}
-                                   clearable
-                                   onChange={() => {
-                                       changedParameters.current.add(parameter.id!!)
-                                       validate()
-                                   }}
-                                   {...inputs.getInputProps(parameter.id!!)}
+                <DFlowInput flowId={flowId}
+                            nodeId={node.id}
+                            parameterId={parameter.id}
+                            title={title}
+                            description={description}
+                            clearable
+                            onChange={() => {
+                                changedParameters.current.add(parameter.id!!)
+                                validate()
+                            }}
+                            {...inputs.getInputProps(parameter.id!!)}
                 />
             </div>
         })}

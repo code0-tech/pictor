@@ -10,6 +10,7 @@ import {
 import {toInputSuggestions} from "./DFlowSuggestionMenu.util";
 import {DFlowSuggestionMenuSearchBar} from "./DFlowSuggestionMenuSearchBar";
 import {useStoreApi} from "@xyflow/react";
+import {Card} from "../card/Card";
 
 export interface DFlowSuggestionMenuProps {
     triggerContent: React.ReactNode
@@ -33,7 +34,7 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
             {triggerContent}
         </MenuTrigger>
         <MenuPortal>
-            <InputSuggestionMenuContent align={"center"}>
+            <InputSuggestionMenuContent align={"center"} color={"secondary"}>
                 <DFlowSuggestionMenuSearchBar onType={event => {
 
                     if (event.key === "ArrowDown") {
@@ -54,17 +55,17 @@ export const DFlowSuggestionMenu: React.FC<DFlowSuggestionMenuProps> = (props) =
                     event.preventDefault()
                     return false
                 }}/>
-                <MenuSeparator/>
-                <InputSuggestionMenuContentItems
-                    /* @ts-ignore */
-                    ref={menuRef}
-                    suggestions={toInputSuggestions(stateSuggestions)}
-                    onSuggestionSelect={(suggestion) => {
-                        onSuggestionSelect(suggestion.valueData as DFlowSuggestion)
-                    }}
-                />
-                <MenuSeparator/>
-                <DFlowSuggestionMenuFooter/>
+                <Card paddingSize={"xxs"} mt={-0.2} mx={-0.2}>
+                    <InputSuggestionMenuContentItems
+                        /* @ts-ignore */
+                        ref={menuRef}
+                        suggestions={toInputSuggestions(stateSuggestions)}
+                        onSuggestionSelect={(suggestion) => {
+                            onSuggestionSelect(suggestion.valueData as DFlowSuggestion)
+                        }}
+                    />
+                </Card>
+
             </InputSuggestionMenuContent>
         </MenuPortal>
     </Menu>

@@ -28,7 +28,7 @@ export const DFlowInputReferenceBadge: React.FC<DFlowInputReferenceBadge> = (pro
                 {value.referencePath ? "." + (value.referencePath?.map(path => path.path).join(".") ?? "") : ""}
             </Flex>
         }
-        return `undefineds`
+        return `undefined`
     }, [value])
 
     return <Badge style={{verticalAlign: "middle"}}

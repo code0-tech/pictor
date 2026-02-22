@@ -68,7 +68,7 @@ export abstract class DFlowDataTypeReactiveService extends ReactiveArrayService<
 
     }
 
-    getValueFromType(dataTypeIdentifier: DataTypeIdentifier, flow?: Flow, dependencies?: DFlowDataTypeDependencies): NodeParameterValue | undefined {
+    getValueFromType(dataTypeIdentifier: DataTypeIdentifier, flow?: Flow, dependencies?: DFlowDataTypeDependencies): LiteralValue | undefined {
         const type = this.getDataType(dataTypeIdentifier, dependencies)
         if (!type) return undefined
 

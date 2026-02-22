@@ -84,6 +84,10 @@ export const DFlowInputObject: React.FC<DFlowInputObjectProps> = (props) => {
         setEditDialogOpen(true)
     }
 
+    const handleClear = React.useCallback(() => {
+        setValue(dataTypeService.getValueFromType(parameterDefinition?.dataTypeIdentifier!))
+    }, [parameter, parameterDefinition, dataTypeStore])
+
     React.useEffect(() => {
         formValidation?.setValue(value)
         // @ts-ignore
@@ -120,7 +124,7 @@ export const DFlowInputObject: React.FC<DFlowInputObjectProps> = (props) => {
                             <IconEdit size={13}/>
                         </Button>
                         <Button paddingSize="xxs" variant="filled" color="secondary"
-                                onClick={() => setValue(initialValue)}>
+                                onClick={handleClear}>
                             <IconX size={13}/>
                         </Button>
                     </ButtonGroup>

@@ -35,7 +35,7 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
     } = props
 
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
-    const value = object?.value
+    const value = isRoot ? object?.value : object
     if (typeof value !== "object" || value === null) return null
 
     const handleClick = (entry: EditableObjectEntry) => {
@@ -90,7 +90,7 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
             const isCollapsed = collapsedState[pathKey] || false
             const isActive = activePath && activePath.length > 0 && currentPath.join(".") === activePath.join(".")
             const parentColorValue = parentColor ?? hashToColor("root")
-            const isCollapsable = typeof (val as any)?.value === "object" && (val as any)?.value !== null && (Array.isArray((val as any).value) ? (val as any).value.length > 0 : Object.keys((val as any).value ?? {}).length > 0)
+            const isCollapsable = typeof (val as any) === "object" && (val as any) !== null && (Array.isArray((val as any)) ? (val as any).length > 0 : Object.keys((val as any) ?? {}).length > 0)
             const collapsableColor = isCollapsable ? hashToColor(pathKey) : parentColorValue
             const icon = isCollapsable ? (isCollapsed ? <IconChevronUp size={13}/> : <IconChevronDown size={13}/>) : null
             const label = isCollapsable ? (

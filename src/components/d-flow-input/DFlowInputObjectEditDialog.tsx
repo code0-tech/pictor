@@ -90,7 +90,7 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
     React.useEffect(() => {
         setActivePath(entry?.path ?? [])
         setEditedObject(value)
-    }, [entry, value])
+    }, [entry])
 
     React.useEffect(() => {
         setEditOpen(open)

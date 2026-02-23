@@ -59,10 +59,10 @@ export class DFlowDataTypeContainsTypeRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!))
+            return (value as LiteralValue).value.every((value1: any) => useValueValidation({__typename: "LiteralValue", value: value1}, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!))
         }
 
-        return (value as LiteralValue).value.every((value1: any) => useValueValidation(value1, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
+        return (value as LiteralValue).value.every((value1: any) => useValueValidation({__typename: "LiteralValue", value: value1}, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping((config.dataTypeIdentifier?.genericType as GenericType).genericMappers!!, generics)))
 
     }
 }

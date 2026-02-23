@@ -159,7 +159,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             scope: [0],
         }, {
             dataType: flow?.inputType
-        })
+        }, dataTypeService)
     }, [flow])
 
     const inputSuggestions: ExtendedReferenceValue[] = React.useMemo(() => {
@@ -228,9 +228,9 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentifier: DataTypeIdentifier, dataTypeService?: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
+const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentifier: DataTypeIdentifier, dataTypeService: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
 
-    const dataType: Maybe<DataType> | undefined = dataTypeService ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
+    const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
 
     const references = dataType.rules?.nodes?.map(rule => {
@@ -244,7 +244,7 @@ const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentif
                         path: (rule.config as DataTypeRulesContainsKeyConfig).key!!
                     }
                 ]
-            }, (rule.config as DataTypeRulesContainsKeyConfig).dataTypeIdentifier!!)
+            }, (rule.config as DataTypeRulesContainsKeyConfig).dataTypeIdentifier!!, dataTypeService)
         }
 
         return undefined

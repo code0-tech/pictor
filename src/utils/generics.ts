@@ -568,7 +568,8 @@ export function isMatchingType(
         return false;
     };
 
-    const deepMatch = (s: unknown, t: unknown): boolean => {
+    const deepMatch = (s: any, t: any): boolean => {
+        if (s && s.identifier && t && t.identifier && s?.identifier === t?.identifier) return true
         if (wildcard(s) || wildcard(t)) return true;
         if (s == null || t == null) return s === t;
 
@@ -595,53 +596,33 @@ export const resolveType = (
     type: DataTypeIdentifier,
     service: DFlowDataTypeReactiveService
 ): DataTypeIdentifier => {
-    if (typeof (type as unknown) === "string") {
-        const dataType = service.getDataType(type);
-        if (!dataType) return type;
-        const genericKeys = dataType.genericKeys ?? [];
+    const dataType = service.getDataType(type);
+    if (!dataType) return type;
 
-        if (dataType.variant === "ARRAY" && genericKeys.length > 0) {
-            const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === "CONTAINS_TYPE");
-            const innerIdentifier = (innerTypeRule?.config as {
-                dataTypeIdentifier?: DataTypeIdentifier
-            })?.dataTypeIdentifier;
-            if (innerIdentifier) {
-                const [genericKey] = genericKeys;
-                if (!genericKey) return type;
-                return {
-                    dataType: dataType.json as DataType,
-                    genericType: {
-                        dataType: dataType.json as DataType,
-                        genericMappers: [
-                            {
-                                target: genericKey,
-                                sourceDataTypeIdentifiers: [resolveType(innerIdentifier, service)]
-                            }
-                        ]
-                    }
-                } as DataTypeIdentifier;
-            }
+    if (dataType.variant === "ARRAY" && dataType.identifier !== "LIST") {
+        const listType = service.getDataType({dataType: {identifier: "LIST"}})
+        const innerTypeRule = dataType.rules?.nodes?.find(rule => rule?.variant === "CONTAINS_TYPE");
+        const innerIdentifier = (innerTypeRule?.config as {
+            dataTypeIdentifier?: DataTypeIdentifier
+        })?.dataTypeIdentifier;
+        if (innerIdentifier && listType) {
+            const [genericKey] = listType?.genericKeys!;
+            if (!genericKey) return type;
+            return {
+                genericType: {
+                    dataType: listType?.json as DataType,
+                    genericMappers: [
+                        {
+                            target: genericKey,
+                            sourceDataTypeIdentifiers: [resolveType(innerIdentifier, service)]
+                        }
+                    ]
+                }
+            } as DataTypeIdentifier;
         }
-
-        return type;
     }
 
-    if (!isDataTypeIdentifier(type)) return type;
-
-    if (!type.genericType) return type;
-
-    const resolvedMappers = type.genericType.genericMappers?.map(mapper => ({
-        ...mapper,
-        sourceDataTypeIdentifiers: mapper?.sourceDataTypeIdentifiers?.map(source => resolveType(source, service))
-    })) ?? [];
-
-    return {
-        ...type,
-        genericType: {
-            ...type.genericType,
-            genericMappers: resolvedMappers
-        }
-    };
+    return type;
 };
 
 const sortValue = (value: unknown): unknown => {

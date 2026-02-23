@@ -27,7 +27,7 @@ export const DFlowInputNodeBadge: React.FC<DFlowInputNodeBadgeProps> = (props) =
     const flowTypeService = definition || useService(DFlowTypeReactiveService)
     const flowTypeStore = definition || useStore(DFlowTypeReactiveService)
 
-    const isTrigger = value.__typename === "NodeFunctionIdWrapper" && value.id === "gid://sagittarius/NodeFunction/-1"
+    const isTrigger = value.__typename === "NodeFunctionIdWrapper" && !value.id
 
     const node: NodeFunction | FlowTypeView | NodeFunctionIdWrapper | undefined = React.useMemo(() => {
         if (isTrigger && !definition) {

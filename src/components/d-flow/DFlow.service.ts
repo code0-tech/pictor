@@ -1,6 +1,5 @@
 import {ReactiveArrayService} from "../../utils";
 import {
-    DataTypeIdentifier,
     FlowInput,
     FlowSetting,
     LiteralValue,
@@ -16,6 +15,7 @@ import {
     NodeFunction,
     NodeFunctionIdWrapper,
     NodeParameter,
+    NodeParameterValueInput, ReferencePathInput,
     ReferenceValue,
     Scalars
 } from "@code0-tech/sagittarius-graphql-types";
@@ -92,30 +92,40 @@ export abstract class DFlowReactiveService extends ReactiveArrayService<Flow, DF
                 nextNodeId: node?.nextNodeId!,
                 functionDefinitionId: node?.functionDefinition?.id!,
                 parameters: (node?.parameters?.nodes ?? []).map(parameter => {
-                    let value
+                    let value: NodeParameterValueInput
 
                     switch (parameter?.value?.__typename) {
                         case "NodeFunctionIdWrapper":
-                            value = { nodeFunctionId: parameter.value.id! }
+                            value = {nodeFunctionId: parameter.value.id!}
                             break
 
                         case "LiteralValue":
-                            value = { literalValue: parameter.value.value! }
+                            value = {literalValue: parameter.value.value!}
                             break
 
                         case "ReferenceValue": {
                             const v = parameter.value as ReferenceValue
                             value = {
                                 referenceValue: {
-                                    nodeFunctionId: v.nodeFunctionId!,
-                                    referencePath: v.referencePath ?? [],
+                                    ...(v.nodeFunctionId ? {nodeFunctionId: v.nodeFunctionId} : {}),
+                                    ...(v.parameterIndex && v.inputIndex ?
+                                        {
+                                            parameterIndex: v.parameterIndex,
+                                            inputIndex: v.inputIndex
+                                        } : {}),
+                                    referencePath: v.referencePath?.map(referencePath => {
+                                        const reference: ReferencePathInput = {
+                                            path: referencePath.path
+                                        }
+                                        return reference
+                                    }) ?? [],
                                 },
                             }
                             break
                         }
 
                         default:
-                            value = { literalValue: null }
+                            value = {literalValue: null}
                     }
 
                     return {

@@ -24,13 +24,10 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
-import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
 import {DFlowTypeReactiveService} from "../d-flow-type";
 
 interface ExtendedReferenceValue extends ReferenceValue {
-    parameterIndex?: number
-    inputTypeIndex?: number
     inputTypeIdentifier?: string
     dataTypeIdentifier: DataTypeIdentifier
     node: number
@@ -41,8 +38,6 @@ interface ExtendedReferenceValue extends ReferenceValue {
 interface ReferenceValueContext extends ReferenceValue {
     node: number
     depth: number
-    parameterIndex?: number
-    inputTypeIndex?: number
     inputTypeIdentifier?: string
     scope: number[]
 }
@@ -74,8 +69,6 @@ export const useReferenceSuggestions = (
 
     const refObjects = useRefObjects(flowId)
 
-    //console.log(refObjects)
-
     return React.useMemo(() => {
         if (!resolvedType || !nodeContext) return []
 
@@ -85,7 +78,7 @@ export const useReferenceSuggestions = (
             if (value.depth === null || value.depth === undefined) return []
             if (value.scope === null || value.scope === undefined) return []
 
-            const isInputTypeRef = value.parameterIndex !== undefined && value.inputTypeIndex !== undefined
+            const isInputTypeRef = value.parameterIndex !== undefined && value.inputIndex !== undefined
             const isInputTypeScopeMatch = isInputTypeRef
                 ? value.scope?.every((scopeId, index) => scope?.[index] === scopeId)
                 : true
@@ -96,7 +89,6 @@ export const useReferenceSuggestions = (
             if (value.scope.some(r => !scope!.includes(r))) return []
 
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!, dataTypeService), [])
-            console.log("resolved", value.nodeFunctionId, resolvedRefObjectType)
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
 
             return [{
@@ -155,7 +147,6 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             const nodeContext = nodeContexts?.find(context => context.nodeFunctionId === node?.id)
 
             if (resolvedReturnType && nodeContext) {
-                console.log(referenceExtraction(nodeContext, resolvedReturnType, dataTypeService))
                 return referenceExtraction(nodeContext, resolvedReturnType, dataTypeService)
             }
 
@@ -168,7 +159,6 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
         return referenceExtraction({
             node: 0,
             depth: 0,
-            nodeFunctionId: "gid://sagittarius/NodeFunction/-1",
             scope: [0],
         }, {
             dataType: flowType?.inputType
@@ -225,7 +215,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                             ...paramNodeContext,
                             nodeFunctionId: node?.id!,
                             parameterIndex: index,
-                            inputTypeIndex: inputIndex,
+                            inputIndex: inputIndex,
                             inputTypeIdentifier: inputType.inputIdentifier!
                         }, resolved, dataTypeService)
                     })

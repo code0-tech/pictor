@@ -34,11 +34,9 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
         parentColor,
     } = props
 
-    // value für Root und Kind korrekt bestimmen
     const value = isRoot ? object?.value : object
     if (typeof value !== "object" || value === null) return null
 
-    // Click/DoubleClick robust trennen
     const clickTimeout = React.useRef<NodeJS.Timeout | null>(null)
     const CLICK_DELAY = 250 // ms
 
@@ -61,6 +59,14 @@ export const DFlowInputObjectTree: React.FC<DFlowInputObjectTreeProps> = (props)
             setCollapsedState(currentPath, !isCollapsed)
         }
     }
+
+    React.useEffect(() => {
+        const currentPath = path ?? []
+        const pathKey = (isRoot ? ["root"] : currentPath).join(".")
+        if (currentPath.length > 1 && collapsedState[pathKey] === undefined) {
+            setCollapsedState(currentPath.length === 0 ? ["root"] : currentPath, true)
+        }
+    }, [path, isRoot, collapsedState, setCollapsedState])
 
     const renderRoot = () => {
         const currentPath = [...path]

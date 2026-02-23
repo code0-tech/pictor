@@ -13,10 +13,6 @@ import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
-import {Badge} from "../badge/Badge";
-import {InputSyntaxSegment} from "./Input.syntax.hook";
-import {InputSuggestion} from "./InputSuggestion";
-import {DUserInput} from "../d-user/DUserInput";
 
 export default {
     title: "Form"

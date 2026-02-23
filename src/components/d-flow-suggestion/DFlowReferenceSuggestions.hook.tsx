@@ -26,6 +26,7 @@ import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
 import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
 import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
+import {DFlowTypeReactiveService} from "../d-flow-type";
 
 interface ExtendedReferenceValue extends ReferenceValue {
     parameterIndex?: number
@@ -95,6 +96,7 @@ export const useReferenceSuggestions = (
             if (value.scope.some(r => !scope!.includes(r))) return []
 
             const resolvedRefObjectType = replaceGenericsAndSortType(resolveType(value.dataTypeIdentifier!, dataTypeService), [])
+            console.log("resolved", value.nodeFunctionId, resolvedRefObjectType)
             if (!isMatchingType(resolvedType, resolvedRefObjectType)) return []
 
             return [{
@@ -129,8 +131,19 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
+    const flowTypeService = useService(DFlowTypeReactiveService)
+    const flowTypeStore = useStore(DFlowTypeReactiveService)
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
+    const flow = React.useMemo(
+        () => flowService.getById(flowId),
+        [flowId, flowStore]
+    )
+
+    const flowType = React.useMemo(
+        () => flowTypeService.getById(flow?.type?.id!),
+        [flow?.type?.id, flowTypeStore]
+    )
+
     const nodeContexts = useNodeContext(flowId)
 
     const nodeSuggestions = React.useMemo(() => {
@@ -158,7 +171,7 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
             nodeFunctionId: "gid://sagittarius/NodeFunction/-1",
             scope: [0],
         }, {
-            dataType: flow?.inputType
+            dataType: flowType?.inputType
         }, dataTypeService)
     }, [flow])
 

@@ -171,7 +171,7 @@ export const RadioExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            radio: null
+            radio: undefined
         },
         validate: {
             radio: (value) => {
@@ -306,10 +306,10 @@ export const PinInputExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            pinInput: null
+            pinInput: undefined
         },
         validate: {
-            pinInput: (value: string | null) => {
+            pinInput: (value: string | undefined) => {
                 if (!value || value.length != 6) return "Please type or paste your 6-digit code"
                 return null
             }

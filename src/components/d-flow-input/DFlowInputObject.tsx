@@ -96,14 +96,16 @@ export const DFlowInputObject: React.FC<DFlowInputObjectProps> = (props) => {
 
     return (
         <>
-            <DFlowInputObjectEditDialog
-                key={String(editDialogOpen)}
-                open={editDialogOpen}
-                entry={editEntry}
-                value={value as any}
-                onOpenChange={open => setEditDialogOpen(open)}
-                onObjectChange={v => setValue(v ?? undefined)}
-            />
+            {value?.__typename === "LiteralValue" && (
+                <DFlowInputObjectEditDialog
+                    key={String(editDialogOpen)}
+                    open={editDialogOpen}
+                    entry={editEntry}
+                    value={value as any}
+                    onOpenChange={open => setEditDialogOpen(open)}
+                    onObjectChange={v => setValue(v ?? undefined)}
+                />
+            )}
             <InputLabel>{title}</InputLabel>
             <InputDescription>{description}</InputDescription>
             <Card color="secondary" paddingSize="xs">

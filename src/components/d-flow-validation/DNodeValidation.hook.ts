@@ -19,6 +19,8 @@ import {DFlowFunctionReactiveService} from "../d-flow-function"
 import {useDataTypeValidation} from "./DDataTypeValidation.hook"
 import {useValueValidation} from "./DValueValidation.hook"
 import {DFlowReactiveService} from "../d-flow"
+import {getReferenceType} from "../d-flow-node/DFlowNodeReference.return.hook";
+import {DFlowTypeReactiveService} from "../d-flow-type";
 
 const isReference = (value: NodeParameterValue) =>
     value.__typename === "ReferenceValue"
@@ -56,6 +58,8 @@ export const useNodeValidation = (
     const functionStore = useStore(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
+    const flowTypeService = useService(DFlowTypeReactiveService)
+    const flowTypeStore = useStore(DFlowTypeReactiveService)
     const dataTypeService = useService(DFlowDataTypeReactiveService)
     const dataTypeStore = useStore(DFlowDataTypeReactiveService)
 
@@ -74,15 +78,20 @@ export const useNodeValidation = (
         (value: NodeParameterValue, expectedDT?: DataTypeView) => {
 
             //TODO seperate check for flow input, return type and parameter type to properly resolve variables
-            if ((isNode(value) && expectedDT?.variant !== "NODE") || isReference(value)) {
+            if ((isNode(value) && expectedDT?.variant !== "NODE")) {
                 const node = flowService.getNodeById(flowId, value.__typename == "NodeFunctionIdWrapper" ? value.id : value.__typename === "ReferenceValue" ? value.nodeFunctionId : undefined)
                 const fn = functionService.getById(node?.functionDefinition?.id!!)!!
                 const params = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
                 return useReturnType(fn, params, dataTypeService, functionService)
+            } else if (isReference(value)) {
+                const node = flowService.getNodeById(flowId, value.__typename == "NodeFunctionIdWrapper" ? value.id : value.__typename === "ReferenceValue" ? value.nodeFunctionId : undefined)
+                const fn = functionService.getById(node?.functionDefinition?.id!!)!!
+                const flowType = flowTypeService.getById(flow?.type?.id)?.json()
+                return getReferenceType(value as ReferenceValue, dataTypeService, functionService, fn, node, flowType)
             }
             return dataTypeService.getTypeFromValue(value, flow)
         },
-        [dataTypeService, flow, flowId, flowService, functionService]
+        [dataTypeService, flow, flowId, flowService, functionService, flowTypeStore]
     )
 
     return React.useMemo(() => {

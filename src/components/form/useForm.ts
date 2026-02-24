@@ -14,9 +14,9 @@ export interface FormValidationProps<Values> {
 }
 
 export interface ValidationProps<Value> {
-    initialValue?: Value | null,
-    defaultValue?: Value | null
-    value?: Value | null
+    initialValue?: Value | undefined,
+    defaultValue?: Value | undefined
+    value?: Value | undefined
     required?: boolean
     formValidation?: {
         setValue: (value: any) => void
@@ -83,7 +83,7 @@ class Validation<Values> implements IValidation<Values> {
         return {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
             defaultValue: currentValue,
-            initialValue: currentValue,
+            initialValue: currentValue || undefined,
             formValidation: {
                 setValue: (value: any) => {
                     this.changeValue(currentName, value)

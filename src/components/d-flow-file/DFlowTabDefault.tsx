@@ -95,7 +95,7 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
 
                 try {
                     const parsedSyntaxValue = Number.isNaN(Number(syntaxValue)) ? JSON.parse(syntaxValue) : syntaxValue
-                    if (!syntaxValue?.__typename) {
+                    if (!parsedSyntaxValue?.__typename) {
                         await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue ? {
                             __typename: "LiteralValue",
                             value: parsedSyntaxValue === null || parsedSyntaxValue === undefined ? String(parsedSyntaxValue) : parsedSyntaxValue
@@ -112,7 +112,9 @@ export const DFlowTabDefault: React.FC<DFlowTabDefaultProps> = (props) => {
                     }
                 }
 
-                await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, syntaxValue.__typename === "LiteralValue" ? (!!syntaxValue.value ? syntaxValue : undefined) : syntaxValue);
+                const parsedSyntaxValue = typeof syntaxValue === "object" ? syntaxValue : JSON.parse(syntaxValue)
+
+                await flowService.setParameterValue(flowId, node.id!!, paramDefinitions1!!.id!!, parsedSyntaxValue.__typename === "LiteralValue" ? (!!parsedSyntaxValue.value ? parsedSyntaxValue : undefined) : parsedSyntaxValue);
             }
             changedParameters.current.clear()
         })

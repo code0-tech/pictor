@@ -33,7 +33,7 @@ export class DFlowDataTypeContainsKeyRule {
         //use generic given type for checking against value
         if (config?.dataTypeIdentifier?.genericKey && genericMapper && genericTypes) {
             const checkAllTypes: boolean[] = genericTypes.map(genericType => {
-                return useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(genericType)!!, dataTypeService!!, flow, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
+                return useValueValidation({__typename: "LiteralValue", value: (value as LiteralValue).value[(config?.key ?? "")]}, dataTypeService?.getDataType(genericType)!!, dataTypeService!!, flow, ((genericType.genericType)!!.genericMappers as GenericMapper[]))
             })
 
             const combination = checkAllTypes.length > 1 ? checkAllTypes.reduce((previousValue, currentValue, currentIndex) => {
@@ -49,9 +49,9 @@ export class DFlowDataTypeContainsKeyRule {
 
         //normal datatype link
         if (config?.dataTypeIdentifier?.dataType) {
-            return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(config.dataTypeIdentifier)!!, dataTypeService!!)
+            return ((config?.key ?? "") in (value as LiteralValue).value) && useValueValidation({__typename: "LiteralValue", value: (value as LiteralValue).value[(config?.key ?? "")]}, dataTypeService?.getDataType(config.dataTypeIdentifier)!!, dataTypeService!!)
         }
 
-        return ((config?.key ?? "") in value) && useValueValidation((value as LiteralValue).value[(config?.key ?? "")], dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
+        return ((config?.key ?? "") in (value as LiteralValue).value) && useValueValidation({__typename: "LiteralValue", value: (value as LiteralValue).value[(config?.key ?? "")]}, dataTypeService?.getDataType(config.dataTypeIdentifier!!)!!, dataTypeService!!, flow, genericMapping(config?.dataTypeIdentifier?.genericType?.genericMappers!!, generics))
     }
 }

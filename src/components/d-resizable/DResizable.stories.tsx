@@ -85,7 +85,7 @@ export const Dashboard = () => {
     const [flowStore, flowService] = useReactiveArrayService<Flow, DFlowReactiveService>(DFlowReactiveServiceExtend, [{
         id: "gid://sagittarius/Flow/1",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "de/codezero/examples/Discord Channel Create Event Flow Example",
         settings: {
@@ -104,7 +104,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/2",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "de/codezero/examples-2/REST Flow",
         settings: {
@@ -122,7 +122,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/3",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "en/codezero/examples/REST Flow",
         settings: {
@@ -140,7 +140,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/4",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "//sp/////codezero/examples/REST Flow",
         settings: {
@@ -158,7 +158,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/5",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "us/codezero/examples/REST Flow",
         settings: {
@@ -176,7 +176,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/6",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "cz/codezero/examples/REST Flow",
         settings: {
@@ -194,7 +194,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/7",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "ens/codezero/examples/REST Flow",
         settings: {
@@ -212,7 +212,7 @@ export const Dashboard = () => {
     }, {
         id: "gid://sagittarius/Flow/8",
         type: {
-            id: "gid://sagittarius/FlowType/888",
+            id: "gid://sagittarius/FlowType/1098",
         },
         name: "ensp/codezero/examples/REST Flow",
         settings: {

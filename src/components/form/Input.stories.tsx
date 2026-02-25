@@ -13,10 +13,6 @@ import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
-import {Badge} from "../badge/Badge";
-import {InputSyntaxSegment} from "./Input.syntax.hook";
-import {InputSuggestion} from "./InputSuggestion";
-import {DUserInput} from "../d-user/DUserInput";
 
 export default {
     title: "Form"
@@ -175,7 +171,7 @@ export const RadioExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            radio: null
+            radio: undefined
         },
         validate: {
             radio: (value) => {
@@ -310,10 +306,10 @@ export const PinInputExample = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            pinInput: null
+            pinInput: undefined
         },
         validate: {
-            pinInput: (value: string | null) => {
+            pinInput: (value: string | undefined) => {
                 if (!value || value.length != 6) return "Please type or paste your 6-digit code"
                 return null
             }

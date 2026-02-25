@@ -90,7 +90,6 @@ const InputSuggestionMenuContentComponent: React.FC<InputSuggestionMenuContentPr
 
     // @ts-ignore
     return <MenuContent ref={localRef}
-                        forceMount
                         onContextMenuCapture={(e) => e.stopPropagation()}
                         onInteractOutside={(event) => event.target instanceof HTMLInputElement && event.preventDefault()}
                         onCloseAutoFocus={(event) => event.preventDefault()}

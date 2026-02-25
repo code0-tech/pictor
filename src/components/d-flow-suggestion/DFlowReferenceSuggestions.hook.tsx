@@ -24,15 +24,21 @@ import {
 } from "@code0-tech/sagittarius-graphql-types";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
-import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
+import {useReturnType} from "../d-flow-function/DFlowFunction.return.hook";
+import {DFlowTypeReactiveService} from "../d-flow-type";
 
 interface ExtendedReferenceValue extends ReferenceValue {
-    parameterIndex?: number
-    inputTypeIndex?: number
     inputTypeIdentifier?: string
-    dataTypeIdentifier?: DataTypeIdentifier
+    dataTypeIdentifier: DataTypeIdentifier
     node: number
     depth: number
+    scope: number[]
+}
+
+interface ReferenceValueContext extends ReferenceValue {
+    node: number
+    depth: number
+    inputTypeIdentifier?: string
     scope: number[]
 }
 
@@ -63,8 +69,6 @@ export const useReferenceSuggestions = (
 
     const refObjects = useRefObjects(flowId)
 
-    console.log(refObjects)
-
     return React.useMemo(() => {
         if (!resolvedType || !nodeContext) return []
 
@@ -74,7 +78,7 @@ export const useReferenceSuggestions = (
             if (value.depth === null || value.depth === undefined) return []
             if (value.scope === null || value.scope === undefined) return []
 
-            const isInputTypeRef = value.parameterIndex !== undefined && value.inputTypeIndex !== undefined
+            const isInputTypeRef = value.parameterIndex !== undefined && value.inputIndex !== undefined
             const isInputTypeScopeMatch = isInputTypeRef
                 ? value.scope?.every((scopeId, index) => scope?.[index] === scopeId)
                 : true
@@ -119,16 +123,27 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     const functionService = useService(DFlowFunctionReactiveService)
     const flowService = useService(DFlowReactiveService)
     const flowStore = useStore(DFlowReactiveService)
+    const flowTypeService = useService(DFlowTypeReactiveService)
+    const flowTypeStore = useStore(DFlowTypeReactiveService)
 
-    const flow = React.useMemo(() => flowService.getById(flowId), [flowId, flowStore]);
+    const flow = React.useMemo(
+        () => flowService.getById(flowId),
+        [flowId, flowStore]
+    )
+
+    const flowType = React.useMemo(
+        () => flowTypeService.getById(flow?.type?.id!),
+        [flow?.type?.id, flowTypeStore]
+    )
+
     const nodeContexts = useNodeContext(flowId)
-
-    const returnTypes = useReturnTypes(flowId)
 
     const nodeSuggestions = React.useMemo(() => {
         return flow?.nodes?.nodes?.map(node => {
 
-            const resolvedReturnType = returnTypes.get(node?.id)
+            const nodeValues = node?.parameters?.nodes?.map(p => p?.value!!) ?? []
+            const functionDefinition = functionService.getById(node?.functionDefinition?.id)
+            const resolvedReturnType = useReturnType(functionDefinition!, nodeValues as NodeParameterValue[], dataTypeService, functionService)
             const nodeContext = nodeContexts?.find(context => context.nodeFunctionId === node?.id)
 
             if (resolvedReturnType && nodeContext) {
@@ -144,14 +159,10 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
         return referenceExtraction({
             node: 0,
             depth: 0,
-            nodeFunctionId: "gid://sagittarius/NodeFunction/-1",
             scope: [0],
-            dataTypeIdentifier: {
-                dataType: flow?.inputType
-            },
         }, {
-            dataType: flow?.inputType
-        })
+            dataType: flowType?.inputType
+        }, dataTypeService)
     }, [flow])
 
     const inputSuggestions: ExtendedReferenceValue[] = React.useMemo(() => {
@@ -204,9 +215,8 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
                             ...paramNodeContext,
                             nodeFunctionId: node?.id!,
                             parameterIndex: index,
-                            inputTypeIndex: inputIndex,
-                            inputTypeIdentifier: inputType.inputIdentifier!,
-                            dataTypeIdentifier: resolved,
+                            inputIndex: inputIndex,
+                            inputTypeIdentifier: inputType.inputIdentifier!
                         }, resolved, dataTypeService)
                     })
                 })
@@ -221,9 +231,9 @@ const useRefObjects = (flowId: Flow['id']): Array<ExtendedReferenceValue> => {
     ].flat()
 }
 
-const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdentifier: DataTypeIdentifier, dataTypeService?: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
+const referenceExtraction = (nodeContext: ReferenceValueContext, dataTypeIdentifier: DataTypeIdentifier, dataTypeService: DFlowDataTypeReactiveService): ExtendedReferenceValue[] => {
 
-    const dataType: Maybe<DataType> | undefined = dataTypeService ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.dataType ?? dataTypeIdentifier.genericType?.dataType
+    const dataType: Maybe<DataType> | undefined = dataTypeIdentifier.dataType ? dataTypeService.getDataType(dataTypeIdentifier) : dataTypeIdentifier.genericType?.dataType
     if (!dataType) return []
 
     const references = dataType.rules?.nodes?.map(rule => {
@@ -231,14 +241,13 @@ const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdenti
             if (!dataTypeIdentifier) return
             return referenceExtraction({
                 ...nodeContext,
-                dataTypeIdentifier: dataTypeIdentifier,
                 referencePath: [
                     ...(nodeContext.referencePath ?? []),
                     {
                         path: (rule.config as DataTypeRulesContainsKeyConfig).key!!
                     }
                 ]
-            }, (rule.config as DataTypeRulesContainsKeyConfig).dataTypeIdentifier!!)
+            }, (rule.config as DataTypeRulesContainsKeyConfig).dataTypeIdentifier!!, dataTypeService)
         }
 
         return undefined
@@ -248,16 +257,17 @@ const referenceExtraction = (nodeContext: ExtendedReferenceValue, dataTypeIdenti
     return [
         ...references,
         {
+            ...nodeContext,
             __typename: "ReferenceValue",
             nodeFunctionId: nodeContext.nodeFunctionId,
-            ...nodeContext
+            dataTypeIdentifier
         }]
 
 }
 
 const useNodeContext = (
     flowId: Flow['id']
-): ExtendedReferenceValue[] => {
+): ReferenceValueContext[] => {
     const dataTypeService = useService(DFlowDataTypeReactiveService);
     const flowService = useService(DFlowReactiveService);
     const functionService = useService(DFlowFunctionReactiveService);
@@ -278,7 +288,7 @@ const useNodeContext = (
         let globalNodeId = 0;
         const nextNodeId = () => ++globalNodeId;
 
-        const contexts: ExtendedReferenceValue[] = [];
+        const contexts: ReferenceValueContext[] = [];
 
         const traverse = (
             node: NodeFunctionIdWrapper | NodeFunction | undefined,

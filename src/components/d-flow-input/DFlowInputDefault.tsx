@@ -1,11 +1,11 @@
 import React from "react";
-import {TextInput, TextInputProps} from "../form";
-import {Flow, NodeFunction, NodeParameter, ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
+import {TextInput} from "../form";
+import {ReferenceValue} from "@code0-tech/sagittarius-graphql-types";
 import {MenuItem} from "../menu/Menu";
 import {Text} from "../text/Text";
 import {DFlowSuggestionMenuFooter} from "../d-flow-suggestion/DFlowSuggestionMenuFooter";
 import {toInputSuggestions} from "../d-flow-suggestion/DFlowSuggestionMenu.util";
-import {InputSyntaxSegment} from "../form/Input.syntax.hook";
+import {InputSyntaxSegment} from "../form";
 import {useService} from "../../utils";
 import {DFlowFunctionReactiveService} from "../d-flow-function";
 import {DFlowReactiveService} from "../d-flow";
@@ -14,12 +14,9 @@ import {DFlowSuggestion} from "../d-flow-suggestion";
 import {DFlowInputNodeBadge} from "./DFlowInputNodeBadge";
 import {DFlowInputReferenceBadge} from "./DFlowInputReferenceBadge";
 import {DFlowTypeReactiveService} from "../d-flow-type";
+import {DFlowInputProps} from "./DFlowInput";
 
-export interface DFlowInputDefaultProps extends TextInputProps {
-    flowId: Flow['id']
-    nodeId: NodeFunction['id']
-    parameterId: NodeParameter['id']
-}
+export type DFlowInputDefaultProps = DFlowInputProps
 
 export const splitTextAndObjects = (input: string) => {
     const result: (string | Record<string, any>)[] = []

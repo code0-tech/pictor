@@ -18,6 +18,7 @@ ul {
 li {
   position: relative;
   padding-inline-start: variables.$xs;
+  list-style: none;
 
   &:before {
     content: '';

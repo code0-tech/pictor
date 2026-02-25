@@ -59,7 +59,7 @@ export const DFlowTabTrigger: React.FC<DFlowTabTriggerProps> = (props) => {
 
     return <Flex style={{gap: ".7rem", flexDirection: "column"}}>
         {definition?.inputType ? <DFlowInputDataType
-            initialValue={testDataType}
+            initialValue={testDataType || undefined}
             label={"Test Data Type"}
             description={"Data type used for testing"}
             onChange={(dataTypeIdentifier) => console.log(dataTypeIdentifier)}/> : null}

@@ -64,10 +64,10 @@ export const Default = () => {
                 </Text>
             </Flex>
             <ButtonGroup>
-                <Button color={"success"} variant={"filled"}>Create</Button>
+                <Button color={"success"} variant={"none"}>Create</Button>
                 <Menu>
                     <MenuTrigger asChild>
-                        <Button color={"secondary"} variant={"filled"}>Sort</Button>
+                        <Button color={"secondary"} variant={"none"}>Sort</Button>
                     </MenuTrigger>
                     <MenuPortal>
                         <MenuContent>

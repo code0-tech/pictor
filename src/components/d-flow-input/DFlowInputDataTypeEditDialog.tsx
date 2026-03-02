@@ -3,7 +3,7 @@ import {Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogT
 import {DLayout} from "../d-layout/DLayout";
 import {Flex} from "../flex/Flex";
 import {Text} from "../text/Text";
-import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable";
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "../resizable/Resizable";
 import {Editor, EditorTokenHighlights} from "../editor/Editor";
 import {DataTypeIdentifier, LiteralValue} from "@code0-tech/sagittarius-graphql-types";
 import {DFlowInputDataTypeRuleTree} from "./DFlowInputDataType";
@@ -127,8 +127,8 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                  </Button>
                              </DialogClose>
                          </Flex>}>
-                    <DResizablePanelGroup style={{borderRadius: "1rem"}}>
-                        <DResizablePanel color={"primary"}>
+                    <ResizablePanelGroup style={{borderRadius: "1rem"}}>
+                        <ResizablePanel color={"primary"}>
                             <ScrollArea h={"100%"} w={"100%"} type={"scroll"}>
                                 <ScrollAreaViewport px={1}>
                                     <Spacing spacing={"md"}/>
@@ -142,9 +142,9 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                     <ScrollAreaThumb/>
                                 </ScrollAreaScrollbar>
                             </ScrollArea>
-                        </DResizablePanel>
-                        <DResizableHandle/>
-                        <DResizablePanel color={"primary"}>
+                        </ResizablePanel>
+                        <ResizableHandle/>
+                        <ResizablePanel color={"primary"}>
                             <Editor suggestions={suggestions} tokenHighlights={myRenderMap} language={"json"} initialValue={editorValue?.value} onChange={value => {
                                 const dataTypeIdentifier = dataTypeService.getTypeFromValue({
                                     __typename: "LiteralValue",
@@ -153,8 +153,8 @@ export const DFlowInputDataTypeEditDialog: React.FC<DFlowInputDataTypeEditDialog
                                 onDataTypeChange?.(dataTypeIdentifier!)
                                 setDataTypeIdentifier(dataTypeIdentifier!)
                             }}/>
-                        </DResizablePanel>
-                    </DResizablePanelGroup>
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
                 </DLayout>
             </DialogContent>
         </DialogPortal>

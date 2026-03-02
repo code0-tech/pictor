@@ -3,7 +3,7 @@ import {Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal} from ".
 import {DLayout} from "../d-layout/DLayout"
 import {Flex} from "../flex/Flex"
 import {Text} from "../text/Text"
-import {DResizableHandle, DResizablePanel, DResizablePanelGroup} from "../d-resizable/DResizable"
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "../resizable/Resizable"
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea"
 import {Spacing} from "../spacing/Spacing"
 import {Button} from "../button/Button"
@@ -142,8 +142,8 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
                                      </DialogClose>
                                  </Flex>
                              }>
-                        <DResizablePanelGroup style={{borderRadius: "1rem"}}>
-                            <DResizablePanel color="primary">
+                        <ResizablePanelGroup style={{borderRadius: "1rem"}}>
+                            <ResizablePanel color="primary">
                                 <ScrollArea h="100%" w="100%" type="scroll">
                                     <ScrollAreaViewport px={1}>
                                         <Spacing spacing="md"/>
@@ -164,9 +164,9 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
                                         <ScrollAreaThumb/>
                                     </ScrollAreaScrollbar>
                                 </ScrollArea>
-                            </DResizablePanel>
-                            <DResizableHandle/>
-                            <DResizablePanel color="primary">
+                            </ResizablePanel>
+                            <ResizableHandle/>
+                            <ResizablePanel color="primary">
                                 <Editor
                                     suggestions={suggestions}
                                     tokenHighlights={tokenHighlights}
@@ -174,8 +174,8 @@ const DFlowInputObjectEditDialog: React.FC<DFlowInputObjectEditDialogProps> = (p
                                     initialValue={editorValue}
                                     onChange={handleEditorChange}
                                 />
-                            </DResizablePanel>
-                        </DResizablePanelGroup>
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     </DLayout>
                 </DialogContent>
             </DialogPortal>

@@ -20,7 +20,6 @@ import {
 import {useValueValidation} from "../d-flow-validation/DValueValidation.hook";
 import {findReturnNode} from "./rules/DFlowDataTypeReturnTypeRule";
 import {md5} from "js-md5";
-import {useReturnTypes} from "../d-flow-node/DFlowNode.return.hook";
 
 export type DFlowDataTypeDependencies = {
     namespaceId: Namespace['id']

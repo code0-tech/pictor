@@ -267,3 +267,6 @@ __snapshots__/__diff_output__/
 
 # GraphQL schema
 schema.graphql
+
+#storybook
+storybook-static/

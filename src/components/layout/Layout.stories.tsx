@@ -1,11 +1,11 @@
 import {Meta} from "@storybook/react-vite";
-import {DLayout} from "./DLayout";
+import {Layout} from "./Layout";
 import React from "react";
 import {Text} from "../text/Text";
 
 const meta: Meta = {
     title: "Dashboard Layout",
-    component: DLayout,
+    component: Layout,
     parameters: {
         visualTest: {
             selector: 'body'
@@ -18,15 +18,15 @@ export default meta
 
 
 export const DashboardLayoutExample = () => {
-    return <DLayout leftContent={<Text>Left</Text>}
-             rightContent={<Text>Right</Text>}
-             topContent={<Text>Top</Text>}
-             bottomContent={<Text>Bottom</Text>}>
+    return <Layout leftContent={<Text>Left</Text>}
+                   rightContent={<Text>Right</Text>}
+                   topContent={<Text>Top</Text>}
+                   bottomContent={<Text>Bottom</Text>}>
         <>
             <Text>Content</Text>
             <div style={{marginBottom: "200vh"}}/>
             <Text>Content</Text>
         </>
-    </DLayout>
+    </Layout>
 
 }

@@ -3,13 +3,13 @@
 import {Code0Component} from "../../utils/types";
 import React from "react";
 import {mergeCode0Props} from "../../utils/utils";
-import "./DFullScreen.style.scss"
+import "./FullScreen.style.scss"
 
-export interface DFullScreenProps extends Code0Component<HTMLDivElement> {
+export interface FullScreenProps extends Code0Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
-export const DFullScreen: React.FC<DFullScreenProps> = props => {
+export const FullScreen: React.FC<FullScreenProps> = props => {
 
     const divRef = React.useRef<HTMLDivElement>(null);
 

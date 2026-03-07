@@ -2,9 +2,9 @@ import React, {CSSProperties} from "react";
 import {Code0Component, Code0Sizes} from "../../utils/types";
 import {getDOMSizeFromCodeZeroSize, mergeCode0Props} from "../../utils/utils";
 import {Flex} from "../flex/Flex";
-import "./DLayout.style.scss"
+import "./Layout.style.scss"
 
-export interface DLayoutProps extends Code0Component<HTMLDivElement> {
+export interface LayoutProps extends Code0Component<HTMLDivElement> {
     children: React.ReactElement
     topContent?: React.ReactElement
     bottomContent?: React.ReactElement
@@ -14,12 +14,22 @@ export interface DLayoutProps extends Code0Component<HTMLDivElement> {
     showLayoutSplitter?: boolean
 }
 
-export const DLayout: React.FC<DLayoutProps> = (props) => {
-    const {children, topContent, bottomContent, leftContent, rightContent, showLayoutSplitter = true, layoutGap = "xl", ...rest} = props
+export const Layout: React.FC<LayoutProps> = (props) => {
+    const {
+        children,
+        topContent,
+        bottomContent,
+        leftContent,
+        rightContent,
+        showLayoutSplitter = true,
+        layoutGap = "xl",
+        ...rest
+    } = props
 
     return (
         <div {...mergeCode0Props("d-layout", rest)}>
-            <Flex className="d-layout__inner" style={{ flexDirection: "column", gap: getDOMSizeFromCodeZeroSize(layoutGap)}}>
+            <Flex className="d-layout__inner"
+                  style={{flexDirection: "column", gap: getDOMSizeFromCodeZeroSize(layoutGap)}}>
                 {topContent && (
                     <div className="d-layout__top">
                         {topContent}

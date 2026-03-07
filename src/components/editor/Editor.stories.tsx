@@ -2,7 +2,7 @@ import React from "react";
 import {Editor, EditorTokenHighlights, EditorTokenizer} from "./Editor";
 import {Badge} from "../badge/Badge";
 import {hashToColor} from "../d-flow/DFlow.util";
-import {DFullScreen} from "../d-fullscreen/DFullScreen";
+import {FullScreen} from "../fullscreen/FullScreen";
 import {CompletionContext, CompletionResult} from "@codemirror/autocomplete";
 import {syntaxTree} from "@codemirror/language";
 
@@ -80,7 +80,7 @@ export const Concept: React.FC = () => {
     }
 
     return (
-        <DFullScreen>
+        <FullScreen>
             <Editor
                 language={"json"}
                 initialValue={value}
@@ -88,7 +88,7 @@ export const Concept: React.FC = () => {
                 tokenHighlights={tokenHighlights}
                 onChange={(val) => console.log("New Value:", val)}
             />
-        </DFullScreen>
+        </FullScreen>
 
     )
 }

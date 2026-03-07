@@ -1,9 +1,8 @@
 import React from "react";
 import {Code0Component} from "../../utils/types";
 import "./Avatar.style.scss"
-import {mergeCode0Props} from "../../utils/utils";
+import {hashToColor, mergeCode0Props} from "../../utils/utils";
 import Identicon from "avvvatars-react"
-import {hashToColor} from "../d-flow/DFlow.util";
 
 interface AvatarImageProps {
     src: string

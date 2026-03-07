@@ -3,11 +3,11 @@ import {Editor} from "../editor/Editor"
 import {StreamLanguage, syntaxTree} from "@codemirror/language"
 import {EditorState} from "@uiw/react-codemirror"
 import {Badge} from "../badge/Badge"
-import {hashToColor} from "../d-flow/DFlow.util"
 import {CompletionContext} from "@codemirror/autocomplete"
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu"
 import {MenuItem} from "../menu/Menu"
 import {DataTableFilterOperator, DataTableFilterProps} from "./DataTable";
+import {hashToColor} from "../../utils";
 
 export interface DataTableFilterTokens {
     token: string

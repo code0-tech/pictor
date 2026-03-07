@@ -1,7 +1,0 @@
-export * from "./DUser.service"
-export * from "./DUser.view"
-export * from "./DUserMenu"
-export * from "./DUserCard"
-export * from "./DUserList"
-export * from "./DUserInput"
-export * from "./DUser.session.hook"

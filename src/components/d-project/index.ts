@@ -1,5 +1,0 @@
-export * from "./DNamespaceProject.service"
-export * from "./DNamespaceProject.view"
-export * from "./DNamespaceProjectCard"
-export * from "./DNamespaceProjectList"
-export * from "./DNamespaceProjectMenu"

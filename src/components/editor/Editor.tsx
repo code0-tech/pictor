@@ -1,6 +1,6 @@
 import React, {isValidElement} from "react"
 import {createPortal} from "react-dom"
-import {Code0Component, mergeCode0Props} from "../../utils"
+import {Code0Component, hashToColor, mergeCode0Props} from "../../utils"
 import {ValidationProps} from "../form"
 import CodeMirror, {
     Decoration,
@@ -20,7 +20,6 @@ import parserBabel from "prettier/plugins/babel"
 import parserEstree from "prettier/plugins/estree"
 import {createTheme} from "@uiw/codemirror-themes"
 import {getStyleTags, tags as t} from "@lezer/highlight"
-import {hashToColor} from "../d-flow/DFlow.util"
 import "./Editor.styles.scss"
 import {Badge} from "../badge/Badge";
 import {

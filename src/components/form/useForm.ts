@@ -10,6 +10,7 @@ export interface FormValidationProps<Values> {
     initialValues: Values
     validate?: Validations<Values>,
     truthyValidationBeforeSubmit?: boolean
+    useInitialValidation?: boolean // defaults to true
     onSubmit?: (values: Values) => void
 }
 
@@ -41,15 +42,18 @@ class Validation<Values> implements IValidation<Values> {
     private readonly changeValue: (key: string, value: any) => void
     private readonly currentValues: Values
     private readonly currentValidations?: Validations<Values>
+    private readonly shouldValidate: boolean
 
     constructor(
         changeValue: (key: string, value: any) => void,
         values: Values,
         validations: Validations<Values>,
+        shouldValidate: boolean = true
     ) {
         this.changeValue = changeValue
         this.currentValues = values
         this.currentValidations = validations
+        this.shouldValidate = shouldValidate
     }
 
     isValid(): boolean {
@@ -78,12 +82,12 @@ class Validation<Values> implements IValidation<Values> {
                 ? this.currentValidations[key]!
                 : (_value: Values[Key]) => null
 
-        const message = currentFc(rawValue, this.currentValues)
+        const message = this.shouldValidate ? currentFc(rawValue, this.currentValues) : null
 
         return {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
             defaultValue: currentValue,
-            initialValue: currentValue || undefined,
+            initialValue: currentValue ?? undefined,
             formValidation: {
                 setValue: (value: any) => {
                     this.changeValue(currentName, value)
@@ -104,17 +108,20 @@ export const useForm = <
     Values extends Record<string, any> = Record<string, any>
 >(props: FormValidationProps<Values>): FormValidationReturn<Values> => {
 
-    const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, onSubmit} = props
+    const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, useInitialValidation = true, onSubmit} = props
 
     const [values, setValues] = useState<Values>(initialValues)
+    const [touched, setTouched] = useState<boolean>(false)
     const valuesRef = useRef<Values>(initialValues)
 
     useEffect(() => {
         setValues(initialValues)
+        setTouched(false)
         valuesRef.current = initialValues
     }, [initialValues])
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
+        setTouched(true)
         setValues(prevState => {
             const nextState = {
                 ...prevState,
@@ -126,8 +133,8 @@ export const useForm = <
     }, [])
 
     const validation = useMemo(
-        () => new Validation<Values>(changeValue, values, validate),
-        [changeValue, values, validate]
+        () => new Validation<Values>(changeValue, values, validate, useInitialValidation || touched),
+        [changeValue, values, validate, useInitialValidation, touched]
     )
 
     const validateFunction = useCallback(() => {
@@ -135,7 +142,8 @@ export const useForm = <
         const currentValidation = new Validation<Values>(
             changeValue,
             valuesRef.current,
-            validate
+            validate,
+            true
         )
 
         if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {

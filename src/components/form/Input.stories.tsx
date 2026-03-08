@@ -21,6 +21,7 @@ export default {
 export const Login = () => {
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             email: "nicoq@de.de",
             password: null,

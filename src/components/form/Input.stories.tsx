@@ -13,6 +13,7 @@ import {PinInput, PinInputField, PinInputHiddenField} from "./PinInput";
 import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
+import {TextAreaInput} from "./TextAreaInput";
 
 export default {
     title: "Form"
@@ -346,4 +347,17 @@ export const PinInputExample = () => {
         </Card>
     </>
 
+}
+
+export const TextAreaExample = () => {
+    return <Card>
+        <TextAreaInput
+            title={"website"}
+            description={"Your website for linking"}
+            clearable
+            placeholder={"code0.tech"}
+            left={"https://"}
+            leftType={"placeholder"}
+        />
+    </Card>
 }

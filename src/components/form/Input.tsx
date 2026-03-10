@@ -216,9 +216,9 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         )
 
         const handlePlainValueChange = React.useCallback(
-            (event: React.FormEvent<HTMLInputElement>) => {
+            (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                 const target = event.currentTarget
-                const nextValue = inputProps.type === "checkbox" ? target.checked : target.value
+                const nextValue = inputProps.type === "checkbox" && "checked" in target ? target.checked : target.value
                 setValue(nextValue)
                 syncValidationValue(nextValue, null)
             },
@@ -507,7 +507,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
          * =========================
          */
         const handleFocus = React.useCallback(
-            (event: React.FocusEvent<HTMLInputElement | HTMLDivElement>) => {
+            (event: React.FocusEvent<HTMLInputElement | HTMLDivElement | HTMLTextAreaElement>) => {
                 openIfSuggestions()
                 userOnFocus?.(event as any)
             },
@@ -515,7 +515,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         )
 
         const handleBlur = React.useCallback(
-            (event: React.FocusEvent<HTMLInputElement | HTMLDivElement>) => {
+            (event: React.FocusEvent<HTMLInputElement | HTMLDivElement | HTMLTextAreaElement>) => {
                 if (ignoreBlurRef.current) {
                     ignoreBlurRef.current = false
                     userOnBlur?.(event as any)
@@ -532,7 +532,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         )
 
         const handleKeyDownCapture = React.useCallback(
-            (event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>) => {
+            (event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement | HTMLTextAreaElement>) => {
                 if (isSyntaxMode) {
                     contentEditable.handleKeyDownCapture(event as any)
                     userOnKeyDownCapture?.(event as any)
@@ -550,7 +550,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         )
 
         const handleKeyDown = React.useCallback(
-            (event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement>) => {
+            (event: React.KeyboardEvent<HTMLInputElement | HTMLDivElement | HTMLTextAreaElement>) => {
                 if (suggestions) {
                     if (event.key === "ArrowDown") {
                         event.preventDefault()
@@ -758,6 +758,25 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             >
                 {syntaxChildren}
             </div>
+        ) : props.type === "textarea" ? (
+            <textarea
+                ref={inputRef as LegacyRef<HTMLTextAreaElement>}
+                {...mergeCode0Props("input__control", mergedInputProps)}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                onKeyDownCapture={handleKeyDownCapture}
+                onKeyDown={handleKeyDown}
+                onInput={(event) => {
+                    handlePlainValueChange(event)
+                    userOnInput?.(event as any)
+                }}
+                onChange={(event) => {
+                    handlePlainValueChange(event)
+                    userOnChange?.(event as any)
+                }}
+                spellCheck={false}
+                disabled={disabled || disabledOnValue}
+            />
         ) : (
             <input
                 ref={inputRef as LegacyRef<HTMLInputElement>}

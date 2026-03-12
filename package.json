@@ -73,7 +73,7 @@
     "css-loader": "^7.1.4",
     "html-webpack-plugin": "^5.6.6",
     "identity-obj-proxy": "^3.0.0",
-    "jest-image-snapshot": "^6.5.1",
+    "jest-image-snapshot": "^6.5.2",
     "js-md5": "^0.8.3",
     "ldrs": "^1.1.9",
     "merge-props": "^6.0.0",

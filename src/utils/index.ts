@@ -1,6 +1,5 @@
 export * from "./arrayService"
 export * from "./contextStore"
-export * from "./inspection"
 export * from "./nonReactiveArrayService"
 export * from "./objectStore"
 export * from "./reactiveArrayService"

@@ -66,6 +66,7 @@ export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, '
     readonly?: boolean
     showTooltips?: boolean
     showValidation?: boolean,
+    formatter?: (value: string) => Promise<string>
     basicSetup?: BasicSetupOptions
 }
 
@@ -136,6 +137,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         suggestions,
         onChange,
         extensions = [],
+        formatter,
         initialValue,
         formValidation,
         disabled,
@@ -157,14 +159,18 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     } | null>(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
 
-    language === "json" && React.useEffect(() => {
+    const jsonFormatter = (value: string) => {
+        return prettier.format(value, {
+            parser: "json",
+            plugins: [parserBabel, parserEstree],
+            printWidth: 1
+        })
+    }
+
+    React.useEffect(() => {
         (async () => {
             try {
-                const pretty = await prettier.format(JSON.stringify(initialValue) ?? "", {
-                    parser: language,
-                    plugins: [parserBabel, parserEstree],
-                    printWidth: 1
-                })
+                const pretty = formatter ? await formatter(initialValue) : language === "json" ? await jsonFormatter(initialValue) : initialValue
                 setFormatted(pretty)
             } catch (e) {
                 setFormatted(JSON.stringify(initialValue) ?? "")

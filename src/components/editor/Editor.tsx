@@ -160,7 +160,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
     const containerRef = React.useRef<HTMLDivElement>(null)
 
     const jsonFormatter = (value: string) => {
-        return prettier.format(value, {
+        return prettier.format(JSON.stringify(value), {
             parser: "json",
             plugins: [parserBabel, parserEstree],
             printWidth: 1

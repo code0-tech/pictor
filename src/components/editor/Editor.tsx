@@ -13,7 +13,7 @@ import CodeMirror, {
     WidgetType
 } from "@uiw/react-codemirror"
 import {json, jsonParseLinter} from "@codemirror/lang-json"
-import {StreamLanguage, syntaxTree} from "@codemirror/language"
+import {StreamLanguage, syntaxTree, type TagStyle} from "@codemirror/language"
 import {Diagnostic, linter} from "@codemirror/lint"
 import prettier from "prettier/standalone"
 import parserBabel from "prettier/plugins/babel"
@@ -68,6 +68,7 @@ export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, '
     showValidation?: boolean,
     formatter?: (value: string) => Promise<string>
     basicSetup?: BasicSetupOptions
+    tokenStyles?: TagStyle[]
 }
 
 class ReactAnchorWidget extends WidgetType {
@@ -98,31 +99,6 @@ class ReactAnchorWidget extends WidgetType {
     }
 }
 
-const myTheme = createTheme({
-    theme: 'light',
-    settings: {
-        background: 'transparent',
-        backgroundImage: '',
-        foreground: 'rgba(255,255,255, 0.75)',
-        caret: 'gray',
-        selection: 'rgba(112,179,255,0.25)',
-        selectionMatch: 'rgba(112,179,255,0.1)',
-        fontSize: "0.8rem",
-        gutterBackground: 'transparent',
-        gutterForeground: 'rgba(255,255,255, 0.5)',
-        gutterBorder: 'transparent',
-        gutterActiveForeground: 'rgba(255,255,255, 1)',
-        lineHighlight: 'rgba(255,255,255, 0.1)',
-    },
-    styles: [
-        {tag: t.squareBracket, color: hashToColor("squareBracket")},
-        {tag: t.bracket, color: hashToColor("bracket")},
-        {tag: t.string, color: hashToColor("Text")},
-        {tag: t.bool, color: hashToColor("Boolean")},
-        {tag: t.number, color: hashToColor("Number")},
-    ]
-})
-
 
 // Helper function to check if value is a ReactNode
 const isReactNode = (value: any): value is React.ReactNode => {
@@ -134,6 +110,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         language,
         tokenizer,
         tokenHighlights,
+        tokenStyles = [],
         suggestions,
         onChange,
         extensions = [],
@@ -149,34 +126,31 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         ...rest
     } = props
 
-    const [formatted, setFormatted] = React.useState("")
+    const [formatted, setFormatted] = React.useState<string>()
     const ref = React.useRef<HTMLDivElement>(null)
     const [anchors, setAnchors] = React.useState<Map<HTMLElement, { type: string, value: string }>>(new Map())
     const [diagnostics, setDiagnostics] = React.useState<readonly Diagnostic[]>([])
+    const [selection, setSelection] = React.useState<{ from: number, to: number } | null>(null)
     const [customSuggestion, setCustomSuggestion] = React.useState<{
         component: React.ReactNode;
         position: { top: number; left: number };
     } | null>(null)
     const containerRef = React.useRef<HTMLDivElement>(null)
 
-    const jsonFormatter = (value: string) => {
-        return prettier.format(JSON.stringify(value), {
-            parser: "json",
-            plugins: [parserBabel, parserEstree],
-            printWidth: 1
-        })
-    }
-
     React.useEffect(() => {
         (async () => {
             try {
-                const pretty = formatter ? await formatter(initialValue) : language === "json" ? await jsonFormatter(initialValue) : initialValue
+                const pretty = formatter ? await formatter(initialValue) : language === "json" ? await prettier.format(JSON.stringify(initialValue), {
+                    parser: "json",
+                    plugins: [parserBabel, parserEstree],
+                    printWidth: 1
+                }) : initialValue
                 setFormatted(pretty)
             } catch (e) {
-                setFormatted(JSON.stringify(initialValue) ?? "")
+                setFormatted(language == "json" ? JSON.stringify(initialValue) : initialValue)
             }
         })()
-    }, [initialValue])
+    }, [])
 
     const internalExtensions = React.useMemo(() => {
         const internExtensions: Extension[] = [...extensions]
@@ -287,10 +261,13 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                         })
 
                         if (foundKey && !userTag) {
-                            builder.add(node.from, node.to, Decoration.replace({
-                                widget: new ReactAnchorWidget(foundKey, rawText),
-                                point: true
-                            }))
+                            const renderFn = tokenHighlights?.[foundKey]({content: rawText})
+                            if (!!renderFn) {
+                                builder.add(node.from, node.to, Decoration.replace({
+                                    widget: new ReactAnchorWidget(foundKey, rawText),
+                                    point: true
+                                }))
+                            }
                         } else if (userTag) {
                             builder.add(node.from, node.to, Decoration.replace({
                                 widget: new ReactAnchorWidget(userTag, rawText),
@@ -310,9 +287,8 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
         }))
 
         return internExtensions
-    }, [language, tokenizer, tokenHighlights, extensions, suggestions, ref.current])
+    }, [ref])
 
-    const [selection, setSelection] = React.useState<{ from: number, to: number } | null>(null)
 
     const handleUpdate = React.useCallback((viewUpdate: any) => {
         if (viewUpdate.docChanged || viewUpdate.viewportChanged || viewUpdate.selectionSet) {
@@ -350,34 +326,48 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
             }
 
 
-            window.requestAnimationFrame(() => {
-                const foundNodes = containerRef.current?.querySelectorAll('.cm-react-anchor')
-                const newAnchors = new Map()
+            const foundNodes = containerRef.current?.querySelectorAll('.cm-react-anchor')
+            const newAnchors = new Map()
 
-                foundNodes?.forEach((node: any) => {
-                    newAnchors.set(node, {
-                        type: node.dataset.type,
-                        value: node.dataset.value
-                    })
+            foundNodes?.forEach((node: any) => {
+                newAnchors.set(node, {
+                    type: node.dataset.type,
+                    value: node.dataset.value
                 })
-
-                setAnchors(newAnchors)
             })
+
+            setAnchors(newAnchors)
         }
     }, [selection])
 
-    React.useEffect(() => {
-        if (containerRef.current) {
-            const timer = window.setTimeout(() => {
-                const event = new CustomEvent('scroll');
-                containerRef.current?.dispatchEvent(event);
-                handleUpdate({docChanged: true, viewportChanged: true, selectionSet: false});
-            }, 50);
-            return () => clearTimeout(timer);
-        }
-        return () => {
-        }
-    }, [handleUpdate]);
+    const myTheme = React.useMemo(
+        () => createTheme({
+            theme: 'light',
+            settings: {
+                background: 'transparent',
+                backgroundImage: '',
+                foreground: 'rgba(255,255,255, 0.75)',
+                caret: 'gray',
+                selection: 'rgba(112,179,255,0.25)',
+                selectionMatch: 'rgba(112,179,255,0.1)',
+                fontSize: "0.8rem",
+                gutterBackground: 'transparent',
+                gutterForeground: 'rgba(255,255,255, 0.5)',
+                gutterBorder: 'transparent',
+                gutterActiveForeground: 'rgba(255,255,255, 1)',
+                lineHighlight: 'rgba(255,255,255, 0.1)',
+            },
+            styles: [
+                {tag: t.squareBracket, color: hashToColor("squareBracket")},
+                {tag: t.bracket, color: hashToColor("bracket")},
+                {tag: t.string, color: hashToColor("Text")},
+                {tag: t.bool, color: hashToColor("Boolean")},
+                {tag: t.number, color: hashToColor("Number")},
+                ...tokenStyles
+            ]
+        }),
+        [tokenStyles]
+    )
 
     return (
         <ScrollArea h={"100%"} type={"scroll"}>
@@ -458,6 +448,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                         ) : null}
                     </Flex>
                 </div>
+
             )}
             {showTooltips && (
                 <div className={"editor__tools"}>
@@ -488,7 +479,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     <CodeMirror
                         width="100%"
                         height="100%"
-                        value={language === "json" ? formatted : initialValue}
+                        value={formatted}
                         theme={myTheme}
                         readOnly={disabled || readonly}
                         editable={!disabled}
@@ -526,12 +517,13 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                     })}
 
                     {customSuggestion && createPortal(
-                        <div  key={customSuggestion.position.top + '-' + customSuggestion.position.left} ref={ref} style={{
-                            position: 'fixed',
-                            top: customSuggestion.position.top,
-                            left: customSuggestion.position.left,
-                            zIndex: 9999,
-                        }}
+                        <div key={customSuggestion.position.top + '-' + customSuggestion.position.left} ref={ref}
+                             style={{
+                                 position: 'fixed',
+                                 top: customSuggestion.position.top,
+                                 left: customSuggestion.position.left,
+                                 zIndex: 9999,
+                             }}
                         >
                             {customSuggestion.component}
                         </div>,

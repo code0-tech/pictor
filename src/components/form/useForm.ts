@@ -111,17 +111,8 @@ export const useForm = <
     const {initialValues, validate = {}, truthyValidationBeforeSubmit = true, useInitialValidation = true, onSubmit} = props
 
     const [values, setValues] = useState<Values>(initialValues)
-    const [touched, setTouched] = useState<boolean>(false)
     const valuesRef = useRef<Values>(initialValues)
-
-    useEffect(() => {
-        setValues(initialValues)
-        setTouched(false)
-        valuesRef.current = initialValues
-    }, [initialValues])
-
     const changeValue = useCallback((key: keyof Values, value: any) => {
-        setTouched(true)
         setValues(prevState => {
             const nextState = {
                 ...prevState,
@@ -131,11 +122,12 @@ export const useForm = <
             return nextState
         })
     }, [])
+    const [validation, setValidation] = useState<Validation<Values>>(new Validation<Values>(changeValue, values, validate, useInitialValidation))
 
-    const validation = useMemo(
-        () => new Validation<Values>(changeValue, values, validate, useInitialValidation || touched),
-        [changeValue, values, validate, useInitialValidation, touched]
-    )
+    useEffect(() => {
+        setValues(initialValues)
+        valuesRef.current = initialValues
+    }, [initialValues])
 
     const validateFunction = useCallback(() => {
 
@@ -145,6 +137,8 @@ export const useForm = <
             validate,
             true
         )
+
+        setValidation(currentValidation)
 
         if (onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
             onSubmit(valuesRef.current as Values)

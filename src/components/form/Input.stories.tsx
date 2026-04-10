@@ -64,6 +64,7 @@ export const Login = () => {
             title={"Password"}
             description={"Your password for login"}
             left={<IconKey size={13}/>}
+            onChange={() => validate("password")}
             {...inputs.getInputProps("password")}
         />
         <br/>

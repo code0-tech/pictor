@@ -1,4 +1,4 @@
-import React, {startTransition} from "react";
+import React from "react";
 import {ArrayService} from "./arrayService";
 import {Payload, View} from "./view";
 
@@ -15,25 +15,19 @@ export class ReactiveArrayService<T extends Payload, D = Record<string, any>> im
     }
 
     delete(index: number) {
-        startTransition(() => {
-            this.access.setState(prev => prev.filter((_, i) => i !== index));
-        })
+        this.access.setState(prev => prev.filter((_, i) => i !== index));
     }
 
     add(value: View<T>) {
-        startTransition(() => {
-            this.access.setState(prev => [...prev, value]);
-        })
+        this.access.setState(prev => [...prev, value]);
     }
 
     set(index: number, value: View<T>) {
-        startTransition(() => {
-            this.access.setState(prev => {
-                const next = prev.slice();
-                next[index] = value;
-                return next;
-            });
-        })
+        this.access.setState(prev => {
+            const next = prev.slice();
+            next[index] = value;
+            return next;
+        });
     }
 
     has(index: number) {
@@ -50,15 +44,11 @@ export class ReactiveArrayService<T extends Payload, D = Record<string, any>> im
     }
 
     update() {
-        startTransition(() => {
-            this.access.setState(prev => [...prev]);
-        })
+        this.access.setState(prev => [...prev]);
     }
 
     clear() {
-        startTransition(() => {
-            this.access.setState(() => []);
-        })
+        this.access.setState(() => []);
     }
 }
 
@@ -83,9 +73,9 @@ export function useReactiveArrayService<
     const getState = React.useCallback(() => stateRef.current, [])
 
     const service = React.useMemo(() => {
-        const store: ReactiveArrayStore<View<R>> = { getState, setState }
+        const store: ReactiveArrayStore<View<R>> = {getState, setState}
 
-        const handler = { construct: () => handler }
+        const handler = {construct: () => handler}
         const isConstructor = (x: any) => {
             try {
                 return !!new (new Proxy(x, handler))()

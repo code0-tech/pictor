@@ -12,7 +12,7 @@
   box-sizing: border-box;
 
   & {
-    @include box.box(variables.$secondary, variables.$white, variables.$white);
+    @include box.box(variables.$tertiary, variables.$white, variables.$white);
     @include box.boxHover(variables.$primary, variables.$white, variables.$white);
     @include box.boxActive(variables.$primary, variables.$white, variables.$white);
     @include helpers.fontStyle();
@@ -120,24 +120,24 @@
   }
 
   &__message {
-    padding: $padding;
+    //padding: $padding;
     z-index: 0;
     display: flex;
     align-items: center;
-    font-size: variables.$xs;
+    font-size: variables.$sm;
     gap: $padding / 2;
     margin-top: $padding;
 
     & {
-      @include box.box(variables.$error, variables.$white, variables.$error);
+      //@include box.box(variables.$error, variables.$white, variables.$error);
       @include helpers.borderRadius();
       @include helpers.fontStyle();
       box-shadow: none;
     }
 
     > svg {
-      width: variables.$sm;
-      height: variables.$sm;
+      width: variables.$md;
+      height: variables.$md;
     }
   }
 

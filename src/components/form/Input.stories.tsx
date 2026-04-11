@@ -4,7 +4,7 @@ import {Card} from "../card/Card";
 import {Button} from "../button/Button";
 import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
 import {Text} from "../text/Text";
-import {PasswordInput} from "./PasswordInput";
+import {PasswordInput, passwordValidation} from "./PasswordInput";
 import {TextInput} from "./TextInput";
 import {EmailInput, emailValidation} from "./EmailInput";
 import {NumberInput} from "./NumberInput";
@@ -33,17 +33,14 @@ export const Login = () => {
                 if (!emailValidation(value)) return "Please provide a valid email"
                 return null
             },
-            password: (value) => {
-                if (!value) return "Password is required"
-                return null
-            }
+            password: passwordValidation
         },
         onSubmit: (values) => {
             console.log(values)
         }
     })
 
-    return <Card color={"primary"} maw={300}>
+    return <Card color={"secondary"} maw={"15vw"}>
         <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
         <br/>
         <Text size={"sm"} display={"block"}>
@@ -73,69 +70,8 @@ export const Login = () => {
             justifyContent: "space-between",
             gap: ".75rem",
         }}>
-            <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={validate}>
+            <Button w={"100%"} color={"tertiary"} onClick={validate}>
                 Login
-            </Button>
-
-            <Button w={"100%"} color={"secondary"} variant={"outlined"} onClick={() => {
-                const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-                    challenge: crypto.getRandomValues(new Uint8Array(32)),
-                    rp: {name: "Code0 Dev", id: "localhost"},
-                    user: {
-                        id: Uint8Array.from("nico", c => c.charCodeAt(0)),
-                        name: "nico@localhost",
-                        displayName: "Nico Sammito",
-                    },
-                    pubKeyCredParams: [
-                        {type: "public-key", alg: -7},
-                        {type: "public-key", alg: -257}
-                    ] as const,
-                    authenticatorSelection: {
-                        userVerification: "preferred" as UserVerificationRequirement,
-                        // authenticatorAttachment: "platform" as AuthenticatorAttachment,
-                    },
-                    timeout: 60000,
-                }
-
-                navigator.credentials.create({
-                    publicKey: publicKeyCredentialCreationOptions,
-                }).then(cred => {
-                    console.log("Passkey registriert:", cred);
-                });
-            }}>
-                Login with Passkeys
-            </Button>
-
-            <Button
-                w={"100%"}
-                color={"primary"}
-                variant={"normal"}
-                onClick={async () => {
-                    const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
-                        challenge: crypto.getRandomValues(new Uint8Array(32)), // Demo: sollte vom Server kommen!
-                        rpId: "localhost",
-                        userVerification: "preferred" as UserVerificationRequirement,
-                        timeout: 60000,
-                        // allowCredentials: [
-                        //   {
-                        //     id: new Uint8Array([/* credentialId als Uint8Array vom Server */]).buffer,
-                        //     type: "public-key" as PublicKeyCredentialType,
-                        //   }
-                        // ],
-                    };
-
-                    try {
-                        await navigator.credentials.get({
-                            publicKey: publicKeyCredentialRequestOptions,
-                        }).then(value => {
-                            console.log("Passkey Login erfolgreich:", value);
-                        });
-                    } catch (err) {
-                        console.error("Login fehlgeschlagen:", err);
-                    }
-                }}
-            >
-                Login with Passkeys
             </Button>
 
         </div>

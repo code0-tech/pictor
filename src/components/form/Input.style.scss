@@ -129,9 +129,9 @@
     margin-top: $padding;
 
     & {
-      //@include box.box(variables.$error, variables.$white, variables.$error);
       @include helpers.borderRadius();
       @include helpers.fontStyle();
+      color: helpers.color(variables.$white, variables.$hierarchySecondary);
       box-shadow: none;
     }
 

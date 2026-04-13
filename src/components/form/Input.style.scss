@@ -138,6 +138,8 @@
     > svg {
       width: variables.$md;
       height: variables.$md;
+      min-width: variables.$md;
+      min-height: variables.$md;
     }
   }
 

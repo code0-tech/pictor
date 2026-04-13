@@ -40,7 +40,7 @@ export const Login = () => {
         }
     })
 
-    return <Card color={"secondary"} maw={"15vw"}>
+    return <Card color={"secondary"} miw={"300px"} maw={"15vw"}>
         <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
         <br/>
         <Text size={"sm"} display={"block"}>

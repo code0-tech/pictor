@@ -1,6 +1,6 @@
 import "./Button.style.scss"
 import React, {ReactNode} from "react";
-import {Component, Code0Sizes, Color, mergeComponentProps} from "../../utils";
+import {Component, Sizes, Color, mergeComponentProps} from "../../utils";
 
 export interface ButtonProps extends Component<HTMLButtonElement> {
     children: ReactNode | ReactNode[]
@@ -12,7 +12,7 @@ export interface ButtonProps extends Component<HTMLButtonElement> {
     active?: boolean
     //defaults to false
     disabled?: boolean
-    paddingSize?: Code0Sizes
+    paddingSize?: Sizes
 }
 
 export const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {

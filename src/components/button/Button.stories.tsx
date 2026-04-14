@@ -3,7 +3,7 @@ import {StoryObj} from "@storybook/react-vite";
 import React from "react";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {IconAbc, IconPhoneFilled} from "@tabler/icons-react";
-import {Colors} from "../../utils/component";
+import {Colors} from "../../utils";
 
 const meta = {
     title: "Button",

@@ -1,6 +1,6 @@
 import React from "react";
 import "./DataTable.style.scss"
-import {Code0Component, mergeCode0Props} from "../../utils";
+import {Component, mergeComponentProps} from "../../utils";
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
@@ -15,7 +15,7 @@ export interface DataTableSortProps {
     [key: string]: 'asc' | 'desc' | undefined
 }
 
-export interface DataTableProps<T> extends Omit<Code0Component<HTMLTableElement>, 'data' | 'children' | 'onSelect'> {
+export interface DataTableProps<T> extends Omit<Component<HTMLTableElement>, 'data' | 'children' | 'onSelect'> {
     data: Array<T>
     sort?: DataTableSortProps
     filter?: DataTableFilterProps
@@ -85,7 +85,7 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
     }, [filteredData, sort])
 
     // @ts-ignore
-    return <table {...mergeCode0Props("data-table", rest)}>
+    return <table {...mergeComponentProps("data-table", rest)}>
         {sortedData.map((item, i) => {
             return <tr className={"data-table__row"} onClick={() => onSelect?.(item)}>
                 {children?.(item, i)}

@@ -1,6 +1,6 @@
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import React from "react";
-import {mergeCode0Props} from "../../utils/utils";
+import {mergeComponentProps} from "../../utils";
 import {InputProps} from "./Input";
 import {InputLabel} from "./InputLabel";
 import {InputDescription} from "./InputDescription";
@@ -31,7 +31,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = (props) => {
         {!!description ? <InputDescription children={description}/> : null}
 
 
-        <RadixRadioGroup.RadioGroup defaultValue={initialValue ?? props.defaultValue} {...mergeCode0Props("radio-group", {
+        <RadixRadioGroup.RadioGroup
+            defaultValue={initialValue ?? props.defaultValue} {...mergeComponentProps("radio-group", {
             ...rest, onValueChange: (value: string) => {
                 if (rest.onValueChange) rest.onValueChange!!(value)
                 formValidation.setValue(value)

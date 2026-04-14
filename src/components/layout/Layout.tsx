@@ -1,16 +1,15 @@
 import React, {CSSProperties} from "react";
-import {Code0Component, Code0Sizes} from "../../utils/types";
-import {getDOMSizeFromCodeZeroSize, mergeCode0Props} from "../../utils/utils";
+import {Component, getDOMSizeFromCodeZeroSize, mergeComponentProps, Sizes} from "../../utils";
 import {Flex} from "../flex/Flex";
 import "./Layout.style.scss"
 
-export interface LayoutProps extends Code0Component<HTMLDivElement> {
+export interface LayoutProps extends Component<HTMLDivElement> {
     children: React.ReactElement
     topContent?: React.ReactElement
     bottomContent?: React.ReactElement
     leftContent?: React.ReactElement
     rightContent?: React.ReactElement
-    layoutGap?: Code0Sizes | CSSProperties['gap']
+    layoutGap?: Sizes | CSSProperties['gap']
     showLayoutSplitter?: boolean
 }
 
@@ -27,7 +26,7 @@ export const Layout: React.FC<LayoutProps> = (props) => {
     } = props
 
     return (
-        <div {...mergeCode0Props("d-layout", rest)}>
+        <div {...mergeComponentProps("d-layout", rest)}>
             <Flex className="d-layout__inner"
                   style={{flexDirection: "column", gap: getDOMSizeFromCodeZeroSize(layoutGap)}}>
                 {topContent && (

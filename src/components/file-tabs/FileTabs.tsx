@@ -9,23 +9,22 @@ import {
     TabsTriggerProps,
     Trigger
 } from "@radix-ui/react-tabs";
-import {mergeCode0Props} from "../../utils/utils";
-import {Code0ComponentProps} from "../../utils/types";
+import {ComponentProps, mergeComponentProps} from "../../utils";
 import "./FileTabs.style.scss"
 import {IconX} from "@tabler/icons-react";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "../scroll-area/ScrollArea";
 
-type FileTabsProps = Code0ComponentProps & TabsProps
-type FileTabsListProps = Code0ComponentProps & TabsListProps & { controls?: React.ReactNode };
-type FileTabsTriggerProps = Code0ComponentProps & TabsTriggerProps & { onClose?: () => void, closable?: boolean }
-type FileTabsContentProps = Code0ComponentProps & TabsContentProps
+type FileTabsProps = ComponentProps & TabsProps
+type FileTabsListProps = ComponentProps & TabsListProps & { controls?: React.ReactNode };
+type FileTabsTriggerProps = ComponentProps & TabsTriggerProps & { onClose?: () => void, closable?: boolean }
+type FileTabsContentProps = ComponentProps & TabsContentProps
 
 export const FileTabs: React.FC<FileTabsProps> = (props) => {
-    return <Tabs data-slot="tabs" {...mergeCode0Props("file-tabs", props)}/>
+    return <Tabs data-slot="tabs" {...mergeComponentProps("file-tabs", props)}/>
 }
 
 export const FileTabsList: React.FC<FileTabsListProps> = (props) => {
-    return <List data-slot="tabs" {...mergeCode0Props("file-tabs__list", props)}>
+    return <List data-slot="tabs" {...mergeComponentProps("file-tabs__list", props)}>
         <div className={"file-tabs__list-content"}> {props.children}</div>
         {props.controls ? <div className={"file-tabs__list-controls"}>
             {props.controls}
@@ -35,7 +34,7 @@ export const FileTabsList: React.FC<FileTabsListProps> = (props) => {
 
 export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
     return <Trigger data-slot="tabs"
-                    data-value={props.value} {...mergeCode0Props("file-tabs__trigger", props) as FileTabsTriggerProps}>
+                    data-value={props.value} {...mergeComponentProps("file-tabs__trigger", props) as FileTabsTriggerProps}>
         {props.children}
         {props.closable ? <div className={"file-tabs__trigger-icon"} onClick={props.onClose}>
             <IconX size={12}/>
@@ -44,7 +43,7 @@ export const FileTabsTrigger: React.FC<FileTabsTriggerProps> = (props) => {
 }
 
 export const FileTabsContent: React.FC<FileTabsContentProps> = ({children, ...props}) => {
-    return <Content data-slot="tabs" {...mergeCode0Props("file-tabs__content", props) as FileTabsContentProps}>
+    return <Content data-slot="tabs" {...mergeComponentProps("file-tabs__content", props) as FileTabsContentProps}>
         <ScrollArea h={"100%"}>
             <ScrollAreaViewport>
                 {children}

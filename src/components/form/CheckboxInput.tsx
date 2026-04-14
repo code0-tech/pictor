@@ -3,7 +3,7 @@ import {Checkbox, CheckboxIndicator, CheckboxProps, CheckedState} from "@radix-u
 import {InputProps} from "./Input";
 import {InputLabel} from "./InputLabel";
 import {InputDescription} from "./InputDescription";
-import {mergeCode0Props} from "../../utils/utils";
+import {mergeComponentProps} from "../../utils";
 import {InputMessage} from "./InputMessage";
 import "./Input.style.scss"
 import {IconCheck, IconMinus} from "@tabler/icons-react";
@@ -35,9 +35,11 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
         {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
-        <div {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""} checkbox-input`, {})} onClick={() => setChecked(prevState => !prevState)}>
+        <div {...mergeComponentProps(`input ${!formValidation?.valid ? "input--not-valid" : ""} checkbox-input`, {})}
+             onClick={() => setChecked(prevState => !prevState)}>
 
-            <Checkbox checked={checked} defaultChecked={checked} {...mergeCode0Props("checkbox-input__button", rest)}>
+            <Checkbox checked={checked}
+                      defaultChecked={checked} {...mergeComponentProps("checkbox-input__button", rest)}>
                 <CheckboxIndicator className={"checkbox-input__indicator"}>
                     {checked === "indeterminate" && <IconMinus size={16}/>}
                     {checked === true && <IconCheck size={16}/>}

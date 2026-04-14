@@ -9,7 +9,7 @@
 
 import React, {LegacyRef, RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react"
 
-import {Code0Component, mergeCode0Props} from "../../utils"
+import {Component, mergeComponentProps} from "../../utils"
 import {ValidationProps} from "./useForm"
 
 import "./Input.style.scss"
@@ -32,7 +32,7 @@ import {Card} from "../card/Card"
 
 import {setSelectionOffsetsInValue, useContentEditableController} from "./InputContentEditable.hook"
 
-export type Code0Input = Omit<Code0Component<HTMLInputElement>, "left" | "right" | "title" | "defaultValue" | "value">
+export type Code0Input = Omit<Component<HTMLInputElement>, "left" | "right" | "title" | "defaultValue" | "value">
 
 export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     suggestions?: InputSuggestion[]
@@ -47,7 +47,7 @@ export interface InputProps<T> extends Code0Input, ValidationProps<T> {
     enforceUniqueSuggestions?: boolean
     suggestionsEmptyState?: React.ReactNode
 
-    wrapperComponent?: Code0Component<HTMLDivElement>
+    wrapperComponent?: Component<HTMLDivElement>
     right?: React.ReactNode
     left?: React.ReactNode
     leftType?: "action" | "placeholder" | "icon"
@@ -178,7 +178,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
         const mergedEditableProps = useMemo(() => {
             const {value: _value, defaultValue: _defaultValue, ...restProps} = inputProps as Record<string, any>
-            return mergeCode0Props("input__control", restProps)
+            return mergeComponentProps("input__control", restProps)
         }, [inputProps])
 
         const focusControl = React.useCallback(() => {
@@ -761,7 +761,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         ) : props.type === "textarea" ? (
             <textarea
                 ref={inputRef as LegacyRef<HTMLTextAreaElement>}
-                {...mergeCode0Props("input__control", mergedInputProps)}
+                {...mergeComponentProps("input__control", mergedInputProps)}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
@@ -780,7 +780,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
         ) : (
             <input
                 ref={inputRef as LegacyRef<HTMLInputElement>}
-                {...mergeCode0Props("input__control", mergedInputProps)}
+                {...mergeComponentProps("input__control", mergedInputProps)}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
@@ -901,7 +901,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
                 <div
                     ref={wrapperRef}
-                    {...mergeCode0Props(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}
+                    {...mergeComponentProps(`input ${!formValidation?.valid ? "input--not-valid" : ""}`, wrapperComponent)}
                     onPointerDown={handleWrapperPointerDown}
                 >
                     {left && <div className={`input__left input__left--${leftType}`}>{left}</div>}

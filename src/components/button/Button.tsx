@@ -1,8 +1,8 @@
 import "./Button.style.scss"
 import React, {ReactNode} from "react";
-import {Code0Component, Code0Sizes, Color, mergeCode0Props} from "../../utils";
+import {Component, Code0Sizes, Color, mergeComponentProps} from "../../utils";
 
-export interface ButtonProps extends Code0Component<HTMLButtonElement> {
+export interface ButtonProps extends Component<HTMLButtonElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
     color?: Color,
@@ -28,7 +28,7 @@ export const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
     } = props
 
     return <button
-        ref={ref} {...mergeCode0Props(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
+        ref={ref} {...mergeComponentProps(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
         aria-disabled={disabled ? "true" : "false"}>
         {children}
     </button>

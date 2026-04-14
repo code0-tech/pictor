@@ -1,5 +1,5 @@
 import React from "react";
-import {Code0Component, Color, mergeCode0Props} from "../../utils";
+import {Component, Color, mergeComponentProps} from "../../utils";
 import {
     IconAlertCircle,
     IconCircleCheck,
@@ -10,7 +10,7 @@ import {
 } from "@tabler/icons-react";
 import "./Alert.style.scss"
 
-export interface AlertProps extends Code0Component<HTMLDivElement> {
+export interface AlertProps extends Component<HTMLDivElement> {
     color?: Color
     children: React.ReactNode
 }
@@ -28,7 +28,7 @@ export const Alert: React.FC<AlertProps> = (props) => {
         "error": <IconCircleX size={16}/>,
     }
 
-    return <div {...mergeCode0Props(`alert alert--${color}`, rest)}>
+    return <div {...mergeComponentProps(`alert alert--${color}`, rest)}>
         {icons[color]}
         {children}
     </div>

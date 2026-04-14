@@ -1,18 +1,17 @@
 import React from "react";
-import {Code0Component, Code0Sizes} from "../../utils/types";
+import {Sizes, Component, mergeComponentProps} from "../../utils";
 import "./Text.style.scss"
-import {mergeCode0Props} from "../../utils/utils";
 
-export interface FontType extends Omit<Omit<Code0Component<HTMLSpanElement>, "children">, "size"> {
+export interface FontType extends Omit<Omit<Component<HTMLSpanElement>, "children">, "size"> {
     children: React.ReactNode,
     //defaults to lg
-    size?: Code0Sizes,
+    size?: Sizes,
     hierarchy?: "primary" | "secondary" | "tertiary"
 }
 
 export const Text: React.FC<FontType> = ({size = "sm", children, hierarchy = "secondary", ...rest}) => {
 
-    return <span {...mergeCode0Props(`text text--${hierarchy} text--${size}`, rest)}>
+    return <span {...mergeComponentProps(`text text--${hierarchy} text--${size}`, rest)}>
         {children}
     </span>
 }

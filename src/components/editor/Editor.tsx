@@ -1,6 +1,6 @@
 import React, {isValidElement} from "react"
 import {createPortal} from "react-dom"
-import {Code0Component, hashToColor, mergeCode0Props} from "../../utils"
+import {Component, hashToColor, mergeComponentProps} from "../../utils"
 import {ValidationProps} from "../form"
 import CodeMirror, {
     Decoration,
@@ -54,7 +54,7 @@ export interface EditorTokenHighlights {
     [tokenName: string]: (props: EditorRendererProps) => React.ReactNode
 }
 
-export interface EditorInputProps extends Omit<Code0Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<any> {
+export interface EditorInputProps extends Omit<Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<any> {
     language?: 'json' | StreamLanguage<unknown>
     tokenizer?: EditorTokenizer
     tokenHighlights?: EditorTokenHighlights
@@ -475,7 +475,7 @@ export const Editor: React.FC<EditorInputProps> = (props) => {
                 </div>
             )}
             <ScrollAreaViewport asChild>
-                <div ref={containerRef} {...mergeCode0Props(`editor`, rest)}>
+                <div ref={containerRef} {...mergeComponentProps(`editor`, rest)}>
                     <CodeMirror
                         width="100%"
                         height="100%"

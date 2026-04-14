@@ -3,8 +3,8 @@
 import React from 'react'
 import { toast as sonnerToast } from 'sonner'
 import "./Toast.style.scss"
-import {Code0Component, Color} from "../../utils"
-import {mergeCode0Props} from "../../utils"
+import {Component, Color} from "../../utils"
+import {mergeComponentProps} from "../../utils"
 import {
     IconAlertCircle,
     IconCircleCheck, IconCircleDot,
@@ -16,7 +16,7 @@ import {Text} from "../text/Text"
 import {Flex} from "../flex/Flex";
 import {Button} from "../button/Button";
 
-export interface ToastProps extends Omit<Code0Component<HTMLDivElement>, "title" | "id"> {
+export interface ToastProps extends Omit<Component<HTMLDivElement>, "title" | "id"> {
     children?: React.ReactNode | React.ReactNode[]
     id: string | number
     title: React.ReactNode
@@ -42,7 +42,7 @@ export function Toast(props: ToastProps) {
     const {dismissible = false, color = "secondary", title, onClose = () => {}, children, duration = 4000, ...rest} = props
 
     return (
-        <div {...mergeCode0Props(`toast toast--${color}`, rest)}>
+        <div {...mergeComponentProps(`toast toast--${color}`, rest)}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
                     {color && <ToastIcon color={color as Color}/>}

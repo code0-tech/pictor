@@ -2,7 +2,7 @@ import {Meta, StoryObj} from "@storybook/react-vite";
 import React from "react";
 import {Card} from "./Card";
 import {Text} from "../text/Text";
-import {Colors} from "../../utils/types";
+import {Colors} from "../../utils";
 import {Button} from "../button/Button";
 import {IconArrowRight, IconBuilding, IconGitBranch, IconServer, IconUserCog} from "@tabler/icons-react";
 import {AuroraBackground} from "../aurora/Aurora";

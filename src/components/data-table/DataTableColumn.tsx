@@ -1,7 +1,7 @@
 import React from "react";
-import {Code0Component, mergeCode0Props} from "../../utils";
+import {Component, mergeComponentProps} from "../../utils";
 
-export interface DataTableColumnProps extends Code0Component<HTMLTableCellElement>{
+export interface DataTableColumnProps extends Component<HTMLTableCellElement>{
     children?: React.ReactNode | React.ReactNode[]
 }
 
@@ -10,7 +10,7 @@ export const DataTableColumn: React.FC<DataTableColumnProps> = (props) => {
     const {children, ...rest} = props
 
     // @ts-ignore
-    return <td {...mergeCode0Props("", rest)}>
+    return <td {...mergeComponentProps("", rest)}>
         {children}
     </td>
 

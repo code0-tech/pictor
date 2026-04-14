@@ -1,9 +1,8 @@
 import React, {ReactNode} from "react";
 import "./Container.style.scss"
-import {Code0Component} from "../../utils/types";
-import {mergeCode0Props} from "../../utils/utils";
+import {Component, mergeComponentProps} from "../../utils";
 
-export interface ContainerType extends Code0Component<HTMLDivElement> {
+export interface ContainerType extends Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
 }
 
@@ -11,7 +10,7 @@ export const Container: React.FC<ContainerType> = (props) => {
 
     const {children, ...args} = props
 
-    return <div {...mergeCode0Props("container", args)}>
+    return <div {...mergeComponentProps("container", args)}>
         {children}
     </div>
 }

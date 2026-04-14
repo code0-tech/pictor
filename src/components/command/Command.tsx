@@ -1,36 +1,35 @@
 import React from "react"
 import {Command as CommandPrimitive} from "cmdk"
-import {mergeCode0Props} from "../../utils/utils"
-import {Code0ComponentProps} from "../../utils/types"
+import {ComponentProps, mergeComponentProps} from "../../utils"
 import {Dialog, DialogContent} from "../dialog/Dialog"
 import "./Command.style.scss"
 import {Badge} from "../badge/Badge"
-import {TextInputProps, TextInput} from "../form/TextInput"
+import {TextInput, TextInputProps} from "../form"
 
-export type CommandProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive>
+export type CommandProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive>
 export type CommandDialogProps = {
-    dialogProps?: Code0ComponentProps & React.ComponentProps<typeof Dialog>
-    contentProps?: Code0ComponentProps & React.ComponentProps<typeof DialogContent>
+    dialogProps?: ComponentProps & React.ComponentProps<typeof Dialog>
+    contentProps?: ComponentProps & React.ComponentProps<typeof DialogContent>
     open?: boolean
     onOpenChange?: () => void
     children: React.ReactNode
 }
-export type CommandListProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.List>
-export type CommandInputProps = Code0ComponentProps & TextInputProps
-export type CommandEmptyProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Empty>
-export type CommandGroupProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Group>
-export type CommandItemProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Item>
-export type CommandSeparatorProps = Code0ComponentProps & React.ComponentProps<typeof CommandPrimitive.Separator>
-export type CommandShortcutProps = Code0ComponentProps & React.ComponentProps<typeof Badge>
+export type CommandListProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.List>
+export type CommandInputProps = ComponentProps & TextInputProps
+export type CommandEmptyProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Empty>
+export type CommandGroupProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Group>
+export type CommandItemProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Item>
+export type CommandSeparatorProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Separator>
+export type CommandShortcutProps = ComponentProps & React.ComponentProps<typeof Badge>
 
 export const Command: React.FC<CommandProps> = (props) => {
-    return <CommandPrimitive {...mergeCode0Props("command", props) as CommandProps}/>
+    return <CommandPrimitive {...mergeComponentProps("command", props) as CommandProps}/>
 }
 
 export const CommandDialog: React.FC<CommandDialogProps> = (props) => {
     return (
         <Dialog {...props.dialogProps} open={props.open} onOpenChange={props.onOpenChange}>
-            <DialogContent {...mergeCode0Props("command__dialog", props.contentProps ?? {}) as Code0ComponentProps & React.ComponentProps<typeof DialogContent>}>
+            <DialogContent {...mergeComponentProps("command__dialog", props.contentProps ?? {}) as ComponentProps & React.ComponentProps<typeof DialogContent>}>
                 <Command {...props}>
                     {props.children}
                 </Command>
@@ -40,7 +39,7 @@ export const CommandDialog: React.FC<CommandDialogProps> = (props) => {
 }
 
 export const CommandList: React.FC<CommandListProps> = (props) => {
-    return <CommandPrimitive.List {...mergeCode0Props("command__list", props) as CommandListProps}/>
+    return <CommandPrimitive.List {...mergeComponentProps("command__list", props) as CommandListProps}/>
 }
 
 export const CommandInput: React.FC<CommandInputProps> = (props) => {
@@ -50,7 +49,7 @@ export const CommandInput: React.FC<CommandInputProps> = (props) => {
             onValueChange={(value) => {
                 if (props.onChange) {
                     const event = {
-                        target: { value: value }
+                        target: {value: value}
                     } as React.ChangeEvent<HTMLInputElement>
 
                     props.onChange(event)
@@ -58,28 +57,28 @@ export const CommandInput: React.FC<CommandInputProps> = (props) => {
             }}
             asChild
         >
-            <TextInput {...mergeCode0Props("command__input", props)} />
+            <TextInput {...mergeComponentProps("command__input", props)} />
         </CommandPrimitive.Input>
     )
 }
 
 export const CommandEmpty: React.FC<CommandEmptyProps> = (props) => {
-    return <CommandPrimitive.Empty {...mergeCode0Props("command__empty", props) as CommandEmptyProps}/>
+    return <CommandPrimitive.Empty {...mergeComponentProps("command__empty", props) as CommandEmptyProps}/>
 }
 
 export const CommandGroup: React.FC<CommandGroupProps> = (props) => {
-    return <CommandPrimitive.Group {...mergeCode0Props("command__group", props) as CommandGroupProps}/>
+    return <CommandPrimitive.Group {...mergeComponentProps("command__group", props) as CommandGroupProps}/>
 }
 
 export const CommandItem: React.FC<CommandItemProps> = (props) => {
-    return <CommandPrimitive.Item {...mergeCode0Props("command__item", props) as CommandItemProps}/>
+    return <CommandPrimitive.Item {...mergeComponentProps("command__item", props) as CommandItemProps}/>
 }
 
 export const CommandSeparator: React.FC<CommandSeparatorProps> = (props) => {
-    return <CommandPrimitive.Separator {...mergeCode0Props("command__separator", props) as CommandSeparatorProps}/>
+    return <CommandPrimitive.Separator {...mergeComponentProps("command__separator", props) as CommandSeparatorProps}/>
 }
 
 export const CommandShortcut: React.FC<CommandShortcutProps> = (props) => {
-    return <Badge {...mergeCode0Props("command__shortcut", props) as CommandShortcutProps}>{props.children}</Badge>
+    return <Badge {...mergeComponentProps("command__shortcut", props) as CommandShortcutProps}>{props.children}</Badge>
 }
 

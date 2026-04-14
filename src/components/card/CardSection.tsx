@@ -1,8 +1,7 @@
-import {Code0Component} from "../../utils/types";
+import {Component, mergeComponentProps} from "../../utils";
 import React, {ReactNode} from "react";
-import {mergeCode0Props} from "../../utils/utils";
 
-export interface SectionType extends Code0Component<HTMLDivElement> {
+export interface SectionType extends Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
     //defaults to false
     image?: boolean,
@@ -22,7 +21,7 @@ const CardSection: React.FC<SectionType> = (props) => {
     } = props;
 
     return <>
-        <div {...mergeCode0Props(`
+        <div {...mergeComponentProps(`
                                 card__section 
                                 ${border ? "card__section--border" : ""} 
                                 ${image ? "card__section--image" : ""}

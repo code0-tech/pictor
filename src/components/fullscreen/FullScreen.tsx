@@ -1,11 +1,10 @@
 "use client"
 
-import {Code0Component} from "../../utils/types";
+import {Component, mergeComponentProps} from "../../utils";
 import React from "react";
-import {mergeCode0Props} from "../../utils/utils";
 import "./FullScreen.style.scss"
 
-export interface FullScreenProps extends Code0Component<HTMLDivElement> {
+export interface FullScreenProps extends Component<HTMLDivElement> {
     children: React.ReactNode | React.ReactNode[]
 }
 
@@ -28,7 +27,7 @@ export const FullScreen: React.FC<FullScreenProps> = props => {
         divRef.current!!.style.width = vw + "px";
     }, [divRef])
 
-    return <div {...mergeCode0Props("d-full-screen", props)} ref={divRef}>
+    return <div {...mergeComponentProps("d-full-screen", props)} ref={divRef}>
         {props.children}
     </div>
 }

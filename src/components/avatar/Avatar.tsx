@@ -1,8 +1,8 @@
 import React from "react";
-import {Code0Component} from "../../utils/types";
+import {Component, mergeComponentProps} from "../../utils/component";
 import "./Avatar.style.scss"
-import {hashToColor, mergeCode0Props} from "../../utils/utils";
 import Identicon from "avvvatars-react"
+import {hashToColor} from "../../utils";
 
 interface AvatarImageProps {
     src: string
@@ -16,7 +16,7 @@ interface AvatarIdenticonProps {
     type?: 'character' | 'shape'
 }
 
-export interface AvatarProps extends Code0Component<HTMLDivElement> {
+export interface AvatarProps extends Component<HTMLDivElement> {
     identifier?: string
     src?: string
     size?: number
@@ -40,7 +40,7 @@ export const Avatar: React.FC<AvatarProps> = (props: AvatarProps) => {
 
     const {identifier, color, src, size = 32, type, ...rest} = props
 
-    return <div {...mergeCode0Props(`avatar ${!identifier && src ? "avatar--image" : "avatar--identicon"}`, rest)}>
+    return <div {...mergeComponentProps(`avatar ${!identifier && src ? "avatar--image" : "avatar--identicon"}`, rest)}>
         {identifier ?
             <AvatarIdenticon type={type} color={color} identifier={identifier} size={size}/> :
             src ? <AvatarImage src={src} size={size}/> : null

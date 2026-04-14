@@ -1,10 +1,9 @@
 import React, {ReactNode} from "react";
 import "./Card.style.scss"
-import {Code0Component, Code0Sizes, Color} from "../../utils/types";
-import {mergeCode0Props} from "../../utils/utils";
+import {Color, Component, mergeComponentProps, Sizes} from "../../utils";
 
 
-export interface Card extends Code0Component<HTMLDivElement> {
+export interface Card extends Component<HTMLDivElement> {
     children: ReactNode | ReactNode[]
     //defaults to primary
     color?: Color,
@@ -22,7 +21,7 @@ export interface Card extends Code0Component<HTMLDivElement> {
     outlineColor?: Color
     //defaults to false
     dashed?: boolean
-    paddingSize?: Code0Sizes
+    paddingSize?: Sizes
 }
 
 
@@ -43,7 +42,7 @@ export const Card: React.FC<Card> = (props) => {
     } = props
 
     return <>
-        <div {...mergeCode0Props(
+        <div {...mergeComponentProps(
             `
                     card 
                     card--${color} card--${variant}

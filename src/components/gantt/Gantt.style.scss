@@ -1,0 +1,65 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.gantt {
+
+  &__item {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: transparent;
+  }
+
+  &__group-wrapper {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    position: absolute;
+    background: transparent;
+  }
+
+  &__header {
+
+    position: sticky;
+    height: fit-content;
+    grid-column: 1 / -1;
+    display: flex;
+    top: 0;
+    background: #070514;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    z-index: 10;
+
+    &-column {
+      position: absolute;
+      height: 100%;
+      padding: 8px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      transform: translate(-50%, 0);
+    }
+
+    &-label {
+      text-wrap: nowrap;
+      display: flex;
+      align-items: center;
+    }
+
+    &-label-column {
+      position: sticky;
+      left: 0;
+      width: fit-content;
+      height: 100%;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      box-sizing: border-box;
+      background: #070514;
+      z-index: 2;
+    }
+  }
+}

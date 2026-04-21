@@ -4,8 +4,11 @@ import {Component, mergeComponentProps} from "../../utils"
 export interface GanttItem {
     start: number
     end: number
-    data?: any
-    type?: string
+    data?: any | {
+        displayMessage: string
+        color: string
+    }
+    type?: string | "group"
     id: string
 }
 

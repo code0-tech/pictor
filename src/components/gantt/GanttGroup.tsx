@@ -13,15 +13,21 @@ const getItemPosition = (itemStart: number, itemEnd: number, start: number, end:
     return {left, width}
 }
 
-export const GanttGroup: React.FC<GanttProps> = (props) => {
+export interface GanttGroupProps extends GanttProps {
+    start?: number
+    end?: number
+    hideScaling?: boolean
+}
+
+export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
 
     const {
         items,
         stepWidth = "50px",
         rowHeight = "50px",
         step = 1,
-        end = 99999999,
-        start,
+        start = 1,
+        end = 999_999_999,
         hideScaling = false,
         children
     } = props

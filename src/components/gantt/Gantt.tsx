@@ -9,16 +9,13 @@ export interface GanttProps extends Omit<Component<HTMLDivElement>, 'children'> 
     items: GanttItem[]
     stepWidth?: CSSProperties["width"]
     rowHeight?: CSSProperties["height"]
-    start: number
     step?: number
-    end?: number
-    hideScaling?: boolean
     children?: (item: GanttItem, index: number) => React.ReactNode
 }
 
 export const Gantt: React.FC<GanttProps> = (props) => {
 
-    const {items, stepWidth = "50px", rowHeight = "50px", step = 1, end = 99999999, start, children} = props
+    const {items, stepWidth = "50px", rowHeight = "50px", step = 1, children} = props
 
     const groups: {
         step: number
@@ -84,7 +81,6 @@ export const Gantt: React.FC<GanttProps> = (props) => {
                         return <GanttGroup children={children}
                                            id={`group-target-${index}`}
                                            hideScaling={index != 0}
-                                           end={end}
                                            start={minStart - (((minStart / (groups[0].step * step)) * (group.step * step)))}
                                            step={group.step * step}
                                            stepWidth={stepWidth} rowHeight={rowHeight} items={group.items}

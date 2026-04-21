@@ -1,7 +1,7 @@
 import React from "react"
 import {Command as CommandPrimitive} from "cmdk"
 import {ComponentProps, mergeComponentProps} from "../../utils"
-import {Dialog, DialogContent, DialogOverlay} from "../dialog/Dialog"
+import {Dialog, DialogContent, DialogOverlay, DialogPortal} from "../dialog/Dialog"
 import "./Command.style.scss"
 import {Badge} from "../badge/Badge"
 import {TextInput, TextInputProps} from "../form"
@@ -29,12 +29,14 @@ export const Command: React.FC<CommandProps> = (props) => {
 export const CommandDialog: React.FC<CommandDialogProps> = (props) => {
     return (
         <Dialog {...props.dialogProps} open={props.open} onOpenChange={props.onOpenChange}>
-            <DialogOverlay/>
-            <DialogContent className={"command__dialog"} {...props.contentProps}>
-                <Command {...props} h={"100%"}>
-                    {props.children}
-                </Command>
-            </DialogContent>
+            <DialogPortal>
+                <DialogOverlay/>
+                <DialogContent className={"command__dialog"} {...props.contentProps}>
+                    <Command {...props} h={"100%"}>
+                        {props.children}
+                    </Command>
+                </DialogContent>
+            </DialogPortal>
         </Dialog>
     )
 }

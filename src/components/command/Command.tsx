@@ -1,7 +1,7 @@
 import React from "react"
 import {Command as CommandPrimitive} from "cmdk"
 import {ComponentProps, mergeComponentProps} from "../../utils"
-import {Dialog, DialogContent} from "../dialog/Dialog"
+import {Dialog, DialogContent, DialogOverlay} from "../dialog/Dialog"
 import "./Command.style.scss"
 import {Badge} from "../badge/Badge"
 import {TextInput, TextInputProps} from "../form"
@@ -15,7 +15,7 @@ export type CommandDialogProps = {
     children: React.ReactNode
 }
 export type CommandListProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.List>
-export type CommandInputProps = ComponentProps & TextInputProps
+export type CommandInputProps = TextInputProps
 export type CommandEmptyProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Empty>
 export type CommandGroupProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Group>
 export type CommandItemProps = ComponentProps & React.ComponentProps<typeof CommandPrimitive.Item>
@@ -29,8 +29,9 @@ export const Command: React.FC<CommandProps> = (props) => {
 export const CommandDialog: React.FC<CommandDialogProps> = (props) => {
     return (
         <Dialog {...props.dialogProps} open={props.open} onOpenChange={props.onOpenChange}>
-            <DialogContent {...mergeComponentProps("command__dialog", props.contentProps ?? {}) as ComponentProps & React.ComponentProps<typeof DialogContent>}>
-                <Command {...props}>
+            <DialogOverlay/>
+            <DialogContent className={"command__dialog"} {...props.contentProps}>
+                <Command {...props} h={"100%"}>
                     {props.children}
                 </Command>
             </DialogContent>
@@ -57,7 +58,7 @@ export const CommandInput: React.FC<CommandInputProps> = (props) => {
             }}
             asChild
         >
-            <TextInput {...mergeComponentProps("command__input", props)} />
+            <TextInput className={"command__input"} {...props} />
         </CommandPrimitive.Input>
     )
 }

@@ -24,7 +24,7 @@ export default {
 
 export const GanttExample = () => {
     return <Container pos={"relative"} h={"300px"}>
-        <Gantt step={0.1} stepWidth={"50px"} rowHeight={"50px"} color={"error"} items={[
+        <Gantt step={0.1} stepWidth={"50px"} rowHeight={"50px"} items={[
             {
                 id: "0",
                 start: 0,

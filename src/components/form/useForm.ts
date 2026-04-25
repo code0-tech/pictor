@@ -153,6 +153,13 @@ export const useForm = <
     useEffect(() => {
         setValues(initialValues)
         valuesRef.current = initialValues
+        setValidation(new Validation<Values>(
+            changeValue,
+            initialValues,
+            validate,
+            useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initialValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
+            cachedMessagesRef.current
+        ))
     }, [initialValues])
 
     const validateFunction = useCallback(<Key extends keyof Values>(key?: Key) => {

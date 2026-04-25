@@ -41,40 +41,48 @@ export const Login = () => {
     })
 
     return <Card color={"secondary"} miw={"300px"} maw={"15vw"}>
-        <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
-        <br/>
-        <Text size={"sm"} display={"block"}>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-            dolore magna aliquyam erat, sed diam voluptua.
-        </Text>
-        <br/>
-        <EmailInput
-            placeholder={"Email"}
-            title={"Email"}
-            description={"Your Email address for login"}
-            left={<IconMail size={13}/>}
-            {...inputs.getInputProps("email")}
-        />
-        <br/>
-        <PasswordInput
-            placeholder={"Password"}
-            title={"Password"}
-            description={"Your password for login"}
-            left={<IconKey size={13}/>}
-            onChange={() => validate("password")}
-            {...inputs.getInputProps("password")}
-        />
-        <br/>
-        <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: ".75rem",
+        <form noValidate onSubmit={(e) => {
+            validate()
+            e.preventDefault()
+            e.stopPropagation()
+            return false
         }}>
-            <Button w={"100%"} color={"tertiary"} onClick={validate}>
-                Login
-            </Button>
+            <Text size={"xl"} display={"block"} hierarchy={"primary"}>Login</Text>
+            <br/>
+            <Text size={"sm"} display={"block"}>
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+                labore et
+                dolore magna aliquyam erat, sed diam voluptua.
+            </Text>
+            <br/>
+            <EmailInput
+                placeholder={"Email"}
+                title={"Email"}
+                description={"Your Email address for login"}
+                left={<IconMail size={13}/>}
+                {...inputs.getInputProps("email")}
+            />
+            <br/>
+            <PasswordInput
+                placeholder={"Password"}
+                title={"Password"}
+                description={"Your password for login"}
+                left={<IconKey size={13}/>}
+                onChange={() => validate("password")}
+                {...inputs.getInputProps("password")}
+            />
+            <br/>
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: ".75rem",
+            }}>
+                <Button type={"submit"} w={"100%"} color={"tertiary"}>
+                    Login
+                </Button>
 
-        </div>
+            </div>
+        </form>
     </Card>
 
 }

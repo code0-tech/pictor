@@ -1,0 +1,57 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+
+.select-input {
+  &__content {
+    padding: variables.$xxs;
+    position: relative;
+    box-sizing: border-box;
+    z-index: 999;
+
+    & {
+      @include helpers.borderRadius();
+    }
+  }
+
+  &__item {
+    border-radius: variables.$borderRadius - variables.$xxs;
+    padding: variables.$xxs variables.$xs;
+    gap: variables.$xs;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: variables.$sm;
+
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+      box-shadow: none;
+    }
+
+    &:focus, &[data-focus=true] {
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
+      box-shadow: none;
+      width: 100%;
+    }
+  }
+
+  &__trigger {
+    height: stretch;
+    width: 100%;
+    position: relative;
+    align-self: stretch;
+    cursor: pointer;
+  }
+}
+
+@each $name, $color in variables.$colors {
+  .select-input__content--#{$name} {
+    @include box.box($color);
+    border: helpers.backgroundColor(variables.$secondary) 2px solid;
+  }
+}

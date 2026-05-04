@@ -2,7 +2,7 @@ import React from "react";
 import {useForm} from "./useForm";
 import {Card} from "../card/Card";
 import {Button} from "../button/Button";
-import {IconKey, IconLogin, IconMail} from "@tabler/icons-react";
+import {IconChevronDown, IconKey, IconLogin, IconMail, IconVariable, IconX} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {PasswordInput, passwordValidation} from "./PasswordInput";
 import {TextInput} from "./TextInput";
@@ -14,6 +14,18 @@ import {CheckboxInput} from "./CheckboxInput";
 import {RadioGroup} from "./RadioGroup";
 import {RadioInput} from "./RadioInput";
 import {TextAreaInput} from "./TextAreaInput";
+import {
+    SelectContent,
+    SelectInput,
+    SelectItem,
+    SelectItemText,
+    SelectPortal,
+    SelectTrigger,
+    SelectValue,
+    SelectViewport
+} from "./SelectInput";
+import {Flex} from "../flex/Flex";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 export default {
     title: "Form"
@@ -164,7 +176,6 @@ export const RadioExample = () => {
 
 }
 
-
 export const Checkbox = () => {
 
     const [inputs, validate] = useForm({
@@ -208,7 +219,6 @@ export const Checkbox = () => {
 
 }
 
-
 export const Switch = () => {
 
     const [inputs, validate] = useForm({
@@ -247,7 +257,6 @@ export const Switch = () => {
     </Card>
 
 }
-
 
 export const PinInputExample = () => {
 
@@ -304,5 +313,71 @@ export const TextAreaExample = () => {
             left={"https://"}
             leftType={"placeholder"}
         />
+    </Card>
+}
+
+export const Select = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            select: undefined
+        },
+        validate: {
+            select: (value) => {
+                if (!value) return "Please select an option"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <SelectInput title={"HTTP Method"}
+                     onValueChange={() => validate()}
+                     description={"You can choose between the standard http methods like GET, POST, etc."} right={
+            <ButtonGroup color={"primary"}>
+                <Button paddingSize={"xxs"}>
+                    <IconVariable size={13}/>
+                </Button>
+                <Button paddingSize={"xxs"}>
+                    <IconX size={13}/>
+                </Button>
+            </ButtonGroup>
+        } rightType={"action"} {...inputs.getInputProps("select")}>
+            <SelectTrigger asChild>
+                <Flex justify={"space-between"} align={"center"}>
+                    <SelectValue placeholder={"Select..."}/>
+                    <IconChevronDown size={13}/>
+                </Flex>
+            </SelectTrigger>
+            <SelectPortal>
+                <SelectContent position={"item-aligned"}>
+                    <SelectViewport>
+                        <SelectItem value={"1"}>
+                            <SelectItemText>
+                                Option 1
+                            </SelectItemText>
+                        </SelectItem>
+                        <SelectItem value={"2"}>
+                            <SelectItemText>
+                                Option 2
+                            </SelectItemText>
+                        </SelectItem>
+                        <SelectItem value={"3"}>
+                            <SelectItemText>
+                                Option 3
+                            </SelectItemText>
+                        </SelectItem>
+                        <SelectItem value={"4"}>
+                            <SelectItemText>
+                                Option 4
+                            </SelectItemText>
+                        </SelectItem>
+                    </SelectViewport>
+                </SelectContent>
+            </SelectPortal>
+        </SelectInput>
     </Card>
 }

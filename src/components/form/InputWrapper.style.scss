@@ -1,0 +1,71 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "../../styles/box";
+@use "sass:math";
+
+.input-wrapper {
+
+  $padding: variables.$xs;
+  display: flex;
+  z-index: 1;
+  width: 100%;
+  align-items: center;
+  box-sizing: border-box;
+  gap: $padding;
+  padding: 0 $padding / 4 0 $padding / 2;
+
+  & {
+    @include box.box(variables.$tertiary, variables.$white, variables.$white);
+    @include box.boxHover(variables.$primary, variables.$white, variables.$white);
+    @include box.boxActive(variables.$primary, variables.$white, variables.$white);
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
+  }
+
+  &:has(&__control:focus) {
+    @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
+  }
+
+  &--not-valid {
+    @include box.box(variables.$error, variables.$white, variables.$error);
+  }
+
+  &__left, &__right {
+    display: flex;
+    align-items: stretch;
+    gap: $padding;
+    margin: $padding / 4 0;
+
+    > button {
+      height: 100%;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    &--action {
+      padding: 0;
+    }
+
+    &--placeholder {
+      @include box.box(variables.$primary);
+      @include helpers.fontStyle();
+      border-radius: variables.$borderRadius - ($padding / 4);
+      padding: $padding;
+      box-shadow: none;
+    }
+  }
+
+  &__left {
+    &--icon {
+      align-items: center;
+    }
+  }
+
+  &__right {
+
+    &--icon {
+      align-items: center;
+    }
+  }
+
+}

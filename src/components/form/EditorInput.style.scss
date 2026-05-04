@@ -1,0 +1,23 @@
+.editor-input {
+  width: 100%;
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding: 0.59rem 0;
+  position: relative;
+  align-self: stretch;
+
+  .cm-editor {
+    height: 100%;
+    outline: none !important;
+  }
+
+  .cm-content {
+    padding: 0;
+    position: relative;
+  }
+
+  .cm-line {
+    align-self: stretch;
+    padding-left: 0;
+  }
+}

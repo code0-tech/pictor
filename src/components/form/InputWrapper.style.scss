@@ -9,10 +9,9 @@
   display: flex;
   z-index: 1;
   width: 100%;
-  align-items: center;
+  align-items: start;
   box-sizing: border-box;
-  gap: $padding;
-  padding: 0 $padding / 4 0 $padding / 2;
+  gap: $padding / 4;
 
   & {
     @include box.box(variables.$tertiary, variables.$white, variables.$white);
@@ -30,11 +29,17 @@
     @include box.box(variables.$error, variables.$white, variables.$error);
   }
 
+  & > :first-child {
+    padding-left: $padding;
+  }
+
   &__left, &__right {
     display: flex;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
     gap: $padding;
-    margin: $padding / 4 0;
+    margin: $padding / 4 $padding / 4;
 
     > button {
       height: 100%;
@@ -58,6 +63,8 @@
   &__left {
     &--icon {
       align-items: center;
+    }
+    &--placeholder {
     }
   }
 

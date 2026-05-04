@@ -31,7 +31,6 @@ export const SelectInput: React.FC<SelectProps> = (props) => {
             ...rest, onValueChange: (value: string) => {
                 formValidation?.setValue(value)
                 rest.onValueChange?.(value)
-                props.onChange?.({} as any)
             }
         }) as SelectProps}/>
     </InputWrapper>

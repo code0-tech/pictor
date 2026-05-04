@@ -54,7 +54,7 @@ export interface EditorTokenHighlights {
     [tokenName: string]: (props: EditorRendererProps) => React.ReactNode
 }
 
-export interface EditorInputProps extends Omit<Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<any> {
+export interface EditorProps extends Omit<Component<HTMLDivElement>, 'onChange' | 'defaultValue' | 'value'>, ValidationProps<any> {
     language?: 'json' | StreamLanguage<unknown>
     tokenizer?: EditorTokenizer
     tokenHighlights?: EditorTokenHighlights
@@ -105,7 +105,7 @@ const isReactNode = (value: any): value is React.ReactNode => {
     return isValidElement(value) || typeof value === 'string' || typeof value === 'number' || Array.isArray(value);
 }
 
-export const Editor: React.FC<EditorInputProps> = (props) => {
+export const Editor: React.FC<EditorProps> = (props) => {
     const {
         language,
         tokenizer,

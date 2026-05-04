@@ -26,6 +26,10 @@ import {
 } from "./SelectInput";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
+import {EditorInput} from "./EditorInput";
+import {StreamLanguage} from "@codemirror/language";
+import {tags as t} from "@lezer/highlight";
+import {hashToColor} from "../../utils";
 
 export default {
     title: "Form"
@@ -379,5 +383,31 @@ export const Select = () => {
                 </SelectContent>
             </SelectPortal>
         </SelectInput>
+    </Card>
+}
+
+export const Editor = () => {
+    return <Card color={"secondary"} w={"400px"}>
+        <EditorInput placeholder={"sd"} language={StreamLanguage.define({
+            token(stream) {
+                if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
+                    return "keyword";
+                }
+
+                stream.next();
+                return null;
+            }
+        })} tokenStyles={[
+            {tag: t.keyword, color: hashToColor("bracket")},
+        ]} title={"Bla"} description={"test"} right={
+            <ButtonGroup color={"primary"}>
+                <Button paddingSize={"xxs"}>
+                    <IconVariable size={13}/>
+                </Button>
+                <Button paddingSize={"xxs"}>
+                    <IconX size={13}/>
+                </Button>
+            </ButtonGroup>
+        } rightType={"action"}/>
     </Card>
 }

@@ -2,7 +2,7 @@ import React from "react";
 import {useForm} from "./useForm";
 import {Card} from "../card/Card";
 import {Button} from "../button/Button";
-import {IconChevronDown, IconKey, IconLogin, IconMail, IconTextCaption, IconVariable, IconX} from "@tabler/icons-react";
+import {IconChevronDown, IconKey, IconLogin, IconMail, IconVariable, IconX} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {PasswordInput, passwordValidation} from "./PasswordInput";
 import {TextInput} from "./TextInput";
@@ -388,7 +388,7 @@ export const Select = () => {
 
 export const Editor = () => {
     return <Card color={"secondary"} w={"400px"}>
-        <EditorInput left={<IconTextCaption size={13}/>} leftType={"placeholder"} placeholder={"sd"} language={StreamLanguage.define({
+        <EditorInput placeholder={"sd"} language={StreamLanguage.define({
             token(stream) {
                 if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
                     return "keyword";

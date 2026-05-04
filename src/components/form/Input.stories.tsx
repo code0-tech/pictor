@@ -387,8 +387,25 @@ export const Select = () => {
 }
 
 export const Editor = () => {
+
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            editor: undefined
+        },
+        validate: {
+            editor: (value) => {
+                if (!value) return "Please type something"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
     return <Card color={"secondary"} w={"400px"}>
-        <EditorInput placeholder={"sd"} language={StreamLanguage.define({
+        <EditorInput {...inputs.getInputProps("editor")} onChange={() => validate("editor")} placeholder={"sd"} language={StreamLanguage.define({
             token(stream) {
                 if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
                     return "keyword";

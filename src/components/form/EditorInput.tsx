@@ -9,18 +9,19 @@ import {tags as t} from "@lezer/highlight";
 import {hashToColor, mergeComponentProps} from "../../utils";
 import "./EditorInput.style.scss"
 
-export interface EditorInputProps extends InputWrapperProps, ValidationProps<any> {
+export interface EditorInputProps extends Omit<InputWrapperProps, 'onChange'>, ValidationProps<any> {
     language?: StreamLanguage<unknown>
     suggestions?: (context: CompletionContext) => CompletionResult
     extensions?: Extension[]
     disabled?: boolean
     readonly?: boolean
     tokenStyles?: TagStyle[]
+    onChange?: (value: string) => void
 }
 
 export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
-    const {title, right, left, rightType, leftType, language, description, extensions = [], tokenStyles = [], formValidation, ...rest} = props
+    const {title, right, left, rightType, leftType, language, description, extensions = [], tokenStyles = [], formValidation, onChange, ...rest} = props
 
     const internalExtensions: Extension[] = [...extensions, language!]
 
@@ -61,7 +62,10 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                          leftType={leftType}
                          formValidation={formValidation}>
 
-        <CodeMirror extensions={internalExtensions} theme={myTheme} {...mergeComponentProps("editor-input", rest)} basicSetup={{
+        <CodeMirror extensions={internalExtensions} onChange={value => {
+            onChange?.(value)
+            formValidation?.setValue(value)
+        }} theme={myTheme} {...mergeComponentProps("editor-input", rest)} basicSetup={{
             lineNumbers: false,
             foldGutter: false,
             highlightActiveLine: false,

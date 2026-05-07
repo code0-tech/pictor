@@ -28,7 +28,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = (props) => {
     const [checked, setChecked] = React.useState<CheckedState>(props.initialValue ?? "indeterminate");
 
     React.useEffect(() => {
-        formValidation.setValue(checked)
+        formValidation.setValue?.(checked)
     }, [checked])
 
     return <>

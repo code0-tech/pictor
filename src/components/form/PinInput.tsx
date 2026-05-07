@@ -43,7 +43,7 @@ export const PinInput: React.FC<PinInputProps> = (props) => {
             <OneTimePasswordField {...mergeComponentProps("pin-input", {
                 ...rest, onValueChange: (value: string) => {
                     if (rest.onValueChange) rest.onValueChange!!(value)
-                    formValidation.setValue(value)
+                    formValidation.setValue?.(value)
                 }
             })}/>
         </div>

@@ -35,7 +35,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = (props) => {
             defaultValue={initialValue ?? props.defaultValue} {...mergeComponentProps("radio-group", {
             ...rest, onValueChange: (value: string) => {
                 if (rest.onValueChange) rest.onValueChange!!(value)
-                formValidation.setValue(value)
+                formValidation.setValue?.(value)
             }
         })}/>
 

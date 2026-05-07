@@ -1,6 +1,6 @@
 "use client"
 
-import {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 export type Validations<Values> = Partial<{
     [Key in keyof Values]: (value: Values[Key], values?: Values) => string | null;
@@ -20,7 +20,7 @@ export interface ValidationProps<Value> {
     value?: Value | undefined
     required?: boolean
     formValidation?: {
-        setValue: (value: any) => void
+        setValue?: (value: any) => void
         valid?: boolean
         notValidMessage?: string | null
     }
@@ -30,11 +30,10 @@ export type ValidationsProps<Values> = Partial<{
     [Key in keyof Values]: ValidationProps<Values[Key]>
 }>
 
-export type FormValidationReturn<Values> = [IValidation<Values>, <Key extends keyof Values>(key?: Key | any) => void]
+export type FormValidationReturn<Values> = [IValidation<Values>, <Key extends keyof Values>(key?: Key | any, submit?: boolean) => void, Values]
 
 export interface IValidation<Values> {
     getInputProps<Key extends keyof Values>(key: Key): ValidationProps<Values[Key]>
-
     isValid(): boolean
 }
 
@@ -127,18 +126,16 @@ export const useForm = <
         onSubmit
     } = props
 
-    const [values, setValues] = useState<Values>(initialValues)
-    const valuesRef = useRef<Values>(initialValues)
+    const initValues = React.useMemo(() => initialValues as Values, [])
+    const [values, setValues] = useState<Values>(initValues)
     const cachedMessagesRef = useRef<Map<keyof Values, string | null>>(new Map())
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
         setValues(prevState => {
-            const nextState = {
+            return {
                 ...prevState,
                 [key]: value,
             }
-            valuesRef.current = nextState
-            return nextState
         })
     }, [])
 
@@ -146,31 +143,30 @@ export const useForm = <
         changeValue,
         values,
         validate,
-        useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initialValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
+        useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
         cachedMessagesRef.current
     ))
 
     useEffect(() => {
-        setValues(initialValues)
-        valuesRef.current = initialValues
+        setValues(initValues)
         setValidation(new Validation<Values>(
             changeValue,
-            initialValues,
+            initValues,
             validate,
-            useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initialValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
+            useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
             cachedMessagesRef.current
         ))
-    }, [initialValues])
+    }, [initValues])
 
-    const validateFunction = useCallback(<Key extends keyof Values>(key?: Key) => {
+    const validateFunction = useCallback(<Key extends keyof Values>(key?: Key, submit = true) => {
 
-        const shouldValidateMap = key && new Set(Object.keys(initialValues)).has(String(key))
+        const shouldValidateMap = key && new Set(Object.keys(values)).has(String(key))
             ? new Map<keyof Values, boolean>([[key, true]])
-            : new Map<keyof Values, boolean>(Object.keys(initialValues).map(k => [String(k) as keyof Values, true]))
+            : new Map<keyof Values, boolean>(Object.keys(values).map(k => [String(k) as keyof Values, true]))
 
         const currentValidation = new Validation<Values>(
             changeValue,
-            valuesRef.current,
+            values,
             validate,
             shouldValidateMap,
             cachedMessagesRef.current
@@ -178,13 +174,14 @@ export const useForm = <
 
         setValidation(currentValidation)
 
-        if (!new Set(Object.keys(initialValues)).has(String(key)) && onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
-            onSubmit(valuesRef.current as Values)
+        if (submit && !new Set(Object.keys(values)).has(String(key)) && onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
+            onSubmit(values as Values)
         }
-    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit, initialValues])
+    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit, values])
 
     return [
         validation,
-        validateFunction
+        validateFunction,
+        values
     ]
 }

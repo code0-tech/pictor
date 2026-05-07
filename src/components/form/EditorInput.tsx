@@ -63,7 +63,7 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                          formValidation={formValidation}>
 
         <CodeMirror extensions={internalExtensions} onChange={value => {
-            formValidation?.setValue(value)
+            formValidation?.setValue?.(value)
             onChange?.(value)
         }} theme={myTheme} {...mergeComponentProps("editor-input", rest)} basicSetup={{
             lineNumbers: false,

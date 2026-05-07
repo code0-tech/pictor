@@ -492,7 +492,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
                                 try {
                                     const json = JSON.parse(val)
                                     onChange?.(json)
-                                    formValidation?.setValue(json)
+                                    formValidation?.setValue?.(json)
                                 } catch (e) {
                                 }
                             } else {

@@ -29,7 +29,7 @@ export const SelectInput: React.FC<SelectProps> = (props) => {
                          formValidation={formValidation}>
         <RadixSelect.Root {...mergeComponentProps("select-input", {
             ...rest, onValueChange: (value: string) => {
-                formValidation?.setValue(value)
+                formValidation?.setValue?.(value)
                 rest.onValueChange?.(value)
             }
         }) as SelectProps}/>

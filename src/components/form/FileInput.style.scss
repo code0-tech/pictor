@@ -1,0 +1,25 @@
+.file-input {
+
+  &__item-group {
+    margin: 0;
+    padding: 0;
+  }
+
+  &__item-preview {
+    max-width: 50px;
+    max-height: 50px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__item-preview-image {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+}

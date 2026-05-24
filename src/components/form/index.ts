@@ -1,6 +1,7 @@
 export * from "./CheckboxInput"
 export * from "./EditorInput"
 export * from "./EmailInput"
+export * from "./FileInput"
 export * from "./Input"
 export * from "./InputDescription"
 export * from "./InputLabel"

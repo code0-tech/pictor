@@ -8,7 +8,6 @@ import {
     IconKey,
     IconLogin,
     IconMail,
-    IconUpload,
     IconVariable,
     IconX
 } from "@tabler/icons-react";
@@ -50,7 +49,8 @@ import {
     FileInputItemName,
     FileInputItemPreview,
     FileInputItemPreviewImage,
-    FileInputItemSizeText, FileInputTrigger
+    FileInputItemSizeText,
+    FileInputTrigger
 } from "./FileInput";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
 

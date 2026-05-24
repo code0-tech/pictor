@@ -2,7 +2,16 @@ import React from "react";
 import {useForm} from "./useForm";
 import {Card} from "../card/Card";
 import {Button} from "../button/Button";
-import {IconChevronDown, IconKey, IconLogin, IconMail, IconUpload, IconVariable, IconX} from "@tabler/icons-react";
+import {
+    IconChevronDown, IconFileInfoFilled,
+    IconKey,
+    IconLicense,
+    IconLogin,
+    IconMail,
+    IconUpload,
+    IconVariable,
+    IconX
+} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {PasswordInput, passwordValidation} from "./PasswordInput";
 import {TextInput} from "./TextInput";
@@ -35,14 +44,13 @@ import {
     FileInputContext,
     FileInputDropzone,
     FileInputHiddenInput,
-    FileInputItem,
+    FileInputItem, FileInputItemDeleteTrigger,
     FileInputItemGroup,
     FileInputItemName,
     FileInputItemPreview,
     FileInputItemPreviewImage,
     FileInputItemSizeText
 } from "./FileInput";
-import {Spacing} from "../spacing/Spacing";
 
 export default {
     title: "Form"
@@ -452,7 +460,7 @@ export const File = () => {
         validate: {
             file: (value) => {
                 console.log(value)
-                if (!value) return "Please type something"
+                if (!value) return "Please upload a license file"
                 return null
             }
         },
@@ -466,7 +474,11 @@ export const File = () => {
     }, [values])
 
     return <Card color={"secondary"} w={"400px"}>
-        <FileInput maxFiles={5} {...inputs.getInputProps("file")}>
+        <FileInput title={"License"}
+                   description={"Build high-class workflows, endpoints and software without coding"}
+                   accept={".code0license"}
+                   maxFiles={5}
+                   {...inputs.getInputProps("file")}>
             <FileInputDropzone asChild>
                 <Card color={"tertiary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.1)"}}>
                     <Flex align={"center"} justify={"center"}
@@ -484,23 +496,45 @@ export const File = () => {
                     </Flex>
                 </Card>
             </FileInputDropzone>
-            <FileInputItemGroup>
+            <FileInputItemGroup display={"flex"} mt={1} style={{flexDirection: "column", gap: "0.35rem"}}>
                 <FileInputContext>
-                    {({acceptedFiles}) => acceptedFiles?.map((file, index) => (
+                    {({acceptedFiles}) => acceptedFiles?.map((file) => (
                         <FileInputItem file={file} key={file.name} asChild>
                             <Card paddingSize={"xxs"}>
-                                <Flex align={"center"} style={{gap: "1.3rem"}}>
-                                    <FileInputItemPreview style={{borderRadius: "0.6rem"}}>
-                                        <FileInputItemPreviewImage/>
-                                    </FileInputItemPreview>
-                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
-                                        <Text>
-                                            <FileInputItemName/>
-                                        </Text>
-                                        <Text>
-                                            <FileInputItemSizeText/>
-                                        </Text>
+                                <Flex align={"center"} justify={"space-between"}>
+                                    <Flex align={"center"} style={{gap: "0.7rem"}}>
+                                        {
+                                            file.name.endsWith(".code0license") && (
+                                                <FileInputItemPreview type=".*" style={{borderRadius: "0.6rem"}}>
+                                                    <svg style={{ width: 0, height: 0, position: "absolute" }}>
+                                                        <defs>
+                                                            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                                <stop offset="0%" stopColor={hashToColor(file.name)}/>
+                                                                <stop offset="100%" stopColor={"#ffffff"}/>
+                                                            </linearGradient>
+                                                        </defs>
+                                                    </svg>
+                                                    <IconFileInfoFilled color={"url(#iconGradient)"} size={24}/>
+                                                </FileInputItemPreview>
+                                            )
+                                        }
+                                        <FileInputItemPreview type="image/*" style={{borderRadius: "0.6rem"}}>
+                                            <FileInputItemPreviewImage/>
+                                        </FileInputItemPreview>
+                                        <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                                            <Text>
+                                                <FileInputItemName/>
+                                            </Text>
+                                            <Text>
+                                                <FileInputItemSizeText/>
+                                            </Text>
+                                        </Flex>
                                     </Flex>
+                                    <FileInputItemDeleteTrigger asChild>
+                                        <Button variant={"none"}>
+                                            <IconX size={16}/>
+                                        </Button>
+                                    </FileInputItemDeleteTrigger>
                                 </Flex>
                             </Card>
                         </FileInputItem>

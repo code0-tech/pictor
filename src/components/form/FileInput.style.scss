@@ -11,6 +11,9 @@
     width: 100%;  /* Optional: Damit das Div auch die 50px annimmt */
     height: 100%; /* Optional */
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__item-preview-image {

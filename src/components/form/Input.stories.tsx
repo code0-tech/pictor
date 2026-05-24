@@ -2,7 +2,7 @@ import React from "react";
 import {useForm} from "./useForm";
 import {Card} from "../card/Card";
 import {Button} from "../button/Button";
-import {IconChevronDown, IconKey, IconLogin, IconMail, IconVariable, IconX} from "@tabler/icons-react";
+import {IconChevronDown, IconKey, IconLogin, IconMail, IconUpload, IconVariable, IconX} from "@tabler/icons-react";
 import {Text} from "../text/Text";
 import {PasswordInput, passwordValidation} from "./PasswordInput";
 import {TextInput} from "./TextInput";
@@ -30,6 +30,19 @@ import {EditorInput} from "./EditorInput";
 import {StreamLanguage} from "@codemirror/language";
 import {tags as t} from "@lezer/highlight";
 import {hashToColor} from "../../utils";
+import {
+    FileInput,
+    FileInputContext,
+    FileInputDropzone,
+    FileInputHiddenInput,
+    FileInputItem,
+    FileInputItemGroup,
+    FileInputItemName,
+    FileInputItemPreview,
+    FileInputItemPreviewImage,
+    FileInputItemSizeText
+} from "./FileInput";
+import {Spacing} from "../spacing/Spacing";
 
 export default {
     title: "Form"
@@ -405,16 +418,17 @@ export const Editor = () => {
     })
 
     return <Card color={"secondary"} w={"400px"}>
-        <EditorInput {...inputs.getInputProps("editor")} onChange={() => validate("editor")} placeholder={"sd"} language={StreamLanguage.define({
-            token(stream) {
-                if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
-                    return "keyword";
-                }
+        <EditorInput {...inputs.getInputProps("editor")} onChange={() => validate("editor")} placeholder={"sd"}
+                     language={StreamLanguage.define({
+                         token(stream) {
+                             if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
+                                 return "keyword";
+                             }
 
-                stream.next();
-                return null;
-            }
-        })} tokenStyles={[
+                             stream.next();
+                             return null;
+                         }
+                     })} tokenStyles={[
             {tag: t.keyword, color: hashToColor("bracket")},
         ]} title={"Bla"} description={"test"} right={
             <ButtonGroup color={"primary"}>
@@ -427,4 +441,74 @@ export const Editor = () => {
             </ButtonGroup>
         } rightType={"action"}/>
     </Card>
+}
+
+export const File = () => {
+
+    const [inputs, validate, values] = useForm({
+        initialValues: {
+            file: undefined
+        },
+        validate: {
+            file: (value) => {
+                console.log(value)
+                if (!value) return "Please type something"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    React.useEffect(() => {
+        validate("file")
+    }, [values])
+
+    return <Card color={"secondary"} w={"400px"}>
+        <FileInput maxFiles={5} {...inputs.getInputProps("file")}>
+            <FileInputDropzone asChild>
+                <Card color={"tertiary"} style={{boxShadow: "none", border: "1px dashed rgba(191, 191, 191, 0.1)"}}>
+                    <Flex align={"center"} justify={"center"}
+                          style={{textAlign: "center", flexDirection: "column", gap: "1rem"}}>
+                        <Flex align={"center"} style={{gap: "0.35rem"}}>
+                            <IconUpload size={16}/>
+                            <Text size={"lg"} hierarchy={"primary"}>
+                                Upload license
+                            </Text>
+                        </Flex>
+                        <Text>
+                            To use the cloud features, you need to have at least one license connected to your <br/>
+                            namespace.
+                        </Text>
+                    </Flex>
+                </Card>
+            </FileInputDropzone>
+            <FileInputItemGroup>
+                <FileInputContext>
+                    {({acceptedFiles}) => acceptedFiles?.map((file, index) => (
+                        <FileInputItem file={file} key={file.name} asChild>
+                            <Card paddingSize={"xxs"}>
+                                <Flex align={"center"} style={{gap: "1.3rem"}}>
+                                    <FileInputItemPreview style={{borderRadius: "0.6rem"}}>
+                                        <FileInputItemPreviewImage/>
+                                    </FileInputItemPreview>
+                                    <Flex style={{flexDirection: "column", gap: "0.35rem"}}>
+                                        <Text>
+                                            <FileInputItemName/>
+                                        </Text>
+                                        <Text>
+                                            <FileInputItemSizeText/>
+                                        </Text>
+                                    </Flex>
+                                </Flex>
+                            </Card>
+                        </FileInputItem>
+                    ))}
+                </FileInputContext>
+            </FileInputItemGroup>
+            <FileInputHiddenInput/>
+        </FileInput>
+    </Card>
+
 }

@@ -13,7 +13,7 @@ import "./FileInput.style.scss"
 export type FileInputProps = {
     title?: React.ReactNode
     description?: React.ReactNode
-} & Code0Input & ValidationProps<ArkUi.FileUploadFileChangeDetails> & ArkUi.FileUploadRootProps
+} & Code0Input & ValidationProps<ArkUi.FileUploadFileChangeDetails | undefined> & ArkUi.FileUploadRootProps
 
 export type FileInputDropzoneProps = ComponentProps & ArkUi.FileUploadDropzoneProps
 export type FileInputTriggerProps = ComponentProps & ArkUi.FileUploadTriggerProps

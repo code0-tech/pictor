@@ -1,0 +1,70 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+
+.progress {
+
+  & {
+    @include box.box(variables.$tertiary);
+    @include helpers.borderRadius();
+    width: 100%;
+    height: 10px;
+    position: relative;
+    transform: translateZ(0);
+  }
+
+  &__dot {
+    @include box.box(variables.$white);
+    background: helpers.backgroundColor(variables.$white, 2);
+    position: absolute;
+    max-width: 100%;
+    aspect-ratio: 1/1;
+    height: 200%;
+    z-index: 2;
+    top: 50%;
+    transform: translateX(50%) translateY(-50%);
+    border-radius: 50rem;
+    right: calc(100% - (1% * (var(--progress, 0))));
+    overflow: hidden;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: inherit;
+      width: 60%;
+      height: 60%;
+      transform: translate(-50%, -50%);
+      background: var(--color);
+      background-repeat: no-repeat;
+    }
+  }
+
+  &__indicator {
+    position: absolute;
+    background: var(--color);
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: calc(100% * (100 / var(--progress, 100))) 100%;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+
+    &--prediction {
+      background: repeating-linear-gradient(
+                      -45deg,
+                      rgba(0,0,0,.5),
+                      rgba(0,0,0,.5) 2.5px,
+                      transparent 2.5px,
+                      transparent 5px
+      ), var(--color);
+      z-index: 0;
+      opacity: 0.5;
+      background-position: left center;
+      background-repeat: no-repeat;
+      background-size: calc(100% * (100 / var(--progressPrediction, 100))) 100%;
+    }
+  }
+}

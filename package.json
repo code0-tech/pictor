@@ -17,6 +17,7 @@
   },
   "author": "CodeZero",
   "devDependencies": {
+    "@ark-ui/react": "^5.36.2",
     "@babel/plugin-proposal-decorators": "^7.29.0",
     "@babel/plugin-transform-class-properties": "^7.28.6",
     "@codemirror/autocomplete": "^6.20.1",
@@ -92,8 +93,7 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-lib-inject-css": "^2.2.2",
-    "vitest": "^4.1.2",
-    "@ark-ui/react": "^5.36.2"
+    "vitest": "^4.1.2"
   },
   "main": "dist/index.js",
   "repository": {
@@ -105,6 +105,7 @@
   ],
   "types": "dist/index.d.ts",
   "peerDependencies": {
+    "@ark-ui/react": "^5.36.2",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.12.1",
@@ -135,10 +136,12 @@
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-resizable-panels": "^4.3.1",
     "react-zoom-pan-pinch": "^3.7.0",
-    "sonner": "^2.0.7",
-    "@ark-ui/react": "^5.36.2"
+    "sonner": "^2.0.7"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@radix-ui/react-progress": "^1.1.8"
   }
 }

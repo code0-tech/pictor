@@ -1,0 +1,177 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+
+.chart {
+  display: flex;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  font-size: variables.$xs;
+
+  & {
+    @include helpers.fontStyle();
+  }
+
+  .recharts-cartesian-axis-tick text {
+    fill: helpers.color(variables.$white, variables.$hierarchySecondary);
+  }
+
+  .recharts-cartesian-grid line[stroke="#ccc"],
+  .recharts-polar-grid [stroke="#ccc"],
+  .recharts-reference-line [stroke="#ccc"] {
+    stroke: helpers.borderColor();
+  }
+
+  .recharts-curve.recharts-tooltip-cursor {
+    stroke: helpers.borderColor();
+  }
+
+  .recharts-dot[stroke="#fff"],
+  .recharts-sector[stroke="#fff"] {
+    stroke: transparent;
+  }
+
+  .recharts-layer,
+  .recharts-sector,
+  .recharts-surface {
+    outline: none;
+  }
+
+  .recharts-radial-bar-background-sector,
+  .recharts-rectangle.recharts-tooltip-cursor {
+    fill: helpers.backgroundColor(variables.$secondary, 0.5);
+  }
+}
+
+.chart__tooltip {
+  display: grid;
+  min-width: 8rem;
+  align-items: start;
+  gap: variables.$xxs;
+  padding: variables.$xxs variables.$xs;
+  font-size: variables.$xs;
+  border: 1px solid helpers.borderColor();
+  background: helpers.backgroundColor(variables.$primary);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+
+  & {
+    @include helpers.borderRadius();
+    @include helpers.fontStyle();
+  }
+}
+
+.chart__tooltip-label {
+  font-weight: 500;
+}
+
+.chart__tooltip-body {
+  display: grid;
+  gap: variables.$xxs;
+}
+
+.chart__tooltip-row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  align-items: stretch;
+  gap: 0.5rem;
+
+  > svg {
+    width: 0.625rem;
+    height: 0.625rem;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+  }
+}
+
+.chart__tooltip-row--dot {
+  align-items: center;
+}
+
+.chart__tooltip-indicator {
+  flex-shrink: 0;
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.chart__tooltip-indicator--dot {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+.chart__tooltip-indicator--line {
+  width: 0.25rem;
+}
+
+.chart__tooltip-indicator--dashed {
+  width: 0;
+  border-width: 1.5px;
+  border-style: dashed;
+  background: transparent;
+}
+
+.chart__tooltip-indicator--nest {
+  margin: 0.125rem 0;
+}
+
+.chart__tooltip-content {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1;
+}
+
+.chart__tooltip-content--nest {
+  align-items: flex-end;
+}
+
+.chart__tooltip-meta {
+  display: grid;
+  gap: variables.$xxs;
+}
+
+.chart__tooltip-name {
+  color: helpers.color(variables.$white, variables.$hierarchySecondary);
+}
+
+.chart__tooltip-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-weight: 500;
+  color: helpers.color(variables.$white, variables.$hierarchyPrimary);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart__legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: variables.$md;
+}
+
+.chart__legend--top {
+  padding-bottom: 0.75rem;
+}
+
+.chart__legend--bottom {
+  padding-top: 0.75rem;
+}
+
+.chart__legend-item {
+  display: flex;
+  align-items: center;
+  gap: variables.$xxs;
+
+  > svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+  }
+}
+
+.chart__legend-swatch {
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+  border-radius: 2px;
+}

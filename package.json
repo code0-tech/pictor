@@ -142,6 +142,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@radix-ui/react-progress": "^1.1.8"
+    "@radix-ui/react-progress": "^1.1.8",
+    "recharts": "^3.8.1"
   }
 }

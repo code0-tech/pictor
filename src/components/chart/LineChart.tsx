@@ -27,6 +27,8 @@ export interface LineChartProps<TData extends Record<string, unknown>>
     showYAxis?: boolean
     showTooltip?: boolean
     showLegend?: boolean
+    showDots?: boolean
+    curveType?: React.ComponentProps<typeof RechartsPrimitive.Line>["type"]
     containerProps?: Omit<React.ComponentProps<typeof ChartContainer>, "children" | "config">
     gridProps?: React.ComponentProps<typeof RechartsPrimitive.CartesianGrid>
     xAxisProps?: Omit<React.ComponentProps<typeof RechartsPrimitive.XAxis>, "dataKey">
@@ -45,6 +47,8 @@ export function LineChart<TData extends Record<string, unknown>>({
     showYAxis = true,
     showTooltip = true,
     showLegend = true,
+    showDots,
+    curveType,
     containerProps,
     gridProps,
     xAxisProps,
@@ -74,8 +78,9 @@ export function LineChart<TData extends Record<string, unknown>>({
                 {showTooltip && <RechartsPrimitive.Tooltip content={tooltipContent ?? <ChartTooltipContent />} {...tooltipRest} />}
                 {showLegend && <RechartsPrimitive.Legend content={legendContent ?? <ChartLegendContent />} {...legendRest} />}
                 {lines.map((line) => {
-                    const { dataKey, label, color, type, stroke, strokeWidth, name, ...lineProps } = line
+                    const { dataKey, label, color, type, stroke, strokeWidth, name, dot, ...lineProps } = line
                     const resolvedStroke = color ?? (typeof stroke === "string" ? stroke : undefined) ?? `var(--color-${dataKey}, currentColor)`
+                    const resolvedDot = dot ?? showDots
 
                     return (
                         <RechartsPrimitive.Line
@@ -83,8 +88,9 @@ export function LineChart<TData extends Record<string, unknown>>({
                             dataKey={dataKey}
                             name={String(label) || name || dataKey}
                             stroke={resolvedStroke}
-                            type={type ?? "monotone"}
+                            type={type ?? curveType ?? "monotone"}
                             strokeWidth={strokeWidth ?? 2}
+                            dot={resolvedDot}
                             {...lineProps}
                         />
                     )

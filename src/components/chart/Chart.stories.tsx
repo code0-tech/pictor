@@ -28,7 +28,9 @@ export const LineChartExample = () => {
             ]}
             yAxisProps={{width: 40}}
             gridProps={{strokeDasharray: "4 4"}}
-            legendProps={{verticalAlign: "top"}}
+            legendProps={{ verticalAlign: "top" }}
+            showDots={false}
+            curveType={"step"}
         />
     </Card>
 }

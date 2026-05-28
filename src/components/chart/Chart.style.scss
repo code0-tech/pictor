@@ -1,5 +1,6 @@
 @use "../../styles/helpers";
 @use "../../styles/variables";
+@use "../../styles/box";
 
 .chart {
   display: flex;
@@ -8,6 +9,11 @@
   font-size: variables.$xs;
 
   & {
+    @include helpers.fontStyle();
+  }
+
+  .recharts-cartesian-axis-tick text,
+  .recharts-cartesian-axis-label text {
     @include helpers.fontStyle();
   }
 
@@ -47,13 +53,13 @@
   min-width: 8rem;
   align-items: start;
   gap: variables.$xxs;
-  padding: variables.$xxs variables.$xs;
+  padding: variables.$xs;
   font-size: variables.$xs;
-  border: 1px solid helpers.borderColor();
-  background: helpers.backgroundColor(variables.$primary);
+  box-sizing: border-box;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 
   & {
+    @include box.box(variables.$primary, variables.$white, variables.$primary);
     @include helpers.borderRadius();
     @include helpers.fontStyle();
   }
@@ -119,6 +125,7 @@
   justify-content: space-between;
   align-items: center;
   line-height: 1;
+  gap: variables.$xs;
 }
 
 .chart__tooltip-content--nest {
@@ -128,10 +135,14 @@
 .chart__tooltip-meta {
   display: grid;
   gap: variables.$xxs;
+  min-width: 0;
 }
 
 .chart__tooltip-name {
   color: helpers.color(variables.$white, variables.$hierarchySecondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chart__tooltip-value {
@@ -140,6 +151,7 @@
   font-weight: 500;
   color: helpers.color(variables.$white, variables.$hierarchyPrimary);
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .chart__legend {

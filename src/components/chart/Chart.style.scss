@@ -21,9 +21,10 @@
     fill: helpers.color(variables.$white, variables.$hierarchySecondary);
   }
 
-  .recharts-cartesian-grid line[stroke="#ccc"],
-  .recharts-polar-grid [stroke="#ccc"],
-  .recharts-reference-line [stroke="#ccc"] {
+  .recharts-cartesian-grid line,
+  .recharts-polar-grid line,
+  .recharts-reference-line line,
+  .recharts-reference-line path {
     stroke: helpers.borderColor();
   }
 
@@ -31,8 +32,8 @@
     stroke: helpers.borderColor();
   }
 
-  .recharts-dot[stroke="#fff"],
-  .recharts-sector[stroke="#fff"] {
+  .recharts-dot,
+  .recharts-sector {
     stroke: transparent;
   }
 
@@ -146,8 +147,6 @@
 }
 
 .chart__tooltip-value {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-    monospace;
   font-weight: 500;
   color: helpers.color(variables.$white, variables.$hierarchyPrimary);
   font-variant-numeric: tabular-nums;

@@ -27,10 +27,10 @@ export const LineChartExample = () => {
                 {dataKey: "users", label: "Active Users", color: "#FFBE0B"}
             ]}
             yAxisProps={{width: 40}}
-            gridProps={{strokeDasharray: "4 4"}}
             legendProps={{ verticalAlign: "top" }}
             showDots={false}
             curveType={"step"}
+            showGrid={false}
         />
     </Card>
 }

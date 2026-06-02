@@ -1,0 +1,33 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.island {
+  @include box.box(variables.$primary, variables.$white, variables.$primary);
+  @include helpers.borderRadius();
+  cursor: pointer;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &__icon {
+    --path-offset: 300%;
+    display: inline-flex;
+
+    padding-left: variables.$xs;
+
+    & svg path {
+      stroke-dasharray: 300%;
+      stroke-dashoffset: inherit;
+    }
+  }
+
+  &__message {
+    padding-right: variables.$xs;
+  }
+
+  &__content {
+    padding: variables.$xs;
+  }
+}

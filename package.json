@@ -142,6 +142,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@radix-ui/react-progress": "^1.1.8"
+    "@radix-ui/react-progress": "^1.1.8",
+    "motion": "^12.40.0",
+    "zustand": "^5.0.13"
   }
 }

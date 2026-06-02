@@ -126,7 +126,7 @@ export const useForm = <
         onSubmit
     } = props
 
-    const initValues = React.useMemo(() => initialValues as Values, [])
+    const initValues = React.useMemo(() => initialValues as Values, [initialValues])
     const [values, setValues] = useState<Values>(initValues)
     const cachedMessagesRef = useRef<Map<keyof Values, string | null>>(new Map())
 

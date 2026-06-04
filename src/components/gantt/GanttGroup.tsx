@@ -1,7 +1,6 @@
 import React, {CSSProperties} from "react"
 import {hashToColor, withAlpha} from "../../utils"
 import {GanttProps} from "./Gantt"
-import {GanttFooter} from "./GanttFooter"
 import {GanttItem} from "./GanttItem"
 import {GanttHeader} from "./GanttHeader"
 
@@ -34,6 +33,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
 
     const viewportRef = React.useRef<HTMLDivElement>(null)
     const [viewportWidth, setViewportWidth] = React.useState(0)
+    const [activeGroup, setActiveGroup] = React.useState<string | undefined>(undefined)
 
     // Parse stepWidth to pixels
     const stepWidthPx = parseInt(stepWidth as string)
@@ -62,9 +62,13 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         }
 
         handleResize()
+        viewportRef?.current?.addEventListener("resize", handleResize)
         window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
-    }, [])
+        return () => {
+            window.removeEventListener("resize", handleResize)
+            viewportRef.current?.removeEventListener("resize", handleResize)
+        }
+    })
 
     // Calculate row assignments (non-overlapping rows)
     const itemRows = items?.length ? items
@@ -81,8 +85,8 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     const containerStyles: CSSProperties = {
         display: "grid",
         gridTemplateColumns: `repeat(${columnsToRender}, ${stepWidth})`,
-        width: "100%",
-        minHeight: "100%"
+        minWidth: "100%",
+        gridColumn: "1 / -1",
     }
 
     return (
@@ -94,29 +98,30 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           avgDuration={avgDuration}
                                           stepWidth={stepWidth}/>}
             {itemRows.map((row, rowIndex) => (
-                <div key={`row-${rowIndex}`} style={{
-                    gridColumn: "1 / -1",
-                    height: rowHeight,
-                    position: "relative",
-                    backgroundColor: "transparent"
-                }}>
-                    {Array.from({length: columnsToRender - 1}).map((_, columnIndex) => (
-                        <div key={`grid-${columnIndex}`} style={{
-                            position: "absolute",
-                            left: (columnIndex + 1) * stepWidthPx,
-                            top: 0,
-                            bottom: 0,
-                            width: "0px",
-                            borderLeft: `1px dashed rgba(255, 255, 255, ${hideScaling ? 0.05 : 0.1})`
-                        }}/>
-                    ))}
+                <>
+                    <div key={`row-${rowIndex}`} style={{
+                        gridColumn: "1 / -1",
+                        minHeight: rowHeight,
+                        position: "relative",
+                        backgroundColor: "transparent"
+                    }}>
+                        {Array.from({length: columnsToRender - 1}).map((_, columnIndex) => (
+                            <div key={`grid-${columnIndex}`} style={{
+                                position: "absolute",
+                                left: (columnIndex + 1) * stepWidthPx,
+                                top: 0,
+                                bottom: 0,
+                                width: "0px",
+                                borderLeft: `1px dashed rgba(255, 255, 255, ${hideScaling ? 0.05 : 0.1})`
+                            }}/>
+                        ))}
 
-                    {hideScaling && (
-                        <>
-                            <div
-                                className="gantt__group-wrapper"
-                                style={{
-                                    backgroundImage: `
+                        {hideScaling && (
+                            <>
+                                <div
+                                    className="gantt__group-wrapper"
+                                    style={{
+                                        backgroundImage: `
                                         linear-gradient(to right, transparent, #070514), 
                                         repeating-linear-gradient(
                                           45deg, 
@@ -125,14 +130,14 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           ${withAlpha(hashToColor(props.id!.replace("target", "source")), 0.5)} 4px
                                         )
                                     `,
-                                    left: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).left}px`,
-                                    width: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).width}px`,
-                                }}
-                            />
-                            <div
-                                className="gantt__group-wrapper"
-                                style={{
-                                    backgroundImage: `
+                                        left: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).left}px`,
+                                        width: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).width}px`,
+                                    }}
+                                />
+                                <div
+                                    className="gantt__group-wrapper"
+                                    style={{
+                                        backgroundImage: `
                                         linear-gradient(to left, transparent, #070514), 
                                         repeating-linear-gradient(
                                           45deg, 
@@ -141,31 +146,45 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           ${withAlpha(hashToColor(props.id!.replace("target", "source")), 0.5)} 4px
                                         )
                                     `,
-                                    left: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).left}px`,
-                                    width: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).width}px`,
-                                }}
-                            />
-                        </>
-                    )}
+                                        left: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).left}px`,
+                                        width: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).width}px`,
+                                    }}
+                                />
+                            </>
+                        )}
 
+                        {row.map((item, itemIndex) => {
+                            const itemPosition = getItemPosition(item.start, item.end, start, end, timeRange, totalTimelineWidth)
+                            const hasVisibleWidth = itemPosition.width > 0
+
+                            return hasVisibleWidth && (
+                                <>
+                                    <GanttItem
+                                        key={item.id}
+                                        id={item.id}
+                                        w={`${itemPosition.width}px`}
+                                        left={`${itemPosition.left}px`}
+                                        onClick={() => {
+                                            if (item.type != "group") return
+                                            setActiveGroup(prevState => item.id === prevState ? undefined : item.id)
+                                        }}
+                                    >
+                                        {children?.(item, itemIndex)}
+                                    </GanttItem>
+                                </>
+                            )
+                        })}
+                    </div>
                     {row.map((item, itemIndex) => {
-                        const itemPosition = getItemPosition(item.start, item.end, start, end, timeRange, totalTimelineWidth)
-                        const hasVisibleWidth = itemPosition.width > 0
-
-                        return hasVisibleWidth && (
-                            <GanttItem
-                                key={item.id}
-                                id={item.id}
-                                w={`${itemPosition.width}px`}
-                                left={`${itemPosition.left}px`}
-                            >
-                                {children?.(item, itemIndex)}
-                            </GanttItem>
-                        )
+                        return item.type === "group" && activeGroup === item.id && <GanttGroup children={children}
+                                           id={`group-target-${itemIndex}`}
+                                           start={(Math.min(...item.data.items.map((item: any) => item.start))) - ((((Math.min(...item.data.items.map((item: any) => item.start))) / (item.data.firstGroupStep * item.data.step)) * (item.data.groupStep * item.data.step)))}
+                                           step={item.data.groupStep * item.data.step}
+                                           stepWidth={stepWidth} rowHeight={rowHeight} items={item.data.items}
+                                           key={`group-target-${itemIndex}`}/>
                     })}
-                </div>
+                </>
             ))}
-            {!hideScaling && <GanttFooter/>}
 
         </div>
     )

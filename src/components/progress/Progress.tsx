@@ -5,12 +5,13 @@ import "./Progress.style.scss"
 
 export type ProgressProps = ComponentProps & Radix.ProgressProps & {
     color?: CSSProperties['background']
+    dot?: React.ReactNode
     predictionValue?: number | null
 }
 
 export const Progress: React.FC<ProgressProps> = (props) => {
 
-    const {color = "white", predictionValue, ...rest} = props
+    const {color = "white", predictionValue, dot, ...rest} = props
 
     const progress = ((Math.min(props.value ?? 0, props.max ?? 100)) / (props.max ?? 100)) * 100;
     const transformValue = `translateX(-${100 - progress}%)`;
@@ -28,7 +29,9 @@ export const Progress: React.FC<ProgressProps> = (props) => {
         }
     })}>
 
-        <div className={"progress__dot"}/>
+        <div className={"progress__dot"}>
+            {dot}
+        </div>
 
         <div style={{
             width: "100%",

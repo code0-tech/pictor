@@ -62,6 +62,10 @@ export const Gantt: React.FC<GanttProps> = (props) => {
                 id: `group-source-${index}`,
                 type: "group",
                 data: {
+                    items: group.items,
+                    step: step,
+                    firstGroupStep: groups[0].step,
+                    groupStep: group.step,
                     displayMessage: `${index}`,
                     color: hashToColor(`group-source-${index}`),
                 }
@@ -70,24 +74,18 @@ export const Gantt: React.FC<GanttProps> = (props) => {
 
     })
 
+    const minStart = Math.min(...groups[0].items.map(item => item.start))
+
     return (
         <ScrollArea w={"100%"} h={"100%"} type={"hover"}>
             <ScrollAreaViewport>
-                {
-                    groups.sort((a, b) => b.step - a.step).map((group, index) => {
-
-                        const minStart = Math.min(...group.items.map(item => item.start))
-
-                        return <GanttGroup children={children}
-                                           id={`group-target-${index}`}
-                                           hideScaling={index != 0}
-                                           start={minStart - (((minStart / (groups[0].step * step)) * (group.step * step)))}
-                                           step={group.step * step}
-                                           stepWidth={stepWidth} rowHeight={rowHeight} items={group.items}
-                                           key={`group-target-${index}`}/>
-
-                    })
-                }
+                <GanttGroup children={children}
+                            id={`group-target`}
+                            hideScaling={false}
+                            start={minStart - (((minStart / (groups[0].step * step)) * (groups[0].step * step)))}
+                            step={groups[0].step * step}
+                            stepWidth={stepWidth} rowHeight={rowHeight} items={groups[0].items}
+                            key={`group-target`}/>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"horizontal"}>
                 <ScrollAreaThumb/>

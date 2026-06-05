@@ -34,34 +34,34 @@ export const addIslandNotification = (toast: IslandNotificationProps) => {
 export const addIslandInfoNotification = (toast: Partial<IslandNotificationProps>) => {
     useIsland.getState().addToast({
         icon: <IconInfoCircle color={"#70ffb2"} size={16}/>,
+        ...toast,
         message: <Text c={"#70ffb2"}>{toast.message}</Text>,
-        ...toast
     })
 }
 
 export const addIslandSuccessNotification = (toast: Partial<IslandNotificationProps>) => {
     useIsland.getState().addToast({
         icon: <IconCircleCheck color={"#29BF12"} size={16}/>,
-        message: <Text c={"#29BF12"}>{toast.message}</Text>,
         index: 1,
-        ...toast
+        ...toast,
+        message: <Text c={"#29BF12"}>{toast.message}</Text>,
     })
 }
 
 export const addIslandWarningNotification = (toast: Partial<IslandNotificationProps>) => {
     useIsland.getState().addToast({
         icon: <IconAlertCircle color={"#FFBE0B"} size={16}/>,
-        message: <Text c={"#FFBE0B"}>{toast.message}</Text>,
         index: 2,
-        ...toast
+        ...toast,
+        message: <Text c={"#FFBE0B"}>{toast.message}</Text>,
     })
 }
 
 export const addIslandErrorNotification = (toast: Partial<IslandNotificationProps>) => {
     useIsland.getState().addToast({
         icon: <IconCircleX color={"#D90429"} size={16}/>,
-        message: <Text c={"#D90429"}>{toast.message}</Text>,
         index: 3,
-        ...toast
+        ...toast,
+        message: <Text c={"#D90429"}>{toast.message}</Text>,
     })
 }

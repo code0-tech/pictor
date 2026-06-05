@@ -4,7 +4,7 @@ import "./ButtonGroup.style.scss"
 import {Component, Color, mergeComponentProps} from "../../utils";
 
 export interface ButtonGroupType extends Component<HTMLDivElement> {
-    children: ReactElement<ButtonProps>[]
+    children: ReactElement<ButtonProps> | ReactElement<ButtonProps>[]
     color?: Color
 }
 
@@ -12,12 +12,23 @@ export const ButtonGroup: React.FC<ButtonGroupType> = (props) => {
 
     const {children, color = "secondary", ...args} = props
 
+    const validChildren = React.Children.toArray(children).filter(child => child != null)
+    const count = validChildren.length
+
     return <div {...mergeComponentProps(`button-group button-group--${color}`, args)}>
 
-        {children.map((child, i) => {
+        {validChildren.map((child, i) => {
+
+            let className = "button-group__item"
+            if (i === count - 1) {
+                className = "button-group__last"
+            } else if (i === 0) {
+                className = "button-group__first"
+            }
+
             return <div
-                key={child.key ?? `button-group-${i}`}
-                className={`${i == 0 || i == children.length - 1 ? i == 0 ? "button-group__first" : "button-group__last" : "button-group__item"}`}>
+                key={`button-group-${i}`}
+                className={className}>
                 {child}
             </div>
         })}

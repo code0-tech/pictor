@@ -12,11 +12,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = props => {
 
     const {splitter = <IconChevronRight size={16}/>, children, ...rest} = props
 
-    const count = React.Children.count(children)
+    const validChildren = React.Children.toArray(children).filter(child => child != null)
+    const count = validChildren.length
 
     return (
         <div {...mergeComponentProps(`breadcrumb`, rest)}>
-            {React.Children.map(children, (child, index) => (
+            {validChildren.map((child, index) => (
                 <React.Fragment key={index}>
                     {child}
                     {index < count - 1 ? (

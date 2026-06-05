@@ -4,7 +4,7 @@ import {Island} from "./Island";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Button} from "../button/Button";
 import {Text} from "../text/Text";
-import {IconCircleCheck, IconCircleX, IconFileSpark} from "@tabler/icons-react";
+import {IconCircleCheck, IconCircleX} from "@tabler/icons-react";
 import {Flex} from "../flex/Flex";
 import {FullScreen} from "../fullscreen/FullScreen";
 import {Progress} from "../progress/Progress";
@@ -43,7 +43,8 @@ export const IslandExample = () => {
                 <Button onClick={() => {
                     addIslandNotification({
                         icon: <Text c={"#70ffb2"}>Approaching limit</Text>,
-                        message:  <Progress w={"100px"} h={"7.5px"} value={30} predictionValue={75} max={100} color={"#70ffb2"}/>,
+                        message: <Progress w={"100px"} h={"7.5px"} value={30} predictionValue={75} max={100}
+                                           color={"#70ffb2"}/>,
                         content: <Flex w={"100%"} style={{flexDirection: "column", gap: "0.7rem"}}>
                             <Text>
                                 You used 50% of your available workflow executions and will used 75% until its reseted.

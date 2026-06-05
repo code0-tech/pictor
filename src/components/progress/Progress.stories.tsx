@@ -19,7 +19,7 @@ export const ProgressExample = () => {
             You used 50% of your available workflow executions and will used 75% until its reseted.
         </Text>
         <Spacing spacing={"xl"}/>
-        <Progress value={30} predictionValue={70} max={100} color={"#70ffb2"}/>
+        <Progress value={30} max={100} color={"#70ffb2"}/>
         <Spacing spacing={"xs"}/>
         <Text>
             You used 30% of your available workflow executions and will used 120% until its reseted.

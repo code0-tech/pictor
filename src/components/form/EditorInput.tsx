@@ -21,7 +21,7 @@ export interface EditorInputProps extends Omit<InputWrapperProps, 'onChange'>, V
 
 export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
-    const {title, right, left, rightType, leftType, language, description, extensions = [], tokenStyles = [], formValidation, onChange, ...rest} = props
+    const {title, right, left, rightType, leftType, language, description, extensions = [], tokenStyles = [], formValidation, onChange, wrapperComponent, ...rest} = props
 
     const internalExtensions: Extension[] = [...extensions, language!]
 
@@ -60,7 +60,9 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                          left={left}
                          rightType={rightType}
                          leftType={leftType}
-                         formValidation={formValidation}>
+                         formValidation={formValidation}
+                         wrapperComponent={wrapperComponent}
+    >
 
         <CodeMirror extensions={internalExtensions} onChange={value => {
             formValidation?.setValue?.(value)

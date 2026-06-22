@@ -1,0 +1,208 @@
+@use "../../styles/variables";
+@use "../../styles/helpers";
+@use "../../styles/box";
+
+.character {
+  display: inline-flex;
+  flex-shrink: 0;
+
+  &__svg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    @include box.box();
+    @include helpers.borderRadius();
+    border-radius: 25%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  &__blob {
+    fill: var(--character-color);
+
+  }
+
+  // ── Shared "look-around" group ────────────────────────────────────────────
+  // Both eyes drift left/right/up/down and pulse smaller/larger together,
+  // continuously, like a curious gaze. Used in idle + happy.
+
+  &__eyes-motion {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: character-look-around 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  // ── Eye outer group ───────────────────────────────────────────────────────
+  // Per-eye rotation (used by error/thinking).
+  &__eye-outer {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // ── Eye inner group ───────────────────────────────────────────────────────
+  // Per-eye blink / loading-pulse.
+  &__eye-inner {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: character-blink 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  // ── Eye shape — accent color, smooth rx/ry transitions per mood ──────────
+  &__eye-shape {
+    rx: 11px;
+    ry: 16px;
+    fill: variables.$bodyBg;
+    transition: rx 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    ry 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  // ── Mood: happy — squinted, smiling eyes, faster gaze ────────────────────
+
+  &--happy &__eyes-motion {
+    animation-duration: 4.5s;
+  }
+
+  &--happy &__eye-shape {
+    rx: 13px;
+    ry: 6px;
+  }
+
+  &--happy &__eye-inner {
+    animation-duration: 4s;
+  }
+
+  // ── Mood: thinking — looking up, right eye is a thin line ────────────────
+
+  &--thinking &__eyes-motion {
+    animation: none;
+    transform: translate(2px, -4px);
+  }
+
+  &--thinking &__eye--left &__eye-shape {
+    ry: 14px;
+  }
+
+  &--thinking &__eye--right &__eye-shape {
+    rx: 9px;
+    ry: 2px;
+  }
+
+  &--thinking &__eye--right &__eye-inner {
+    animation: none;
+  }
+
+  // ── Mood: error — slanted angry eyes, no drift ───────────────────────────
+
+  &--error &__eyes-motion {
+    animation: character-eye-shake 0.3s linear infinite;
+  }
+
+  &--error &__eye-outer.character__eye--left {
+    transform: rotate(-18deg);
+  }
+
+  &--error &__eye-outer.character__eye--right {
+    transform: rotate(18deg);
+  }
+
+  &--error &__eye-shape {
+    rx: 10px;
+    ry: 14px;
+  }
+
+  &--error &__eye-inner {
+    animation: none;
+  }
+
+  // ── Mood: loading — round dots, breathing pulse, no drift ────────────────
+
+  &--loading &__eyes-motion {
+    animation: none;
+  }
+
+  &--loading &__eye-shape {
+    rx: 10px;
+    ry: 10px;
+  }
+
+  &--loading &__eye-inner {
+    animation: character-eye-pulse 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  &--loading &__eye--right &__eye-inner {
+    animation-delay: 0.65s;
+  }
+}
+
+// ── Keyframes ────────────────────────────────────────────────────────────────
+
+// Continuous look-around: left → up-right → down → recenter, with a gentle
+// size pulse layered in so the eyes never feel frozen.
+@keyframes character-look-around {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  12% {
+    transform: translate(-4px, -1px) scale(0.96);
+  }
+  24% {
+    transform: translate(-4px, -1px) scale(0.96);
+  }
+  38% {
+    transform: translate(4px, -3px) scale(1.08);
+  }
+  52% {
+    transform: translate(4px, -3px) scale(1.08);
+  }
+  66% {
+    transform: translate(0, 3px) scale(0.92);
+  }
+  80% {
+    transform: translate(0, 3px) scale(0.92);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+// Soft, eased blink
+@keyframes character-blink {
+  0%, 85%, 100% {
+    transform: scaleY(1);
+  }
+  91% {
+    transform: scaleY(0.08);
+  }
+  97% {
+    transform: scaleY(1);
+  }
+}
+
+// Loading: gentle breathing
+@keyframes character-eye-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.78);
+    opacity: 0.4;
+  }
+}
+
+// Error: small angry shake
+@keyframes character-eye-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}

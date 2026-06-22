@@ -9,6 +9,8 @@ import {Flex} from "../flex/Flex";
 import {FullScreen} from "../fullscreen/FullScreen";
 import {Progress} from "../progress/Progress";
 import {addIslandNotification} from "./Island.hook";
+import {Character} from "../character/Character";
+import {Spacing} from "../spacing/Spacing";
 
 export default {
     title: "Island",
@@ -64,7 +66,7 @@ export const IslandExample = () => {
                 </Button>
                 <Button onClick={() => {
                     addIslandNotification({
-                        icon: <IconCircleCheck color={"#29BF12"} size={16}/>,
+                        icon: <Character mood={"idle"} color="success" size={24} />,
                         message: <Text c={"#29BF12"}>Added license</Text>,
                     })
                 }}>
@@ -74,7 +76,22 @@ export const IslandExample = () => {
                     addIslandNotification({
                         icon: <IconCircleX color={"#D90429"} size={16}/>,
                         message: <Text c={"#D90429"}>Internal error</Text>,
-                        index: 1
+                        index: 1,
+                        content: <Flex align={"center"} justify={"center"} w={"100%"} style={{flexDirection: "column"}}>
+                            <Character mood={"error"} color="error" size={120} />
+                            <Text c={"#D90429"} size={"md"} style={{textAlign: "center"}} mx={2}>
+                                Spark has experienced issues, but can't track it down.
+                            </Text>
+                            <Spacing spacing={"xl"}/>
+                            <ButtonGroup>
+                                <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
+                                    Contact support
+                                </Button>
+                                <Button paddingSize={"xxs"} color={"tertiary"} variant={"none"}>
+                                    Ask community
+                                </Button>
+                            </ButtonGroup>
+                        </Flex>
                     })
                 }}>
                     Error

@@ -19,39 +19,80 @@ export interface EditorInputProps extends Omit<InputWrapperProps, 'onChange'>, V
     onChange?: (value: string) => void
 }
 
-export const EditorInput: React.FC<EditorInputProps> = (props) => {
+const EMPTY_EXTENSIONS: Extension[] = []
+const EMPTY_TOKEN_STYLES: TagStyle[] = []
 
-    const {title, right, left, rightType, leftType, language, description, extensions = [], tokenStyles = [], formValidation, onChange, wrapperComponent, ...rest} = props
+const BASIC_SETUP = {
+    lineNumbers: false,
+    foldGutter: false,
+    highlightActiveLine: false,
+    highlightActiveLineGutter: false,
+} as const
 
-    const internalExtensions: Extension[] = [...extensions, language!]
+const THEME_SETTINGS = {
+    background: 'transparent',
+    backgroundImage: '',
+    foreground: 'rgba(255,255,255, 0.75)',
+    caret: 'gray',
+    selection: 'rgba(112,179,255,0.25)',
+    selectionMatch: 'rgba(112,179,255,0.1)',
+    fontSize: "0.8rem",
+    gutterBackground: 'transparent',
+    gutterForeground: 'rgba(255,255,255, 0.5)',
+    gutterBorder: 'transparent',
+    gutterActiveForeground: 'rgba(255,255,255, 1)',
+    lineHighlight: 'rgba(255,255,255, 0.1)',
+} as const
+
+const BASE_TOKEN_STYLES: TagStyle[] = [
+    {tag: t.squareBracket, color: hashToColor("squareBracket")},
+    {tag: t.bracket, color: hashToColor("bracket")},
+    {tag: t.string, color: hashToColor("Text")},
+    {tag: t.bool, color: hashToColor("Boolean")},
+    {tag: t.number, color: hashToColor("Number")},
+]
+
+const DEFAULT_THEME = createTheme({
+    theme: 'light',
+    settings: THEME_SETTINGS,
+    styles: BASE_TOKEN_STYLES,
+})
+
+export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
+
+    const {
+        title, right, left, rightType, leftType,
+        language, description,
+        extensions = EMPTY_EXTENSIONS,
+        tokenStyles = EMPTY_TOKEN_STYLES,
+        formValidation, onChange, wrapperComponent, ...rest
+    } = props
+
+    const internalExtensions = React.useMemo<Extension[]>(
+        () => language ? [...extensions, language] : extensions,
+        [extensions, language]
+    )
 
     const myTheme = React.useMemo(
-        () => createTheme({
-            theme: 'light',
-            settings: {
-                background: 'transparent',
-                backgroundImage: '',
-                foreground: 'rgba(255,255,255, 0.75)',
-                caret: 'gray',
-                selection: 'rgba(112,179,255,0.25)',
-                selectionMatch: 'rgba(112,179,255,0.1)',
-                fontSize: "0.8rem",
-                gutterBackground: 'transparent',
-                gutterForeground: 'rgba(255,255,255, 0.5)',
-                gutterBorder: 'transparent',
-                gutterActiveForeground: 'rgba(255,255,255, 1)',
-                lineHighlight: 'rgba(255,255,255, 0.1)',
-            },
-            styles: [
-                {tag: t.squareBracket, color: hashToColor("squareBracket")},
-                {tag: t.bracket, color: hashToColor("bracket")},
-                {tag: t.string, color: hashToColor("Text")},
-                {tag: t.bool, color: hashToColor("Boolean")},
-                {tag: t.number, color: hashToColor("Number")},
-                ...tokenStyles
-            ]
-        }),
+        () => tokenStyles.length === 0
+            ? DEFAULT_THEME
+            : createTheme({
+                theme: 'light',
+                settings: THEME_SETTINGS,
+                styles: [...BASE_TOKEN_STYLES, ...tokenStyles],
+            }),
         [tokenStyles]
+    )
+
+    const setValue = formValidation?.setValue
+    const handleChange = React.useCallback((value: string) => {
+        setValue?.(value)
+        onChange?.(value)
+    }, [setValue, onChange])
+
+    const mergedProps = React.useMemo(
+        () => mergeComponentProps("editor-input", rest),
+        [rest]
     )
 
     return <InputWrapper title={title}
@@ -64,14 +105,12 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                          wrapperComponent={wrapperComponent}
     >
 
-        <CodeMirror extensions={internalExtensions} onChange={value => {
-            formValidation?.setValue?.(value)
-            onChange?.(value)
-        }} theme={myTheme} {...mergeComponentProps("editor-input", rest)} basicSetup={{
-            lineNumbers: false,
-            foldGutter: false,
-            highlightActiveLine: false,
-            highlightActiveLineGutter: false,
-        }}/>
+        <CodeMirror extensions={internalExtensions}
+                    onChange={handleChange}
+                    theme={myTheme}
+                    {...mergedProps}
+                    basicSetup={BASIC_SETUP}/>
     </InputWrapper>
-}
+})
+
+EditorInput.displayName = "EditorInput"

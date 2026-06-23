@@ -3,186 +3,185 @@
 @use "../../styles/box";
 
 .chart {
-  display: flex;
-  justify-content: center;
-  aspect-ratio: 16 / 9;
-  font-size: variables.$xs;
+    display: flex;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    font-size: variables.$xs;
 
-  & {
-    @include helpers.fontStyle();
-  }
+    & {
+        @include helpers.fontStyle();
+    }
 
-  .recharts-cartesian-axis-tick text,
-  .recharts-cartesian-axis-label text {
-    @include helpers.fontStyle();
-  }
+    .recharts-cartesian-axis-tick text,
+    .recharts-cartesian-axis-label text {
+        @include helpers.fontStyle();
+    }
 
-  .recharts-cartesian-axis-tick text {
-    fill: helpers.color(variables.$white, variables.$hierarchySecondary);
-  }
+    .recharts-cartesian-axis-tick text {
+        fill: helpers.color(variables.$white, variables.$hierarchySecondary);
+    }
 
-  .recharts-cartesian-grid line,
-  .recharts-polar-grid line,
-  .recharts-reference-line line,
-  .recharts-reference-line path {
-    stroke: helpers.borderColor();
-  }
+    .recharts-cartesian-grid line,
+    .recharts-polar-grid line,
+    .recharts-reference-line line,
+    .recharts-reference-line path {
+        stroke: helpers.borderColor();
+    }
 
-  .recharts-curve.recharts-tooltip-cursor {
-    stroke: helpers.borderColor();
-  }
+    .recharts-curve.recharts-tooltip-cursor {
+        stroke: helpers.borderColor();
+    }
 
-  .recharts-dot,
-  .recharts-sector {
-    stroke: transparent;
-  }
+    .recharts-dot,
+    .recharts-sector {
+        stroke: transparent;
+    }
 
-  .recharts-layer,
-  .recharts-sector,
-  .recharts-surface {
-    outline: none;
-  }
+    .recharts-layer,
+    .recharts-sector,
+    .recharts-surface {
+        outline: none;
+    }
 
-  .recharts-radial-bar-background-sector,
-  .recharts-rectangle.recharts-tooltip-cursor {
-    fill: helpers.backgroundColor(variables.$secondary, 0.5);
-  }
+    .recharts-radial-bar-background-sector,
+    .recharts-rectangle.recharts-tooltip-cursor {
+        fill: helpers.backgroundColor(variables.$secondary, 0.5);
+    }
 }
 
 .chart__tooltip {
-  display: grid;
-  min-width: 8rem;
-  align-items: start;
-  gap: variables.$xxs;
-  padding: variables.$xs;
-  font-size: variables.$xs;
-  box-sizing: border-box;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    display: grid;
+    min-width: 8rem;
+    align-items: start;
+    gap: variables.$xxs;
+    padding: variables.$xs;
+    font-size: variables.$xs;
 
-  & {
-    @include box.box(variables.$primary, variables.$white, variables.$primary);
-    @include helpers.borderRadius();
-    @include helpers.fontStyle();
-  }
+    & {
+        @include box.box(variables.$tertiary);
+        @include helpers.borderRadius();
+        @include helpers.fontStyle();
+    }
 }
 
 .chart__tooltip-label {
-  font-weight: 500;
+    @include helpers.fontStyle();
 }
 
 .chart__tooltip-body {
-  display: grid;
-  gap: variables.$xxs;
+    display: grid;
+    gap: variables.$xxs;
 }
 
 .chart__tooltip-row {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  align-items: stretch;
-  gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-items: stretch;
+    gap: variables.$xs;
 
-  > svg {
-    width: 0.625rem;
-    height: 0.625rem;
-    color: helpers.color(variables.$white, variables.$hierarchySecondary);
-  }
+    > svg {
+        width: variables.$xs;
+        height: variables.$xs;
+        color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    }
 }
 
 .chart__tooltip-row--dot {
-  align-items: center;
+    align-items: center;
 }
 
 .chart__tooltip-indicator {
-  flex-shrink: 0;
-  border-radius: 2px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
+    flex-shrink: 0;
+    border-radius: variables.$borderRadius;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
 }
 
 .chart__tooltip-indicator--dot {
-  width: 0.625rem;
-  height: 0.625rem;
+    border-radius: variables.$xxs * variables.$hierarchyTertiary;
+    width: variables.$xs;
+    height: variables.$xs;
 }
 
 .chart__tooltip-indicator--line {
-  width: 0.25rem;
+    width: variables.$xxs;
 }
 
 .chart__tooltip-indicator--dashed {
-  width: 0;
-  border-width: 1.5px;
-  border-style: dashed;
-  background: transparent;
+    width: 0;
+    border-width: variables.$md * variables.$hierarchyTertiary;
+    border-style: dashed;
+    background: transparent;
 }
 
 .chart__tooltip-indicator--nest {
-  margin: 0.125rem 0;
+    margin: variables.$xxs 0;
 }
 
 .chart__tooltip-content {
-  display: flex;
-  flex: 1;
-  justify-content: space-between;
-  align-items: center;
-  line-height: 1;
-  gap: variables.$xs;
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    line-height: 1;
+    gap: variables.$xs;
 }
 
 .chart__tooltip-content--nest {
-  align-items: flex-end;
+    align-items: flex-end;
 }
 
 .chart__tooltip-meta {
-  display: grid;
-  gap: variables.$xxs;
-  min-width: 0;
+    display: grid;
+    gap: variables.$xxs;
+    min-width: 0;
 }
 
 .chart__tooltip-name {
-  color: helpers.color(variables.$white, variables.$hierarchySecondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .chart__tooltip-value {
-  font-weight: 500;
-  color: helpers.color(variables.$white, variables.$hierarchyPrimary);
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
+    @include helpers.fontStyle();
+    color: helpers.color(variables.$white, variables.$hierarchyPrimary);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
 }
 
 .chart__legend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: variables.$md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: variables.$md;
 }
 
 .chart__legend--top {
-  padding-bottom: 0.75rem;
+    padding-bottom: variables.$xs;
 }
 
 .chart__legend--bottom {
-  padding-top: 0.75rem;
+    padding-top: variables.$xs;
 }
 
 .chart__legend-item {
-  display: flex;
-  align-items: center;
-  gap: variables.$xxs;
+    display: flex;
+    align-items: center;
+    gap: variables.$xxs;
 
-  > svg {
-    width: 0.75rem;
-    height: 0.75rem;
-    color: helpers.color(variables.$white, variables.$hierarchySecondary);
-  }
+    > svg {
+        width: variables.$xs;
+        height: variables.$xs;
+        color: helpers.color(variables.$white, variables.$hierarchySecondary);
+    }
 }
 
 .chart__legend-swatch {
-  width: 0.5rem;
-  height: 0.5rem;
-  flex-shrink: 0;
-  border-radius: 2px;
+    width: variables.$md * variables.$hierarchyTertiary;
+    height: variables.$md * variables.$hierarchyTertiary;
+    flex-shrink: 0;
+    border-radius: 2px;
 }

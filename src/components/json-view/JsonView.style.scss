@@ -1,0 +1,52 @@
+@use "../../styles/helpers";
+@use "../../styles/variables";
+@use "../../styles/box";
+
+.json-view {
+  width: 100%;
+  box-sizing: border-box;
+
+  & {
+    @include helpers.fontStyle();
+  }
+
+  &__arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: helpers.color(variables.$tertiary);
+    margin-right: variables.$xxs;
+    cursor: pointer;
+    transition: ease-in 0.05s transform;
+
+    &:hover {
+      color: helpers.color(variables.$tertiary, variables.$hierarchySecondary);
+    }
+
+
+    &[data-expanded="false"] {
+      transform: rotate(90deg) !important;
+    }
+
+    &[data-expanded="true"] {
+      transform: rotate(0deg) !important;
+    }
+  }
+
+  &__copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: helpers.color(variables.$tertiary);
+    margin-left: variables.$xs !important;
+
+    &:hover {
+      color: helpers.color(variables.$tertiary, variables.$hierarchySecondary);
+    }
+
+    &[data-copied="true"] {
+      color: helpers.color(variables.$success, variables.$hierarchyPrimary);
+    }
+  }
+}

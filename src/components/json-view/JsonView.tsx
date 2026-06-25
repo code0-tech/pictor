@@ -57,10 +57,15 @@ export const JsonView = <T extends object = object>(props: JsonViewProps<T>) => 
         displayDataTypes = false,
         enableClipboard = true,
         indentWidth = 12.8,
+        value,
         ...rest
     } = props
 
     const merged = mergeComponentProps("json-view", rest)
+
+    const safeValue = (value === null || value === undefined || typeof value !== 'object')
+        ? [value] as unknown as T
+        : value
 
     return (
         <ReactJsonView
@@ -69,6 +74,7 @@ export const JsonView = <T extends object = object>(props: JsonViewProps<T>) => 
             enableClipboard={enableClipboard}
             indentWidth={indentWidth}
             {...merged}
+            value={safeValue}
             style={{...JSON_VIEW_THEME, ...(merged.style ?? {})}}
         >
                 <ReactJsonView.Arrow

@@ -14,17 +14,31 @@ export const GanttHeader: React.FC<GanttHeaderProps> = (props) => {
 
     const {columnCount, start, step, avgDuration, stepWidth, ...rest} = props
 
-    const stepWidthPx = parseInt(stepWidth as string)
+    const stepWidthPx = React.useMemo(() => parseInt(stepWidth as string), [stepWidth])
+    const label = React.useMemo(() => getTimelineLabel(avgDuration), [avgDuration])
+    const columns = React.useMemo(() => Array.from({length: columnCount}), [columnCount])
 
     return <div {...mergeComponentProps("gantt__header", rest)}>
-        {Array.from({length: columnCount}).map((_, columnIndex) => {
-            const timelineValue = start + columnIndex * step
-            const shouldShowLabel = columnIndex % 4 === 0
-            const label = getTimelineLabel(avgDuration)
-            const {value, unit} = getTimelineLabel(timelineValue)
-            const displayValue = `${Math.round(value * 10) / 10}${unit}`
+        {columns.map((_, columnIndex) => {
+            if (columnIndex === 0) {
+                return (
+                    <div key={`header-${columnIndex}`} className={"gantt__header-label-column"}>
+                        <Text className={"gantt__header-label"}>
+                            Range in {label.unit}
+                        </Text>
+                    </div>
+                )
+            }
 
-            return columnIndex !== 0 ? (
+            const shouldShowLabel = columnIndex % 4 === 0
+            let displayValue = ""
+            if (shouldShowLabel) {
+                const timelineValue = start + columnIndex * step
+                const {value, unit} = getTimelineLabel(timelineValue)
+                displayValue = `${Math.round(value * 10) / 10}${unit}`
+            }
+
+            return (
                 <div
                     key={`header-${columnIndex}`}
                     className={"gantt__header-column"}
@@ -34,13 +48,7 @@ export const GanttHeader: React.FC<GanttHeaderProps> = (props) => {
                     }}
                 >
                     <Text>
-                        {shouldShowLabel ? displayValue : ""}
-                    </Text>
-                </div>
-            ) : (
-                <div key={`header-${columnIndex}`} className={"gantt__header-label-column"}>
-                    <Text className={"gantt__header-label"}>
-                        Range in {label.unit}
+                        {displayValue}
                     </Text>
                 </div>
             )

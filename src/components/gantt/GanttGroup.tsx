@@ -36,7 +36,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     const [activeGroup, setActiveGroup] = React.useState<string | undefined>(undefined)
 
     // Parse stepWidth to pixels
-    const stepWidthPx = parseInt(stepWidth as string)
+    const stepWidthPx = React.useMemo(() => parseInt(stepWidth as string), [stepWidth])
 
     // Timeline calculations
     const timeRange = end - start
@@ -44,12 +44,29 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     const totalTimelineWidth = timelineColumns * stepWidthPx
 
     // Item statistics
-    const nonGroupItems = items?.filter((item: any) => item.type !== "group") ?? []
-    const avgDuration = nonGroupItems.length === 0
-        ? step
-        : nonGroupItems.reduce((sum: number, item: any) => sum + (item.end - item.start), 0) / nonGroupItems.length
-    const itemMinStart = items && items.length > 0 ? Math.min(...items.map(item => item.start)) : start
-    const itemMaxEnd = items && items.length > 0 ? Math.max(...items.map(item => item.end)) : end
+    const {avgDuration, itemMinStart, itemMaxEnd} = React.useMemo(() => {
+        if (!items || items.length === 0) {
+            return {avgDuration: step, itemMinStart: start, itemMaxEnd: end}
+        }
+        let sumDuration = 0
+        let nonGroupCount = 0
+        let minStart = Infinity
+        let maxEnd = -Infinity
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i]
+            if (item.start < minStart) minStart = item.start
+            if (item.end > maxEnd) maxEnd = item.end
+            if ((item as any).type !== "group") {
+                sumDuration += item.end - item.start
+                nonGroupCount++
+            }
+        }
+        return {
+            avgDuration: nonGroupCount === 0 ? step : sumDuration / nonGroupCount,
+            itemMinStart: minStart,
+            itemMaxEnd: maxEnd,
+        }
+    }, [items, start, end, step])
 
     // Column rendering calculations
     const columnsNeeded = items && items.length > 0 ? Math.ceil((itemMaxEnd - start) / step) : timelineColumns
@@ -62,13 +79,14 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         }
 
         handleResize()
-        viewportRef?.current?.addEventListener("resize", handleResize)
+        const viewport = viewportRef.current
+        viewport?.addEventListener("resize", handleResize)
         window.addEventListener("resize", handleResize)
         return () => {
             window.removeEventListener("resize", handleResize)
-            viewportRef.current?.removeEventListener("resize", handleResize)
+            viewport?.removeEventListener("resize", handleResize)
         }
-    })
+    }, [])
 
     // Calculate row assignments (non-overlapping rows)
     const itemRows = items?.length ? items
@@ -82,12 +100,24 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         : []
 
     // Style configurations
-    const containerStyles: CSSProperties = {
+    const containerStyles: CSSProperties = React.useMemo(() => ({
         display: "grid",
         gridTemplateColumns: `repeat(${columnsToRender}, ${stepWidth})`,
         minWidth: "100%",
         gridColumn: "1 / -1",
-    }
+    }), [columnsToRender, stepWidth])
+
+    const rowStyle: CSSProperties = React.useMemo(() => ({
+        gridColumn: "1 / -1",
+        minHeight: rowHeight,
+        position: "relative",
+        backgroundColor: "transparent"
+    }), [rowHeight])
+
+    const gridLineColumns = React.useMemo(
+        () => Array.from({length: Math.max(0, columnsToRender - 1)}),
+        [columnsToRender]
+    )
 
     return (
         <div data-gantt-id={props.id} id={props.id} ref={viewportRef} style={containerStyles}>
@@ -98,14 +128,9 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           avgDuration={avgDuration}
                                           stepWidth={stepWidth}/>}
             {itemRows.map((row, rowIndex) => (
-                <>
-                    <div key={`row-${rowIndex}`} style={{
-                        gridColumn: "1 / -1",
-                        minHeight: rowHeight,
-                        position: "relative",
-                        backgroundColor: "transparent"
-                    }}>
-                        {Array.from({length: columnsToRender - 1}).map((_, columnIndex) => (
+                <React.Fragment key={`row-frag-${rowIndex}`}>
+                    <div key={`row-${rowIndex}`} style={rowStyle}>
+                        {gridLineColumns.map((_, columnIndex) => (
                             <div key={`grid-${columnIndex}`} style={{
                                 position: "absolute",
                                 left: (columnIndex + 1) * stepWidthPx,
@@ -158,20 +183,18 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                             const hasVisibleWidth = itemPosition.width > 0
 
                             return hasVisibleWidth && (
-                                <>
-                                    <GanttItem
-                                        key={item.id}
-                                        id={item.id}
-                                        w={`${itemPosition.width}px`}
-                                        left={`${itemPosition.left}px`}
-                                        onClick={() => {
-                                            if (item.type != "group") return
-                                            setActiveGroup(prevState => item.id === prevState ? undefined : item.id)
-                                        }}
-                                    >
-                                        {children?.(item, itemIndex)}
-                                    </GanttItem>
-                                </>
+                                <GanttItem
+                                    key={item.id}
+                                    id={item.id}
+                                    w={`${itemPosition.width}px`}
+                                    left={`${itemPosition.left}px`}
+                                    onClick={() => {
+                                        if (item.type != "group") return
+                                        setActiveGroup(prevState => item.id === prevState ? undefined : item.id)
+                                    }}
+                                >
+                                    {children?.(item, itemIndex)}
+                                </GanttItem>
                             )
                         })}
                     </div>
@@ -183,7 +206,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                            stepWidth={stepWidth} rowHeight={rowHeight} items={item.data.items}
                                            key={`group-target-${itemIndex}`}/>
                     })}
-                </>
+                </React.Fragment>
             ))}
 
         </div>

@@ -17,64 +17,83 @@ export const Gantt: React.FC<GanttProps> = (props) => {
 
     const {items, stepWidth = "50px", rowHeight = "50px", step = 1, children} = props
 
-    const groups: {
-        step: number
-        items: GanttItem[]
-    }[] = []
+    const {targetItems, targetStep, minStart} = React.useMemo(() => {
+        const groups: {
+            step: number
+            items: GanttItem[]
+        }[] = []
 
-    items?.forEach(item => {
+        items?.forEach(item => {
 
-        const itemDuration = item.end - item.start
-        let itemAdded = false
+            const itemDuration = item.end - item.start
+            let itemAdded = false
 
-        if (groups.length <= 0) {
-            groups.push({step: itemDuration, items: [item]})
-            return
-        }
-
-
-        groups.forEach((group) => {
-            const newStep = (group.step + itemDuration) / 1.75
-            const lowerBound = (group.step / 3) - 10
-            const upperBound = (group.step * 3) + 10
-
-            if (lowerBound < itemDuration && itemDuration < upperBound && !itemAdded) {
-                group.step = newStep
-                group.items.push(item)
-                itemAdded = true
+            if (groups.length <= 0) {
+                groups.push({step: itemDuration, items: [item]})
+                return
             }
+
+
+            for (let i = 0; i < groups.length; i++) {
+                const group = groups[i]
+                const newStep = (group.step + itemDuration) / 1.75
+                const lowerBound = (group.step / 3) - 10
+                const upperBound = (group.step * 3) + 10
+
+                if (lowerBound < itemDuration && itemDuration < upperBound) {
+                    group.step = newStep
+                    group.items.push(item)
+                    itemAdded = true
+                    break
+                }
+            }
+
+            if (!itemAdded) {
+                groups.push({step: itemDuration, items: [item]})
+            }
+
         })
 
-        if (!itemAdded) {
-            groups.push({step: itemDuration, items: [item]})
-        }
+        groups.sort((a, b) => b.step - a.step).forEach((group, index) => {
 
-    })
-
-    groups.sort((a, b) => b.step - a.step).forEach((group, index) => {
-
-        if (index > 0) {
-            const minStart = Math.min(...group.items.map(item => item.start))
-            const maxEnd = Math.max(...group.items.map(item => item.end))
-            groups[0].items.push({
-                start: minStart,
-                end: (maxEnd + ((groups[0].step * step) / 6)),
-                id: `group-source-${index}`,
-                type: "group",
-                data: {
-                    items: group.items,
-                    step: step,
-                    firstGroupStep: groups[0].step,
-                    groupStep: group.step,
-                    displayMessage: `${index}`,
-                    color: hashToColor(`group-source-${index}`),
+            if (index > 0) {
+                let minStart = Infinity
+                let maxEnd = -Infinity
+                for (let i = 0; i < group.items.length; i++) {
+                    const it = group.items[i]
+                    if (it.start < minStart) minStart = it.start
+                    if (it.end > maxEnd) maxEnd = it.end
                 }
-            })
+                groups[0].items.push({
+                    start: minStart,
+                    end: (maxEnd + ((groups[0].step * step) / 6)),
+                    id: `group-source-${index}`,
+                    type: "group",
+                    data: {
+                        items: group.items,
+                        step: step,
+                        firstGroupStep: groups[0].step,
+                        groupStep: group.step,
+                        displayMessage: `${index}`,
+                        color: hashToColor(`group-source-${index}`),
+                    }
+                })
+            }
+
+        })
+
+        let minStart = Infinity
+        const firstItems = groups[0].items
+        for (let i = 0; i < firstItems.length; i++) {
+            if (firstItems[i].start < minStart) minStart = firstItems[i].start
         }
 
-    })
-
-    const minStart = Math.min(...groups[0].items.map(item => item.start))
+        return {
+            targetItems: firstItems,
+            targetStep: groups[0].step,
+            minStart,
+        }
+    }, [items, step])
 
     return (
         <ScrollArea w={"100%"} h={"100%"} type={"hover"}>
@@ -82,9 +101,9 @@ export const Gantt: React.FC<GanttProps> = (props) => {
                 <GanttGroup children={children}
                             id={`group-target`}
                             hideScaling={false}
-                            start={minStart - (((minStart / (groups[0].step * step)) * (groups[0].step * step)))}
-                            step={groups[0].step * step}
-                            stepWidth={stepWidth} rowHeight={rowHeight} items={groups[0].items}
+                            start={minStart - (((minStart / (targetStep * step)) * (targetStep * step)))}
+                            step={targetStep * step}
+                            stepWidth={stepWidth} rowHeight={rowHeight} items={targetItems}
                             key={`group-target`}/>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar orientation={"horizontal"}>

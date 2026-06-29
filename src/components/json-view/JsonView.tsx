@@ -4,6 +4,7 @@ import {IconCheck, IconChevronRight, IconCopy} from "@tabler/icons-react";
 import {AnimatePresence, motion} from "motion/react";
 import {Component, hashToColor, mergeComponentProps} from "../../utils";
 import "./JsonView.style.scss";
+import {Text} from "../text/Text";
 
 export interface JsonViewProps<T extends object = object> extends Omit<Component<HTMLDivElement>, 'value'> {
     value?: T
@@ -63,9 +64,11 @@ export const JsonView = <T extends object = object>(props: JsonViewProps<T>) => 
 
     const merged = mergeComponentProps("json-view", rest)
 
-    const safeValue = (value === null || value === undefined || typeof value !== 'object')
-        ? [value] as unknown as T
-        : value
+    if ((value === null || value === undefined || typeof value !== 'object')) {
+        return <Text c={hashToColor("Text")}>
+            {String(value)}
+        </Text>
+    }
 
     return (
         <ReactJsonView
@@ -74,7 +77,7 @@ export const JsonView = <T extends object = object>(props: JsonViewProps<T>) => 
             enableClipboard={enableClipboard}
             indentWidth={indentWidth}
             {...merged}
-            value={safeValue}
+            value={value}
             style={{...JSON_VIEW_THEME, ...(merged.style ?? {})}}
         >
                 <ReactJsonView.Arrow

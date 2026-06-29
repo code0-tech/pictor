@@ -47,7 +47,7 @@ export const Collapsed = () => {
     }
 
     return <Card color={"secondary"} w={"500px"}>
-        <JsonView value={value} collapsed={1}/>
+        <JsonView value={value} collapsed={2}/>
     </Card>
 }
 
@@ -64,6 +64,16 @@ export const WithDataTypes = () => {
     }
 
     return <Card color={"secondary"} w={"500px"}>
+        <JsonView value={value} displayDataTypes displayObjectSize/>
+    </Card>
+}
+
+export const Primitive = () => {
+
+    const value = "hello"
+
+    return <Card color={"secondary"} w={"500px"}>
+        {/**@ts-ignore**/}
         <JsonView value={value} displayDataTypes displayObjectSize/>
     </Card>
 }

@@ -37,6 +37,9 @@ const THEME_SETTINGS = {
     selection: 'rgba(112,179,255,0.25)',
     selectionMatch: 'rgba(112,179,255,0.1)',
     fontSize: "0.8rem",
+    fontFamily: '"Inter", sans-serif',
+    letterSpacing: "-0.5px",
+    fontWeight: "400",
     gutterBackground: 'transparent',
     gutterForeground: 'rgba(255,255,255, 0.5)',
     gutterBorder: 'transparent',
@@ -69,7 +72,10 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
     } = props
 
     const internalExtensions = React.useMemo<Extension[]>(
-        () => language ? [...extensions, language] : extensions,
+        () => {
+            const base = language ? [...extensions, language] : extensions;
+            return [...base];
+        },
         [extensions, language]
     )
 
@@ -108,6 +114,7 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
         <CodeMirror extensions={internalExtensions}
                     onChange={handleChange}
                     theme={myTheme}
+                    indentWithTab={false}
                     {...mergedProps}
                     basicSetup={BASIC_SETUP}/>
     </InputWrapper>

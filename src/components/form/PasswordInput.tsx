@@ -36,6 +36,8 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
             if (ref.current.type === "password") ref.current.type = "text"
             else if (ref.current.type === "text") ref.current.type = "password"
         }
+        event.stopPropagation()
+        event.preventDefault()
         return false
     }
 

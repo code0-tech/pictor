@@ -129,17 +129,15 @@ export const useForm = <
     const initValues = React.useMemo(() => initialValues as Values, [initialValues])
     const [values, setValues] = useState<Values>(initValues)
     const cachedMessagesRef = useRef<Map<keyof Values, string | null>>(new Map())
+    const valuesRef = useRef<Values>(values)
+    valuesRef.current = values
 
     const changeValue = useCallback((key: keyof Values, value: any) => {
-        setValues(prevState => {
-            return {
-                ...prevState,
-                [key]: value,
-            }
-        })
+        valuesRef.current = {...valuesRef.current, [key]: value}
+        setValues(valuesRef.current)
     }, [])
 
-    const [validation, setValidation] = useState<Validation<Values>>(new Validation<Values>(
+    const [validation, setValidation] = useState<Validation<Values>>(() => new Validation<Values>(
         changeValue,
         values,
         validate,
@@ -148,6 +146,7 @@ export const useForm = <
     ))
 
     useEffect(() => {
+        valuesRef.current = initValues
         setValues(initValues)
         setValidation(new Validation<Values>(
             changeValue,
@@ -160,13 +159,15 @@ export const useForm = <
 
     const validateFunction = useCallback(<Key extends keyof Values>(key?: Key, submit = true) => {
 
-        const shouldValidateMap = key && new Set(Object.keys(values)).has(String(key))
+        const currentValues = valuesRef.current
+
+        const shouldValidateMap = key && new Set(Object.keys(currentValues)).has(String(key))
             ? new Map<keyof Values, boolean>([[key, true]])
-            : new Map<keyof Values, boolean>(Object.keys(values).map(k => [String(k) as keyof Values, true]))
+            : new Map<keyof Values, boolean>(Object.keys(currentValues).map(k => [String(k) as keyof Values, true]))
 
         const currentValidation = new Validation<Values>(
             changeValue,
-            values,
+            currentValues,
             validate,
             shouldValidateMap,
             cachedMessagesRef.current
@@ -174,10 +175,10 @@ export const useForm = <
 
         setValidation(currentValidation)
 
-        if (submit && !new Set(Object.keys(values)).has(String(key)) && onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
-            onSubmit(values as Values)
+        if (submit && !new Set(Object.keys(currentValues)).has(String(key)) && onSubmit && (!truthyValidationBeforeSubmit || currentValidation.isValid())) {
+            onSubmit(currentValues)
         }
-    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit, values])
+    }, [changeValue, validate, onSubmit, truthyValidationBeforeSubmit])
 
     return [
         validation,

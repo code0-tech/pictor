@@ -49,7 +49,9 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         size={13}/></Button>)
 
 
-    const failedRules = formValidation?.notValidMessage?.length ?? 0
+    const notValidMessage = formValidation?.notValidMessage ?? ""
+    const usesPasswordValidation = /^[1-5]+$/.test(notValidMessage)
+    const failedRules = notValidMessage.length
     const passedRules = Math.max(0, 5 - failedRules)
     const strengthValue = (passedRules / 5) * 100
 
@@ -60,21 +62,20 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
             type={"password"}
             ref={ref as RefObject<HTMLInputElement>}
             {...(formValidation ? {
-                formValidation: {
+                formValidation: usesPasswordValidation ? {
                     setValue: formValidation.setValue,
                     valid: formValidation.valid,
-                }
+                } : formValidation
             } : {})}
             {...rest}
         />
         {
-            !formValidation?.valid && (
+            usesPasswordValidation && !formValidation?.valid && (
                 <Flex mt={0.7} style={{flexDirection: "column"}}>
                     <Progress value={strengthValue} max={100}
                               color={"linear-gradient(to right, #D90429 0%, #29BF12 100%)"}/>
                     {(() => {
-                        const message = formValidation?.notValidMessage ?? ""
-                        const nextRule = ["2", "3", "4", "5", "1"].find(rule => message.includes(rule))
+                        const nextRule = ["2", "3", "4", "5", "1"].find(rule => notValidMessage.includes(rule))
                         if (!nextRule) return null
                         const label = {
                             "1": "Must be at least 8 characters",

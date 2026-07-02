@@ -1,10 +1,11 @@
 import React, {RefObject} from "react";
 import {Input, InputProps} from "./Input";
-import {IconCheck, IconEye, IconX} from "@tabler/icons-react";
+import {IconEye, IconX} from "@tabler/icons-react";
 import {Button} from "../button/Button";
 import {clearInputElement} from "./Input.utils";
 import {Flex} from "../flex/Flex";
-import {Text} from "../text/Text";
+import {Progress} from "../progress/Progress";
+import {InputMessage} from "./InputMessage";
 
 interface PasswordInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
     clearable?: boolean,
@@ -48,6 +49,10 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         size={13}/></Button>)
 
 
+    const failedRules = formValidation?.notValidMessage?.length ?? 0
+    const passedRules = Math.max(0, 5 - failedRules)
+    const strengthValue = (passedRules / 5) * 100
+
     return <>
         <Input
             right={rightAction}
@@ -65,31 +70,23 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         {
             !formValidation?.valid && (
                 <Flex mt={0.7} style={{flexDirection: "column"}}>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        {formValidation?.notValidMessage?.includes("1") ? <IconX color={"#D90429"} size={16}/> :
-                            <IconCheck color={"#29BF12"} size={16}/>}
-                        <Text>Must be at least 8 characters</Text>
-                    </Flex>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        {formValidation?.notValidMessage?.includes("2") ? <IconX color={"#D90429"} size={16}/> :
-                            <IconCheck color={"#29BF12"} size={16}/>}
-                        <Text>Must include a lowercase letter</Text>
-                    </Flex>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        {formValidation?.notValidMessage?.includes("3") ? <IconX color={"#D90429"} size={16}/> :
-                            <IconCheck color={"#29BF12"} size={16}/>}
-                        <Text>Must include an uppercase letter</Text>
-                    </Flex>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        {formValidation?.notValidMessage?.includes("4") ? <IconX color={"#D90429"} size={16}/> :
-                            <IconCheck color={"#29BF12"} size={16}/>}
-                        <Text>Must include a number</Text>
-                    </Flex>
-                    <Flex align={"center"} style={{gap: "0.35rem"}}>
-                        {formValidation?.notValidMessage?.includes("5") ? <IconX color={"#D90429"} size={16}/> :
-                            <IconCheck color={"#29BF12"} size={16}/>}
-                        <Text>Must include a special character</Text>
-                    </Flex>
+                    <Progress value={strengthValue} max={100}
+                              color={"linear-gradient(to right, #D90429 0%, #29BF12 100%)"}/>
+                    {(() => {
+                        const message = formValidation?.notValidMessage ?? ""
+                        const nextRule = ["2", "3", "4", "5", "1"].find(rule => message.includes(rule))
+                        if (!nextRule) return null
+                        const label = {
+                            "1": "Must be at least 8 characters",
+                            "2": "Must include a lowercase letter",
+                            "3": "Must include an uppercase letter",
+                            "4": "Must include a number",
+                            "5": "Must include a special character",
+                        }[nextRule]
+                        return <InputMessage>
+                            {label as string}
+                        </InputMessage>
+                    })()}
                 </Flex>
             )
         }

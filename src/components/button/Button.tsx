@@ -28,7 +28,7 @@ export const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
     } = props
 
     return <button
-        ref={ref} {...mergeComponentProps(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
+        ref={ref} type={"button"} {...mergeComponentProps(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
         aria-disabled={disabled ? "true" : "false"}>
         {children}
     </button>

@@ -34,9 +34,9 @@ import {
 } from "./SelectInput";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
-import {EditorInput} from "./EditorInput";
-import {StreamLanguage} from "@codemirror/language";
-import {tags as t} from "@lezer/highlight";
+import {EditorInput, EditorTokenRule} from "./EditorInput";
+import {Badge} from "../badge/Badge";
+import {InputSuggestion} from "./InputSuggestion";
 import {hashToColor} from "../../utils";
 import {
     FileInput,
@@ -409,16 +409,17 @@ export const Select = () => {
     </Card>
 }
 
-export const Editor = () => {
-
+// ---- Badge tag rendering ----
+// Shows {{ variable }} tokens rendered as Badge components via tokenRules
+export const EditorBadgeTags = () => {
 
     const [inputs, validate] = useForm({
         initialValues: {
-            editor: undefined
+            expression: ""
         },
         validate: {
-            editor: (value) => {
-                if (!value) return "Please type something"
+            expression: (value) => {
+                if (!value?.trim()) return "Please enter an expression"
                 return null
             }
         },
@@ -427,29 +428,169 @@ export const Editor = () => {
         }
     })
 
-    return <Card color={"secondary"} w={"400px"}>
-        <EditorInput {...inputs.getInputProps("editor")} onChange={() => validate("editor")} placeholder={"sd"}
-                     language={StreamLanguage.define({
-                         token(stream) {
-                             if (stream.match(/\{\{\s*(.*?)\s*\}\}/)) {
-                                 return "keyword";
-                             }
+    const tokenRules: EditorTokenRule[] = [
+        {
+            pattern: /\{\{([^}]+)\}\}/g,
+            wrap: (_text, children) => (
+                <Badge color={"info"}>{children}</Badge>
+            ),
+        },
+    ]
 
-                             stream.next();
-                             return null;
-                         }
-                     })} tokenStyles={[
-            {tag: t.keyword, color: hashToColor("bracket")},
-        ]} title={"Bla"} description={"test"} right={
-            <ButtonGroup color={"primary"}>
-                <Button paddingSize={"xxs"}>
-                    <IconVariable size={13}/>
-                </Button>
-                <Button paddingSize={"xxs"}>
-                    <IconX size={13}/>
-                </Button>
-            </ButtonGroup>
-        } rightType={"action"}/>
+    return <Card color={"secondary"} w={"400px"}>
+        <EditorInput
+            {...inputs.getInputProps("expression")}
+            onChange={() => validate("expression")}
+            title={"Template Expression"}
+            description={"Use {{ variable }} to reference variables"}
+            placeholder={"Hello {{ user.name }}!"}
+            tokenRules={tokenRules}
+            right={
+                <ButtonGroup color={"primary"}>
+                    <Button paddingSize={"xxs"}>
+                        <IconVariable size={13}/>
+                    </Button>
+                    <Button paddingSize={"xxs"} onClick={() => validate()}>
+                        <IconLogin size={13}/>
+                    </Button>
+                </ButtonGroup>
+            }
+            rightType={"action"}
+        />
+    </Card>
+}
+
+// ---- Suggestions via Radix menu ----
+// Demonstrates the built-in Radix DropdownMenu for autocomplete
+export const EditorSuggestions = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            value: ""
+        },
+        validate: {
+            value: (value) => {
+                if (!value?.trim()) return "Please select or type a value"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const suggestions: InputSuggestion[] = [
+        {value: "user.name", children: "user.name", groupBy: "User"},
+        {value: "user.email", children: "user.email", groupBy: "User"},
+        {value: "user.role", children: "user.role", groupBy: "User"},
+        {value: "order.id", children: "order.id", groupBy: "Order"},
+        {value: "order.total", children: "order.total", groupBy: "Order"},
+        {value: "order.status", children: "order.status", groupBy: "Order"},
+    ]
+
+    return <Card color={"secondary"} w={"400px"}>
+        <EditorInput
+            {...inputs.getInputProps("value")}
+            onChange={() => validate("value")}
+            title={"Variable"}
+            description={"Press Ctrl+Space to open, ↑ ↓ to navigate, Enter to select"}
+            placeholder={"Select or type a variable…"}
+            suggestions={suggestions}
+            onSuggestionSelect={(s) => {
+                console.log("selected:", s)
+                validate("value")
+            }}
+        />
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit
+            </Button>
+        </div>
+    </Card>
+}
+
+// ---- Combined: badge tags + filtered suggestions + useForm ----
+// Full-featured template editor: badge rendering + contextual suggestion filtering
+export const EditorCombined = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            template: ""
+        },
+        validate: {
+            template: (value) => {
+                if (!value?.trim()) return "Template is required"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const [filterText, setFilterText] = React.useState("")
+
+    const allVariables = [
+        {name: "user.name", group: "User"},
+        {name: "user.email", group: "User"},
+        {name: "user.role", group: "User"},
+        {name: "order.id", group: "Order"},
+        {name: "order.total", group: "Order"},
+        {name: "order.status", group: "Order"},
+    ]
+
+    const suggestions: InputSuggestion[] = allVariables
+        .filter(v => !filterText || v.name.toLowerCase().includes(filterText.toLowerCase()))
+        .map(v => ({
+            value: `{{ ${v.name} }}`,
+            children: <Badge color={"info"}>{v.name}</Badge>,
+            groupBy: v.group,
+            insertMode: "insert" as const,
+        }))
+
+    const tokenRules: EditorTokenRule[] = [
+        {
+            pattern: /\{\{([^}]+)\}\}/g,
+            wrap: (_text, children) => <Badge color={"info"}>{children}</Badge>,
+        },
+    ]
+
+    return <Card color={"secondary"} w={"500px"}>
+        <EditorInput
+            {...inputs.getInputProps("template")}
+            onChange={(value) => {
+                validate("template")
+                // Show suggestions when user opens {{ — filter by partial variable name inside
+                const match = value.match(/\{\{([^}]*)$/)
+                setFilterText(match ? match[1].trim() : "")
+            }}
+            title={"Email Template"}
+            description={"Type text, then Ctrl+Space to insert a variable"}
+            placeholder={"Hi {{ user.name }}, your order {{ order.id }} is ready!"}
+            tokenRules={tokenRules}
+            suggestions={suggestions}
+            onSuggestionSelect={() => {
+                setFilterText("")
+                validate("template")
+            }}
+            right={
+                <ButtonGroup color={"primary"}>
+                    <Button paddingSize={"xxs"}>
+                        <IconVariable size={13}/>
+                    </Button>
+                </ButtonGroup>
+            }
+            rightType={"action"}
+        />
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit
+            </Button>
+        </div>
     </Card>
 }
 

@@ -110,7 +110,9 @@ InputSuggestionMenuContentComponent.displayName = "InputSuggestionMenuContent"
 export const InputSuggestionMenuContent = React.memo(InputSuggestionMenuContentComponent)
 
 
-const InputSuggestionMenuContentItemsComponent: React.FC<InputSuggestionMenuContentItemsProps> = React.forwardRef<InputSuggestionMenuContentItemsHandle, InputSuggestionMenuContentItemsProps>((props, ref) => {
+// No React.FC annotation here — it would erase forwardRef's ref typing and
+// consumers couldn't pass `ref` for the imperative handle.
+const InputSuggestionMenuContentItemsComponent = React.forwardRef<InputSuggestionMenuContentItemsHandle, InputSuggestionMenuContentItemsProps>((props, ref) => {
 
     const {
         suggestions,

@@ -460,6 +460,49 @@ export const EditorBadgeTags = () => {
     </Card>
 }
 
+// ---- Single line ----
+// Renders the EditorInput as a one-line field (like a text input): line breaks
+// are blocked and pasted newlines collapse to spaces, while token highlighting
+// still works.
+export const EditorSingleLine = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            expression: ""
+        },
+        validate: {
+            expression: (value) => {
+                if (!value?.trim()) return "Please enter an expression"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const tokenRules: EditorTokenRule[] = [
+        {
+            pattern: /\{\{([^}]+)\}\}/g,
+            wrap: (_text, children) => (
+                <Badge color={"info"}>{children}</Badge>
+            ),
+        },
+    ]
+
+    return <Card color={"secondary"} w={"400px"}>
+        <EditorInput
+            {...inputs.getInputProps("expression")}
+            onChange={() => validate("expression")}
+            singleLine
+            title={"Expression"}
+            description={"A single-line expression — Enter does not add a new line"}
+            placeholder={"Hello {{ user.name }}!"}
+            tokenRules={tokenRules}
+        />
+    </Card>
+}
+
 // ---- Suggestions via Radix menu ----
 // Demonstrates the built-in Radix DropdownMenu for autocomplete
 export const EditorSuggestions = () => {
@@ -694,4 +737,110 @@ export const File = () => {
     </FileInput>
     </Card>
 
+}
+
+// ---- Performance: many EditorInputs in a single form ----
+// Stress-tests the Slate-based EditorInput by rendering up to 50 instances at once,
+// each with token highlighting + suggestions, so we can spot rendering/typing lag.
+export const EditorPerformance = () => {
+
+    const MAX_INPUTS = 200
+
+    const [count, setCount] = React.useState(MAX_INPUTS)
+    const [renderTime, setRenderTime] = React.useState<number | null>(null)
+
+    // Measure the time from the start of a render pass to the browser paint.
+    const renderStart = React.useRef(performance.now())
+    renderStart.current = performance.now()
+    React.useLayoutEffect(() => {
+        const start = renderStart.current
+        requestAnimationFrame(() => {
+            setRenderTime(prev => {
+                const measured = performance.now() - start
+                // Avoid an infinite measure->setState->measure loop.
+                return prev === null || Math.abs(prev - measured) > 0.5 ? measured : prev
+            })
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [count])
+
+    const fields = React.useMemo(
+        () => Array.from({length: MAX_INPUTS}, (_, i) => `field_${i}`),
+        []
+    )
+
+    // Stable reference — useForm keys its internal state off the identity of
+    // `initialValues`, so recreating this object each render would loop forever.
+    const initialValues = React.useMemo(
+        () => fields.reduce((acc, key) => {
+            acc[key] = ""
+            return acc
+        }, {} as Record<string, string>),
+        [fields]
+    )
+
+    const [inputs, validate] = useForm<Record<string, string>>({
+        initialValues,
+        useInitialValidation: false,
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const tokenRules: EditorTokenRule[] = React.useMemo(() => [
+        {
+            pattern: /\{\{([^}]+)\}\}/g,
+            wrap: (_text, children) => <Badge color={"info"}>{children}</Badge>,
+        },
+    ], [])
+
+    const suggestions: InputSuggestion[] = React.useMemo(() => [
+        {value: "user.name", children: "user.name", groupBy: "User"},
+        {value: "user.email", children: "user.email", groupBy: "User"},
+        {value: "order.id", children: "order.id", groupBy: "Order"},
+        {value: "order.total", children: "order.total", groupBy: "Order"},
+    ], [])
+
+    return <Card color={"secondary"} w={"600px"}>
+        <Flex align={"center"} justify={"space-between"} style={{marginBottom: "1rem"}}>
+            <Text size={"sm"}>
+                Rendering <b>{count}</b> EditorInput{count === 1 ? "" : "s"}
+                {renderTime !== null && ` · last render ${renderTime.toFixed(1)}ms`}
+            </Text>
+            <ButtonGroup color={"primary"}>
+                <Button paddingSize={"xxs"} onClick={() => setCount(c => Math.max(1, c - 10))}>
+                    -10
+                </Button>
+                <Button paddingSize={"xxs"} onClick={() => setCount(c => Math.min(MAX_INPUTS, c + 10))}>
+                    +10
+                </Button>
+                <Button paddingSize={"xxs"} onClick={() => setCount(MAX_INPUTS)}>
+                    Max ({MAX_INPUTS})
+                </Button>
+            </ButtonGroup>
+        </Flex>
+
+        <Flex style={{flexDirection: "column", gap: "0.5rem"}}>
+            {fields.slice(0, count).map((key, i) => (
+                <EditorInput
+                    key={key}
+                    {...inputs.getInputProps(key)}
+                    onChange={() => validate(key)}
+                    title={`Expression ${i + 1}`}
+                    placeholder={"Hello {{ user.name }}!"}
+                    tokenRules={tokenRules}
+                    suggestions={suggestions}
+                    onSuggestionSelect={() => validate(key)}
+                />
+            ))}
+        </Flex>
+
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit all
+            </Button>
+        </div>
+    </Card>
 }

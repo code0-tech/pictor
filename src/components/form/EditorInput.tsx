@@ -32,11 +32,13 @@ export interface EditorInputProps extends Omit<InputWrapperProps, "onChange">, V
     onSuggestionSelect?: (suggestion: InputSuggestion) => void
     disabled?: boolean
     readonly?: boolean
+    /** Render as a single-line input: Enter is blocked, newlines in pasted or external values become spaces. */
+    singleLine?: boolean
     onChange?: (value: string) => void
     placeholder?: string
 }
 
-type CustomText = {text: string; tokenRuleIndex?: number; tokenText?: string; tokenMatch?: RegExpExecArray}
+type CustomText = { text: string; tokenRuleIndex?: number; tokenText?: string; tokenMatch?: RegExpExecArray }
 
 const textToSlate = (text: string): Descendant[] =>
     (text || "").split("\n").map(line => ({type: "paragraph" as const, children: [{text: line}]}))
@@ -44,26 +46,35 @@ const textToSlate = (text: string): Descendant[] =>
 const slateToText = (value: Descendant[]): string =>
     value.map(n => SlateNode.string(n)).join("\n")
 
-const EMPTY_TOKEN_RULES: EditorTokenRule[] = []
-
 export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
 
     const {
-        title, right, left, rightType, leftType,
+        title,
+        right,
+        left,
+        rightType,
+        leftType,
         description, wrapperComponent,
-        tokenRules = EMPTY_TOKEN_RULES,
+        tokenRules = [],
         suggestions,
         suggestionsEmptyState,
-        onSuggestionSelect: onSuggestionSelectProp,
+        onSuggestionSelect,
         formValidation, onChange,
-        disabled = false, readonly = false,
+        disabled = false,
+        readonly = false,
+        singleLine = false,
         placeholder,
-        value: valueProp, initialValue: initialValueProp, defaultValue: defaultValueProp,
-        required: _required,
+        value: valueProp,
+        initialValue,
+        defaultValue,
+        required,
         ...rest
     } = props
 
-    const externalText = String(valueProp ?? initialValueProp ?? defaultValueProp ?? "")
+    // In single-line mode, newlines never reach the document: they are stripped
+    // here (external values), on Enter (keydown), and on paste.
+    const rawText = String(valueProp ?? initialValue ?? defaultValue ?? "")
+    const externalText = singleLine ? rawText.replace(/\n/g, " ") : rawText
 
     const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
@@ -71,11 +82,6 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
     const initialSlateValue = useMemo(() => textToSlate(externalText), [])
 
     const prevTextRef = useRef(externalText)
-
-    // Read at onChange time (handleChange is defined before `open` / the position
-    // updater exist), so keep the latest values in refs.
-    const openRef = useRef(false)
-    const updateTriggerPositionRef = useRef<(() => void) | undefined>(undefined)
 
     // Sync external value resets (e.g. form reset)
     React.useEffect(() => {
@@ -91,18 +97,6 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
         })
     }, [externalText, editor])
 
-    const setFormValue = formValidation?.setValue
-    const handleChange = useCallback((newValue: Descendant[]) => {
-        // Slate fires onChange for selection changes too — keep the menu anchored
-        // to the caret as it moves while the suggestions are open.
-        if (openRef.current) updateTriggerPositionRef.current?.()
-        const text = slateToText(newValue)
-        if (text === prevTextRef.current) return
-        prevTextRef.current = text
-        setFormValue?.(text)
-        onChange?.(text)
-    }, [setFormValue, onChange])
-
     const decorate = useCallback(([node, path]: any) => {
         const ranges: any[] = []
         if (!Text.isText(node) || !tokenRules.length) return ranges
@@ -112,7 +106,13 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
             let match: RegExpExecArray | null
             while ((match = re.exec(text)) !== null) {
                 if (!match[0].length) break
-                ranges.push({anchor: {path, offset: match.index}, focus: {path, offset: match.index + match[0].length}, tokenRuleIndex: ri, tokenText: match[0], tokenMatch: match})
+                ranges.push({
+                    anchor: {path, offset: match.index},
+                    focus: {path, offset: match.index + match[0].length},
+                    tokenRuleIndex: ri,
+                    tokenText: match[0],
+                    tokenMatch: match
+                })
             }
         })
         return ranges
@@ -124,7 +124,11 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
             const rule = tokenRules[l.tokenRuleIndex]
             if (rule) {
                 if (rule.wrap) return <span {...attributes}>{rule.wrap(l.tokenText ?? "", children, l.tokenMatch ?? [] as any)}</span>
-                return <span {...attributes}><span style={rule.style} className={rule.className}>{children}</span></span>
+                return <span {...attributes}>
+                    <span style={rule.style} className={rule.className}>
+                        {children}
+                    </span>
+                </span>
             }
         }
         return <span {...attributes}>{children}</span>
@@ -134,7 +138,7 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
     const itemsHandleRef = useRef<InputSuggestionMenuContentItemsHandle>(null)
     const editorContainerRef = useRef<HTMLDivElement>(null)
     const triggerRef = useRef<HTMLButtonElement>(null)
-    const blurTimer = useRef<ReturnType<typeof setTimeout>>()
+    const blurTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
     // Move the invisible Radix trigger to sit right behind the caret, so the
     // suggestion menu is anchored under the text cursor instead of the start of
@@ -148,7 +152,9 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
         let rect: DOMRect | null = null
         try {
             if (editor.selection) rect = ReactEditor.toDOMRange(editor, editor.selection).getBoundingClientRect()
-        } catch { rect = null }
+        } catch {
+            rect = null
+        }
         // Collapsed selections can report an empty rect — fall back to the editor start.
         if (!rect || (!rect.width && !rect.height && !rect.left && !rect.top)) rect = container.getBoundingClientRect()
 
@@ -159,22 +165,17 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
         btn.style.height = `${rect.height || parseFloat(getComputedStyle(container).lineHeight) || 16}px`
     }, [editor])
 
-    openRef.current = open
-    updateTriggerPositionRef.current = updateTriggerPosition
-
-    // A ref-like handle that focuses the Slate editor. The InputSuggestion menu
-    // uses this to keep the caret in the editor while the menu is open, so the
-    // menu never steals focus (which would otherwise blur the editor and make
-    // typing impossible).
-    const editorFocusRef = useMemo(
-        () => ({current: {focus: () => { try { ReactEditor.focus(editor) } catch { /* not mounted yet */ } }}}),
-        [editor]
-    ) as unknown as React.RefObject<HTMLInputElement>
-
-    // When the menu is opened via keyboard we want to highlight an item straight
-    // away, but the items only mount once `open` flips — so remember the intent
-    // and apply it in an effect after the menu (and its handle) has mounted.
-    const pendingHighlightRef = useRef<null | "first" | "last">(null)
+    const setFormValue = formValidation?.setValue
+    const handleChange = useCallback((newValue: Descendant[]) => {
+        // Slate fires onChange for selection changes too — keep the menu anchored
+        // to the caret as it moves while the suggestions are open.
+        if (open) updateTriggerPosition()
+        const text = slateToText(newValue)
+        if (text === prevTextRef.current) return
+        prevTextRef.current = text
+        setFormValue?.(text)
+        onChange?.(text)
+    }, [open, updateTriggerPosition, setFormValue, onChange])
 
     const openMenu = useCallback(() => {
         if (blurTimer.current) clearTimeout(blurTimer.current)
@@ -185,27 +186,8 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
     }, [suggestions, updateTriggerPosition])
 
     React.useEffect(() => {
-        if (!open) {
-            pendingHighlightRef.current = null
-            return
-        }
-        // Correct the anchor position once the menu has actually mounted.
+        if (!open) return
         updateTriggerPosition()
-        const highlight = pendingHighlightRef.current
-        if (!highlight) return
-        let raf = 0
-        const apply = () => {
-            const handle = itemsHandleRef.current
-            if (!handle) {
-                raf = requestAnimationFrame(apply)
-                return
-            }
-            if (highlight === "first") handle.focusFirstItem()
-            else handle.focusLastItem()
-            pendingHighlightRef.current = null
-        }
-        apply()
-        return () => { if (raf) cancelAnimationFrame(raf) }
     }, [open])
 
     // Defer closing so a transient blur (e.g. Radix moving focus on open, or a
@@ -216,6 +198,9 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
     }, [])
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        // No line breaks in single-line mode (menu selection below still works —
+        // it calls preventDefault itself).
+        if (singleLine && e.key === "Enter") e.preventDefault()
         if (!suggestions) return
         const handle = itemsHandleRef.current
 
@@ -224,12 +209,8 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
         // on macOS it may need the input-source switch shortcut disabled.
         if (e.ctrlKey && e.code === "Space") {
             e.preventDefault()
-            if (!open) {
-                pendingHighlightRef.current = "first"
-                openMenu()
-            } else {
-                handle?.focusFirstItem()
-            }
+            if (!open) openMenu()
+            else handle?.focusFirstItem()
             return
         }
 
@@ -251,20 +232,30 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
             e.preventDefault()
             setOpen(false)
         }
-    }, [suggestions, open, openMenu])
+    }, [suggestions, open, openMenu, singleLine])
 
 
     const editorContent = (
         <div {...mergeComponentProps("editor-input", rest)} ref={editorContainerRef}>
             <Editable
-                className="input-wrapper__control"
+                className={singleLine ? "input-wrapper__control input-wrapper__control--single-line" : "input-wrapper__control"}
                 decorate={decorate}
                 renderLeaf={renderLeaf}
                 readOnly={disabled || readonly}
                 spellCheck={false}
                 placeholder={placeholder}
                 onBlur={scheduleClose}
+                // A transient blur (focus bounced back by the menu) must not
+                // close the menu — cancel the pending close on refocus.
+                onFocus={() => {
+                    if (blurTimer.current) clearTimeout(blurTimer.current)
+                }}
                 onKeyDown={handleKeyDown}
+                onPaste={singleLine ? (e) => {
+                    // Like a native <input>: paste plain text with newlines as spaces.
+                    e.preventDefault()
+                    editor.insertText(e.clipboardData.getData("text/plain").replace(/\r?\n/g, " "))
+                } : undefined}
             />
         </div>
     )
@@ -277,7 +268,10 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
                 rightType={rightType} leftType={leftType}
                 formValidation={formValidation}
                 wrapperComponent={suggestions
-                    ? {...(wrapperComponent ?? {}), style: {position: "relative" as const, ...(wrapperComponent as any)?.style}}
+                    ? {
+                        ...(wrapperComponent ?? {}),
+                        style: {position: "relative" as const, ...(wrapperComponent as any)?.style}
+                    }
                     : wrapperComponent
                 }
             >
@@ -291,13 +285,12 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
                                 tabIndex={-1}
                                 aria-hidden
                                 onMouseDown={(e) => e.preventDefault()}
-                                style={{position: "absolute", left: 0, top: 0, width: 0, height: 0, opacity: 0, pointerEvents: "none"}}
+                                className="editor-input__menu-anchor"
                             />
                         </MenuTrigger>
                         <MenuPortal>
                             <InputSuggestionMenuContent
                                 color="primary"
-                                inputRef={editorFocusRef}
                                 onInteractOutside={(e) => {
                                     // The Slate editor is a contenteditable <div>, not an
                                     // <input>, so keep the menu open while the user clicks
@@ -310,9 +303,8 @@ export const EditorInput: React.FC<EditorInputProps> = React.memo((props) => {
                                 <InputSuggestionMenuContentItems
                                     ref={itemsHandleRef}
                                     suggestions={suggestions}
-                                    inputRef={editorFocusRef}
                                     onSuggestionSelect={(s) => {
-                                        onSuggestionSelectProp?.(s)
+                                        onSuggestionSelect?.(s)
                                         setOpen(false)
                                     }}
                                 />

@@ -1,3 +1,30 @@
+// Single-line mode for the Slate Editable. white-space needs !important
+// because Editable sets `white-space: pre-wrap` as an inline style, which
+// would otherwise beat any stylesheet rule.
+.input-wrapper__control--single-line {
+  white-space: pre !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Invisible Radix anchor for the suggestion menu — a sibling of .editor-input
+// inside .input-wrapper. updateTriggerPosition() moves it to the caret via
+// inline left/top/height, which intentionally override these initial values.
+.editor-input__menu-anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .editor-input {
   width: 100%;
   overflow: hidden;

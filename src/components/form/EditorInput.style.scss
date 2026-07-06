@@ -1,29 +1,65 @@
+// Single-line mode for the Slate Editable. white-space needs !important
+// because Editable sets `white-space: pre-wrap` as an inline style, which
+// would otherwise beat any stylesheet rule.
+.input-wrapper__control--single-line {
+  white-space: pre !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Invisible Radix anchor for the suggestion menu — a sibling of .editor-input
+// inside .input-wrapper. updateTriggerPosition() moves it to the caret via
+// inline left/top/height, which intentionally override these initial values.
+.editor-input__menu-anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .editor-input {
   width: 100%;
-  flex: 1 1 auto;
   overflow: hidden;
-  padding: 0.59rem 0;
   position: relative;
   align-self: stretch;
 
-  .cm-editor {
-    height: 100%;
-    outline: none !important;
-  }
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: -0.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
 
-  .cm-content {
-    padding: 0;
-    position: relative;
-  }
-
-  .cm-line {
+  [data-slate-editor] {
+    flex: 1 1 auto;
+    padding: 0.6rem 0;
     align-self: stretch;
-    padding-left: 0;
+    outline: none;
+    caret-color: white;
+    min-height: 1.2em;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
-  .cm-cursor {
-    border-width: 2px;
-    border-radius: 50rem;
-    border-color: white;
+  [data-slate-node="element"] {
+    margin: 0;
+    padding: 0;
+  }
+
+  ::selection {
+    background: rgba(112, 179, 255, 0.25);
+  }
+
+  [data-slate-placeholder] {
+    color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    user-select: none;
   }
 }

@@ -20,11 +20,15 @@
     "esModuleInterop": true,
     "baseUrl": "src/",
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
     "build",
     "dist",
-    ".storybook"
+    ".storybook",
+    "storybook-static"
   ],
   "types": [
     "typePatches"

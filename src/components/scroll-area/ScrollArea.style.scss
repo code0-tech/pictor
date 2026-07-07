@@ -5,6 +5,12 @@
 .scroll-area {
   overflow: hidden;
 
+  // allows the auto scroll area to shrink inside flexed popper
+  // content (menus, sub menus, tooltips) so it never overflows it
+  &--auto {
+    min-height: 0;
+  }
+
   &__viewport {
     width: 100%;
     height: 100%;

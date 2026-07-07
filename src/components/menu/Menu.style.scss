@@ -9,6 +9,11 @@
     position: relative;
     box-sizing: border-box;
     z-index: 999;
+    // clamp to the space the popper has left on screen; the inner
+    // auto scroll area shrinks with it and takes over scrolling
+    max-height: var(--radix-popper-available-height, 100vh);
+    display: flex;
+    flex-direction: column;
 
     & {
       @include helpers.borderRadius();
@@ -66,6 +71,6 @@
 @each $name, $color in variables.$colors {
   .menu__content--#{$name}, .menu__sub-content--#{$name} {
     @include box.box($color);
-    border: helpers.backgroundColor(variables.$secondary) 2px solid;
+    border: helpers.backgroundColor(variables.$secondary) 1px solid;
   }
 }

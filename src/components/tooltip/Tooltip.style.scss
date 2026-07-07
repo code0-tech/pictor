@@ -8,6 +8,12 @@
 
     z-index: 999;
     padding: variables.$xxs variables.$xs;
+    box-sizing: border-box;
+    // clamp to the space the popper has left on screen; the inner
+    // auto scroll area shrinks with it and takes over scrolling
+    max-height: var(--radix-popper-available-height, 100vh);
+    display: flex;
+    flex-direction: column;
 
     & {
       @include box.box(variables.$tertiary);

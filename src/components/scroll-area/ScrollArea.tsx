@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import {ComponentProps, mergeComponentProps} from "../../utils";
 import * as RadixScrollArea from "@radix-ui/react-scroll-area";
@@ -23,4 +25,41 @@ export const ScrollAreaThumb: React.FC<ScrollAreaThumbProps> = (props) => {
 }
 export const ScrollAreaCorner: React.FC<ScrollAreaCornerProps> = (props) => {
     return <RadixScrollArea.ScrollAreaCorner {...mergeComponentProps("scroll-area__corner", props)} />
+}
+
+export type AutoScrollAreaProps = ScrollAreaProps
+
+/**
+ * ScrollArea that sizes itself to its content and scrolls once the content
+ * exceeds the available height of the surrounding Radix popper (menus,
+ * sub menus, tooltips). Used internally by MenuContent, MenuSubContent,
+ * ContextMenuContent, ContextMenuSubContent and TooltipContent.
+ */
+export const AutoScrollArea: React.FC<AutoScrollAreaProps> = (props) => {
+    const {children, mah = "var(--radix-popper-available-height, 100vh)", ...rest} = props
+    const contentRef = React.useRef<HTMLDivElement>(null)
+    const [height, setHeight] = React.useState<number>()
+
+    React.useLayoutEffect(() => {
+        const el = contentRef.current
+        if (!el) return
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0]
+            if (entry) setHeight(entry.contentRect.height)
+        })
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
+    return <ScrollArea className={"scroll-area--auto"} mah={mah}
+                       h={height !== undefined ? `${height}px` : undefined} {...rest}>
+        <ScrollAreaViewport>
+            <div ref={contentRef}>
+                {children}
+            </div>
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar orientation={"vertical"}>
+            <ScrollAreaThumb/>
+        </ScrollAreaScrollbar>
+    </ScrollArea>
 }

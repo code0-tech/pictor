@@ -2,6 +2,7 @@ import React from "react";
 import {Color, ComponentProps, mergeComponentProps} from "../../utils";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import "./Tooltip.style.scss"
+import {AutoScrollArea} from "../scroll-area/ScrollArea";
 
 export type TooltipProps = ComponentProps & RadixTooltip.TooltipProps
 export type TooltipTriggerProps = ComponentProps & RadixTooltip.TooltipTriggerProps
@@ -24,8 +25,13 @@ export const TooltipPortal: React.FC<TooltipPortalProps> = (props) => {
 }
 
 export const TooltipContent: React.FC<TooltipContentProps> = (props) => {
+    const {children, ...rest} = props
     return <RadixTooltip.TooltipContent
-        align={props.align} {...mergeComponentProps(`tooltip__content tooltip__content--${props.color ?? "tertiary"}`, props) as TooltipContentProps}/>
+        align={props.align} {...mergeComponentProps(`tooltip__content tooltip__content--${props.color ?? "tertiary"}`, rest) as TooltipContentProps}>
+        <AutoScrollArea>
+            {children}
+        </AutoScrollArea>
+    </RadixTooltip.TooltipContent>
 }
 
 export const TooltipArrow: React.FC<TooltipArrowProps> = (props) => {

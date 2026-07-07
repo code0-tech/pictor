@@ -59,3 +59,34 @@ export const ExampleMenu = () => {
     </Menu>
 
 }
+
+export const ScrollableMenu = () => {
+
+    return <Menu>
+        <MenuTrigger asChild>
+            <Button>Open Menu</Button>
+        </MenuTrigger>
+        <MenuPortal>
+            <MenuContent side={"bottom"} align={"start"} sideOffset={5.6} collisionPadding={16}>
+                {Array.from({length: 50}, (_, index) => {
+                    return <MenuItem key={index}>Item {index + 1}</MenuItem>
+                })}
+                <MenuSub>
+                    <MenuSubTrigger>
+                        <Flex justify={"space-between"} align={"center"} w={"100%"}>
+                            More items <IconChevronRight size={16}/>
+                        </Flex>
+                    </MenuSubTrigger>
+                    <MenuPortal>
+                        <MenuSubContent collisionPadding={16}>
+                            {Array.from({length: 50}, (_, index) => {
+                                return <MenuItem key={index}>Sub item {index + 1}</MenuItem>
+                            })}
+                        </MenuSubContent>
+                    </MenuPortal>
+                </MenuSub>
+            </MenuContent>
+        </MenuPortal>
+    </Menu>
+
+}

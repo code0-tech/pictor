@@ -32,6 +32,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuTriggerProps
 } from "@radix-ui/react-dropdown-menu";
+import {AutoScrollArea} from "../scroll-area/ScrollArea";
 
 export type MenuProps = ComponentProps & DropdownMenuProps
 export type MenuTriggerProps = ComponentProps & DropdownMenuTriggerProps
@@ -65,8 +66,13 @@ export const MenuPortal: React.FC<MenuPortalProps> = (props) => {
 }
 
 export const MenuContent: React.FC<MenuContentProps> = (props) => {
+    const {children, ...rest} = props
     return <DropdownMenuContent
-        align={props.align} {...mergeComponentProps(`menu__content menu__content--${props.color ?? "primary"}`, props) as MenuContentProps}/>
+        align={props.align} {...mergeComponentProps(`menu__content menu__content--${props.color ?? "primary"}`, rest) as MenuContentProps}>
+        <AutoScrollArea>
+            {children}
+        </AutoScrollArea>
+    </DropdownMenuContent>
 }
 
 export const MenuLabel: React.FC<MenuLabelProps> = (props) => {
@@ -90,7 +96,12 @@ export const MenuSubTrigger: React.FC<MenuSubTriggerProps> = (props) => {
 }
 
 export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
-    return <DropdownMenuSubContent {...mergeComponentProps(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, props) as MenuSubContentProps}/>
+    const {children, ...rest} = props
+    return <DropdownMenuSubContent {...mergeComponentProps(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, rest) as MenuSubContentProps}>
+        <AutoScrollArea>
+            {children}
+        </AutoScrollArea>
+    </DropdownMenuSubContent>
 }
 
 export const MenuSeparator: React.FC<MenuSeparatorProps> = (props) => {

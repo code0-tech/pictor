@@ -4,11 +4,7 @@ import React from "react";
 import {ComponentProps, Color, mergeComponentProps} from "../../utils";
 import * as Radix from "@radix-ui/react-context-menu";
 import "./ContextMenu.style.scss"
-import {Card} from "../card/Card";
-import {Flex} from "../flex/Flex";
-import {Badge} from "../badge/Badge";
-import {IconArrowDown, IconArrowUp, IconCornerDownLeft} from "@tabler/icons-react";
-import {Spacing} from "../spacing/Spacing";
+import {AutoScrollArea} from "../scroll-area/ScrollArea";
 
 export type ContextMenuProps = ComponentProps & Radix.ContextMenuProps
 export type ContextMenuTriggerProps = ComponentProps & Radix.ContextMenuTriggerProps
@@ -40,8 +36,13 @@ export const ContextMenuPortal: React.FC<ContextMenuPortalProps> = (props) => {
 }
 
 export const ContextMenuContent: React.FC<ContextMenuContentProps> = (props) => {
+    const {children, ...rest} = props
     return <Radix.ContextMenuContent
-        align={props.align} {...mergeComponentProps(`context-menu__content context-menu__content--${props.color ?? "primary"}`, props) as ContextMenuContentProps}/>
+        align={props.align} {...mergeComponentProps(`context-menu__content context-menu__content--${props.color ?? "primary"}`, rest) as ContextMenuContentProps}>
+        <AutoScrollArea>
+            {children}
+        </AutoScrollArea>
+    </Radix.ContextMenuContent>
 }
 
 export const ContextMenuLabel: React.FC<ContextMenuLabelProps> = (props) => {
@@ -65,7 +66,12 @@ export const ContextMenuSubTrigger: React.FC<ContextMenuSubTriggerProps> = (prop
 }
 
 export const ContextMenuSubContent: React.FC<ContextMenuSubContentProps> = (props) => {
-    return <Radix.ContextMenuSubContent align={props.align} {...mergeComponentProps(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, props) as ContextMenuSubContentProps}/>
+    const {children, ...rest} = props
+    return <Radix.ContextMenuSubContent align={props.align} {...mergeComponentProps(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, rest) as ContextMenuSubContentProps}>
+        <AutoScrollArea>
+            {children}
+        </AutoScrollArea>
+    </Radix.ContextMenuSubContent>
 }
 
 export const ContextMenuSeparator: React.FC<ContextMenuSeparatorProps> = (props) => {

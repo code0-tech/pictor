@@ -57,6 +57,9 @@ export default defineConfig({
                 storybookTest({
                     configDir: path.join(dirname, '.storybook')
                 })],
+            optimizeDeps: {
+                include: ['storybook/test']
+            },
             test: {
                 name: 'storybook',
                 browser: {

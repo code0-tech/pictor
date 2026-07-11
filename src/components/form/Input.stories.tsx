@@ -53,6 +53,8 @@ import {
     FileInputTrigger
 } from "./FileInput";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
+import {expect, userEvent, within} from "storybook/test";
+import {ValidationProps} from "./useForm";
 
 export default {
     title: "Form"
@@ -737,6 +739,99 @@ export const File = () => {
     </FileInput>
     </Card>
 
+}
+
+// ---- formValidation prop identity stability ----
+// Measures whether getInputProps(key) keeps referential identity for keys whose value
+// did NOT change. Typing happens only in the first input; the counters of the second
+// (untouched) input show how often its props were rebuilt anyway.
+// Hoisted: with "use no memo" the React Compiler no longer memoizes inline literals,
+// and useForm keys its reset effect off the identity of `initialValues`.
+const propStabilityInitialValues = {
+    typed: "",
+    untouched: ""
+}
+const propStabilityValidate = {
+    typed: (value: string) => value ? null : "Required",
+    untouched: (value: string) => value !== undefined ? null : "Required"
+}
+
+const PropStabilityStats = () => {
+    "use no memo" // opt out of the React Compiler so the raw getInputProps behavior is measured
+
+    const [inputs, validate] = useForm({
+        useInitialValidation: false,
+        initialValues: propStabilityInitialValues,
+        validate: propStabilityValidate
+    })
+
+    const keys = ["typed", "untouched"] as const
+    const statsRef = React.useRef<Record<string, Record<string, number>>>({
+        typed: {props: 0, setValue: 0, validation: 0, value: 0},
+        untouched: {props: 0, setValue: 0, validation: 0, value: 0}
+    })
+    const prevRef = React.useRef<Record<string, ValidationProps<any>>>({})
+
+    const propsByKey: Record<string, ValidationProps<any>> = {}
+    for (const key of keys) {
+        const props = inputs.getInputProps(key)
+        const prev = prevRef.current[key]
+        if (prev) {
+            const stats = statsRef.current[key]
+            if (props !== prev) stats.props++
+            if (props.formValidation?.setValue !== prev.formValidation?.setValue) stats.setValue++
+            if (props.formValidation?.valid !== prev.formValidation?.valid
+                || props.formValidation?.notValidMessage !== prev.formValidation?.notValidMessage) stats.validation++
+            if (!Object.is(props.initialValue, prev.initialValue)) stats.value++
+        }
+        prevRef.current[key] = props
+        propsByKey[key] = props
+    }
+
+    return <Card color={"secondary"} w={"400px"}>
+        <TextInput
+            placeholder={"typed"}
+            title={"Typed input"}
+            onChange={() => validate("typed")}
+            {...propsByKey.typed}
+        />
+        <br/>
+        <TextInput
+            placeholder={"untouched"}
+            title={"Untouched input"}
+            {...propsByKey.untouched}
+        />
+        <br/>
+        {keys.map(key => (
+            <div key={key}>
+                <Text size={"sm"}>{key}: </Text>
+                <span data-testid={`stats-${key}`}>{JSON.stringify(statsRef.current[key])}</span>
+            </div>
+        ))}
+    </Card>
+}
+
+export const FormValidationPropStability = {
+    render: () => <PropStabilityStats/>,
+    play: async ({canvasElement}: { canvasElement: HTMLElement }) => {
+        const canvas = within(canvasElement)
+        const readStats = (key: string): Record<string, number> =>
+            JSON.parse(canvas.getByTestId(`stats-${key}`).textContent ?? "{}")
+
+        await userEvent.type(canvas.getByPlaceholderText("typed"), "hello")
+
+        console.log("prop identity changes after typing 5 chars into 'typed':",
+            JSON.stringify({typed: readStats("typed"), untouched: readStats("untouched")}))
+
+        const untouched = readStats("untouched")
+        // Sanity check: the untouched input's value really never changed.
+        expect(untouched.value).toBe(0)
+        // Desired behavior: props of a key whose value and validation result did not
+        // change keep their identity. Fails while getInputProps rebuilds them per render.
+        expect(untouched.validation).toBe(0)
+        expect(untouched.setValue).toBe(0)
+        expect(untouched.props).toBe(0)
+    }
 }
 
 // ---- Performance: many EditorInputs in a single form ----

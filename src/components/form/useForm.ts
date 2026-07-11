@@ -37,6 +37,13 @@ export interface IValidation<Values> {
     isValid(): boolean
 }
 
+interface CachedInputProps<Value> {
+    value: Value | null
+    message: string | null
+    required: boolean
+    props: ValidationProps<Value>
+}
+
 class Validation<Values> implements IValidation<Values> {
 
     private readonly changeValue: (key: string, value: any) => void
@@ -44,19 +51,25 @@ class Validation<Values> implements IValidation<Values> {
     private readonly currentValidations?: Validations<Values>
     private readonly shouldValidate: Map<keyof Values, boolean>
     private readonly cachedMessages: Map<keyof Values, string | null>
+    private readonly cachedSetters: Map<keyof Values, (value: any) => void>
+    private readonly cachedProps: Map<keyof Values, CachedInputProps<any>>
 
     constructor(
         changeValue: (key: string, value: any) => void,
         values: Values,
         validations: Validations<Values>,
         shouldValidate: Map<keyof Values, boolean> = new Map<keyof Values, boolean>(),
-        cachedMessages: Map<keyof Values, string | null> = new Map()
+        cachedMessages: Map<keyof Values, string | null> = new Map(),
+        cachedSetters: Map<keyof Values, (value: any) => void> = new Map(),
+        cachedProps: Map<keyof Values, CachedInputProps<any>> = new Map()
     ) {
         this.changeValue = changeValue
         this.currentValues = values
         this.currentValidations = validations
         this.shouldValidate = shouldValidate
         this.cachedMessages = cachedMessages
+        this.cachedSetters = cachedSetters
+        this.cachedProps = cachedProps
     }
 
     isValid(): boolean {
@@ -94,23 +107,43 @@ class Validation<Values> implements IValidation<Values> {
             message = this.cachedMessages.get(key) ?? null
         }
 
-        return {
+        const required = Boolean(this.currentValidations && this.currentValidations[key])
+
+        // Reuse the cached props object as long as nothing for this key changed, so
+        // consumers can memoize directly on the getInputProps output.
+        const cached = this.cachedProps.get(key)
+        if (cached && Object.is(cached.value, currentValue) && cached.message === message && cached.required === required) {
+            return cached.props
+        }
+
+        // One setValue per key for the lifetime of the form: changeValue reads from
+        // valuesRef and never goes stale, so the wrapper never has to be rebuilt.
+        let setValue = this.cachedSetters.get(key)
+        if (!setValue) {
+            const changeValue = this.changeValue
+            setValue = (value: any) => {
+                changeValue(currentName, value)
+            }
+            this.cachedSetters.set(key, setValue)
+        }
+
+        const props: ValidationProps<Values[Key]> = {
             // @ts-ignore – z.B. wenn dein Input `defaultValue` kennt
             defaultValue: currentValue ?? undefined,
             initialValue: currentValue ?? undefined,
             formValidation: {
-                setValue: (value: any) => {
-                    this.changeValue(currentName, value)
-                },
+                setValue,
                 ...({
                     notValidMessage: message,
                     valid: message === null,
                 })
             },
-            ...(this.currentValidations && this.currentValidations[key]
+            ...(required
                 ? {required: true}
                 : {})
         }
+        this.cachedProps.set(key, {value: currentValue, message, required, props})
+        return props
     }
 }
 
@@ -129,6 +162,8 @@ export const useForm = <
     const initValues = React.useMemo(() => initialValues as Values, [initialValues])
     const [values, setValues] = useState<Values>(initValues)
     const cachedMessagesRef = useRef<Map<keyof Values, string | null>>(new Map())
+    const cachedSettersRef = useRef<Map<keyof Values, (value: any) => void>>(new Map())
+    const cachedPropsRef = useRef<Map<keyof Values, CachedInputProps<any>>>(new Map())
     const valuesRef = useRef<Values>(values)
     valuesRef.current = values
 
@@ -142,18 +177,30 @@ export const useForm = <
         values,
         validate,
         useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
-        cachedMessagesRef.current
+        cachedMessagesRef.current,
+        cachedSettersRef.current,
+        cachedPropsRef.current
     ))
 
+    const didInitRef = useRef(false)
     useEffect(() => {
         valuesRef.current = initValues
         setValues(initValues)
+        // Form reset: props must be rebuilt from the new initial values. The setter
+        // cache survives on purpose — changeValue is stable, so the setters stay valid.
+        // On mount the cache only holds props built from these initValues, so keep it.
+        if (didInitRef.current) {
+            cachedPropsRef.current.clear()
+        }
+        didInitRef.current = true
         setValidation(new Validation<Values>(
             changeValue,
             initValues,
             validate,
             useInitialValidation ? new Map<keyof Values, boolean>(Object.keys(initValues).map(k => [k as keyof Values, true])) : new Map<keyof Values, boolean>(),
-            cachedMessagesRef.current
+            cachedMessagesRef.current,
+            cachedSettersRef.current,
+            cachedPropsRef.current
         ))
     }, [initValues])
 
@@ -170,7 +217,9 @@ export const useForm = <
             currentValues,
             validate,
             shouldValidateMap,
-            cachedMessagesRef.current
+            cachedMessagesRef.current,
+            cachedSettersRef.current,
+            cachedPropsRef.current
         )
 
         setValidation(currentValidation)

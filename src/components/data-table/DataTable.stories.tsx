@@ -198,6 +198,28 @@ export const Default = () => {
     </>
 }
 
+export const Pagination = () => {
+
+    const testData = Array.from({length: 23}, (_, i) => ({
+        name: `Project ${i + 1}`,
+        payload: {id: String(i + 1)},
+    }))
+
+    return <DataTable data={testData} pagination limit={5}>
+        {(item: any) => <>
+            <DataTableColumn>
+                <Avatar identifier={String(item.name)}/>
+            </DataTableColumn>
+            <DataTableColumn>
+                <Text>{String(item.name)}</Text>
+            </DataTableColumn>
+            <DataTableColumn>
+                <Text>{item.payload.id}</Text>
+            </DataTableColumn>
+        </>}
+    </DataTable>
+}
+
 
 export default {
     title: "DataTable",

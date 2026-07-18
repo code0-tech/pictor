@@ -21,6 +21,8 @@ export interface Card extends Component<HTMLDivElement> {
     outlineColor?: Color
     //defaults to false
     dashed?: boolean
+    //defaults to false; adds hover + active (pressed) styling and a pointer cursor
+    clickable?: boolean
     paddingSize?: Sizes
 }
 
@@ -37,6 +39,7 @@ export const Card: React.FC<Card> = (props) => {
         outlineColor = "secondary",
         outline = false,
         dashed = false,
+        clickable = false,
         paddingSize = "xl",
         ...args
     } = props
@@ -50,9 +53,10 @@ export const Card: React.FC<Card> = (props) => {
                     ${outline ? `card--outline-${outlineColor}` : ""} 
                     ${gradient ? "card--gradient" : ""} 
                     ${borderColor ? `card--border-${borderColor}` : ""} 
-                    ${dashed ? `card--border--dashed` : ""} 
-                    ${gradient ? `card--gradient-${gradientColor}` : ""} 
-                   
+                    ${dashed ? `card--border--dashed` : ""}
+                    ${gradient ? `card--gradient-${gradientColor}` : ""}
+                    ${clickable ? "card--clickable" : ""}
+
                `
             , args)}>
             {children}

@@ -1,6 +1,19 @@
 import React from "react";
 import "./DataTable.style.scss"
 import {Component, mergeComponentProps} from "../../utils";
+import {Flex} from "../flex/Flex";
+import {Button} from "../button/Button";
+import {ButtonGroup} from "../button-group/ButtonGroup";
+import {Text} from "../text/Text";
+import {IconChevronLeft, IconChevronRight} from "@tabler/icons-react";
+import {
+    DataTableMaxPaginationValue,
+    DataTablePagination,
+    DataTablePaginationBackwardsTrigger,
+    DataTablePaginationContext,
+    DataTablePaginationForwardTrigger,
+    DataTablePaginationValue
+} from "./DataTablePagination";
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
@@ -15,15 +28,21 @@ export interface DataTableSortProps {
     [key: string]: 'asc' | 'desc' | undefined
 }
 
+export type DataTableRowRenderer<T> = (item: T, index: number) => React.ReactNode
+
 export interface DataTableProps<T> extends Omit<Component<HTMLTableElement>, 'data' | 'children' | 'onSelect'> {
     data: Array<T>
     sort?: DataTableSortProps
     filter?: DataTableFilterProps
+    limit?: number
+    //when enabled the table splits its rows into pages of `limit` (default 10) and creates the pagination context
+    pagination?: boolean
     loading?: boolean
     loadingComponent?: React.ReactNode
     emptyComponent?: React.ReactNode
     onSelect?: (item: T | undefined) => void
-    children?: (item: T, index: number) => React.ReactNode
+    //the row renderer (function child) plus any pagination controls, e.g. <DataTablePagination/>, to render below the table
+    children?: DataTableRowRenderer<T> | React.ReactNode | Array<DataTableRowRenderer<T> | React.ReactNode>
 }
 
 const getNestedValue = (obj: any, path: string): any => {
@@ -41,7 +60,14 @@ const getNestedValue = (obj: any, path: string): any => {
 
 export const DataTable = <T, >(props: DataTableProps<T>) => {
 
-    const {data, sort, filter, loading, loadingComponent, emptyComponent, onSelect, children, ...rest} = props
+    const {data, sort, filter, limit, pagination, loading, loadingComponent, emptyComponent, onSelect, children, ...rest} = props
+
+    const [page, setPage] = React.useState(0)
+
+    // children may hold the row renderer (a function) plus pagination controls (elements)
+    const childArray: Array<DataTableRowRenderer<T> | React.ReactNode> = Array.isArray(children) ? children : [children]
+    const renderRow = childArray.find((child): child is DataTableRowRenderer<T> => typeof child === "function")
+    const footerNodes = childArray.filter((child) => typeof child !== "function") as React.ReactNode[]
 
     const filteredData = data.filter(item => {
         return Object.entries(filter || {}).every(([key, {operator, value}]) => {
@@ -84,11 +110,24 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
         })
     }, [filteredData, sort])
 
+    const pageSize = typeof limit === "number" ? limit : 10
+    const pageCount = pagination ? Math.max(1, Math.ceil(sortedData.length / pageSize)) : 1
+    // clamp: filtering/sorting can shrink the data below the current page
+    const currentPage = Math.min(page, pageCount - 1)
+
+    React.useEffect(() => {
+        if (page !== currentPage) setPage(currentPage)
+    }, [page, currentPage])
+
+    const visibleData = pagination
+        ? sortedData.slice(currentPage * pageSize, currentPage * pageSize + pageSize)
+        : typeof limit === "number" ? sortedData.slice(0, limit) : sortedData
+
     // @ts-ignore
-    return <table {...mergeComponentProps("data-table", rest)}>
-        {sortedData.map((item, i) => {
+    const table = <table {...mergeComponentProps("data-table", rest)}>
+        {visibleData.map((item, i) => {
             return <tr className={"data-table__row"} onClick={() => onSelect?.(item)}>
-                {children?.(item, i)}
+                {renderRow?.(item, i)}
             </tr>
         })}
         {sortedData.length === 0 && !loading && emptyComponent ? (
@@ -97,4 +136,33 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
             </tr>
         ) : null}
     </table>
+
+    if (!pagination) return table
+
+    // DataTable owns the pagination state and provides the context that the controls
+    // (e.g. a <DataTablePagination/> placed as a child) read from.
+    return <DataTablePaginationContext.Provider value={{page: currentPage, pageCount, setPage}}>
+        <Flex style={{flexDirection: "column", gap: "0.5rem"}}>
+            {table}
+            {footerNodes.length > 0
+                ? footerNodes.map((node, i) => <React.Fragment key={i}>{node}</React.Fragment>)
+                : <DataTablePagination>
+                    <Text size={"sm"} hierarchy={"tertiary"}>
+                        Page <DataTablePaginationValue/> of <DataTableMaxPaginationValue/>
+                    </Text>
+                    <ButtonGroup>
+                        <DataTablePaginationBackwardsTrigger asChild>
+                            <Button paddingSize={"xxs"}>
+                                <IconChevronLeft size={13}/>
+                            </Button>
+                        </DataTablePaginationBackwardsTrigger>
+                        <DataTablePaginationForwardTrigger asChild>
+                            <Button paddingSize={"xxs"}>
+                                <IconChevronRight size={13}/>
+                            </Button>
+                        </DataTablePaginationForwardTrigger>
+                    </ButtonGroup>
+                </DataTablePagination>}
+        </Flex>
+    </DataTablePaginationContext.Provider>
 }

@@ -105,6 +105,17 @@
       }
     }
 
+    &.card--hover {
+      @include box.boxHover($color);
+      cursor: pointer;
+    }
+
+    &.card--clickable {
+      @include box.boxHover($color);
+      @include box.boxActive($color);
+      cursor: pointer;
+    }
+
   }
 
   .card--outline-#{$name} {

@@ -23,11 +23,12 @@
   &--identicon {
     > div > div {
       --color: inherit;
-      background: helpers.backgroundColor(variables.$tertiary);
+      background: transparent;
     }
 
     > div > div > span, > div > div > p {
-      color: var(--color)
+      color: var(--color);
+      font-size: calc(var(--size) * 1px);
     }
   }
 }

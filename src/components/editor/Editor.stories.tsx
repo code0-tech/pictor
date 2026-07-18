@@ -95,7 +95,7 @@ export const Concept: React.FC = () => {
 
 
 export default {
-    title: "Concepts/Editor",
+    title: "Editor",
     component: Concept,
     parameters: {
         visualTest: {

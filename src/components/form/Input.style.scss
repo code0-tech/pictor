@@ -147,16 +147,66 @@
 
 .pin-input {
   display: flex;
-  justify-content: space-between;
-  gap: variables.$xs;
+  align-items: stretch;
   position: relative;
-  background: transparent;
+  width: 100%;
+  overflow: hidden;
+
+  & {
+    @include box.box(variables.$tertiary, variables.$white, variables.$white);
+    @include box.boxHover(variables.$primary, variables.$white, variables.$white);
+    @include helpers.fontStyle();
+    @include helpers.borderRadius();
+  }
+
+  // Active/focus state for the whole field when any cell is focused
+  &:has(&__field:focus) {
+    @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
+  }
+
+  &--not-valid {
+    @include box.box(variables.$error, variables.$white, variables.$error);
+  }
 
   &__field {
     flex: 1;
-    width: 100%;
-    aspect-ratio: 1/1;
+    min-width: 0;
+    padding: variables.$xs 0;
     text-align: center;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 1px 100%;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    font-size: variables.$sm;
+    color: variables.$white;
+    box-sizing: border-box;
+
+    & {
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+    }
+
+    // The "|" separator between cells — spans the middle 50% of the height
+    &:not(:first-of-type) {
+      background-image: linear-gradient(
+        to bottom,
+        transparent 25%,
+        rgba(variables.$white, .12) 25%,
+        rgba(variables.$white, .12) 75%,
+        transparent 75%
+      );
+    }
+
+    &:focus {
+      background-color: rgba(variables.$white, .06);
+    }
+
+    &::placeholder {
+      color: rgba(variables.$white, .35);
+    }
   }
 }
 

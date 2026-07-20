@@ -435,7 +435,7 @@ export const Dashboard = () => {
                                     <Spacing spacing={"md"}/>
 
                                     {/* ── Slim attention banner — expands its own table of the flows ── */}
-                                    <Card color={"secondary"} className={"card--hover"}
+                                    <Card color={"secondary"} clickable
                                           onClick={() => setAttentionOpen((o) => !o)}>
                                         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
                                             <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
@@ -458,21 +458,8 @@ export const Dashboard = () => {
                                         </Flex>
                                         {attentionOpen && (
                                             <div onClick={(e) => e.stopPropagation()}>
+                                                <Spacing spacing={"xl"}/>
                                                 <DataTable data={attentionFlows}>
-                                                    <DataTableHeader>
-                                                        <DataTableHeaderColumn>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>Flow</Text>
-                                                        </DataTableHeaderColumn>
-                                                        <DataTableHeaderColumn>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>Project</Text>
-                                                        </DataTableHeaderColumn>
-                                                        <DataTableHeaderColumn>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>Issue</Text>
-                                                        </DataTableHeaderColumn>
-                                                        <DataTableHeaderColumn>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>Last run</Text>
-                                                        </DataTableHeaderColumn>
-                                                    </DataTableHeader>
                                                     {(f) => <>
                                                         <DataTableColumn>
                                                             <Flex align={"center"}
@@ -901,7 +888,7 @@ export const Workspaces = () => {
                                     <Spacing spacing={"md"}/>
 
                                     {/* ── Slim attention banner: flows across workspaces needing action ── */}
-                                    <Card color={"secondary"} className={"card--hover"}>
+                                    <Card color={"secondary"} clickable>
                                         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
                                             <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
                                                 <div style={{
@@ -989,10 +976,7 @@ export const Workspaces = () => {
                                         alignItems: "stretch",
                                     }}>
                                         {visibleWorkspaces.map((w) => (
-                                            <Card key={w.name} color={"secondary"} className={"card--hover"}
-                                                  style={w.personal ? {
-                                                      border: "1px solid var(--info)",
-                                                  } : undefined}>
+                                            <Card key={w.name} color={"secondary"} clickable>
                                                 <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
                                                     {/* identity: avatar, name (+ personal marker) and description */}
                                                     <Flex align={"center"} style={{gap: "0.85rem"}}>

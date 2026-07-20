@@ -12,6 +12,7 @@ import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {Badge} from "../badge/Badge";
 import {DataTableColumn} from "./DataTableColumn";
+import {DataTableHeader, DataTableHeaderColumn} from "./DataTableHeader";
 
 export const Default = () => {
 
@@ -206,6 +207,38 @@ export const Pagination = () => {
     }))
 
     return <DataTable data={testData} pagination limit={5}>
+        {(item: any) => <>
+            <DataTableColumn>
+                <Avatar identifier={String(item.name)}/>
+            </DataTableColumn>
+            <DataTableColumn>
+                <Text>{String(item.name)}</Text>
+            </DataTableColumn>
+            <DataTableColumn>
+                <Text>{item.payload.id}</Text>
+            </DataTableColumn>
+        </>}
+    </DataTable>
+}
+
+
+export const Header = () => {
+
+    const testData = Array.from({length: 12}, (_, i) => ({
+        name: `Project ${i + 1}`,
+        payload: {id: String(i + 1)},
+    }))
+
+    return <DataTable data={testData} pagination limit={5}>
+        <DataTableHeader>
+            <DataTableHeaderColumn/>
+            <DataTableHeaderColumn>
+                <Text size={"sm"} hierarchy={"tertiary"}>Name</Text>
+            </DataTableHeaderColumn>
+            <DataTableHeaderColumn>
+                <Text size={"sm"} hierarchy={"tertiary"}>Identifier</Text>
+            </DataTableHeaderColumn>
+        </DataTableHeader>
         {(item: any) => <>
             <DataTableColumn>
                 <Avatar identifier={String(item.name)}/>

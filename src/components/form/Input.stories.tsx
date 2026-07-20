@@ -290,6 +290,7 @@ export const Switch = () => {
 export const PinInputExample = () => {
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             pinInput: undefined
         },

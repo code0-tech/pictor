@@ -8,7 +8,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 50%;
 
   & {
     @include box.box();
@@ -23,11 +22,19 @@
   &--identicon {
     > div > div {
       --color: inherit;
-      background: helpers.backgroundColor(variables.$tertiary);
+      background: transparent;
+      width: calc(var(--size) * 1px);
+      height: calc(var(--size) * 1px);
+
+      > span >svg {
+        width: calc(var(--size) * 1px);
+        height: calc(var(--size) * 1px);
+      }
     }
 
     > div > div > span, > div > div > p {
-      color: var(--color)
+      color: var(--color);
+      font-size: calc(var(--size) * 1px);
     }
   }
 }

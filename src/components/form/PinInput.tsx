@@ -39,14 +39,12 @@ export const PinInput: React.FC<PinInputProps> = (props) => {
         {!!title ? <InputLabel children={title}/> : null}
         {!!description ? <InputDescription children={description}/> : null}
 
-        <div {...mergeComponentProps(`${!formValidation?.valid ? "input--not-valid" : ""}`, {})}>
-            <OneTimePasswordField {...mergeComponentProps("pin-input", {
-                ...rest, onValueChange: (value: string) => {
-                    if (rest.onValueChange) rest.onValueChange!!(value)
-                    formValidation.setValue?.(value)
-                }
-            })}/>
-        </div>
+        <OneTimePasswordField {...mergeComponentProps(`pin-input ${!formValidation?.valid ? "pin-input--not-valid" : ""}`, {
+            ...rest, disabled, onValueChange: (value: string) => {
+                if (rest.onValueChange) rest.onValueChange!!(value)
+                formValidation.setValue?.(value)
+            }
+        })}/>
 
         {!formValidation?.valid && formValidation?.notValidMessage ?
             <InputMessage children={formValidation.notValidMessage}/> : null}
@@ -55,7 +53,7 @@ export const PinInput: React.FC<PinInputProps> = (props) => {
 }
 
 export const PinInputField: React.FC<PinInputFieldProps> = (props) => {
-    return <OneTimePasswordFieldInput {...mergeComponentProps("input pin-input__field", props)}/>
+    return <OneTimePasswordFieldInput {...mergeComponentProps("pin-input__field", props)}/>
 }
 
 export const PinInputHiddenField: React.FC<PinInputHiddenFieldProps> = (props) => {

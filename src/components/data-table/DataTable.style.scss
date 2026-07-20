@@ -8,22 +8,46 @@
   -webkit-border-vertical-spacing: 0;
   border-spacing: 0;
 
+  &__header {
+    th {
+      text-align: left;
+      padding: variables.$xs 0;
+      border-bottom: 0.5px solid helpers.borderColor();
+    }
+
+    th:last-child {
+      width: 1px;
+      white-space: nowrap;
+    }
+  }
+
   &__row {
     td {
       border-bottom: 0.5px solid helpers.borderColor();
       border-top: 0.5px solid helpers.borderColor();
-      padding: variables.$xs variables.$xxs;
+      padding: variables.$xs 0;
     }
 
     &:hover {
-      background: helpers.backgroundColor();
+      background: rgba(255,255,255, .05);
       cursor: pointer;
+    }
+
+    &:active {
+      background: rgba(255,255,255, .1);
     }
 
     td:last-child {
       width: 1px;
       white-space: nowrap;
     }
+  }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: variables.$xs;
   }
 
 }

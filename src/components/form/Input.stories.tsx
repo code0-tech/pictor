@@ -290,6 +290,7 @@ export const Switch = () => {
 export const PinInputExample = () => {
 
     const [inputs, validate] = useForm({
+        useInitialValidation: false,
         initialValues: {
             pinInput: undefined
         },
@@ -307,7 +308,9 @@ export const PinInputExample = () => {
     return <>
         <Card maw={300}>
             <PinInput title={"OTP"}
-                      description={"Paste or type your 6-digit code"} {...inputs.getInputProps("pinInput")}>
+                      description={"Paste or type your 6-digit code"}
+                      onChange={() => validate("pinInput")}
+                      {...inputs.getInputProps("pinInput")}>
                 <PinInputField/>
                 <PinInputField/>
                 <PinInputField/>

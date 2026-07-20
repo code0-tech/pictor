@@ -1,4 +1,6 @@
 export * from "./DataTable"
 export * from "./DataTableColumn"
+export * from "./DataTableHeader"
+export * from "./DataTablePagination"
 export * from "./DataTableFilterInput"
 export * from "./DataTableFilterSuggestionMenu"

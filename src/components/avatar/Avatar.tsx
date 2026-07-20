@@ -30,7 +30,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({src, size}) => {
 
 const AvatarIdenticon: React.FC<AvatarIdenticonProps> = ({identifier, size, color, type}) => {
 
-    return <div style={{"--color": color ?? hashToColor(identifier)} as React.CSSProperties}>
+    return <div style={{"--color": color ?? hashToColor(identifier), "--size": size} as React.CSSProperties}>
         <Identicon style={type ?? "shape"} value={identifier} size={size}/>
     </div>
 

@@ -2,18 +2,8 @@ import React from "react";
 import "./DataTable.style.scss"
 import {Component, mergeComponentProps} from "../../utils";
 import {Flex} from "../flex/Flex";
-import {Button} from "../button/Button";
-import {ButtonGroup} from "../button-group/ButtonGroup";
-import {Text} from "../text/Text";
-import {IconChevronLeft, IconChevronRight} from "@tabler/icons-react";
-import {
-    DataTableMaxPaginationValue,
-    DataTablePagination,
-    DataTablePaginationBackwardsTrigger,
-    DataTablePaginationContext,
-    DataTablePaginationForwardTrigger,
-    DataTablePaginationValue
-} from "./DataTablePagination";
+import {DataTableHeader} from "./DataTableHeader";
+import {DataTablePaginationContext} from "./DataTablePagination";
 
 export type DataTableFilterOperator = "isOneOf" | "isNotOneOf"
 
@@ -41,7 +31,7 @@ export interface DataTableProps<T> extends Omit<Component<HTMLTableElement>, 'da
     loadingComponent?: React.ReactNode
     emptyComponent?: React.ReactNode
     onSelect?: (item: T | undefined) => void
-    //the row renderer (function child) plus any pagination controls, e.g. <DataTablePagination/>, to render below the table
+    //the row renderer (function child) plus an optional <DataTableHeader/> and any pagination controls, e.g. <DataTablePagination/>, to render below the table
     children?: DataTableRowRenderer<T> | React.ReactNode | Array<DataTableRowRenderer<T> | React.ReactNode>
 }
 
@@ -60,14 +50,27 @@ const getNestedValue = (obj: any, path: string): any => {
 
 export const DataTable = <T, >(props: DataTableProps<T>) => {
 
-    const {data, sort, filter, limit, pagination, loading, loadingComponent, emptyComponent, onSelect, children, ...rest} = props
+    const {
+        data,
+        sort,
+        filter,
+        limit,
+        pagination,
+        loading,
+        loadingComponent,
+        emptyComponent,
+        onSelect,
+        children,
+        ...rest
+    } = props
 
     const [page, setPage] = React.useState(0)
 
-    // children may hold the row renderer (a function) plus pagination controls (elements)
+    // children may hold the row renderer (a function), an optional <DataTableHeader/> and pagination controls (elements)
     const childArray: Array<DataTableRowRenderer<T> | React.ReactNode> = Array.isArray(children) ? children : [children]
     const renderRow = childArray.find((child): child is DataTableRowRenderer<T> => typeof child === "function")
-    const footerNodes = childArray.filter((child) => typeof child !== "function") as React.ReactNode[]
+    const headerNode = childArray.find((child) => React.isValidElement(child) && child.type === DataTableHeader) as React.ReactNode
+    const footerNodes = childArray.filter((child) => typeof child !== "function" && child !== headerNode) as React.ReactNode[]
 
     const filteredData = data.filter(item => {
         return Object.entries(filter || {}).every(([key, {operator, value}]) => {
@@ -125,6 +128,8 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
 
     // @ts-ignore
     const table = <table {...mergeComponentProps("data-table", rest)}>
+        {headerNode}
+        <tbody>
         {visibleData.map((item, i) => {
             return <tr className={"data-table__row"} onClick={() => onSelect?.(item)}>
                 {renderRow?.(item, i)}
@@ -135,6 +140,7 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
                 {emptyComponent}
             </tr>
         ) : null}
+        </tbody>
     </table>
 
     if (!pagination) return table
@@ -144,25 +150,7 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
     return <DataTablePaginationContext.Provider value={{page: currentPage, pageCount, setPage}}>
         <Flex style={{flexDirection: "column", gap: "0.5rem"}}>
             {table}
-            {footerNodes.length > 0
-                ? footerNodes.map((node, i) => <React.Fragment key={i}>{node}</React.Fragment>)
-                : <DataTablePagination>
-                    <Text size={"sm"} hierarchy={"tertiary"}>
-                        Page <DataTablePaginationValue/> of <DataTableMaxPaginationValue/>
-                    </Text>
-                    <ButtonGroup>
-                        <DataTablePaginationBackwardsTrigger asChild>
-                            <Button paddingSize={"xxs"}>
-                                <IconChevronLeft size={13}/>
-                            </Button>
-                        </DataTablePaginationBackwardsTrigger>
-                        <DataTablePaginationForwardTrigger asChild>
-                            <Button paddingSize={"xxs"}>
-                                <IconChevronRight size={13}/>
-                            </Button>
-                        </DataTablePaginationForwardTrigger>
-                    </ButtonGroup>
-                </DataTablePagination>}
+            {footerNodes.map((node, i) => <React.Fragment key={i}>{node}</React.Fragment>)}
         </Flex>
     </DataTablePaginationContext.Provider>
 }

@@ -1,4 +1,5 @@
 import type { StorybookConfig } from "@storybook/react-vite";
+import svgr from "vite-plugin-svgr";
 
 const config: StorybookConfig = {
     stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -32,6 +33,7 @@ const config: StorybookConfig = {
         return mergeConfig(config, {
             // Add dependencies to pre-optimization
             reactStrictMode: true,
+            plugins: [svgr()],
             resolve: {
                 alias: {
                     // /esm/icons/index.mjs only exports the icons statically, so no separate chunks are created

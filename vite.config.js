@@ -4,6 +4,7 @@ import {extname, relative, resolve} from 'path';
 import {fileURLToPath} from 'node:url';
 import {glob} from 'glob';
 import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
 import {libInjectCss} from 'vite-plugin-lib-inject-css';
 import dts from 'vite-plugin-dts';
 import pkg from './package.json';
@@ -21,7 +22,7 @@ export default defineConfig({
                 decoratorsBeforeExport: true
             }], '@babel/plugin-transform-class-properties']
         }
-    }), libInjectCss(), dts({
+    }), svgr(), libInjectCss(), dts({
         include: ['src'],
         exclude: ['src/**/*.stories.tsx'],
         afterDiagnostic: diagnostics => {

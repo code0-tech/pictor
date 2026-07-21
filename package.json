@@ -27,6 +27,7 @@
     "@codemirror/state": "^6.7.1",
     "@codemirror/view": "^6.43.5",
     "@dagrejs/dagre": "^3.0.0",
+    "@icons-pack/react-simple-icons": "^13.13.0",
     "@lezer/common": "^1.5.2",
     "@mdx-js/react": "^3.1.1",
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -98,6 +99,7 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-lib-inject-css": "^2.2.2",
+    "vite-plugin-svgr": "^5.2.0",
     "vitest": "^4.1.2",
     "zustand": "^4.3.0"
   },
@@ -112,6 +114,7 @@
   "types": "dist/index.d.ts",
   "peerDependencies": {
     "@ark-ui/react": "^5.36.2",
+    "@icons-pack/react-simple-icons": "^13.13.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-json": "^6.0.2",
     "@codemirror/language": "^6.12.1",

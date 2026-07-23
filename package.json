@@ -57,7 +57,7 @@
     "@storybook/react-vite": "^10.4.2",
     "@tabler/icons-react": "3.41.1",
     "@types/jest-image-snapshot": "^6.4.1",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@uiw/codemirror-themes": "^4.25.10",

@@ -9,61 +9,60 @@ import {
     IconAlertCircle,
     IconCircleCheck, IconCircleDot,
     IconCircleX, IconInfoCircle,
-    IconProps,
-    IconX
+    IconProps
 } from "@tabler/icons-react"
 import {Text} from "../text/Text"
 import {Flex} from "../flex/Flex";
-import {Button} from "../button/Button";
 
 export interface ToastProps extends Omit<Component<HTMLDivElement>, "title" | "id"> {
     children?: React.ReactNode | React.ReactNode[]
     id: string | number
     title: React.ReactNode
-    //defaults to true
-    color?: Color
-    //defaults to false
-    dismissible?: boolean
-    onClose?: (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => void
+    //defaults to "secondary", accepts a preset Color or any custom CSS color string
+    color?: Color | (string & {})
+    //custom icon, overrides the default color-based icon
+    icon?: React.ReactNode
     duration?: number //defaults to 4000
 }
 
-export function toast(toast: Omit<ToastProps, 'id'>) {
-    return sonnerToast.custom((id) => (
-        <Toast id={id} {...toast}>
-            {toast.children}
-        </Toast>
-    ), {
+const presetColors: Color[] = ["primary", "secondary", "tertiary", "info", "success", "warning", "error"]
+
+const isPresetColor = (color: string): color is Color => presetColors.includes(color as Color)
+
+export function toast({wrapper, ...toast}: Omit<ToastProps, 'id'> & {wrapper?: (children: React.ReactNode) => React.ReactNode}) {
+    return sonnerToast.custom((id) => {
+        const element = (
+            <Toast id={id} {...toast}>
+                {toast.children}
+            </Toast>
+        )
+
+        return <>{wrapper ? wrapper(element) : element}</>
+    }, {
         duration: toast.duration ?? 4000
     })
 }
 
 export function Toast(props: ToastProps) {
-    const {dismissible = false, color = "secondary", title, onClose = () => {}, children, duration = 4000, ...rest} = props
+    const {color = "secondary", icon, title, children, duration = 4000, ...rest} = props
+
+    const preset = isPresetColor(color)
+    //custom colors are not backed by a SCSS class, so apply them inline and fall back to the base toast styling
+    const customStyle = preset ? {} : {style: {color, ...(rest as {style?: React.CSSProperties}).style}}
 
     return (
-        <div {...mergeComponentProps(`toast toast--${color}`, rest)}>
+        <div {...mergeComponentProps(`toast toast--${preset ? color : "secondary"}`, {...rest, ...customStyle})}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
-                    {color && <ToastIcon color={color as Color}/>}
-                    <Text size={"md"}>{title}</Text>
+                    {icon ?? (preset && <ToastIcon color={color}/>)}
+                    <Text size={"md"} hierarchy={"primary"}>{title}</Text>
                 </Flex>
-                {dismissible &&
-                    <Button variant={"none"} paddingSize={"xxs"} color={color as Color} className={"toast__dismissible"} onClick={() => sonnerToast.dismiss(props.id)}>
-                        <IconX size={16}/>
-                    </Button>
-                }
             </Flex>
             {children &&
                 <div className={"toast__content"}>
                     {children}
                 </div>
             }
-            <Flex className={"toast__duration"} style={{
-                ["--toast-duration" as any]: `${duration}ms`,
-            }}>
-                <Text hierarchy={"tertiary"}>This message will close in</Text> <Text hierarchy={"primary"}>{duration / 1000}</Text> <Text>seconds</Text>
-            </Flex>
         </div>
     )
 }

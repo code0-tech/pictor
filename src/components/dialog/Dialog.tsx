@@ -52,7 +52,7 @@ export const DialogContent: React.FC<DialogContentProps> = (props) => {
                 <Flex align={"center"} justify={"space-between"}>
                     <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
                     <DialogClose asChild>
-                        <Button>
+                        <Button variant={"none"} color={"tertiary"}>
                             <IconX size={16}/>
                         </Button>
                     </DialogClose>

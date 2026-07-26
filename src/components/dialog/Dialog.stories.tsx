@@ -35,15 +35,7 @@ export const ExampleDialog = () => {
             <DialogTrigger asChild>
                 <Button type="primary">Open</Button>
             </DialogTrigger>
-            <DialogContent showCloseButton>
-                <DialogHeader>
-                    <DialogTitle>
-                        Title
-                    </DialogTitle>
-                    <DialogDescription>
-                        Simple Description
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent title={"Title"} showCloseButton>
                 <form>
                     <EmailInput
                         placeholder={"Email"}

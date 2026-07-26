@@ -29,10 +29,11 @@
   &__content {
     box-sizing: border-box;
     margin-left: 27px;
+    margin-top: variables.$xxs;
   }
 
   &__header-wrapper {
-    align-items: flex-start;
+    align-items: center;
     gap: variables.$xs;
 
     > svg {
@@ -41,69 +42,12 @@
     }
 
   }
-
-  &__dismissible {
-
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    & {
-      @include helpers.borderRadius();
-    }
-
-    svg {
-      min-width: variables.$md;
-      min-height: variables.$md;
-    }
-  }
-
-  @keyframes toast-duration {
-    from {
-      width: 0%;
-    }
-    to {
-      width: 100%;
-    }
-  }
-
-  &:hover {
-    .toast__duration {
-      &:after {
-        animation-play-state: paused;
-      }
-    }
-  }
-
-  &__duration {
-    position: relative;
-    margin: variables.$md (-1 * variables.$md) (-1 * variables.$md);
-    padding: variables.$xxs variables.$md (variables.$xxs + 0.25rem);
-    gap: variables.$xxs;
-
-    & {
-      border-top: 1px solid helpers.borderColor();
-    }
-
-    &::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 0%; // Start: leer
-      height: 4px;
-      background: helpers.borderColor();
-      animation-name: toast-duration;
-      animation-duration: var(--toast-duration, 4000ms);
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-    }
-  }
 }
 
 @each $name, $color in variables.$colors {
   .toast--#{$name} {
-    @include box.box($color);
+    @include box.box(variables.$primary);
+    border: 1px solid helpers.borderColor(variables.$primary);
+    color: $color;
   }
 }

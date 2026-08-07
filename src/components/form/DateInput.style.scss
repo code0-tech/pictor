@@ -1,0 +1,136 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.date-input {
+
+  &__control {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+  }
+
+  &__segment-group {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__segment {
+    padding: 0 1px;
+    border-radius: variables.$borderRadius - variables.$xxs;
+    font-variant-numeric: tabular-nums;
+
+    & {
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+    }
+
+    &[data-placeholder] {
+      opacity: .5;
+    }
+
+    &:focus, &[data-focus] {
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
+    }
+  }
+
+  &__trigger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  &__view-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: variables.$xs;
+    padding: variables.$xxs;
+  }
+
+  &__prev-trigger,
+  &__next-trigger,
+  &__view-trigger {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: variables.$xxs variables.$xs;
+    border-radius: variables.$borderRadius - variables.$xxs;
+
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      box-shadow: none;
+    }
+
+    &:hover, &[data-focus=true] {
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
+      box-shadow: none;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__table-header {
+    font-size: variables.$sm;
+    padding: variables.$xxs;
+    text-align: center;
+    opacity: .6;
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__cell {
+    border-radius: variables.$borderRadius - variables.$xxs;
+    padding: variables.$xxs;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: variables.$sm;
+
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$primary);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      @include helpers.disabled();
+      box-shadow: none;
+    }
+
+    &:focus, &:hover, &[data-focus=true], &[data-selected] {
+      @include box.box(variables.$secondary, variables.$white, variables.$white);
+      box-shadow: none;
+    }
+
+    &[data-outside-range] {
+      opacity: .4;
+    }
+  }
+
+  &__time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: variables.$xxs;
+    padding: variables.$xs variables.$xxs variables.$xxs;
+  }
+
+  &__time-separator {
+    font-size: variables.$sm;
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+}

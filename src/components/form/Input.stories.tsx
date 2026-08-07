@@ -1,8 +1,9 @@
 import React from "react";
-import {useForm} from "./useForm";
+import {useForm, ValidationProps} from "./useForm";
 import {Card} from "../card/Card";
 import {Button} from "../button/Button";
 import {
+    IconCalendar,
     IconChevronDown,
     IconFileInfoFilled,
     IconKey,
@@ -32,6 +33,7 @@ import {
     SelectValue,
     SelectViewport
 } from "./SelectInput";
+import {DateInput, DateInputContent, DateInputControl, DateInputField, DateInputTrigger} from "./DateInput";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {EditorInput, EditorTokenRule} from "./EditorInput";
@@ -54,7 +56,6 @@ import {
 } from "./FileInput";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
 import {expect, userEvent, within} from "storybook/test";
-import {ValidationProps} from "./useForm";
 
 export default {
     title: "Form"
@@ -411,6 +412,135 @@ export const Select = () => {
                 </SelectContent>
             </SelectPortal>
         </SelectInput>
+    </Card>
+}
+
+export const Date = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            date: ""
+        },
+        validate: {
+            date: (value) => {
+                if (!value) {
+                    return "Please pick a date"
+                }
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <DateInput title={"Delivery date"}
+                   onValueChange={() => validate()}
+                   locale={"de-DE"}
+                   description={"Choose the day the request should be scheduled for."}
+                   right={
+                       <ButtonGroup color={"primary"}>
+                           <DateInputTrigger asChild>
+                               <Button paddingSize={"xxs"}>
+                                   <IconCalendar size={13}/>
+                               </Button>
+                           </DateInputTrigger>
+                       </ButtonGroup>
+                   } rightType={"action"} {...inputs.getInputProps("date")}>
+            <DateInputControl>
+                <DateInputField/>
+            </DateInputControl>
+            <DateInputContent/>
+        </DateInput>
+    </Card>
+}
+
+export const DateTime = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            date: ""
+        },
+        validate: {
+            date: (value) => {
+                if (!value) {
+                    return "Please pick a date and time"
+                }
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <DateInput title={"Scheduled at"}
+                   onValueChange={() => validate()}
+                   description={"Pick the day, month, year and the exact hour, minute and second."}
+                   granularity={"second"}
+                   locale={"de-DE"}
+                   closeOnSelect={false}
+                   right={
+                       <ButtonGroup color={"primary"}>
+                           <DateInputTrigger asChild>
+                               <Button paddingSize={"xxs"}>
+                                   <IconCalendar size={13}/>
+                               </Button>
+                           </DateInputTrigger>
+                       </ButtonGroup>
+                   } rightType={"action"} {...inputs.getInputProps("date")}>
+            <DateInputControl>
+                <DateInputField/>
+            </DateInputControl>
+            <DateInputContent withTime/>
+        </DateInput>
+    </Card>
+}
+
+// Seeds a non-empty initial date through useForm: getInputProps("date") hands the
+// stored Unix timestamp (seconds) across as initialValue, which DateInput converts to a
+// DateValue to seed both Ark machines on mount. The field should render "07.08.2026"
+// without any interaction, and onSubmit logs the value back as a Unix timestamp.
+export const DateWithInitialValue = () => {
+
+    const [inputs, validate] = useForm<{ date: number | null }>({
+        initialValues: {
+            date: 1754524800 // 2026-08-07T00:00:00Z
+        },
+        validate: {
+            date: (value) => {
+                if (!value) {
+                    return "Please pick a date"
+                }
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <DateInput title={"Delivery date"}
+                   onValueChange={() => validate()}
+                   locale={"de-DE"}
+                   description={"Pre-filled from the form's initialValues."}
+                   right={
+                       <ButtonGroup color={"primary"}>
+                           <DateInputTrigger asChild>
+                               <Button paddingSize={"xxs"}>
+                                   <IconCalendar size={13}/>
+                               </Button>
+                           </DateInputTrigger>
+                       </ButtonGroup>
+                   } rightType={"action"} {...inputs.getInputProps("date")}>
+            <DateInputControl>
+                <DateInputField/>
+            </DateInputControl>
+            <DateInputContent/>
+        </DateInput>
     </Card>
 }
 

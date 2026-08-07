@@ -18,6 +18,7 @@
   "author": "CodeZero",
   "devDependencies": {
     "@ark-ui/react": "^5.36.2",
+    "@internationalized/date": "^3.12.0",
     "@babel/plugin-proposal-decorators": "^7.29.7",
     "@babel/plugin-transform-class-properties": "^7.29.7",
     "@codemirror/autocomplete": "^6.20.3",
@@ -114,6 +115,7 @@
   "types": "dist/index.d.ts",
   "peerDependencies": {
     "@ark-ui/react": "^5.36.2",
+    "@internationalized/date": "^3.12.0",
     "@icons-pack/react-simple-icons": "^13.13.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-json": "^6.0.2",

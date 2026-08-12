@@ -137,6 +137,18 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             onInput: userOnInput,
             ...inputProps
         } = rest
+        
+        const generatedId = React.useId()
+        const inputId = (inputProps.id as string | undefined) ?? generatedId
+        const labelId = `${inputId}-label`
+        const ariaLabelFallback = !title
+            ? ((inputProps["aria-label"] as string | undefined) ?? (inputProps.placeholder as string | undefined))
+            : undefined
+        const accessibilityProps = {
+            id: inputId,
+            ...(title ? {"aria-labelledby": labelId} : {}),
+            ...(ariaLabelFallback ? {"aria-label": ariaLabelFallback} : {}),
+        }
 
         const wrapperRef = useRef<HTMLDivElement>(null)
         const inputRef = useRef<HTMLInputElement>(null)
@@ -728,6 +740,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 key={syntaxRenderKey}
                 ref={editorRef as any}
                 {...mergedEditableProps}
+                {...accessibilityProps}
                 contentEditable={!disabled && !disabledOnValue}
                 suppressContentEditableWarning
                 aria-disabled={disabled || disabledOnValue}
@@ -762,6 +775,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             <textarea
                 ref={inputRef as LegacyRef<HTMLTextAreaElement>}
                 {...mergeComponentProps("input__control", mergedInputProps)}
+                {...accessibilityProps}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
@@ -781,6 +795,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
             <input
                 ref={inputRef as LegacyRef<HTMLInputElement>}
                 {...mergeComponentProps("input__control", mergedInputProps)}
+                {...accessibilityProps}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onKeyDownCapture={handleKeyDownCapture}
@@ -896,7 +911,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
         return (
             <div>
-                {title && <InputLabel>{title}</InputLabel>}
+                {title && <InputLabel htmlFor={inputId} id={labelId}>{title}</InputLabel>}
                 {description && <InputDescription>{description}</InputDescription>}
 
                 <div

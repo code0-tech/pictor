@@ -5,6 +5,7 @@ import {Button} from "../button/Button";
 import {
     IconCalendar,
     IconChevronDown,
+    IconColorPicker,
     IconFileInfoFilled,
     IconKey,
     IconLogin,
@@ -34,6 +35,14 @@ import {
     SelectViewport
 } from "./SelectInput";
 import {DateInput, DateInputContent, DateInputControl, DateInputField, DateInputTrigger} from "./DateInput";
+import {
+    ColorInput,
+    ColorInputContent,
+    ColorInputControl,
+    ColorInputSwatch,
+    ColorInputTrigger,
+    ColorInputValueText
+} from "./ColorInput";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 import {EditorInput, EditorTokenRule} from "./EditorInput";
@@ -541,6 +550,91 @@ export const DateWithInitialValue = () => {
             </DateInputControl>
             <DateInputContent/>
         </DateInput>
+    </Card>
+}
+
+export const Color = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            color: ""
+        },
+        validate: {
+            color: (value) => {
+                if (!value) {
+                    return "Please pick a color"
+                }
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <ColorInput title={"Brand color"}
+                    onValueChange={() => validate()}
+                    description={"Enter a color in rgba, hex or hsla. The stored value is hsla."}
+                    right={
+                        <ButtonGroup color={"primary"}>
+                            <ColorInputTrigger asChild>
+                                <Button paddingSize={"xxs"}>
+                                    <IconColorPicker size={13}/>
+                                </Button>
+                            </ColorInputTrigger>
+                        </ButtonGroup>
+                    } rightType={"action"} {...inputs.getInputProps("color")}>
+            <ColorInputControl>
+                <ColorInputSwatch/>
+                <ColorInputValueText/>
+            </ColorInputControl>
+            <ColorInputContent/>
+        </ColorInput>
+    </Card>
+}
+
+// Seeds a non-empty initial color through useForm: getInputProps("color") hands the
+// stored hsla string across as initialValue, which ColorInput parses to seed the Ark
+// machine on mount. The swatch and value text should render pre-filled without interaction.
+export const ColorWithInitialValue = () => {
+
+    const [inputs, validate] = useForm<{ color: string }>({
+        initialValues: {
+            color: "hsla(275, 89%, 60%, 1)"
+        },
+        validate: {
+            color: (value) => {
+                if (!value) {
+                    return "Please pick a color"
+                }
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    return <Card color={"secondary"} w={"400px"}>
+        <ColorInput title={"Brand color"}
+                    onValueChange={() => validate()}
+                    description={"Pre-filled from the form's initialValues."}
+                    right={
+                        <ButtonGroup color={"primary"}>
+                            <ColorInputTrigger asChild>
+                                <Button paddingSize={"xxs"}>
+                                    <IconColorPicker size={13}/>
+                                </Button>
+                            </ColorInputTrigger>
+                        </ButtonGroup>
+                    } rightType={"action"} {...inputs.getInputProps("color")}>
+            <ColorInputControl>
+                <ColorInputSwatch/>
+                <ColorInputValueText/>
+            </ColorInputControl>
+            <ColorInputContent defaultNotation={"rgba"}/>
+        </ColorInput>
     </Card>
 }
 

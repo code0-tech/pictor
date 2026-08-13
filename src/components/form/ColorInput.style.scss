@@ -1,0 +1,233 @@
+@use "../../styles/helpers";
+@use "../../styles/box";
+@use "../../styles/variables";
+
+.color-input {
+
+  &__control {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    gap: variables.$xs;
+  }
+
+  &__swatch-wrapper {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border-radius: variables.$borderRadius - variables.$xs;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px helpers.borderColor(variables.$white);
+  }
+
+  &__transparency-grid {
+    position: absolute;
+    inset: 0;
+  }
+
+  // Ark sets `position: relative` inline on the swatch, so fill via width/height
+  // (an absolute `inset: 0` would be ignored and collapse it to 0 height).
+  &__swatch {
+    width: 100%;
+    height: 100%;
+  }
+
+  // Shown when no color has been picked yet: a neutral empty square with a slash.
+  &__swatch--empty {
+    background:
+      linear-gradient(to top right,
+        transparent calc(50% - 1px), helpers.color(variables.$white, .4),
+        transparent calc(50% + 1px));
+  }
+
+  &__value-text {
+    font-variant-numeric: tabular-nums;
+
+    & {
+      @include helpers.fontStyle();
+    }
+
+    &--placeholder {
+      opacity: .5;
+    }
+  }
+
+  &__trigger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  // ---- menu content ----
+
+  &__content {
+    padding: variables.$xxs;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$xs;
+    width: 240px;
+    max-width: 100%;
+  }
+
+  &__area {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    border-radius: variables.$borderRadius - variables.$xxs;
+    overflow: hidden;
+  }
+
+  // Ark sets `position: relative` inline on the background/track, which beats a
+  // stylesheet `position: absolute`. So fill via width/height instead of inset.
+  &__area-background {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  &__area-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid variables.$white;
+    box-shadow: 0 0 0 1px rgba(variables.$black, .35);
+
+    & {
+      @include helpers.noFocusStyle();
+    }
+  }
+
+  &__sliders {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$xs;
+  }
+
+  &__channel-slider {
+    position: relative;
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+
+    & {
+      @include helpers.noFocusStyle();
+    }
+  }
+
+  &__channel-slider-grid {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  &__channel-slider-track {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  &__channel-slider-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid variables.$white;
+    box-shadow: 0 0 0 1px rgba(variables.$black, .35);
+    transform: translate(-50%, -50%);
+
+    & {
+      @include helpers.noFocusStyle();
+    }
+  }
+
+  // ---- channel / hex inputs ----
+
+  &__channels {
+    display: flex;
+    flex-direction: column;
+    gap: variables.$xs;
+  }
+
+  &__notation {
+    width: 100%;
+
+    .segmented-control__item {
+      flex: 1;
+      text-align: center;
+      justify-content: center;
+      font-size: variables.$sm;
+    }
+  }
+
+  // ---- copy / paste footer ----
+
+  &__actions {
+    width: 100%;
+    gap: variables.$xs;
+    margin-top: variables.$xxs;
+
+    .button {
+      flex: 1;
+      gap: variables.$xxs;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  &__channel-row {
+    display: flex;
+    align-items: flex-end;
+    gap: variables.$xxs;
+  }
+
+  &__channel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+
+    &--hex {
+      align-items: stretch;
+
+      .color-input__channel-label {
+        text-align: center;
+      }
+    }
+  }
+
+  &__channel-label {
+    font-size: variables.$xs;
+    opacity: .6;
+
+    & {
+      @include helpers.fontStyle();
+    }
+  }
+
+  &__channel-input {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    padding: variables.$xxs;
+    border-radius: variables.$borderRadius - variables.$xxs;
+    font-variant-numeric: tabular-nums;
+
+    & {
+      @include box.box(variables.$primary, variables.$white, variables.$white);
+      @include helpers.noFocusStyle();
+      @include helpers.fontStyle();
+      font-size: variables.$sm;
+    }
+
+    &:focus, &[data-focus] {
+      @include box.boxActiveStyle(variables.$primary, variables.$white, variables.$white);
+    }
+  }
+}

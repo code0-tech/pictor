@@ -23,8 +23,8 @@
     > div > div {
       --color: inherit;
       background: transparent;
-      width: calc(var(--size) * 1px);
-      height: calc(var(--size) * 1px);
+      width: calc(var(--size) * 0.75px);
+      height: calc(var(--size) * 0.75px);
 
       > span >svg {
         width: calc(var(--size) * 0.75px);

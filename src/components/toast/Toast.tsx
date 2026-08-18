@@ -50,8 +50,14 @@ export function Toast(props: ToastProps) {
     //custom colors are not backed by a SCSS class, so apply them inline and fall back to the base toast styling
     const customStyle = preset ? {} : {style: {color, ...(rest as {style?: React.CSSProperties}).style}}
 
+    //error toasts are critical and interrupt the screen reader (assertive); everything else is announced politely
+    const isCritical = color === "error"
+
     return (
-        <div {...mergeComponentProps(`toast toast--${preset ? color : "secondary"}`, {...rest, ...customStyle})}>
+        <div
+            role={isCritical ? "alert" : "status"}
+            aria-live={isCritical ? "assertive" : "polite"}
+            {...mergeComponentProps(`toast toast--${preset ? color : "secondary"}`, {...rest, ...customStyle})}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
                     {icon ?? (preset && <ToastIcon color={color}/>)}

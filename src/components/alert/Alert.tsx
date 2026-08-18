@@ -28,7 +28,13 @@ export const Alert: React.FC<AlertProps> = (props) => {
         "error": <IconCircleX size={16}/>,
     }
 
-    return <div {...mergeComponentProps(`alert alert--${color}`, rest)}>
+    //error alerts are critical and interrupt the screen reader (assertive); everything else is announced politely
+    const isCritical = color === "error"
+
+    return <div
+        role={isCritical ? "alert" : "status"}
+        aria-live={isCritical ? "assertive" : "polite"}
+        {...mergeComponentProps(`alert alert--${color}`, rest)}>
         {icons[color]}
         {children}
     </div>

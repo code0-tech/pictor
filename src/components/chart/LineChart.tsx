@@ -32,23 +32,18 @@ type LineChartComponent = <TData extends Record<string, unknown>>(props: LineCha
 
 export const LineChart: LineChartComponent = (props) => {
     const { data, lines, xKey, config, showDots, curveType, containerProps, grid, xAxis, yAxis, tooltip, legend, ...rest } = props
-    const resolvedConfig = React.useMemo<ChartConfig>(() => {
-        if (config) return config
-        return lines.reduce((acc, line) => {
-            const lineColor = line.color ?? (typeof line.stroke === "string" ? line.stroke : undefined)
-            acc[line.dataKey] = {
-                label: line.label ?? line.name ?? line.dataKey,
-                color: lineColor,
-            }
-            return acc
-        }, {} as ChartConfig)
-    }, [config, lines])
 
-    const tooltipProps = tooltip === false ? undefined : tooltip
-    const legendProps = legend === false ? undefined : legend
+    const lineColor = (line: ChartLines) => line.color ?? (typeof line.stroke === "string" ? line.stroke : undefined)
 
-    const { content: tooltipContent, ...tooltipRest } = tooltipProps ?? {}
-    const { content: legendContent, ...legendRest } = legendProps ?? {}
+    const resolvedConfig = React.useMemo<ChartConfig>(
+        () =>
+            config ??
+            lines.reduce((acc, line) => {
+                acc[line.dataKey] = { label: line.label ?? line.name ?? line.dataKey, color: lineColor(line) }
+                return acc
+            }, {} as ChartConfig),
+        [config, lines]
+    )
 
     return (
         <ChartContainer config={resolvedConfig} {...containerProps}>
@@ -56,11 +51,10 @@ export const LineChart: LineChartComponent = (props) => {
                 <RechartsPrimitive.XAxis dataKey={xKey} {...xAxis} />
                 <RechartsPrimitive.YAxis {...yAxis} />
                 {grid !== false && <RechartsPrimitive.CartesianGrid strokeDasharray="4 4" {...grid} />}
-                {tooltip !== false && <RechartsPrimitive.Tooltip content={tooltipContent ?? <ChartTooltipContent />} {...tooltipRest} />}
-                {legend !== false && <RechartsPrimitive.Legend content={legendContent ?? <ChartLegendContent />} {...legendRest} />}
+                {tooltip !== false && <RechartsPrimitive.Tooltip {...tooltip} content={tooltip?.content ?? <ChartTooltipContent />} />}
+                {legend !== false && <RechartsPrimitive.Legend {...legend} content={legend?.content ?? <ChartLegendContent />} />}
                 {lines.map((line) => {
-                    const { dataKey, label, color, type, stroke, strokeWidth, name, dot, ...lineProps } = line
-                    const resolvedStroke = color ?? (typeof stroke === "string" ? stroke : undefined) ?? `var(--color-${dataKey}, currentColor)`
+                    const { dataKey, label, type, strokeWidth, name, dot, color: _color, stroke: _stroke, ...lineProps } = line
                     const resolvedName = typeof label === "string" || typeof label === "number" ? String(label) : (name ?? dataKey)
 
                     return (
@@ -68,7 +62,7 @@ export const LineChart: LineChartComponent = (props) => {
                             key={dataKey}
                             dataKey={dataKey}
                             name={resolvedName}
-                            stroke={resolvedStroke}
+                            stroke={lineColor(line) ?? `var(--color-${dataKey}, currentColor)`}
                             type={type ?? curveType ?? "monotone"}
                             strokeWidth={strokeWidth ?? 2}
                             dot={dot ?? showDots}

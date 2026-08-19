@@ -73,129 +73,53 @@ interface ChartTooltipContentProps
     extends Omit<React.ComponentProps<typeof RechartsPrimitive.Tooltip>, "content">, Omit<React.ComponentProps<"div">, "content"> {
     payload?: RechartsPrimitive.TooltipPayload
     label?: string | number
-    labelClassName?: string
     hideLabel?: boolean
     hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-    color?: string
 }
 
 export const ChartTooltipContent: React.FC<ChartTooltipContentProps> = (props) => {
-    const {
-        active,
-        payload,
-        className,
-        indicator = "dot",
-        hideLabel = false,
-        hideIndicator = false,
-        label,
-        labelClassName,
-        labelFormatter,
-        formatter,
-        color,
-        nameKey,
-        labelKey,
-        ...rest
-    } = props
+    const { active, payload, className, hideLabel = false, hideIndicator = false, label, ...rest } = props
     const { config } = useChart()
-
-    const tooltipLabel = () => {
-        if (hideLabel || !payload?.length) return null
-
-        const [item] = payload
-        const key = `${labelKey ?? item?.dataKey ?? item?.name ?? "value"}`
-        const itemConfig = getPayloadConfigFromPayload(config, item, key)
-        const value = !labelKey && typeof label === "string" ? (config[label]?.label ?? label) : itemConfig?.label
-
-        if (labelFormatter) {
-            return (
-                <div
-                    {...mergeComponentProps("chart__tooltip-label", {
-                        className: labelClassName,
-                    })}
-                >
-                    {labelFormatter(value, payload)}
-                </div>
-            )
-        }
-
-        if (!value) return null
-
-        return (
-            <div
-                {...mergeComponentProps("chart__tooltip-label", {
-                    className: labelClassName,
-                })}
-            >
-                {value}
-            </div>
-        )
-    }
 
     if (!active || !payload?.length) return null
 
-    const nestLabel = payload.length === 1 && indicator !== "dot"
+    const [first] = payload
+    const labelConfig = getPayloadConfigFromPayload(config, first, `${first?.dataKey ?? first?.name ?? "value"}`)
+    const resolvedLabel = typeof label === "string" ? (config[label]?.label ?? label) : labelConfig?.label
 
     return (
         <div {...mergeComponentProps("chart__tooltip", { className })} {...rest}>
-            {!nestLabel && tooltipLabel()}
+            {!hideLabel && resolvedLabel && <div className="chart__tooltip-label">{resolvedLabel}</div>}
             <div className="chart__tooltip-body">
                 {payload
                     .filter((item) => item.type !== "none")
                     .map((item, index) => {
-                        const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`
-                        const itemConfig = getPayloadConfigFromPayload(config, item, key)
-                        const indicatorColor = color ?? item.payload?.fill ?? item.color
+                        const itemConfig = getPayloadConfigFromPayload(config, item, `${item.name ?? item.dataKey ?? "value"}`)
+                        const color = item.payload?.fill ?? item.color
 
                         return (
-                            <div
-                                key={index}
-                                {...mergeComponentProps("chart__tooltip-row", {
-                                    className: indicator === "dot" && "chart__tooltip-row--dot",
-                                })}
-                            >
-                                {formatter && item?.value !== undefined && item.name ? (
-                                    formatter(item.value, item.name, item, index, item.payload)
+                            <div key={index} className="chart__tooltip-row chart__tooltip-row--dot">
+                                {itemConfig?.icon ? (
+                                    <itemConfig.icon />
                                 ) : (
-                                    <>
-                                        {itemConfig?.icon ? (
-                                            <itemConfig.icon />
-                                        ) : (
-                                            !hideIndicator && (
-                                                <div
-                                                    {...mergeComponentProps(
-                                                        `
-                                                            chart__tooltip-indicator
-                                                            ${indicator === "dot" ? "chart__tooltip-indicator--dot" : ""}
-                                                            ${indicator === "line" ? "chart__tooltip-indicator--line" : ""}
-                                                            ${indicator === "dashed" ? "chart__tooltip-indicator--dashed" : ""}
-                                                            ${nestLabel && indicator === "dashed" ? "chart__tooltip-indicator--nest" : ""}
-                                                            `,
-                                                        {
-                                                            style: {
-                                                                "--color-bg": indicatorColor,
-                                                                "--color-border": indicatorColor,
-                                                            } as React.CSSProperties,
-                                                        }
-                                                    )}
-                                                />
-                                            )
-                                        )}
-                                        <div {...mergeComponentProps(`chart__tooltip-content ${nestLabel ? "chart__tooltip-content--nest" : ""}`, {})}>
-                                            <div className="chart__tooltip-meta">
-                                                {nestLabel && tooltipLabel()}
-                                                <span className="chart__tooltip-name">{itemConfig?.label ?? item.name}</span>
-                                            </div>
-                                            {item.value != null && (
-                                                <span className="chart__tooltip-value">
-                                                    {typeof item.value === "number" ? item.value.toLocaleString() : String(item.value)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </>
+                                    !hideIndicator && (
+                                        <div
+                                            {...mergeComponentProps("chart__tooltip-indicator chart__tooltip-indicator--dot", {
+                                                style: { "--color-bg": color, "--color-border": color } as React.CSSProperties,
+                                            })}
+                                        />
+                                    )
                                 )}
+                                <div className="chart__tooltip-content">
+                                    <div className="chart__tooltip-meta">
+                                        <span className="chart__tooltip-name">{itemConfig?.label ?? item.name}</span>
+                                    </div>
+                                    {item.value != null && (
+                                        <span className="chart__tooltip-value">
+                                            {typeof item.value === "number" ? item.value.toLocaleString() : String(item.value)}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         )
                     })}
@@ -208,11 +132,10 @@ interface ChartLegendContentProps extends Omit<React.ComponentProps<"div">, "dan
     payload?: ReadonlyArray<RechartsPrimitive.LegendPayload>
     verticalAlign?: "top" | "bottom" | "middle"
     hideIcon?: boolean
-    nameKey?: string
 }
 
 export const ChartLegendContent: React.FC<ChartLegendContentProps> = (props) => {
-    const { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey } = props
+    const { className, hideIcon = false, payload, verticalAlign = "bottom" } = props
     const { config } = useChart()
     if (!payload?.length) return null
 
@@ -221,8 +144,7 @@ export const ChartLegendContent: React.FC<ChartLegendContentProps> = (props) => 
             {payload
                 .filter((item) => item.type !== "none")
                 .map((item, index) => {
-                    const key = `${nameKey ?? item.dataKey ?? "value"}`
-                    const itemConfig = getPayloadConfigFromPayload(config, item, key)
+                    const itemConfig = getPayloadConfigFromPayload(config, item, `${item.dataKey ?? "value"}`)
 
                     return (
                         <div key={index} className="chart__legend-item">

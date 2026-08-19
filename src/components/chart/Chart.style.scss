@@ -104,21 +104,6 @@
     height: variables.$xs;
 }
 
-.chart__tooltip-indicator--line {
-    width: variables.$xxs;
-}
-
-.chart__tooltip-indicator--dashed {
-    width: 0;
-    border-width: variables.$md * variables.$hierarchyTertiary;
-    border-style: dashed;
-    background: transparent;
-}
-
-.chart__tooltip-indicator--nest {
-    margin: variables.$xxs 0;
-}
-
 .chart__tooltip-content {
     display: flex;
     flex: 1;
@@ -126,10 +111,6 @@
     align-items: center;
     line-height: 1;
     gap: variables.$xs;
-}
-
-.chart__tooltip-content--nest {
-    align-items: flex-end;
 }
 
 .chart__tooltip-meta {

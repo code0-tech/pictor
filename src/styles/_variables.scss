@@ -9,26 +9,33 @@ $error: #D90429;
 $black: #000000;
 $white: #ffffff;
 $bodyBg: $primary;
-//(font-)sizes
 
-$xxs: 0.35rem;
-$xs: 0.7rem;
-$sm: 0.8rem;
+//(font-)sizes
+//generated with the Perfect Fourth principle (ratio 1.333, base 1rem)
+$xxxs: 0.316rem;
+$xxs: 0.422rem;
+$xs: 0.563rem;
+$sm: 0.75rem;
 $md: 1rem;
-$lg: 1.2rem;
-$xl: 1.3rem;
+$lg: 1.333rem;
+$xl: 1.777rem;
+$xxl: 2.369rem;
+$xxxl: 3.157rem;
 
 $hierarchyPrimary: 1;
 $hierarchySecondary: 0.75;
 $hierarchyTertiary: 0.5;
 
 $sizes: (
+        "xxxs": $xxxs,
         "xxs": $xxs,
         "xs": $xs,
         "sm": $sm,
         "md": $md,
         "lg": $lg,
         "xl": $xl,
+        "xxl": $xxl,
+        "xxxl": $xxxl,
 );
 
 $hierarchy: (

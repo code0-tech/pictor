@@ -35,7 +35,7 @@ export default {
 export const ExampleCommand = () => {
 
     return (
-        <CommandDialog p={"0"} open={true} contentProps={{h: "75vh"}}>
+        <CommandDialog open={true} contentProps={{h: "75vh"}}>
             <Layout p={0.7} layoutGap={0} showLayoutSplitter={false} bottomContent={<Text>sd</Text>} topContent={<div style={{paddingBottom: "0.35rem"}}><CommandInput left={<IconSearch size={13}/>} placeholder="Type a command or search..." clearable/></div>}>
                 <Card mx={-0.5} h={"100%"} paddingSize={"xxs"}>
                     <Layout style={{overflow: "hidden"}} leftContent={<ScrollArea p={0.7} h={"100%"} type={"always"} w={"fit-content"} miw={"25%"}>

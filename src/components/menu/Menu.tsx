@@ -79,9 +79,9 @@ export const MenuLabel: React.FC<MenuLabelProps> = (props) => {
     return <DropdownMenuLabel {...mergeComponentProps("menu__label", props) as MenuLabelProps}/>
 }
 
-export const MenuItem: React.FC<MenuItemProps> = (props) => {
-    return <DropdownMenuItem {...mergeComponentProps("menu__item", props) as MenuItemProps}/>
-}
+export const MenuItem = React.forwardRef<HTMLDivElement, MenuItemProps>((props, ref) => {
+    return <DropdownMenuItem ref={ref} {...mergeComponentProps("menu__item", props) as MenuItemProps}/>
+})
 
 export const MenuGroup: React.FC<MenuGroupProps> = (props) => {
     return <DropdownMenuGroup {...mergeComponentProps("menu__group", props) as MenuGroupProps}/>
@@ -91,9 +91,9 @@ export const MenuSub: React.FC<MenuSubProps> = (props) => {
     return <DropdownMenuSub {...mergeComponentProps("menu__sub", props) as MenuSubProps}/>
 }
 
-export const MenuSubTrigger: React.FC<MenuSubTriggerProps> = (props) => {
-    return <DropdownMenuSubTrigger {...mergeComponentProps("menu__sub-trigger", props) as MenuSubTriggerProps}/>
-}
+export const MenuSubTrigger = React.forwardRef<HTMLDivElement, MenuSubTriggerProps>((props, ref) => {
+    return <DropdownMenuSubTrigger ref={ref} {...mergeComponentProps("menu__sub-trigger", props) as MenuSubTriggerProps}/>
+})
 
 export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
     const {children, ...rest} = props

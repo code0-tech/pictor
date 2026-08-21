@@ -127,6 +127,7 @@ export const Login = () => {
                 title={"Email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
+                clearable
                 {...inputs.getInputProps("email")}
             />
             <br/>

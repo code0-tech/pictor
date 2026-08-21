@@ -123,6 +123,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
 
         return (
             <InputWrapper
+                type={inputProps.type}
                 title={title}
                 description={description}
                 left={left}
@@ -130,7 +131,7 @@ const InputComponent = React.forwardRef<InputElement, InputProps<any>>(
                 leftType={leftType}
                 rightType={rightType}
                 formValidation={formValidation}
-                wrapperComponent={wrapperComponent}
+                {...wrapperComponent}
             >
                 {control}
             </InputWrapper>

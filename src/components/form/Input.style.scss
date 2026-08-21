@@ -41,7 +41,7 @@
     }
 
     &--action {
-      padding: 0;
+      padding: 0 !important;
     }
 
     &--placeholder {
@@ -50,6 +50,14 @@
       border-radius: variables.$borderRadius - ($padding / 4);
       padding: $padding;
       box-shadow: none;
+    }
+  }
+
+  &-wrapper {
+    &[type=email], &[type=password], &[type=number], &[type=text] {
+      > .input-wrapper__left, > .input-wrapper__right {
+        align-self: stretch;
+      }
     }
   }
 
@@ -74,7 +82,7 @@
     box-shadow: none;
     border: none;
     outline: none;
-    margin: $padding $padding;
+    padding: $padding $padding;
     vertical-align: middle;
     flex: 1;
     width: 100%;
@@ -84,6 +92,10 @@
 
     & {
       @include helpers.fontStyle();
+    }
+
+    &[type=email], &[type=password], &[type=number], &[type=text] {
+      align-self: stretch;
     }
   }
 
@@ -222,6 +234,9 @@
 }
 
 .radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: variables.$xxxs;
 }
 
 .radio-input {
@@ -235,9 +250,10 @@
 
   &__button {
     top: -1px;
-    width: 18px;
-    height: 18px;
+    width: variables.$lg;
+    height: variables.$lg;
     padding: variables.$xxs;
+    cursor: pointer;
 
     & {
       @include helpers.fontStyle();
@@ -286,8 +302,8 @@
 
   &__button {
     aspect-ratio: 1/1;
-    width: variables.$xl;
-    height: variables.$xl;
+    width: variables.$lg;
+    height: variables.$lg;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -308,7 +324,7 @@
     align-items: center;
     justify-content: center;
     top: 1px;
-    color: variables.$info;
+    color: variables.$white;
   }
 }
 
@@ -319,10 +335,18 @@
 
   box-shadow: none !important;
   background: transparent !important;
-  width: fit-content;
+
+  &.input-wrapper {
+    width: fit-content;
+
+    > :first-child {
+      padding-left: 0;
+    }
+  }
 
   .input__control {
 
+    flex: 0 0 auto;
     position: relative;
     box-sizing: border-box;
     padding: 0;

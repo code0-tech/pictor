@@ -2,6 +2,7 @@ import React, {RefObject} from "react";
 import {Input, InputProps} from "./Input";
 import {IconMinus, IconPlus} from "@tabler/icons-react";
 import {Button} from "../button/Button";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 
 interface NumberInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type" | "left" | "right" | "leftType" | "rightType"> {
@@ -33,8 +34,12 @@ export const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = Re
 
     return <Input
         className={"number-input"}
-        right={<Button variant={"none"} onClick={countUp}><IconPlus size={13}/></Button>}
-        left={<Button variant={"none"} onClick={countDown}><IconMinus size={13}/></Button>}
+        right={<ButtonGroup color={"primary"}>
+            <Button color={"secondary"} paddingSize={"xxs"} onClick={countUp}><IconPlus size={13}/></Button>
+        </ButtonGroup>}
+        left={<ButtonGroup color={"primary"}>
+            <Button color={"secondary"} paddingSize={"xxs"} onClick={countDown}><IconMinus size={13}/></Button>
+        </ButtonGroup>}
         leftType={"action"}
         type={"number"}
         ref={ref}

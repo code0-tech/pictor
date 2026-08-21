@@ -13,21 +13,20 @@ export interface InputWrapperProps<T = any> extends Omit<Component<HTMLElement>,
     rightType?: "action" | "placeholder" | "icon"
     title?: React.ReactNode
     description?: React.ReactNode
-    wrapperComponent?: Component<HTMLDivElement>
 }
 
 export const InputWrapper: React.ForwardRefExoticComponent<InputWrapperProps> = React.forwardRef((props, ref) => {
 
     const {
         children,
-        wrapperComponent = {},
         left,
         right,
         leftType = "icon",
         rightType = "action",
         title,
         description,
-        formValidation = {valid: true, notValidMessage: null, setValue: null}
+        formValidation = {valid: true, notValidMessage: null, setValue: null},
+        ...rest
     } = props
 
     return <>
@@ -35,7 +34,7 @@ export const InputWrapper: React.ForwardRefExoticComponent<InputWrapperProps> = 
         {title && <InputLabel>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
 
-        <div {...mergeComponentProps(`input-wrapper ${!formValidation?.valid ? "input-wrapper--not-valid" : ""}`, wrapperComponent)}>
+        <div {...mergeComponentProps(`input-wrapper ${!formValidation?.valid ? "input-wrapper--not-valid" : ""}`, rest)}>
             {left && <div className={`input-wrapper__left input__left--${leftType}`}>{left}</div>}
             {children}
             {right && <div className={`input-wrapper__right input-wrapper__right--${rightType}`}>{right}</div>}

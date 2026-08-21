@@ -1,8 +1,9 @@
-import React, {RefObject} from "react";
+import React, {ReactElement, RefObject} from "react";
 import {Input, InputProps} from "./Input";
 import {IconX} from "@tabler/icons-react";
-import {Button} from "../button/Button";
+import {Button, ButtonProps} from "../button/Button";
 import {clearInputElement} from "./Input.utils";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 
 export interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
@@ -26,12 +27,14 @@ export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.
         if (props.onClear) props.onClear(event)
     }
 
-    const rightAction = [right]
-    clearable && rightAction.push(<Button variant={"none"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
+    const rightAction: ReactElement<ButtonProps>[] = [right as ReactElement<ButtonProps>]
+    clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
 
     return <Input
-        right={rightAction}
+        right={<ButtonGroup color={"primary"}>
+            {rightAction}
+        </ButtonGroup>}
         type={"text"}
         ref={ref as RefObject<HTMLInputElement>}
         {...rest}

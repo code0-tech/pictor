@@ -746,23 +746,24 @@ export const Workspaces = () => {
             : filter === "team" ? teamWorkspaces
                 : [...workspaces.filter((w) => w.personal), ...teamWorkspaces]
 
-    return <FullScreen bg={"var(--secondary)"}>
+    return <FullScreen bg={"var(--primary)"}>
         <div style={{
             position: "absolute",
             top: 0,
-            right: "0",
+            left: 0,
             width: "100%",
-            transform: "scaleX(1)",
-            height: "100%",
+            transform: "scaleX(-1) scaleY(1)",
+            height: "50%",
         }}>
             <div style={{
                 position: "absolute",
                 top: "0",
-                right: "0",
+                left: 0,
                 width: "100%",
                 height: "100%",
-                background: "radial-gradient(circle at top right,rgba(25, 24, 37, 0.25) 0%, rgba(25, 24, 37, 1) 25%)",
-                zIndex: "1"
+                background: "radial-gradient(circle at top center,rgba(25, 24, 37, 0) 0%, var(--primary) 50%)",
+                zIndex: "1",
+                WebkitBackdropFilter: "blur(5rem)",
             }}/>
             <AuroraBackground/>
 
@@ -821,7 +822,8 @@ export const Workspaces = () => {
                             {workspaces.map((w) => (
                                 <Button key={w.name} variant={"none"} w={"100%"} justify={"flex-start"}
                                         paddingSize={"xxs"}>
-                                    <Avatar bg={"transparent"} color={hashToColor(w.name, 0, 100)} identifier={w.name}
+                                    <Avatar bg={"transparent"} color={hashToColor(w.name, 0, 100)}
+                                            identifier={w.name}
                                             size={13}/>
                                     <Text size={"md"}>
                                         {w.name}
@@ -877,7 +879,7 @@ export const Workspaces = () => {
                                 <div style={{maxWidth: "52rem", margin: "0 auto", padding: "2rem 2rem"}}>
 
                                     {/* ── Account-wide summary: four numbers + trend, hairline dividers ── */}
-                                    <Card color={"secondary"}>
+                                    <Card color={"primary"}>
                                         <Flex align={"center"}>
                                             {stats.map((s, i) => (
                                                 <React.Fragment key={s.label}>
@@ -890,13 +892,17 @@ export const Workspaces = () => {
                                                     <Flex style={{flexDirection: "column", gap: "0.7rem", flex: 1}}>
                                                         <Flex align={"center"} justify={"space-between"}
                                                               style={{gap: "0.5rem"}}>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>{s.label}</Text>
-                                                            <Badge color={s.tone === "warning" ? "warning" : "success"}>
-                                                                {s.tone === "success" && <IconTrendingUp size={12}/>}
+                                                            <Text size={"sm"}
+                                                                  hierarchy={"tertiary"}>{s.label}</Text>
+                                                            <Badge
+                                                                color={s.tone === "warning" ? "warning" : "success"}>
+                                                                {s.tone === "success" &&
+                                                                    <IconTrendingUp size={12}/>}
                                                                 {s.delta}
                                                             </Badge>
                                                         </Flex>
-                                                        <Text fz={3} style={{lineHeight: 0.9}} fw={600}>{s.value}</Text>
+                                                        <Text fz={3} style={{lineHeight: 0.9}}
+                                                              fw={600}>{s.value}</Text>
                                                     </Flex>
                                                 </React.Fragment>
                                             ))}
@@ -906,7 +912,7 @@ export const Workspaces = () => {
                                     <Spacing spacing={"md"}/>
 
                                     {/* ── Slim attention banner: flows across workspaces needing action ── */}
-                                    <Card color={"tertiary"} clickable>
+                                    <Card color={"secondary"} clickable>
                                         <Flex align={"center"} justify={"space-between"} style={{gap: "0.75rem"}}>
                                             <Flex align={"center"} style={{gap: "0.75rem", minWidth: 0}}>
                                                 <div style={{
@@ -934,11 +940,11 @@ export const Workspaces = () => {
                                             <Badge color={"secondary"}>{visibleWorkspaces.length}</Badge>
                                         </Flex>
 
-                                        <ButtonGroup color={"tertiary"}>
+                                        <ButtonGroup color={"secondary"}>
                                             {/* Filter */}
                                             <Menu>
                                                 <MenuTrigger asChild>
-                                                    <Button variant={"none"} color={"tertiary"} paddingSize={"xxs"}
+                                                    <Button variant={"none"} color={"secondary"} paddingSize={"xxs"}
                                                             active={filter !== "all"}>
                                                         <IconAdjustmentsHorizontal size={13}/>
                                                     </Button>
@@ -960,7 +966,8 @@ export const Workspaces = () => {
                                             {/* Sort */}
                                             <Menu>
                                                 <MenuTrigger asChild>
-                                                    <Button color={"tertiary"} variant={"none"} paddingSize={"xxs"}>
+                                                    <Button color={"secondary"} variant={"none"}
+                                                            paddingSize={"xxs"}>
                                                         <IconArrowsSort size={13}/>
                                                     </Button>
                                                 </MenuTrigger>
@@ -979,7 +986,7 @@ export const Workspaces = () => {
                                             </Menu>
 
                                             {/* Create */}
-                                            <Button color={"tertiary"} variant={"none"} paddingSize={"xxs"}>
+                                            <Button color={"secondary"} variant={"none"} paddingSize={"xxs"}>
                                                 <IconPlus size={13}/>
                                             </Button>
                                         </ButtonGroup>
@@ -994,7 +1001,7 @@ export const Workspaces = () => {
                                         alignItems: "stretch",
                                     }}>
                                         {visibleWorkspaces.map((w) => (
-                                            <Card key={w.name} color={"tertiary"} clickable>
+                                            <Card key={w.name} color={"secondary"} clickable>
                                                 <Flex style={{flexDirection: "column", gap: "1.25rem"}}>
                                                     {/* identity: avatar, name (+ personal marker) and description */}
                                                     <Flex align={"center"} style={{gap: "0.85rem"}}>
@@ -1007,7 +1014,8 @@ export const Workspaces = () => {
                                                             minWidth: 0,
                                                             flex: 1,
                                                         }}>
-                                                            <Flex align={"center"} style={{gap: "0.5rem", minWidth: 0}}>
+                                                            <Flex align={"center"}
+                                                                  style={{gap: "0.5rem", minWidth: 0}}>
                                                                 <Text fw={500}>{w.name}</Text>
                                                                 {w.personal &&
                                                                     <Badge color={"info"}>Personal</Badge>}
@@ -1044,7 +1052,7 @@ export const Workspaces = () => {
 
                                         {/* create-workspace affordance, matching card footprint */}
                                         <Button variant={"none"} h={"100%"} w={"100%"} style={{
-                                            border: "2px dashed var(--tertiary)",
+                                            border: "2px dashed var(--secondary)",
                                             borderRadius: "0.75rem",
                                         }}>
                                             <Flex align={"center"} justify={"center"} style={{

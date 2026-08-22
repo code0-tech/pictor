@@ -1,8 +1,9 @@
-import React, {RefObject} from "react";
+import React, {ReactElement, RefObject} from "react";
 import {Input, InputProps} from "./Input";
 import {IconX} from "@tabler/icons-react";
-import {Button} from "../button/Button";
+import {Button, ButtonProps} from "../button/Button";
 import {clearInputElement} from "./Input.utils";
+import {ButtonGroup} from "../button-group/ButtonGroup";
 
 /**
  * This regex is based on the validation behind the type="email" validation of html.
@@ -31,12 +32,14 @@ export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = Reac
         clearInputElement(ref.current)
     }
 
-    const rightAction = [right]
-    clearable && rightAction.push(<Button onClick={toClearable}><IconX size={13}/></Button>)
+    const rightAction: ReactElement<ButtonProps>[] = [right as ReactElement<ButtonProps>]
+    clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={toClearable}><IconX size={13}/></Button>)
 
 
     return <Input
-        right={rightAction}
+        right={<ButtonGroup color={"primary"}>
+            {rightAction}
+        </ButtonGroup>}
         type={"email"}
         ref={ref as RefObject<HTMLInputElement>}
         {...rest}

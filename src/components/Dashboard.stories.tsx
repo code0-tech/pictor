@@ -43,7 +43,7 @@ import {
 import {DataTableColumn} from "./data-table/DataTableColumn";
 import {DataTableHeader, DataTableHeaderColumn} from "./data-table/DataTableHeader";
 import {ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "./scroll-area/ScrollArea";
-import {hashToColor} from "../utils";
+import {getSize, hashToColor} from "../utils";
 
 export default {
     title: "Concepts/Dashboard",
@@ -746,9 +746,31 @@ export const Workspaces = () => {
             : filter === "team" ? teamWorkspaces
                 : [...workspaces.filter((w) => w.personal), ...teamWorkspaces]
 
-    return <FullScreen bg={"var(--secondary)"}>
-        <Layout p={1} showLayoutSplitter={false} layoutGap={16} leftContent={
-            <Flex h={"100%"} style={{boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
+    return <FullScreen bg={"var(--primary)"}>
+        <div style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            transform: "scaleX(-1) scaleY(1)",
+            height: "50%",
+        }}>
+            <div style={{
+                position: "absolute",
+                top: "0",
+                left: 0,
+                width: "100%",
+                height: "100%",
+                background: "radial-gradient(circle at top center,rgba(25, 24, 37, 0) 0%, var(--primary) 50%)",
+                zIndex: "1",
+                WebkitBackdropFilter: "blur(5rem)",
+            }}/>
+            <AuroraBackground/>
+
+        </div>
+
+        <Layout p={0.1} showLayoutSplitter={false} layoutGap={0} leftContent={
+            <Flex p={1} h={"100%"} style={{boxSizing: "border-box", flexDirection: 'column', gap: "0.7rem"}}>
                 <Button variant={"none"} p={0.5}>
                     <svg xmlns="http://www.w3.org/2000/svg" height={16} width={16} fill={"#fff"} id="c"
                          viewBox="8.01 8.97 23.83 23.83">
@@ -781,13 +803,11 @@ export const Workspaces = () => {
                     boxSizing: "border-box",
                     borderRadius: "1rem",
                 }}>
-                    <Flex h={"100%"} style={{boxSizing: "border-box", flexDirection: 'column', gap: "1.3rem"}}>
-                        <Button paddingSize={"xxs"} justify={"flex-start"} w={"100%"} variant={"none"}>
-                            <IconSearch size={16}/>
-                            <Text size={"md"} hierarchy={"tertiary"}>
-                                Search...
-                            </Text>
-                        </Button>
+                    <Flex h={"100%"} p={1} mt={0.3} style={{
+                        boxSizing: "border-box",
+                        flexDirection: 'column',
+                        gap: getSize("lg")
+                    }}>
                         {/* ── Workspaces: the primary navigation at this level ── */}
                         <Flex style={{boxSizing: "border-box", flexDirection: 'column'}}>
                             <Flex align={"center"} justify={"space-between"}>
@@ -802,7 +822,8 @@ export const Workspaces = () => {
                             {workspaces.map((w) => (
                                 <Button key={w.name} variant={"none"} w={"100%"} justify={"flex-start"}
                                         paddingSize={"xxs"}>
-                                    <Avatar bg={"transparent"} color={hashToColor(w.name, 0, 100)} identifier={w.name}
+                                    <Avatar bg={"transparent"} color={hashToColor(w.name, 0, 100)}
+                                            identifier={w.name}
                                             size={13}/>
                                     <Text size={"md"}>
                                         {w.name}
@@ -818,7 +839,7 @@ export const Workspaces = () => {
                             </Button>
                         </Flex>
                         <div style={{
-                            borderTop: "1px dashed rgba(255,255,255, .1)",
+                            borderTop: "2px dashed var(--tertiary)",
                         }}/>
                         {/* ── Recent projects across every workspace ── */}
                         <Flex style={{boxSizing: "border-box", flexDirection: 'column'}}>
@@ -846,20 +867,19 @@ export const Workspaces = () => {
             }>
                 <Layout showLayoutSplitter={false} layoutGap={16}>
                     <div style={{
-                        background: "var(--primary)",
                         height: "100%",
                         position: "relative",
                         boxSizing: "border-box",
-                        borderRadius: "1rem",
-                        padding: "1rem",
+                        borderRadius: getSize("lg"),
+                        borderBottomLeftRadius: getSize("lg"),
+                        padding: "1rem"
                     }}>
-                        <AuroraBackground/>
                         <ScrollArea style={{position: "absolute", inset: 0, zIndex: 1}}>
                             <ScrollAreaViewport>
-                                <div style={{maxWidth: "52rem", margin: "0 auto", padding: "4rem 1rem"}}>
+                                <div style={{maxWidth: "52rem", margin: "0 auto", padding: "2rem 2rem"}}>
 
                                     {/* ── Account-wide summary: four numbers + trend, hairline dividers ── */}
-                                    <Card color={"secondary"}>
+                                    <Card color={"primary"}>
                                         <Flex align={"center"}>
                                             {stats.map((s, i) => (
                                                 <React.Fragment key={s.label}>
@@ -872,13 +892,17 @@ export const Workspaces = () => {
                                                     <Flex style={{flexDirection: "column", gap: "0.7rem", flex: 1}}>
                                                         <Flex align={"center"} justify={"space-between"}
                                                               style={{gap: "0.5rem"}}>
-                                                            <Text size={"sm"} hierarchy={"tertiary"}>{s.label}</Text>
-                                                            <Badge color={s.tone === "warning" ? "warning" : "success"}>
-                                                                {s.tone === "success" && <IconTrendingUp size={12}/>}
+                                                            <Text size={"sm"}
+                                                                  hierarchy={"tertiary"}>{s.label}</Text>
+                                                            <Badge
+                                                                color={s.tone === "warning" ? "warning" : "success"}>
+                                                                {s.tone === "success" &&
+                                                                    <IconTrendingUp size={12}/>}
                                                                 {s.delta}
                                                             </Badge>
                                                         </Flex>
-                                                        <Text fz={3} style={{lineHeight: 0.9}} fw={600}>{s.value}</Text>
+                                                        <Text fz={3} style={{lineHeight: 0.9}}
+                                                              fw={600}>{s.value}</Text>
                                                     </Flex>
                                                 </React.Fragment>
                                             ))}
@@ -916,11 +940,11 @@ export const Workspaces = () => {
                                             <Badge color={"secondary"}>{visibleWorkspaces.length}</Badge>
                                         </Flex>
 
-                                        <ButtonGroup>
+                                        <ButtonGroup color={"secondary"}>
                                             {/* Filter */}
                                             <Menu>
                                                 <MenuTrigger asChild>
-                                                    <Button variant={"none"} paddingSize={"xxs"}
+                                                    <Button variant={"none"} color={"secondary"} paddingSize={"xxs"}
                                                             active={filter !== "all"}>
                                                         <IconAdjustmentsHorizontal size={13}/>
                                                     </Button>
@@ -942,7 +966,8 @@ export const Workspaces = () => {
                                             {/* Sort */}
                                             <Menu>
                                                 <MenuTrigger asChild>
-                                                    <Button variant={"none"} paddingSize={"xxs"}>
+                                                    <Button color={"secondary"} variant={"none"}
+                                                            paddingSize={"xxs"}>
                                                         <IconArrowsSort size={13}/>
                                                     </Button>
                                                 </MenuTrigger>
@@ -961,7 +986,7 @@ export const Workspaces = () => {
                                             </Menu>
 
                                             {/* Create */}
-                                            <Button variant={"none"} paddingSize={"xxs"}>
+                                            <Button color={"secondary"} variant={"none"} paddingSize={"xxs"}>
                                                 <IconPlus size={13}/>
                                             </Button>
                                         </ButtonGroup>
@@ -989,7 +1014,8 @@ export const Workspaces = () => {
                                                             minWidth: 0,
                                                             flex: 1,
                                                         }}>
-                                                            <Flex align={"center"} style={{gap: "0.5rem", minWidth: 0}}>
+                                                            <Flex align={"center"}
+                                                                  style={{gap: "0.5rem", minWidth: 0}}>
                                                                 <Text fw={500}>{w.name}</Text>
                                                                 {w.personal &&
                                                                     <Badge color={"info"}>Personal</Badge>}
@@ -1026,7 +1052,7 @@ export const Workspaces = () => {
 
                                         {/* create-workspace affordance, matching card footprint */}
                                         <Button variant={"none"} h={"100%"} w={"100%"} style={{
-                                            border: "1px dashed rgba(255,255,255, .15)",
+                                            border: "2px dashed var(--secondary)",
                                             borderRadius: "0.75rem",
                                         }}>
                                             <Flex align={"center"} justify={"center"} style={{

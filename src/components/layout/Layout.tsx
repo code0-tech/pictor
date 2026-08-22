@@ -1,5 +1,5 @@
 import React, {CSSProperties} from "react";
-import {Component, getDOMSizeFromCodeZeroSize, mergeComponentProps, Sizes} from "../../utils";
+import {Component, getSize, mergeComponentProps, Sizes} from "../../utils";
 import {Flex} from "../flex/Flex";
 import "./Layout.style.scss"
 
@@ -28,7 +28,7 @@ export const Layout: React.FC<LayoutProps> = (props) => {
     return (
         <div {...mergeComponentProps("d-layout", rest)}>
             <Flex className="d-layout__inner"
-                  style={{flexDirection: "column", gap: getDOMSizeFromCodeZeroSize(layoutGap)}}>
+                  style={{flexDirection: "column", gap: getSize(layoutGap)}}>
                 {topContent && (
                     <div className="d-layout__top">
                         {topContent}
@@ -39,7 +39,7 @@ export const Layout: React.FC<LayoutProps> = (props) => {
                     <div className="d-layout__splitter" aria-orientation={"horizontal"}/>
                 )}
 
-                <Flex className="d-layout__middle" style={{gap: getDOMSizeFromCodeZeroSize(layoutGap)}}>
+                <Flex className="d-layout__middle" style={{gap: getSize(layoutGap)}}>
                     {leftContent && (
                         <div className="d-layout__left">
                             {leftContent}

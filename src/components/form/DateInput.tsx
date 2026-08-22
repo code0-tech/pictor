@@ -288,8 +288,7 @@ const DateInputTimeSelect: React.FC<{
 }> = ({label, value, count, disabled, onValueChange}) => {
     return <SelectInput value={String(value)}
                         disabled={disabled}
-                        onValueChange={(next) => onValueChange(Number(next))}
-                        wrapperComponent={{className: "date-input__time-select"}}>
+                        onValueChange={(next) => onValueChange(Number(next))}>
         <SelectTrigger asChild>
             <Button paddingSize={"xxs"} justify={"start"}>
                 <Flex justify={"space-between"} w={"100%"} align={"center"}>

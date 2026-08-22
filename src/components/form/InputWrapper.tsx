@@ -13,31 +13,45 @@ export interface InputWrapperProps<T = any> extends Omit<Component<HTMLElement>,
     rightType?: "action" | "placeholder" | "icon"
     title?: React.ReactNode
     description?: React.ReactNode
-    wrapperComponent?: Component<HTMLDivElement>
 }
 
 export const InputWrapper: React.ForwardRefExoticComponent<InputWrapperProps> = React.forwardRef((props, ref) => {
 
     const {
         children,
-        wrapperComponent = {},
         left,
         right,
         leftType = "icon",
         rightType = "action",
         title,
         description,
-        formValidation = {valid: true, notValidMessage: null, setValue: null}
+        formValidation = {valid: true, notValidMessage: null, setValue: null},
+        ...rest
     } = props
+
+    const generatedId = React.useId()
+    const inputId = (rest.id as string | undefined) ?? generatedId
+    const labelId = `${inputId}-label`
+
+    const ariaLabelFallback = !title
+        ? ((rest["aria-label"] as string | undefined) ?? (rest.placeholder as string | undefined))
+        : undefined
+    const accessibilityProps = {
+        id: inputId,
+        ...(title ? {"aria-labelledby": labelId} : {}),
+        ...(ariaLabelFallback ? {"aria-label": ariaLabelFallback} : {}),
+    }
 
     return <>
 
-        {title && <InputLabel>{title}</InputLabel>}
+        {title && <InputLabel htmlFor={inputId} id={labelId}>{title}</InputLabel>}
         {description && <InputDescription>{description}</InputDescription>}
 
-        <div {...mergeComponentProps(`input-wrapper ${!formValidation?.valid ? "input-wrapper--not-valid" : ""}`, wrapperComponent)}>
+        <div {...mergeComponentProps(`input-wrapper ${!formValidation?.valid ? "input-wrapper--not-valid" : ""}`, rest)}>
             {left && <div className={`input-wrapper__left input__left--${leftType}`}>{left}</div>}
-            {children}
+            {React.isValidElement(children)
+                ? React.cloneElement(children as React.ReactElement, {...accessibilityProps})
+                : children}
             {right && <div className={`input-wrapper__right input-wrapper__right--${rightType}`}>{right}</div>}
         </div>
 

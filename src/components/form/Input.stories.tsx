@@ -45,9 +45,25 @@ import {
 } from "./ColorInput";
 import {Flex} from "../flex/Flex";
 import {ButtonGroup} from "../button-group/ButtonGroup";
-import {EditorInput, EditorTokenRule} from "./EditorInput";
+import {
+    EditorInput,
+    EditorInputMenu,
+    EditorInputMenuItem,
+    EditorInputTrigger,
+    EditorInputValue,
+    EditorTokenRule
+} from "./EditorInput";
+import {
+    TagInput,
+    TagInputMenu,
+    TagInputMenuItem,
+    TagInputSubMenu,
+    TagInputTrigger,
+    TagInputValue,
+    TagSuggestion,
+    TagValue
+} from "./TagInput";
 import {Badge} from "../badge/Badge";
-import {InputSuggestion} from "./InputSuggestion";
 import {hashToColor} from "../../utils";
 import {
     FileInput,
@@ -111,6 +127,7 @@ export const Login = () => {
                 title={"Email"}
                 description={"Your Email address for login"}
                 left={<IconMail size={13}/>}
+                clearable
                 {...inputs.getInputProps("email")}
             />
             <br/>
@@ -685,7 +702,9 @@ export const EditorBadgeTags = () => {
                 </ButtonGroup>
             }
             rightType={"action"}
-        />
+        >
+            <EditorInputValue/>
+        </EditorInput>
     </Card>
 }
 
@@ -728,7 +747,9 @@ export const EditorSingleLine = () => {
             description={"A single-line expression — Enter does not add a new line"}
             placeholder={"Hello {{ user.name }}!"}
             tokenRules={tokenRules}
-        />
+        >
+            <EditorInputValue/>
+        </EditorInput>
     </Card>
 }
 
@@ -751,28 +772,41 @@ export const EditorSuggestions = () => {
         }
     })
 
-    const suggestions: InputSuggestion[] = [
-        {value: "user.name", children: "user.name", groupBy: "User"},
-        {value: "user.email", children: "user.email", groupBy: "User"},
-        {value: "user.role", children: "user.role", groupBy: "User"},
-        {value: "order.id", children: "order.id", groupBy: "Order"},
-        {value: "order.total", children: "order.total", groupBy: "Order"},
-        {value: "order.status", children: "order.status", groupBy: "Order"},
+    const suggestions: TagSuggestion[] = [
+        {value: "user.name", children: "user.name"},
+        {value: "user.email", children: "user.email"},
+        {value: "user.role", children: "user.role"},
+        {value: "order.id", children: "order.id"},
+        {value: "order.total", children: "order.total"},
+        {value: "order.status", children: "order.status"},
     ]
+
+    const [value, setValue] = React.useState("")
 
     return <Card color={"secondary"} w={"400px"}>
         <EditorInput
             {...inputs.getInputProps("value")}
-            onChange={() => validate("value")}
-            title={"Variable"}
-            description={"Press Ctrl+Space to open, ↑ ↓ to navigate, Enter to select"}
-            placeholder={"Select or type a variable…"}
-            suggestions={suggestions}
-            onSuggestionSelect={(s) => {
-                console.log("selected:", s)
+            value={value}
+            onChange={(next) => {
+                setValue(next)
                 validate("value")
             }}
-        />
+            onSelect={(selected) => setValue(prev => (prev ? prev + " " : "") + String(selected))}
+            singleLine
+            title={"Variable"}
+            description={"Ctrl+Space to open, ↑ ↓ to navigate, Enter to insert"}
+            placeholder={"Type, then Ctrl+Space…"}
+        >
+            <EditorInputMenu>
+                {suggestions.map((suggestion, index) => (
+                    <EditorInputMenuItem key={index} value={suggestion.value}>
+                        {suggestion.children}
+                    </EditorInputMenuItem>
+                ))}
+            </EditorInputMenu>
+            <EditorInputValue/>
+            <EditorInputTrigger/>
+        </EditorInput>
         <br/>
         <div style={{display: "flex", justifyContent: "end"}}>
             <Button color={"info"} onClick={() => validate()}>
@@ -813,13 +847,11 @@ export const EditorCombined = () => {
         {name: "order.status", group: "Order"},
     ]
 
-    const suggestions: InputSuggestion[] = allVariables
+    const suggestions: TagSuggestion[] = allVariables
         .filter(v => !filterText || v.name.toLowerCase().includes(filterText.toLowerCase()))
         .map(v => ({
             value: `{{ ${v.name} }}`,
             children: <Badge color={"info"}>{v.name}</Badge>,
-            groupBy: v.group,
-            insertMode: "insert" as const,
         }))
 
     const tokenRules: EditorTokenRule[] = [
@@ -829,24 +861,27 @@ export const EditorCombined = () => {
         },
     ]
 
+    const [value, setValue] = React.useState("")
+
     return <Card color={"secondary"} w={"500px"}>
         <EditorInput
             {...inputs.getInputProps("template")}
-            onChange={(value) => {
+            value={value}
+            onChange={(next) => {
+                setValue(next)
                 validate("template")
                 // Show suggestions when user opens {{ — filter by partial variable name inside
-                const match = value.match(/\{\{([^}]*)$/)
+                const match = next.match(/\{\{([^}]*)$/)
                 setFilterText(match ? match[1].trim() : "")
+            }}
+            onSelect={(selected) => {
+                setValue(prev => (prev ? prev + " " : "") + String(selected))
+                setFilterText("")
             }}
             title={"Email Template"}
             description={"Type text, then Ctrl+Space to insert a variable"}
             placeholder={"Hi {{ user.name }}, your order {{ order.id }} is ready!"}
             tokenRules={tokenRules}
-            suggestions={suggestions}
-            onSuggestionSelect={() => {
-                setFilterText("")
-                validate("template")
-            }}
             right={
                 <ButtonGroup color={"primary"}>
                     <Button paddingSize={"xxs"}>
@@ -855,7 +890,17 @@ export const EditorCombined = () => {
                 </ButtonGroup>
             }
             rightType={"action"}
-        />
+        >
+            <EditorInputMenu>
+                {suggestions.map((suggestion, index) => (
+                    <EditorInputMenuItem key={index} value={suggestion.value}>
+                        {suggestion.children}
+                    </EditorInputMenuItem>
+                ))}
+            </EditorInputMenu>
+            <EditorInputValue/>
+            <EditorInputTrigger/>
+        </EditorInput>
         <br/>
         <div style={{display: "flex", justifyContent: "end"}}>
             <Button color={"info"} onClick={() => validate()}>
@@ -1116,11 +1161,11 @@ export const EditorPerformance = () => {
         },
     ], [])
 
-    const suggestions: InputSuggestion[] = React.useMemo(() => [
-        {value: "user.name", children: "user.name", groupBy: "User"},
-        {value: "user.email", children: "user.email", groupBy: "User"},
-        {value: "order.id", children: "order.id", groupBy: "Order"},
-        {value: "order.total", children: "order.total", groupBy: "Order"},
+    const suggestions: TagSuggestion[] = React.useMemo(() => [
+        {value: "user.name", children: "user.name"},
+        {value: "user.email", children: "user.email"},
+        {value: "order.id", children: "order.id"},
+        {value: "order.total", children: "order.total"},
     ], [])
 
     return <Card color={"secondary"} w={"600px"}>
@@ -1148,12 +1193,21 @@ export const EditorPerformance = () => {
                     key={key}
                     {...inputs.getInputProps(key)}
                     onChange={() => validate(key)}
+                    onSelect={() => validate(key)}
                     title={`Expression ${i + 1}`}
                     placeholder={"Hello {{ user.name }}!"}
                     tokenRules={tokenRules}
-                    suggestions={suggestions}
-                    onSuggestionSelect={() => validate(key)}
-                />
+                >
+                    <EditorInputMenu>
+                        {suggestions.map((suggestion, index) => (
+                            <EditorInputMenuItem key={index} value={suggestion.value}>
+                                {suggestion.children}
+                            </EditorInputMenuItem>
+                        ))}
+                    </EditorInputMenu>
+                    <EditorInputValue/>
+                    <EditorInputTrigger/>
+                </EditorInput>
             ))}
         </Flex>
 
@@ -1162,6 +1216,140 @@ export const EditorPerformance = () => {
             <Button color={"info"} onClick={() => validate()}>
                 <IconLogin size={13}/>
                 Submit all
+            </Button>
+        </div>
+    </Card>
+}
+
+// ---- TagInput: suggestion-only tags, built on top of EditorInput ----
+// The tags ARE the editor value: picking a suggestion inserts a token that the
+// tokenRule renders inline as a Badge. Typing only filters; tags can only be
+// added from the suggestions. Each suggestion carries `valueData`, which the
+// form value preserves per tag. Duplicates are allowed; delete via Backspace.
+// Press Ctrl+Space to open.
+export const Tags = () => {
+
+    const [inputs, validate, values] = useForm<{ tags: TagValue[] }>({
+        initialValues: {
+            tags: []
+        },
+        validate: {
+            tags: (value) => {
+                if (!value?.length) return "Please add at least one tag"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const suggestions: TagSuggestion[] = [
+        {value: "react", valueData: {id: 1, ecosystem: "js"}, children: <Badge color={"info"}>React</Badge>},
+        {value: "vue", valueData: {id: 2, ecosystem: "js"}, children: <Badge color={"success"}>Vue</Badge>},
+        {value: "svelte", valueData: {id: 3, ecosystem: "js"}, children: <Badge color={"warning"}>Svelte</Badge>},
+        {value: "node", valueData: {id: 4, ecosystem: "js"}, children: <Badge color={"primary"}>Node</Badge>},
+        {value: "go", valueData: {id: 5, ecosystem: "go"}, children: <Badge color={"secondary"}>Go</Badge>},
+        {value: "rust", valueData: {id: 6, ecosystem: "rust"}, children: <Badge color={"error"}>Rust</Badge>},
+    ]
+
+    return <Card color={"secondary"} w={"440px"}>
+        <TagInput
+            {...inputs.getInputProps("tags")}
+            title={"Tags"}
+            description={"Ctrl+Space to open, type to filter, ↑ ↓ + Enter to add, Backspace to remove. Same tag can be added multiple times."}
+            placeholder={"Add tags…"}
+            onChange={() => validate("tags")}
+        >
+            <TagInputMenu>
+                {suggestions.map((s, i) => (
+                    <TagInputMenuItem key={i} value={s.value} data={s.valueData}>
+                        {s.children}
+                    </TagInputMenuItem>
+                ))}
+            </TagInputMenu>
+            <TagInputValue/>
+            <TagInputTrigger/>
+        </TagInput>
+
+        <br/>
+        <Text size={"sm"}>{JSON.stringify(values.tags)}</Text>
+
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit
+            </Button>
+        </div>
+    </Card>
+}
+
+// ---- TagInput with custom values ----
+// Same as Tags, but `allowCustomValues` lets the user commit free-typed text as
+// a tag via Enter or comma (custom tags have no `valueData`). A highlighted
+// suggestion still wins on Enter.
+export const TagsCustom = () => {
+
+    const [inputs, validate, values] = useForm<{ tags: TagValue[] }>({
+        initialValues: {
+            tags: []
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const suggestions: TagSuggestion[] = [
+        {value: "bug", valueData: {kind: "type"}, children: <Badge color={"error"}>bug</Badge>},
+        {value: "feature", valueData: {kind: "type"}, children: <Badge color={"success"}>feature</Badge>},
+        {value: "chore", valueData: {kind: "type"}, children: <Badge color={"warning"}>chore</Badge>},
+        {value: "docs", valueData: {kind: "type"}, children: <Badge color={"info"}>docs</Badge>},
+    ]
+
+    return <Card color={"secondary"} w={"440px"}>
+        <TagInput
+            {...inputs.getInputProps("tags")}
+            right={
+                <ButtonGroup color={"primary"}>
+                    <Button paddingSize={"xxs"}>
+                        <IconColorPicker size={13}/>
+                    </Button>
+                </ButtonGroup>
+            } rightType={"action"}
+            allowCustomValues
+            title={"Labels"}
+            description={"Pick a suggestion, or type your own and press Enter / comma to add it."}
+            placeholder={"Add labels…"}
+            onChange={() => validate("tags")}
+        >
+            <TagInputMenu>
+                {suggestions.map((s, i) => (
+                    <TagInputMenuItem key={i} value={s.value} data={s.valueData}>
+                        {s.children}
+                    </TagInputMenuItem>
+                ))}
+                <TagInputSubMenu label={"More…"}>
+                    <TagInputMenuItem onlyOnce value={"test"} data={"test"}>
+                        Test
+                    </TagInputMenuItem>
+                    <TagInputMenuItem value={"nested"} data={"nested"}>
+                        Nested
+                    </TagInputMenuItem>
+                </TagInputSubMenu>
+            </TagInputMenu>
+            <TagInputValue/>
+            <TagInputTrigger/>
+        </TagInput>
+
+        <br/>
+        <Text size={"sm"}>{JSON.stringify(values.tags)}</Text>
+
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit
             </Button>
         </div>
     </Card>

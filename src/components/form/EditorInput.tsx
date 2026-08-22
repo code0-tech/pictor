@@ -28,6 +28,7 @@ export interface EditorTokenRule {
 }
 
 export interface EditorInputProps extends Omit<InputWrapperProps, "onChange" | "onSelect">, ValidationProps<any> {
+    wrapperComponent?: Component<HTMLDivElement>
     tokenRules?: EditorTokenRule[]
     onSelect?: (value: any, data: any) => void
     search?: string
@@ -411,10 +412,8 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                         right={right} left={left}
                         rightType={rightType} leftType={leftType}
                         formValidation={formValidation}
-                        wrapperComponent={{
-                            ...(wrapperComponent ?? {}),
-                            style: {position: "relative" as const, ...(wrapperComponent as any)?.style},
-                        }}
+                        {...(wrapperComponent ?? {})}
+                        style={{position: "relative" as const, ...(wrapperComponent as any)?.style}}
                     >
                         {children}
                     </InputWrapper>

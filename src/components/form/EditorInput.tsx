@@ -40,9 +40,19 @@ export interface EditorInputProps extends Omit<InputWrapperProps, "onChange" | "
     children?: React.ReactNode
 }
 
+export type EditorInputMenuOpenMode = "shortcut" | "focus"
+
 export type EditorInputValueProps = Component<HTMLDivElement>
 export type EditorInputTriggerProps = Component<HTMLButtonElement>
-export type EditorInputMenuProps = MenuContentProps
+export type EditorInputMenuProps = MenuContentProps & {
+    /**
+     * When the menu opens.
+     * - "shortcut" (default): opens only on Ctrl+Space.
+     * - "focus": opens as soon as the input is focused and stays open while focused.
+     * Positioning stays anchored to the caret in both modes.
+     */
+    openOn?: EditorInputMenuOpenMode
+}
 export type EditorInputMenuItemProps = MenuItemProps & {
     value: any
     data?: any
@@ -86,6 +96,8 @@ interface EditorInputContextValue {
     open: boolean
     setOpen: (open: boolean) => void
     openMenu: () => void
+    menuOpenMode: EditorInputMenuOpenMode
+    setMenuOpenMode: (mode: EditorInputMenuOpenMode) => void
 
     editorContainerRef: React.RefObject<HTMLDivElement | null>
     triggerRef: React.RefObject<HTMLButtonElement | null>
@@ -223,6 +235,9 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
     }, [externalText, editor, tokenRules])
 
     const [open, setOpen] = useState(false)
+    const [menuOpenMode, setMenuOpenMode] = useState<EditorInputMenuOpenMode>("shortcut")
+    const menuOpenModeRef = useRef(menuOpenMode)
+    menuOpenModeRef.current = menuOpenMode
     const editorContainerRef = useRef<HTMLDivElement>(null)
     const triggerRef = useRef<HTMLButtonElement>(null)
     const blurTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -340,7 +355,8 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
     const select = useCallback((value: any, data: any) => {
         onSelect?.(value, data)
-        setOpen(false)
+        // In focus mode the menu stays open as long as the input keeps focus.
+        if (menuOpenModeRef.current !== "focus") setOpen(false)
     }, [onSelect])
 
     const selectActive = useCallback(() => {
@@ -392,13 +408,14 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
     const ctx = useMemo<EditorInputContextValue>(() => ({
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
-        open, setOpen, openMenu,
+        open, setOpen, openMenu, menuOpenMode, setMenuOpenMode,
         editorContainerRef, triggerRef, updateTriggerPosition, scheduleClose, cancelClose,
         registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
         openSubId, enterSub, exitSub, openActiveSub,
     }), [
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
-        open, openMenu, updateTriggerPosition, scheduleClose, cancelClose,
+        open, openMenu, menuOpenMode,
+        updateTriggerPosition, scheduleClose, cancelClose,
         registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
         openSubId, enterSub, exitSub, openActiveSub,
     ])
@@ -426,10 +443,15 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
 export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
     const {
         editor, tokenRules, singleLine, disabled, readonly, placeholder,
-        open, openMenu, setOpen, editorContainerRef, scheduleClose, cancelClose,
+        open, openMenu, setOpen, menuOpenMode, editorContainerRef, scheduleClose, cancelClose,
         highlightNext, highlightPrevious, focusFirst, selectActive,
         openSubId, exitSub, openActiveSub,
     } = useEditorInputContext()
+
+    const handleFocus = useCallback(() => {
+        cancelClose()
+        if (menuOpenMode === "focus") openMenu()
+    }, [cancelClose, menuOpenMode, openMenu])
 
     const decorate = useCallback(([node, path]: any) => {
         const ranges: any[] = []
@@ -552,7 +574,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 spellCheck={false}
                 placeholder={placeholder}
                 onBlur={scheduleClose}
-                onFocus={cancelClose}
+                onFocus={handleFocus}
                 onKeyDown={handleKeyDown}
                 onPaste={singleLine ? (e) => {
                     e.preventDefault()
@@ -578,8 +600,10 @@ export const EditorInputTrigger: React.FC<EditorInputTriggerProps> = (props) => 
 }
 
 export const EditorInputMenu: React.FC<EditorInputMenuProps> = (props) => {
-    const {editor, editorContainerRef} = useEditorInputContext()
-    const {children, ...rest} = props
+    const {editor, editorContainerRef, setMenuOpenMode} = useEditorInputContext()
+    const {children, openOn = "shortcut", ...rest} = props
+
+    useEffect(() => setMenuOpenMode(openOn), [openOn, setMenuOpenMode])
 
     const contentProps = {
         color: "primary",

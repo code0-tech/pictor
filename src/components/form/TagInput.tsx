@@ -31,7 +31,14 @@ export interface TagSuggestion {
 export interface TagInputProps extends Omit<InputWrapperProps, "onChange">, ValidationProps<any> {
     allowCustomValues?: boolean
     onChange?: (tags: TagValue[]) => void
-    tagColor?: string
+    /**
+     * Defines how a tag is rendered as a chip inside the input. Each rule's
+     * `pattern` is matched against the tag's value; the first match decides the
+     * chip via its `wrap`/`style`/`className`. Tags with no matching rule fall
+     * back to a plain badge. The chip rendering is token-defined only — a menu
+     * item's `children` is never reused here.
+     */
+    tokenRules?: EditorTokenRule[]
     children?: React.ReactNode
 }
 
@@ -86,7 +93,7 @@ export const TagInput: React.FC<TagInputProps> = (props) => {
         allowCustomValues = false,
         onChange,
         formValidation,
-        tagColor = "primary",
+        tokenRules,
         value,
         initialValue,
         defaultValue,
@@ -123,16 +130,24 @@ export const TagInput: React.FC<TagInputProps> = (props) => {
         setText(tagsToText(externalTags ?? []))
     }, [externalTags])
 
-    const tokenRules = useMemo<EditorTokenRule[]>(() => [{
+    const editorTokenRules = useMemo<EditorTokenRule[]>(() => [{
         pattern: tokenPattern,
         void: true,
+        // The chip (input rendering) is defined by the token alone — the menu
+        // item's `children` is menu-only and must NOT be reused here. The tag's
+        // value is matched against the consumer's `tokenRules` to pick the chip.
         wrap: matched => {
             const inner = decodeToken(matched)
-            const registered = tagRegistry.current.get(inner)
-            if (registered) return <>{registered.children}</>
-            return <Badge m={0.01} color={tagColor}><Text>{inner}</Text></Badge>
+            const rule = tokenRules?.find(r =>
+                new RegExp(r.pattern.source, r.pattern.flags.replace("g", "")).test(inner))
+            if (rule?.wrap) {
+                const match = new RegExp(rule.pattern.source, rule.pattern.flags.replace("g", "")).exec(inner)
+                return rule.wrap(inner, <Text>{inner}</Text>, (match ?? [inner]) as RegExpExecArray)
+            }
+            if (rule) return <span style={rule.style} className={rule.className}><Text>{inner}</Text></span>
+            return <Badge m={0.01}><Text>{inner}</Text></Badge>
         },
-    }], [tagColor])
+    }], [tokenRules])
 
     const context: TagInputContextValue = {
         search: textToSearch(text),
@@ -146,7 +161,7 @@ export const TagInput: React.FC<TagInputProps> = (props) => {
             {...rest}
             value={text}
             search={context.search}
-            tokenRules={tokenRules}
+            tokenRules={editorTokenRules}
             formValidation={formValidation && {valid: formValidation.valid, notValidMessage: formValidation.notValidMessage}}
             onChange={commit}
             onSelect={token => context.insertToken(String(token))}

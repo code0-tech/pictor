@@ -817,6 +817,71 @@ export const EditorSuggestions = () => {
     </Card>
 }
 
+// ---- Suggestions that open on focus ----
+// Same as EditorSuggestions, but the menu opens as soon as the input is focused
+// and stays open while it keeps focus (openOn="focus"), instead of Ctrl+Space.
+export const EditorFocusSuggestions = () => {
+
+    const [inputs, validate] = useForm({
+        initialValues: {
+            value: ""
+        },
+        validate: {
+            value: (value) => {
+                if (!value?.trim()) return "Please select or type a value"
+                return null
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values)
+        }
+    })
+
+    const suggestions: TagSuggestion[] = [
+        {value: "user.name", children: "user.name"},
+        {value: "user.email", children: "user.email"},
+        {value: "user.role", children: "user.role"},
+        {value: "order.id", children: "order.id"},
+        {value: "order.total", children: "order.total"},
+        {value: "order.status", children: "order.status"},
+    ]
+
+    const [value, setValue] = React.useState("")
+
+    return <Card color={"secondary"} w={"400px"}>
+        <EditorInput
+            {...inputs.getInputProps("value")}
+            value={value}
+            onChange={(next) => {
+                setValue(next)
+                validate("value")
+            }}
+            onSelect={(selected) => setValue(prev => (prev ? prev + " " : "") + String(selected))}
+            singleLine
+            title={"Variable"}
+            description={"Focus the input to open, ↑ ↓ to navigate, Enter to insert. Stays open while focused."}
+            placeholder={"Focus me…"}
+        >
+            <EditorInputMenu openOn={"focus"}>
+                {suggestions.map((suggestion, index) => (
+                    <EditorInputMenuItem key={index} value={suggestion.value}>
+                        {suggestion.children}
+                    </EditorInputMenuItem>
+                ))}
+            </EditorInputMenu>
+            <EditorInputValue/>
+            <EditorInputTrigger/>
+        </EditorInput>
+        <br/>
+        <div style={{display: "flex", justifyContent: "end"}}>
+            <Button color={"info"} onClick={() => validate()}>
+                <IconLogin size={13}/>
+                Submit
+            </Button>
+        </div>
+    </Card>
+}
+
 // ---- Combined: badge tags + filtered suggestions + useForm ----
 // Full-featured template editor: badge rendering + contextual suggestion filtering
 export const EditorCombined = () => {
@@ -1244,6 +1309,8 @@ export const Tags = () => {
         }
     })
 
+    // `children` is the menu rendering; the chip inside the input is defined only by
+    // `tokenRules` (matched against the tag value), never by these children.
     const suggestions: TagSuggestion[] = [
         {value: "react", valueData: {id: 1, ecosystem: "js"}, children: <Badge color={"info"}>React</Badge>},
         {value: "vue", valueData: {id: 2, ecosystem: "js"}, children: <Badge color={"success"}>Vue</Badge>},
@@ -1253,9 +1320,18 @@ export const Tags = () => {
         {value: "rust", valueData: {id: 6, ecosystem: "rust"}, children: <Badge color={"error"}>Rust</Badge>},
     ]
 
+    const colorByValue: Record<string, string> = {
+        react: "info", vue: "success", svelte: "warning", node: "primary", go: "secondary", rust: "error",
+    }
+    const tokenRules: EditorTokenRule[] = [{
+        pattern: /.+/,
+        wrap: (value) => <Badge m={0.01} color={colorByValue[value] ?? "primary"}>{value}</Badge>,
+    }]
+
     return <Card color={"secondary"} w={"440px"}>
         <TagInput
             {...inputs.getInputProps("tags")}
+            tokenRules={tokenRules}
             title={"Tags"}
             description={"Ctrl+Space to open, type to filter, ↑ ↓ + Enter to add, Backspace to remove. Same tag can be added multiple times."}
             placeholder={"Add tags…"}
@@ -1323,7 +1399,7 @@ export const TagsCustom = () => {
             placeholder={"Add labels…"}
             onChange={() => validate("tags")}
         >
-            <TagInputMenu>
+            <TagInputMenu openOn={"focus"}>
                 {suggestions.map((s, i) => (
                     <TagInputMenuItem key={i} value={s.value} data={s.valueData}>
                         {s.children}

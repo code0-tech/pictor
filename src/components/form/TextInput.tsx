@@ -30,11 +30,13 @@ export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.
     const rightAction: ReactElement<ButtonProps>[] = [right as ReactElement<ButtonProps>]
     clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
+    const rightActions = rightAction.filter(Boolean)
+
 
     return <Input
-        right={<ButtonGroup color={"primary"}>
-            {rightAction}
-        </ButtonGroup>}
+        right={rightActions.length > 0 ? <ButtonGroup color={"primary"}>
+            {rightActions}
+        </ButtonGroup> : undefined}
         type={"text"}
         ref={ref as RefObject<HTMLInputElement>}
         {...rest}

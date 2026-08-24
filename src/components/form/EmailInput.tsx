@@ -35,11 +35,13 @@ export const EmailInput: React.ForwardRefExoticComponent<EmailInputProps> = Reac
     const rightAction: ReactElement<ButtonProps>[] = [right as ReactElement<ButtonProps>]
     clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={toClearable}><IconX size={13}/></Button>)
 
+    const rightActions = rightAction.filter(Boolean)
+
 
     return <Input
-        right={<ButtonGroup color={"primary"}>
-            {rightAction}
-        </ButtonGroup>}
+        right={rightActions.length > 0 ? <ButtonGroup color={"primary"}>
+            {rightActions}
+        </ButtonGroup> : undefined}
         type={"email"}
         ref={ref as RefObject<HTMLInputElement>}
         {...rest}

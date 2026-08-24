@@ -49,6 +49,8 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
     clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={(event) => toClearable(event)}><IconX
         size={13}/></Button>)
 
+    const rightActions = rightAction.filter(Boolean)
+
 
     const notValidMessage = formValidation?.notValidMessage ?? ""
     const usesPasswordValidation = /^[1-5]+$/.test(notValidMessage)
@@ -58,9 +60,9 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
 
     return <>
         <Input
-            right={<ButtonGroup color={"primary"}>
-                {rightAction}
-            </ButtonGroup>}
+            right={rightActions.length > 0 ? <ButtonGroup color={"primary"}>
+                {rightActions}
+            </ButtonGroup> : undefined}
             rightType={"action"}
             type={"password"}
             ref={ref as RefObject<HTMLInputElement>}

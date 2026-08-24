@@ -29,9 +29,11 @@ export const TextAreaInput: React.ForwardRefExoticComponent<TextAreaInputProps> 
     const rightAction = [right]
     clearable && rightAction.push(<Button variant={"none"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
+    const rightActions = rightAction.filter(Boolean)
+
 
     return <Input
-        right={rightAction}
+        right={rightActions.length > 0 ? rightActions : undefined}
         type={"textarea"}
         ref={ref as RefObject<HTMLInputElement>}
         {...rest}

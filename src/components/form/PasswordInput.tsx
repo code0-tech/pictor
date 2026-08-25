@@ -4,7 +4,7 @@ import {IconEye, IconX} from "@tabler/icons-react";
 import {Button, ButtonProps} from "../button/Button";
 import {clearInputElement} from "./Input.utils";
 import {Flex} from "../flex/Flex";
-import {Progress} from "../progress/Progress";
+import {ProgressLinear} from "../progress/ProgressLinear";
 import {InputMessage} from "./InputMessage";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 
@@ -77,7 +77,7 @@ export const PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps> 
         {
             usesPasswordValidation && !formValidation?.valid && (
                 <Flex mt={0.7} style={{flexDirection: "column"}}>
-                    <Progress value={strengthValue} max={100}
+                    <ProgressLinear value={strengthValue} max={100}
                               color={"linear-gradient(to right, #D90429 0%, #29BF12 100%)"}/>
                     {(() => {
                         const nextRule = ["2", "3", "4", "5", "1"].find(rule => notValidMessage.includes(rule))

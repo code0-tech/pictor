@@ -3,13 +3,17 @@ import * as Radix from "@radix-ui/react-progress"
 import React, {CSSProperties} from "react";
 import "./Progress.style.scss"
 
-export type ProgressProps = ComponentProps & Radix.ProgressProps & {
+export type ProgressProps = ComponentProps & {
+    value?: number | null
+    max?: number
     color?: CSSProperties['background']
     dot?: React.ReactNode
     predictionValue?: number | null
 }
 
-export const Progress: React.FC<ProgressProps> = (props) => {
+export type ProgressLinearProps = ProgressProps & Omit<Radix.ProgressProps, 'value' | 'max' | 'color'>
+
+export const ProgressLinear: React.FC<ProgressLinearProps> = (props) => {
 
     const {color = "white", predictionValue, dot, ...rest} = props
 
@@ -19,7 +23,7 @@ export const Progress: React.FC<ProgressProps> = (props) => {
     const progressPrediction = ((Math.min(props.predictionValue ?? 0, props.max ?? 100)) / (props.max ?? 100)) * 100;
     const transformPredictionValue = `translateX(-${100 - progressPrediction}%)`;
 
-    return <Radix.Progress {...mergeComponentProps('progress', {
+    return <Radix.Progress {...mergeComponentProps('progress-linear', {
         ...rest,
         style: {
             ...rest.style,
@@ -29,7 +33,7 @@ export const Progress: React.FC<ProgressProps> = (props) => {
         }
     })}>
 
-        <div className={"progress__dot"}>
+        <div className={"progress-linear__dot"}>
             {dot}
         </div>
 
@@ -41,12 +45,12 @@ export const Progress: React.FC<ProgressProps> = (props) => {
             position: "relative",
         }}>
             <Radix.ProgressIndicator
-                className="progress__indicator"
+                className="progress-linear__indicator"
                 style={{
                     transform: transformValue
                 }}/>
             {typeof props.predictionValue === "number" && <Radix.ProgressIndicator
-                className="progress__indicator progress__indicator--prediction"
+                className="progress-linear__indicator progress-linear__indicator--prediction"
                 style={{
                     transform: transformPredictionValue
                 }}/>}

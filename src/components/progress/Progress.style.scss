@@ -3,7 +3,7 @@
 @use "../../styles/variables";
 
 
-.progress {
+.progress-linear {
 
   & {
     @include box.box(variables.$primary);
@@ -64,5 +64,52 @@
       background-repeat: no-repeat;
       background-size: calc(100% * (100 / var(--progressPrediction, 100))) 100%;
     }
+  }
+}
+
+.progress-circle {
+
+  & {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--size);
+    height: var(--size);
+  }
+
+  &__circle {
+    display: block;
+    width: var(--size);
+    height: var(--size);
+    transform: translateZ(0);
+  }
+
+  &__track {
+    opacity: 0.1;
+    stroke: var(--color);
+    stroke-linecap: round;
+  }
+
+  &__prediction {
+    opacity: 0.25;
+    stroke: url(#circle-stripe-overlay);
+    stroke-linecap: round;
+    z-index: 1;
+  }
+
+  &__range {
+    stroke: var(--color);
+    stroke-linecap: round;
+    z-index: 2;
+  }
+
+  &__dot {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

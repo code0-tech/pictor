@@ -30,7 +30,8 @@ export const InputWrapper: React.ForwardRefExoticComponent<InputWrapperProps> = 
     } = props
 
     const generatedId = React.useId()
-    const inputId = (rest.id as string | undefined) ?? generatedId
+    const childId = React.isValidElement(children) ? (children.props as { id?: string }).id : undefined
+    const inputId = childId ?? (rest.id as string | undefined) ?? generatedId
     const labelId = `${inputId}-label`
 
     const ariaLabelFallback = !title

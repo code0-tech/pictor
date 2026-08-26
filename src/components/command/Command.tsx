@@ -60,7 +60,12 @@ export const CommandInput: React.FC<CommandInputProps> = (props) => {
             }}
             asChild
         >
-            <TextInput className={"command__input"} {...props} />
+            <TextInput wrapperComponent={{
+                style: {
+                    background: "transparent",
+                    boxShadow: "none"
+                }
+            }} className={"command__input"} {...props} />
         </CommandPrimitive.Input>
     )
 }

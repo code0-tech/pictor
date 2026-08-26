@@ -6,7 +6,7 @@ import {clearInputElement} from "./Input.utils";
 import {ButtonGroup} from "../button-group/ButtonGroup";
 
 
-export interface TextInputProps extends Omit<InputProps<string | null>, "wrapperComponent" | "type"> {
+export interface TextInputProps extends Omit<InputProps<string | null>, "type"> {
     //defaults to false
     clearable?: boolean
     onClear?: (event: React.MouseEvent<HTMLButtonElement>) => void

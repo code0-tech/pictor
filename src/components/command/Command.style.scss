@@ -21,34 +21,7 @@
     @include helpers.noFocusStyle();
   }
 
-  &__input.input,
-  .input.input:hover,
-  .input.input:active,
-  .input.input:focus,
-  .input.input:focus-within,
-  .input.input:not(:focus),
-  {
-    @include helpers.noFocusStyle();
-
-    width: 100%;
-    border: none !important;
-    outline: none !important;
-    background: transparent;
-    box-shadow: none !important;
-    display: flex;
-    height: 2rem;
-    color: helpers.color(variables.$white, variables.$hierarchySecondary);
-    font-size: variables.$sm;
-    border-radius: variables.$borderRadius - variables.$xxs;
-
-    &::placeholder {
-      color: helpers.color(variables.$white, 25%);
-    }
-
-    .input__right {
-      padding-right: 0;
-    }
-  }
+  
 
   &__empty {
     padding: variables.$md 0 variables.$xl 0;

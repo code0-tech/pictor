@@ -1,6 +1,7 @@
 import React, {CSSProperties} from "react"
 import {Component, mergeComponentProps} from "../../utils"
 import {Text} from "../text/Text"
+import {IconChevronLeft, IconChevronRight} from "@tabler/icons-react"
 
 export interface GanttHeaderProps extends Component<HTMLDivElement> {
     columnCount: number
@@ -8,17 +9,24 @@ export interface GanttHeaderProps extends Component<HTMLDivElement> {
     step: number
     avgDuration: number
     stepWidth: CSSProperties["width"]
+    canScrollLeft?: boolean
+    canScrollRight?: boolean
 }
 
 export const GanttHeader: React.FC<GanttHeaderProps> = (props) => {
 
-    const {columnCount, start, step, avgDuration, stepWidth, ...rest} = props
+    const {columnCount, start, step, avgDuration, stepWidth, canScrollLeft, canScrollRight, ...rest} = props
 
     const stepWidthPx = React.useMemo(() => parseInt(stepWidth as string), [stepWidth])
     const label = React.useMemo(() => getTimelineLabel(avgDuration), [avgDuration])
     const columns = React.useMemo(() => Array.from({length: columnCount}), [columnCount])
 
     return <div {...mergeComponentProps("gantt__header", rest)}>
+        {canScrollLeft && (
+            <div className={"gantt__header-scroll gantt__header-scroll--left"}>
+                <IconChevronLeft size={16}/>
+            </div>
+        )}
         {columns.map((_, columnIndex) => {
             if (columnIndex === 0) {
                 return (
@@ -53,6 +61,11 @@ export const GanttHeader: React.FC<GanttHeaderProps> = (props) => {
                 </div>
             )
         })}
+        {canScrollRight && (
+            <div className={"gantt__header-scroll gantt__header-scroll--right"}>
+                <IconChevronRight size={16}/>
+            </div>
+        )}
     </div>
 }
 

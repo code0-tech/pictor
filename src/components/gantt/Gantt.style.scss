@@ -48,6 +48,26 @@
       align-items: center;
     }
 
+    &-scroll {
+      position: sticky;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 variables.$xxxs;
+      color: variables.$white;
+      background: variables.$bodyBg;
+      z-index: 3;
+
+      &--left {
+        left: 0;
+      }
+
+      &--right {
+        right: 0;
+        margin-left: auto;
+      }
+    }
+
     &-label-column {
       position: sticky;
       left: 0;

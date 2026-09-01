@@ -40,7 +40,9 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
 
     // Horizontal scroll state of the surrounding ScrollArea viewport, used to
     // drive the "you can scroll" indicators that stick to the visible edges.
-    const [scrollState, setScrollState] = React.useState({scrollLeft: 0, clientWidth: 0, groupWidth: 0})
+    // `scrollWidth` is the viewport's full scrollable width (which can exceed
+    // this group's own width when a wider nested group is expanded).
+    const [scrollState, setScrollState] = React.useState({scrollLeft: 0, clientWidth: 0, scrollWidth: 0})
 
     // Parse stepWidth to pixels
     const stepWidthPx = React.useMemo(() => parseInt(stepWidth as string), [stepWidth])
@@ -161,7 +163,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         const update = () => setScrollState({
             scrollLeft: scroller.scrollLeft,
             clientWidth: scroller.clientWidth,
-            groupWidth: container.offsetWidth,
+            scrollWidth: scroller.scrollWidth,
         })
 
         update()
@@ -179,7 +181,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
 
     // A 1px threshold avoids the indicator flickering on sub-pixel scroll ends.
     const canScrollLeft = scrollState.scrollLeft > 1
-    const canScrollRight = scrollState.scrollLeft + scrollState.clientWidth < scrollState.groupWidth - 1
+    const canScrollRight = scrollState.scrollLeft + scrollState.clientWidth < scrollState.scrollWidth - 1
 
     // Calculate row assignments (non-overlapping rows)
     const itemRows = items?.length ? items

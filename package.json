@@ -81,7 +81,7 @@
     "js-md5": "^0.8.3",
     "merge-props": "^6.0.0",
     "motion": "^12.40.0",
-    "playwright": "1.58.1",
+    "playwright": "1.62.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hotkeys-hook": "^5.3.3",

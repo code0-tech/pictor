@@ -29,7 +29,9 @@ export const TooltipContent: React.FC<TooltipContentProps> = (props) => {
     return <RadixTooltip.TooltipContent
         align={props.align} {...mergeComponentProps(`tooltip__content tooltip__content--${props.color ?? "tertiary"}`, rest) as TooltipContentProps}>
         <AutoScrollArea>
-            {children}
+            <div className={"tooltip__content-inner"}>
+                {children}
+            </div>
         </AutoScrollArea>
     </RadixTooltip.TooltipContent>
 }

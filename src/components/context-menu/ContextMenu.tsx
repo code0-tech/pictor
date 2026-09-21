@@ -40,7 +40,9 @@ export const ContextMenuContent: React.FC<ContextMenuContentProps> = (props) => 
     return <Radix.ContextMenuContent
         align={props.align} {...mergeComponentProps(`context-menu__content context-menu__content--${props.color ?? "primary"}`, rest) as ContextMenuContentProps}>
         <AutoScrollArea>
-            {children}
+            <div className={"context-menu__content-inner"}>
+                {children}
+            </div>
         </AutoScrollArea>
     </Radix.ContextMenuContent>
 }
@@ -69,7 +71,9 @@ export const ContextMenuSubContent: React.FC<ContextMenuSubContentProps> = (prop
     const {children, ...rest} = props
     return <Radix.ContextMenuSubContent align={props.align} {...mergeComponentProps(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, rest) as ContextMenuSubContentProps}>
         <AutoScrollArea>
-            {children}
+            <div className={"context-menu__content-inner"}>
+                {children}
+            </div>
         </AutoScrollArea>
     </Radix.ContextMenuSubContent>
 }

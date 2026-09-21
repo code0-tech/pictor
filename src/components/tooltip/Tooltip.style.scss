@@ -7,7 +7,8 @@
   &__content {
 
     z-index: 999;
-    padding: variables.$xxs variables.$xs;
+    // no padding here - it lives on the inner element inside the auto scroll
+    // area, so the scrollbar sits at the edge of the content
     box-sizing: border-box;
     // clamp to the space the popper has left on screen; the inner
     // auto scroll area shrinks with it and takes over scrolling
@@ -20,6 +21,10 @@
       @include helpers.fontStyle();
       @include helpers.borderRadius();
     }
+  }
+
+  &__content-inner {
+    padding: variables.$xxs variables.$xs;
   }
 
   &__arrow {

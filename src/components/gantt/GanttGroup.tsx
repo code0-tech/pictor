@@ -13,6 +13,17 @@ interface TimeScale {
     effTime: (t: number) => number
     // Inverse: map a compressed time back to the actual time (used for labels).
     invEffTime: (e: number) => number
+    // True while `t` sits inside a compressed gap, where the timeline jumps and
+    // no label may be placed.
+    inGap: (t: number) => boolean
+}
+
+// Pick a "round" interval (1, 2, 5 or 10 x 10^n) close to the target spacing, so
+// header labels land on values a human reads as whole (50μs, 0.1s, ...).
+const niceInterval = (target: number) => {
+    const magnitude = Math.pow(10, Math.floor(Math.log10(target)))
+    const normalized = target / magnitude
+    return (normalized < 1.5 ? 1 : normalized < 3 ? 2 : normalized < 7 ? 5 : 10) * magnitude
 }
 
 export interface GanttGroupProps extends GanttProps {
@@ -77,7 +88,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         }
     }, [items, start, end, step])
 
-    const {effTime, invEffTime}: TimeScale = React.useMemo(() => {
+    const {effTime, invEffTime, inGap}: TimeScale = React.useMemo(() => {
         const maxGap = MAX_GAP_COLUMNS * step
 
         // Occupied time intervals, sorted and merged.
@@ -89,24 +100,27 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
             else merged.push([s, e])
         }
 
-        // Collect the gaps that exceed the allowed width.
-        const gaps: { gapStart: number, gapEnd: number, remove: number, removedBefore: number }[] = []
+        // Collect the gaps that exceed the allowed width. `effGapEnd` is snapped to a
+        // column boundary so the item following a jump starts exactly on a grid line -
+        // otherwise it and the header label of that column drift apart by up to a column.
+        const gaps: { gapStart: number, gapEnd: number, effGapEnd: number, remove: number }[] = []
         let removed = 0
         for (let i = 1; i < merged.length; i++) {
             const gapStart = merged[i - 1][1]
             const gapEnd = merged[i][0]
-            const len = gapEnd - gapStart
-            if (len > maxGap) {
-                gaps.push({gapStart, gapEnd, remove: len - maxGap, removedBefore: removed})
-                removed += len - maxGap
-            }
+            if (gapEnd - gapStart <= maxGap) continue
+            const columns = Math.round((gapStart - removed + maxGap - start) / step)
+            const effGapEnd = start + columns * step
+            const remove = gapEnd - removed - effGapEnd
+            gaps.push({gapStart, gapEnd, effGapEnd, remove})
+            removed += remove
         }
 
         const effTime = (t: number) => {
             let e = t
             for (const g of gaps) {
                 if (t >= g.gapEnd) e -= g.remove
-                else if (t > g.gapStart + maxGap) e -= t - (g.gapStart + maxGap)
+                else if (t > g.gapStart) e = Math.min(e, g.effGapEnd)
             }
             return e
         }
@@ -114,14 +128,15 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         const invEffTime = (eff: number) => {
             let t = eff
             for (const g of gaps) {
-                const effGapStart = g.gapStart - g.removedBefore
-                if (eff >= effGapStart + maxGap) t += g.remove
+                if (eff >= g.effGapEnd) t += g.remove
             }
             return t
         }
 
-        return {effTime, invEffTime}
-    }, [items, step])
+        const inGap = (t: number) => gaps.some(g => t > g.gapStart && t < g.gapEnd)
+
+        return {effTime, invEffTime, inGap}
+    }, [items, step, start])
 
     // Position of an item on the compressed timeline (in pixels).
     const positionFor = (startT: number, endT: number) => {
@@ -136,6 +151,23 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     const columnsNeeded = items && items.length > 0 ? Math.ceil((effTime(itemMaxEnd) - start) / step) : timelineColumns
     const columnsInViewport = Math.ceil(viewportWidth / stepWidthPx)
     const columnsToRender = Math.max(columnsInViewport, columnsNeeded + 2)
+
+    // Header labels are anchored to round time values and positioned through the
+    // same compressed scale as the items, so a label lines up with the item edge
+    // it describes instead of drifting onto the nearest column.
+    const {headerTicks, headerInterval} = React.useMemo(() => {
+        const interval = niceInterval(step * 3)
+        const ticks: { time: number, left: number }[] = []
+        if (!(interval > 0)) return {headerTicks: ticks, headerInterval: 1}
+        const maxTime = invEffTime(start + columnsToRender * step)
+        const first = Math.ceil(start / interval) * interval
+        for (let i = 0; first + i * interval <= maxTime; i++) {
+            const time = first + i * interval
+            if (inGap(time)) continue
+            ticks.push({time, left: ((effTime(time) - start) / step) * stepWidthPx})
+        }
+        return {headerTicks: ticks, headerInterval: interval}
+    }, [effTime, invEffTime, inGap, start, step, columnsToRender, stepWidthPx])
 
     React.useEffect(() => {
         const handleResize = () => {
@@ -218,12 +250,10 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     return (
         <div data-gantt-id={props.id} id={props.id} ref={viewportRef} style={containerStyles}>
 
-            {!hideScaling && <GanttHeader columnCount={columnsToRender}
-                                          start={start}
-                                          step={step}
+            {!hideScaling && <GanttHeader ticks={headerTicks}
+                                          interval={headerInterval}
                                           avgDuration={avgDuration}
                                           stepWidth={stepWidth}
-                                          timeAtColumn={(columnIndex) => invEffTime(start + columnIndex * step)}
                                           canScrollLeft={canScrollLeft}
                                           canScrollRight={canScrollRight}/>}
             {itemRows.map((row, rowIndex) => (

@@ -4,12 +4,26 @@ import {GanttProps} from "./Gantt"
 import {GanttItem} from "./GanttItem"
 import {GanttHeader} from "./GanttHeader"
 
-const getItemPosition = (itemStart: number, itemEnd: number, start: number, end: number, timeRange: number, totalTimelineWidth: number) => {
-    const relativeStart = Math.max(0, itemStart - start)
-    const relativeEnd = Math.min(timeRange, itemEnd - start)
-    const left = (relativeStart / timeRange) * totalTimelineWidth
-    const width = ((relativeEnd - relativeStart) / timeRange) * totalTimelineWidth
-    return {left, width}
+// The maximum empty gap between two items, expressed in columns. Larger gaps are
+// compressed to this size so the timeline "jumps" instead of leaving huge voids.
+const MAX_GAP_COLUMNS = 3
+
+interface TimeScale {
+    // Map an actual time value to its compressed ("effective") time.
+    effTime: (t: number) => number
+    // Inverse: map a compressed time back to the actual time (used for labels).
+    invEffTime: (e: number) => number
+    // True while `t` sits inside a compressed gap, where the timeline jumps and
+    // no label may be placed.
+    inGap: (t: number) => boolean
+}
+
+// Pick a "round" interval (1, 2, 5 or 10 x 10^n) close to the target spacing, so
+// header labels land on values a human reads as whole (50μs, 0.1s, ...).
+const niceInterval = (target: number) => {
+    const magnitude = Math.pow(10, Math.floor(Math.log10(target)))
+    const normalized = target / magnitude
+    return (normalized < 1.5 ? 1 : normalized < 3 ? 2 : normalized < 7 ? 5 : 10) * magnitude
 }
 
 export interface GanttGroupProps extends GanttProps {
@@ -34,6 +48,12 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     const viewportRef = React.useRef<HTMLDivElement>(null)
     const [viewportWidth, setViewportWidth] = React.useState(0)
     const [activeGroup, setActiveGroup] = React.useState<string | undefined>(undefined)
+
+    // Horizontal scroll state of the surrounding ScrollArea viewport, used to
+    // drive the "you can scroll" indicators that stick to the visible edges.
+    // `scrollWidth` is the viewport's full scrollable width (which can exceed
+    // this group's own width when a wider nested group is expanded).
+    const [scrollState, setScrollState] = React.useState({scrollLeft: 0, clientWidth: 0, scrollWidth: 0})
 
     // Parse stepWidth to pixels
     const stepWidthPx = React.useMemo(() => parseInt(stepWidth as string), [stepWidth])
@@ -68,10 +88,86 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         }
     }, [items, start, end, step])
 
+    const {effTime, invEffTime, inGap}: TimeScale = React.useMemo(() => {
+        const maxGap = MAX_GAP_COLUMNS * step
+
+        // Occupied time intervals, sorted and merged.
+        const merged: [number, number][] = []
+        const sorted = (items ?? []).map(i => [i.start, i.end] as [number, number]).sort((a, b) => a[0] - b[0])
+        for (const [s, e] of sorted) {
+            const last = merged[merged.length - 1]
+            if (last && s <= last[1]) last[1] = Math.max(last[1], e)
+            else merged.push([s, e])
+        }
+
+        // Collect the gaps that exceed the allowed width. `effGapEnd` is snapped to a
+        // column boundary so the item following a jump starts exactly on a grid line -
+        // otherwise it and the header label of that column drift apart by up to a column.
+        const gaps: { gapStart: number, gapEnd: number, effGapEnd: number, remove: number }[] = []
+        let removed = 0
+        for (let i = 1; i < merged.length; i++) {
+            const gapStart = merged[i - 1][1]
+            const gapEnd = merged[i][0]
+            if (gapEnd - gapStart <= maxGap) continue
+            const columns = Math.round((gapStart - removed + maxGap - start) / step)
+            const effGapEnd = start + columns * step
+            const remove = gapEnd - removed - effGapEnd
+            gaps.push({gapStart, gapEnd, effGapEnd, remove})
+            removed += remove
+        }
+
+        const effTime = (t: number) => {
+            let e = t
+            for (const g of gaps) {
+                if (t >= g.gapEnd) e -= g.remove
+                else if (t > g.gapStart) e = Math.min(e, g.effGapEnd)
+            }
+            return e
+        }
+
+        const invEffTime = (eff: number) => {
+            let t = eff
+            for (const g of gaps) {
+                if (eff >= g.effGapEnd) t += g.remove
+            }
+            return t
+        }
+
+        const inGap = (t: number) => gaps.some(g => t > g.gapStart && t < g.gapEnd)
+
+        return {effTime, invEffTime, inGap}
+    }, [items, step, start])
+
+    // Position of an item on the compressed timeline (in pixels).
+    const positionFor = (startT: number, endT: number) => {
+        const effStart = Math.max(start, effTime(startT))
+        const effEnd = effTime(endT)
+        const left = ((effStart - start) / step) * stepWidthPx
+        const width = ((effEnd - effStart) / step) * stepWidthPx
+        return {left, width}
+    }
+
     // Column rendering calculations
-    const columnsNeeded = items && items.length > 0 ? Math.ceil((itemMaxEnd - start) / step) : timelineColumns
+    const columnsNeeded = items && items.length > 0 ? Math.ceil((effTime(itemMaxEnd) - start) / step) : timelineColumns
     const columnsInViewport = Math.ceil(viewportWidth / stepWidthPx)
     const columnsToRender = Math.max(columnsInViewport, columnsNeeded + 2)
+
+    // Header labels are anchored to round time values and positioned through the
+    // same compressed scale as the items, so a label lines up with the item edge
+    // it describes instead of drifting onto the nearest column.
+    const {headerTicks, headerInterval} = React.useMemo(() => {
+        const interval = niceInterval(step * 3)
+        const ticks: { time: number, left: number }[] = []
+        if (!(interval > 0)) return {headerTicks: ticks, headerInterval: 1}
+        const maxTime = invEffTime(start + columnsToRender * step)
+        const first = Math.ceil(start / interval) * interval
+        for (let i = 0; first + i * interval <= maxTime; i++) {
+            const time = first + i * interval
+            if (inGap(time)) continue
+            ticks.push({time, left: ((effTime(time) - start) / step) * stepWidthPx})
+        }
+        return {headerTicks: ticks, headerInterval: interval}
+    }, [effTime, invEffTime, inGap, start, step, columnsToRender, stepWidthPx])
 
     React.useEffect(() => {
         const handleResize = () => {
@@ -87,6 +183,37 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
             viewport?.removeEventListener("resize", handleResize)
         }
     }, [])
+
+    // Track the horizontal scroll position / size of the enclosing ScrollArea
+    // viewport so the scroll indicators know whether more content is available.
+    React.useEffect(() => {
+        const container = viewportRef.current
+        if (!container) return
+        const scroller = container.closest("[data-radix-scroll-area-viewport]") as HTMLElement | null
+        if (!scroller) return
+
+        const update = () => setScrollState({
+            scrollLeft: scroller.scrollLeft,
+            clientWidth: scroller.clientWidth,
+            scrollWidth: scroller.scrollWidth,
+        })
+
+        update()
+        scroller.addEventListener("scroll", update, {passive: true})
+        window.addEventListener("resize", update)
+        const resizeObserver = new ResizeObserver(update)
+        resizeObserver.observe(scroller)
+        resizeObserver.observe(container)
+        return () => {
+            scroller.removeEventListener("scroll", update)
+            window.removeEventListener("resize", update)
+            resizeObserver.disconnect()
+        }
+    }, [])
+
+    // A 1px threshold avoids the indicator flickering on sub-pixel scroll ends.
+    const canScrollLeft = scrollState.scrollLeft > 1
+    const canScrollRight = scrollState.scrollLeft + scrollState.clientWidth < scrollState.scrollWidth - 1
 
     // Calculate row assignments (non-overlapping rows)
     const itemRows = items?.length ? items
@@ -105,6 +232,7 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
         gridTemplateColumns: `repeat(${columnsToRender}, ${stepWidth})`,
         minWidth: "100%",
         gridColumn: "1 / -1",
+        position: "relative",
     }), [columnsToRender, stepWidth])
 
     const rowStyle: CSSProperties = React.useMemo(() => ({
@@ -122,11 +250,12 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
     return (
         <div data-gantt-id={props.id} id={props.id} ref={viewportRef} style={containerStyles}>
 
-            {!hideScaling && <GanttHeader columnCount={columnsToRender}
-                                          start={start}
-                                          step={step}
+            {!hideScaling && <GanttHeader ticks={headerTicks}
+                                          interval={headerInterval}
                                           avgDuration={avgDuration}
-                                          stepWidth={stepWidth}/>}
+                                          stepWidth={stepWidth}
+                                          canScrollLeft={canScrollLeft}
+                                          canScrollRight={canScrollRight}/>}
             {itemRows.map((row, rowIndex) => (
                 <React.Fragment key={`row-frag-${rowIndex}`}>
                     <div key={`row-${rowIndex}`} style={rowStyle}>
@@ -155,8 +284,8 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           ${withAlpha(hashToColor(props.id!.replace("target", "source")), 0.5)} 4px
                                         )
                                     `,
-                                        left: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).left}px`,
-                                        width: `${getItemPosition(itemMinStart, itemMinStart + step, start, end, timeRange, totalTimelineWidth).width}px`,
+                                        left: `${positionFor(itemMinStart, itemMinStart + step).left}px`,
+                                        width: `${positionFor(itemMinStart, itemMinStart + step).width}px`,
                                     }}
                                 />
                                 <div
@@ -171,15 +300,15 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                                           ${withAlpha(hashToColor(props.id!.replace("target", "source")), 0.5)} 4px
                                         )
                                     `,
-                                        left: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).left}px`,
-                                        width: `${getItemPosition(itemMaxEnd - step, itemMaxEnd, start, end, timeRange, totalTimelineWidth).width}px`,
+                                        left: `${positionFor(itemMaxEnd - step, itemMaxEnd).left}px`,
+                                        width: `${positionFor(itemMaxEnd - step, itemMaxEnd).width}px`,
                                     }}
                                 />
                             </>
                         )}
 
                         {row.map((item, itemIndex) => {
-                            const itemPosition = getItemPosition(item.start, item.end, start, end, timeRange, totalTimelineWidth)
+                            const itemPosition = positionFor(item.start, item.end)
                             const hasVisibleWidth = itemPosition.width > 0
 
                             return hasVisibleWidth && (
@@ -200,11 +329,13 @@ export const GanttGroup: React.FC<GanttGroupProps> = (props) => {
                     </div>
                     {row.map((item, itemIndex) => {
                         return item.type === "group" && activeGroup === item.id && <GanttGroup children={children}
-                                           id={`group-target-${itemIndex}`}
-                                           start={(Math.min(...item.data.items.map((item: any) => item.start))) - ((((Math.min(...item.data.items.map((item: any) => item.start))) / (item.data.firstGroupStep * item.data.step)) * (item.data.groupStep * item.data.step)))}
-                                           step={item.data.groupStep * item.data.step}
-                                           stepWidth={stepWidth} rowHeight={rowHeight} items={item.data.items}
-                                           key={`group-target-${itemIndex}`}/>
+                                                                                               id={`group-target-${itemIndex}`}
+                                                                                               start={(Math.min(...item.data.items.map((item: any) => item.start))) - ((((Math.min(...item.data.items.map((item: any) => item.start))) / (item.data.firstGroupStep * item.data.step)) * (item.data.groupStep * item.data.step)))}
+                                                                                               step={item.data.groupStep * item.data.step}
+                                                                                               stepWidth={stepWidth}
+                                                                                               rowHeight={rowHeight}
+                                                                                               items={item.data.items}
+                                                                                               key={`group-target-${itemIndex}`}/>
                     })}
                 </React.Fragment>
             ))}

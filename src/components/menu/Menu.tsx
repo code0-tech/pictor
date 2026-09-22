@@ -70,7 +70,9 @@ export const MenuContent: React.FC<MenuContentProps> = (props) => {
     return <DropdownMenuContent
         align={props.align} {...mergeComponentProps(`menu__content menu__content--${props.color ?? "primary"}`, rest) as MenuContentProps}>
         <AutoScrollArea>
-            {children}
+            <div className={"menu__content-inner"}>
+                {children}
+            </div>
         </AutoScrollArea>
     </DropdownMenuContent>
 }
@@ -99,7 +101,9 @@ export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
     const {children, ...rest} = props
     return <DropdownMenuSubContent {...mergeComponentProps(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, rest) as MenuSubContentProps}>
         <AutoScrollArea>
-            {children}
+            <div className={"menu__content-inner"}>
+                {children}
+            </div>
         </AutoScrollArea>
     </DropdownMenuSubContent>
 }

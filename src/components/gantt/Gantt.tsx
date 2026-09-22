@@ -37,8 +37,8 @@ export const Gantt: React.FC<GanttProps> = (props) => {
             for (let i = 0; i < groups.length; i++) {
                 const group = groups[i]
                 const newStep = (group.step + itemDuration) / 1.75
-                const lowerBound = (group.step / 3) - 10
-                const upperBound = (group.step * 3) + 10
+                const lowerBound = (group.step / 2)
+                const upperBound = (group.step * 2)
 
                 if (lowerBound < itemDuration && itemDuration < upperBound) {
                     group.step = newStep

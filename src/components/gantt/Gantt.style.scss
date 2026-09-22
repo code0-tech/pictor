@@ -26,7 +26,7 @@
     grid-column: 1 / -1;
     display: flex;
     top: 0;
-    background: #070514;
+    background: variables.$bodyBg;
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
     z-index: 10;
 
@@ -48,9 +48,35 @@
       align-items: center;
     }
 
-    &-label-column {
+    &-scroll {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 variables.$xxxs;
+      color: variables.$white;
+      background: variables.$bodyBg;
+      z-index: 3;
+
+      &--right {
+        position: sticky;
+        right: 0;
+        margin-left: auto;
+      }
+    }
+
+    // Sticky left block: scroll indicator first, label next to it.
+    &-start {
       position: sticky;
       left: 0;
+      width: fit-content;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      background: variables.$bodyBg;
+      z-index: 2;
+    }
+
+    &-label-column {
       width: fit-content;
       height: 100%;
       padding: 8px;
@@ -58,8 +84,7 @@
       align-items: center;
       justify-content: start;
       box-sizing: border-box;
-      background: #070514;
-      z-index: 2;
+      background: variables.$bodyBg;
     }
   }
 }

@@ -72,8 +72,8 @@ export const GanttExample = () => {
             },
             {
                 id: "2",
-                start: 199,
-                end: 300,
+                start: 999,
+                end: 1100,
                 data: {
                     icon: IconArrowRampRight2,
                     displayMessage: "If"

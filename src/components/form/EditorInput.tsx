@@ -113,9 +113,11 @@ interface EditorInputContextValue {
     focusFirst: () => void
     selectActive: () => boolean
     select: (value: any, data: any) => void
-    openSubId: string | null
+    openSubPath: string[]
     enterSub: (id: string) => void
-    exitSub: () => void
+    exitSub: (id?: string) => void
+    hoverSub: (id: string) => void
+    cancelHoverSub: () => void
     openActiveSub: () => boolean
 }
 
@@ -302,11 +304,11 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         setActiveIdState(id)
     }, [])
 
-    const [openSubId, setOpenSubIdState] = useState<string | null>(null)
-    const openSubIdRef = useRef<string | null>(null)
-    const setOpenSubId = useCallback((id: string | null) => {
-        openSubIdRef.current = id
-        setOpenSubIdState(id)
+    const [openSubPath, setOpenSubPathState] = useState<string[]>([])
+    const openSubPathRef = useRef<string[]>([])
+    const setOpenSubPath = useCallback((path: string[]) => {
+        openSubPathRef.current = path
+        setOpenSubPathState(path)
     }, [])
 
     const registerItem = useCallback((id: string, item: RegisteredItem) => {
@@ -319,7 +321,7 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
     const orderedIds = useCallback(() => {
         return Array.from(itemsRef.current.entries())
-            .filter(([, item]) => item.el.current && item.parentId === openSubIdRef.current)
+            .filter(([, item]) => item.el.current && item.parentId === (openSubPathRef.current[openSubPathRef.current.length - 1] ?? null))
             .sort((a, b) => {
                 const rel = a[1].el.current!.compareDocumentPosition(b[1].el.current!)
                 return rel & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
@@ -372,8 +374,31 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         return true
     }, [select])
 
+    const hoverSubTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+    const cancelHoverSub = useCallback(() => {
+        if (hoverSubTimer.current) clearTimeout(hoverSubTimer.current)
+        hoverSubTimer.current = undefined
+    }, [])
+
+    // Depth a submenu owned by `parentId` occupies in the open path, or -1 when
+    // that parent is not itself open and the submenu is therefore unreachable.
+    const subDepth = useCallback((parentId: string | null) => {
+        if (parentId === null) return 0
+        const index = openSubPathRef.current.indexOf(parentId)
+        return index < 0 ? -1 : index + 1
+    }, [])
+
+    const isSubOpen = useCallback((id: string, depth: number) => {
+        const path = openSubPathRef.current
+        return path.length === depth + 1 && path[depth] === id
+    }, [])
+
     const enterSub = useCallback((id: string) => {
-        setOpenSubId(id)
+        cancelHoverSub()
+        const depth = subDepth(itemsRef.current.get(id)?.parentId ?? null)
+        if (depth < 0 || isSubOpen(id, depth)) return
+        setOpenSubPath([...openSubPathRef.current.slice(0, depth), id])
         setTimeout(() => {
             const ids = Array.from(itemsRef.current.entries())
                 .filter(([, item]) => item.el.current && item.parentId === id)
@@ -381,14 +406,31 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
                 .map(([itemId]) => itemId)
             if (ids.length) highlightTo(ids[0])
         }, 20)
-    }, [setOpenSubId, highlightTo])
+    }, [cancelHoverSub, subDepth, isSubOpen, setOpenSubPath, highlightTo])
 
-    const exitSub = useCallback(() => {
-        const trigger = openSubIdRef.current
-        if (trigger === null) return
-        setOpenSubId(null)
-        setActiveId(trigger)
-    }, [setOpenSubId, setActiveId])
+    // Radix gates its own submenu open timer behind a 300ms pointer grace area
+    // that never releases here, because focus stays in the editor and so no sub
+    // content is ever closed by its focus-outside handler. Hover intent is owned
+    // by us instead: the first submenu of a level opens at once, swapping to a
+    // sibling settles briefly so a diagonal sweep does not flicker through them.
+    const hoverSub = useCallback((id: string) => {
+        cancelHoverSub()
+        const depth = subDepth(itemsRef.current.get(id)?.parentId ?? null)
+        if (depth < 0 || isSubOpen(id, depth)) return
+        if (openSubPathRef.current.length <= depth) {
+            enterSub(id)
+            return
+        }
+        hoverSubTimer.current = setTimeout(() => enterSub(id), 60)
+    }, [cancelHoverSub, subDepth, isSubOpen, enterSub])
+
+    const exitSub = useCallback((id?: string) => {
+        const path = openSubPathRef.current
+        const depth = id === undefined ? path.length - 1 : path.indexOf(id)
+        if (depth < 0) return
+        setOpenSubPath(path.slice(0, depth))
+        setActiveId(path[depth])
+    }, [setOpenSubPath, setActiveId])
 
     const openActiveSub = useCallback(() => {
         const id = activeIdRef.current
@@ -401,23 +443,26 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
 
     useEffect(() => {
         if (!open) {
+            cancelHoverSub()
             setActiveId(null)
-            setOpenSubId(null)
+            setOpenSubPath([])
         }
-    }, [open, setActiveId, setOpenSubId])
+    }, [open, cancelHoverSub, setActiveId, setOpenSubPath])
+
+    useEffect(() => cancelHoverSub, [cancelHoverSub])
 
     const ctx = useMemo<EditorInputContextValue>(() => ({
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
         open, setOpen, openMenu, menuOpenMode, setMenuOpenMode,
         editorContainerRef, triggerRef, updateTriggerPosition, scheduleClose, cancelClose,
         registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
-        openSubId, enterSub, exitSub, openActiveSub,
+        openSubPath, enterSub, exitSub, hoverSub, cancelHoverSub, openActiveSub,
     }), [
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
         open, openMenu, menuOpenMode,
         updateTriggerPosition, scheduleClose, cancelClose,
         registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
-        openSubId, enterSub, exitSub, openActiveSub,
+        openSubPath, enterSub, exitSub, hoverSub, cancelHoverSub, openActiveSub,
     ])
 
     return (
@@ -445,7 +490,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
         editor, tokenRules, singleLine, disabled, readonly, placeholder,
         open, openMenu, setOpen, menuOpenMode, editorContainerRef, scheduleClose, cancelClose,
         highlightNext, highlightPrevious, focusFirst, selectActive,
-        openSubId, exitSub, openActiveSub,
+        openSubPath, exitSub, openActiveSub,
     } = useEditorInputContext()
 
     const handleFocus = useCallback(() => {
@@ -530,7 +575,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 e.preventDefault()
                 return
             }
-            if (e.key === "ArrowLeft" && openSubId !== null) {
+            if (e.key === "ArrowLeft" && openSubPath.length > 0) {
                 e.preventDefault()
                 exitSub()
                 return
@@ -541,7 +586,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
             }
             if (e.key === "Escape") {
                 e.preventDefault()
-                if (openSubId !== null) exitSub()
+                if (openSubPath.length > 0) exitSub()
                 else setOpen(false)
                 return
             }
@@ -561,7 +606,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 }
             }
         }
-    }, [singleLine, tokenRules, editor, open, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, setOpen, openSubId, exitSub, openActiveSub])
+    }, [singleLine, tokenRules, editor, open, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, setOpen, openSubPath, exitSub, openActiveSub])
 
     return (
         <div {...mergeComponentProps("editor-input", props)} ref={editorContainerRef}>
@@ -632,7 +677,9 @@ export const EditorInputMenu: React.FC<EditorInputMenuProps> = (props) => {
 
 export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) => {
     const {value, data, children, onlyOnce, aliases, ...rest} = props
-    const {editor, registerItem, activeId, setActiveId, select, search, documentText} = useEditorInputContext()
+    const {
+        editor, registerItem, activeId, setActiveId, select, search, documentText, cancelHoverSub
+    } = useEditorInputContext()
     const parentId = React.useContext(SubMenuIdContext)
 
     const id = React.useId()
@@ -676,7 +723,7 @@ export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) =
         }}
         onPointerMove={(event) => {
             event.preventDefault()
-            event.stopPropagation()
+            cancelHoverSub()
             if (activeId !== id) setActiveId(id)
         }}
         onSelect={() => setTimeout(() => select(dataRef.current.value, dataRef.current.data), 0)}
@@ -686,7 +733,9 @@ export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) =
 }
 
 export const EditorInputSubMenu: React.FC<EditorInputSubMenuProps> = ({label, children}) => {
-    const {editor, registerItem, activeId, setActiveId, openSubId, enterSub, exitSub} = useEditorInputContext()
+    const {
+        editor, registerItem, activeId, setActiveId, openSubPath, enterSub, exitSub, hoverSub, cancelHoverSub
+    } = useEditorInputContext()
     const parentId = React.useContext(SubMenuIdContext)
 
     const id = React.useId()
@@ -712,11 +761,8 @@ export const EditorInputSubMenu: React.FC<EditorInputSubMenuProps> = ({label, ch
     } as any
 
     return <MenuSub
-        open={openSubId === id}
-        onOpenChange={(next) => {
-            if (next && openSubId !== id) enterSub(id)
-            else if (!next && openSubId === id) exitSub()
-        }}
+        open={openSubPath.includes(id)}
+        onOpenChange={(next) => next ? enterSub(id) : exitSub(id)}
     >
         <MenuSubTrigger
             ref={(el: HTMLDivElement | null) => {
@@ -726,11 +772,20 @@ export const EditorInputSubMenu: React.FC<EditorInputSubMenuProps> = ({label, ch
             onPointerDown={(e) => {
                 e.preventDefault()
                 setActiveId(id)
+                enterSub(id)
                 ReactEditor.focus(editor)
             }}
-            onPointerMove={() => {
+            onPointerEnter={() => {
+                setActiveId(id)
+                hoverSub(id)
+            }}
+            onPointerMove={(e) => {
+                // Owning hover intent means suppressing Radix's own open timer,
+                // which composeEventHandlers skips once the event is defaulted.
+                e.preventDefault()
                 if (activeId !== id) setActiveId(id)
             }}
+            onPointerLeave={cancelHoverSub}
         >
             {label}
         </MenuSubTrigger>

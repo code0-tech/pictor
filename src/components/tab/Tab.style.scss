@@ -30,50 +30,67 @@
     position: relative;
     box-sizing: border-box;
     opacity: 0.5;
-    transition: all ease-in-out 0.2s;
-
-    &[data-orientation="horizontal"] {
-      &:after {
-        content: "";
-        position: absolute;
-        background: transparent;
-
-        border-top-left-radius: 50rem;
-        border-top-right-radius: 50rem;
-        width: 35%;
-        min-width: 28px;
-        height: 2px;
-        bottom: -0.475rem;
-        left: 50%;
-        transform: translateX(-50%);
-      }
-    }
-
-    &[data-orientation="vertical"] {
-      &:after {
-        content: "";
-        position: absolute;
-        background: transparent;
-
-        border-bottom-right-radius: 50rem;
-        border-top-right-radius: 50rem;
-        width: 2px;
-        height: 35%;
-        top: 50%;
-        left: -0.7rem;
-        transform: translateY(-50%);
-      }
-    }
+    transition: opacity 150ms ease-out, color 150ms ease-out;
 
     &[aria-selected=true] {
-      &[data-orientation="vertical"], &[data-orientation="horizontal"] {
-        opacity: 1;
-        &:after {
-          background: variables.$info;
-        }
-      }
+      opacity: 1;
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  //the indicator is a single shared element that springs from the previously
+  //selected trigger to the new one, so it must not carry a transform of its
+  //own - the layout animation owns that. It therefore spans the trigger and
+  //centers the bar with flex instead of translating it
+  &__indicator {
+    position: absolute;
+    display: flex;
+    pointer-events: none;
+
+    &-bar {
+      background: variables.$info;
+    }
+  }
+
+  &__trigger-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
+  &__trigger-wrapper[data-orientation="horizontal"] .tab__indicator {
+    left: 0;
+    right: 0;
+    bottom: -0.475rem;
+    height: 2px;
+    justify-content: center;
+
+    .tab__indicator-bar {
+      width: 35%;
+      min-width: 28px;
+      height: 100%;
+      border-top-left-radius: 50rem;
+      border-top-right-radius: 50rem;
+    }
+  }
+
+  &__trigger-wrapper[data-orientation="vertical"] .tab__indicator {
+    top: 0;
+    bottom: 0;
+    left: -0.7rem;
+    width: 2px;
+    flex-direction: column;
+    justify-content: center;
+
+    .tab__indicator-bar {
+      height: 35%;
+      min-height: 28px;
+      width: 100%;
+      border-bottom-right-radius: 50rem;
+      border-top-right-radius: 50rem;
+    }
   }
 
   &__content {

@@ -9,6 +9,11 @@
     position: relative;
     box-sizing: border-box;
     z-index: 999;
+    //the surface materialises out of its trigger - blur and scale together, so
+    //it reads as a material arriving instead of a plain fade. Radix unmounts the
+    //content on close, so there is no exit animation to mirror here
+    transform-origin: var(--radix-select-content-transform-origin, center);
+    animation: select-input-materialize 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
     & {
       @include helpers.borderRadius();
@@ -52,5 +57,46 @@
   .select-input__content--#{$name} {
     @include box.box($color);
     border: helpers.backgroundColor(variables.$secondary) 2px solid;
+  }
+}
+
+//the highlight follows the pointer and the arrow keys continuously, so it gets
+//a short cross fade instead of a hard cut
+.select-input__item {
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select-input__item {
+    transition: none;
+  }
+}
+
+@keyframes select-input-materialize {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+//reduced motion keeps the feedback, but without the travel
+@media (prefers-reduced-motion: reduce) {
+  .select-input__content {
+    animation: select-input-fade 150ms ease-out both;
+  }
+}
+
+@keyframes select-input-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

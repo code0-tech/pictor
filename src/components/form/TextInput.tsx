@@ -28,7 +28,7 @@ export const TextInput: React.ForwardRefExoticComponent<TextInputProps> = React.
     }
 
     const rightAction: ReactElement<ButtonProps>[] = [right as ReactElement<ButtonProps>]
-    clearable && rightAction.push(<Button color={"secondary"} paddingSize={"xxs"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
+    clearable && rightAction.push(<Button color={"secondary"} tabIndex={-1} paddingSize={"xxs"} onClick={(event) => toClearable(event)}><IconX size={13}/></Button>)
 
     const rightActions = rightAction.filter(Boolean)
 

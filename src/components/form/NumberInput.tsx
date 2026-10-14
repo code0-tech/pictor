@@ -35,10 +35,10 @@ export const NumberInput: React.ForwardRefExoticComponent<NumberInputProps> = Re
     return <Input
         className={"number-input"}
         right={<ButtonGroup color={"primary"}>
-            <Button color={"secondary"} paddingSize={"xxs"} onClick={countUp}><IconPlus size={13}/></Button>
+            <Button tabIndex={-1} color={"secondary"} paddingSize={"xxs"} onClick={countUp}><IconPlus size={13}/></Button>
         </ButtonGroup>}
         left={<ButtonGroup color={"primary"}>
-            <Button color={"secondary"} paddingSize={"xxs"} onClick={countDown}><IconMinus size={13}/></Button>
+            <Button tabIndex={-1} color={"secondary"} paddingSize={"xxs"} onClick={countDown}><IconMinus size={13}/></Button>
         </ButtonGroup>}
         leftType={"action"}
         type={"number"}

@@ -3,8 +3,9 @@
 import React from 'react'
 import { toast as sonnerToast } from 'sonner'
 import "./Toast.style.scss"
-import {Component, Color} from "../../utils"
-import {mergeComponentProps} from "../../utils"
+import {Color, Component} from "../../utils"
+import {mergeComponentProps, usePopperMotion} from "../../utils"
+import {motion} from "motion/react"
 import {
     IconAlertCircle,
     IconCircleCheck, IconCircleDot,
@@ -53,10 +54,17 @@ export function Toast(props: ToastProps) {
     //error toasts are critical and interrupt the screen reader (assertive); everything else is announced politely
     const isCritical = color === "error"
 
+    //the toast materialises on mount; sonner owns the exit, so only the enter
+    //states are handed to motion here
+    const {initial, animate, transition} = usePopperMotion()
+
     return (
-        <div
+        <motion.div
             role={isCritical ? "alert" : "status"}
             aria-live={isCritical ? "assertive" : "polite"}
+            initial={initial}
+            animate={animate}
+            transition={transition}
             {...mergeComponentProps(`toast toast--${preset ? color : "secondary"}`, {...rest, ...customStyle})}>
             <Flex className={"toast__header"}>
                 <Flex className={"toast__header-wrapper"}>
@@ -69,7 +77,7 @@ export function Toast(props: ToastProps) {
                     {children}
                 </div>
             }
-        </div>
+        </motion.div>
     )
 }
 

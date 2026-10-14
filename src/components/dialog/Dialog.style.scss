@@ -24,22 +24,34 @@
     left: 0;
     z-index: 50;
     background: rgba(variables.$primary, 0.75);
+
+    //while the overlay animates out it is no longer interactive, but still on
+    //screen - clicks have to reach what is behind it again
+    &[data-state="closed"] {
+      pointer-events: none;
+    }
   }
 
   &__content {
     @include box.box(variables.$secondary);
     @include helpers.borderRadius();
 
+    //centred without a transform, so the enter and exit animation owns the
+    //element's transform on its own
     position: fixed;
-    top: 50%;
-    left: 50%;
+    inset: 0;
+    margin: auto;
+    height: fit-content;
     z-index: 50;
     width: 100%;
     max-width: calc(100% - 2rem);
     gap: 1rem;
-    transform: translate(-50%, -50%);
     padding: 1rem;
     overflow: hidden;
+
+    &[data-state="closed"] {
+      pointer-events: none;
+    }
 
     @include media.respond-above(md) {
       width: 490px;
@@ -81,5 +93,15 @@
       flex-direction: row;
       justify-content: flex-end;
     }
+  }
+}
+
+//the scrim's blur is animated inline, so it has to be overridden here; a
+//frostier, near solid scrim replaces it
+@media (prefers-reduced-transparency: reduce) {
+  .dialog__overlay {
+    background: rgba(variables.$primary, 0.95);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }

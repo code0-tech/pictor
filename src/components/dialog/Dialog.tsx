@@ -1,5 +1,13 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import {Component, ComponentProps, mergeComponentProps} from "../../utils";
+import {
+    Component,
+    ComponentProps,
+    mergeComponentProps,
+    useObservedOpen,
+    useScrimMotion,
+    useSurfaceMotion
+} from "../../utils";
+import {AnimatePresence, motion} from "motion/react";
 import React from "react";
 import {IconX} from "@tabler/icons-react"
 import "./Dialog.style.scss"
@@ -25,8 +33,17 @@ export type DialogStickyContentProps = Component<HTMLDivElement> & {
     children: React.ReactNode | React.ReactNode[]
 }
 
+//the overlay and the content are force mounted and kept alive by
+//AnimatePresence while they animate out, so the open state has to be known one
+//level above them
+const DialogOpenContext = React.createContext(false)
+
 export const Dialog: React.FC<DialogProps> = (props) => {
-    return <DialogPrimitive.Root {...mergeComponentProps("dialog", props) as DialogProps}/>
+    const [open, onOpenChange] = useObservedOpen(props.open, props.defaultOpen, props.onOpenChange)
+
+    return <DialogOpenContext.Provider value={open}>
+        <DialogPrimitive.Root {...mergeComponentProps("dialog", props) as DialogProps} onOpenChange={onOpenChange}/>
+    </DialogOpenContext.Provider>
 }
 
 export const DialogTrigger: React.FC<DialogTriggerProps> = (props) => {
@@ -34,7 +51,8 @@ export const DialogTrigger: React.FC<DialogTriggerProps> = (props) => {
 }
 
 export const DialogPortal: React.FC<DialogPortalProps> = (props) => {
-    return <DialogPrimitive.Portal {...mergeComponentProps("dialog__portal", props) as DialogPortalProps}/>
+    //force mounted so the portal outlives the dialog's exit animation
+    return <DialogPrimitive.Portal forceMount {...mergeComponentProps("dialog__portal", props) as DialogPortalProps}/>
 }
 
 export const DialogClose: React.FC<DialogCloseProps> = (props) => {
@@ -42,24 +60,50 @@ export const DialogClose: React.FC<DialogCloseProps> = (props) => {
 }
 
 export const DialogOverlay: React.FC<DialogOverlayProps> = (props) => {
-    return <DialogPrimitive.Overlay {...mergeComponentProps("dialog__overlay", props) as DialogOverlayProps}/>
+    const open = React.useContext(DialogOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = useScrimMotion()
+
+    return <AnimatePresence initial={!openOnMount.current}>
+        {open && <DialogPrimitive.Overlay
+            key={"dialog__overlay"}
+            forceMount
+            asChild
+            {...mergeComponentProps("dialog__overlay", props) as DialogOverlayProps}>
+            <motion.div {...motionProps}/>
+        </DialogPrimitive.Overlay>}
+    </AnimatePresence>
 }
 
 export const DialogContent: React.FC<DialogContentProps> = (props) => {
+    const open = React.useContext(DialogOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = useSurfaceMotion()
+
     return (
-        <DialogPrimitive.Content {...mergeComponentProps("dialog__content", props) as DialogContentProps}>
-            {props.showCloseButton && (
-                <Flex align={"center"} justify={"space-between"}>
-                    <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
-                    <DialogClose asChild>
-                        <Button variant={"none"} color={"tertiary"}>
-                            <IconX size={16}/>
-                        </Button>
-                    </DialogClose>
-                </Flex>
-            )}
-            {props.children}
-        </DialogPrimitive.Content>
+        <AnimatePresence initial={!openOnMount.current}>
+            {open && <DialogPrimitive.Content
+                key={"dialog__content"}
+                forceMount
+                asChild
+                {...mergeComponentProps("dialog__content", props) as DialogContentProps}>
+                <motion.div {...motionProps}>
+                    {props.showCloseButton && (
+                        <Flex align={"center"} justify={"space-between"}>
+                            <Text hierarchy={"primary"} size={"xl"}>{props.title}</Text>
+                            <DialogClose asChild>
+                                <Button variant={"none"} color={"tertiary"}>
+                                    <IconX size={16}/>
+                                </Button>
+                            </DialogClose>
+                        </Flex>
+                    )}
+                    {props.children}
+                </motion.div>
+            </DialogPrimitive.Content>}
+        </AnimatePresence>
     )
 }
 

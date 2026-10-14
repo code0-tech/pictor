@@ -1,10 +1,18 @@
 "use client"
 
 import React from "react";
-import {ComponentProps, Color, mergeComponentProps} from "../../utils";
+import {
+    Color,
+    ComponentProps,
+    mergeComponentProps,
+    popperTransformOrigin,
+    useObservedOpen,
+    usePopperMotion
+} from "../../utils";
 import * as Radix from "@radix-ui/react-context-menu";
 import "./ContextMenu.style.scss"
 import {AutoScrollArea} from "../scroll-area/ScrollArea";
+import {AnimatePresence, motion} from "motion/react";
 
 export type ContextMenuProps = ComponentProps & Radix.ContextMenuProps
 export type ContextMenuTriggerProps = ComponentProps & Radix.ContextMenuTriggerProps
@@ -23,8 +31,18 @@ export type ContextMenuSubContentProps = ComponentProps & Radix.ContextMenuSubCo
 export type ContextMenuSeparatorProps = ComponentProps & Radix.ContextMenuSeparatorProps
 export type ContextMenuArrowProps = ComponentProps & Radix.ContextMenuArrowProps
 
+//the content is force mounted and kept alive by AnimatePresence while it
+//animates out, so the open state has to be known one level above it. A context
+//menu is only ever opened by the user, so its state can only be observed
+const ContextMenuOpenContext = React.createContext(false)
+const ContextMenuSubOpenContext = React.createContext(false)
+
 export const ContextMenu: React.FC<ContextMenuProps> = (props) => {
-    return <Radix.ContextMenu {...mergeComponentProps(`context-menu`, props) as ContextMenuProps}/>
+    const [open, onOpenChange] = useObservedOpen(undefined, undefined, props.onOpenChange)
+
+    return <ContextMenuOpenContext.Provider value={open}>
+        <Radix.ContextMenu {...mergeComponentProps(`context-menu`, props) as ContextMenuProps} onOpenChange={onOpenChange}/>
+    </ContextMenuOpenContext.Provider>
 }
 
 export const ContextMenuTrigger: React.FC<ContextMenuTriggerProps> = (props) => {
@@ -32,19 +50,32 @@ export const ContextMenuTrigger: React.FC<ContextMenuTriggerProps> = (props) => 
 }
 
 export const ContextMenuPortal: React.FC<ContextMenuPortalProps> = (props) => {
-    return <Radix.ContextMenuPortal {...mergeComponentProps("context-menu__portal", props) as ContextMenuPortalProps}/>
+    //force mounted so the portal outlives the menu's exit animation
+    return <Radix.ContextMenuPortal forceMount {...mergeComponentProps("context-menu__portal", props) as ContextMenuPortalProps}/>
 }
 
 export const ContextMenuContent: React.FC<ContextMenuContentProps> = (props) => {
     const {children, ...rest} = props
-    return <Radix.ContextMenuContent
-        align={props.align} {...mergeComponentProps(`context-menu__content context-menu__content--${props.color ?? "primary"}`, rest) as ContextMenuContentProps}>
-        <AutoScrollArea>
-            <div className={"context-menu__content-inner"}>
-                {children}
-            </div>
-        </AutoScrollArea>
-    </Radix.ContextMenuContent>
+    const open = React.useContext(ContextMenuOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = usePopperMotion()
+
+    return <AnimatePresence initial={!openOnMount.current}>
+        {open && <Radix.ContextMenuContent
+            key={"context-menu__content"}
+            forceMount
+            asChild
+            {...mergeComponentProps(`context-menu__content context-menu__content--${props.color ?? "primary"}`, rest) as ContextMenuContentProps}>
+            <motion.div {...motionProps} style={popperTransformOrigin("context-menu")}>
+                <AutoScrollArea>
+                    <div className={"context-menu__content-inner"}>
+                        {children}
+                    </div>
+                </AutoScrollArea>
+            </motion.div>
+        </Radix.ContextMenuContent>}
+    </AnimatePresence>
 }
 
 export const ContextMenuLabel: React.FC<ContextMenuLabelProps> = (props) => {
@@ -60,7 +91,11 @@ export const ContextMenuGroup: React.FC<ContextMenuGroupProps> = (props) => {
 }
 
 export const ContextMenuSub: React.FC<ContextMenuSubProps> = (props) => {
-    return <Radix.ContextMenuSub {...mergeComponentProps("context-menu__sub", props) as ContextMenuSubProps}/>
+    const [open, onOpenChange] = useObservedOpen(props.open, props.defaultOpen, props.onOpenChange)
+
+    return <ContextMenuSubOpenContext.Provider value={open}>
+        <Radix.ContextMenuSub {...mergeComponentProps("context-menu__sub", props) as ContextMenuSubProps} onOpenChange={onOpenChange}/>
+    </ContextMenuSubOpenContext.Provider>
 }
 
 export const ContextMenuSubTrigger: React.FC<ContextMenuSubTriggerProps> = (props) => {
@@ -69,13 +104,26 @@ export const ContextMenuSubTrigger: React.FC<ContextMenuSubTriggerProps> = (prop
 
 export const ContextMenuSubContent: React.FC<ContextMenuSubContentProps> = (props) => {
     const {children, ...rest} = props
-    return <Radix.ContextMenuSubContent align={props.align} {...mergeComponentProps(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, rest) as ContextMenuSubContentProps}>
-        <AutoScrollArea>
-            <div className={"context-menu__content-inner"}>
-                {children}
-            </div>
-        </AutoScrollArea>
-    </Radix.ContextMenuSubContent>
+    const open = React.useContext(ContextMenuSubOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = usePopperMotion()
+
+    return <AnimatePresence initial={!openOnMount.current}>
+        {open && <Radix.ContextMenuSubContent
+            key={"context-menu__sub-content"}
+            forceMount
+            asChild
+            {...mergeComponentProps(`context-menu__sub-content context-menu__sub-content--${props.color ?? "primary"}`, rest) as ContextMenuSubContentProps}>
+            <motion.div {...motionProps} style={popperTransformOrigin("context-menu")}>
+                <AutoScrollArea>
+                    <div className={"context-menu__content-inner"}>
+                        {children}
+                    </div>
+                </AutoScrollArea>
+            </motion.div>
+        </Radix.ContextMenuSubContent>}
+    </AnimatePresence>
 }
 
 export const ContextMenuSeparator: React.FC<ContextMenuSeparatorProps> = (props) => {

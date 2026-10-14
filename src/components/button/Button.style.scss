@@ -13,8 +13,23 @@
   justify-content: center;
   font-size: variables.$sm;
 
+  //feedback lives on the press, not on the release, so it has to be instant
+  transition: transform 100ms ease-out, background-color 150ms ease-out, box-shadow 150ms ease-out;
+
   @include helpers.borderRadius();
   @include helpers.disabled;
+
+  &:active:not([aria-disabled="true"]) {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: background-color 150ms ease-out, box-shadow 150ms ease-out;
+
+    &:active:not([aria-disabled="true"]) {
+      transform: none;
+    }
+  }
 }
 
 

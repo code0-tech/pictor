@@ -19,24 +19,44 @@
 
     cursor: pointer;
     padding: variables.$xxs variables.$xs;
+    //the selected background lives on the indicator, which slides between the
+    //items, so the item itself stays transparent and is painted above it
+    position: relative;
+    z-index: 1;
+    transition: opacity 150ms ease-out;
 
     &[data-state="off"] {
-      background: transparent;
       opacity: .6666666666;
     }
 
     & {
       @include box.box(variables.$secondary);
       @include helpers.disabled();
-      background: helpers.backgroundColor(variables.$secondary, 2);
+      background: transparent;
       border-radius: variables.$borderRadius - (variables.$xxs / 2);
       box-shadow: none;
     }
 
-    &:disabled {
-      background: transparent;
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
     }
 
+  }
+
+  &__item-wrapper {
+    position: relative;
+    display: inline-flex;
+  }
+
+  //the indicator is a single shared element that slides from the previously
+  //selected item to the new one; the item itself is lifted above it
+  &__indicator {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: variables.$borderRadius - (variables.$xxs / 2);
+    background: helpers.backgroundColor(variables.$secondary, 2);
+    pointer-events: none;
   }
 
 }

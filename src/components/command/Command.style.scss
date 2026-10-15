@@ -99,3 +99,15 @@
     background: helpers.backgroundColor(variables.$primary);
   }
 }
+
+//the highlight follows the pointer and the arrow keys continuously, so it gets
+//a short cross fade instead of a hard cut
+.command__item {
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command__item {
+    transition: none;
+  }
+}

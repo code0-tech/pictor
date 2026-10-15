@@ -1,7 +1,15 @@
 import React from "react";
 import "./Menu.style.scss"
 
-import {Color, ComponentProps, mergeComponentProps} from "../../utils";
+import {
+    Color,
+    ComponentProps,
+    mergeComponentProps,
+    popperTransformOrigin,
+    useObservedOpen,
+    usePopperMotion
+} from "../../utils";
+import {AnimatePresence, motion} from "motion/react";
 import {
     DropdownMenu,
     DropdownMenuArrow,
@@ -53,8 +61,17 @@ export type MenuSubContentProps = ComponentProps & DropdownMenuSubContentProps &
 export type MenuSeparatorProps = ComponentProps & DropdownMenuSeparatorProps
 export type MenuArrowProps = ComponentProps & DropdownMenuArrowProps
 
+//the content is force mounted and kept alive by AnimatePresence while it
+//animates out, so the open state has to be known one level above it
+const MenuOpenContext = React.createContext(false)
+const MenuSubOpenContext = React.createContext(false)
+
 export const Menu: React.FC<MenuProps> = (props) => {
-    return <DropdownMenu {...mergeComponentProps(`menu`, props) as MenuProps}/>
+    const [open, onOpenChange] = useObservedOpen(props.open, props.defaultOpen, props.onOpenChange)
+
+    return <MenuOpenContext.Provider value={open}>
+        <DropdownMenu {...mergeComponentProps(`menu`, props) as MenuProps} onOpenChange={onOpenChange}/>
+    </MenuOpenContext.Provider>
 }
 
 export const MenuTrigger: React.FC<MenuTriggerProps> = (props) => {
@@ -62,19 +79,32 @@ export const MenuTrigger: React.FC<MenuTriggerProps> = (props) => {
 }
 
 export const MenuPortal: React.FC<MenuPortalProps> = (props) => {
-    return <DropdownMenuPortal {...mergeComponentProps("menu__portal", props) as MenuPortalProps}/>
+    //force mounted so the portal outlives the menu's exit animation
+    return <DropdownMenuPortal forceMount {...mergeComponentProps("menu__portal", props) as MenuPortalProps}/>
 }
 
 export const MenuContent: React.FC<MenuContentProps> = (props) => {
     const {children, ...rest} = props
-    return <DropdownMenuContent
-        align={props.align} {...mergeComponentProps(`menu__content menu__content--${props.color ?? "primary"}`, rest) as MenuContentProps}>
-        <AutoScrollArea>
-            <div className={"menu__content-inner"}>
-                {children}
-            </div>
-        </AutoScrollArea>
-    </DropdownMenuContent>
+    const open = React.useContext(MenuOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = usePopperMotion()
+
+    return <AnimatePresence initial={!openOnMount.current}>
+        {open && <DropdownMenuContent
+            key={"menu__content"}
+            forceMount
+            asChild
+            align={props.align} {...mergeComponentProps(`menu__content menu__content--${props.color ?? "primary"}`, rest) as MenuContentProps}>
+            <motion.div {...motionProps} style={popperTransformOrigin("dropdown-menu")}>
+                <AutoScrollArea>
+                    <div className={"menu__content-inner"}>
+                        {children}
+                    </div>
+                </AutoScrollArea>
+            </motion.div>
+        </DropdownMenuContent>}
+    </AnimatePresence>
 }
 
 export const MenuLabel: React.FC<MenuLabelProps> = (props) => {
@@ -90,7 +120,11 @@ export const MenuGroup: React.FC<MenuGroupProps> = (props) => {
 }
 
 export const MenuSub: React.FC<MenuSubProps> = (props) => {
-    return <DropdownMenuSub {...mergeComponentProps("menu__sub", props) as MenuSubProps}/>
+    const [open, onOpenChange] = useObservedOpen(props.open, props.defaultOpen, props.onOpenChange)
+
+    return <MenuSubOpenContext.Provider value={open}>
+        <DropdownMenuSub {...mergeComponentProps("menu__sub", props) as MenuSubProps} onOpenChange={onOpenChange}/>
+    </MenuSubOpenContext.Provider>
 }
 
 export const MenuSubTrigger = React.forwardRef<HTMLDivElement, MenuSubTriggerProps>((props, ref) => {
@@ -99,13 +133,26 @@ export const MenuSubTrigger = React.forwardRef<HTMLDivElement, MenuSubTriggerPro
 
 export const MenuSubContent: React.FC<MenuSubContentProps> = (props) => {
     const {children, ...rest} = props
-    return <DropdownMenuSubContent {...mergeComponentProps(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, rest) as MenuSubContentProps}>
-        <AutoScrollArea>
-            <div className={"menu__content-inner"}>
-                {children}
-            </div>
-        </AutoScrollArea>
-    </DropdownMenuSubContent>
+    const open = React.useContext(MenuSubOpenContext)
+    //already open on mount means the user did not open it, so it does not animate in
+    const openOnMount = React.useRef(open)
+    const motionProps = usePopperMotion()
+
+    return <AnimatePresence initial={!openOnMount.current}>
+        {open && <DropdownMenuSubContent
+            key={"menu__sub-content"}
+            forceMount
+            asChild
+            {...mergeComponentProps(`menu__sub-content menu__sub-content--${props.color ?? "primary"}`, rest) as MenuSubContentProps}>
+            <motion.div {...motionProps} style={popperTransformOrigin("dropdown-menu")}>
+                <AutoScrollArea>
+                    <div className={"menu__content-inner"}>
+                        {children}
+                    </div>
+                </AutoScrollArea>
+            </motion.div>
+        </DropdownMenuSubContent>}
+    </AnimatePresence>
 }
 
 export const MenuSeparator: React.FC<MenuSeparatorProps> = (props) => {

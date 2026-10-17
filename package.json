@@ -64,7 +64,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@uiw/codemirror-themes": "^4.25.12",
     "@uiw/react-codemirror": "^4.25.10",
-    "@uiw/react-json-view": "^2.0.0-alpha.43",
+    "@uiw/react-json-view": "^2.0.0-alpha.44",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/browser-playwright": "^4.1.11",
     "@vitest/coverage-v8": "^4.1.11",

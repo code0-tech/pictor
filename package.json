@@ -80,7 +80,7 @@
     "jest-image-snapshot": "^6.5.2",
     "js-md5": "^0.8.3",
     "merge-props": "^6.0.0",
-    "motion": "^12.40.0",
+    "motion": "^12.43.0",
     "playwright": "1.58.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

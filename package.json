@@ -17,7 +17,7 @@
   },
   "author": "CodeZero",
   "devDependencies": {
-    "@ark-ui/react": "^5.38.1",
+    "@ark-ui/react": "^5.40.0",
     "@babel/plugin-proposal-decorators": "^7.29.7",
     "@babel/plugin-transform-class-properties": "^7.29.7",
     "@codemirror/autocomplete": "^6.20.3",

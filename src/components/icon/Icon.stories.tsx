@@ -21,6 +21,11 @@ export const Sources = () => {
         <Icon color={"#fff"} icon={"simple:github"}/>
         <Icon color={"#fff"} icon={"codezero:codezero"}/>
         <Icon color={"#fff"} icon={"codezero:gls"}/>
+        <Icon color={"#fff"} icon={"thesvg:safari/mono"}/>
+        <Icon color={"#fff"} icon={"thesvg:figma/mono"}/>
+        <Icon color={"#fff"} icon={"thesvg:notion/mono"}/>
+        <Icon color={"#fff"} icon={"thesvg:1password/mono"}/>
+        <Icon color={"#fff"} icon={"thesvg:aws-amazon-ecs-anywhere/mono"}/>
     </Flex>
 }
 

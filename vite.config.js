@@ -37,7 +37,14 @@ export default defineConfig({
             formats: ['es']
         },
         rollupOptions: {
-            external: [...Object.keys(pkg.peerDependencies), 'react/jsx-runtime'],
+            // Peer dependencies are supplied by the consumer. The id has to be matched
+            // with its subpaths too ("motion/react", "react/compiler-runtime"): a plain
+            // list only matches the bare specifier, so the subpaths end up bundled into
+            // dist/node_modules. That duplicates the library for every consumer and, for
+            // the CommonJS ones, emits a rolldown interop runtime that reads `require` as
+            // a value - which Turbopack rejects at module evaluation.
+            external: id => Object.keys(pkg.peerDependencies)
+                .some(peer => id === peer || id.startsWith(`${peer}/`)),
             input: Object.fromEntries(glob.sync('src/**/*.{ts,tsx}', {
                 ignore: ['src/**/*.stories.tsx', 'src/**/*.test.ts']
             }).map(file => [relative('src', file.slice(0, file.length - extname(file).length)), fileURLToPath(new URL(file, import.meta.url))])),

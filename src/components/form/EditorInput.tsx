@@ -58,6 +58,13 @@ export type EditorInputMenuItemProps = MenuItemProps & {
     data?: any
     onlyOnce?: boolean
     aliases?: string[]
+    /**
+     * Replaces the default selection for this item. When set, choosing the item
+     * (click, Enter) runs this instead of handing `value`/`data` to the input's
+     * `onSelect`, so an item can open a dialog or branch off without writing to
+     * the editor.
+     */
+    onActivate?: () => void
 }
 
 export interface EditorInputSubMenuProps {
@@ -81,6 +88,7 @@ interface RegisteredItem {
     el: React.RefObject<HTMLElement | null>
     parentId: string | null
     onActivate?: () => void
+    isSub?: boolean
 }
 
 interface EditorInputContextValue {
@@ -436,7 +444,7 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         const id = activeIdRef.current
         if (!id) return false
         const item = itemsRef.current.get(id)
-        if (!item?.onActivate) return false
+        if (!item?.isSub || !item.onActivate) return false
         item.onActivate()
         return true
     }, [])
@@ -676,7 +684,7 @@ export const EditorInputMenu: React.FC<EditorInputMenuProps> = (props) => {
 }
 
 export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) => {
-    const {value, data, children, onlyOnce, aliases, ...rest} = props
+    const {value, data, children, onlyOnce, aliases, onActivate, ...rest} = props
     const {
         editor, registerItem, activeId, setActiveId, select, search, documentText, cancelHoverSub
     } = useEditorInputContext()
@@ -686,6 +694,9 @@ export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) =
     const elRef = useRef<HTMLElement | null>(null)
     const dataRef = useRef({value, data})
     dataRef.current = {value, data}
+    const activateRef = useRef(onActivate)
+    activateRef.current = onActivate
+    const hasActivate = !!onActivate
 
     const alreadyPresent = !!onlyOnce && documentText.includes(String(value))
     const query = search?.trim().toLowerCase() ?? ""
@@ -702,8 +713,9 @@ export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) =
             getData: () => dataRef.current.data,
             el: elRef,
             parentId,
+            onActivate: hasActivate ? () => activateRef.current?.() : undefined,
         })
-    }, [id, registerItem, parentId, hidden])
+    }, [id, registerItem, parentId, hidden, hasActivate])
 
     if (hidden) return null
 
@@ -726,7 +738,9 @@ export const EditorInputMenuItem: React.FC<EditorInputMenuItemProps> = (props) =
             cancelHoverSub()
             if (activeId !== id) setActiveId(id)
         }}
-        onSelect={() => setTimeout(() => select(dataRef.current.value, dataRef.current.data), 0)}
+        onSelect={() => setTimeout(() => activateRef.current
+            ? activateRef.current()
+            : select(dataRef.current.value, dataRef.current.data), 0)}
     >
         {children}
     </MenuItem>
@@ -742,6 +756,7 @@ export const EditorInputSubMenu: React.FC<EditorInputSubMenuProps> = ({label, ch
     const elRef = useRef<HTMLElement | null>(null)
 
     useEffect(() => registerItem(id, {
+        isSub: true,
         getValue: () => undefined,
         getData: () => undefined,
         el: elRef,

@@ -175,7 +175,7 @@ export const TagInputMenu: React.FC<TagInputMenuProps> = (props) => <EditorInput
 
 export const TagInputSubMenu: React.FC<TagInputSubMenuProps> = (props) => <EditorInputSubMenu {...props}/>
 
-export const TagInputMenuItem: React.FC<TagInputMenuItemProps> = ({value, data, onlyOnce, aliases, children}) => {
+export const TagInputMenuItem: React.FC<TagInputMenuItemProps> = ({value, data, onlyOnce, aliases, children, ...rest}) => {
     const {registerTag} = useTagInput()
 
     const tag = useRef<TagInputMenuItemProps>({value, data, children})
@@ -185,6 +185,7 @@ export const TagInputMenuItem: React.FC<TagInputMenuItemProps> = ({value, data, 
     useEffect(() => registerTag(String(value), tag.current), [value, registerTag])
 
     return <EditorInputMenuItem
+        {...rest}
         value={encodeToken(value)}
         data={data}
         onlyOnce={onlyOnce}

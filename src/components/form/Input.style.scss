@@ -164,6 +164,10 @@
   width: 100%;
   overflow: hidden;
 
+  &:has(&__field:disabled) {
+    @include helpers.disabledState();
+  }
+
   & {
     @include box.box(variables.$tertiary, variables.$white, variables.$white);
     @include box.boxHover(variables.$primary, variables.$white, variables.$white);
@@ -248,6 +252,12 @@
   gap: variables.$xxs;
   position: relative;
 
+  // Disabled directly or through the group - both land as data-disabled on the
+  // button, and the whole row has to follow it.
+  &:has(.radio-input__button[data-disabled]) {
+    @include helpers.disabledState();
+  }
+
   &__button {
     top: -1px;
     width: variables.$lg;
@@ -293,6 +303,12 @@
 
   $padding: variables.$xxs;
   $size: 0.9rem;
+
+  // The row itself toggles the checkbox, so dimming the box alone would leave
+  // the input fully usable.
+  &:has(.checkbox-input__button[data-disabled]) {
+    @include helpers.disabledState();
+  }
 
   background: transparent !important;
   box-shadow: none !important;

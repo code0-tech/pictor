@@ -2,11 +2,25 @@
 @use "sass:color";
 @use "variables";
 
+// The look and feel of a disabled element, without a selector of its own, so it
+// can be hung on whatever marks the disabled state (see `disabled` below for the
+// usual markers, and the `:has()` rules that forward a control's state to its
+// wrapper).
+@mixin disabledState() {
+  cursor: not-allowed;
+  opacity: 25%;
+  // disabled has to actually block interaction, not just dim: nothing in the
+  // subtree may be clickable either (action slots, steppers, triggers, labels).
+  pointer-events: none;
+
+  * {
+    pointer-events: none;
+  }
+}
+
 @mixin disabled() {
   &:disabled, &[data-disabled], &[aria-disabled=true], &--disabled {
-    cursor: not-allowed;
-    opacity: 25%;
-    pointer-events: unset;
+    @include disabledState();
   }
 }
 

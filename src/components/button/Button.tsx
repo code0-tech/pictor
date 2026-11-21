@@ -24,11 +24,17 @@ export const Button: React.FC<ButtonProps> = React.forwardRef((props, ref) => {
         paddingSize = "xs",
         active = false,
         disabled = false,
+        type = "button",
         ...args
     } = props
 
     return <button
-        ref={ref} type={"button"} {...mergeComponentProps(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
+        ref={ref}
+        {...mergeComponentProps(`button button--${color} ${active ? "button--active" : ""} ${disabled ? "button--disabled" : ""} button--${variant} button--${paddingSize}`, args)}
+        //applied after the spread: a disabled button must never be given a submit
+        //type that still works
+        type={type as "button" | "reset" | "submit"}
+        disabled={disabled}
         aria-disabled={disabled ? "true" : "false"}>
         {children}
     </button>

@@ -29,6 +29,19 @@
     @include box.box(variables.$error, variables.$white, variables.$error);
   }
 
+  & {
+    @include helpers.disabled();
+  }
+
+  // A disabled control disables its whole wrapper: otherwise the field is dimmed
+  // while the left/right action slots (clear, reveal, steppers, the select/date/
+  // color triggers) stay clickable. Covers the native controls (:disabled) and
+  // the Radix/Ark ones, which mark themselves with data-disabled.
+  &:has(&__control:disabled),
+  &:has([data-disabled]) {
+    @include helpers.disabledState();
+  }
+
   & > :first-child {
     padding-left: $padding;
   }

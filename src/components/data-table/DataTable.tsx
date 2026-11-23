@@ -131,7 +131,7 @@ export const DataTable = <T, >(props: DataTableProps<T>) => {
         {headerNode}
         <tbody>
         {visibleData.map((item, i) => {
-            return <tr className={"data-table__row"} onClick={() => onSelect?.(item)}>
+            return <tr key={i} className={"data-table__row"} onClick={() => onSelect?.(item)}>
                 {renderRow?.(item, i)}
             </tr>
         })}

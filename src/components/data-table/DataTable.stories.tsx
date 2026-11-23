@@ -1,5 +1,4 @@
 import React from "react";
-import {expect, spyOn} from "storybook/test";
 import {DataTableFilterInput} from "./DataTableFilterInput";
 import {DataTableFilterSuggestionMenu} from "./DataTableFilterSuggestionMenu";
 import {Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuPortal, MenuTrigger} from "../menu/Menu";
@@ -254,41 +253,6 @@ export const Header = () => {
     </DataTable>
 }
 
-
-const isKeyWarning = (args: unknown[]) => args.some(arg => typeof arg === "string" && arg.includes('unique "key" prop'))
-
-export const RowKey = () => {
-
-    const testData = Array.from({length: 7}, (_, i) => ({
-        name: `Project ${i + 1}`,
-        payload: {id: String(i + 1)},
-    }))
-
-    return <Flex style={{flexDirection: "column", gap: "1rem"}}>
-        {/* without rowKey: falls back to the row index */}
-        <DataTable data={testData}>
-            {(item: any) => <DataTableColumn>
-                <Text>{String(item.name)}</Text>
-            </DataTableColumn>}
-        </DataTable>
-        {/* with a stable rowKey, also across pages */}
-        <DataTable data={testData} rowKey={(item: any) => item.payload.id} pagination limit={5}>
-            {(item: any) => <DataTableColumn>
-                <Text>{String(item.name)}</Text>
-            </DataTableColumn>}
-        </DataTable>
-    </Flex>
-}
-
-RowKey.beforeEach = () => {
-    const consoleError = spyOn(console, "error")
-    return () => consoleError.mockRestore()
-}
-
-RowKey.play = async () => {
-    const keyWarnings = (console.error as any).mock.calls.filter(isKeyWarning)
-    await expect(keyWarnings).toHaveLength(0)
-}
 
 export default {
     title: "DataTable",

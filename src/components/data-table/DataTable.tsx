@@ -31,6 +31,8 @@ export interface DataTableProps<T> extends Omit<Component<HTMLTableElement>, 'da
     loadingComponent?: React.ReactNode
     emptyComponent?: React.ReactNode
     onSelect?: (item: T | undefined) => void
+    //the stable identity of a row; without it rows are keyed by index, so cell state can
+    //shift to the wrong row when the data is sorted, filtered or paginated
     rowKey?: (item: T, index: number) => React.Key
     //the row renderer (function child) plus an optional <DataTableHeader/> and any pagination controls, e.g. <DataTablePagination/>, to render below the table
     children?: DataTableRowRenderer<T> | React.ReactNode | Array<DataTableRowRenderer<T> | React.ReactNode>

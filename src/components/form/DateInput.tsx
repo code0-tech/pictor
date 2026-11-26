@@ -46,10 +46,12 @@ export type DateInputContentProps = ComponentProps & MenuContentProps & {
 export type DateInputPrevTriggerProps = ComponentProps & DatePicker.PrevTriggerProps
 export type DateInputNextTriggerProps = ComponentProps & DatePicker.NextTriggerProps
 
-const fromUnixSeconds = (seconds: number): DateValue =>
-    fromDate(new Date(seconds * 1000), getLocalTimeZone())
-const toUnixSeconds = (value: DateValue): number =>
-    Math.floor(toZoned(value, getLocalTimeZone()).toDate().getTime() / 1000)
+const microsecondsPerMillisecond = 1000
+
+const fromUnixMicroseconds = (microseconds: number): DateValue =>
+    fromDate(new Date(microseconds / microsecondsPerMillisecond), getLocalTimeZone())
+const toUnixMicroseconds = (value: DateValue): number =>
+    toZoned(value, getLocalTimeZone()).toDate().getTime() * microsecondsPerMillisecond
 
 const toDateValues = (input: unknown): DateValue[] => {
     const list = Array.isArray(input) ? input : [input]
@@ -57,7 +59,7 @@ const toDateValues = (input: unknown): DateValue[] => {
     for (const item of list) {
         if (item == null || item === "") continue
         if (typeof item === "number") {
-            if (!Number.isNaN(item)) result.push(fromUnixSeconds(item))
+            if (!Number.isNaN(item)) result.push(fromUnixMicroseconds(item))
         } else {
             result.push(item as DateValue)
         }
@@ -81,7 +83,7 @@ export const DateInput: React.FC<DateProps> = (props) => {
 
     const handleValueChange = (details: ValueChangeDetails) => {
         setCurrent(details.value)
-        formValidation?.setValue?.(details.value[0] ? toUnixSeconds(details.value[0]) : null)
+        formValidation?.setValue?.(details.value[0] ? toUnixMicroseconds(details.value[0]) : null)
         onValueChange?.(details)
     }
 

@@ -36,9 +36,11 @@
   // A disabled control disables its whole wrapper: otherwise the field is dimmed
   // while the left/right action slots (clear, reveal, steppers, the select/date/
   // color triggers) stay clickable. Covers the native controls (:disabled) and
-  // the Radix/Ark ones, which mark themselves with data-disabled.
+  // the Radix/Ark ones, which mark themselves with data-disabled. Decorative
+  // parts are excluded: Ark stamps data-disabled on every literal date segment
+  // (the "." and ":" separators), which would dim every date input.
   &:has(&__control:disabled),
-  &:has([data-disabled]) {
+  &:has([data-disabled]:not([data-type="literal"])) {
     @include helpers.disabledState();
   }
 

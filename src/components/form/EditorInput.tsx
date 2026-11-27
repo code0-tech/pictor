@@ -27,7 +27,7 @@ export interface EditorTokenRule {
     void?: boolean
 }
 
-export interface EditorInputProps extends Omit<InputWrapperProps, "onChange" | "onSelect">, ValidationProps<any> {
+export interface EditorInputProps extends Omit<InputWrapperProps, "onChange" | "onSelect" | "onSubmit">, ValidationProps<any> {
     wrapperComponent?: Component<HTMLDivElement>
     tokenRules?: EditorTokenRule[]
     onSelect?: (value: any, data: any) => void
@@ -36,6 +36,7 @@ export interface EditorInputProps extends Omit<InputWrapperProps, "onChange" | "
     readonly?: boolean
     singleLine?: boolean
     onChange?: (value: string) => void
+    onSubmit?: (value: string) => void
     placeholder?: string
     children?: React.ReactNode
 }
@@ -120,6 +121,7 @@ interface EditorInputContextValue {
     highlightPrevious: () => void
     focusFirst: () => void
     selectActive: () => boolean
+    submit: () => void
     select: (value: any, data: any) => void
     openSubPath: string[]
     enterSub: (id: string) => void
@@ -197,7 +199,7 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         tokenRules = [],
         onSelect,
         search,
-        formValidation, onChange,
+        formValidation, onChange, onSubmit,
         disabled = false,
         readonly = false,
         singleLine = false,
@@ -382,6 +384,10 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         return true
     }, [select])
 
+    const submit = useCallback(() => {
+        onSubmit?.(slateToText(editor.children))
+    }, [onSubmit, editor])
+
     const hoverSubTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
     const cancelHoverSub = useCallback(() => {
@@ -463,13 +469,13 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
         open, setOpen, openMenu, menuOpenMode, setMenuOpenMode,
         editorContainerRef, triggerRef, updateTriggerPosition, scheduleClose, cancelClose,
-        registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
+        registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, submit, select,
         openSubPath, enterSub, exitSub, hoverSub, cancelHoverSub, openActiveSub,
     }), [
         editor, tokenRules, singleLine, disabled, readonly, placeholder, search, documentText,
         open, openMenu, menuOpenMode,
         updateTriggerPosition, scheduleClose, cancelClose,
-        registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, select,
+        registerItem, activeId, setActiveId, highlightNext, highlightPrevious, focusFirst, selectActive, submit, select,
         openSubPath, enterSub, exitSub, hoverSub, cancelHoverSub, openActiveSub,
     ])
 
@@ -497,7 +503,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
     const {
         editor, tokenRules, singleLine, disabled, readonly, placeholder,
         open, openMenu, setOpen, menuOpenMode, editorContainerRef, scheduleClose, cancelClose,
-        highlightNext, highlightPrevious, focusFirst, selectActive,
+        highlightNext, highlightPrevious, focusFirst, selectActive, submit,
         openSubPath, exitSub, openActiveSub,
     } = useEditorInputContext()
 
@@ -588,8 +594,8 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 exitSub()
                 return
             }
-            if (e.key === "Enter") {
-                if (selectActive()) e.preventDefault()
+            if (e.key === "Enter" && selectActive()) {
+                e.preventDefault()
                 return
             }
             if (e.key === "Escape") {
@@ -598,6 +604,12 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 else setOpen(false)
                 return
             }
+        }
+
+        if (e.key === "Enter") {
+            const modified = e.shiftKey || e.altKey || e.ctrlKey || e.metaKey
+            if (singleLine && !e.nativeEvent.isComposing && !modified) submit()
+            return
         }
 
         if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.shiftKey
@@ -614,7 +626,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 }
             }
         }
-    }, [singleLine, tokenRules, editor, open, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, setOpen, openSubPath, exitSub, openActiveSub])
+    }, [singleLine, tokenRules, editor, open, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, submit, setOpen, openSubPath, exitSub, openActiveSub])
 
     return (
         <div {...mergeComponentProps("editor-input", props)} ref={editorContainerRef}>

@@ -98,6 +98,7 @@ export const TagInput: React.FC<TagInputProps> = (props) => {
         initialValue,
         defaultValue,
         children,
+        onSubmit: _onSubmit,
         ...rest
     } = props
 

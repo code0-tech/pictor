@@ -80,7 +80,7 @@ import {
     FileInputTrigger
 } from "./FileInput";
 import {FileUploadFileChangeDetails} from "@ark-ui/react";
-import {expect, userEvent, within} from "storybook/test";
+import {expect, userEvent, waitFor, within} from "storybook/test";
 
 export default {
     title: "Form"
@@ -751,6 +751,110 @@ export const EditorSingleLine = () => {
             <EditorInputValue/>
         </EditorInput>
     </Card>
+}
+
+// ---- Single line with submit ----
+// Enter calls onSubmit with the current text, like submitting a native <input>.
+// Shift/Alt/Ctrl/Meta+Enter and Enter during IME composition do not submit.
+export const EditorSingleLineSubmit = {
+    render: () => {
+
+        const [value, setValue] = React.useState("")
+        const [submitted, setSubmitted] = React.useState<string[]>([])
+
+        return <Card color={"secondary"} w={"400px"}>
+            <EditorInput
+                value={value}
+                onChange={setValue}
+                onSubmit={(next) => setSubmitted(prev => [...prev, next])}
+                singleLine
+                title={"Name"}
+                description={"Press Enter to submit"}
+                placeholder={"Type, then Enter…"}
+            >
+                <EditorInputValue/>
+            </EditorInput>
+            <br/>
+            <Text size={"sm"}>Submitted: </Text>
+            <span data-testid={"submitted"}>{JSON.stringify(submitted)}</span>
+        </Card>
+    },
+    play: async ({canvasElement}: { canvasElement: HTMLElement }) => {
+        const canvas = within(canvasElement)
+        const readSubmitted = (): string[] => JSON.parse(canvas.getByTestId("submitted").textContent ?? "[]")
+        const editor = canvas.getByRole("textbox")
+
+        await userEvent.click(editor)
+        await userEvent.keyboard("hello")
+        await waitFor(() => expect(editor.textContent).toBe("hello"))
+
+        await userEvent.keyboard("{Shift>}{Enter}{/Shift}")
+        expect(readSubmitted()).toEqual([])
+
+        await userEvent.keyboard("{Enter}")
+        await waitFor(() => expect(readSubmitted()).toEqual(["hello"]))
+        // singleLine still blocks the line break.
+        expect(editor.textContent).toBe("hello")
+    }
+}
+
+// ---- Suggestions with submit ----
+// Enter that picks a menu entry only inserts it; Enter with the menu closed
+// (or without a highlighted entry) submits.
+export const EditorSuggestionsSubmit = {
+    render: () => {
+
+        const suggestions: TagSuggestion[] = [
+            {value: "user.name", children: "user.name"},
+            {value: "user.email", children: "user.email"},
+            {value: "order.id", children: "order.id"},
+        ]
+
+        const [value, setValue] = React.useState("")
+        const [submitted, setSubmitted] = React.useState<string[]>([])
+
+        return <Card color={"secondary"} w={"400px"}>
+            <EditorInput
+                value={value}
+                onChange={setValue}
+                onSelect={(selected) => setValue(prev => (prev ? prev + " " : "") + String(selected))}
+                onSubmit={(next) => setSubmitted(prev => [...prev, next])}
+                singleLine
+                title={"Variable"}
+                description={"Ctrl+Space to open, Enter inserts the entry, Enter again submits"}
+                placeholder={"Type, then Ctrl+Space…"}
+            >
+                <EditorInputMenu>
+                    {suggestions.map((suggestion, index) => (
+                        <EditorInputMenuItem key={index} value={suggestion.value}>
+                            {suggestion.children}
+                        </EditorInputMenuItem>
+                    ))}
+                </EditorInputMenu>
+                <EditorInputValue/>
+                <EditorInputTrigger/>
+            </EditorInput>
+            <br/>
+            <Text size={"sm"}>Submitted: </Text>
+            <span data-testid={"submitted"}>{JSON.stringify(submitted)}</span>
+        </Card>
+    },
+    play: async ({canvasElement}: { canvasElement: HTMLElement }) => {
+        const canvas = within(canvasElement)
+        const readSubmitted = (): string[] => JSON.parse(canvas.getByTestId("submitted").textContent ?? "[]")
+        const editor = canvas.getByRole("textbox")
+
+        await userEvent.click(editor)
+        await userEvent.keyboard("{Control>}[Space]{/Control}")
+        await userEvent.keyboard("{ArrowDown}")
+        await userEvent.keyboard("{Enter}")
+
+        await waitFor(() => expect(editor.textContent).toBe("user.name"))
+        expect(readSubmitted()).toEqual([])
+
+        await userEvent.keyboard("{Enter}")
+        await waitFor(() => expect(readSubmitted()).toEqual(["user.name"]))
+    }
 }
 
 // ---- Suggestions via Radix menu ----

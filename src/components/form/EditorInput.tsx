@@ -231,6 +231,10 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         setDocumentText(externalText)
         if (slateToText(editor.children) === externalText) return
         const next = textToSlate(externalText, tokenRules)
+        // Deselecting takes the DOM selection out of the editable, which blurs
+        // it - so a value written from the outside would silently cost the field
+        // its focus and with it a menu that is open for as long as it is focused.
+        const wasFocused = ReactEditor.isFocused(editor)
         Editor.withoutNormalizing(editor, () => {
             Transforms.deselect(editor)
             const previousCount = editor.children.length
@@ -242,6 +246,15 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
             Transforms.select(editor, Editor.end(editor, []))
         } catch {
         }
+        // Slate writes the selection to the DOM in the commit that follows this
+        // effect, so the blur is still ahead of us here and focusing now would be
+        // undone by it - the field is claimed back once that has happened.
+        if (wasFocused) requestAnimationFrame(() => {
+            try {
+                ReactEditor.focus(editor)
+            } catch {
+            }
+        })
     }, [externalText, editor, tokenRules])
 
     const [open, setOpen] = useState(false)
@@ -295,9 +308,16 @@ export const EditorInput: React.FC<EditorInputProps> = (props) => {
         if (open) updateTriggerPosition()
     }, [open, updateTriggerPosition])
 
+    // A value written from the outside makes the editable lose and regain focus
+    // on its own, so a blur is only worth closing the menu for once the field has
+    // actually given up focus.
     const scheduleClose = useCallback(() => {
         if (blurTimer.current) clearTimeout(blurTimer.current)
-        blurTimer.current = setTimeout(() => setOpen(false), 150)
+        blurTimer.current = setTimeout(() => {
+            const container = editorContainerRef.current
+            if (container && container.contains(document.activeElement)) return
+            setOpen(false)
+        }, 150)
     }, [])
 
     const cancelClose = useCallback(() => {
@@ -600,6 +620,12 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
             }
         }
 
+        // Escape, a cleared selection and a removed token all close the menu
+        // while focus never leaves the field, so onFocus will not reopen it -
+        // the next edit is what brings it back.
+        if (!open && menuOpenMode === "focus" && !e.ctrlKey && !e.metaKey && !e.altKey
+            && (e.key.length === 1 || e.key === "Backspace" || e.key === "Delete")) openMenu()
+
         if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !e.shiftKey
             && tokenRules.some(rule => rule.void)
             && editor.selection && Range.isCollapsed(editor.selection)) {
@@ -614,7 +640,7 @@ export const EditorInputValue: React.FC<EditorInputValueProps> = (props) => {
                 }
             }
         }
-    }, [singleLine, tokenRules, editor, open, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, setOpen, openSubPath, exitSub, openActiveSub])
+    }, [singleLine, tokenRules, editor, open, menuOpenMode, openMenu, focusFirst, highlightNext, highlightPrevious, selectActive, setOpen, openSubPath, exitSub, openActiveSub])
 
     return (
         <div {...mergeComponentProps("editor-input", props)} ref={editorContainerRef}>

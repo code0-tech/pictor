@@ -99,12 +99,8 @@ const createStyle = (styles: Component<any>): CSSProperties => ({
 export const mergeComponentProps = (cn: string, rest: object) => {
 
     const style = createStyle(rest)
-    const newProps: ComponentProps = {...rest};
-    const keys: (keyof ComponentProps)[] = ["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex", "align", "justify", "tf"]
-
-    keys.forEach(key => {
-        delete newProps[key]
-    })
+    const keys = new Set<string>(["m", "my", "mx", "mt", "mb", "ml", "mr", "p", "py", "px", "pt", "pb", "pl", "pr", "bg", "c", "opacity", "ff", "fz", "fw", "lts", "ta", "lh", "fs", "tt", "td", "w", "miw", "maw", "h", "mih", "mah", "bgsz", "bgp", "bgr", "bga", "pos", "top", "left", "bottom", "right", "inset", "display", "flex", "align", "justify", "tf"])
+    const newProps = Object.fromEntries(Object.entries(rest).filter(([key]) => !keys.has(key))) as ComponentProps
 
     return mergeProps(newProps, {
         className: cn,

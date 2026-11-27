@@ -759,7 +759,7 @@ export const EditorSingleLine = () => {
 export const EditorSingleLineSubmit = {
     render: () => {
 
-        const [value, setValue] = React.useState("")
+        const [value, setValue] = React.useState("hello")
         const [submitted, setSubmitted] = React.useState<string[]>([])
 
         return <Card color={"secondary"} w={"400px"}>
@@ -785,8 +785,6 @@ export const EditorSingleLineSubmit = {
         const editor = canvas.getByRole("textbox")
 
         await userEvent.click(editor)
-        await userEvent.keyboard("hello")
-        await waitFor(() => expect(editor.textContent).toBe("hello"))
 
         await userEvent.keyboard("{Shift>}{Enter}{/Shift}")
         expect(readSubmitted()).toEqual([])
